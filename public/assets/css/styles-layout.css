@@ -148,7 +148,7 @@
     width: calc(100vw - 20px) !important; /* 10px de respiro lateral */
     max-width: 460px !important;
     margin: 0 auto !important;
-    margin-top: 40px !important;            /* empurra o painel pra baixo do rasgo do pergaminho */ 
+    margin-top: 74px !important;            /* empurra o painel pra baixo do rasgo do pergaminho */ 
     padding: 32px 24px 52px 24px !important; /* ar interno confortável */
     border-radius: 26px !important;
     box-sizing: border-box !important;    
@@ -177,23 +177,23 @@
   /* Texto dos termos */
   #section-termos1 .termos-texto,
   #section-termos2 .termos-texto {
-    font-size: 15px !important;
-    line-height: 1.55 !important;
-    padding: 16px 14px !important;
+    font-size: 15.5px !important;
+    line-height: 1.6 !important;
+    padding: 24px 26px !important;
     border-radius: 16px !important;
   }
 
   /* Área do botão */
   #section-termos1 .termos-actions,
   #section-termos2 .termos-actions {
-    margin-top: 28px !important;
+    margin-top: 36px !important;
   }
 
   #section-termos1 .btn-continuar,
   #section-termos2 .btn-continuar {
-    min-height: 60px !important;
-    font-size: 18px !important;
-    padding: 0 30px !important;
+    min-height: 64px !important;
+    font-size: 18.5px !important;
+    padding: 0 36px !important;
     border-radius: 16px !important;
   }
 }
