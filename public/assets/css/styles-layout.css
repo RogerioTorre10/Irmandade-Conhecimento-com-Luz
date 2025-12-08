@@ -126,50 +126,71 @@
 }
 
 /* ---- TERMOS 1 e TERMOS 2: sobem um pouco mais ainda ---- */
+/* =========================================
+   TERMOS 1 e 2 — IGUALZINHO À INTRO (com névoa + luz pulsando)
+   ========================================= */
 @media (max-width: 600px) {
 
-  /* Remove qualquer padding exagerado que esteja empurrando pra baixo */
+  /* Libera os efeitos que ficam fora do painel */
   #section-termo1,
   #section-termo2 {
-    padding: 20px 0 140px !important;   /* mesmo valor da intro e da final */
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;   /* ← esse é o segredo da centralização vertical */
-    min-height: 80vh !important;
-    overflow: hidden !important;
+    padding: 20px 0 140px !important;
+    overflow: visible !important;        /* <─ essencial pra névoa e luz aparecerem */
+    position: relative !important;
   }
 
-  /* Painel sobe e fica exatamente na mesma posição da intro */
+  /* Painel de vidro largo e perfeito */
   #section-termo1 .j-panel-glow,
   #section-termo2 .j-panel-glow {
-    width: calc(100vw - 20px) !important;        /* 10px de margem lateral */
+    width: calc(100vw - 20px) !important;     /* 10px de margem cada lado → padrão da intro */
     max-width: 460px !important;
     margin: 0 auto !important;
-    padding: 36px 26px 52px 26px !important;
+    padding: 36px 26px 56px 26px !important;
     border-radius: 26px !important;
     box-sizing: border-box !important;
     position: relative !important;
-    transform: translateZ(0) !important;         /* fix do backdrop-filter */
-    -webkit-transform: translateZ(0) !important;
+    z-index: 2;
+
+    /* Fix do backdrop-filter sem matar os efeitos */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
     backface-visibility: hidden;
     overflow: hidden !important;
-
-    /* Remove qualquer translate antigo que estava jogando pra baixo/esquerda */
-    transform: translateZ(0) !important;
-    top: auto !important;
-    left: auto !important;
   }
 
-  /* Pergaminho interno */
+  /* Pergaminho interno confortável */
   #section-termo1 .j-perg-v-inner,
   #section-termo2 .j-perg-v-inner {
+    width: 100% !important;
     padding: 0 8px !important;
+    box-sizing: border-box !important;
   }
 
-  /* Botão com a mesma folga da intro */
+  /* Reativa névoa, luz pulsante e qualquer efeito decorativo */
+  #section-termo1 .fog-effect,
+  #section-termo1 .light-glow,
+  #section-termo1 [class*="glow"],
+  #section-termo1 [class*="fog"],
+  #section-termo2 .fog-effect,
+  #section-termo2 .light-glow,
+  #section-termo2 [class*="glow"],
+  #section-termo2 [class*="fog"] {
+    display: block !important;
+    pointer-events: none !important;
+    z-index: 1 !important;
+  }
+
+  /* Remove qualquer translate antigo que estava deslocando */
+  #section-termo1 .j-panel-glow,
+  #section-termo2 .j-panel-glow {
+    transform: translateZ(0) !important;
+  }
+
+  /* Botão com folga perfeita */
   #section-termo1 .btn,
   #section-termo2 .btn {
     min-height: 58px !important;
+    padding: 0 28px !important;
     font-size: 17px !important;
     margin-top: 32px !important;
     width: 100% !important;
@@ -177,17 +198,7 @@
     margin-left: auto !important;
     margin-right: auto !important;
   }
-
-
-  /* Garante que nada vaze (mesmo com sombras decorativas) */
-  #section-termo1 .j-panel-glow::before,
-  #section-termo1 .j-panel-glow::after,
-  #section-termo2 .j-panel-glow::before,
-  #section-termo2 .j-panel-glow::after {
-    display: none !important;
-  }
 }
-
 /* ---- SENHA: sobe e centraliza melhor ---- */
 @media (max-width: 600px) {
 
