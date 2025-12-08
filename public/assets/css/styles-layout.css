@@ -126,73 +126,76 @@
 }
 
 /* ---- TERMOS 1 e TERMOS 2: sobem um pouco mais ainda ---- */
-/* =========================================
-   TERMOS 1 e 2 — IGUALZINHO À INTRO (com névoa + luz pulsando)
-   ========================================= */
 @media (max-width: 600px) {
 
-  /* Libera os efeitos que ficam fora do painel */
-  #section-termo1,
-  #section-termo2 {
-    padding: 20px 0 140px !important;
-    overflow: visible !important;        /* <─ essencial pra névoa e luz aparecerem */
-    position: relative !important;
-  }
-
-  /* Painel de vidro largo e perfeito */
-  #section-termo1 .j-panel-glow,
-  #section-termo2 .j-panel-glow {
-    width: calc(100vw - 20px) !important;     /* 10px de margem cada lado → padrão da intro */
-    max-width: 460px !important;
-    margin: 0 auto !important;
-    padding: 36px 26px 56px 26px !important;
-    border-radius: 26px !important;
-    box-sizing: border-box !important;
-    position: relative !important;
-    z-index: 2;
-
-    /* Fix do backdrop-filter sem matar os efeitos */
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
-    backface-visibility: hidden;
+  /* Section pai: flex pra centralizar tudo verticalmente, igual intro */
+  #section-termos1,
+  #section-termos2 {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;  /* igual ao .parchment-inner-rough da intro */
+    align-items: center !important;
+    min-height: 80vh !important;             /* garante espaço pra centralizar */
+    padding: 12px 0 120px !important;        /* respiro igual à intro */
     overflow: hidden !important;
   }
 
-  /* Pergaminho interno confortável */
-  #section-termo1 .j-perg-v-inner,
-  #section-termo2 .j-perg-v-inner {
+  /* Painel de vidro: sobe exatamente como na intro */
+  #section-termos1 .j-panel-glow,
+  #section-termos2 .j-panel-glow,
+  #section-termos1 .termos-panel,
+  #section-termos2 .termos-panel {
+    width: calc(100vw - 20px) !important;
+    max-width: 460px !important;
+    margin: 0 auto !important;
+    margin-top: -40px !important;            /* ← ESSE É O SEGREDO: sobe 40px (ajuste pra -50px se quiser mais alto) */
+    padding: 32px 24px 48px !important;      /* padding interno igual à intro mobile */
+    border-radius: 26px !important;
+    box-sizing: border-box !important;
+    position: relative !important;
+    transform: translateZ(0) !important;
+    -webkit-transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    overflow: hidden !important;
+  }
+
+  /* Pergaminho/conteúdo interno: ocupa tudo, com pan sutil igual à intro */
+  #section-termos1 .j-perg-v-inner,
+  #section-termos2 .j-perg-v-inner,
+  #section-termos1 .conteudo-pergaminho,
+  #section-termos2 .conteudo-pergaminho,
+  #section-termos1 .termo-wrap,
+  #section-termos2 .termo-wrap {
     width: 100% !important;
+    max-width: 100% !important;
     padding: 0 8px !important;
     box-sizing: border-box !important;
+    animation: introPan 9s ease-in-out 1;    /* ← copia o pan da intro pra subir levemente */
   }
 
-  /* Reativa névoa, luz pulsante e qualquer efeito decorativo */
-  #section-termo1 .fog-effect,
-  #section-termo1 .light-glow,
-  #section-termo1 [class*="glow"],
-  #section-termo1 [class*="fog"],
-  #section-termo2 .fog-effect,
-  #section-termo2 .light-glow,
-  #section-termo2 [class*="glow"],
-  #section-termo2 [class*="fog"] {
-    display: block !important;
-    pointer-events: none !important;
-    z-index: 1 !important;
+  /* Título: igual à intro mobile */
+  #section-termos1 .termos-title,
+  #section-termos2 .termos-title {
+    font-size: 28px !important;
+    margin-top: 24px !important;
+    margin-bottom: 16px !important;
   }
 
-  /* Remove qualquer translate antigo que estava deslocando */
-  #section-termo1 .j-panel-glow,
-  #section-termo2 .j-panel-glow {
-    transform: translateZ(0) !important;
+  /* Texto: igual à parchment-text-rough da intro */
+  #section-termos1 .termos-texto,
+  #section-termos2 .termos-texto {
+    font-size: 12.5px !important;
+    line-height: 1.35 !important;
+    margin: 12px auto !important;
+    max-width: 100% !important;
   }
 
-  /* Botão com folga perfeita */
-  #section-termo1 .btn,
-  #section-termo2 .btn {
+  /* Botão: com folga igual à intro */
+  #section-termos1 .btn-continuar,
+  #section-termos2 .btn-continuar {
     min-height: 58px !important;
-    padding: 0 28px !important;
     font-size: 17px !important;
-    margin-top: 32px !important;
+    margin-top: 28px !important;
     width: 100% !important;
     max-width: 320px !important;
     margin-left: auto !important;
