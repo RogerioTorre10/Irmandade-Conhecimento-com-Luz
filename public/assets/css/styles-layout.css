@@ -149,8 +149,8 @@
     box-sizing: border-box !important;
 
     /* NADA de margin-top negativo, NADA de flex aqui */
-    transform: translate(-16px, -70px) !important;
-    -webkit-transform: translate(-16px, -70px) !important;
+    transform: translateY(-70px) translateZ(0) !important;
+    -webkit-transform: translateY(-70px) translateZ(0) !important;
     overflow: hidden !important;
   }
 
