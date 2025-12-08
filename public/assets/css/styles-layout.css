@@ -128,80 +128,74 @@
 /* ---- TERMOS 1 e TERMOS 2: sobem um pouco mais ainda ---- */
 @media (max-width: 600px) {
 
-  /* Section pai: flex pra centralizar tudo verticalmente, igual intro */
   #section-termos1,
   #section-termos2 {
+    padding: 16px 0 130px !important;        /* respiro em cima + espaço pro botão embaixo */
+    min-height: 90vh !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: flex-start !important;  /* igual ao .parchment-inner-rough da intro */
+    justify-content: flex-start !important;
     align-items: center !important;
-    min-height: 80vh !important;             /* garante espaço pra centralizar */
-    padding: 12px 0 120px !important;        /* respiro igual à intro */
-    overflow: hidden !important;
   }
 
-  /* Painel de vidro: sobe exatamente como na intro */
+  /* Painel de vidro — altura e posição perfeita */
   #section-termos1 .j-panel-glow,
   #section-termos2 .j-panel-glow,
   #section-termos1 .termos-panel,
   #section-termos2 .termos-panel {
-    width: calc(100vw - 20px) !important;
+    width: calc(100vw - 20px) !important;      /* 10px de margem lateral → encosta quase tudo */
     max-width: 460px !important;
     margin: 0 auto !important;
-    margin-top: -40px !important;            /* ← ESSE É O SEGREDO: sobe 40px (ajuste pra -50px se quiser mais alto) */
-    padding: 32px 24px 48px !important;      /* padding interno igual à intro mobile */
-    border-radius: 26px !important;
-    box-sizing: border-box !important;
-    position: relative !important;
+    margin-top: -56px !important;              /* sobe bastante (valor mágico que bate com a intro) */
+    padding: 40px 28px 56px 28px !important;   /* ar interno generoso */
+    border-radius: 28px !important;
     transform: translateZ(0) !important;
     -webkit-transform: translateZ(0) !important;
-    backface-visibility: hidden !important;
-    overflow: hidden !important;
+    overflow: visible !important;              /* libera névoa e glow */
   }
 
-  /* Pergaminho/conteúdo interno: ocupa tudo, com pan sutil igual à intro */
+  /* Conteúdo interno */
   #section-termos1 .j-perg-v-inner,
   #section-termos2 .j-perg-v-inner,
   #section-termos1 .conteudo-pergaminho,
-  #section-termos2 .conteudo-pergaminho,
-  #section-termos1 .termo-wrap,
-  #section-termos2 .termo-wrap {
-    width: 100% !important;
-    max-width: 100% !important;
-    padding: 0 8px !important;
-    box-sizing: border-box !important;
-    animation: introPan 9s ease-in-out 1;    /* ← copia o pan da intro pra subir levemente */
+  #section-termos2 .conteudo-pergaminho {
+    padding: 0 12px !important;                /* texto não gruda na borda */
   }
 
-  /* Título: igual à intro mobile */
+  /* Título grande e com espaço */
   #section-termos1 .termos-title,
   #section-termos2 .termos-title {
-    font-size: 28px !important;
-    margin-top: 24px !important;
-    margin-bottom: 16px !important;
+    font-size: 31px !important;
+    margin: 8px 0 20px 0 !important;
+    line-height: 1.1 !important;
   }
 
-  /* Texto: igual à parchment-text-rough da intro */
+  /* Texto dos termos — legível e arejado */
   #section-termos1 .termos-texto,
   #section-termos2 .termos-texto {
-    font-size: 12.5px !important;
-    line-height: 1.35 !important;
-    margin: 12px auto !important;
-    max-width: 100% !important;
+    font-size: 15px !important;
+    line-height: 1.55 !important;
+    padding: 20px 18px !important;
+    border-radius: 16px !important;
   }
 
-  /* Botão: com folga igual à intro */
+  /* Botão na posição exata */
+  #section-termos1 .termos-actions,
+  #section-termos2 .termos-actions {
+    margin-top: 32px !important;
+  }
+
   #section-termos1 .btn-continuar,
   #section-termos2 .btn-continuar {
-    min-height: 58px !important;
-    font-size: 17px !important;
-    margin-top: 28px !important;
-    width: 100% !important;
-    max-width: 320px !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
+    min-height: 62px !important;
+    font-size: 18px !important;
+    padding: 0 32px !important;
+    border-radius: 16px !important;
   }
+   
 }
+
+
 /* ---- SENHA: sobe e centraliza melhor ---- */
 @media (max-width: 600px) {
 
