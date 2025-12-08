@@ -766,6 +766,7 @@ body.final-lock {
    SECTION-FINAL MOBILE — PERFEITO 2025
    (sem barrinha + pergaminho largo e bonito)
    ========================================= */
+/* SECTION-FINAL MOBILE — VERSÃO PERFEITA E DEFINITIVA */
 @media (max-width: 600px) {
   html, body {
     width: 100%;
@@ -776,52 +777,44 @@ body.final-lock {
     overscroll-behavior-x: none;
   }
 
-  /* Container principal da página final */
   #section-final {
-    padding: 20px 0 120px !important;
+    padding: 20px 0 140px !important;   /* mais espaço embaixo pros botões */
     overflow: hidden !important;
-    position: relative;
   }
 
-  /* Painel de vidro com glow — agora ocupa quase tudo, mas sem vazar */
+  /* Painel de vidro: agora bem largo e com espaço de sobra */
   #section-final .j-panel-glow {
-    width: calc(100vw - 28px) !important;     /* 14px de respiro de cada lado → fica lindo e seguro */
+    width: calc(100vw - 20px) !important;     /* 10px de respiro de cada lado → fica gigante e lindo */
     max-width: 460px !important;
     margin: 0 auto !important;
-    padding: 28px 20px 36px !important;       /* um pouco mais de ar interno */
-    border-radius: 24px !important;
+    padding: 32px 24px 48px 24px !important;  /* muito mais ar embaixo e nas laterais */
+    border-radius: 26px !important;
     box-sizing: border-box !important;
     position: relative !important;
-    left: auto !important;
-    right: auto !important;
-    transform: none !important;
-
-    /* Truque final que mata 100% do vazamento do backdrop-filter no Android */
-    transform: translateZ(0);
+    transform: translateZ(0);                 /* mata o bug do backdrop-filter de vez */
     -webkit-transform: translateZ(0);
     backface-visibility: hidden;
     overflow: hidden !important;
   }
 
-  /* Pergaminho interno — ocupa todo o espaço disponível do painel */
+  /* Pergaminho interno: ocupa tudo com conforto */
   #section-final .j-perg-v-inner {
     width: 100% !important;
     max-width: 100% !important;
-    margin: 0 auto !important;
-    padding: 0 8px !important;                /* só um tiquinho de respiro pro texto não grudar na borda */
+    padding: 0 6px !important;        /* só um respiro mínimo pro texto não encostar na borda do pergaminho */
     box-sizing: border-box !important;
-    overflow-x: hidden !important;
   }
 
-  /* Garante que as sombras/glows decorativos não vazem mais */
-  #section-final .j-panel-glow::before,
-  #section-final .j-panel-glow::after {
-    display: none !important;
+  /* Botões nunca mais vão ser cortados */
+  #section-final .final-buttons {
+    margin-top: 20px !important;
+    gap: 16px !important;
+    padding: 0 10px !important;
   }
 
-  /* Força tudo dentro da section ficar contido */
-  #section-final > * {
-    max-width: 100% !important;
+  #section-final .btn-final {
+    min-height: 56px !important;
+    padding: 0 20px !important;
+    font-size: 17px !important;
   }
 }
-
