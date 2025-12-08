@@ -132,6 +132,51 @@
     /* estava -26, agora um pouco mais alto */
     transform: translate(-6px, -32px);
   }
+   
+  /* Espaço vertical parecido com a intro */
+  #section-termo1,
+  #section-termo2 {
+    padding: 40px 0 120px !important;
+    overflow: hidden !important;
+  }
+
+  /* Painel de vidro central e largo, igual intro */
+  #section-termo1 .j-panel-glow,
+  #section-termo2 .j-panel-glow {
+    width: calc(100vw - 20px) !important;   /* respiro lateral */
+    max-width: 460px !important;
+    margin: 0 auto !important;
+    padding: 32px 24px 48px 24px !important;
+    border-radius: 26px !important;
+    box-sizing: border-box !important;
+
+    position: relative !important;
+    isolation: isolate;
+
+    background: rgba(0,0,0,0.72) !important;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+
+    overflow: hidden !important;
+  }
+
+  /* Pergaminho interno ocupando bem o painel,
+     como na intro */
+  #section-termo1 .j-perg-v-inner,
+  #section-termo2 .j-perg-v-inner {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 6px !important;  /* texto não gruda na borda */
+    box-sizing: border-box !important;
+  }
+
+  /* Botão "Próxima página" com folga embaixo */
+  #section-termo1 .btn,
+  #section-termo2 .btn {
+    min-height: 52px !important;
+    font-size: 16px !important;
+    margin-top: 18px !important;
+  }
 }
 
 /* ---- SENHA: sobe e centraliza melhor ---- */
