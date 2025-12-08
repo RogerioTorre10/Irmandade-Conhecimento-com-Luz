@@ -127,63 +127,84 @@
 
 /* ---- TERMOS 1 e TERMOS 2: sobem um pouco mais ainda ---- */
 @media (max-width: 600px) {
-  #section-termos1 .j-panel-glow,
-  #section-termos2 .j-panel-glow {
-    /* estava -26, agora um pouco mais alto */
-    transform: translate(-6px, -32px);
+
+  html, body {
+    overflow-x: hidden;
+    overscroll-behavior-x: none;
   }
-     
-    /* Seções dos termos — ajuste de respiro vertical */
+
+  /* Seções dos termos */
   #section-termo1,
   #section-termo2 {
-    padding: 32px 0 110px !important;
+    padding: 20px 0 140px !important;   /* mesmo respiro da final e intro */
     overflow: hidden !important;
   }
 
-  /* Painel de vidro central e largo, igual intro */
+  /* Painel de vidro – exatamente igual à intro e final */
   #section-termo1 .j-panel-glow,
   #section-termo2 .j-panel-glow {
-    width: calc(100vw - 20px) !important;
+    width: calc(100vw - 20px) !important;      /* 10px de cada lado → padrão perfeito */
     max-width: 460px !important;
     margin: 0 auto !important;
-    padding: 28px 22px 44px 22px !important;
-
-    /* 🔽 aqui vem o segredo da métrica */
-    min-height: 460px !important;  /* ajuste fino da “altura padrão” */
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: space-between !important;
-
+    padding: 36px 26px 52px 26px !important;   /* mais ar interno que a intro (porque o texto é maior) */
     border-radius: 26px !important;
     box-sizing: border-box !important;
     position: relative !important;
-    isolation: isolate;
 
-    background: rgba(0,0,0,0.72) !important;
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-
+    /* Truque que mata o vazamento do backdrop-filter de uma vez */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
     overflow: hidden !important;
   }
 
-  /* Pergaminho interno ocupando bem o painel,
-     como na intro */
+  /* Remove aquele translate antigo que estava deslocando errado */
+  #section-termo1 .j-panel-glow,
+  #section-termo2 .j-panel-glow {
+    transform: translateZ(0) !important;
+    -webkit-transform: translateZ(0) !important;
+  }
+
+  /* Pergaminho interno – ocupa tudo com conforto */
   #section-termo1 .j-perg-v-inner,
   #section-termo2 .j-perg-v-inner {
     width: 100% !important;
     max-width: 100% !important;
-    padding: 0 8px !important;  /* texto não gruda na borda */
+    padding: 0 8px !important;
     box-sizing: border-box !important;
   }
 
-  /* Botão "Próxima página" com folga embaixo */
-  #section-termo1 .btn,
-  #section-termo2 .btn {
-    min-height: 52px !important;
-    font-size: 16px !important;
-    margin-top: 18px !important;
+  /* Títulos e texto com mais espaço (fica lindo) */
+  #section-termo1 .j-perg-title,
+  #section-termo2 .j-perg-title {
+    margin-bottom: 24px !important;
+    font-size: 28px !important;
+    line-height: 1.2 !important;
   }
- }
+
+  /* Botão nunca mais corta e fica com folga perfeita */
+  #section-termo1 .btn,
+  #section-termo2 .btn,
+  #section-termo1 .btn-final,
+  #section-termo2 .btn-final {
+    min-height: 58px !important;
+    padding: 0 28px !important;
+    font-size: 17px !important;
+    margin-top: 28px !important;
+    width: 100% !important;
+    max-width: 320px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  /* Garante que nada vaze (mesmo com sombras decorativas) */
+  #section-termo1 .j-panel-glow::before,
+  #section-termo1 .j-panel-glow::after,
+  #section-termo2 .j-panel-glow::before,
+  #section-termo2 .j-panel-glow::after {
+    display: none !important;
+  }
+}
 
 /* ---- SENHA: sobe e centraliza melhor ---- */
 @media (max-width: 600px) {
@@ -835,21 +856,32 @@ body.final-lock {
 
     /* Painel de vidro: largo, mas mantendo a névoa e o glow */
   #section-final .j-panel-glow {
-    width: calc(100vw - 20px) !important;   /* respiro lateral */
+    width: calc(100vw - 20px) !important;
     max-width: 460px !important;
     margin: 0 auto !important;
-    padding: 32px 24px 64px 24px !important; /* um pouco mais de ar embaixo */
+    padding: 36px 26px 52px 26px !important;
     border-radius: 26px !important;
     box-sizing: border-box !important;
-
     position: relative !important;
-    isolation: isolate;                     /* protege o “radar” interno */
+    
+    /* ESSAS 3 LINHAS SÃO O SEGREDO */
+    overflow: visible !important;          /* deixa os ::before e ::after vazarem */
+    isolation: isolate;                     /* cria novo stacking context */
+    transform: translateZ(0);               /* mantém o fix do backdrop-filter */
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+  }
 
-    /* NÃO criamos novo contexto 3D nem cortamos o glow */
-    transform: none !important;
-    -webkit-transform: none !important;
-    backface-visibility: visible !important;
-    overflow: visible !important;           /* deixa a névoa e a luz respirarem */
+  /* Corta só o que realmente vaza pro lado (a névoa e a luz ficam livres) */
+  #section-final {
+    overflow: hidden !important;            /* corta só o container pai */
+  }
+
+  /* Garante que a névoa e a luz pulsante voltem a aparecer */
+  #section-final .j-panel-glow::before,
+  #section-final .j-panel-glow::after {
+    display: block !important;             /* reativa os dois efeitos */
+    pointer-events: none !important;       /* não atrapalha clique */
   }
 
 
