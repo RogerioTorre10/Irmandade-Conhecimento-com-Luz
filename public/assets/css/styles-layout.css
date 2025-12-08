@@ -132,11 +132,11 @@
   /* Seção dos termos: ocupa a tela e centraliza o painel */
   #section-termos1,
   #section-termos2 {
-    padding: 32px 0 120px !important;     /* respiro em cima e embaixo */
+    padding: 60px 0 120px !important;     /* respiro em cima e embaixo */
     min-height: 100vh !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: center !important;   /* painel vem pro centro do pergaminho */
+    justify-content: flex-start !important;   /* painel vem pro centro do pergaminho */
     align-items: center !important;
   }
 
@@ -148,13 +148,10 @@
     width: calc(100vw - 20px) !important; /* 10px de respiro lateral */
     max-width: 460px !important;
     margin: 0 auto !important;
+    margin-top: 40px !important;            /* empurra o painel pra baixo do rasgo do pergaminho */ 
     padding: 32px 24px 52px 24px !important; /* ar interno confortável */
     border-radius: 26px !important;
-    box-sizing: border-box !important;
-
-    /* sem puxar pra cima à força */
-    margin-top: 0 !important;
-
+    box-sizing: border-box !important;    
     transform: translateZ(0) !important;
     -webkit-transform: translateZ(0) !important;
     overflow: hidden !important;          /* mantém o vidro limpo */
