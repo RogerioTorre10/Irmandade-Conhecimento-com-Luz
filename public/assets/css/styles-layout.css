@@ -214,20 +214,6 @@
   }   
 }
 
-/* ---- SENHA: sobe e centraliza melhor ---- */
-@media (max-width: 600px) {
-
-  /* pergaminho estava levemente deslocado; mantemos o X,
-     mas alinhamos um pouco mais no Y */
-  #section-senha .j-perg-v-inner {
-    transform: translate(-10px, -4px);
-  }
-
-  #section-senha .j-panel-glow {
-    /* sobe mais um pouquinho em relação ao -24 anterior */
-    transform: translate(-4px, -32px);
-  }
-}
 
 /* ---- GUIA: card com nome/inputs – segue padrão alto e central ---- */
 @media (max-width: 600px) {
@@ -289,6 +275,46 @@
   }
 }
 
+/* ---- SENHA: sobe e centraliza melhor ---- */
+@media (max-width: 600px) {
+
+  /* ====== SENHA — ALINHAMENTO LATERAL ====== */
+  #section-senha .j-panel-glow,
+  #section-senha .senha-panel {
+    width: calc(100vw - 20px) !important; /* mesmo da Intro */
+    max-width: 460px !important;
+    margin: 0 auto !important;
+  }   
+
+  /* pergaminho estava levemente deslocado; mantemos o X,
+     mas alinhamos um pouco mais no Y */
+  #section-senha .j-perg-v-inner {
+    transform: translate(-10px, -4px);
+  }
+
+  #section-senha .j-panel-glow {
+    /* sobe mais um pouquinho em relação ao -24 anterior */
+    transform: translate(-4px, -32px);
+  }
+
+  /* ====== SENHA — BORDAS FINAS (IGUAL INTRO / TERMOS) ====== */
+  #section-senha .j-panel-glow {
+    padding: 10px !important;
+  }
+
+  #section-senha .j-panel-glow::before {
+    inset: 4px !important;
+    border-radius: 22px !important;
+  }
+
+  #section-senha .senha-panel {
+    border: 1px solid rgba(255, 210, 140, 0.35) !important;
+    box-shadow:
+      0 0 14px rgba(255, 190, 120, 0.25),
+      inset 0 0 18px rgba(0, 0, 0, 0.45) !important;
+  }
+
+}   
 
 /* =========================================================
    AJUSTE SELFIE – ALINHAR COM INTRO / TERMOS / SENHA (DESKTOP)
