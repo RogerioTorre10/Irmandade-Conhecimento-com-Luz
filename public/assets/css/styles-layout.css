@@ -782,20 +782,25 @@ body.final-lock {
     overflow: hidden !important;
   }
 
-  /* Painel de vidro: agora bem largo e com espaço de sobra */
+    /* Painel de vidro: largo, mas mantendo a névoa e o glow */
   #section-final .j-panel-glow {
-    width: calc(100vw - 20px) !important;     /* 10px de respiro de cada lado → fica gigante e lindo */
+    width: calc(100vw - 20px) !important;   /* respiro lateral */
     max-width: 460px !important;
     margin: 0 auto !important;
-    padding: 32px 24px 48px 24px !important;  /* muito mais ar embaixo e nas laterais */
+    padding: 32px 24px 64px 24px !important; /* um pouco mais de ar embaixo */
     border-radius: 26px !important;
     box-sizing: border-box !important;
+
     position: relative !important;
-    transform: translateZ(0);                 /* mata o bug do backdrop-filter de vez */
-    -webkit-transform: translateZ(0);
-    backface-visibility: hidden;
-    overflow: hidden !important;
+    isolation: isolate;                     /* protege o “radar” interno */
+
+    /* NÃO criamos novo contexto 3D nem cortamos o glow */
+    transform: none !important;
+    -webkit-transform: none !important;
+    backface-visibility: visible !important;
+    overflow: visible !important;           /* deixa a névoa e a luz respirarem */
   }
+
 
   /* Pergaminho interno: ocupa tudo com conforto */
   #section-final .j-perg-v-inner {
