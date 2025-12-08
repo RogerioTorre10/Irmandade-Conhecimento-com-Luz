@@ -126,75 +126,80 @@
 }
 
 /* ---- TERMOS 1 e TERMOS 2: sobem um pouco mais ainda ---- */
+/* VALORES MÉTRICOS PERFEITOS — TERMOS 1 e 2 MOBILE (CORRIGIDO) */
 @media (max-width: 600px) {
 
+  /* Seção dos termos: ocupa a tela e centraliza o painel */
   #section-termos1,
   #section-termos2 {
-    padding: 16px 0 130px !important;        /* respiro em cima + espaço pro botão embaixo */
-    min-height: 90vh !important;
+    padding: 32px 0 120px !important;     /* respiro em cima e embaixo */
+    min-height: 100vh !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: flex-start !important;
+    justify-content: center !important;   /* painel vem pro centro do pergaminho */
     align-items: center !important;
   }
 
-  /* Painel de vidro — altura e posição perfeita */
+  /* Painel de vidro dentro do pergaminho */
   #section-termos1 .j-panel-glow,
   #section-termos2 .j-panel-glow,
   #section-termos1 .termos-panel,
   #section-termos2 .termos-panel {
-    width: calc(100vw - 20px) !important;      /* 10px de margem lateral → encosta quase tudo */
+    width: calc(100vw - 20px) !important; /* 10px de respiro lateral */
     max-width: 460px !important;
     margin: 0 auto !important;
-    margin-top: -56px !important;              /* sobe bastante (valor mágico que bate com a intro) */
-    padding: 40px 28px 56px 28px !important;   /* ar interno generoso */
-    border-radius: 28px !important;
+    padding: 32px 24px 52px 24px !important; /* ar interno confortável */
+    border-radius: 26px !important;
+    box-sizing: border-box !important;
+
+    /* sem puxar pra cima à força */
+    margin-top: 0 !important;
+
     transform: translateZ(0) !important;
     -webkit-transform: translateZ(0) !important;
-    overflow: visible !important;              /* libera névoa e glow */
+    overflow: hidden !important;          /* mantém o vidro limpo */
   }
 
-  /* Conteúdo interno */
+  /* Conteúdo interno do pergaminho dos termos */
   #section-termos1 .j-perg-v-inner,
   #section-termos2 .j-perg-v-inner,
   #section-termos1 .conteudo-pergaminho,
   #section-termos2 .conteudo-pergaminho {
-    padding: 0 12px !important;                /* texto não gruda na borda */
+    padding: 0 12px !important;           /* texto não gruda nas bordas */
+    box-sizing: border-box !important;
   }
 
-  /* Título grande e com espaço */
+  /* Título do termo */
   #section-termos1 .termos-title,
   #section-termos2 .termos-title {
-    font-size: 31px !important;
-    margin: 8px 0 20px 0 !important;
+    font-size: 28px !important;
+    margin: 4px 0 18px 0 !important;
     line-height: 1.1 !important;
   }
 
-  /* Texto dos termos — legível e arejado */
+  /* Texto dos termos */
   #section-termos1 .termos-texto,
   #section-termos2 .termos-texto {
     font-size: 15px !important;
     line-height: 1.55 !important;
-    padding: 20px 18px !important;
+    padding: 16px 14px !important;
     border-radius: 16px !important;
   }
 
-  /* Botão na posição exata */
+  /* Área do botão */
   #section-termos1 .termos-actions,
   #section-termos2 .termos-actions {
-    margin-top: 32px !important;
+    margin-top: 28px !important;
   }
 
   #section-termos1 .btn-continuar,
   #section-termos2 .btn-continuar {
-    min-height: 62px !important;
+    min-height: 60px !important;
     font-size: 18px !important;
-    padding: 0 32px !important;
+    padding: 0 30px !important;
     border-radius: 16px !important;
   }
-   
 }
-
 
 /* ---- SENHA: sobe e centraliza melhor ---- */
 @media (max-width: 600px) {
