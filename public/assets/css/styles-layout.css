@@ -329,16 +329,16 @@
 @media (min-width: 900px) {
    
    #section-selfie {
-    padding-top: 32px !important;
-    padding-bottom: 32px !important;
+    padding-top: 22px !important;
+    padding-bottom: 22px !important;
   }
 
   /* painel de vidro um pouco mais baixo */
   #section-selfie .j-panel-glow,
   #section-selfie .selfie-panel {
-    max-height: 82vh !important;   /* antes ocupava quase a tela toda */
-    padding-top: 20px !important;
-    padding-bottom: 24px !important;
+    max-height: 79vh !important;   /* antes ocupava quase a tela toda */
+    padding-top: 16px !important;
+    padding-bottom: 18px !important;
     margin-top: 0 !important;
     margin-bottom: 0 !important;
   }
