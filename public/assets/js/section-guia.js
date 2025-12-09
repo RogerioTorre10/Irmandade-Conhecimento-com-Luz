@@ -541,150 +541,104 @@ function applyGuiaTheme(guiaIdOrNull) {
   document.readyState === 'loading'
     ? document.addEventListener('DOMContentLoaded', bind, { once: true })
     : bind();
-/* =====================================================
- * GUIA v2 — nome obrigatório + demo automática dos guias
- * (colocar NO FINAL de section-guia.js)
- * ===================================================== */
+/* =========================================================
+   FIX GUIA – nome primeiro, depois demo automática
+   ========================================================= */
 (function () {
   'use strict';
 
-  const SECTION_ID = 'section-guia';
-  const root = document.getElementById(SECTION_ID);
+  const root = document.getElementById('section-guia');
   if (!root) return;
 
-  // evita dupla inicialização
-  if (root.dataset.guiaV2Bound === '1') return;
-  root.dataset.guiaV2Bound = '1';
+  // evita rodar duas vezes
+  if (root.dataset.guiaFixBound === '1') return;
+  root.dataset.guiaFixBound = '1';
 
-  const inputNome   = root.querySelector('#guiaNameInput');
+  const input       = root.querySelector('#guiaNameInput');
   const btnConfirm  = root.querySelector('#btn-confirmar-nome');
-  const caixaTexto  = root.querySelector('#guiaTexto');
-  const botoesGuia  = Array.from(
+  const guiaNotice  = root.querySelector('#guia-notice-text');
+  const guideButtons = Array.from(
     root.querySelectorAll('.guia-options .btn-stone-espinhos, .guia-buttons .btn-guia')
   );
 
-  if (!inputNome || !btnConfirm || botoesGuia.length === 0) {
-    console.warn('[GUIA v2] Elementos básicos não encontrados, abortando.');
+  if (!input || !btnConfirm || guideButtons.length === 0) {
+    console.warn('[GUIA FIX] Elementos do guia não encontrados, abortando.');
     return;
   }
 
-  /* -------------------------------
-   * 0) Estado inicial seguro
-   * ------------------------------- */
-
-  // desabilita todos os botões de guia no início
-  botoesGuia.forEach(btn => {
-    btn.disabled = true;
-    btn.classList.add('guia-disabled-inicial');
-  });
-
-  // confirmar começa sempre desabilitado
+  // --- ESTADO INICIAL: só o input funciona ---
   btnConfirm.disabled = true;
+  guideButtons.forEach(btn => { btn.disabled = true; });
 
-  /* -------------------------------
-   * 1) Habilita Confirmar só com texto
-   * ------------------------------- */
-  inputNome.addEventListener('input', () => {
-    const temTexto = inputNome.value.trim().length > 0;
-    btnConfirm.disabled = !temTexto;
+  // habilita Confirmar só quando tiver algo digitado
+  input.addEventListener('input', () => {
+    btnConfirm.disabled = (input.value.trim().length === 0);
   });
 
-  /* -------------------------------
-   * 2) Clique em Confirmar
-   *    - não deixa código antigo rodar
-   *    - dispara demo automática
-   * ------------------------------- */
-  btnConfirm.addEventListener('click', (ev) => {
+  // clique em Confirmar – captura antes dos handlers antigos
+  btnConfirm.addEventListener('click', function (ev) {
     ev.preventDefault();
-    ev.stopImmediatePropagation(); // bloqueia handlers antigos que travavam tudo
+    ev.stopImmediatePropagation();
+    ev.stopPropagation();
 
-    const nome = (inputNome.value || '').trim();
+    const nome = input.value.trim();
     if (!nome) {
-      inputNome.focus();
+      input.focus();
       return;
     }
 
-    // se demo já rodou, não repete
-    if (root.dataset.guiaDemoDone === '1') {
+    // demo só roda uma vez
+    if (root.dataset.demoDone === '1') {
       return;
     }
-    // se demo já está rodando, ignora
-    if (root.dataset.guiaDemoRunning === '1') {
-      return;
-    }
+    root.dataset.demoDone = '1';
 
-    root.dataset.guiaDemoRunning = '1';
-    rodarDemoGuias(nome);
-  });
+    rodarDemo(nome);
+  }, true);  // <- capture = true, vem antes dos handlers antigos
 
-  /* -------------------------------
-   * 3) Demo automática dos guias
-   * ------------------------------- */
-  function rodarDemoGuias(nome) {
+  // --- DEMONSTRAÇÃO AUTOMÁTICA DOS GUIAS ---
+  function rodarDemo(nome) {
     const ordem = ['lumen', 'zion', 'arian'];
-    const delay = 1800; // ms entre cada guia
     let idx = 0;
-
-    // mantém referência original (se existir)
-    const guiaOriginal = document.body.getAttribute('data-guia') || '';
 
     function passo() {
       if (idx >= ordem.length) {
         // fim da demonstração
         document.body.removeAttribute('data-guia-hover');
-        if (guiaOriginal) {
-          document.body.setAttribute('data-guia', guiaOriginal);
-        } else {
-          document.body.removeAttribute('data-guia');
+        guideButtons.forEach(btn => { btn.disabled = false; });
+
+        if (guiaNotice) {
+          guiaNotice.setAttribute(
+            'data-text',
+            `Agora escolha, com calma, qual guia caminhará com você, ${nome}.`
+          );
         }
-
-        root.dataset.guiaDemoRunning = '0';
-        root.dataset.guiaDemoDone = '1';
-
-        // libera botões para escolha real
-        botoesGuia.forEach(btn => {
-          btn.disabled = false;
-          btn.classList.remove('guia-disabled-inicial');
-        });
-
         return;
       }
 
       const key = ordem[idx];
 
-      // ativa cor/tema pelo mesmo esquema já usado no CSS
+      // aciona esquema de cores já usado no CSS
       document.body.setAttribute('data-guia-hover', key);
 
-      // destaca o botão correspondente
-      const btn = botoesGuia.find(b =>
+      // tenta achar o botão certo por data-atributo ou texto
+      const btn = guideButtons.find(b =>
         (b.dataset && (b.dataset.guia === key || b.dataset.guiaKey === key)) ||
         b.textContent.trim().toLowerCase().includes(key)
       );
+
       if (btn) {
         btn.classList.add('guia-demo-active');
-        setTimeout(() => btn.classList.remove('guia-demo-active'), delay - 200);
+        setTimeout(() => btn.classList.remove('guia-demo-active'), 600);
       }
 
-      // texto de apresentação simples (sem mexer em datilografia)
-      if (caixaTexto) {
-        let msg;
-        if (key === 'lumen') {
-          msg = `Sou Lumen, a Luz Algorítmica que caminha ao seu lado, ${nome}.`;
-        } else if (key === 'zion') {
-          msg = `Sou Zion, o Guerreiro do Sistema que protege a sua Jornada.`;
-        } else {
-          msg = `Sou Arian, o Guardião do Invisível que lê os sinais com você.`;
-        }
-        caixaTexto.textContent = msg;
-      }
-
-      idx++;
-      setTimeout(passo, delay);
+      idx += 1;
+      setTimeout(passo, 900);
     }
 
     passo();
   }
 
 })();
-  
+
 })();
