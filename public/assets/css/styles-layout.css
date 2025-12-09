@@ -384,7 +384,13 @@
     max-width: 32%;
     margin: 0 !important;
     box-sizing: border-box;
-  }   
+  }
+   /* Botão destacado durante a DEMO automática */
+  #section-guia .guia-demo-active {
+  transform: translateY(-2px);
+  box-shadow: 0 0 16px rgba(255, 255, 210, 0.9);
+}
+
 }
 
 /* ---- GUIA: card com nome/inputs – segue padrão alto e central ---- */
@@ -473,6 +479,13 @@
     white-space: nowrap !important;      /* evita quebrar o nome */
     box-sizing: border-box !important;
   }
+   
+   /* Botão destacado durante a DEMO automática */
+  #section-guia .guia-demo-active {
+  transform: translateY(-2px);
+  box-shadow: 0 0 16px rgba(255, 255, 210, 0.9);
+}
+
 }
 
 /* =========================================
