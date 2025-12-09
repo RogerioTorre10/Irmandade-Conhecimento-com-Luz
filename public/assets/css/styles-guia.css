@@ -374,3 +374,30 @@ body[data-guia-hover="arian"] {
     overflow: visible;
   }
 }
+/* =========================================================
+   GUIA – BOTÕES LADO A LADO NO MOBILE (3 COLUNAS)
+   ========================================================= */
+@media (max-width: 600px) {
+
+  /* faixa onde ficam Lumen / Zion / Arian */
+  #section-guia .guia-buttons {
+    width: min(92%, 380px) !important;   /* entra bonito dentro do vidro */
+    margin: 12px auto 0 !important;
+
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 2px !important;                 /* se quiser colado MESMO, pode pôr 0 */
+    justify-items: stretch !important;
+    align-items: stretch !important;
+  }
+
+  /* cada botão ocupa 1/3 da faixa, sem quebrar linha */
+  #section-guia .guia-buttons .btn-guia {
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 6px 2px !important;
+    font-size: 13px !important;
+    white-space: nowrap !important;      /* evita quebrar o nome */
+    box-sizing: border-box !important;
+  }
+}
