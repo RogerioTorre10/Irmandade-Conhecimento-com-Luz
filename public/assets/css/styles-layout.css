@@ -931,6 +931,8 @@ body.final-lock {
   #section-final .j-panel-glow::after {
     display: block !important;             /* reativa os dois efeitos */
     pointer-events: none !important;       /* não atrapalha clique */
+    max-width: 100vw !important;
+    box-sizing: border-box !important; 
   }
 
 
