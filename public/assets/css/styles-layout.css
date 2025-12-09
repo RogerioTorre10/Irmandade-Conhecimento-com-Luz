@@ -396,7 +396,7 @@
 
   /* Seção: centraliza o painel */
   #section-guia {
-    padding: 24px 0 130px !important;
+    padding: 24px 0 120px !important;
     min-height: 100vh !important;
     display: flex !important;
     justify-content: center !important;
@@ -410,15 +410,20 @@
     left: 0 !important;
     right: 0 !important;
     transform: none !important;
-
     width: calc(100vw - 48px) !important;  /* entra com folga no pergaminho */
     max-width: 460px !important;
     margin: 0 auto !important;
-
     padding: 10px !important;              /* borda fininha */
     border-radius: 22px !important;
     box-sizing: border-box !important;
     overflow: hidden !important;
+  }
+   /* conteúdo interno do painel */
+   #section-guia .guia-wrap {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 12px 10px 0 10px !important;
+    box-sizing: border-box !important;
   }
 
   /* Painel interno do conteúdo */
@@ -448,25 +453,31 @@
     box-sizing: border-box !important;
   }
   
-  /* Container dos botões de escolha do guia */
-  #section-guia .guia-buttons,
-  #section-guia .guia-actions,
-  #section-guia .guia-opcoes {
+  /* ===== BOTÕES LUMEN / ZION / ARIAN LADO A LADO ===== */
+
+  #section-guia .guia-buttons {
+    width: 100% !important;
+    margin: 12px auto 4px !important;
+
     display: flex !important;
+    flex-direction: row !important;
     flex-wrap: nowrap !important;
     justify-content: space-between !important;
-    gap: 4px !important;           /* se quiser coladinho mesmo, pode pôr 0 */
-    margin-top: 18px !important;
+    gap: 4px !important;               /* se quiser colado mesmo, pode pôr 0 */
+    box-sizing: border-box !important;
   }
 
-  /* Cada botão de guia — ocupa 1/3 da largura */
-  #section-guia .guia-buttons .btn-guia,
-  #section-guia .guia-actions .btn-guia,
-  #section-guia .guia-opcoes .btn-guia {
-    flex: 1 1 0 !important;
-    max-width: 33.33% !important;
+  #section-guia .guia-buttons .btn-guia {
+    flex: 1 1 0 !important;            /* divide igualmente em 3 */
+    min-width: 0 !important;
+    width: auto !important;
+    max-width: none !important;
+
+    font-size: 14px !important;
+    padding: 8px 4px !important;
     text-align: center !important;
     white-space: nowrap !important;
+    box-sizing: border-box !important;
   }
 }
 
