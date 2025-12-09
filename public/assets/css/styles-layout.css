@@ -333,7 +333,7 @@
     min-height: 86vh !important;   /* era ~100vh */
     height: auto !important;
     padding-top: 8px !important;   /* baixou mais um pouco */
-    padding-bottom: 8px !important;
+    padding-bottom: 6px !important;
   }
 
   /* Painel com glow (o vidro + fundo preto) */
@@ -348,6 +348,7 @@
   #section-selfie .selfie-inner,
   #section-selfie .selfie-wrapper,
   #section-selfie .selfie-content {
+    padding-bottom: 4px !important; 
     max-height: 68vh !important;
   }
 
@@ -357,7 +358,15 @@
   #section-selfie .selfie-preview video,
   #section-selfie .selfie-preview img,
   #section-selfie #selfiePreview {
-    max-height: 48vh !important;   /* é aqui que dá a “encurtada” forte */
+    margin-bottom: 4px !important;
+    max-height: 46vh !important; /* sobe a base sem esmagar */
+  }
+   /* Texto inferior (“Afaste um pouco o celular…”) */
+  #section-selfie .selfie-hint,
+  #section-selfie .selfie-footer,
+  #section-selfie small {
+    margin-top: 4px !important;
+    margin-bottom: 0 !important;
   }
 }
 
