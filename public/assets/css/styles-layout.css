@@ -218,14 +218,6 @@
   }   
 }
 
-
-/* ---- GUIA: card com nome/inputs – segue padrão alto e central ---- */
-@media (max-width: 600px) {
-  #section-guia .j-panel-glow {
-    transform: translate(-6px, -30px);
-  }
-}
-
 /* ---- SELFIE: geralmente o conteúdo é mais alto, mas
        mantemos alinhado com o mesmo eixo do pergaminho ---- */
 @media (max-width: 600px) {
@@ -313,13 +305,6 @@
     inset: 4px !important;    /* afina o aro interno */
     border-radius: 22px !important;
   }
-
-  #section-senha .termos-panel {
-    border: 1px solid rgba(255, 210, 140, 0.35) !important;
-    box-shadow:
-      0 0 14px rgba(255, 190, 120, 0.25),
-      inset 0 0 18px rgba(0, 0, 0, 0.45) !important;
-  }   
   
   #section-senha .senha-panel {
     width: 100% !important;
@@ -401,6 +386,90 @@
     box-sizing: border-box;
   }   
 }
+
+/* ---- GUIA: card com nome/inputs – segue padrão alto e central ---- */
+@media (max-width: 600px) {
+   
+  #section-guia .j-panel-glow {
+    transform: translate(-6px, -30px);
+  }
+
+  /* Seção: centraliza o painel */
+  #section-guia {
+    padding: 24px 0 130px !important;
+    min-height: 100vh !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    overflow: hidden !important;
+  }
+
+  /* Painel de vidro (mesmo padrão das outras páginas) */
+  #section-guia .j-panel-glow {
+    position: relative !important;
+    left: 0 !important;
+    right: 0 !important;
+    transform: none !important;
+
+    width: calc(100vw - 48px) !important;  /* entra com folga no pergaminho */
+    max-width: 460px !important;
+    margin: 0 auto !important;
+
+    padding: 10px !important;              /* borda fininha */
+    border-radius: 22px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  /* Painel interno do conteúdo */
+  #section-guia .guia-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    border: 1px solid rgba(255, 210, 140, 0.35) !important;
+    box-shadow:
+      0 0 14px rgba(255, 190, 120, 0.25),
+      inset 0 0 18px rgba(0, 0, 0, 0.45) !important;
+    border-radius: 18px !important;
+    box-sizing: border-box !important;
+  }
+   
+   #section-guia .j-panel-glow {
+    padding: 10px !important; /* igual Intro */
+  }
+  
+  #section-guia .j-panel-glow::before {
+    inset: 4px !important;    /* afina o aro interno */
+    border-radius: 22px !important;
+  }
+
+  /* Se tiver um wrapper interno tipo .guia-panel-inner */
+  #section-guia .guia-panel-inner {
+    padding: 24px 20px 40px 20px !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Container dos botões de escolha do guia */
+  #section-guia .guia-buttons,
+  #section-guia .guia-actions,
+  #section-guia .guia-opcoes {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    justify-content: space-between !important;
+    gap: 4px !important;           /* se quiser coladinho mesmo, pode pôr 0 */
+    margin-top: 18px !important;
+  }
+
+  /* Cada botão de guia — ocupa 1/3 da largura */
+  #section-guia .guia-buttons .btn-guia,
+  #section-guia .guia-actions .btn-guia,
+  #section-guia .guia-opcoes .btn-guia {
+    flex: 1 1 0 !important;
+    max-width: 33.33% !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+  }
+}
+
 /* =========================================
    PAGE CARD – REMOVER O PERGAMINHO GLOBAL
    ========================================= */
