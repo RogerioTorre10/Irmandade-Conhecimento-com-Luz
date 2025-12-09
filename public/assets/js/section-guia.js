@@ -666,5 +666,56 @@ function applyGuiaTheme(guiaIdOrNull) {
     playStep();
   });
 })();
+  /* ============================================
+   GUARDIÃO DO BOTÃO CONFIRMAR – ANTI-TRAVA
+   ============================================ */
+(function () {
+  'use strict';
+
+  const root = document.getElementById('section-guia');
+  if (!root) return;
+
+  // evita rodar duas vezes
+  if (root.dataset.confirmGuardBound === '1') return;
+  root.dataset.confirmGuardBound = '1';
+
+  const input      = root.querySelector('#guiaNameInput');
+  const btnConfirm = root.querySelector('#btn-confirmar-nome');
+
+  if (!input || !btnConfirm) {
+    console.warn('[GUIA GUARD] Input ou botão Confirmar não encontrados.');
+    return;
+  }
+
+  // 1) Começa com Confirmar desabilitado
+  btnConfirm.disabled = true;
+
+  // 2) Habilita Confirmar só se tiver pelo menos 1 caractere
+  input.addEventListener('input', () => {
+    const hasName = input.value.trim().length > 0;
+    btnConfirm.disabled = !hasName;
+  });
+
+  // 3) Clique em Confirmar:
+  //    - se NÃO tiver nome -> bloqueia totalmente (não deixa código velho rodar)
+  //    - se tiver nome -> deixa tudo seguir normal
+  btnConfirm.addEventListener('click', function (ev) {
+    const nome = (input.value || '').trim();
+
+    if (!nome) {
+      // bloqueia qualquer lógica antiga que travava a página
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+      ev.stopPropagation();
+
+      input.focus();
+      return;
+    }
+
+    // COM NOME: não fazemos mais nada aqui,
+    // deixamos o JS original cuidar da escolha do guia.
+  }, true); // <- capture = true, roda ANTES dos handlers antigos
+})();
+
 
 })();
