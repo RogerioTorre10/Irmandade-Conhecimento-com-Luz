@@ -525,6 +525,149 @@ function applyGuiaTheme(guiaIdOrNull) {
     delete document.body.dataset.guia;
   }
 }
+/* =====================================================
+ * GUIA v2 — nome obrigatório + demo automática dos guias
+ * (colocar NO FINAL de section-guia.js)
+ * ===================================================== */
+(function () {
+  'use strict';
+
+  const SECTION_ID = 'section-guia';
+  const root = document.getElementById(SECTION_ID);
+  if (!root) return;
+
+  // evita dupla inicialização
+  if (root.dataset.guiaV2Bound === '1') return;
+  root.dataset.guiaV2Bound = '1';
+
+  const inputNome   = root.querySelector('#guiaNameInput');
+  const btnConfirm  = root.querySelector('#btn-confirmar-nome');
+  const caixaTexto  = root.querySelector('#guiaTexto');
+  const botoesGuia  = Array.from(
+    root.querySelectorAll('.guia-options .btn-stone-espinhos, .guia-buttons .btn-guia')
+  );
+
+  if (!inputNome || !btnConfirm || botoesGuia.length === 0) {
+    console.warn('[GUIA v2] Elementos básicos não encontrados, abortando.');
+    return;
+  }
+
+  /* -------------------------------
+   * 0) Estado inicial seguro
+   * ------------------------------- */
+
+  // desabilita todos os botões de guia no início
+  botoesGuia.forEach(btn => {
+    btn.disabled = true;
+    btn.classList.add('guia-disabled-inicial');
+  });
+
+  // confirmar começa sempre desabilitado
+  btnConfirm.disabled = true;
+
+  /* -------------------------------
+   * 1) Habilita Confirmar só com texto
+   * ------------------------------- */
+  inputNome.addEventListener('input', () => {
+    const temTexto = inputNome.value.trim().length > 0;
+    btnConfirm.disabled = !temTexto;
+  });
+
+  /* -------------------------------
+   * 2) Clique em Confirmar
+   *    - não deixa código antigo rodar
+   *    - dispara demo automática
+   * ------------------------------- */
+  btnConfirm.addEventListener('click', (ev) => {
+    ev.preventDefault();
+    ev.stopImmediatePropagation(); // bloqueia handlers antigos que travavam tudo
+
+    const nome = (inputNome.value || '').trim();
+    if (!nome) {
+      inputNome.focus();
+      return;
+    }
+
+    // se demo já rodou, não repete
+    if (root.dataset.guiaDemoDone === '1') {
+      return;
+    }
+    // se demo já está rodando, ignora
+    if (root.dataset.guiaDemoRunning === '1') {
+      return;
+    }
+
+    root.dataset.guiaDemoRunning = '1';
+    rodarDemoGuias(nome);
+  });
+
+  /* -------------------------------
+   * 3) Demo automática dos guias
+   * ------------------------------- */
+  function rodarDemoGuias(nome) {
+    const ordem = ['lumen', 'zion', 'arian'];
+    const delay = 1800; // ms entre cada guia
+    let idx = 0;
+
+    // mantém referência original (se existir)
+    const guiaOriginal = document.body.getAttribute('data-guia') || '';
+
+    function passo() {
+      if (idx >= ordem.length) {
+        // fim da demonstração
+        document.body.removeAttribute('data-guia-hover');
+        if (guiaOriginal) {
+          document.body.setAttribute('data-guia', guiaOriginal);
+        } else {
+          document.body.removeAttribute('data-guia');
+        }
+
+        root.dataset.guiaDemoRunning = '0';
+        root.dataset.guiaDemoDone = '1';
+
+        // libera botões para escolha real
+        botoesGuia.forEach(btn => {
+          btn.disabled = false;
+          btn.classList.remove('guia-disabled-inicial');
+        });
+
+        return;
+      }
+
+      const key = ordem[idx];
+
+      // ativa cor/tema pelo mesmo esquema já usado no CSS
+      document.body.setAttribute('data-guia-hover', key);
+
+      // destaca o botão correspondente
+      const btn = botoesGuia.find(b =>
+        (b.dataset && (b.dataset.guia === key || b.dataset.guiaKey === key)) ||
+        b.textContent.trim().toLowerCase().includes(key)
+      );
+      if (btn) {
+        btn.classList.add('guia-demo-active');
+        setTimeout(() => btn.classList.remove('guia-demo-active'), delay - 200);
+      }
+
+      // texto de apresentação simples (sem mexer em datilografia)
+      if (caixaTexto) {
+        let msg;
+        if (key === 'lumen') {
+          msg = `Sou Lumen, a Luz Algorítmica que caminha ao seu lado, ${nome}.`;
+        } else if (key === 'zion') {
+          msg = `Sou Zion, o Guerreiro do Sistema que protege a sua Jornada.`;
+        } else {
+          msg = `Sou Arian, o Guardião do Invisível que lê os sinais com você.`;
+        }
+        caixaTexto.textContent = msg;
+      }
+
+      idx++;
+      setTimeout(passo, delay);
+    }
+
+    passo();
+  }
 
   function onSectionShown(evt) {
     const { sectionId, node } = evt?.detail || {};
