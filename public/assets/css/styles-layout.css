@@ -218,13 +218,7 @@
   }   
 }
 
-/* ---- SELFIE: geralmente o conteúdo é mais alto, mas
-       mantemos alinhado com o mesmo eixo do pergaminho ---- */
-@media (max-width: 600px) {
-  #section-selfie .j-panel-glow {
-    transform: translate(-6px, -30px);
-  }
-}
+
 
 /* ---- PERGUNTAS: card com perguntas – um pouco mais central ---- */
 @media (max-width: 600px) {
@@ -333,6 +327,21 @@
    AJUSTE SELFIE – ALINHAR COM INTRO / TERMOS / SENHA (DESKTOP)
    ========================================================= */
 @media (min-width: 900px) {
+   
+   #section-selfie {
+    padding-top: 32px !important;
+    padding-bottom: 32px !important;
+  }
+
+  /* painel de vidro um pouco mais baixo */
+  #section-selfie .j-panel-glow,
+  #section-selfie .selfie-panel {
+    max-height: 82vh !important;   /* antes ocupava quase a tela toda */
+    padding-top: 20px !important;
+    padding-bottom: 24px !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
 
   /* Pergaminho de fundo da página Selfie */
   #section-selfie .j-perg-v-inner {
@@ -357,7 +366,13 @@
     z-index: 6 !important;
   }
 }
-
+/* ---- SELFIE: geralmente o conteúdo é mais alto, mas
+       mantemos alinhado com o mesmo eixo do pergaminho ---- */
+@media (max-width: 600px) {
+  #section-selfie .j-panel-glow {
+    transform: translate(-6px, -30px);
+  }
+}
 /* =========================================
    GUIA – alinhar botões no vidro (desktop)
    ========================================= */
