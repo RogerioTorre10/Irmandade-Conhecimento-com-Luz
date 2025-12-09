@@ -284,10 +284,7 @@
 
  /* Seção senha: ocupa a tela com respiro */
   #section-senha {
-    display: flex !important;
-    justify-content: center !important;
-    align-items: flex-start !important;  
-    padding: 24px 0 120px !important;
+    padding: 8px 0 140px !important;
     min-height: 100vh !important;
     overflow: hidden !important;
   }
