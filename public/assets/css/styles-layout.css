@@ -459,7 +459,7 @@
 
     display: grid !important;
     grid-template-columns: repeat(3, 1fr) !important;
-    gap: 2px !important;                 /* se quiser colado MESMO, pode pôr 0 */
+    gap: 0px !important;                 /* se quiser colado MESMO, pode pôr 0 */
     justify-items: stretch !important;
     align-items: stretch !important;
   }
