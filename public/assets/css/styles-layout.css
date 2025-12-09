@@ -323,49 +323,44 @@
 }
 
 
-/* =========================================================
-   AJUSTE SELFIE – ALINHAR COM INTRO / TERMOS / SENHA (DESKTOP)
-   ========================================================= */
+/* =========================================
+   SELFIE – ENCURTAR CONTAINER (DESKTOP)
+   ========================================= */
 @media (min-width: 900px) {
-   
-   #section-selfie {
-    padding-top: 22px !important;
-    padding-bottom: 22px !important;
+
+  /* Seção toda: menos “altura de tela” e menos respiro */
+  #section-selfie {
+    min-height: 86vh !important;   /* era ~100vh */
+    height: auto !important;
+    padding-top: 8px !important;   /* baixou mais um pouco */
+    padding-bottom: 8px !important;
   }
 
-  /* painel de vidro um pouco mais baixo */
+  /* Painel com glow (o vidro + fundo preto) */
   #section-selfie .j-panel-glow,
   #section-selfie .selfie-panel {
-    max-height: 79vh !important;   /* antes ocupava quase a tela toda */
-    padding-top: 16px !important;
-    padding-bottom: 18px !important;
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
+    max-height: 78vh !important;   /* encurta o “containerzão” */
+    padding-top: 14px !important;
+    padding-bottom: 14px !important;
   }
 
-  /* Pergaminho de fundo da página Selfie */
-  #section-selfie .j-perg-v-inner {
-    position: relative !important;
-    transform: translate(-14px, -90px) !important; /* sobe o bloco dentro do pergaminho */
-    margin-top: 0 !important;
-    padding-top: 0 !important;
-    overflow: visible !important;
-    z-index: 5 !important;
+  /* Container da área preta da câmera / pré-visualização */
+  #section-selfie .selfie-inner,
+  #section-selfie .selfie-wrapper,
+  #section-selfie .selfie-content {
+    max-height: 68vh !important;
   }
 
-  /* Vidro (card) da Selfie */
-  #section-selfie .j-panel-glow {
-    position: relative !important;
-    transform: translate(-14px, -90px) !important; /* acompanha o pergaminho */
-    margin-top: 0 !important;
-    width: 90% !important;
-    max-width: 470px !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-
-    z-index: 6 !important;
+  /* Caixa de pré-visualização em si (o retângulo preto grande) */
+  #section-selfie .selfie-preview,
+  #section-selfie .selfie-preview-box,
+  #section-selfie .selfie-preview video,
+  #section-selfie .selfie-preview img,
+  #section-selfie #selfiePreview {
+    max-height: 48vh !important;   /* é aqui que dá a “encurtada” forte */
   }
 }
+
 /* ---- SELFIE: geralmente o conteúdo é mais alto, mas
        mantemos alinhado com o mesmo eixo do pergaminho ---- */
 @media (max-width: 600px) {
