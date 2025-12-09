@@ -525,6 +525,22 @@ function applyGuiaTheme(guiaIdOrNull) {
     delete document.body.dataset.guia;
   }
 }
+  
+  function onSectionShown(evt) {
+    const { sectionId, node } = evt?.detail || {};
+    if (sectionId !== SECTION_ID) return;
+    initOnce(node || document.getElementById(SECTION_ID));
+  }
+
+  function bind() {
+    document.addEventListener('section:shown', onSectionShown, { passive: true });
+    const now = document.getElementById(SECTION_ID);
+    if (now && !now.classList.contains(HIDE_CLASS)) initOnce(now);
+  }
+
+  document.readyState === 'loading'
+    ? document.addEventListener('DOMContentLoaded', bind, { once: true })
+    : bind();
 /* =====================================================
  * GUIA v2 — nome obrigatório + demo automática dos guias
  * (colocar NO FINAL de section-guia.js)
@@ -669,20 +685,5 @@ function applyGuiaTheme(guiaIdOrNull) {
     passo();
   }
 
-  function onSectionShown(evt) {
-    const { sectionId, node } = evt?.detail || {};
-    if (sectionId !== SECTION_ID) return;
-    initOnce(node || document.getElementById(SECTION_ID));
-  }
-
-  function bind() {
-    document.addEventListener('section:shown', onSectionShown, { passive: true });
-    const now = document.getElementById(SECTION_ID);
-    if (now && !now.classList.contains(HIDE_CLASS)) initOnce(now);
-  }
-
-  document.readyState === 'loading'
-    ? document.addEventListener('DOMContentLoaded', bind, { once: true })
-    : bind();
-
 })();
+
