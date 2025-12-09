@@ -359,7 +359,7 @@
   #section-selfie .selfie-preview img,
   #section-selfie #selfiePreview {
     margin-bottom: 4px !important;
-    max-height: 42vh !important; /* sobe a base sem esmagar */
+    max-height: 36vh !important; /* sobe a base sem esmagar */
   }
    /* Texto inferior (“Afaste um pouco o celular…”) */
   #section-selfie .selfie-hint,
