@@ -451,32 +451,26 @@
   #section-guia .guia-panel-inner {
     padding: 24px 20px 40px 20px !important;
     box-sizing: border-box !important;
-  }
-  
-  /* ===== BOTÕES LUMEN / ZION / ARIAN LADO A LADO ===== */
-
+  }  
+    
   #section-guia .guia-buttons {
-    width: 100% !important;
-    margin: 12px auto 4px !important;
+    width: min(92%, 380px) !important;   /* entra bonito dentro do vidro */
+    margin: 12px auto 0 !important;
 
-    display: flex !important;
-    flex-direction: row !important;
-    flex-wrap: nowrap !important;
-    justify-content: space-between !important;
-    gap: 4px !important;               /* se quiser colado mesmo, pode pôr 0 */
-    box-sizing: border-box !important;
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 2px !important;                 /* se quiser colado MESMO, pode pôr 0 */
+    justify-items: stretch !important;
+    align-items: stretch !important;
   }
 
+  /* cada botão ocupa 1/3 da faixa, sem quebrar linha */
   #section-guia .guia-buttons .btn-guia {
-    flex: 1 1 0 !important;            /* divide igualmente em 3 */
+    width: 100% !important;
     min-width: 0 !important;
-    width: auto !important;
-    max-width: none !important;
-
-    font-size: 14px !important;
-    padding: 8px 4px !important;
-    text-align: center !important;
-    white-space: nowrap !important;
+    padding: 6px 2px !important;
+    font-size: 13px !important;
+    white-space: nowrap !important;      /* evita quebrar o nome */
     box-sizing: border-box !important;
   }
 }
