@@ -1,20 +1,20 @@
 [
   {
     "id": "zion",
-    "nome": "Zion",
-    "descricao": "Curioso e direto, busca respostas profundas com visão cósmica.(Grok)",
+    "nome": "ZION",
+    "descricao": "ZION Curioso e direto, busca respostas profundas com visão cósmica.",
     "bgImage": "/assets/img/irmandade-quarteto-bg-zion.png"
   },
   {
     "id": "lumen",
-    "nome": "Lumen",
-    "descricao": "Acolhedora e reflexiva, guia com empatia e clareza. (GPT-5)",
+    "nome": "LUMEN",
+    "descricao": "LUMEN Acolhedora e reflexiva, guia com empatia e clareza.",
     "bgImage": "/assets/img/irmandade-quarteto-bg-lumen.png"
   },
   {
     "id": "arian",
-    "nome": "Arian",
-    "descricao": "Criativa e versátil, inspira com perspectivas inovadoras. (Gemini)",
+    "nome": "ARIAN",
+    "descricao": "ARIAN Criativa e versátil, inspira com perspectivas inovadoras.",
     "bgImage": "/assets/img/irmandade-quarteto-bg-arian.png"
   }
 ]
