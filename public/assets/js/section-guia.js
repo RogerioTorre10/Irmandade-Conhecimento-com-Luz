@@ -279,13 +279,7 @@ try {
       optionsBox.appendChild(btn);
     });
   }
-  
-  /* Botão destacado durante a DEMO automática */
-  #section-guia .guia-demo-active {
-  transform: translateY(-2px);
-  box-shadow: 0 0 16px rgba(255, 255, 210, 0.9);
- }
-
+    
   function findGuia(guias, id) {
     id = (id || '').toLowerCase();
     return guias.find(g => (g.id || '').toLowerCase() === id);
