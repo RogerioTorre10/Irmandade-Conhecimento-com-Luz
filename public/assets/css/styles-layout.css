@@ -291,7 +291,7 @@
 
   /* Painel de vidro (MESMA FAMÍLIA DO INTRO/TERMOS) */
   #section-senha .j-panel-glow {
-    width: calc(100vw - 48px) !important;  /* um pouco menor p/ não “explodir” */
+    width: calc(100vw - 72px) !important;  /* um pouco menor p/ não “explodir” */
     max-width: 460px !important;           /* mesmo corpo da intro */
     margin: 0 auto !important;
     padding: 10px !important;              /* borda fininha */
