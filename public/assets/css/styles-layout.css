@@ -141,7 +141,7 @@
   #section-termos2 .j-panel-glow,
   #section-termos1 .termos-panel,
   #section-termos2 .termos-panel {
-    width: calc(100vw - 24px) !important;  /* 10px de respiro de cada lado */
+    width: calc(100vw - 20px) !important;  /* 10px de respiro de cada lado */
     max-width: 460px !important;
     margin: 0 auto !important;            /* centraliza */
     padding: 32px 24px 52px 24px !important;
@@ -207,10 +207,14 @@
 
   #section-termos1 .termos-panel,
   #section-termos2 .termos-panel {
+    width: 100% !important;
+    max-width: 100% !important;
     border: 1px solid rgba(255, 210, 140, 0.35) !important;
     box-shadow:
       0 0 14px rgba(255, 190, 120, 0.25),
       inset 0 0 18px rgba(0, 0, 0, 0.45) !important;
+    border-radius: 18px !important;
+    box-sizing: border-box !important;
   }   
 }
 
@@ -287,7 +291,7 @@
 
   /* Painel de vidro (MESMA FAMÍLIA DO INTRO/TERMOS) */
   #section-senha .j-panel-glow {
-    width: calc(100vw - 24px) !important;  /* um pouco menor p/ não “explodir” */
+    width: calc(100vw - 20px) !important;  /* um pouco menor p/ não “explodir” */
     max-width: 460px !important;           /* mesmo corpo da intro */
     margin: 0 auto !important;
     padding: 10px !important;              /* borda fininha */
