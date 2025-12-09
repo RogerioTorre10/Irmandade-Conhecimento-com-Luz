@@ -453,7 +453,6 @@ try {
     });
 
     // ===== CLIQUE: ARMAR / DUPLUCLIQUE: CONFIRMAR =====
-   // ===== CLIQUE: ARMAR / DUPLUCLIQUE: CONFIRMAR =====
 guideButtons.forEach(btn => {
   const label = (btn.dataset.nome || btn.textContent || 'guia').toUpperCase();
   const guiaId = (btn.dataset.guia || '').toLowerCase();
@@ -541,8 +540,9 @@ function applyGuiaTheme(guiaIdOrNull) {
   document.readyState === 'loading'
     ? document.addEventListener('DOMContentLoaded', bind, { once: true })
     : bind();
+  
 /* =========================================================
-   FIX GUIA – nome primeiro, depois demo automática
+   GUIA – Nome primeiro + DEMO automática dos 3 guias
    ========================================================= */
 (function () {
   'use strict';
@@ -550,95 +550,121 @@ function applyGuiaTheme(guiaIdOrNull) {
   const root = document.getElementById('section-guia');
   if (!root) return;
 
-  // evita rodar duas vezes
-  if (root.dataset.guiaFixBound === '1') return;
-  root.dataset.guiaFixBound = '1';
+  // evita rodar 2x
+  if (root.dataset.guiaDemoBound === '1') return;
+  root.dataset.guiaDemoBound = '1';
 
-  const input       = root.querySelector('#guiaNameInput');
-  const btnConfirm  = root.querySelector('#btn-confirmar-nome');
-  const guiaNotice  = root.querySelector('#guia-notice-text');
+  const input      = root.querySelector('#guiaNameInput');
+  const btnConfirm = root.querySelector('#btn-confirmar-nome');
+  const guiaNotice = root.querySelector('#guia-notice-text');
+
   const guideButtons = Array.from(
-    root.querySelectorAll('.guia-options .btn-stone-espinhos, .guia-buttons .btn-guia')
+    root.querySelectorAll('.guia-options button, .guia-buttons button, .btn-guia')
   );
 
   if (!input || !btnConfirm || guideButtons.length === 0) {
-    console.warn('[GUIA FIX] Elementos do guia não encontrados, abortando.');
+    console.warn('[GUIA DEMO] elementos não encontrados');
     return;
   }
 
-  // --- ESTADO INICIAL: só o input funciona ---
-  btnConfirm.disabled = true;
-  guideButtons.forEach(btn => { btn.disabled = true; });
+  let demoDone = false;
 
-  // habilita Confirmar só quando tiver algo digitado
+  // 1) Começa com Confirmar desabilitado
+  btnConfirm.disabled = true;
+
+  // 2) Bots de guia começam travados até acabar a demo
+  function lockGuides() {
+    guideButtons.forEach(btn => {
+      btn.disabled = true;
+      btn.style.pointerEvents = 'none';
+      btn.classList.remove('guia-demo-active');
+    });
+    document.body.removeAttribute('data-guia-hover');
+  }
+
+  function unlockGuides() {
+    guideButtons.forEach(btn => {
+      btn.disabled = false;
+      btn.style.pointerEvents = 'auto';
+      btn.classList.remove('guia-demo-active');
+    });
+    document.body.removeAttribute('data-guia-hover');
+    demoDone = true;
+
+    if (guiaNotice) {
+      guiaNotice.setAttribute(
+        'data-text',
+        'Agora escolha, com calma, qual guia caminhará com você nesta jornada.'
+      );
+    }
+  }
+
+  lockGuides();
+
+  // 3) Habilita Confirmar quando tiver pelo menos 1 caractere
   input.addEventListener('input', () => {
-    btnConfirm.disabled = (input.value.trim().length === 0);
+    const hasName = input.value.trim().length > 0;
+    btnConfirm.disabled = !hasName;
   });
 
-  // clique em Confirmar – captura antes dos handlers antigos
-  btnConfirm.addEventListener('click', function (ev) {
-    ev.preventDefault();
-    ev.stopImmediatePropagation();
-    ev.stopPropagation();
-
+  // 4) Clique no Confirmar → roda a demo (se ainda não rodou)
+  btnConfirm.addEventListener('click', () => {
     const nome = input.value.trim();
     if (!nome) {
       input.focus();
       return;
     }
 
-    // demo só roda uma vez
-    if (root.dataset.demoDone === '1') {
+    // Se a demo já foi rodada, só garante que tudo continue liberado
+    if (demoDone) {
+      unlockGuides();
       return;
     }
-    root.dataset.demoDone = '1';
 
-    rodarDemo(nome);
-  }, true);  // <- capture = true, vem antes dos handlers antigos
+    // Mensagem carinhosa
+    if (guiaNotice) {
+      guiaNotice.setAttribute(
+        'data-text',
+        `Veja a apresentação dos guias, ${nome}, e depois escolha o que tocar seu coração.`
+      );
+    }
 
-  // --- DEMONSTRAÇÃO AUTOMÁTICA DOS GUIAS ---
-  function rodarDemo(nome) {
-    const ordem = ['lumen', 'zion', 'arian'];
-    let idx = 0;
+    lockGuides(); // garante que ninguém clique no meio da demo
 
-    function passo() {
-      if (idx >= ordem.length) {
-        // fim da demonstração
-        document.body.removeAttribute('data-guia-hover');
-        guideButtons.forEach(btn => { btn.disabled = false; });
+    const seq = [
+      { key: 'lumen', match: /lumen/i },
+      { key: 'zion',  match: /zion/i },
+      { key: 'arian', match: /arian/i }
+    ];
 
-        if (guiaNotice) {
-          guiaNotice.setAttribute(
-            'data-text',
-            `Agora escolha, com calma, qual guia caminhará com você, ${nome}.`
-          );
-        }
+    let step = 0;
+
+    const playStep = () => {
+      // limpa destaque anterior
+      guideButtons.forEach(btn => btn.classList.remove('guia-demo-active'));
+
+      if (step >= seq.length) {
+        unlockGuides();
         return;
       }
 
-      const key = ordem[idx];
+      const { key, match } = seq[step];
 
-      // aciona esquema de cores já usado no CSS
+      // acende a cor do guia (usa seus CSS body[data-guia-hover="..."])
       document.body.setAttribute('data-guia-hover', key);
 
-      // tenta achar o botão certo por data-atributo ou texto
-      const btn = guideButtons.find(b =>
-        (b.dataset && (b.dataset.guia === key || b.dataset.guiaKey === key)) ||
-        b.textContent.trim().toLowerCase().includes(key)
-      );
-
+      // destaca o botão correspondente
+      const btn = guideButtons.find(b => match.test(b.textContent || ''));
       if (btn) {
         btn.classList.add('guia-demo-active');
-        setTimeout(() => btn.classList.remove('guia-demo-active'), 600);
       }
 
-      idx += 1;
-      setTimeout(passo, 900);
-    }
+      step += 1;
+      setTimeout(playStep, 1300); // tempo de cada guia na demo
+    };
 
-    passo();
-  }
-
+    playStep();
+  });
 })();
 
 })();
