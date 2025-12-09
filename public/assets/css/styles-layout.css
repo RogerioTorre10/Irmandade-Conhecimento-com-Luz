@@ -297,8 +297,8 @@
     width: calc(100vw - 84px) !important;  /* um pouco menor p/ não “explodir” */
     max-width: 460px !important;           /* mesmo corpo da intro */
     margin: 0 auto !important;
-    padding: 10px !important;              /* borda fininha */
-    border-radius: 22px !important;
+    padding: 32px 24px 52px 24px !important;             /* borda fininha */
+    border-radius: 26px !important;
     box-sizing: border-box !important;
      transform: none !important;
     -webkit-transform: translateY(0) translateZ(0) !important;
@@ -319,7 +319,7 @@
 
   /* Opcional: título e conteúdo respirando igual intro */
   #section-senha .senha-panel-inner {
-    padding: 24px 20px 40px 20px !important;
+    padding: 0 10px !important;
     box-sizing: border-box !important;
   }
   #section-senha .pergaminho,
