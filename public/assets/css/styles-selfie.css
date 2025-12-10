@@ -243,35 +243,5 @@ input[type=range]::-webkit-slider-thumb {
   max-width: 520px;
   display: none;
 }
-/* =========================================================
-   AJUSTE FINO – LAYOUT DA PÁGINA SELFIE (DESKTOP)
-   ========================================================= */
-@media (min-width: 900px) {
 
-  /* Pergaminho de fundo da Selfie */
-  #section-selfie .j-perg-v-inner {
-    position: relative !important;
-    transform: translateY(0) !important;  /* zera qualquer tombo pra baixo */
-    top: 0 !important;
-    margin-top: 0 !important;
-    padding-top: 0 !important;
-    overflow: visible !important;
-    z-index: 5 !important;
-  }
-
-  /* Card (vidro) da Selfie */
-  #section-selfie .j-panel-glow {
-    position: relative !important;
-    transform: translateY(0) !important;  /* zera o deslocamento também */
-    top: 0 !important;
-    margin-top: 0 !important;
-
-    width: 90% !important;
-    max-width: 470px !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-
-    z-index: 6 !important;
-  }
-}
 
