@@ -46,23 +46,6 @@
   background-repeat: no-repeat;
   background-position: top center;
 }
-/* ============================================
-   ALTURA PADRÃO DO CARD NO DESKTOP
-   (Intro, Termos, Senha, Guia e Selfie)
-   ============================================ */
-@media (min-width: 1024px) {
-  #section-intro  .j-arcane-card,
-  #section-termos-1 .j-arcane-card,
-  #section-termos-2 .j-arcane-card,
-  #section-senha .j-arcane-card,
-  #section-guia  .j-arcane-card,
-  #section-selfie .j-arcane-card {
-    max-height: 72vh;      /* mesma “altura de vidro interno” das outras */
-    margin-top: 26px;      /* mantém o topo bonito */
-    margin-bottom: 32px;   /* sobe a base, abre respiro no rodapé */
-  }
-}
-
 
 /* =========================================================
    2) DESKTOP (>= 900px)
@@ -92,6 +75,17 @@
   #section-perguntas .j-panel-glow,
   #section-final  .j-panel-glow {
     transform: translateY(-10px);
+  }
+   
+  #section-intro  .j-arcane-card,
+  #section-termos-1 .j-arcane-card,
+  #section-termos-2 .j-arcane-card,
+  #section-senha .j-arcane-card,
+  #section-guia  .j-arcane-card,
+  #section-selfie .j-arcane-card {
+    max-height: 72vh;      /* mesma “altura de vidro interno” das outras */
+    margin-top: 26px;      /* mantém o topo bonito */
+    margin-bottom: 32px;   /* sobe a base, abre respiro no rodapé */
   }
 }
 
