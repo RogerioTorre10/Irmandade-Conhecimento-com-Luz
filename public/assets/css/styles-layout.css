@@ -127,9 +127,138 @@
    4) AJUSTES FINOS – MOBILE
    (valores calibrados pelos teus prints)
    ========================================================= */
+/* ---- TERMOS 1 sobem um pouco mais ainda ---- */
+@media (min-width: 900px) {
 
-/* ---- INTRO: subir um pouco mais ---- */
+  /* Pergaminho de fundo da senha */
+  #section-intro .j-perg-v-inner {
+    position: relative !important;
+    transform: translateY(40px) !important; /* antes 80px */
+    top: 40px !important;                   /* antes 80px */
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    overflow: visible !important;
+    z-index: 5 !important;
+  }
+
+  /* Card (vidro) da senha */
+  #section-intro .j-panel-glow {
+    position: relative !important;
+    transform: translate(-16px, -70px) !important; /* antes 40px */
+    top: 10px !important;                   /* antes 40px */
+    margin-top: 0 !important;
+    width: 90% !important;
+    max-width: 470px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    z-index: 6 !important;  
+}
+   
+  #section-intro .j-panel-glow {
+    padding: 10px !important; /* igual Intro */
+  }
+  
+   #section-intro .j-panel-glow::before {
+    inset: 4px !important;    /* afina o aro interno */
+    border-radius: 22px !important;
+  }
+  
+   #section-intro .senha-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    border: 1px solid rgba(255, 210, 140, 0.35) !important;
+    box-shadow:
+      0 0 14px rgba(255, 190, 120, 0.25),
+      inset 0 0 18px rgba(0, 0, 0, 0.45) !important;
+    border-radius: 18px !important;
+    box-sizing: border-box !important;
+  }
+    /* Guia (mesmo problema) */
+  #section-intro .j-arcane-card {
+    margin-top: -18px !important;
+    margin-bottom: 24px !important;
+  }   
+}
+
 @media (max-width: 600px) {
+
+  /* Seção inteira da intro */
+  #section-intro {
+    padding: 8px 0 140px !important;  /* distância do topo + espaço pro botão */
+    overflow: hidden !important;
+    min-height: 100vh !important;
+  }
+
+  /* Painel de vidro dentro do pergaminho */
+  #section-intro .j-panel-glow, 
+  #section-intro .termos-panel {
+    width: calc(100vw - 10px) !important;  /* 10px de respiro de cada lado */
+    max-width: 460px !important;
+    margin: 0 auto !important;            /* centraliza */
+    padding: 32px 24px 52px 24px !important;
+    border-radius: 26px !important;
+    box-sizing: border-box !important;
+
+    /* NADA de margin-top negativo, NADA de flex aqui */
+    transform: translateY(-80px) translateZ(0) !important;
+    -webkit-transform: translateY(-80px) translateZ(0) !important;
+    overflow: hidden !important;
+  }
+
+  /* Conteúdo interno do pergaminho da intro */
+  #section-intro .j-perg-v-inner,
+  #section-intro .conteudo-pergaminho {
+    padding: 0 10px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Título da intro */
+  #section-intro .termos-title {
+    font-size: 28px !important;
+    margin: 4px 0 18px 0 !important;
+    line-height: 1.1 !important;
+  }
+
+  /* Texto da intro */
+  #section-intro .termos-texto {
+    font-size: 15.5px !important;
+    line-height: 1.6 !important;
+    padding: 24px 26px !important;
+    border-radius: 16px !important;
+  }
+
+  /* Área do botão */
+  #section-intro .termos-actions {
+    margin-top: 36px !important;
+  }
+
+  #section-intro .btn-continuar {
+    min-height: 64px !important;
+    font-size: 18.5px !important;
+    padding: 0 36px !important;
+    border-radius: 16px !important;
+  }
+/* INTRO — afinar bordas igual à INTRO */
+  #section-intro .j-panel-glow {
+    padding: 10px !important; /* igual Intro */
+  }
+
+  #section-intro .j-panel-glow::before {
+    inset: 4px !important;    /* afina o aro interno */
+    border-radius: 22px !important;
+  }
+
+  #section-intro .termos-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    border: 1px solid rgba(255, 210, 140, 0.35) !important;
+    box-shadow:
+      0 0 14px rgba(255, 190, 120, 0.25),
+      inset 0 0 18px rgba(0, 0, 0, 0.45) !important;
+    border-radius: 18px !important;
+    box-sizing: border-box !important;
+  }   
+
   #section-intro .j-panel-glow {
     /* estava -16, subimos mais um pouco */
     transform: translate(-6px, -26px);
@@ -584,20 +713,74 @@
   }  
 }
 
-/* ---- SELFIE: geralmente o conteúdo é mais alto, mas
-       mantemos alinhado com o mesmo eixo do pergaminho ---- */
+/* ---- SELFIE ---- */
+
 @media (max-width: 600px) {
+   /* Seção senha: ocupa a tela com respiro */
+  #section-selfie {
+    padding: 8px 0 140px !important;
+    min-height: 100vh !important;
+    overflow: hidden !important;
+  }
+
+  /* Painel de vidro (MESMA FAMÍLIA DO INTRO/TERMOS) */
+  #section-selfie .j-panel-glow {
+    position: relative !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: calc(100vw - 84px) !important;  /* um pouco menor p/ não “explodir” */
+    max-width: 460px !important;           /* mesmo corpo da intro */
+    margin: 0 auto !important;
+    padding: 32px 24px 52px 24px !important;             /* borda fininha */
+    border-radius: 26px !important;
+    box-sizing: border-box !important;
+     transform: none !important;
+    -webkit-transform: translateY(0) translateZ(0) !important;
+    overflow: hidden !important;
+  } 
+  
+  #section-selfie .j-panel-glow {
+    padding: 10px !important; /* igual Intro */
+  }
+  
+  #section-selfie .j-panel-glow::before {
+    inset: 4px !important;    /* afina o aro interno */
+    border-radius: 22px !important;
+  }
+  
+  #section-selfie .senha-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    border: 1px solid rgba(255, 210, 140, 0.35) !important;
+    box-shadow:
+      0 0 14px rgba(255, 190, 120, 0.25),
+      inset 0 0 18px rgba(0, 0, 0, 0.45) !important;
+    border-radius: 18px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Opcional: título e conteúdo respirando igual intro */
+  #section-selfie .senha-panel-inner {
+    padding: 0 10px !important;
+    box-sizing: border-box !important;
+  }
+  #section-selfie .pergaminho,
+  #section-selfie .pergaminho-v {
+  overflow-x: hidden !important;
+}   
+
   #section-selfie .j-panel-glow {
     transform: translate(-6px, -30px);
-  }
+  }   
 }
+
 /* =========================================
    GUIA – alinhar botões no vidro (desktop)
    ========================================= */
 @media (min-width: 900px) {
    
      /* Pergaminho de fundo da senha */
-  #section-senha .j-perg-v-inner {
+  #section-guia .j-perg-v-inner {
     position: relative !important;
     transform: translateY(40px) !important; /* antes 80px */
     top: 40px !important;                   /* antes 80px */
@@ -608,7 +791,7 @@
   }
 
   /* Card (vidro) da senha */
-  #section-senha .j-panel-glow {
+  #section-guia .j-panel-glow {
     position: relative !important;
     transform: translate(-16px, -70px) !important; /* antes 40px */
     top: 10px !important;                   /* antes 40px */
@@ -766,7 +949,6 @@
   transform: translateY(-2px);
   box-shadow: 0 0 16px rgba(255, 255, 210, 0.9);
 }
-
 }
 
 /* =========================================
@@ -928,7 +1110,62 @@
     margin-top: -20px;
   }
 }
+/* =========================================================
+   AJUSTE FINO – LAYOUT DA PÁGINA PERGUNTAS (DESKTOP)
+   (um pouco mais alta dentro do pergaminho)
+   ========================================================= */
 
+@media (min-width: 900px) {
+
+  /* Pergaminho de fundo da senha */
+  #section-perguntas .j-perg-v-inner {
+    position: relative !important;
+    transform: translateY(40px) !important; /* antes 80px */
+    top: 40px !important;                   /* antes 80px */
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    overflow: visible !important;
+    z-index: 5 !important;
+  }
+
+  /* Card (vidro) da senha */
+  #section-perguntas .j-panel-glow {
+    position: relative !important;
+    transform: translate(-16px, -70px) !important; /* antes 40px */
+    top: 10px !important;                   /* antes 40px */
+    margin-top: 0 !important;
+    width: 90% !important;
+    max-width: 470px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    z-index: 6 !important;  
+}
+#section-perguntas .j-panel-glow {
+    padding: 10px !important; /* igual Intro */
+  }
+  
+  #section-perguntas .j-panel-glow::before {
+    inset: 4px !important;    /* afina o aro interno */
+    border-radius: 22px !important;
+  }
+  
+  #section-perguntas .senha-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    border: 1px solid rgba(255, 210, 140, 0.35) !important;
+    box-shadow:
+      0 0 14px rgba(255, 190, 120, 0.25),
+      inset 0 0 18px rgba(0, 0, 0, 0.45) !important;
+    border-radius: 18px !important;
+    box-sizing: border-box !important;
+  }
+}
+   /* Guia (mesmo problema) */
+  #section-perguntas .j-arcane-card {
+    margin-top: -18px !important;
+    margin-bottom: 24px !important;
+  }
+}
 /* =========================================
    DNA DE LUZ DOS GUIAS – CORES GLOBAIS
    ========================================= */
@@ -1032,10 +1269,6 @@
   color: #fff;
   text-shadow: 0 0 10px var(--theme-main-color-soft, rgba(255,216,116,0.8));
 }
-
-/* ===============================
-   LAYOUT PERGUNTAS – DESKTOP BASE
-   =============================== */
 
 #section-perguntas .perguntas-panel {
   padding: 24px 0;
@@ -1192,8 +1425,62 @@
   font-weight: bold;
 }
 
-/* MOBILE */
+/* ---- PERGUNTAS: sobe e centraliza melhor ---- */
 @media (max-width: 600px) {
+
+ /* Seção perguntas: ocupa a tela com respiro */
+  #section-perguntas {
+    padding: 8px 0 140px !important;
+    min-height: 100vh !important;
+    overflow: hidden !important;
+  }
+
+  /* Painel de vidro (MESMA FAMÍLIA DO INTRO/TERMOS) */
+  #section-perguntas .j-panel-glow {
+    position: relative !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: calc(100vw - 84px) !important;  /* um pouco menor p/ não “explodir” */
+    max-width: 460px !important;           /* mesmo corpo da intro */
+    margin: 0 auto !important;
+    padding: 32px 24px 52px 24px !important;             /* borda fininha */
+    border-radius: 26px !important;
+    box-sizing: border-box !important;
+     transform: none !important;
+    -webkit-transform: translateY(0) translateZ(0) !important;
+    overflow: hidden !important;
+  } 
+  
+  #section-perguntas .j-panel-glow {
+    padding: 10px !important; /* igual Intro */
+  }
+  
+  #section-perguntas .j-panel-glow::before {
+    inset: 4px !important;    /* afina o aro interno */
+    border-radius: 22px !important;
+  }
+  
+  #section-perguntas .senha-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    border: 1px solid rgba(255, 210, 140, 0.35) !important;
+    box-shadow:
+      0 0 14px rgba(255, 190, 120, 0.25),
+      inset 0 0 18px rgba(0, 0, 0, 0.45) !important;
+    border-radius: 18px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Opcional: título e conteúdo respirando igual intro */
+  #section-perguntas .senha-panel-inner {
+    padding: 0 10px !important;
+    box-sizing: border-box !important;
+  }
+  #section-perguntas .pergaminho,
+  #section-perguntas .pergaminho-v {
+  overflow-x: hidden !important;
+}   
+}
   #section-perguntas .j-perg-v-inner {
     padding: 12px 8px;
   }
