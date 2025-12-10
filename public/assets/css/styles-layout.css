@@ -339,92 +339,29 @@
    ========================================= */
 @media (min-width: 900px) {
 
-  /* Seção toda: menos “altura de tela” e menos respiro */
-  #section-selfie {
-    min-height: 86vh !important;   /* era ~100vh */
-    height: auto !important;
-    padding-top: 8px !important;   /* baixou mais um pouco */
-    padding-bottom: 6px !important;
+  /* Pergaminho de fundo da senha */
+  #section-selfie .j-perg-v-inner {
+    position: relative !important;
+    transform: translateY(40px) !important; /* antes 80px */
+    top: 40px !important;                   /* antes 80px */
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    overflow: visible !important;
+    z-index: 5 !important;
   }
 
-  /* Painel com glow (o vidro + fundo preto) */
-  #section-selfie .j-panel-glow,
-  #section-selfie .selfie-panel {
-    max-height: auto !important;   /* encurta o “containerzão” */
-    padding-top: 22px !important;
-    padding-bottom: 8px !important;
-  }
-
-  /* Container da área preta da câmera / pré-visualização */
-  #section-selfie .selfie-inner,
-  #section-selfie .selfie-wrapper,
-  #section-selfie .selfie-content {
-     min-height: auto !important;
-    height: auto !important;
-    padding-bottom: 0 !important;
-  }
-
-  /* Caixa de pré-visualização em si (o retângulo preto grande) */
-  #section-selfie .selfie-preview,
-  #section-selfie .selfie-preview-box,
-  #section-selfie .selfie-preview video,
-  #section-selfie .selfie-preview img,
-  #section-selfie #selfiePreview {
-    margin-bottom: 4px !important;
-    max-height: 32vh !important; /* sobe a base sem esmagar */
-  }
-   /* Texto inferior (“Afaste um pouco o celular…”) */
-  #section-selfie .selfie-hint,
-  #section-selfie .selfie-footer,
-  #section-selfie small {
-     margin-top: 6px !important;
-    margin-bottom: 0 !important;
-    padding-bottom: 0 !important;
-  }
-   /* Se existir algum espaçador escondido lá embaixo, some com ele */
-  #section-selfie .selfie-spacer,
-  #section-selfie .bottom-gap,
-  #section-selfie .spacer {
-    display: none !important;
-    height: 0 !important;
-  }
-    #section-selfie .j-panel-glow,
-  #section-selfie .j-panel-glow.selfie-panel,
-  #section-selfie .j-panel-inner {
-    min-height: 0 !important;
-    height: auto !important;
-    max-height: none !important;
-  }
-
-  /* Ajuste fino do padding final */
+  /* Card (vidro) da senha */
   #section-selfie .j-panel-glow {
-    padding-bottom: 8px !important;
-    padding-top: 22px !important;
-  }
-
-  /* Se houver camada interna extra, derruba também */
-  #section-selfie .j-perg-v-inner,
-  #section-selfie .j-panel-content {
-    min-height: auto !important;
-    height: auto !important;
-  }
+    position: relative !important;
+    transform: translate(-16px, -70px) !important; /* antes 40px */
+    top: 10px !important;                   /* antes 40px */
+    margin-top: 0 !important;
+    width: 90% !important;
+    max-width: 470px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    z-index: 6 !important; 
  
-  /* tente estes seletores – um deles é o da caixa preta */
-  #section-selfie .selfie-preview,
-  #section-selfie .selfie-frame,
-  #section-selfie .preview-box,
-  #section-selfie #selfiePreview,
-  #section-selfie canvas,
-  #section-selfie video {
-    height: 300px !important;      /* antes devia estar 420 / 480 etc */
-    max-height: 300px !important;
-  }
-
-  /* um respiro embaixo, pra base subir visualmente */
-  #section-selfie .selfie-wrapper,
-  #section-selfie .selfie-area {
-    margin-bottom: 8px !important;
-  }
 }
 
 
@@ -439,6 +376,30 @@
    GUIA – alinhar botões no vidro (desktop)
    ========================================= */
 @media (min-width: 900px) {
+   
+     /* Pergaminho de fundo da senha */
+  #section-senha .j-perg-v-inner {
+    position: relative !important;
+    transform: translateY(40px) !important; /* antes 80px */
+    top: 40px !important;                   /* antes 80px */
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    overflow: visible !important;
+    z-index: 5 !important;
+  }
+
+  /* Card (vidro) da senha */
+  #section-senha .j-panel-glow {
+    position: relative !important;
+    transform: translate(-16px, -70px) !important; /* antes 40px */
+    top: 10px !important;                   /* antes 40px */
+    margin-top: 0 !important;
+    width: 90% !important;
+    max-width: 470px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    z-index: 6 !important;
+  }
 
  #section-guia .guia-options,
   #section-guia .guia-buttons-row,
