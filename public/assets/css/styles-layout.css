@@ -397,7 +397,25 @@
     min-height: auto !important;
     height: auto !important;
   }
+ 
+  /* tente estes seletores – um deles é o da caixa preta */
+  #section-selfie .selfie-preview,
+  #section-selfie .selfie-frame,
+  #section-selfie .preview-box,
+  #section-selfie #selfiePreview,
+  #section-selfie canvas,
+  #section-selfie video {
+    height: 340px !important;      /* antes devia estar 420 / 480 etc */
+    max-height: 340px !important;
+  }
+
+  /* um respiro embaixo, pra base subir visualmente */
+  #section-selfie .selfie-wrapper,
+  #section-selfie .selfie-area {
+    margin-bottom: 8px !important;
+  }
 }
+
 
 /* ---- SELFIE: geralmente o conteúdo é mais alto, mas
        mantemos alinhado com o mesmo eixo do pergaminho ---- */
