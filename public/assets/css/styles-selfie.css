@@ -197,7 +197,7 @@ input[type=range]::-webkit-slider-thumb {
 /* ================= PREVIEW ================= */
 .selfie-preview-wrap {
   width: 92%;
-  max-width: 480px;
+  max-width: 380px;
   margin: 0 auto 8px;
   position: relative;
 }
