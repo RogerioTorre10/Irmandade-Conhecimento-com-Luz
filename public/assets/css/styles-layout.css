@@ -405,8 +405,8 @@
   #section-selfie #selfiePreview,
   #section-selfie canvas,
   #section-selfie video {
-    height: 340px !important;      /* antes devia estar 420 / 480 etc */
-    max-height: 340px !important;
+    height: 300px !important;      /* antes devia estar 420 / 480 etc */
+    max-height: 300px !important;
   }
 
   /* um respiro embaixo, pra base subir visualmente */
