@@ -184,7 +184,7 @@
 
   /* Seção inteira da intro */
   #section-intro {
-    padding: 24px 0 120px !important;  /* distância do topo + espaço pro botão */
+    padding: 8px 0 140px !important;  /* distância do topo + espaço pro botão */
     overflow: hidden !important;
     min-height: 100vh !important;
   }
@@ -192,16 +192,16 @@
   /* Painel de vidro dentro do pergaminho */
   #section-intro .j-panel-glow, 
   #section-intro .termos-panel {
-    width: calc(100vw - 40px) !important;  /* 10px de respiro de cada lado */
+    width: calc(100vw - 10px) !important;  /* 10px de respiro de cada lado */
     max-width: 460px !important;
     margin: 0 auto !important;            /* centraliza */
-    padding: 28px 22px 46px 22px !important;
+    padding: 32px 24px 52px 24px !important;
     border-radius: 26px !important;
     box-sizing: border-box !important;
 
     /* NADA de margin-top negativo, NADA de flex aqui */
-    transform: translateY(-40px) translateZ(0) !important;
-    -webkit-transform: translateY(-40px) translateZ(0) !important;
+    transform: translateY(-80px) translateZ(0) !important;
+    -webkit-transform: translateY(-80px) translateZ(0) !important;
     overflow: hidden !important;
   }
 
@@ -223,19 +223,19 @@
   #section-intro .termos-texto {
     font-size: 15.5px !important;
     line-height: 1.6 !important;
-    padding: 24px 22px !important;
+    padding: 24px 26px !important;
     border-radius: 16px !important;
   }
 
   /* Área do botão */
   #section-intro .termos-actions {
-    margin-top: 32px !important;
+    margin-top: 36px !important;
   }
 
   #section-intro .btn-continuar {
-    min-height: 60px !important;
+    min-height: 64px !important;
     font-size: 18px !important;
-    padding: 0 32px !important;
+    padding: 0 36px !important;
     border-radius: 16px !important;
   }
 /* INTRO — afinar bordas igual à INTRO */
