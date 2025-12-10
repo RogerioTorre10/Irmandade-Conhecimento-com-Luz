@@ -243,26 +243,6 @@ input[type=range]::-webkit-slider-thumb {
   max-width: 520px;
   display: none;
 }
-/* =========================================
-   SELFIE – reduzir o quadradão preto (desktop)
-   ========================================= */
-@media (min-width: 900px) {
-  /* tente estes seletores – um deles é o da caixa preta */
-  #section-selfie .selfie-preview,
-  #section-selfie .selfie-frame,
-  #section-selfie .preview-box,
-  #section-selfie #selfiePreview,
-  #section-selfie canvas,
-  #section-selfie video {
-    height: 340px !important;      /* antes devia estar 420 / 480 etc */
-    max-height: 340px !important;
-  }
 
-  /* um respiro embaixo, pra base subir visualmente */
-  #section-selfie .selfie-wrapper,
-  #section-selfie .selfie-area {
-    margin-bottom: 8px !important;
-  }
-}
 
 
