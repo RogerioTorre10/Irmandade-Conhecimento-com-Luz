@@ -1602,32 +1602,7 @@ body.guia-arion #section-perguntas .btn.btn-stone {
    #section-final .j-arcane-card {
    margin-top: -18px !important;
    margin-bottom: 24px !important;
-  }   
-  
-    /* Painel final alinhado com o resto, mas um pouco mais pra cima */
-  #section-final {
-  padding-top: 32px !important;
-  padding-bottom: 120px !important;
-  position: relative;
-  min-height: 100vh;
-  height: auto;
-  margin: 0 !important;
-  padding: 0 !important;
-  overflow-x: hidden !important;
-}
-
-#section-final .final-pergaminho-wrapper {
-  position: relative;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  padding-top: 40px;
-  padding-bottom: 120px; 
-  padding: 32px 16px 120px;
-  box-sizing: border-box;
-}
+  } 
 
 #section-final .final-panel {
   margin: 0 auto !important;
@@ -1642,25 +1617,6 @@ body.final-lock {
   overflow: hidden !important;
   overflow-y: hidden;
 }
-
-#section-final .final-acoes #btnVoltarInicio {
-  background: rgba(0, 0, 0, 0.65);
-  color: #f6e7c6;
-  border: 2px solid #d4af37;
-  backdrop-filter: blur(6px);
-  box-shadow:
-    0 0 18px rgba(212,175,55,0.7),
-    inset 0 0 10px rgba(255,215,160,0.25);
-  opacity: 0.9;
-  transition: all .35s ease;
-}
-
-#section-final .final-acoes #btnVoltarInicio:hover {
-  opacity: 1;
-  box-shadow:
-    0 0 26px rgba(212,175,55,0.95),
-    inset 0 0 14px rgba(255,235,190,0.45);
-} 
 }
 
 /* =========================================
@@ -1677,17 +1633,16 @@ body.final-lock {
     padding: 0;
     overscroll-behavior-x: none;
   }
-
  /* Seção inteira dos termos */
-    #section-termos2 {
+    #section-final {
     padding: 8px 0 140px !important;  /* distância do topo + espaço pro botão */
     overflow: hidden !important;
     min-height: 100vh !important;
   }
 
   /* Painel de vidro dentro do pergaminho */
-    #section-termos2 .j-panel-glow,
-    #section-termos2 .termos-panel {
+    #section-final .j-panel-glow,
+    #section-final .termos-panel {
     width: calc(100vw - 10px) !important;  /* 10px de respiro de cada lado */
     max-width: 460px !important;
     margin: 0 auto !important;            /* centraliza */
@@ -1702,21 +1657,21 @@ body.final-lock {
   }
 
   /* Conteúdo interno do pergaminho dos termos */
-  #section-termos2 .j-perg-v-inner,
-  #section-termos2 .conteudo-pergaminho {
+  #section-final .j-perg-v-inner,
+  #section-final .conteudo-pergaminho {
     padding: 0 10px !important;
     box-sizing: border-box !important;
   }
 
   /* Título do termo */
-  #section-termos2 .termos-title {
+  #section-final .termos-title {
   font-size: 28px !important;
    margin: 4px 0 18px 0 !important;
    line-height: 1.1 !important;
   }
 
   /* Texto dos termos */
-    #section-termos2 .termos-texto {
+    #section-final .termos-texto {
     font-size: 15.5px !important;
     line-height: 1.6 !important;
     padding: 24px 26px !important;
@@ -1724,27 +1679,104 @@ body.final-lock {
   }
 
   /* Área do botão */
-    #section-termos2 .termos-actions {
+    #section-final .termos-actions {
     margin-top: 36px !important;
   }
 
-    #section-termos2 .btn-continuar {
+    #section-final .btn-continuar {
+    min-height: 64px !important;
+    font-size: 18.5px !important;
+    padding: 0 36px !important;
+    border-radius: 16px !important;
+  }
+/* FINAL — afinar bordas igual à INTRO */
+    #section-final .j-panel-glow {
+    padding: 10px !important; /* igual Intro */
+  }
+
+    #section-final .j-panel-glow::before {
+    inset: 4px !important;    /* afina o aro interno */
+    border-radius: 22px !important;
+  }
+  
+  #section-final .termos-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    border: 1px solid rgba(255, 210, 140, 0.35) !important;
+    box-shadow:
+      0 0 14px rgba(255, 190, 120, 0.25),
+      inset 0 0 18px rgba(0, 0, 0, 0.45) !important;
+    border-radius: 18px !important;
+    box-sizing: border-box !important;
+  }   
+}
+ /* Seção inteira da final */
+    #section-final {
+    padding: 8px 0 140px !important;  /* distância do topo + espaço pro botão */
+    overflow: hidden !important;
+    min-height: 100vh !important;
+  }
+
+  /* Painel de vidro dentro do pergaminho */
+    #section-final .j-panel-glow,
+    #section-final .termos-panel {
+    width: calc(100vw - 10px) !important;  /* 10px de respiro de cada lado */
+    max-width: 460px !important;
+    margin: 0 auto !important;            /* centraliza */
+    padding: 32px 24px 52px 24px !important;
+    border-radius: 26px !important;
+    box-sizing: border-box !important;
+
+    /* NADA de margin-top negativo, NADA de flex aqui */
+    transform: translateY(-80px) translateZ(0) !important;
+    -webkit-transform: translateY(-80px) translateZ(0) !important;
+    overflow: hidden !important;
+  }
+
+  /* Conteúdo interno do pergaminho dos termos */
+  #section-final .j-perg-v-inner,
+  #section-final .conteudo-pergaminho {
+    padding: 0 10px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Título do termo */
+  #section-final .termos-title {
+  font-size: 28px !important;
+   margin: 4px 0 18px 0 !important;
+   line-height: 1.1 !important;
+  }
+
+  /* Texto dos termos */
+    #section-final .termos-texto {
+    font-size: 15.5px !important;
+    line-height: 1.6 !important;
+    padding: 24px 26px !important;
+    border-radius: 16px !important;
+  }
+
+  /* Área do botão */
+    #section-final .termos-actions {
+    margin-top: 36px !important;
+  }
+
+    #section-final .btn-continuar {
     min-height: 64px !important;
     font-size: 18.5px !important;
     padding: 0 36px !important;
     border-radius: 16px !important;
   }
 /* TERMOS 2 — afinar bordas igual à INTRO */
-    #section-termos2 .j-panel-glow {
+    #section-final .j-panel-glow {
     padding: 10px !important; /* igual Intro */
   }
 
-    #section-termos2 .j-panel-glow::before {
+    #section-final .j-panel-glow::before {
     inset: 4px !important;    /* afina o aro interno */
     border-radius: 22px !important;
   }
   
-  #section-termos2 .termos-panel {
+  #section-final .termos-panel {
     width: 100% !important;
     max-width: 100% !important;
     border: 1px solid rgba(255, 210, 140, 0.35) !important;
