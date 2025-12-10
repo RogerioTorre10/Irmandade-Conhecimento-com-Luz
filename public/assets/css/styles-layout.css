@@ -257,12 +257,7 @@
       inset 0 0 18px rgba(0, 0, 0, 0.45) !important;
     border-radius: 18px !important;
     box-sizing: border-box !important;
-  }   
-
-  #section-intro .j-panel-glow {
-    /* estava -16, subimos mais um pouco */
-    transform: translate(-6px, -26px);
-  }
+  } 
 }
 
 /* ---- TERMOS 1 sobem um pouco mais ainda ---- */
