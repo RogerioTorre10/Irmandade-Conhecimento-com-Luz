@@ -78,8 +78,8 @@
   }
    
   #section-intro  .j-arcane-card,
-  #section-termos-1 .j-arcane-card,
-  #section-termos-2 .j-arcane-card,
+  #section-termos1 .j-arcane-card,
+  #section-termos2 .j-arcane-card,
   #section-senha .j-arcane-card,
   #section-guia  .j-arcane-card,
   #section-selfie .j-arcane-card {
@@ -140,8 +140,7 @@
 @media (min-width: 900px) {
 
   /* Pergaminho de fundo da senha */
-   #section-termos1,
-  #section-termos2 .j-perg-v-inner {
+  #section-termos1 .j-perg-v-inner {
     position: relative !important;
     transform: translateY(40px) !important; /* antes 80px */
     top: 40px !important;                   /* antes 80px */
@@ -152,8 +151,7 @@
   }
 
   /* Card (vidro) da senha */
-   #section-termos1,
-  #section-termos2 .j-panel-glow {
+  #section-termos1 .j-panel-glow {
     position: relative !important;
     transform: translate(-16px, -70px) !important; /* antes 40px */
     top: 10px !important;                   /* antes 40px */
@@ -165,19 +163,16 @@
     z-index: 6 !important;  
 }
    
- #section-termos1,
-  #section-termos2 .j-panel-glow {
+  #section-termos1 .j-panel-glow {
     padding: 10px !important; /* igual Intro */
   }
   
-   #section-termos1,
-  #section-termos2 .j-panel-glow::before {
+   #section-termos1 .j-panel-glow::before {
     inset: 4px !important;    /* afina o aro interno */
     border-radius: 22px !important;
   }
   
-   #section-termos1,
-  #section-termos2 .senha-panel {
+   #section-termos1 .senha-panel {
     width: 100% !important;
     max-width: 100% !important;
     border: 1px solid rgba(255, 210, 140, 0.35) !important;
@@ -188,8 +183,7 @@
     box-sizing: border-box !important;
   }
     /* Guia (mesmo problema) */
-  #section-termos1,
-  #section-termos2 .j-arcane-card {
+  #section-termos1 .j-arcane-card {
     margin-top: -18px !important;
     margin-bottom: 24px !important;
   }   
@@ -198,18 +192,15 @@
 @media (max-width: 600px) {
 
   /* Seção inteira dos termos */
-  #section-termos1,
-  #section-termos2 {
+  #section-termos1 {
     padding: 8px 0 140px !important;  /* distância do topo + espaço pro botão */
     overflow: hidden !important;
     min-height: 100vh !important;
   }
 
   /* Painel de vidro dentro do pergaminho */
-  #section-termos1 .j-panel-glow,
-  #section-termos2 .j-panel-glow,
-  #section-termos1 .termos-panel,
-  #section-termos2 .termos-panel {
+  #section-termos1 .j-panel-glow, 
+  #section-termos1 .termos-panel {
     width: calc(100vw - 10px) !important;  /* 10px de respiro de cada lado */
     max-width: 460px !important;
     margin: 0 auto !important;            /* centraliza */
@@ -225,24 +216,20 @@
 
   /* Conteúdo interno do pergaminho dos termos */
   #section-termos1 .j-perg-v-inner,
-  #section-termos2 .j-perg-v-inner,
-  #section-termos1 .conteudo-pergaminho,
-  #section-termos2 .conteudo-pergaminho {
+  #section-termos1 .conteudo-pergaminho {
     padding: 0 10px !important;
     box-sizing: border-box !important;
   }
 
   /* Título do termo */
-  #section-termos1 .termos-title,
-  #section-termos2 .termos-title {
+  #section-termos1 .termos-title {
     font-size: 28px !important;
     margin: 4px 0 18px 0 !important;
     line-height: 1.1 !important;
   }
 
   /* Texto dos termos */
-  #section-termos1 .termos-texto,
-  #section-termos2 .termos-texto {
+  #section-termos1 .termos-texto {
     font-size: 15.5px !important;
     line-height: 1.6 !important;
     padding: 24px 26px !important;
@@ -250,31 +237,158 @@
   }
 
   /* Área do botão */
-  #section-termos1 .termos-actions,
-  #section-termos2 .termos-actions {
+  #section-termos1 .termos-actions {
     margin-top: 36px !important;
   }
 
-  #section-termos1 .btn-continuar,
-  #section-termos2 .btn-continuar {
+  #section-termos1 .btn-continuar {
     min-height: 64px !important;
     font-size: 18.5px !important;
     padding: 0 36px !important;
     border-radius: 16px !important;
   }
 /* TERMOS 1 e 2 — afinar bordas igual à INTRO */
-  #section-termos1 .j-panel-glow,
-  #section-termos2 .j-panel-glow {
+  #section-termos1 .j-panel-glow {
     padding: 10px !important; /* igual Intro */
   }
 
-  #section-termos1 .j-panel-glow::before,
-  #section-termos2 .j-panel-glow::before {
+  #section-termos1 .j-panel-glow::before {
     inset: 4px !important;    /* afina o aro interno */
     border-radius: 22px !important;
   }
 
-  #section-termos1 .termos-panel,
+  #section-termos1 .termos-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    border: 1px solid rgba(255, 210, 140, 0.35) !important;
+    box-shadow:
+      0 0 14px rgba(255, 190, 120, 0.25),
+      inset 0 0 18px rgba(0, 0, 0, 0.45) !important;
+    border-radius: 18px !important;
+    box-sizing: border-box !important;
+  }   
+}
+/* ---- TERMOS 2: sobem um pouco mais ainda ---- */
+@media (min-width: 900px) {
+
+  /* Pergaminho de fundo da senha */
+    #section-termos2 .j-perg-v-inner {
+    position: relative !important;
+    transform: translateY(40px) !important; /* antes 80px */
+    top: 40px !important;                   /* antes 80px */
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    overflow: visible !important;
+    z-index: 5 !important;
+  }
+
+  /* Card (vidro) da senha */
+   #section-termos2 .j-panel-glow {
+    position: relative !important;
+    transform: translate(-16px, -70px) !important; /* antes 40px */
+    top: 10px !important;                   /* antes 40px */
+    margin-top: 0 !important;
+    width: 90% !important;
+    max-width: 470px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    z-index: 6 !important;  
+}
+   
+    #section-termos2 .j-panel-glow {
+    padding: 10px !important; /* igual Intro */
+  }
+  
+    #section-termos2 .j-panel-glow::before {
+    inset: 4px !important;    /* afina o aro interno */
+    border-radius: 22px !important;
+  }
+  
+    #section-termos2 .senha-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    border: 1px solid rgba(255, 210, 140, 0.35) !important;
+    box-shadow:
+      0 0 14px rgba(255, 190, 120, 0.25),
+      inset 0 0 18px rgba(0, 0, 0, 0.45) !important;
+    border-radius: 18px !important;
+    box-sizing: border-box !important;
+  }
+    /* Guia (mesmo problema) */
+   #section-termos2 .j-arcane-card {
+   margin-top: -18px !important;
+   margin-bottom: 24px !important;
+  }   
+}
+
+@media (max-width: 600px) {
+
+  /* Seção inteira dos termos */
+    #section-termos2 {
+    padding: 8px 0 140px !important;  /* distância do topo + espaço pro botão */
+    overflow: hidden !important;
+    min-height: 100vh !important;
+  }
+
+  /* Painel de vidro dentro do pergaminho */
+    #section-termos2 .j-panel-glow,
+    #section-termos2 .termos-panel {
+    width: calc(100vw - 10px) !important;  /* 10px de respiro de cada lado */
+    max-width: 460px !important;
+    margin: 0 auto !important;            /* centraliza */
+    padding: 32px 24px 52px 24px !important;
+    border-radius: 26px !important;
+    box-sizing: border-box !important;
+
+    /* NADA de margin-top negativo, NADA de flex aqui */
+    transform: translateY(-80px) translateZ(0) !important;
+    -webkit-transform: translateY(-80px) translateZ(0) !important;
+    overflow: hidden !important;
+  }
+
+  /* Conteúdo interno do pergaminho dos termos */
+  #section-termos2 .j-perg-v-inner,
+  #section-termos2 .conteudo-pergaminho {
+    padding: 0 10px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Título do termo */
+  #section-termos2 .termos-title {
+  font-size: 28px !important;
+   margin: 4px 0 18px 0 !important;
+   line-height: 1.1 !important;
+  }
+
+  /* Texto dos termos */
+    #section-termos2 .termos-texto {
+    font-size: 15.5px !important;
+    line-height: 1.6 !important;
+    padding: 24px 26px !important;
+    border-radius: 16px !important;
+  }
+
+  /* Área do botão */
+    #section-termos2 .termos-actions {
+    margin-top: 36px !important;
+  }
+
+    #section-termos2 .btn-continuar {
+    min-height: 64px !important;
+    font-size: 18.5px !important;
+    padding: 0 36px !important;
+    border-radius: 16px !important;
+  }
+/* TERMOS 2 — afinar bordas igual à INTRO */
+    #section-termos2 .j-panel-glow {
+    padding: 10px !important; /* igual Intro */
+  }
+
+    #section-termos2 .j-panel-glow::before {
+    inset: 4px !important;    /* afina o aro interno */
+    border-radius: 22px !important;
+  }
+  
   #section-termos2 .termos-panel {
     width: 100% !important;
     max-width: 100% !important;
@@ -286,7 +400,6 @@
     box-sizing: border-box !important;
   }   
 }
-
 
 
 /* ---- PERGUNTAS: card com perguntas – um pouco mais central ---- */
