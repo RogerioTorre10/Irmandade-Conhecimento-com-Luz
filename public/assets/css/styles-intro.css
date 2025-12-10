@@ -172,16 +172,4 @@
   right: 0;
 }
 
-/* ================== MOBILE – SÓ INTRO ================== */
-@media (max-width: 600px) {
-  #section-intro .intro-title {
-    font-size: 28px;
-    margin-top: 24px;
-    margin-bottom: 16px;
-  }
 
-  #section-intro .parchment-text-rough {
-    font-size: 12.5px;
-    line-height: 1.35;
-  }
-}
