@@ -360,11 +360,28 @@
     max-width: 470px !important;
     margin-left: auto !important;
     margin-right: auto !important;
-    z-index: 6 !important; 
- 
+    z-index: 6 !important;  
 }
-
-
+#section-selfie .j-panel-glow {
+    padding: 10px !important; /* igual Intro */
+  }
+  
+  #section-selfie .j-panel-glow::before {
+    inset: 4px !important;    /* afina o aro interno */
+    border-radius: 22px !important;
+  }
+  
+  #section-selfie .senha-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    border: 1px solid rgba(255, 210, 140, 0.35) !important;
+    box-shadow:
+      0 0 14px rgba(255, 190, 120, 0.25),
+      inset 0 0 18px rgba(0, 0, 0, 0.45) !important;
+    border-radius: 18px !important;
+    box-sizing: border-box !important;
+  }
+}
 /* ---- SELFIE: geralmente o conteúdo é mais alto, mas
        mantemos alinhado com o mesmo eixo do pergaminho ---- */
 @media (max-width: 600px) {
@@ -428,7 +445,25 @@
   transform: translateY(-2px);
   box-shadow: 0 0 16px rgba(255, 255, 210, 0.9);
 }
-
+#section-guia .j-panel-glow {
+    padding: 10px !important; /* igual Intro */
+  }
+  
+  #section-guia .j-panel-glow::before {
+    inset: 4px !important;    /* afina o aro interno */
+    border-radius: 22px !important;
+  }
+  
+  #section-guia .senha-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    border: 1px solid rgba(255, 210, 140, 0.35) !important;
+    box-shadow:
+      0 0 14px rgba(255, 190, 120, 0.25),
+      inset 0 0 18px rgba(0, 0, 0, 0.45) !important;
+    border-radius: 18px !important;
+    box-sizing: border-box !important;
+  }
 }
 
 /* ---- GUIA: card com nome/inputs – segue padrão alto e central ---- */
