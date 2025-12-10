@@ -339,17 +339,18 @@
   /* Painel com glow (o vidro + fundo preto) */
   #section-selfie .j-panel-glow,
   #section-selfie .selfie-panel {
-    max-height: 78vh !important;   /* encurta o “containerzão” */
-    padding-top: 14px !important;
-    padding-bottom: 14px !important;
+    max-height: auto !important;   /* encurta o “containerzão” */
+    padding-top: 26px !important;
+    padding-bottom: 12px !important;
   }
 
   /* Container da área preta da câmera / pré-visualização */
   #section-selfie .selfie-inner,
   #section-selfie .selfie-wrapper,
   #section-selfie .selfie-content {
-    padding-bottom: 4px !important; 
-    max-height: 68vh !important;
+     min-height: auto !important;
+    height: auto !important;
+    padding-bottom: 0 !important;
   }
 
   /* Caixa de pré-visualização em si (o retângulo preto grande) */
@@ -365,8 +366,16 @@
   #section-selfie .selfie-hint,
   #section-selfie .selfie-footer,
   #section-selfie small {
-    margin-top: 4px !important;
+     margin-top: 6px !important;
     margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+  }
+   /* Se existir algum espaçador escondido lá embaixo, some com ele */
+  #section-selfie .selfie-spacer,
+  #section-selfie .bottom-gap,
+  #section-selfie .spacer {
+    display: none !important;
+    height: 0 !important;
   }
 }
 
