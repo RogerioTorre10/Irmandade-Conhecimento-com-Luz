@@ -293,40 +293,47 @@ window.playBlockTransition = function(videoSrc, onDone) {
       window.JORNADA_CHAMA.ensureHeroFlame(SECTION_ID);
     }
   }
-  // ====== INJETAR CORES LUMINOSAS POR GUIA ======
-(function applyGuideGlow(){
-  const guia = sessionStorage.getItem('jornada.guia')?.toLowerCase() || 'lumen';
+   // ====== INJETAR CORES LUMINOSAS POR GUIA ======
+  (function applyGuideGlow() {
+    const guia = sessionStorage.getItem('jornada.guia')?.toLowerCase() || 'lumen';
 
-  const style = document.createElement('style');
-  style.id = 'progress-glow-style';
+    const style = document.createElement('style');
+    style.id = 'progress-glow-style';
 
-  let color = '#00ff9d';    // padrão: Lumen
-  let glow  = '0 0 12px #00ff9d, 0 0 24px #00ff9d';
+    let color = '#00ff9d';    // padrão: Lumen
+    let glow  = '0 0 12px #00ff9d, 0 0 24px #00ff9d';
 
-  if (guia === 'arian') {
-    color = '#ff00ff';
-    glow  = '0 0 12px #ff00ff, 0 0 24px #ff55ff';
-  }
-  if (guia === 'zion') {
-    color = '#00aaff';
-    glow  = '0 0 10px #ffd65b, 0 0 18px #ffd65b, 0 0 30px #00aaff';
-  }
-
-  style.textContent = `
-    #progress-block-fill,
-    #progress-question-fill {
-      background: ${color} !important;
-      box-shadow: ${glow} !important;
+    if (guia === 'arian') {
+      color = '#ff00ff';
+      glow  = '0 0 12px #ff00ff, 0 0 24px #ff55ff';
     }
-  `;
+    if (guia === 'zion') {
+      color = '#00aaff';
+      glow  = '0 0 10px #ffd65b, 0 0 18px #ffd65b, 0 0 30px #00aaff';
+    }
 
-  // remove estilo antigo se existir
-  const old = document.getElementById('progress-glow-style');
-  if (old) old.remove();
+    style.textContent = `
+      #progress-block-fill,
+      #progress-question-fill {
+        background: ${color} !important;
+        box-shadow: ${glow} !important;
+      }
+    `;
 
-  document.head.appendChild(style);
-})();
+    // remove estilo antigo se existir
+    const old = document.getElementById('progress-glow-style');
+    if (old) old.remove();
 
+    document.head.appendChild(style);
+
+    // AURA nos botões da página de perguntas
+    document
+      .querySelectorAll('#section-perguntas .btn')
+      .forEach((b) => {
+        b.style.boxShadow  = glow;
+        b.style.borderColor = color;
+      });
+  })();
 
   // --------------------------------------------------
   // RESPOSTAS
@@ -450,116 +457,91 @@ window.playBlockTransition = function(videoSrc, onDone) {
   }
 }
 
-// --------------------------------------------------
-// BIND UI
-// --------------------------------------------------
-function bindUI(root) {
-  root = root || document.getElementById(SECTION_ID) || document;
+  // --------------------------------------------------
+  // BIND UI
+  // --------------------------------------------------
 
-  const btnFalar  = $('#jp-btn-falar', root);
-  const btnApagar = $('#jp-btn-apagar', root);
-  const btnConf   = $('#jp-btn-confirmar', root);
-  const input     = $('#jp-answer-input', root);
+  function bindUI(root) {
+    root = root || document.getElementById(SECTION_ID) || document;
 
-  // ================================
-  // MICROFONE controlado pelo botão
-  // ================================
-  let micInstance = null;
+    const btnFalar  = $('#jp-btn-falar', root);
+    const btnApagar = $('#jp-btn-apagar', root);
+    const btnConf   = $('#jp-btn-confirmar', root);
+    const input     = $('#jp-answer-input', root);
 
-btnFalar.addEventListener('click', (ev) => {
-  ev.preventDefault();
-  ev.stopPropagation();
+    // ================================
+    // MICROFONE controlado pelo botão
+    // ================================
+    let micAttached = false;
+    let micInstance = null;
 
-  if (!micAttached) {
-    micInstance = Micro.attach(input, { mode:'append' });
-    micAttached = true;
-  }
+    if (btnFalar && input && window.JORNADA_MICRO) {
+      const Micro = window.JORNADA_MICRO;
 
-  if (!micInstance) return;
+      btnFalar.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
 
-  // Toggle manual
-  if (micInstance.button.classList.contains('rec')) {
-    micInstance.stop();
-  } else {
-    micInstance.start();
-  }
-});
-
-    // 2) click do botão Falar
-    btnFalar.addEventListener('click', (ev) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-
-      // garante attach, se ainda não conseguiu
-      if (!micAttached && typeof Micro.attach === 'function') {
-        try {
-          Micro.attach(input, { mode: 'append', button: btnFalar });
+        // 1) Garante que o input está "conectado" ao módulo de voz
+        if (!micAttached && typeof Micro.attach === 'function') {
+          micInstance = Micro.attach(input, { mode: 'append' });
           micAttached = true;
-        } catch (e) {
-          console.warn('[PERGUNTAS] Erro ao anexar JORNADA_MICRO no clique:', e);
         }
-      }
 
-      // ordem de preferência para compatibilidade:
-      //  onButtonClick(ev, input) -> toggle() -> start()
-      if (typeof Micro.onButtonClick === 'function') {
-        Micro.onButtonClick(ev, input);
-      } else if (typeof Micro.toggle === 'function') {
-        Micro.toggle();
-      } else if (typeof Micro.start === 'function') {
-        Micro.start();
-      } else {
-        console.warn('[PERGUNTAS] JORNADA_MICRO disponível, mas sem onButtonClick/toggle/start().');
-      }
-    });
+        if (!micInstance) return;
+
+        // 2) Liga / desliga a captura de voz (toggle manual)
+        const btnMic = micInstance.button;
+        const isRec  = btnMic && btnMic.classList.contains('rec');
+
+        if (isRec) {
+          if (typeof micInstance.stop === 'function') {
+            micInstance.stop();
+          }
+        } else {
+          if (typeof micInstance.start === 'function') {
+            micInstance.start();
+          }
+        }
+      });
+    }
+
+    // APAGAR
+    if (btnApagar && input) {
+      btnApagar.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+        input.value = '';
+        input.focus();
+        if (window.JORNADA_CHAMA) {
+          window.JORNADA_CHAMA.setChamaIntensidade('chama-perguntas', 'media');
+        }
+      });
+    }
+
+    // CONFIRMAR
+    if (btnConf) {
+      btnConf.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        if (completed) {
+          log('Clique em confirmar após conclusão; ignorado.');
+          return;
+        }
+        saveCurrentAnswer();
+        nextStep();
+      });
+    }
+
+    // INPUT CHAMA
+    if (input && window.JORNADA_CHAMA) {
+      input.addEventListener('input', () => {
+        const txt = input.value || '';
+        window.JORNADA_CHAMA.updateChamaFromText(txt, 'chama-perguntas');
+      });
+    }
+
+    // (opcional) nada de attach automático aqui, só pelo botão falar
   }
-
-  // ================================
-  // APAGAR
-  // ================================
-  if (btnApagar && input) {
-    btnApagar.addEventListener('click', (ev) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-      input.value = '';
-      input.focus();
-      if (window.JORNADA_CHAMA) {
-        window.JORNADA_CHAMA.setChamaIntensidade('chama-perguntas', 'media');
-      }
-    });
-  }
-
-  // ================================
-  // CONFIRMAR
-  // ================================
-  if (btnConf) {
-    btnConf.addEventListener('click', (ev) => {
-      ev.preventDefault();
-      if (completed) {
-        log('Clique em confirmar após conclusão; ignorado.');
-        return;
-      }
-      saveCurrentAnswer();
-      nextStep();
-    });
-  }
-
-  // ================================
-  // INPUT -> intensidade da chama
-  // ================================
-  if (input && window.JORNADA_CHAMA) {
-    input.addEventListener('input', () => {
-      const txt = input.value || '';
-      window.JORNADA_CHAMA.updateChamaFromText(txt, 'chama-perguntas');
-    });
-  }
-
-  // MICROFONE AUTOMÁTICO DESLIGADO (por enquanto)
-  // if (input && window.JORNADA_MICRO) {
-  //   window.JORNADA_MICRO.attach(input, { mode: 'append' });
-  // }
-}
-
 
   // --------------------------------------------------
   // INIT
