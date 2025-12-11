@@ -1287,7 +1287,8 @@
 
 #section-perguntas .answer-box,
 #section-perguntas .resposta-box,
-#section-perguntas .jp-answer-bg ,
+#section-perguntas .jp-answer-frame,
+#section-perguntas .jp-answer-bg,
 #section-perguntas .textarea-wrapper {
   position: relative !important;
   padding: 16px !important;
