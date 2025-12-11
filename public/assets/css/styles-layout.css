@@ -2,7 +2,122 @@
    4) AJUSTES FINOS DESKTOP – MOBILE
    (valores calibrados pelos teus prints)
    ========================================================= */
-/* ---- TERMOS 1 sobem um pouco mais ainda ---- */
+#section-intro .j-perg-v-inner,
+#section-termos1 .j-perg-v-inner,
+#section-termos2 .j-perg-v-inner,
+#section-senha  .j-perg-v-inner,
+#section-guia   .j-perg-v-inner,
+#section-selfie .j-perg-v-inner,
+#section-csrd .j-perg-v-inner,
+#section-perguntas .j-perg-v-inner,
+#section-final  .j-perg-v-inner {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 850px;
+  width: 100%;
+  position: relative;
+}
+
+#section-intro .j-panel-glow,
+#section-termos1 .j-panel-glow,
+#section-termos2 .j-panel-glow,
+#section-senha  .j-panel-glow,
+#section-guia   .j-panel-glow,
+#section-selfie .j-panel-glow,
+#section-card .j-panel-glow,
+#section-perguntas .j-panel-glow,
+#section-final  .j-panel-glow {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Pergaminho base (onde estiver usando a classe .pergaminho) */
+.pergaminho {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  background-size: 100% auto !important;
+  background-repeat: no-repeat;
+  background-position: top center;
+}
+
+/* =========================================================
+   2) DESKTOP (>= 900px)
+   Pergaminho um pouco mais baixo, card centrado
+   ========================================================= */
+@media (min-width: 900px) {
+
+  #section-intro .j-perg-v-inner,
+  #section-termos1 .j-perg-v-inner,
+  #section-termos2 .j-perg-v-inner,
+  #section-senha  .j-perg-v-inner,
+  #section-guia   .j-perg-v-inner,
+  #section-selfie .j-perg-v-inner,
+  #section-card .j-perg-v-inner, 
+  #section-perguntas .j-perg-v-inner,
+  #section-final  .j-perg-v-inner {
+    transform: translateY(40px);
+  }
+
+  #section-intro .j-panel-glow,
+  #section-termos1 .j-panel-glow,
+  #section-termos2 .j-panel-glow,
+  #section-senha  .j-panel-glow,
+  #section-guia   .j-panel-glow,
+  #section-selfie .j-panel-glow,
+  #section-card .j-panel-glow, 
+  #section-perguntas .j-panel-glow,
+  #section-final  .j-panel-glow {
+    transform: translateY(-10px);
+  }
+   
+  #section-intro  .j-arcane-card,
+  #section-termos-1 .j-arcane-card,
+  #section-termos-2 .j-arcane-card,
+  #section-senha .j-arcane-card,
+  #section-guia  .j-arcane-card,
+  #section-selfie .j-arcane-card {
+    max-height: 72vh;      /* mesma “altura de vidro interno” das outras */
+    margin-top: 26px;      /* mantém o topo bonito */
+    margin-bottom: 32px;   /* sobe a base, abre respiro no rodapé */
+  }
+}
+
+/* =========================================================
+   3) MOBILE BASE (<= 600px)
+   Mesma largura/altura de card pra TODAS as seções
+   ========================================================= */
+@media (max-width: 600px) {
+
+  #section-intro .j-panel-glow,
+  #section-termos1 .j-panel-glow,
+  #section-termos2 .j-panel-glow,
+  #section-senha  .j-panel-glow,
+  #section-guia   .j-panel-glow,
+  #section-selfie .j-panel-glow,
+  #section-card .j-panel-glow, 
+  #section-perguntas .j-panel-glow,
+  #section-final  .j-panel-glow {
+    width: min(320px, 84vw);
+    max-width: 320px;
+    margin: 18px auto 26px;
+    padding: 18px 14px 22px;
+  }
+
+  #section-intro .j-perg-v-inner,
+  #section-termos1 .j-perg-v-inner,
+  #section-termos2 .j-perg-v-inner,
+  #section-senha  .j-perg-v-inner,
+  #section-guia   .j-perg-v-inner,
+  #section-selfie .j-perg-v-inner,
+  #section-card .j-perg-v-inner,  
+  #section-perguntas .j-perg-v-inner,
+  #section-final  .j-perg-v-inner {
+    transform: translateY(0); /* base neutra; overrides abaixo */
+  }
+}
+
+/* ---- INTRO sobem um pouco mais ainda ---- */
 @media (min-width: 900px) {
 
   /* Pergaminho de fundo da senha */
