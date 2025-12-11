@@ -975,6 +975,17 @@ body, html {
 .progress-fill {
   transition: width 0.6s ease, box-shadow 0.4s ease !important; /* anima luz */
 }
+
+/* FIX 4: Perguntas em cima da barra contador */
+.j-pergunta {
+  margin-top: 0 !important; /* tira espaço antes */
+  padding-top: 0 !important;
+}
+.perguntas-no-bloco { /* a barra em si */
+  margin-top: -8px !important; /* cola na pergunta */
+  background-color: color-mix(in srgb, var(--guide-color, #ffd700) 30%, transparent); /* reflete cor do guia */
+}
+
 /* FIX 5: Áurea nos botões na cor do guia */
 .j-pergunta .btn,
 .btn-continuar,
