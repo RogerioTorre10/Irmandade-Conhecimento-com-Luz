@@ -117,49 +117,6 @@
     margin-top: -18px !important;
     margin-bottom: 24px !important;
   }   
-}
-
-/* =========================================================
-   3) MOBILE BASE (<= 600px)
-   Mesma largura/altura de card pra TODAS as seções
-   ========================================================= */
-@media (max-width: 600px) {
-
-  #section-intro .j-panel-glow,
-  #section-termos1 .j-panel-glow,
-  #section-termos2 .j-panel-glow,
-  #section-senha  .j-panel-glow,
-  #section-guia   .j-panel-glow,
-  #section-selfie .j-panel-glow,
-  #section-card .j-panel-glow, 
-  #section-perguntas .j-panel-glow,
-  #section-final  .j-panel-glow {
-    width: min(320px, 84vw);
-    max-width: 320px;
-    margin: 18px auto 26px;
-    padding: 18px 14px 22px;
-  }
-
-  #section-intro .j-perg-v-inner,
-  #section-termos1 .j-perg-v-inner,
-  #section-termos2 .j-perg-v-inner,
-  #section-senha  .j-perg-v-inner,
-  #section-guia   .j-perg-v-inner,
-  #section-selfie .j-perg-v-inner,
-  #section-card .j-perg-v-inner,  
-  #section-perguntas .j-perg-v-inner,
-  #section-final  .j-perg-v-inner {
-    transform: translateY(0); /* base neutra; overrides abaixo */
-  }
-}
-
-/* =========================================================
-   4) AJUSTES FINOS – MOBILE
-   (valores calibrados pelos teus prints)
-   ========================================================= */
-
-/* ---- INTRO: subir um pouco mais ---- */
-@media (max-width: 600px) {
   #section-intro .j-panel-glow {
     /* estava -16, subimos mais um pouco */
     transform: translate(-6px, -26px);
@@ -432,25 +389,32 @@
   }   
 }
 
-
-/* ---- PERGUNTAS: card com perguntas – um pouco mais central ---- */
-@media (max-width: 600px) {
-  #section-perguntas .j-panel-glow {
-    transform: translate(-6px, -30px);
-  }
-}
-
-/* ---- FINAL: tela de encerramento – segue mesmo eixo ---- */
-@media (max-width: 600px) {
-  #section-final .j-panel-glow {
-    transform: translate(-6px, -30px);
-  }
-}
-
 /* =========================================================
    AJUSTE FINO – LAYOUT DA PÁGINA SENHA (DESKTOP)
    (um pouco mais alta dentro do pergaminho)
    ========================================================= */
+#section-senha  .j-perg-v-inner {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 850px;
+  width: 100%;
+  position: relative;
+}
+
+#section-senha  .j-panel-glow {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Pergaminho base (onde estiver usando a classe .pergaminho) */
+.pergaminho {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  background-size: 100% auto !important;
+  background-repeat: no-repeat;
+  background-position: top center;
+}
 @media (min-width: 900px) {
 
   /* Pergaminho de fundo da senha */
@@ -476,6 +440,21 @@
     margin-right: auto !important;
     z-index: 6 !important;  
 }
+   
+#section-senha  .j-perg-v-inner {
+    transform: translateY(40px);
+  }
+
+ #section-senha  .j-panel-glow {
+    transform: translateY(-10px);
+  }
+  
+  #section-senha .j-arcane-card{
+    max-height: 72vh;      /* mesma “altura de vidro interno” das outras */
+    margin-top: 26px;      /* mantém o topo bonito */
+    margin-bottom: 32px;   /* sobe a base, abre respiro no rodapé */
+  }
+   
 #section-senha .j-panel-glow {
     padding: 10px !important; /* igual Intro */
   }
@@ -495,7 +474,7 @@
     border-radius: 18px !important;
     box-sizing: border-box !important;
   }
-}
+
    /* Guia (mesmo problema) */
   #section-senha .j-arcane-card {
     margin-top: -18px !important;
@@ -557,7 +536,18 @@
   #section-senha .pergaminho,
   #section-senha .pergaminho-v {
   overflow-x: hidden !important;
-}   
+}
+
+   #section-senha  .j-panel-glow {
+    width: min(320px, 84vw);
+    max-width: 320px;
+    margin: 18px auto 26px;
+    padding: 18px 14px 22px;
+  }
+  
+  #section-senha  .j-perg-v-inner {
+    transform: translateY(0); /* base neutra; overrides abaixo */
+  }
 }
 
 
@@ -1385,7 +1375,11 @@
   #section-perguntas .pergaminho-v {
   overflow-x: hidden !important;
 }   
-}
+
+  #section-perguntas .j-panel-glow {
+    transform: translate(-6px, -30px);
+  }
+
   #section-perguntas .j-perg-v-inner {
     padding: 12px 8px;
   }
@@ -1611,7 +1605,11 @@ body.final-lock {
       inset 0 0 18px rgba(0, 0, 0, 0.45) !important;
     border-radius: 18px !important;
     box-sizing: border-box !important;
-  }   
+  }
+  
+  #section-final .j-panel-glow {
+    transform: translate(-6px, -30px);
+  }
 }
     
     /* ESSAS 3 LINHAS SÃO O SEGREDO */
