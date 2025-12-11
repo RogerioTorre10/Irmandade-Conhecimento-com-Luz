@@ -1041,7 +1041,7 @@
     border-radius: 22px !important;
   }
   
-  #section-perguntas .senha-panel {
+  #section-perguntas .perguntas-panel {
     width: 100% !important;
     max-width: 100% !important;
     border: 1px solid rgba(255, 210, 140, 0.35) !important;
@@ -1432,7 +1432,7 @@ body.guia-arion #section-perguntas .btn.btn-stone {
     border-radius: 22px !important;
   }
   
-  #section-perguntas .senha-panel {
+  #section-perguntas .perguntas-panel {
     width: 100% !important;
     max-width: 100% !important;
     border: 1px solid rgba(255, 210, 140, 0.35) !important;
@@ -1444,7 +1444,7 @@ body.guia-arion #section-perguntas .btn.btn-stone {
   }
 
   /* Opcional: título e conteúdo respirando igual intro */
-  #section-perguntas .senha-panel-inner {
+  #section-perguntas .perguntas-panel-inner {
     padding: 0 10px !important;
     box-sizing: border-box !important;
   }
@@ -1705,7 +1705,6 @@ body.guia-arion #section-perguntas .btn.btn-stone {
 
 #section-perguntas .answer-box,
 #section-perguntas .resposta-box,
-#section-perguntas .jp-answer-input,
 #section-perguntas .jp-answer-frame,
 #section-perguntas .textarea-wrapper {
   position: relative !important;
