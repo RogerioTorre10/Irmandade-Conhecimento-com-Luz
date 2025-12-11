@@ -175,4 +175,11 @@ const qBar   = document.getElementById('progress-question-fill');
   } else {
     watch();
   }
+   // FIX 1: Reinit quando section-perguntas vira active
+      document.addEventListener('sectionLoaded', (e) => {
+      if (e.detail.sectionId === 'section-perguntas') {
+      relocateOnce(); // força reposicionamento do badge/bloco
+    }
+});
+  
 })();
