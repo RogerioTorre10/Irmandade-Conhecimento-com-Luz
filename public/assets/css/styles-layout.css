@@ -1008,7 +1008,7 @@
 
 @media (min-width: 900px) {
 
-  /* Pergaminho de fundo da senha */
+  /* Pergaminho de fundo da perguntas */
   #section-perguntas .j-perg-v-inner {
     position: relative !important;
     transform: translateY(40px) !important; /* antes 80px */
@@ -1019,7 +1019,7 @@
     z-index: 5 !important;
   }
 
-  /* Card (vidro) da senha */
+  /* Card (vidro) da perguntas  */
   #section-perguntas .j-panel-glow {
     position: relative !important;
     transform: translate(-16px, -70px) !important; /* antes 40px */
@@ -1279,6 +1279,32 @@
   resize: none;
   font-size: 0.95rem;
   box-sizing: border-box;
+}
+/* ============================================
+   FIXO: Moldura medieval sempre aparecendo
+   para a caixa de resposta da Jornada
+   ============================================ */
+
+#section-perguntas .answer-box,
+#section-perguntas .resposta-box,
+#section-perguntas .j-answer,
+#section-perguntas .textarea-wrapper {
+  position: relative !important;
+  padding: 16px !important;
+  background: url('/assets/img/pergaminho-rasgado-vert.png') center/cover no-repeat !important;
+  border: 14px solid transparent !important;
+  border-image: url('/assets/img/moldura-medieval-espinhos.png') 60 stretch !important;
+  border-radius: 6px !important;
+}
+
+/* mantém o textarea limpo, sem apagar a moldura */
+#section-perguntas textarea {
+  background: rgba(0,0,0,0.65) !important;
+  border: none !important;
+  color: #f2e7c9 !important;
+  font-family: 'Cardo', serif !important;
+  padding: 12px !important;
+  resize: none !important;
 }
 
 /* PROGRESSO DO MEIO */
