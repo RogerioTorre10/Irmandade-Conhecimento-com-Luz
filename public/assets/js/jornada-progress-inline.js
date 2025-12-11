@@ -53,10 +53,8 @@ const qBar   = document.getElementById('progress-question-fill');
   function placeAbove(sec, wrap){
     // tenta ancorar após chama / título / pergunta digitada
     var anchor =
-      byId('chama-perguntas') ||
-      q('.jp-header', sec) ||
-      q('.jp-question-typed', sec) ||
-      sec.firstElementChild;
+  document.getElementById('jp-question-typed') ||
+  sec.firstElementChild;
 
     if (anchor && anchor.parentNode) {
       anchor.insertAdjacentElement('afterend', wrap);
