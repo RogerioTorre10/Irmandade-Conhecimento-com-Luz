@@ -467,7 +467,7 @@ window.playBlockTransition = function(videoSrc, onDone) {
     const btnFalar  = $('#jp-btn-falar', root);
     const btnApagar = $('#jp-btn-apagar', root);
     const btnConf   = $('#jp-btn-confirmar', root);
-    const input     = $('#jp-answer-input', root);
+    const input     = $('#jp-answer-input', root);    
 
     // ================================
     // MICROFONE controlado pelo botão
@@ -539,6 +539,12 @@ window.playBlockTransition = function(videoSrc, onDone) {
         window.JORNADA_CHAMA.updateChamaFromText(txt, 'chama-perguntas');
       });
     }
+    
+    // FIX 5: Atualiza áurea quando guia muda
+      const guideColor = localStorage.getItem('JORNADA_GUIA_COLOR') || '#ffd700';
+      document.querySelectorAll('.btn').forEach(b => {
+      b.style.setProperty('--guide-color', guideColor);
+   });
 
     // (opcional) nada de attach automático aqui, só pelo botão falar
   }
@@ -653,6 +659,12 @@ window.playBlockTransition = function(videoSrc, onDone) {
     const pct    = Math.min(100, (nAtual / nTotal) * 100);
 
     fillEl.style.width = pct + '%';
+
+    // FIX 2: Luz do guia no progresso
+    const guideColor = localStorage.getItem('JORNADA_GUIA_COLOR') || '#ffd700'; // pega cor do guia salvo
+    qBar.style.background = `linear-gradient(to right, transparent, ${guideColor})`; // luz preenchendo
+    qBar.style.boxShadow = `0 0 10px ${guideColor}`; // emite luz
+    qBadge.style.color = guideColor; // badge reflete cor do guia
 
     if (labelEl) {
       labelEl.textContent = `${nAtual} / ${nTotal}`;
