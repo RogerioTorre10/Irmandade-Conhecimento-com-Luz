@@ -65,20 +65,18 @@
   }
 
   /* Painel de vidro dentro do pergaminho */
-  #section-intro .j-panel-glow, 
-  #section-intro .termos-panel {
-    width: calc(100vw - 50px) !important;  /* 10px de respiro de cada lado */
-    max-width: 460px !important;
-    margin: 18px auto 32px !important;            /* centraliza */
-    padding: 28px 22px 48px 22px !important;
-    border-radius: 26px !important;
-    box-sizing: border-box !important;
+ #section-intro .j-panel-glow {
+    position: relative !important;
+    /* X = 0 (sem puxar para a esquerda), Y controla o quanto sobe/desce */
+    transform: translateY(-40px) !important;  /* ajuste fino da altura */
+    top: 0 !important;
 
+    margin: 0 auto !important;
+    width: 90vw !important;
+    max-width: 520px !important;
 
-    /* NADA de margin-top negativo, NADA de flex aqui */
-    transform: translateY(-50px) translateZ(0) !important;
-    -webkit-transform: translateY(-50px) translateZ(0) !important;
-    overflow: hidden !important;
+    padding: 10px !important; /* mesmo respiro das outras páginas */
+    z-index: 6 !important;
   }
 
   /* Conteúdo interno do pergaminho da intro */
