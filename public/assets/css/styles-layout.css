@@ -71,8 +71,8 @@
     width: calc(100vw - 20px) !important;
     max-width: 460px !important;
     margin: 0 auto !important;
-    margin-top: -88px !important;           /* valor exato que alinha com termos 1/2 */
-    padding: 44px 28px 60px 28px !important; /* mesmo interno das outras */
+    margin-top: -48px !important;           /* valor exato que alinha com termos 1/2 */
+    padding: 36px 26px 56px 26px !important; /* mesmo interno das outras */
     border-radius: 28px !important;
     transform: translateZ(0) !important;
     overflow: visible !important;
@@ -84,7 +84,7 @@
     width: 100% !important;
     padding: 0 10px !important;
     margin: 0 !important;
-    margin-top: -10px !important; 
+    margin-top: 0 !important; 
   }
 
   /* Botão na mesma altura das outras páginas */
