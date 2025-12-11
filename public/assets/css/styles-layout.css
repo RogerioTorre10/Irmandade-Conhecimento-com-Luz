@@ -1288,13 +1288,12 @@
 #section-perguntas .answer-box,
 #section-perguntas .resposta-box,
 #section-perguntas .jp-answer-frame,
-#section-perguntas .jp-answer-bg,
 #section-perguntas .textarea-wrapper {
   position: relative !important;
   padding: 16px !important;
   background: url('/assets/img/pergaminho-rasgado-vert.png') center/cover no-repeat !important;
   border: 14px solid transparent !important;
-  border-image: url('/assets/img/moldura-medieval-espinhos.png') 60 stretch !important;
+  border-image: url('/assets/img/moldura-medieval.png') 60 stretch !important;
   border-radius: 6px !important;
 }
 
