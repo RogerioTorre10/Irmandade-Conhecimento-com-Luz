@@ -970,5 +970,12 @@ body, html {
   color: #ffd700;
 }
 
+document.querySelectorAll('#section-perguntas .btn').forEach((b) => {
+    b.style.boxShadow = glow;
+    b.style.borderColor = color;
+});
+
+
+
 
 
