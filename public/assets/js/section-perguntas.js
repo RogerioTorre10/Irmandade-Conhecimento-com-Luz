@@ -592,6 +592,181 @@ window.playBlockTransition = function(videoSrc, onDone) {
       log('Reset concluído.');
     }
   };
-
   log(MOD, 'carregado');
 })();
+
+/* ============================================================
+ * PATCH – Mimos da página de perguntas
+ * - Indicador de bloco
+ * - Barras de progresso
+ * - Cor do guia nas perguntas
+ * - Botão Falar (TTS)
+ * ============================================================ */
+(function () {
+  'use strict';
+
+  if (!window.__PERGUNTAS_MIMOS__) {
+    window.__PERGUNTAS_MIMOS__ = true;
+  } else {
+    // evita rodar duas vezes
+    return;
+  }
+
+  const log = (...a) => console.log('[PERGUNTAS:MIMOS]', ...a);
+  const $   = (sel, root = document) => (root || document).querySelector(sel);
+
+  // ---- 1. Pegar elementos básicos uma vez ----
+  const rootSection    = $('#section-perguntas');
+  if (!rootSection) {
+    log('Seção #section-perguntas não encontrada – abortando patch.');
+    return;
+  }
+
+  // topo: "1 de 5"
+  const elBlocoIndicador = rootSection.querySelector('[data-perguntas-bloco-indicador], .perg-bloco-indicador');
+
+  // barras de progresso
+  const barraMacroFill  = rootSection.querySelector('.perg-progress-outer[data-kind="macro"] .perg-progress-fill');
+  const barraMacroLabel = rootSection.querySelector('.perguntas-progress-top, .perg-progress-top-label');
+
+  const barraMicroFill  = rootSection.querySelector('.perg-progress-outer[data-kind="micro"] .perg-progress-fill');
+  const barraMicroLabel = rootSection.querySelector('.perguntas-progress-bottom, .perg-progress-bottom-label');
+
+  // container da pergunta (para tingir com a cor do guia)
+  const perguntaBox = rootSection.querySelector('.perg-pergunta-titulo, .perguntas-pergunta-titulo');
+
+  // botão Falar
+  const btnFalar = rootSection.querySelector('[data-action="tts"], .btn-tts, .btn-falar');
+
+  // ---- 2. Funções utilitárias ----
+
+  function setProgress(fillEl, labelEl, atual, total) {
+    if (!fillEl) return;
+    const nAtual = Math.max(0, Number(atual) || 0);
+    const nTotal = Math.max(1, Number(total) || 1);
+    const pct    = Math.min(100, (nAtual / nTotal) * 100);
+
+    fillEl.style.width = pct + '%';
+
+    if (labelEl) {
+      labelEl.textContent = `${nAtual} / ${nTotal}`;
+    }
+  }
+
+  function updateGuiaColor() {
+    // Usa o atributo data-guia do <body> para determinar a cor
+    const guia = (document.body.getAttribute('data-guia') || '').toLowerCase();
+    if (!perguntaBox || !guia) return;
+
+    perguntaBox.classList.remove('guia-lumen', 'guia-zion', 'guia-arian');
+    if (guia === 'lumen') perguntaBox.classList.add('guia-lumen');
+    if (guia === 'zion')  perguntaBox.classList.add('guia-zion');
+    if (guia === 'arian') perguntaBox.classList.add('guia-arian');
+  }
+
+  function updateBlocoIndicador(blocoAtual, blocosTotal) {
+    if (!elBlocoIndicador) return;
+    const a = Number(blocoAtual) || 1;
+    const t = Number(blocosTotal) || 1;
+    elBlocoIndicador.textContent = `${a} de ${t}`;
+  }
+
+  // ---- 3. Integração com o State existente ----
+  //
+  // Este patch tenta ler o objeto State exportado pelo section-perguntas.js.
+  // Se ele não existir, caímos em um modo mais simples baseado em data-atributos.
+
+  function getStateSnapshot() {
+    const S = window.PERGUNTAS_STATE || window.SectionPerguntasState || window.State || {};
+    const snap = {
+      blocoAtual:   S.currentBlockIndex ?? S.blocoAtual ?? 0,
+      blocosTotal:  S.totalBlocks      ?? S.blocosTotal ?? 1,
+      perguntaIdx:  S.currentIndex     ?? S.perguntaIdx ?? 0,
+      perguntasBloco: S.questionsPerBlock ?? S.perguntasBloco ?? 1,
+      perguntaGlobal: S.currentGlobalIndex ?? S.perguntaGlobal ?? 0,
+      perguntasTotal: S.totalQuestions     ?? S.perguntasTotal ?? 1,
+    };
+    return snap;
+  }
+
+  function refreshUIFromState() {
+    const s = getStateSnapshot();
+
+    // bloco atual (1 de 5)
+    updateBlocoIndicador(s.blocoAtual + 1, s.blocosTotal);
+
+    // barra global (todas perguntas da jornada)
+    setProgress(
+      barraMacroFill,
+      barraMacroLabel,
+      s.perguntaGlobal + 1,
+      s.perguntasTotal
+    );
+
+    // barra micro (perguntas dentro do bloco)
+    setProgress(
+      barraMicroFill,
+      barraMicroLabel,
+      (s.perguntaIdx % s.perguntasBloco) + 1,
+      s.perguntasBloco
+    );
+
+    // tingir pergunta com a cor do guia
+    updateGuiaColor();
+  }
+
+  // ---- 4. TTS – botão Falar ----
+  function speakCurrentQuestion() {
+    try {
+      const synth = window.speechSynthesis;
+      if (!synth) {
+        alert('Leitura em voz alta não está disponível neste navegador.');
+        return;
+      }
+
+      const perguntaEl = rootSection.querySelector('.perguntas-pergunta-texto, .pergunta-texto, .pergunta-atual');
+      if (!perguntaEl) return;
+
+      const text = perguntaEl.textContent.trim();
+      if (!text) return;
+
+      synth.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = document.documentElement.lang || 'pt-BR';
+      synth.speak(utter);
+    } catch (e) {
+      console.error('[PERGUNTAS:TTS] erro ao falar', e);
+    }
+  }
+
+  if (btnFalar) {
+    btnFalar.addEventListener('click', function (ev) {
+      ev.preventDefault();
+      speakCurrentQuestion();
+    });
+  }
+
+  // ---- 5. Hooks de atualização ----
+  //
+  // A maioria dos seus scripts dispara eventos do JC quando troca de pergunta/bloco.
+  // Vamos ouvir esses eventos; se eles não existirem, ainda chamamos 1x no início.
+
+  document.addEventListener('perguntas:state-changed', refreshUIFromState);
+  document.addEventListener('JC.perguntas:next',        refreshUIFromState);
+  document.addEventListener('JC.perguntas:prev',        refreshUIFromState);
+  document.addEventListener('JC.perguntas:jump',        refreshUIFromState);
+
+  // Quando a seção aparece pela primeira vez
+  document.addEventListener('JC.section:shown', function (ev) {
+    if (!ev || !ev.detail || ev.detail.id !== 'section-perguntas') return;
+    refreshUIFromState();
+  });
+
+  // fallback – se nada disparar, ainda assim tentamos uma vez após o load
+  window.addEventListener('load', function () {
+    setTimeout(refreshUIFromState, 400);
+  });
+
+  log('Patch de mimos inicializado.');
+})();
+
