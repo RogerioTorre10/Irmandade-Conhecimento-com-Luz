@@ -21,21 +21,10 @@
   function q(sel, root){ return (root || document).querySelector(sel); }
   function byId(id){ return document.getElementById(id); }
 
-  // ---- Localizadores ----
-  function findBadge(){
-    // Ex: porcentagem ou contador de perguntas
-    return byId('jprog-pct') || byId('badgeProgressoBlocos') || q('.j-progress-badge');
-  }
+ // depois do bloco principal
+const qBadge = document.getElementById('progress-question-value');
+const qBar   = document.getElementById('progress-question-fill');
 
-  function findBar(){
-    // Ex: barra preenchida padrão jornada
-    return q('.j-progress__fill') || q('.progress-bar') || q('.j-progress-bar-fill');
-  }
-
-  function findMeta(){
-    // Ex: container com textos tipo "Pergunta 3 de 10"
-    return byId('j-meta') || q('.j-progress') || q('.j-progress-meta');
-  }
 
   function ensureWrap(){
     var wrap = byId('progress-inline');
