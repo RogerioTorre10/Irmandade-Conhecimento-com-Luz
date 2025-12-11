@@ -57,111 +57,46 @@
 
 @media (max-width: 600px) {
 
-  /* Seção inteira vira flex e centraliza verticalmente */
   #section-intro {
+    padding: 16px 0 130px !important;
+    min-height: 90vh !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: flex-start !important;   /* começa do topo, mas com respiro */
+    justify-content: flex-start !important;
     align-items: center !important;
-    min-height: 100vh !important;
-    padding: 20px 0 140px !important;         /* mesmo valor da final e termos */
-    overflow: hidden !important;
-    position: relative !important;
   }
 
-  /* Painel de vidro — sobe bastante e fica na mesma altura das outras páginas */
+  /* Painel de vidro da intro – sobe na mesma posição das outras páginas */
   #section-intro .j-panel-glow {
-    width: calc(100vw - 20px) !important;     /* 10px de margem lateral → padrão ouro */
+    width: calc(100vw - 20px) !important;
     max-width: 460px !important;
     margin: 0 auto !important;
-    margin-top: -74px !important;             /* valor mágico que bate EXATO com termos/final */
-    padding: 40px 28px 56px 28px !important;  /* ar interno generoso */
+    margin-top: -68px !important;           /* valor exato que alinha com termos 1/2 */
+    padding: 36px 28px 52px 28px !important; /* mesmo interno das outras */
     border-radius: 28px !important;
-    box-sizing: border-box !important;
-    position: relative !important;
-    z-index: 5 !important;
-
-    /* Fix do backdrop-filter + libera névoa */
     transform: translateZ(0) !important;
-    -webkit-transform: translateZ(0) !important;
-    backface-visibility: hidden !important;
     overflow: visible !important;
   }
 
-  /* Conteúdo interno (pergaminho) */
+  /* Conteúdo interno – NÃO mexe no espaçamento dos parágrafos */
   #section-intro .j-perg-v-inner,
-  #section-intro .conteudo-pergaminho,
   #section-intro .parchment-inner-rough {
     width: 100% !important;
-    max-width: 100% !important;
-    padding: 0 12px !important;
-    box-sizing: border-box !important;
+    padding: 0 10px !important;
+    margin: 0 !important;
   }
 
-  /* Título grande e majestoso */
-  #section-intro .intro-title,
-  #section-intro .termos-title {
-    font-size: 31px !important;
-    margin: 8px 0 24px 0 !important;
-    line-height: 1.1 !important;
-    text-align: center !important;
-  }
-
-  /* Texto da intro (typing) */
-  #section-intro .parchment-text-rough,
-  #section-intro .termos-texto {
-    font-size: 15.5px !important;
-    line-height: 1.6 !important;
-    padding: 20px 24px !important;
-    text-align: left !important;
-  }
-
-  /* Botão na mesma posição das outras páginas */
+  /* Botão na mesma altura das outras páginas */
   #section-intro .parchment-actions-rough,
   #section-intro .termos-actions {
     margin-top: 36px !important;
-    display: flex;
-    justify-content: center;
   }
 
-  #section-intro .btn-continuar,
-  #section-intro [class*="btn"] {
+  #section-intro .btn-continuar {
     min-height: 64px !important;
     font-size: 18.5px !important;
     padding: 0 36px !important;
-    border-radius: 16px !important;
   }
-
-  /* Libera névoa e glow da intro (se tiver ::before/::after) */
-  #section-intro .j-panel-glow::before,
-  #section-intro .j-panel-glow::after {
-    display: block !important;
-    pointer-events: none !important;
-  }
-   #section-termos1 .j-panel-glow {
-    padding: 10px !important; /* igual Intro */
-  }
-  
-   #section-intro .j-panel-glow::before {
-    inset: 4px !important;    /* afina o aro interno */
-    border-radius: 22px !important;
-  }
-  
-   #section-intro .senha-panel {
-    width: 100% !important;
-    max-width: 100% !important;
-    border: 1px solid rgba(255, 210, 140, 0.35) !important;
-    box-shadow:
-      0 0 14px rgba(255, 190, 120, 0.25),
-      inset 0 0 18px rgba(0, 0, 0, 0.45) !important;
-    border-radius: 18px !important;
-    box-sizing: border-box !important;
-  }
-    /* Guia (mesmo problema) */
-  #section-intro .j-arcane-card {
-    margin-top: -18px !important;
-    margin-bottom: 24px !important;
-  }   
 }
 
 /* ---- TERMOS 1 sobem um pouco mais ainda ---- */
