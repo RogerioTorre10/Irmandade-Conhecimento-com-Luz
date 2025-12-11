@@ -71,8 +71,8 @@
     width: calc(100vw - 20px) !important;
     max-width: 460px !important;
     margin: 0 auto !important;
-    margin-top: -68px !important;           /* valor exato que alinha com termos 1/2 */
-    padding: 36px 28px 52px 28px !important; /* mesmo interno das outras */
+    margin-top: -10px !important;           /* valor exato que alinha com termos 1/2 */
+    padding: 44px 28px 60px 28px !important; /* mesmo interno das outras */
     border-radius: 28px !important;
     transform: translateZ(0) !important;
     overflow: visible !important;
