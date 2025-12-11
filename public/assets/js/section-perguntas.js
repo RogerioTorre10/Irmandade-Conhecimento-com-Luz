@@ -450,13 +450,10 @@ window.playBlockTransition = function(videoSrc, onDone) {
   }
 }
 
-
-
-  // --------------------------------------------------
-  // BIND UI
-  // --------------------------------------------------
-
-  function bindUI(root) {
+// --------------------------------------------------
+// BIND UI
+// --------------------------------------------------
+function bindUI(root) {
   root = root || document.getElementById(SECTION_ID) || document;
 
   const btnFalar  = $('#jp-btn-falar', root);
@@ -472,32 +469,49 @@ window.playBlockTransition = function(videoSrc, onDone) {
   if (btnFalar && input && window.JORNADA_MICRO) {
     const Micro = window.JORNADA_MICRO;
 
+    // 1) tenta anexar o input ao módulo de voz UMA vez
+    if (!micAttached && typeof Micro.attach === 'function') {
+      try {
+        // se o jornada-micro.js aceitar opções, já passamos o botão
+        Micro.attach(input, { mode: 'append', button: btnFalar });
+        micAttached = true;
+      } catch (e) {
+        console.warn('[PERGUNTAS] Erro ao anexar JORNADA_MICRO:', e);
+      }
+    }
+
+    // 2) click do botão Falar
     btnFalar.addEventListener('click', (ev) => {
       ev.preventDefault();
       ev.stopPropagation();
 
-      // 1) Garante que o input está "conectado" ao módulo de voz
+      // garante attach, se ainda não conseguiu
       if (!micAttached && typeof Micro.attach === 'function') {
-        // se no jornada-micro.js existir alguma opção tipo "hideButton",
-        // pode passar aqui também, ex: { mode: 'append', hideButton: true }
-        Micro.attach(input, { mode: 'append' });
-        micAttached = true;
+        try {
+          Micro.attach(input, { mode: 'append', button: btnFalar });
+          micAttached = true;
+        } catch (e) {
+          console.warn('[PERGUNTAS] Erro ao anexar JORNADA_MICRO no clique:', e);
+        }
       }
 
-      // 2) Liga / desliga a captura de voz
-      if (typeof Micro.toggle === 'function') {
-        // caminho ideal: módulo expõe um toggle()
+      // ordem de preferência para compatibilidade:
+      //  onButtonClick(ev, input) -> toggle() -> start()
+      if (typeof Micro.onButtonClick === 'function') {
+        Micro.onButtonClick(ev, input);
+      } else if (typeof Micro.toggle === 'function') {
         Micro.toggle();
       } else if (typeof Micro.start === 'function') {
-        // fallback: se só existir start(), chama start sempre
         Micro.start();
       } else {
-        console.warn('[PERGUNTAS] JORNADA_MICRO não tem toggle()/start().');
+        console.warn('[PERGUNTAS] JORNADA_MICRO disponível, mas sem onButtonClick/toggle/start().');
       }
     });
   }
 
+  // ================================
   // APAGAR
+  // ================================
   if (btnApagar && input) {
     btnApagar.addEventListener('click', (ev) => {
       ev.preventDefault();
@@ -510,7 +524,9 @@ window.playBlockTransition = function(videoSrc, onDone) {
     });
   }
 
+  // ================================
   // CONFIRMAR
+  // ================================
   if (btnConf) {
     btnConf.addEventListener('click', (ev) => {
       ev.preventDefault();
@@ -523,7 +539,9 @@ window.playBlockTransition = function(videoSrc, onDone) {
     });
   }
 
-  // INPUT CHAMA
+  // ================================
+  // INPUT -> intensidade da chama
+  // ================================
   if (input && window.JORNADA_CHAMA) {
     input.addEventListener('input', () => {
       const txt = input.value || '';
@@ -531,11 +549,12 @@ window.playBlockTransition = function(videoSrc, onDone) {
     });
   }
 
-  // MICROFONE AUTOMÁTICO (opcional)
-  //if (input && window.JORNADA_MICRO) {
-  // window.JORNADA_MICRO.attach(input, { mode: 'append' });
- // }
+  // MICROFONE AUTOMÁTICO DESLIGADO (por enquanto)
+  // if (input && window.JORNADA_MICRO) {
+  //   window.JORNADA_MICRO.attach(input, { mode: 'append' });
+  // }
 }
+
 
   // --------------------------------------------------
   // INIT
