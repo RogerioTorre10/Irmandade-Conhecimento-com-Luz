@@ -1563,6 +1563,7 @@ body.final-lock {
 
   /* Painel de vidro dentro do pergaminho */
     #section-final .j-panel-glow,
+    #section-final .final-panel,
     #section-final .termos-panel {
     width: calc(100vw - 40px) !important;  /* 10px de respiro de cada lado */
     max-width: 460px !important;
