@@ -56,48 +56,115 @@
 }
 
 @media (max-width: 600px) {
+#section-intro .j-perg-v-inner {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 850px;
+  width: 100%;
+  position: relative;
+}
 
-  #section-intro {
-    padding: 16px 0 130px !important;
-    min-height: 90vh !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: flex-start !important;
-    align-items: center !important;
+#section-intro .j-panel-glow {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Pergaminho base (onde estiver usando a classe .pergaminho) */
+.pergaminho {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  background-size: 100% auto !important;
+  background-repeat: no-repeat;
+  background-position: top center;
+}
+
+
+  #section-intro .j-perg-v-inner {
+    transform: translateY(40px);
   }
 
-  /* Painel de vidro da intro – sobe na mesma posição das outras páginas */
   #section-intro .j-panel-glow {
-    width: calc(100vw - 20px) !important;
-    max-width: 460px !important;
-    margin: 0 auto !important;
-    margin-top: -48px !important;           /* valor exato que alinha com termos 1/2 */
-    padding: 36px 26px 56px 26px !important; /* mesmo interno das outras */
-    border-radius: 28px !important;
-    transform: translateZ(0) !important;
-    overflow: visible !important;
+    transform: translateY(-10px);
   }
-
-  /* Conteúdo interno – NÃO mexe no espaçamento dos parágrafos */
-  #section-intro .j-perg-v-inner,
-  #section-intro .parchment-inner-rough {
+   
+  #section-intro  .j-arcane-card {
+    max-height: 72vh;      /* mesma “altura de vidro interno” das outras */
+    margin-top: 26px;      /* mantém o topo bonito */
+    margin-bottom: 32px;   /* sobe a base, abre respiro no rodapé */
+  }
+    #section-intro .j-panel-glow {
+    padding: 10px !important; /* igual Intro */
+  }
+  
+   #section-intro .j-panel-glow::before {
+    inset: 4px !important;    /* afina o aro interno */
+    border-radius: 22px !important;
+  }
+  
+   #section-intro .senha-panel {
     width: 100% !important;
-    padding: 0 10px !important;
-    margin: 0 !important;
-    margin-top: 0 !important; 
+    max-width: 100% !important;
+    border: 1px solid rgba(255, 210, 140, 0.35) !important;
+    box-shadow:
+      0 0 14px rgba(255, 190, 120, 0.25),
+      inset 0 0 18px rgba(0, 0, 0, 0.45) !important;
+    border-radius: 18px !important;
+    box-sizing: border-box !important;
+  }
+    /* Guia (mesmo problema) */
+  #section-intro .j-arcane-card {
+    margin-top: -18px !important;
+    margin-bottom: 24px !important;
+  }   
+}
+
+/* =========================================================
+   3) MOBILE BASE (<= 600px)
+   Mesma largura/altura de card pra TODAS as seções
+   ========================================================= */
+@media (max-width: 600px) {
+
+  #section-intro .j-panel-glow,
+  #section-termos1 .j-panel-glow,
+  #section-termos2 .j-panel-glow,
+  #section-senha  .j-panel-glow,
+  #section-guia   .j-panel-glow,
+  #section-selfie .j-panel-glow,
+  #section-card .j-panel-glow, 
+  #section-perguntas .j-panel-glow,
+  #section-final  .j-panel-glow {
+    width: min(320px, 84vw);
+    max-width: 320px;
+    margin: 18px auto 26px;
+    padding: 18px 14px 22px;
   }
 
-  /* Botão na mesma altura das outras páginas */
-  #section-intro .parchment-actions-rough,
-  #section-intro .termos-actions {
-    margin-top: 36px !important;
+  #section-intro .j-perg-v-inner,
+  #section-termos1 .j-perg-v-inner,
+  #section-termos2 .j-perg-v-inner,
+  #section-senha  .j-perg-v-inner,
+  #section-guia   .j-perg-v-inner,
+  #section-selfie .j-perg-v-inner,
+  #section-card .j-perg-v-inner,  
+  #section-perguntas .j-perg-v-inner,
+  #section-final  .j-perg-v-inner {
+    transform: translateY(0); /* base neutra; overrides abaixo */
   }
+}
 
-  #section-intro .btn-continuar {
-    min-height: 64px !important;
-    font-size: 18.5px !important;
-    padding: 0 36px !important;
+/* =========================================================
+   4) AJUSTES FINOS – MOBILE
+   (valores calibrados pelos teus prints)
+   ========================================================= */
+
+/* ---- INTRO: subir um pouco mais ---- */
+@media (max-width: 600px) {
+  #section-intro .j-panel-glow {
+    /* estava -16, subimos mais um pouco */
+    transform: translate(-6px, -26px);
   }
+  
 }
 
 /* ---- TERMOS 1 sobem um pouco mais ainda ---- */
