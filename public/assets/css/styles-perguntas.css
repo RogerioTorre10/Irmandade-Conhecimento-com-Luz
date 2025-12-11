@@ -263,14 +263,17 @@
 
 /* Microfone */
 .jp-answer-frame .jp-mic{
-  position: absolute;
-  right: 10px;
-  bottom: 10px;
-  width: 26px;
-  height: 26px;
-  z-index: 20;
-  pointer-events: auto !important;
-  cursor: pointer;
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important; 
+ /*position: absolute;
+   right: 10px;
+   bottom: 10px;
+   width: 26px;
+   height: 26px;
+   z-index: 20;
+   pointer-events: auto !important;
+//  cursor: pointer; */
 }
 
 /* ===========================================================
