@@ -464,21 +464,26 @@ function bindUI(root) {
   // ================================
   // MICROFONE controlado pelo botão
   // ================================
-  let micAttached = false;
+  let micInstance = null;
 
-  if (btnFalar && input && window.JORNADA_MICRO) {
-    const Micro = window.JORNADA_MICRO;
+btnFalar.addEventListener('click', (ev) => {
+  ev.preventDefault();
+  ev.stopPropagation();
 
-    // 1) tenta anexar o input ao módulo de voz UMA vez
-    if (!micAttached && typeof Micro.attach === 'function') {
-      try {
-        // se o jornada-micro.js aceitar opções, já passamos o botão
-        Micro.attach(input, { mode: 'append', button: btnFalar });
-        micAttached = true;
-      } catch (e) {
-        console.warn('[PERGUNTAS] Erro ao anexar JORNADA_MICRO:', e);
-      }
-    }
+  if (!micAttached) {
+    micInstance = Micro.attach(input, { mode:'append' });
+    micAttached = true;
+  }
+
+  if (!micInstance) return;
+
+  // Toggle manual
+  if (micInstance.button.classList.contains('rec')) {
+    micInstance.stop();
+  } else {
+    micInstance.start();
+  }
+});
 
     // 2) click do botão Falar
     btnFalar.addEventListener('click', (ev) => {
