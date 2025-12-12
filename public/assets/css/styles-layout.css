@@ -1962,11 +1962,11 @@ body.final-lock {
 }
    
 #section-final {
-  padding-bottom: 30px !important;   /* antes estava grande demais */
+  padding-bottom: 24px !important;   /* antes estava grande demais */
 }
    
 #section-final .pergaminho-content {
-  padding-bottom: 18px !important;   /* menos peso na base interna */
+  padding-bottom: 14px !important;   /* menos peso na base interna */
 }
    
 #section-final .final-pergaminho-wrapper {
