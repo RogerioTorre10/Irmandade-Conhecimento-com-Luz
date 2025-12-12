@@ -1950,6 +1950,7 @@ body.final-lock {
     margin-top: 26px;      /* mantém o topo bonito */
     margin-bottom: 32px;   /* sobe a base, abre respiro no rodapé */
   }
+   
    /* Pergaminho base (onde estiver usando a classe .pergaminho) */
 .pergaminho {
   width: 100%;
@@ -1959,10 +1960,20 @@ body.final-lock {
   background-repeat: no-repeat;
   background-position: top center;
 }
-    #section-final .final-pergaminho-wrapper {
-    position: relative;
-    left: 25px;     /* ajuste fino: pode ser 18px, 22px, 28px */
-  }
+   
+#section-final {
+  padding-bottom: 30px !important;   /* antes estava grande demais */
+}
+   
+#section-final .pergaminho-content {
+  padding-bottom: 18px !important;   /* menos peso na base interna */
+}
+   
+#section-final .final-pergaminho-wrapper {
+position: relative;
+left: 25px;     /* ajuste fino: pode ser 18px, 22px, 28px */
+margin-bottom: 10px !important;    /* sobe o conjunto */   
+}
 
   #section-final .pergaminho-content,
   #section-final .final-panel,
