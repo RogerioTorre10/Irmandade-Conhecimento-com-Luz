@@ -1842,6 +1842,24 @@ body.guia-arion #section-perguntas .btn.btn-stone {
 /* =========================================
    SECTION-FINAL — BASE CORRIGIDA
    ========================================= */
+@media (min-width: 900px) {
+   
+ html, body {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+    overscroll-behavior-x: none;
+  }
+   
+ /* Seção inteira dos termos */
+    #section-final {
+    padding: 24px 0 120px !important;  /* distância do topo + espaço pro botão */
+    overflow: hidden !important;
+    min-height: 100vh !important;
+  }  
+   
 #section-final  .j-perg-v-inner {
   margin-left: auto;
   margin-right: auto;
@@ -1855,9 +1873,7 @@ body.guia-arion #section-perguntas .btn.btn-stone {
   margin-right: auto;
 }
 
-@media (min-width: 900px) {
-
-  /* Pergaminho de fundo da senha */
+  /* Pergaminho de fundo da final */
     #section-final .j-perg-v-inner {
     position: relative !important;
     transform: translateY(40px) !important; /* antes 80px */
@@ -1942,6 +1958,7 @@ body.final-lock {
   background-repeat: no-repeat;
   background-position: top center;
 }
+   
  }
 
 /* =========================================
