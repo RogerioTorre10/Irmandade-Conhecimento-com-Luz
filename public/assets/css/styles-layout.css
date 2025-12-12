@@ -1187,6 +1187,20 @@
   width: 100%;
 }
 
+ /* Espaço entre a barra do topo e o texto da pergunta */
+#section-perguntas #jp-question-typed {
+  display: block;
+  margin-top: 8px;      /* afasta a pergunta da barra */
+  line-height: 1.4;
+}
+   
+#section-perguntas #jp-question-typed {
+  display: block;
+  margin-top: 8px;
+  font-size: 1.05rem;   /* levemente maior que o padrão */
+  line-height: 1.4;
+}   
+
 /* TOPO – AMPULHETA + BLOCO */
 #section-perguntas .progress-total {
   display: flex;
@@ -1460,7 +1474,21 @@ body.guia-arion #section-perguntas .btn.btn-stone {
   #section-perguntas .j-perg-v-inner {
     padding: 12px 8px;
   }
+   
+   /* Espaço entre a barra do topo e o texto da pergunta */
+#section-perguntas #jp-question-typed {
+  display: block;
+  margin-top: 8px;      /* afasta a pergunta da barra */
+  line-height: 1.4;
+}
 
+#section-perguntas #jp-question-typed {
+  display: block;
+  margin-top: 8px;
+  font-size: 1.05rem;   /* levemente maior que o padrão */
+  line-height: 1.4;
+}
+   
   #section-perguntas .progress-top {
     flex-direction: column;
     align-items: flex-start;
