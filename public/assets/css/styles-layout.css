@@ -1853,8 +1853,9 @@ body.guia-arion #section-perguntas .btn.btn-stone {
     overscroll-behavior-x: none;
   }
    
- /* Seção inteira dos termos */
+ /* Seção inteira da final */
     #section-final {
+    padding-top: 90px !important;   
     padding: 24px 0 120px !important;  /* distância do topo + espaço pro botão */
     overflow: hidden !important;
     min-height: 100vh !important;
@@ -1958,6 +1959,17 @@ body.final-lock {
   background-repeat: no-repeat;
   background-position: top center;
 }
+    #section-final .final-pergaminho-wrapper {
+    position: relative;
+    left: 25px;     /* ajuste fino: pode ser 18px, 22px, 28px */
+  }
+
+  #section-final .pergaminho-content,
+  #section-final .final-panel,
+  #section-final .final-glass {
+    position: relative;
+    left: 25px;     /* mantém tudo alinhado */
+  }
    
  }
 
