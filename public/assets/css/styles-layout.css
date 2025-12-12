@@ -1969,6 +1969,77 @@ body.final-lock {
   #section-final .final-glass {
     position: relative;
     left: 25px;     /* mantém tudo alinhado */
+ 
+  /* ESSAS 3 LINHAS SÃO O SEGREDO */
+    overflow: visible !important;          /* deixa os ::before e ::after vazarem */
+    isolation: isolate;                     /* cria novo stacking context */
+    transform: translateZ(0);               /* mantém o fix do backdrop-filter */
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
+  /* Corta só o que realmente vaza pro lado (a névoa e a luz ficam livres) */
+  #section-final {
+    overflow: hidden !important;            /* corta só o container pai */
+  }
+
+  /* Garante que a névoa e a luz pulsante voltem a aparecer */
+  #section-final .j-panel-glow::before,
+  #section-final .j-panel-glow::after {
+    display: block !important;             /* reativa os dois efeitos */
+    pointer-events: none !important;       /* não atrapalha clique */
+    max-width: 100vw !important;
+    box-sizing: border-box !important; 
+  }
+  
+  /* Botões nunca mais vão ser cortados */
+  #section-final .final-buttons {
+    margin-top: 20px !important;
+    gap: 16px !important;
+    padding: 0 10px !important;
+  }
+
+  #section-final .btn-final {
+    min-height: 56px !important;
+    padding: 0 20px !important;
+    font-size: 17px !important;
+  }
+   
+   /* ===============================
+   FINAL — TEXTO CENTRALIZADO
+   =============================== */
+#section-final .final-title,
+#section-final #final-title {
+  text-align: center !important;
+}
+
+#section-final .final-message {
+  text-align: center !important;
+}
+
+#section-final .final-message p {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 92%;        /* mantém boa leitura */
+  line-height: 1.5;
+} 
+
+ /* --- TURBINA A NÉVOA E O GLOW NO MOBILE --- */
+  #section-final .j-panel-glow {
+    background:
+      radial-gradient(circle at 50% 10%, rgba(255,255,255,0.18), transparent 55%),
+      radial-gradient(circle at 15% 80%, rgba(0,255,200,0.24), transparent 60%),
+      radial-gradient(circle at 85% 80%, rgba(255,210,80,0.22), transparent 60%),
+      rgba(0,0,0,0.78) !important;       /* fundo black estilo “radar” */
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+  }
+
+  /* Respiração da luz – acompanha a leitura */
+  @keyframes finalGlowBreath {
+    0%   { opacity: 0.50; transform: scale(1);   }
+    50%  { opacity: 0.95; transform: scale(1.05); }
+    100% { opacity: 0.50; transform: scale(1);   }
   }
    
  }
@@ -1989,7 +2060,8 @@ body.final-lock {
   }
  /* Seção inteira dos termos */
     #section-final {
-    padding: 24px 0 120px !important;  /* distância do topo + espaço pro botão */
+    padding-bottom: 30px !important;   
+    padding: 24px 0 120px;  /* distância do topo + espaço pro botão */
     overflow: hidden !important;
     min-height: 100vh !important;
   }
@@ -2082,6 +2154,14 @@ body.final-lock {
     transform: translateY(0); /* base neutra; overrides abaixo */
   }
    
+   #section-final .final-pergaminho-wrapper {
+  margin-bottom: 10px !important;    /* sobe o conjunto */
+}
+
+#section-final .pergaminho-content {
+  padding-bottom: 18px !important;   /* menos peso na base interna */
+}
+   
    /* Pergaminho base (onde estiver usando a classe .pergaminho) */
 .pergaminho {
   width: 100%;
@@ -2090,8 +2170,6 @@ body.final-lock {
   background-size: 100% auto !important;
   background-repeat: no-repeat;
   background-position: top center;
-}
-}
     
     /* ESSAS 3 LINHAS SÃO O SEGREDO */
     overflow: visible !important;          /* deixa os ::before e ::after vazarem */
@@ -2127,6 +2205,24 @@ body.final-lock {
     padding: 0 20px !important;
     font-size: 17px !important;
   }
+/* ===============================
+   FINAL — TEXTO CENTRALIZADO
+   =============================== */
+#section-final .final-title,
+#section-final #final-title {
+  text-align: center !important;
+}
+
+#section-final .final-message {
+  text-align: center !important;
+}
+
+#section-final .final-message p {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 92%;        /* mantém boa leitura */
+  line-height: 1.5;
+}
 
   /* --- TURBINA A NÉVOA E O GLOW NO MOBILE --- */
   #section-final .j-panel-glow {
@@ -2145,3 +2241,4 @@ body.final-lock {
     50%  { opacity: 0.95; transform: scale(1.05); }
     100% { opacity: 0.50; transform: scale(1);   }
   }
+}
