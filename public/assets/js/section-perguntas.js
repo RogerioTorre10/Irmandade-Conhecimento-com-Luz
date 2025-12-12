@@ -307,6 +307,7 @@ window.playBlockTransition = function(videoSrc, onDone) {
     }
   }
    // ====== INJETAR CORES LUMINOSAS POR GUIA ======
+   // ====== INJETAR CORES LUMINOSAS POR GUIA ======
   (function applyGuideGlow() {
     const guia = sessionStorage.getItem('jornada.guia')?.toLowerCase() || 'lumen';
 
@@ -339,6 +340,14 @@ window.playBlockTransition = function(videoSrc, onDone) {
 
     document.head.appendChild(style);
 
+    // reforço direto na barra (garante a cor mesmo com outros CSS)
+    document
+      .querySelectorAll('#progress-block-fill, #progress-question-fill')
+      .forEach((f) => {
+        f.style.background = color;
+        f.style.boxShadow  = glow;
+      });
+
     // AURA nos botões da página de perguntas
     document
       .querySelectorAll('#section-perguntas .btn')
@@ -347,6 +356,7 @@ window.playBlockTransition = function(videoSrc, onDone) {
         b.style.borderColor = color;
       });
   })();
+
 
   // --------------------------------------------------
   // RESPOSTAS
