@@ -1855,6 +1855,7 @@ body.guia-arion #section-perguntas .btn.btn-stone {
    
  /* Seção inteira da final */
     #section-final {
+    padding-bottom: 12px !important;   
     padding-top: 24px !important;   
     padding: 24px 0 120px;  /* distância do topo + espaço pro botão */
     overflow: hidden !important;
@@ -1873,13 +1874,21 @@ body.guia-arion #section-perguntas .btn.btn-stone {
 }
 
 #section-final  .j-panel-glow {
+  position: relative;
+  z-index: 10; 
   top: 0 !important;
   transform: translate(-6px, -42px) !important; /* sobe mais o painel */
   margin-bottom: 0 !important;
   margin-left: auto;
   margin-right: auto;
+} 
+   
+#section-final .j-perg-v-inner,
+#section-final .pergaminho {
+  max-height: 88vh !important;     /* ← ESSE É O SEGREDO */
+  overflow: hidden !important;
 }
-
+   
   /* Pergaminho de fundo da final */
     #section-final .j-perg-v-inner {
     position: relative !important;
@@ -1995,11 +2004,7 @@ margin-bottom: 10px !important;    /* sobe o conjunto */
     backface-visibility: hidden;
   }
 
-  /* Corta só o que realmente vaza pro lado (a névoa e a luz ficam livres) */
-  #section-final {
-    overflow: hidden !important;            /* corta só o container pai */
-  }
-
+  
   /* Garante que a névoa e a luz pulsante voltem a aparecer */
   #section-final .j-panel-glow::before,
   #section-final .j-panel-glow::after {
