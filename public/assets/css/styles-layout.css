@@ -1855,8 +1855,8 @@ body.guia-arion #section-perguntas .btn.btn-stone {
    
  /* Seção inteira da final */
     #section-final {
-    padding-top: 90px !important;   
-    padding: 24px 0 120px !important;  /* distância do topo + espaço pro botão */
+    padding-top: 110px !important;   
+    padding: 24px 0 120px;  /* distância do topo + espaço pro botão */
     overflow: hidden !important;
     min-height: 100vh !important;
   }  
@@ -1888,7 +1888,7 @@ body.guia-arion #section-perguntas .btn.btn-stone {
   /* Card (vidro) da senha */
    #section-final .j-panel-glow {
     position: relative !important;
-    transform: translate(-16px, -70px) !important; /* antes 40px */
+    transform: translate(-16px, -80px) !important; /* antes 40px */
     top: 10px !important;                   /* antes 40px */
     margin-top: 0 !important;
     width: 90% !important;
