@@ -1190,7 +1190,7 @@
  /* Espaço entre a barra do topo e o texto da pergunta */
 #section-perguntas #jp-question-typed {
   display: block;
-  margin-top: 8px;      /* afasta a pergunta da barra */
+  margin-top: 12px;      /* afasta a pergunta da barra */
   line-height: 1.4;
 }
    
@@ -1478,7 +1478,7 @@ body.guia-arion #section-perguntas .btn.btn-stone {
    /* Espaço entre a barra do topo e o texto da pergunta */
 #section-perguntas #jp-question-typed {
   display: block;
-  margin-top: 8px;      /* afasta a pergunta da barra */
+  margin-top: 12px;      /* afasta a pergunta da barra */
   line-height: 1.4;
 }
 
