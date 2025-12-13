@@ -1919,69 +1919,209 @@ body.guia-arion #section-perguntas .btn.btn-stone {
    SECTION-FINAL MOBILE — PERFEITO 2025
    (sem barrinha + pergaminho largo e bonito)
    ========================================= */
-/* ====================== MOBILE — TELA FINAL 100% CONFORTÁVEL ====================== */
-@media (max-width: 899px) {
-
-  #section-final {
-    padding: 20px 0 90px !important;           /* mais espaço em cima/baixo */
+@media (min-width: 600px) {
+   
+ html, body {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+    overscroll-behavior-x: none;
   }
+   
+ /* Seção inteira da final */
+    #section-final {
+    padding-bottom: 12px !important;   
+    padding-top: 24px !important;   
+    padding: 30px 0 80px;  /* distância do topo + espaço pro botão */
+    overflow: hidden !important;
+    min-height: unset !important;
+  }  
+   
+#section-final  .j-perg-v-inner {
+  top: 0 !important;
+  transform: translateY(18px) !important;  /* era 40px */
+  margin-bottom: 0 !important;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 850px;
+  width: 100%;
+  position: relative;
+}
 
-  /* VIDRO: mais largo, com margens generosas nas laterais */
-  #section-final .j-panel-glow {
-    width: 92% !important;
-    max-width: 440px !important;
+#section-final  .j-panel-glow {
+  width: 94% !important;
+    max-width: 500px !important;
+    padding: 20px 16px !important;           /* mais ar dentro do vidro */
+    transform: translateY(-40px) !important; /* desce só um pouquinho */
     margin: 0 auto !important;
-    padding: 32px 24px 28px !important;        /* ←←← muito mais ar dentro */
-    transform: translateY(-30px) !important;   /* desce só um tico */
-    border-radius: 26px !important;
+} 
+   
+#section-final .j-perg-v-inner,
+#section-final .pergaminho {
+  max-height: 88vh !important;     /* ← ESSE É O SEGREDO */
+  overflow: hidden !important;
+}
+   
+  /* Pergaminho de fundo da final */
+    #section-final .j-perg-v-inner {
+    position: relative !important;
+    transform: translateY(40px) !important; /* antes 80px */
+    top: 40px !important;                   /* antes 80px */
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    overflow: visible !important;
+    z-index: 5 !important;
   }
-
-  /* TÍTULO: um pouco menor e com mais espaço embaixo */
-  #section-final .final-title,
-  #section-final #final-title {
-    font-size: 2rem !important;
-    line-height: 1.15 !important;
-    margin-bottom: 24px !important;
+  
+  
+    #section-final .j-panel-glow::before {
+    inset: 4px !important;    /* afina o aro interno */
+    border-radius: 22px !important;
   }
-
-  /* PARÁGRAFOS: fonte menor + mais espaçamento + margem lateral segura */
-  #section-final .final-message p {
-    font-size: 1.48rem !important;      /* perfeito pra leitura no celular */
-    line-height: 1.68 !important;       /* respira entre linhas */
-    margin: 18px auto !important;
-    padding: 0 12px !important;         /* ←←← nunca mais vai encostar na borda */
+  
+    #section-final .final-panel {
+    width: 100% !important;
     max-width: 100% !important;
+    border: 1px solid rgba(255, 210, 140, 0.35) !important;
+    box-shadow:
+      0 0 14px rgba(255, 190, 120, 0.25),
+      inset 0 0 18px rgba(0, 0, 0, 0.45) !important;
+    border-radius: 18px !important;
+    box-sizing: border-box !important;
+  }
+    /* Guia (mesmo problema) */
+   #section-final .j-arcane-card {
+   margin-top: -18px !important;
+   margin-bottom: 24px !important;
+  } 
+
+#section-final .final-panel {
+  margin: 0 auto !important;
+}
+   
+/* trava scroll apenas quando FINAL ativa */
+body.final-lock {
+  overflow: hidden !important;
+  overflow-y: hidden;
+}
+
+#section-final  .j-perg-v-inner {
+    transform: translateY(40px);
+  }
+  
+     
+  #section-final .j-arcane-card {
+    max-height: 68vh;      /* mesma “altura de vidro interno” das outras */
+    margin-top: 26px;      /* mantém o topo bonito */
+    margin-bottom: 18px;   /* sobe a base, abre respiro no rodapé */
+  }
+   
+   /* Pergaminho base (onde estiver usando a classe .pergaminho) */
+.pergaminho {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  background-size: 100% auto !important;
+  background-repeat: no-repeat;
+  background-position: top center;
+}
+   
+#section-final {
+  padding-bottom: 24px !important;   /* antes estava grande demais */
+}
+   
+#section-final .pergaminho-content {
+  padding-bottom: 14px !important;   /* menos peso na base interna */
+}
+   
+#section-final .final-pergaminho-wrapper {
+position: relative;
+left: 25px;     /* ajuste fino: pode ser 18px, 22px, 28px */
+margin-bottom: 10px !important;    /* sobe o conjunto */   
+}
+
+  #section-final .pergaminho-content,
+  #section-final .final-panel,
+  #section-final .final-glass {
+    position: relative;
+    left: 25px;     /* mantém tudo alinhado */
+ 
+  /* ESSAS 3 LINHAS SÃO O SEGREDO */
+    overflow: visible !important;          /* deixa os ::before e ::after vazarem */
+    isolation: isolate;                     /* cria novo stacking context */
+    transform: translateZ(0);               /* mantém o fix do backdrop-filter */
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
   }
 
-  /* BOTÕES: mais altos e com espaço entre eles */
+  
+  /* Garante que a névoa e a luz pulsante voltem a aparecer */
+  #section-final .j-panel-glow::before,
+  #section-final .j-panel-glow::after {
+    display: block !important;             /* reativa os dois efeitos */
+    pointer-events: none !important;       /* não atrapalha clique */
+    max-width: 100vw !important;
+    box-sizing: border-box !important; 
+  }
+  
+  /* Botões nunca mais vão ser cortados */
   #section-final .final-buttons {
-    margin-top: 36px !important;
-    gap: 22px !important;
-    padding: 0 20px !important;
+    margin-top: 32px !important;
+    gap: 20px !important;
+    padding: 0 10px !important;
   }
 
   #section-final .btn-final {
-    min-height: 66px !important;
-    padding: 0 28px !important;
-    font-size: 1.65rem !important;
-    border-radius: 16px !important;
+    min-height: 62px !important;
+    padding: 0 24px !important;
+    font-size: 1.6rem !important;
   }
-
-  /* Pergaminho de fundo: sobe mais pra não ficar colado embaixo */
-  #section-final .j-perg-v-inner {
-    transform: translateY(12px) !important;
-  }
-
-  /* Fundo pergaminho um pouco maior pra cobrir bem */
-  .pergaminho {
-    background-size: 110% auto !important;
-  }
+   
+   /* ===============================
+   FINAL — TEXTO CENTRALIZADO
+   =============================== */
+#section-final .final-title,
+#section-final #final-title {
+ font-size: 2.1rem !important;   /* era muito grande no celular */
+ line-height: 1.2 !important;
+ margin-bottom: 16px !important;  
+ text-align: center !important;
 }
 
-/* Telas bem pequenas (iPhone SE, etc) */
+#section-final .final-message p {
+  font-size: 1.55rem !important;   /* mais legível */
+    line-height: 1.55 !important;
+    margin: 14px auto !important;
+    padding: 0 8px !important;
+    max-width: 96% !important;
+    text-align: center !important;
+} 
+
+ /* --- TURBINA A NÉVOA E O GLOW NO MOBILE --- */
+  #section-final .j-panel-glow {
+    background:
+      radial-gradient(circle at 50% 10%, rgba(255,255,255,0.18), transparent 55%),
+      radial-gradient(circle at 15% 80%, rgba(0,255,200,0.24), transparent 60%),
+      radial-gradient(circle at 85% 80%, rgba(255,210,80,0.22), transparent 60%),
+      rgba(0,0,0,0.78) !important;       /* fundo black estilo “radar” */
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+  }
+
+  /* Respiração da luz – acompanha a leitura */
+  @keyframes finalGlowBreath {
+    0%   { opacity: 0.50; transform: scale(1);   }
+    50%  { opacity: 0.95; transform: scale(1.05); }
+    100% { opacity: 0.50; transform: scale(1);   }
+  }
+
+   /* Para telas bem pequenas (iPhone SE, Galaxy Fold, etc) */
 @media (max-width: 380px) {
-  #section-final .j-panel-glow      { padding: 28px 20px 24px !important; }
-  #section-final .final-title       { font-size: 1.85rem !important; }
-  #section-final .final-message p   { font-size: 1.42rem !important; line-height: 1.65 !important; }
-  #section-final .btn-final         { min-height: 62px !important; font-size: 1.55rem !important; }
+  #section-final .final-title { font-size: 1.9rem !important; }
+  #section-final .final-message p { font-size: 1.45rem !important; }
+  #section-final .btn-final { min-height: 58px !important; font-size: 1.5rem !important; }
 }
+   
+ }
