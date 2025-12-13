@@ -1902,17 +1902,17 @@ body.guia-arion #section-perguntas .btn.btn-stone {
     pointer-events: none;
   }
 
-/* enquanto digita: esquerda (natural) */
+/* 1) Enquanto NÃO terminou: força tudo em left */
 #section-final .final-message:not(.typing-done),
-#section-final .final-message p:not(.typing-done) {
+#section-final .final-message:not(.typing-done) * {
   text-align: left !important;
 }
 
-/* depois que termina: centro (estético) */
+/* 2) Quando terminou: centraliza o bloco inteiro */
 #section-final .final-message.typing-done,
-#section-final .final-message.typing-done p {
+#section-final .final-message.typing-done * {
   text-align: center !important;
-}  
+}
 }
 
 /* =========================================
