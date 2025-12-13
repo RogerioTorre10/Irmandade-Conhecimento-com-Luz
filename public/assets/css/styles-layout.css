@@ -1919,73 +1919,69 @@ body.guia-arion #section-perguntas .btn.btn-stone {
    SECTION-FINAL MOBILE — PERFEITO 2025
    (sem barrinha + pergaminho largo e bonito)
    ========================================= */
-/* ====================== MOBILE — TELA FINAL PERFEITA ====================== */
+/* ====================== MOBILE — TELA FINAL 100% CONFORTÁVEL ====================== */
 @media (max-width: 899px) {
 
   #section-final {
-    padding: 30px 0 80px !important;
+    padding: 20px 0 90px !important;           /* mais espaço em cima/baixo */
   }
 
-  /* Vidro maior e com mais espaço interno no mobile */
+  /* VIDRO: mais largo, com margens generosas nas laterais */
   #section-final .j-panel-glow {
-    width: 94% !important;
-    max-width: 500px !important;
-    padding: 20px 16px !important;           /* mais ar dentro do vidro */
-    transform: translateY(-40px) !important; /* desce só um pouquinho */
+    width: 92% !important;
+    max-width: 440px !important;
     margin: 0 auto !important;
+    padding: 32px 24px 28px !important;        /* ←←← muito mais ar dentro */
+    transform: translateY(-30px) !important;   /* desce só um tico */
+    border-radius: 26px !important;
   }
 
-  /* Título um pouco menor, mas ainda imponente */
+  /* TÍTULO: um pouco menor e com mais espaço embaixo */
   #section-final .final-title,
   #section-final #final-title {
-    font-size: 2.1rem !important;   /* era muito grande no celular */
-    line-height: 1.2 !important;
-    margin-bottom: 16px !important;
+    font-size: 2rem !important;
+    line-height: 1.15 !important;
+    margin-bottom: 24px !important;
   }
 
-  /* Parágrafos com mais espaço entre linhas e respirando nas laterais */
+  /* PARÁGRAFOS: fonte menor + mais espaçamento + margem lateral segura */
   #section-final .final-message p {
-    font-size: 1.55rem !important;   /* mais legível */
-    line-height: 1.55 !important;
-    margin: 14px auto !important;
-    padding: 0 8px !important;
-    max-width: 96% !important;
+    font-size: 1.48rem !important;      /* perfeito pra leitura no celular */
+    line-height: 1.68 !important;       /* respira entre linhas */
+    margin: 18px auto !important;
+    padding: 0 12px !important;         /* ←←← nunca mais vai encostar na borda */
+    max-width: 100% !important;
   }
 
-  /* Botões mais altos e com mais espaço entre eles */
+  /* BOTÕES: mais altos e com espaço entre eles */
   #section-final .final-buttons {
-    margin-top: 32px !important;
-    gap: 20px !important;
-    padding: 0 10px !important;
+    margin-top: 36px !important;
+    gap: 22px !important;
+    padding: 0 20px !important;
   }
 
   #section-final .btn-final {
-    min-height: 62px !important;
-    padding: 0 24px !important;
-    font-size: 1.6rem !important;
+    min-height: 66px !important;
+    padding: 0 28px !important;
+    font-size: 1.65rem !important;
+    border-radius: 16px !important;
   }
 
-  /* Pergaminho de fundo sobe um pouco pra não ficar colado na base */
+  /* Pergaminho de fundo: sobe mais pra não ficar colado embaixo */
   #section-final .j-perg-v-inner {
-    transform: translateY(20px) !important;
+    transform: translateY(12px) !important;
   }
 
-  /* Garante que o glow e a névoa apareçam inteiros no mobile */
-  #section-final .j-panel-glow::before,
-  #section-final .j-panel-glow::after {
-    display: block !important;
-  }
-
-  /* Se você usa a classe .pergaminho como background */
+  /* Fundo pergaminho um pouco maior pra cobrir bem */
   .pergaminho {
-    background-size: 105% auto !important;
-    background-position: center top !important;
+    background-size: 110% auto !important;
   }
 }
 
-/* Para telas bem pequenas (iPhone SE, Galaxy Fold, etc) */
+/* Telas bem pequenas (iPhone SE, etc) */
 @media (max-width: 380px) {
-  #section-final .final-title { font-size: 1.9rem !important; }
-  #section-final .final-message p { font-size: 1.45rem !important; }
-  #section-final .btn-final { min-height: 58px !important; font-size: 1.5rem !important; }
+  #section-final .j-panel-glow      { padding: 28px 20px 24px !important; }
+  #section-final .final-title       { font-size: 1.85rem !important; }
+  #section-final .final-message p   { font-size: 1.42rem !important; line-height: 1.65 !important; }
+  #section-final .btn-final         { min-height: 62px !important; font-size: 1.55rem !important; }
 }
