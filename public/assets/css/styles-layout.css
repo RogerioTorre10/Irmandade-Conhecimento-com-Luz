@@ -1847,7 +1847,7 @@ body.guia-arion #section-perguntas .btn.btn-stone {
   /* ====================== SECTION FINAL - AJUSTES FINAIS ====================== */
   #section-final {
     padding: 40px 0 100px !important; /* mais espaço em cima e embaixo */
-    overflow: hidden;
+    overflow: hidden !important;
   }
 
   /* Pergaminho de fundo - sobe um pouco a base e centraliza melhor */
@@ -1860,6 +1860,13 @@ body.guia-arion #section-perguntas .btn.btn-stone {
     transform: translateY(28px) !important;     /* sobe o pergaminho inteiro */
     max-width: 900px;
     margin: 0 auto;
+  }
+   /* Restaura o pergaminho de fundo exatamente como estava antes */
+  #section-final .j-perg-v-inner,
+  #section-final .pergaminho {
+    transform: none !important;
+    top: 0 !important;
+    z-index: 1 !important;
   }
 
   /* Vidro (card com glow) - desce um pouco e centraliza perfeitamente */
