@@ -1877,11 +1877,17 @@ body.guia-arion #section-perguntas .btn.btn-stone {
   position: relative;
   z-index: 10; 
   top: 0 !important;
-  transform: translate(-6px, -42px) !important; /* sobe mais o painel */
   margin-bottom: 0 !important;
-  margin-left: auto;
-  margin-right: auto;
-} 
+  padding: 10px !important; /* igual Intro */ 
+  left: 50% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  transform: translateX(-50%) translateY(-44px) !important;
+  margin-top: 0 !important;
+  width: 90% !important;
+  max-width: 470px !important;
+}
+   
    
 #section-final .j-perg-v-inner,
 #section-final .pergaminho {
@@ -1900,22 +1906,8 @@ body.guia-arion #section-perguntas .btn.btn-stone {
     z-index: 5 !important;
   }
 
-  /* Card (vidro) da senha */
-   #section-final .j-panel-glow {
-    position: relative !important;
-    transform: translate(-16px, -80px) !important; /* antes 40px */
-    top: 10px !important;                   /* antes 40px */
-    margin-top: 0 !important;
-    width: 90% !important;
-    max-width: 470px !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    z-index: 6 !important;  
-}
-   
-    #section-final .j-panel-glow {
-    padding: 10px !important; /* igual Intro */
-  }
+
+ 
   
     #section-final .j-panel-glow::before {
     inset: 4px !important;    /* afina o aro interno */
@@ -1923,6 +1915,7 @@ body.guia-arion #section-perguntas .btn.btn-stone {
   }
   
     #section-final .final-panel {
+     margin: 0 auto !important;   
     width: 100% !important;
     max-width: 100% !important;
     border: 1px solid rgba(255, 210, 140, 0.35) !important;
@@ -1936,30 +1929,14 @@ body.guia-arion #section-perguntas .btn.btn-stone {
    #section-final .j-arcane-card {
    margin-top: -18px !important;
    margin-bottom: 24px !important;
-  } 
-
-#section-final .final-panel {
-  margin: 0 auto !important;
-}
-
-#section-final .j-panel-glow {
- transform: translate(-6px, -30px);
-}  
-
-/* trava scroll apenas quando FINAL ativa */
-body.final-lock {
+  }
+   
+ /* trava scroll apenas quando FINAL ativa */
+  body.final-lock {
   overflow: hidden !important;
   overflow-y: hidden;
-}
-
-#section-final  .j-perg-v-inner {
-    transform: translateY(40px);
-  }
-  
-  #section-final  .j-panel-glow {
-    transform: translateY(-10px);
-  }
-     
+ } 
+       
   #section-final .j-arcane-card {
     max-height: 68vh;      /* mesma “altura de vidro interno” das outras */
     margin-top: 26px;      /* mantém o topo bonito */
@@ -1978,30 +1955,32 @@ body.final-lock {
    
 #section-final {
   padding-bottom: 24px !important;   /* antes estava grande demais */
-}
-   
-#section-final .pergaminho-content {
-  padding-bottom: 14px !important;   /* menos peso na base interna */
-}
+}  
+
    
 #section-final .final-pergaminho-wrapper {
-position: relative;
-left: 25px;     /* ajuste fino: pode ser 18px, 22px, 28px */
-margin-bottom: 10px !important;    /* sobe o conjunto */   
-}
+ position: relative;
+ left: 0 !important;
+ margin-left: auto !important;
+ margin-right: auto !important;
+ margin-bottom: 10px !important;    /* sobe o conjunto */   
+ }
 
   #section-final .pergaminho-content,
   #section-final .final-panel,
   #section-final .final-glass {
     position: relative;
     left: 25px;     /* mantém tudo alinhado */
- 
+    padding-bottom: 14px !important;   /* menos peso na base interna */
   /* ESSAS 3 LINHAS SÃO O SEGREDO */
     overflow: visible !important;          /* deixa os ::before e ::after vazarem */
     isolation: isolate;                     /* cria novo stacking context */
     transform: translateZ(0);               /* mantém o fix do backdrop-filter */
     -webkit-transform: translateZ(0);
     backface-visibility: hidden;
+    padding-left: 22px !important;
+    padding-right: 22px !important;
+    box-sizing: border-box !important;  
   }
 
   
@@ -2016,9 +1995,11 @@ margin-bottom: 10px !important;    /* sobe o conjunto */
   
   /* Botões nunca mais vão ser cortados */
   #section-final .final-buttons {
-    margin-top: 20px !important;
-    gap: 16px !important;
-    padding: 0 10px !important;
+    margin-top: 22px !important;
+    padding-bottom: 18px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    gap: 18px !important;;
   }
 
   #section-final .btn-final {
@@ -2032,18 +2013,23 @@ margin-bottom: 10px !important;    /* sobe o conjunto */
    =============================== */
 #section-final .final-title,
 #section-final #final-title {
+  font-size: clamp(26px, 2.2vw, 34px) !important;
+  line-height: 1.15 !important; 
   text-align: center !important;
 }
-
-#section-final .final-message {
-  text-align: center !important;
-}
-
+   
+ #section-final .final-message {
+    font-size: 18px !important;
+    line-height: 1.55 !important;
+ }
+   
 #section-final .final-message p {
+  text-align: center !important;
+  font-size: 18px !important;
+  line-height: 1.55 !important; 
   margin-left: auto;
   margin-right: auto;
   max-width: 92%;        /* mantém boa leitura */
-  line-height: 1.5;
 } 
 
  /* --- TURBINA A NÉVOA E O GLOW NO MOBILE --- */
@@ -2079,7 +2065,18 @@ margin-bottom: 10px !important;    /* sobe o conjunto */
   #section-final .final-message.typing-done,
   #section-final .final-message.typing-done *  {
   text-align: center !important;
-}  
+} 
+   
+   /* 1) remove qualquer empurrão lateral perdido */
+  #section-final .final-pergaminho-wrapper,
+  #section-final .pergaminho-content,
+  #section-final .final-panel,
+  #section-final .final-glass,
+  #section-final .j-perg-v-inner {
+    left: 0 !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
 }
 
 
@@ -2101,7 +2098,7 @@ margin-bottom: 10px !important;    /* sobe o conjunto */
  /* Seção inteira da final */
     #section-final {
     padding-bottom: 24px !important;   
-    padding-top: 24px !important;   
+    padding-top: 22px !important;   
     padding: 30px 0 80px;  /* distância do topo + espaço pro botão */
     overflow: hidden !important;
     min-height: unset !important;
@@ -2109,7 +2106,8 @@ margin-bottom: 10px !important;    /* sobe o conjunto */
     
 #section-final  .j-perg-v-inner {
   top: 0 !important;
-  transform: translateY(18px) !important;  /* era 40px */
+  transform: translateY(8px) !important;  /* era 40px */
+  margin-top: 0 !important;  
   margin-bottom: 0 !important;
   margin-left: auto;
   margin-right: auto;
@@ -2120,10 +2118,14 @@ margin-bottom: 10px !important;    /* sobe o conjunto */
 
 #section-final  .j-panel-glow {
   width: 94% !important;
-    max-width: 500px !important;
     padding: 20px 16px !important;           /* mais ar dentro do vidro */
-    transform: translateY(-40px) !important; /* desce só um pouquinho */
+    transform: translateY(-22px) !important; /* puxa o vidro pra cima */
+    top: 0 !important;
+    left: 0 !important;
     margin: 0 auto !important;
+    width: 94vw !important;                 /* mais largo no mobile */
+    max-width: 94vw !important;
+    box-sizing: border-box !important;
 } 
    
 #section-final .j-perg-v-inner,
@@ -2193,6 +2195,9 @@ margin-bottom: 10px !important;    /* sobe o conjunto */
 }
    
 #section-final .pergaminho-content {
+  padding-left: 14px !important;
+  padding-right: 14px !important;
+  box-sizing: border-box !important; 
   padding-bottom: 14px !important;   /* menos peso na base interna */
 }
    
@@ -2228,15 +2233,21 @@ margin-bottom: 10px !important;    /* sobe o conjunto */
   
   /* Botões nunca mais vão ser cortados */
   #section-final .final-buttons {
-    margin-top: 32px !important;
-    gap: 20px !important;
-    padding: 0 10px !important;
+    display: grid !important;
+    grid-template-columns: 1fr !important;  /* empilha para não apertar */
+    gap: 12px !important;
+    padding: 0 12px !important;            /* folga nas laterais */
+    margin-top: 14px !important;
   }
 
   #section-final .btn-final {
-    min-height: 62px !important;
-    padding: 0 24px !important;
-    font-size: 1.6rem !important;
+     width: 100% !important;
+    max-width: 100% !important;
+    min-height: 54px !important;
+    padding: 12px 14px !important;
+    font-size: 16px !important;
+    line-height: 1.15 !important;
+    white-space: normal !important;         /* permite quebrar linha */
   }
    
    /* ===============================
