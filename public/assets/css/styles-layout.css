@@ -1901,6 +1901,18 @@ body.guia-arion #section-perguntas .btn.btn-stone {
     display: block !important;
     pointer-events: none;
   }
+
+/* enquanto digita: esquerda (natural) */
+#section-final .final-message:not(.typing-done),
+#section-final .final-message p:not(.typing-done) {
+  text-align: left !important;
+}
+
+/* depois que termina: centro (estético) */
+#section-final .final-message.typing-done,
+#section-final .final-message.typing-done p {
+  text-align: center !important;
+}  
 }
 
 /* =========================================
