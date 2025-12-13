@@ -1853,6 +1853,9 @@ body.guia-arion #section-perguntas .btn.btn-stone {
   /* Pergaminho de fundo - sobe um pouco a base e centraliza melhor */
   #section-final .j-perg-v-inner {
     position: relative;
+    left: auto !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
     top: 0;
     transform: translateY(28px) !important;     /* sobe o pergaminho inteiro */
     max-width: 900px;
@@ -1861,10 +1864,12 @@ body.guia-arion #section-perguntas .btn.btn-stone {
 
   /* Vidro (card com glow) - desce um pouco e centraliza perfeitamente */
   #section-final .j-panel-glow {
-    position: relative;
+    position: relative !important;
+    left: 50% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;     
     top: 0;
     transform: translateY(-52px) translateX(-50%) !important; /* desce o vidro */
-    left: 50% !important;                                     /* centraliza 100% */
     width: 92%;
     max-width: 480px;
     margin: 0 auto !important;
