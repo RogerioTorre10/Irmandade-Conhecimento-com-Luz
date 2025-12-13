@@ -1913,23 +1913,7 @@ body.guia-arion #section-perguntas .btn.btn-stone {
 #section-final .final-message.typing-done * {
   text-align: center !important;
 }
-    /* --- TURBINA A NÉVOA E O GLOW NO MOBILE --- */
-  #section-final .j-panel-glow {
-    background:
-      radial-gradient(circle at 50% 10%, rgba(255,255,255,0.18), transparent 55%),
-      radial-gradient(circle at 15% 80%, rgba(0,255,200,0.24), transparent 60%),
-      radial-gradient(circle at 85% 80%, rgba(255,210,80,0.22), transparent 60%),
-      rgba(0,0,0,0.78) !important;       /* fundo black estilo “radar” */
-    backdrop-filter: blur(16px) !important;
-    -webkit-backdrop-filter: blur(16px) !important;
-  }
-
-  /* Respiração da luz – acompanha a leitura */
-  @keyframes finalGlowBreath {
-    0%   { opacity: 0.50; transform: scale(1);   }
-    50%  { opacity: 0.95; transform: scale(1.05); }
-    100% { opacity: 0.50; transform: scale(1);   }
-  }
+  
 }
 
 /* =========================================
