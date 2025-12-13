@@ -1902,6 +1902,7 @@ body.guia-arion #section-perguntas .btn.btn-stone {
     pointer-events: none;
   }
 
+
 /* 1) Enquanto NÃO terminou: força tudo em left */
 #section-final .final-message:not(.typing-done),
 #section-final .final-message:not(.typing-done) * {
