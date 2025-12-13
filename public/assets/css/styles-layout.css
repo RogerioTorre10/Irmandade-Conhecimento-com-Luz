@@ -1843,8 +1843,8 @@ body.guia-arion #section-perguntas .btn.btn-stone {
    SECTION-FINAL — BASE CORRIGIDA
    ========================================= */
 @media (min-width: 900px) {
-
-   html, body {
+   
+ html, body {
     width: 100%;
     max-width: 100vw;
     overflow-x: hidden;
@@ -1853,91 +1853,120 @@ body.guia-arion #section-perguntas .btn.btn-stone {
     overscroll-behavior-x: none;
   }
    
-  #section-final {
+ /* Seção inteira da final */
+    #section-final {
     padding-bottom: 12px !important;   
     padding-top: 24px !important;   
+    padding: 24px 0 120px;  /* distância do topo + espaço pro botão */
     overflow: hidden !important;
     min-height: unset !important;
-    padding: 40px 0 100px !important; /* mais espaço em cima e embaixo */
-  }
-
-  /* Pergaminho de fundo - sobe um pouco a base e centraliza melhor */
-  #section-final .j-perg-v-inner {
+  }  
+   
+#section-final  .j-perg-v-inner {
   top: 0 !important;
-  transform: translateY(28px) !important;  /* era 40px */
+  transform: translateY(18px) !important;  /* era 40px */
   margin-bottom: 0 !important;
   margin-left: auto;
   margin-right: auto;
-  max-width: 900px;
+  max-width: 850px;
   width: 100%;
   position: relative;
-  margin: 0 auto;
+}
+
+#section-final  .j-panel-glow {
+  position: relative;
+  z-index: 10; 
+  top: 0 !important;
+  transform: translate(-6px, -42px) !important; /* sobe mais o painel */
+  margin-bottom: 0 !important;
+  margin-left: auto;
+  margin-right: auto;
+} 
+   
+#section-final .j-perg-v-inner,
+#section-final .pergaminho {
+  max-height: 88vh !important;     /* ← ESSE É O SEGREDO */
+  overflow: hidden !important;
+}
+   
+  /* Pergaminho de fundo da final */
+    #section-final .j-perg-v-inner {
+    position: relative !important;
+    transform: translateY(40px) !important; /* antes 80px */
+    top: 40px !important;                   /* antes 80px */
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    overflow: visible !important;
+    z-index: 5 !important;
   }
 
-  /* Vidro (card com glow) - desce um pouco e centraliza perfeitamente */
-  #section-final .j-panel-glow {
-    position: relative;
-    transform: translateY(-52px) translateX(-50%) !important; /* desce o vidro */
-    left: 50% !important;                                     /* centraliza 100% */
-    width: 92%;
-    max-width: 480px;
-    margin: 0 auto !important;
-    z-index: 10;
-    top: 0 !important;
-    margin-bottom: 0 !important;
-    margin-left: auto;
-    margin-right: auto; 
-  }
-
-  /* Texto dentro do vidro - centralização perfeita (igual ao botão) */
-  #section-final .final-title,
-  #section-final #final-title,
-  #section-final .final-message,
-  #section-final .final-message p {
-    text-align: center !important;
+  /* Card (vidro) da senha */
+   #section-final .j-panel-glow {
+    position: relative !important;
+    transform: translate(-16px, -80px) !important; /* antes 40px */
+    top: 10px !important;                   /* antes 40px */
+    margin-top: 0 !important;
+    width: 90% !important;
+    max-width: 470px !important;
     margin-left: auto !important;
     margin-right: auto !important;
-    max-width: 94%;
-    line-height: 1.5; 
+    z-index: 6 !important;  
+}
+   
+    #section-final .j-panel-glow {
+    padding: 10px !important; /* igual Intro */
   }
-
-  /* Botões já estão bons, só garante que não sejam cortados */
-  #section-final .final-buttons {
-    margin-top: 28px !important;
-    justify-content: center !important;
-    gap: 20px;
-    padding: 0 10px !important;  
+  
+    #section-final .j-panel-glow::before {
+    inset: 4px !important;    /* afina o aro interno */
+    border-radius: 22px !important;
   }
+  
+    #section-final .final-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    border: 1px solid rgba(255, 210, 140, 0.35) !important;
+    box-shadow:
+      0 0 14px rgba(255, 190, 120, 0.25),
+      inset 0 0 18px rgba(0, 0, 0, 0.45) !important;
+    border-radius: 18px !important;
+    box-sizing: border-box !important;
+  }
+    /* Guia (mesmo problema) */
+   #section-final .j-arcane-card {
+   margin-top: -18px !important;
+   margin-bottom: 24px !important;
+  } 
 
-    #section-final .btn-final {
-    min-height: 56px !important;
-    padding: 0 20px !important;
-    font-size: 17px !important;
+#section-final .final-panel {
+  margin: 0 auto !important;
+}
+
+#section-final .j-panel-glow {
+ transform: translate(-6px, -30px);
+}  
+
+/* trava scroll apenas quando FINAL ativa */
+body.final-lock {
+  overflow: hidden !important;
+  overflow-y: hidden;
+}
+
+#section-final  .j-perg-v-inner {
+    transform: translateY(40px);
+  }
+  
+  #section-final  .j-panel-glow {
+    transform: translateY(-10px);
+  }
+     
+  #section-final .j-arcane-card {
+    max-height: 68vh;      /* mesma “altura de vidro interno” das outras */
+    margin-top: 26px;      /* mantém o topo bonito */
+    margin-bottom: 18px;   /* sobe a base, abre respiro no rodapé */
   }
    
-  #section-final .pergaminho-content,
-  #section-final .final-panel,
-  #section-final .final-glass {
-    position: relative;
-    left: 25px;     /* mantém tudo alinhado */ 
-    overflow: visible !important;          /* deixa os ::before e ::after vazarem */
-    isolation: isolate;                     /* cria novo stacking context */
-    transform: translateZ(0);               /* mantém o fix do backdrop-filter */
-    -webkit-transform: translateZ(0);
-    backface-visibility: hidden;
-    padding-bottom: 14px !important;   /* menos peso na base interna */ 
-  }
-   
-
-  /* Pequeno ajuste no pergaminho de fundo pra não ficar colado embaixo */
-  #section-final .pergaminho,
-  #section-final .final-pergaminho-wrapper {
-    position: relative;
-    left: 25px;     /* ajuste fino: pode ser 18px, 22px, 28px */  
-    margin-bottom: 20px !important;   /* sobe a base do pergaminho */
-  }
-
- /* Pergaminho base (onde estiver usando a classe .pergaminho) */
+   /* Pergaminho base (onde estiver usando a classe .pergaminho) */
 .pergaminho {
   width: 100%;
   max-width: 900px;
@@ -1946,22 +1975,114 @@ body.guia-arion #section-perguntas .btn.btn-stone {
   background-repeat: no-repeat;
   background-position: top center;
 }
+   
+#section-final {
+  padding-bottom: 24px !important;   /* antes estava grande demais */
+}
+   
+#section-final .pergaminho-content {
+  padding-bottom: 14px !important;   /* menos peso na base interna */
+}
+   
+#section-final .final-pergaminho-wrapper {
+position: relative;
+left: 25px;     /* ajuste fino: pode ser 18px, 22px, 28px */
+margin-bottom: 10px !important;    /* sobe o conjunto */   
+}
 
-  /* Garante que o glow e a névoa não sejam cortados */
-  #section-final .j-panel-glow::before,
-  #section-final .j-panel-glow::after {
-    display: block !important;
-    pointer-events: none !important;       /* não atrapalha clique */
-    max-width: 100vw !important;
-    box-sizing: border-box !important;  
+  #section-final .pergaminho-content,
+  #section-final .final-panel,
+  #section-final .final-glass {
+    position: relative;
+    left: 25px;     /* mantém tudo alinhado */
+ 
+  /* ESSAS 3 LINHAS SÃO O SEGREDO */
+    overflow: visible !important;          /* deixa os ::before e ::after vazarem */
+    isolation: isolate;                     /* cria novo stacking context */
+    transform: translateZ(0);               /* mantém o fix do backdrop-filter */
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
   }
 
-   /* trava scroll apenas quando FINAL ativa */
-body.final-lock {
-  overflow: hidden !important;
-  overflow-y: hidden;
+  
+  /* Garante que a névoa e a luz pulsante voltem a aparecer */
+  #section-final .j-panel-glow::before,
+  #section-final .j-panel-glow::after {
+    display: block !important;             /* reativa os dois efeitos */
+    pointer-events: none !important;       /* não atrapalha clique */
+    max-width: 100vw !important;
+    box-sizing: border-box !important; 
+  }
+  
+  /* Botões nunca mais vão ser cortados */
+  #section-final .final-buttons {
+    margin-top: 20px !important;
+    gap: 16px !important;
+    padding: 0 10px !important;
+  }
+
+  #section-final .btn-final {
+    min-height: 56px !important;
+    padding: 0 20px !important;
+    font-size: 17px !important;
+  }
+   
+   /* ===============================
+   FINAL — TEXTO CENTRALIZADO
+   =============================== */
+#section-final .final-title,
+#section-final #final-title {
+  text-align: center !important;
 }
+
+#section-final .final-message {
+  text-align: center !important;
 }
+
+#section-final .final-message p {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 92%;        /* mantém boa leitura */
+  line-height: 1.5;
+} 
+
+ /* --- TURBINA A NÉVOA E O GLOW NO MOBILE --- */
+  #section-final .j-panel-glow {
+    background:
+      radial-gradient(circle at 50% 10%, rgba(255,255,255,0.18), transparent 55%),
+      radial-gradient(circle at 15% 80%, rgba(0,255,200,0.24), transparent 60%),
+      radial-gradient(circle at 85% 80%, rgba(255,210,80,0.22), transparent 60%),
+      rgba(0,0,0,0.78) !important;       /* fundo black estilo “radar” */
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+  }
+
+  /* Respiração da luz – acompanha a leitura */
+  @keyframes finalGlowBreath {
+    0%   { opacity: 0.50; transform: scale(1);   }
+    50%  { opacity: 0.95; transform: scale(1.05); }
+    100% { opacity: 0.50; transform: scale(1);   }
+  }
+
+   /* =========================================
+   FINAL — DATILOGRAFIA CONSISTENTE
+   (sempre esquerda durante typing, centro ao final)
+   ========================================= */
+
+   /* 1) Enquanto NÃO terminou: força tudo em left */
+   #section-final .final-message:not(.typing-done),
+   #section-final .final-message:not(.typing-done) * {
+   text-align: left !important;
+  }
+
+  /* 2) Quando terminou: centraliza o bloco inteiro */
+  #section-final .final-message.typing-done,
+  #section-final .final-message.typing-done *  {
+  text-align: center !important;
+}  
+}
+
+
 /* =========================================
    SECTION-FINAL MOBILE — PERFEITO 2025
    (sem barrinha + pergaminho largo e bonito)
