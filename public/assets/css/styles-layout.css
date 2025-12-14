@@ -1853,52 +1853,51 @@ body.guia-arion #section-perguntas .btn.btn-stone {
     overscroll-behavior-x: none;
   }
 
-  /* Seção final - LIMPO E ESTÁVEL */
+  /* Seção final - ESTÁVEL EM QUALQUER ZOOM */
   #section-final {
     display: flex !important;
     justify-content: center !important;
     align-items: flex-start !important; /* começa do topo */
-    padding: 20px 20px 80px 20px !important; /* padding FIXO pequeno no topo (ajuste os 20px se quiser mais/menos) */
-    min-height: 100dvh !important; /* dvh = dynamic viewport height → melhor comportamento em zoom/mobile */
+    padding: 30px 20px 80px 20px !important; /* 30px fixo no topo → espaço pequeno e consistente */
+    min-height: 100dvh !important; /* ou 100vh se preferir, mas dvh é mais estável */
     box-sizing: border-box !important;
     overflow: hidden !important;
   }
 
-  /* Wrapper principal do pergaminho - centralizado e sem empurrão extra */
+  /* Wrapper do pergaminho - sem empurrão extra */
   #section-final .j-perg-v-inner {
     position: relative !important;
     top: 0 !important;
     margin: 0 auto !important;
     max-width: 850px !important;
     width: 100% !important;
-    transform: none !important; /* remove qualquer translateY bagunçando */
+    transform: translateY(20px) !important; /* empurrão FIXO pequeno pra baixo (ajuste se quiser mais/menos) */
   }
 
-  /* Painel com glow - centralizado horizontalmente, sem translateY negativo descontrolado */
+  /* Painel principal com glow - centralizado e com leve sobe pra sobrepor o pergaminho */
   #section-final .j-panel-glow {
     position: relative !important;
     z-index: 10 !important;
-    margin: 0 auto !important; /* centraliza bonitinho */
+    margin: 0 auto !important;
     padding: 10px !important;
     width: 90% !important;
     max-width: 470px !important;
-    transform: translateX(-50%) !important; /* só o horizontal, remove o translateY */
     left: 50% !important;
+    transform: translateX(-50%) translateY(-20px) !important; /* sobe 20px fixo pra ficar sobreposto bonitinho */
   }
 
-  /* Pergaminho e conteúdo - altura máxima sem cortar efeitos */
+  /* Limita a altura do conteúdo pra caber perfeito como antes */
   #section-final .j-perg-v-inner,
   #section-final .pergaminho {
-    max-height: none !important; /* remove o 88vh se não precisar limitar */
-    overflow: visible !important;
+    max-height: 88vh !important; /* volta o seu "segredo" que fazia caber direitinho */
+    overflow: hidden !important;
   }
 
-  /* Remove empurrões extras desnecessários */
+  /* Remove qualquer left extra que bagunça alinhamento */
   #section-final .final-pergaminho-wrapper,
   #section-final .pergaminho-content,
   #section-final .final-panel,
   #section-final .final-glass {
-    position: relative !important;
     left: 0 !important;
     margin-left: auto !important;
     margin-right: auto !important;
@@ -1909,12 +1908,21 @@ body.guia-arion #section-perguntas .btn.btn-stone {
     isolation: isolate !important;
   }
 
-  /* Botões e textos - mantém o resto que já tá bom */
+  /* Garante que o texto não cresça demais (ajuste se necessário) */
+  #section-final .final-title,
+  #section-final #final-title {
+    font-size: clamp(26px, 2.2vw, 34px) !important;
+  }
+
+  #section-final .final-message p {
+    font-size: 18px !important; /* volta pro tamanho original que cabia */
+    line-height: 1.55 !important;
+  }
+
+  /* Botões no fundo, sem corte */
   #section-final .final-buttons {
     margin-top: 22px !important;
     padding-bottom: 18px !important;
-    padding-left: 8px !important;
-    padding-right: 8px !important;
     gap: 18px !important;
   }
      
