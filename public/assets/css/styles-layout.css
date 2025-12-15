@@ -1841,187 +1841,105 @@ body.guia-arion #section-perguntas .btn.btn-stone {
 }
 
 /* ========================================= SECTION-FINAL — BASE CORRIGIDA ========================================= */
-  @media (min-width: 900px) { 
-  html, body {
-  width: 100%; 
+@media (min-width: 900px) {
+
+html, body {
+  width: 100%;
   max-width: 100vw;
   overflow-x: hidden;
   margin: 0;
   padding: 0;
-  overscroll-behavior-x: none;
-  }
-   
-   /* Seção inteira da final */ 
-   #section-final {
-   padding: 24px 0 120px;
-   overflow: hidden !important;
-   min-height: auto !important;
-   padding-top: 24px !important;   /* ajuste fino */
-   padding-bottom: 48px !important;
-   display: flex;
-   align-items: flex-start !important;
-   justify-content: flex-start !important;
-   }     
-   
-   #section-final .j-perg-v-inner {
-   margin-top: 0 !important;   
-   margin-left: auto;
-   margin-right: auto;
-   max-width: 850px; 
-   width: 100%; 
-   position: relative !important;
-   transform: translateY(40px) !important; /* antes 80px */ 
-   top: 40px !important; /* antes 80px */ 
-   padding-top: 0 !important;
-   overflow: visible !important; 
-   z-index: 5 !important;
-   } 
-   
-   /* Card (vidro) da senha */
-   #section-final .j-panel-glow { 
-   position: relative !important; 
-   transform: translate(-16px, -80px) !important;  /* antes 40px */ 
-   top: 10px !important; /* antes 40px */ 
-   margin-top: 0 !important; 
-   width: 90% !important; 
-   max-width: 470px !important; 
-   margin-left: auto !important; 
-   margin-right: auto !important;
-   z-index: 6 !important;
-   padding: 10px !important;    
-   } 
-  
-   #section-final .j-panel-glow::before { 
-   inset: 4px !important; /* afina o aro interno */ 
-   border-radius: 22px !important;     
-   }
-     
-   #section-final .final-panel { 
-   width: 100% !important;
-   max-width: 100% !important;
-   border: 1px solid rgba(255, 210, 140, 0.35) !important;
-   box-shadow: 0 0 14px rgba(255, 190, 120, 0.25), 
-   inset 0 0 18px rgba(0, 0, 0, 0.45) !important; 
-   border-radius: 18px !important; 
-   box-sizing: border-box !important;
-   margin: 0 auto !important;      
-   }   
-   
-   /* Guia (mesmo problema) */ 
-   #section-final .j-arcane-card {
-   margin-top: -18px !important; 
-   margin-bottom: 24px !important;
-   max-height: 72vh; /* mesma “altura de vidro interno” das outras */ 
-   margin-top: 26px; /* mantém o topo bonito */ 
-   }
- 
-   /* trava scroll apenas quando FINAL ativa */
-   body.final-lock {
-   overflow: hidden !important; 
-   overflow-y: hidden; 
-   }
-  
-   /* Pergaminho base (onde estiver usando a classe .pergaminho) */
-   .pergaminho { 
-   width: 100%; 
-   max-width: 900px;
-   margin: 0 auto;
-   background-size: 100% auto !important; 
-   background-repeat: no-repeat; 
-   background-position: top center;
-   }
-     
-   #section-final .pergaminho-content { 
-   padding-bottom: 14px !important; /* menos peso na base interna */
-   }
-     
-   #section-final .final-pergaminho-wrapper { 
-   position: relative; 
-   left: 25px; /* ajuste fino: pode ser 18px, 22px, 28px */ 
-    margin-bottom: 10px !important; /* sobe o conjunto */ 
-   }
-     
-   #section-final .pergaminho-content,
-   #section-final .final-panel, 
-   #section-final .final-glass {
-   position: relative; 
-   left: 25px; /* mantém tudo alinhado */
-   /* ESSAS 3 LINHAS SÃO O SEGREDO */
-   overflow: visible !important; /* deixa os ::before e ::after vazarem */ 
-   isolation: isolate; /* cria novo stacking context */
-   transform: translateZ(0); /* mantém o fix do backdrop-filter */ 
-   -webkit-transform: translateZ(0); backface-visibility: hidden;
-    } 
-  
-   /* Garante que a névoa e a luz pulsante voltem a aparecer */ 
-   #section-final .j-panel-glow::before, 
-   #section-final .j-panel-glow::after { 
-   display: block !important; /* reativa os dois efeitos */
-   pointer-events: none !important; /* não atrapalha clique */
-   max-width: 100vw !important; 
-   box-sizing: border-box !important; } /* Botões nunca mais vão ser cortados */ 
-   #section-final .final-buttons { 
-   margin-top: 20px !important;
-   gap: 16px !important; 
-   padding: 0 10px !important;
-   }
-   
-   #section-final .btn-final { 
-   min-height: 56px !important;
-   padding: 0 20px !important;
-   font-size: 17px !important;
-   }
-   
-   #section-final .final-title, 
-   #section-final #final-title { 
-   text-align: left !important;
-   } 
-     
-   #section-final .final-message {
-   text-align: left !important;
-   } 
-     
-   #section-final .final-message p { 
-    text-align: left !important; 
-    margin-left: auto;
-    margin-right: auto;
-    max-width: 92%; /* mantém boa leitura */ 
-    line-height: 1.5;
-   }
+}
 
-   /* TEXTO FINAL — DATILOGRAFIA CORRETA */
-   #section-final .final-text,
-   #section-final .typing-text {
-   text-align: left !important;
-   justify-content: flex-start !important;
-   align-items: flex-start !important;
-   }
-  
-     /* TEXTO FINAL — TAMANHO REFINADO */
-    #section-final .final-text {
-    font-size: clamp(15px, 1.6vw, 17px);
-    line-height: 1.6;
-    }
-   
-   /* --- TURBINA A NÉVOA E O GLOW NO MOBILE --- */    
-   #section-final .j-panel-glow {
-   background: radial-gradient(circle at 50% 10%, rgba(255,255,255,0.18), 
-   transparent 55%), radial-gradient(circle at 15% 80%,
-   rgba(0,255,200,0.24), 
-   transparent 60%), 
-   radial-gradient(circle at 85% 80%, rgba(255,210,80,0.22),
-   transparent 60%), rgba(0,0,0,0.78) !important;
-   /* fundo black estilo “radar” */
-   backdrop-filter: blur(16px) !important; 
-   -webkit-backdrop-filter: blur(16px) !important;
-   }
-   /* Respiração da luz – acompanha a leitura */ 
-   @keyframes finalGlowBreath {
-   0% { opacity: 0.50; transform: scale(1); } 
-   50% { opacity: 0.95; transform: scale(1.05); } 
-   100% { opacity: 0.50; transform: scale(1); }
-   }
-} 
+/* SEÇÃO FINAL */
+#section-final {
+  padding-top: 16px !important;   /* topo real */
+  padding-bottom: 64px !important;
+  min-height: auto !important;
+  display: block !important;
+  overflow: visible !important;
+}
+
+/* CONTAINER CENTRAL */
+#section-final .j-perg-v-inner {
+  margin: 0 auto !important;
+  max-width: 900px;
+  width: 100%;
+  position: relative;
+  padding-top: 0 !important;
+}
+
+/* VIDRO / CARD */
+#section-final .j-panel-glow {
+  margin: 0 auto !important;
+  width: 92% !important;
+  max-width: 470px !important;
+  padding: 12px !important;
+  position: relative;
+}
+
+/* ARO INTERNO */
+#section-final .j-panel-glow::before {
+  inset: 4px !important;
+  border-radius: 22px !important;
+}
+
+/* PAINEL INTERNO */
+#section-final .final-panel {
+  width: 100%;
+  border-radius: 18px;
+  box-sizing: border-box;
+}
+
+/* PERGAMINHO */
+#section-final .pergaminho,
+#section-final .final-pergaminho-wrapper {
+  margin: 0 auto !important;
+  left: 0 !important;
+  width: 100%;
+  max-width: 900px;
+}
+
+/* TEXTO */
+#section-final .final-title,
+#section-final .final-message,
+#section-final .final-message p {
+  text-align: left !important;
+}
+
+/* TAMANHO DE TEXTO AJUSTADO */
+#section-final .final-message p {
+  font-size: clamp(15px, 1.5vw, 16px);
+  line-height: 1.55;
+  max-width: 92%;
+  margin: 0 auto;
+}
+
+/* BOTÕES */
+#section-final .final-buttons {
+  margin-top: 24px;
+  padding: 0 12px;
+  gap: 16px;
+}
+
+#section-final .btn-final {
+  min-height: 54px;
+  font-size: 16px;
+}
+
+/* GLOW + NÉVOA PRESERVADOS */
+#section-final .j-panel-glow {
+  background:
+    radial-gradient(circle at 50% 10%, rgba(255,255,255,0.18), transparent 55%),
+    radial-gradient(circle at 15% 80%, rgba(0,255,200,0.24), transparent 60%),
+    radial-gradient(circle at 85% 80%, rgba(255,210,80,0.22), transparent 60%),
+    rgba(0,0,0,0.78);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+}
+
 
 /* =========================================
    SECTION-FINAL MOBILE — PERFEITO 2025
