@@ -1839,6 +1839,235 @@ body.guia-arion #section-perguntas .btn.btn-stone {
 }
    
 }
+
+/* ==============================
+   BASE DA SEÇÃO FINAL
+   ============================== */
+@media (min-width: 900px) {
+   
+#section-final {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100dvh;                 /* viewport dinâmica do mobile */
+  min-height: 100dvh;
+  background: radial-gradient(circle at center, #1a1a2e, #0a0a1a);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  overflow: auto;                /* deixa rolar se precisar */
+  -webkit-overflow-scrolling: touch;
+  opacity: 0;
+  transition: opacity 1s ease;
+  pointer-events: auto;          /* garante toque */
+  touch-action: manipulation;    /* melhora clique */
+}
+#section-final.show { opacity: 1; }
+
+.final-pergaminho-wrapper {
+  width: 100%;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding:
+    max(16px, env(safe-area-inset-top))
+    max(16px, env(safe-area-inset-right))
+    max(16px, env(safe-area-inset-bottom))
+    max(16px, env(safe-area-inset-left));
+  box-sizing: border-box;
+}
+
+.pergaminho-vertical {
+  background: center/contain no-repeat url('/assets/img/pergaminho-rasgado-vert.png');
+  width: min(92vw, 520px);
+  height: auto;
+  max-height: calc(100dvh - 40px);   /* nunca estoura a tela */
+  aspect-ratio: 3 / 4.6;             /* mantém proporção bonita */
+  padding: clamp(36px, 6vw, 60px) clamp(22px, 5vw, 40px);
+  border-radius: 20px;
+  box-shadow: 0 0 60px rgba(212,175,55,0.8);
+  position: relative;
+  background-color: rgba(245, 235, 200, 0.1);
+  display: flex;                     /* conteúdo sempre centralizado */
+}
+
+.pergaminho-content {
+  text-align: center;
+  color: #ffd700;
+  font-family: 'BerkshireSwash', cursive;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(14px, 2.8vh, 22px);
+  width: 100%;
+  height: 100%;
+  overflow: visible;                /* não corta botões */
+  pointer-events: auto;
+}
+
+/* garante clique sempre */
+.final-acoes,
+.final-acoes * {
+  pointer-events: auto !important;
+  z-index: 5;
+  position: relative;
+}
+
+/* ==============================
+   BOTÕES — GLAMOUR + LAYOUT
+   ============================== */
+
+/* hit-area maior e clique suave */
+.final-acoes .btn-gold,
+.final-acoes .btn-light{
+  min-height: 52px;                 /* dedo agradece */
+  width: 100%;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+  z-index: 10;
+}
+
+/* glamour base (antes de liberar) — fica bonito mas sem pulso */
+.final-acoes .btn-gold{
+  box-shadow:
+    0 0 18px rgba(212,175,55,0.95),
+    0 0 42px rgba(212,175,55,0.75),
+    inset 0 0 10px rgba(255,240,180,0.65);
+}
+.final-acoes .btn-light{
+  box-shadow:
+    0 0 10px rgba(212,175,55,0.6),
+    0 0 26px rgba(212,175,55,0.35);
+}
+
+/* feedback de toque */
+.final-acoes .btn-gold:active,
+.final-acoes .btn-light:active{
+  transform: translateY(1px) scale(0.98);
+}
+
+/* safe-area para o último botão */
+.final-acoes{
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+}
+
+/* painel 100% */
+.final-panel,
+.final-panel .j-perg-v-inner,
+.final-panel .pergaminho-content{
+  width: 100%;
+  max-width: 100%;
+}
+
+/* botões lado a lado (padrão) */
+.final-acoes{
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: center !important;
+  align-items: stretch !important;
+  gap: 12px !important;
+  width: 100% !important;
+  max-width: 420px !important;
+  margin: 12px auto 0 !important;
+}
+.final-acoes .btn-gold,
+.final-acoes .btn-light{
+  flex: 1 1 0 !important;
+  width: 50% !important;
+  min-height: 52px !important;
+  padding: 14px 10px !important;
+  white-space: nowrap !important;
+}
+
+/* 1) fallback padrão */
+:root{
+  --final-glow-color: #d4af37; /* ouro */
+}
+
+/* 2) cores por guia (robusto por data-guia ou classe) */
+
+/* ZION — azul celestial */
+body[data-guia="zion"],
+#section-final[data-guia="zion"],
+.jp-video-overlay[data-guia="zion"],
+.guia-zion{
+  --final-glow-color: #2aa7ff;
+}
+
+/* LUMEN — verde esmeralda */
+body[data-guia="lumen"],
+#section-final[data-guia="lumen"],
+.jp-video-overlay[data-guia="lumen"],
+.guia-lumen{
+  --final-glow-color: #20e38a;
+}
+
+/* ARION/ARIAN — magenta arcano */
+body[data-guia="arion"],
+body[data-guia="arian"],
+#section-final[data-guia="arion"],
+#section-final[data-guia="arian"],
+.jp-video-overlay[data-guia="arion"],
+.jp-video-overlay[data-guia="arian"],
+.guia-arion,
+.guia-arian{
+  --final-glow-color: #ff4fd8;
+}
+
+/* 3) pulso quando liberado */
+.final-acoes.show .btn-gold,
+.final-acoes.show .btn-light{
+  animation: finalPulseGuide 1.8s ease-in-out infinite !important;
+  box-shadow:
+    0 0 18px color-mix(in srgb, var(--final-glow-color) 85%, transparent),
+    0 0 34px color-mix(in srgb, var(--final-glow-color) 60%, transparent),
+    inset 0 0 12px rgba(255,255,255,0.50) !important;
+  filter: brightness(1.12) saturate(1.15) !important;
+}
+
+/* animação do pulso guiado */
+@keyframes finalPulseGuide{
+  0%{
+    transform: scale(1);
+    box-shadow:
+      0 0 14px color-mix(in srgb, var(--final-glow-color) 75%, transparent),
+      0 0 26px color-mix(in srgb, var(--final-glow-color) 50%, transparent),
+      inset 0 0 8px rgba(255,255,255,0.30);
+  }
+  50%{
+    transform: scale(1.035);  /* mais forte */
+    box-shadow:
+      0 0 24px color-mix(in srgb, var(--final-glow-color) 95%, transparent),
+      0 0 44px color-mix(in srgb, var(--final-glow-color) 75%, transparent),
+      inset 0 0 14px rgba(255,255,255,0.55);
+  }
+  100%{
+    transform: scale(1);
+    box-shadow:
+      0 0 14px color-mix(in srgb, var(--final-glow-color) 75%, transparent),
+      0 0 26px color-mix(in srgb, var(--final-glow-color) 50%, transparent),
+      inset 0 0 8px rgba(255,255,255,0.30);
+  }
+
+/* 4) antes do fim da leitura (desabilitado) → apagado */
+.final-acoes .btn-gold.disabled,
+.final-acoes .btn-gold[disabled],
+.final-acoes .btn-light.disabled,
+.final-acoes .btn-light[disabled]{
+  animation: none !important;
+  box-shadow: none !important;
+  filter: grayscale(60%) brightness(.65) !important;
+  transform: scale(.95) !important;
+}
+}
+
+
+
+
+
 =========================================
    SECTION-FINAL — BASE CORRIGIDA
    ========================================= */
