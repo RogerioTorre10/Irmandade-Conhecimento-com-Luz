@@ -1843,187 +1843,79 @@ body.guia-arion #section-perguntas .btn.btn-stone {
    SECTION-FINAL — BASE CORRIGIDA
    ========================================= */
 @media (min-width: 900px) {
-  
- html, body {
-    width: 100%;
-    max-width: 100vw;
-    overflow-x: hidden;
-    margin: 0;
-    padding: 0;
-    overscroll-behavior-x: none;
-  }
-  
- /* Seção inteira da final */
-    #section-final {
-    display: flex !important;
-    justify-content: center !important;
-    align-items: flex-start !important;
-    /* menos empurrão fixo */
-    padding-top: clamp(12px, 2vh, 28px) !important;
-    padding-bottom: clamp(18px, 3vh, 40px) !important;
-    /* garante altura do viewport (funciona melhor que 100vh em alguns cenários) */
-    padding: 20px 20px 80px 20px !important; /* padding FIXO pequeno no topo (ajuste os 20px se quiser mais/menos) */
-    min-height: 100dvh !important; /* dvh = dynamic viewport height → melhor comportamento em zoom/mobile */
-    box-sizing: border-box !important;
-    overflow: hidden !important;
-  }
-#section-final .j-perg-v-inner {
-  top: 0 !important;
-  transform: none !important; /* remove qualquer translateY bagunçando */
-  margin-bottom: 0 !important;
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 850px;
-  width: 100%;
-  position: relative;
+   
+    /* Painel final alinhado com o resto, mas um pouco mais pra cima */
+  #section-final {
+  padding-top: 32px !important;
+  padding-bottom: 120px !important;
+  position: relative;
+  min-height: 100vh;
+  height: auto;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow-x: hidden !important;
 }
-#section-final .j-panel-glow {
-  position: relative;
-  z-index: 10;
-  top: 0 !important;
-  margin-bottom: 0 !important;
-  padding: 10px !important; /* igual Intro */
-  left: 50% !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-  transform: translateX(-50%) translateY(clamp(-34px, -4vh, -18px)) !important;
-  margin-top: 0 !important;
-  width: 90% !important;
-  max-width: 470px !important;
-}
-  
-  
-#section-final .j-perg-v-inner,
-#section-final .pergaminho {
-  max-height: none !important; /* remove o 88vh se não precisar limitar */
-  overflow: visible !important;
-}
-  
-  /* Pergaminho de fundo da final */
-    #section-final .j-perg-v-inner {
-    position: relative !important;
-    transform: translateY(40px) !important; /* antes 80px */
-    top: 40px !important; /* antes 80px */
-    margin-top: 0 !important;
-    padding-top: 0 !important;
-    overflow: visible !important;
-    z-index: 5 !important;
-  }
- 
-    #section-final .j-panel-glow::before {
-    inset: 4px !important; /* afina o aro interno */
-    border-radius: 22px !important;
-  }
- 
-    #section-final .final-panel {
-     margin: 0 auto !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    border: 1px solid rgba(255, 210, 140, 0.35) !important;
-    box-shadow:
-      0 0 14px rgba(255, 190, 120, 0.25),
-      inset 0 0 18px rgba(0, 0, 0, 0.45) !important;
-    border-radius: 18px !important;
-    box-sizing: border-box !important;
-  }
-    /* Guia (mesmo problema) */
-   #section-final .j-arcane-card {
-   margin-top: -18px !important;
-   margin-bottom: 24px !important;
-  }
-  
- /* trava scroll apenas quando FINAL ativa */
-  body.final-lock {
-  overflow: hidden !important;
-  overflow-y: hidden;
- }
-      
-  #section-final .j-arcane-card {
-    max-height: 68vh; /* mesma “altura de vidro interno” das outras */
-    margin-top: 26px; /* mantém o topo bonito */
-    margin-bottom: 18px; /* sobe a base, abre respiro no rodapé */
-  }
-  
-   /* Pergaminho base (onde estiver usando a classe .pergaminho) */
-.pergaminho {
-  width: 100%;
-  max-width: 900px;
-  margin: 0 auto;
-  background-size: 100% auto !important;
-  background-repeat: no-repeat;
-  background-position: top center;
-}
-     
+
 #section-final .final-pergaminho-wrapper {
- position: relative;
- left: 0 !important;
- margin-left: auto !important;
- margin-right: auto !important;
- margin-bottom: 10px !important; /* sobe o conjunto */
- }
-  #section-final .pergaminho-content,
-  #section-final .final-panel,
-  #section-final .final-glass {
-    position: relative;
-    left: 25px; /* mantém tudo alinhado */
-    padding-bottom: 14px !important; /* menos peso na base interna */
-  /* ESSAS 3 LINHAS SÃO O SEGREDO */
-    overflow: visible !important; /* deixa os ::before e ::after vazarem */
-    isolation: isolate; /* cria novo stacking context */
-    transform: translateZ(0); /* mantém o fix do backdrop-filter */
-    -webkit-transform: translateZ(0);
-    backface-visibility: hidden;
-    padding-left: 22px !important;
-    padding-right: 22px !important;
-    box-sizing: border-box !important;
-  }
- 
-  /* Garante que a névoa e a luz pulsante voltem a aparecer */
-  #section-final .j-panel-glow::before,
-  #section-final .j-panel-glow::after {
-    display: block !important; /* reativa os dois efeitos */
-    pointer-events: none !important; /* não atrapalha clique */
-    max-width: 100vw !important;
-    box-sizing: border-box !important;
-  }
- 
-  /* Botões nunca mais vão ser cortados */
-  #section-final .final-buttons {
-    margin-top: 22px !important;
-    padding-bottom: 18px !important;
-    padding-left: 8px !important;
-    padding-right: 8px !important;
-    gap: 18px !important;;
-  }
-  #section-final .btn-final {
-    min-height: 56px !important;
-    padding: 0 20px !important;
-    font-size: 17px !important;
-  }
-  
-   /* ===============================
-   FINAL — TEXTO CENTRALIZADO
-   =============================== */
-#section-final .final-title,
-#section-final #final-title {
-  font-size: clamp(26px, 2.2vw, 34px) !important;
-  line-height: 1.15 !important;
-  text-align: center !important;
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding-top: 40px;
+  padding-bottom: 120px; 
+  padding: 32px 16px 120px;
+  box-sizing: border-box;
 }
-  
- #section-final .final-message {
-    font-size: 18px !important;
-    line-height: 1.55 !important;
- }
-  
-#section-final .final-message p {
-  text-align: center !important;
-  font-size: 12px !important;
-  line-height: 1.55 !important;
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 92%; /* mantém boa leitura */
+
+#section-final .final-panel {
+  margin: 0 auto !important;
 }
+
+/* trava scroll apenas quando FINAL ativa */
+body.final-lock {
+  overflow: hidden !important;
+  overflow-y: hidden;
+}
+
+#section-final .final-acoes #btnVoltarInicio {
+  background: rgba(0, 0, 0, 0.65);
+  color: #f6e7c6;
+  border: 2px solid #d4af37;
+  backdrop-filter: blur(6px);
+  box-shadow:
+    0 0 18px rgba(212,175,55,0.7),
+    inset 0 0 10px rgba(255,215,160,0.25);
+  opacity: 0.9;
+  transition: all .35s ease;
+}
+
+#section-final .final-acoes #btnVoltarInicio:hover {
+  opacity: 1;
+  box-shadow:
+    0 0 26px rgba(212,175,55,0.95),
+    inset 0 0 14px rgba(255,235,190,0.45);
+}
+
+  #section-final .j-panel-glow {
+    width: min(480px, 92vw) !important;
+    margin: 0 auto !important;
+    padding: 32px 24px 40px !important;
+    border-radius: 26px;
+    box-sizing: border-box; 
+    background:
+      radial-gradient(circle at 20% 0%, rgba(255,255,255,0.12), transparent 55%),
+      rgba(0,0,0,0.65);
+    box-shadow:
+      0 18px 40px rgba(0,0,0,0.78),
+      0 0 60px rgba(0,0,0,0.85);
+    left: 50%
+    position: relative !important;
+    top: -24px;                  /* sobe um pouco o painel */
+    transform: translateX(-50%);
+  }
+
  /* --- TURBINA A NÉVOA E O GLOW NO MOBILE --- */
   #section-final .j-panel-glow {
     background:
@@ -2071,6 +1963,7 @@ body.guia-arion #section-perguntas .btn.btn-stone {
     overflow: visible !important;
     isolation: isolate !important;
   }
+   
 }
 
 /* =========================================
