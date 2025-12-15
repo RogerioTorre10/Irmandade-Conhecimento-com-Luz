@@ -1842,103 +1842,124 @@ body.guia-arion #section-perguntas .btn.btn-stone {
 
 /* ========================================= SECTION-FINAL — BASE CORRIGIDA ========================================= */
 @media (min-width: 900px) {
+  /* SEÇÃO FINAL */
+  #section-final {
+    margin-top: 18px !important;
+    margin-bottom: 40px !important; /* mais respiro inferior geral */
+    padding-top: 16px !important;
+    padding-bottom: 20px !important;
+  }
 
-/* SEÇÃO FINAL - CORREÇÕES */
-#section-final {
-  margin-top: 18px !important;
-  margin-bottom: 30px !important; /* mais respiro na parte inferior da seção */
-  padding-bottom: 12px !important;
-  padding-top: 16px !important;
-  min-height: auto !important;
-  display: block !important;
-  overflow: visible !important;
-}
+  /* CONTAINER CENTRAL */
+  #section-final .j-perg-v-inner {
+    margin: 0 auto !important;
+    max-width: 900px;
+    width: 100%;
+  }
 
-/* CONTAINER CENTRAL */
-#section-final .j-perg-v-inner {
-  margin: 0 auto !important;
-  max-width: 900px;
-  width: 100%;
-  position: relative;
-  padding-top: 0 !important;
-}
+  /* VIDRO / CARD PRINCIPAL */
+  #section-final .j-panel-glow {
+    margin: 0 auto !important;
+    width: 92% !important;
+    max-width: 500px !important; /* aumentei um pouco para evitar corte no lado direito */
+    padding: 24px 16px 48px 16px !important; /* padding simétrico e mais espaço inferior */
+    box-sizing: border-box;
+  }
 
-/* VIDRO / CARD */
-#section-final .j-panel-glow {
-  margin: 0 auto !important;
-  width: 92% !important;
-  max-width: 470px !important;
-  padding: 20px 12px 40px 12px !important; /* aumentei padding-bottom para dar mais espaço aos botões */
-  position: relative;
-  box-sizing: border-box;
-}
+  /* ARO INTERNO */
+  #section-final .j-panel-glow::before {
+    inset: 4px !important;
+    border-radius: 22px !important;
+  }
 
-/* PAINEL INTERNO */
-#section-final .final-panel {
-  width: 100%;
-  border-radius: 18px;
-  box-sizing: border-box;
-  padding-bottom: 0 !important;
-}
+  /* PAINEL INTERNO */
+  #section-final .final-panel {
+    width: 100%;
+    border-radius: 18px;
+    box-sizing: border-box;
+  }
 
-/* TEXTO PRINCIPAL - FORÇAR LTR E ALINHAMENTO CORRETO */
-#section-final .final-message,
-#section-final .final-message p,
-#section-final .typing-text,
-#section-final .final-text {
-  direction: ltr !important;
-  unicode-bidi: plaintext !important;
-  text-align: center !important; /* texto final centralizado */
-}
+  /* TÍTULO - GARANTIR QUE APAREÇA */
+  #section-final .final-title {
+    display: block !important;
+    text-align: center !important;
+    margin-bottom: 24px !important;
+    font-size: clamp(18px, 2.2vw, 24px) !important;
+    color: #ffd700 !important; /* cor típica do título, ajuste se necessário */
+  }
 
-/* ELEMENTO DE DIGITAÇÃO - GARANTIR QUE O TEXTO CRESÇA DA ESQUERDA PARA DIREITA */
-#section-final .typing-text,
-#section-final .final-text {
-  display: inline-block !important; /* mudou para inline-block */
-  width: auto !important;
-  max-width: 92% !important;
-  margin: 0 auto !important;
-  text-align: left !important; /* durante a digitação, alinha à esquerda para crescer naturalmente LTR */
-  white-space: nowrap; /* evita quebra de linha durante digitação */
-  overflow: hidden; /* esconde o que ainda não foi "datilografado" */
-}
+  /* WRAPPER PARA O TEXTO (para centralizar o container de digitação) */
+  #section-final .final-message {
+    text-align: center !important; /* centraliza o bloco inteiro */
+    margin: 0 auto 32px auto !important;
+    max-width: 95%;
+  }
 
-/* Quando a digitação terminar, centralizar de verdade (adicione classe via JS no final, ex: .typing-complete) */
-#section-final .typing-text.typing-complete,
-#section-final .final-text.typing-complete {
-  white-space: normal;
-  text-align: center !important;
-  width: 92% !important;
-}
+  /* ELEMENTO DE DIGITAÇÃO */
+  #section-final .typing-text,
+  #section-final .final-text {
+    display: inline-block !important; /* permite centralizar via wrapper */
+    direction: ltr !important;
+    unicode-bidi: plaintext !important;
+    text-align: left !important; /* cresce da esquerda para direita */
+    white-space: nowrap; /* evita quebra durante digitação */
+    overflow: hidden; /* esconde o resto */
+    max-width: 100% !important;
+    width: auto !important;
+    margin: 0 auto !important; /* centraliza o bloco */
+  }
 
-/* BOTÕES - SUBIR MAIS */
-#section-final .final-buttons {
-  position: relative !important;
-  bottom: auto !important; /* remove o posicionamento que colava na base */
-  margin-top: 32px !important; /* mais espaço acima dos botões */
-  padding: 0 12px;
-  gap: 16px;
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-}
+  /* PÁRAFOOS INDIVIDUAIS (se o texto for em <p>) */
+  #section-final .final-message p {
+    text-align: left !important; /* durante digitação */
+    margin: 12px 0 !important;
+    font-size: clamp(15px, 1.6vw, 17px);
+    line-height: 1.6;
+  }
 
-#section-final .btn-final {
-  min-height: 54px;
-  font-size: 16px;
-}
+  /* QUANDO A DIGITAÇÃO TERMINAR - CENTRALIZAR TUDO (adicione classe via JS no final) */
+  #section-final .typing-text.typing-complete,
+  #section-final .final-text.typing-complete,
+  #section-final .final-message.typing-complete p {
+    text-align: center !important;
+    white-space: normal !important;
+    width: 95% !important;
+    margin: 12px auto !important;
+  }
 
-/* GLOW PRESERVADO */
-#section-final .j-panel-glow {
-  background:
-    radial-gradient(circle at 50% 10%, rgba(255,255,255,0.18), transparent 55%),
-    radial-gradient(circle at 15% 80%, rgba(0,255,200,0.24), transparent 60%),
-    radial-gradient(circle at 85% 80%, rgba(255,210,80,0.22), transparent 60%),
-    rgba(0,0,0,0.78);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-}
+  /* BOTÕES - MAIS ESPAÇO E CENTRALIZADOS */
+  #section-final .final-buttons {
+    position: relative !important;
+    bottom: auto !important;
+    margin-top: 40px !important; /* sobe mais os botões */
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 0 12px;
+  }
 
+  #section-final .btn-final {
+    min-height: 56px;
+    font-size: 16px;
+    min-width: 180px;
+  }
+
+  /* GLOW E FUNDO PRESERVADOS */
+  #section-final .j-panel-glow {
+    background:
+      radial-gradient(circle at 50% 10%, rgba(255,255,255,0.18), transparent 55%),
+      radial-gradient(circle at 15% 80%, rgba(0,255,200,0.24), transparent 60%),
+      radial-gradient(circle at 85% 80%, rgba(255,210,80,0.22), transparent 60%),
+      rgba(0,0,0,0.78);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  /* FORÇAR LTR EM TUDO */
+  #section-final * {
+    direction: ltr !important;
+  }
 }
 
 
