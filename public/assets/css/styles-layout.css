@@ -1842,6 +1842,7 @@ body.guia-arion #section-perguntas .btn.btn-stone {
 /* =========================================
    SECTION-FINAL — BASE CORRIGIDA
    ========================================= */
+
 @media (min-width: 900px) {
    
     /* Painel final alinhado com o resto, mas um pouco mais pra cima */
@@ -1962,8 +1963,7 @@ body.final-lock {
     padding-bottom: 14px !important;
     overflow: visible !important;
     isolation: isolate !important;
-  }
-   
+  }   
 }
 
 /* =========================================
