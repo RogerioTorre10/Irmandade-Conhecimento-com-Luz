@@ -1842,9 +1842,8 @@ body.guia-arion #section-perguntas .btn.btn-stone {
 /* =========================================
    SECTION-FINAL — BASE CORRIGIDA
    ========================================= */
+@media (min-width: 900px) {
 
-@media (min-width: 900px) {   
- 
 #section-final {
   position: fixed;
   top: 0; left: 0;
@@ -1974,6 +1973,17 @@ body.guia-arion #section-perguntas .btn.btn-stone {
   color: #000;
 }
 
+/* Responsivo */
+@media (max-width: 480px) {
+  .pergaminho-vertical {
+    padding: 40px 25px;
+    width: 95vw;
+    height: 95vh;
+  }
+  .final-title { font-size: 2em; }
+  .final-message p { font-size: 1.1em; }
+  .final-bold { font-size: 1.3em !important; }
+}
 }
 
 /* =========================================
