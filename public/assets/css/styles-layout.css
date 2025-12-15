@@ -1883,7 +1883,8 @@ body.guia-arion #section-perguntas .btn.btn-stone {
   #section-final .final-title {
     display: block !important;
     text-align: center !important;
-    margin-bottom: 24px !important;
+    margin-top: 8px !important;
+    margin-bottom: 16px !important;
     font-size: clamp(18px, 2.2vw, 24px) !important;
     color: #ffd700 !important; /* cor típica do título, ajuste se necessário */
   }
@@ -1900,13 +1901,14 @@ body.guia-arion #section-perguntas .btn.btn-stone {
   #section-final .final-text {
     display: inline-block !important; /* permite centralizar via wrapper */
     direction: ltr !important;
-    unicode-bidi: plaintext !important;
+    unicode-bidi: bidi-override !important; /* força LTR */
     text-align: left !important; /* cresce da esquerda para direita */
     white-space: nowrap; /* evita quebra durante digitação */
     overflow: hidden; /* esconde o resto */
     max-width: 100% !important;
     width: auto !important;
-    margin: 0 auto !important; /* centraliza o bloco */
+    margin-left: 0 !important;
+    margin-right: auto !important;
   }
 
   /* PÁRAFOOS INDIVIDUAIS (se o texto for em <p>) */
@@ -1923,6 +1925,7 @@ body.guia-arion #section-perguntas .btn.btn-stone {
   #section-final .final-message.typing-complete p {
     text-align: center !important;
     white-space: normal !important;
+    overflow: visible !important;
     width: 95% !important;
     margin: 12px auto !important;
   }
@@ -1931,7 +1934,7 @@ body.guia-arion #section-perguntas .btn.btn-stone {
   #section-final .final-buttons {
     position: relative !important;
     bottom: auto !important;
-    margin-top: 40px !important; /* sobe mais os botões */
+    margin-top: 32px !important; /* sobe mais os botões */
     display: flex;
     justify-content: center;
     gap: 20px;
