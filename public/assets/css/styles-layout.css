@@ -1948,22 +1948,6 @@ body.final-lock {
   text-align: center !important;
 }
   
-   /* 1) remove qualquer empurrão lateral perdido */
-  #section-final .final-pergaminho-wrapper,
-  #section-final .pergaminho-content,
-  #section-final .final-panel,
-  #section-final .final-glass,
-  #section-final .j-perg-v-inner {
-    position: relative !important;
-    left: 0 !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    padding-left: 22px !important;
-    padding-right: 22px !important;
-    padding-bottom: 14px !important;
-    overflow: visible !important;
-    isolation: isolate !important;
-  }   
 }
 
 /* =========================================
