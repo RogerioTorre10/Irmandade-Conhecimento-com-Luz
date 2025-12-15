@@ -1853,8 +1853,10 @@ html, body {
 
 /* SEÇÃO FINAL */
 #section-final {
+  margin-top: 18px !important;
+  margin-bottom: 18px !important; /* cria respiro dentro do painel */
+  padding-bottom: 6px !important; 
   padding-top: 16px !important;   /* topo real */
-  padding-bottom: 64px !important;
   min-height: auto !important;
   display: block !important;
   overflow: visible !important;
@@ -1889,6 +1891,7 @@ html, body {
   width: 100%;
   border-radius: 18px;
   box-sizing: border-box;
+  padding-bottom: 22px !important; 
 }
 
 /* PERGAMINHO */
@@ -1904,7 +1907,7 @@ html, body {
 #section-final .final-title,
 #section-final .final-message,
 #section-final .final-message p {
-  text-align: left !important;
+  text-align: center !important;
 }
 
 /* TAMANHO DE TEXTO AJUSTADO */
@@ -1917,6 +1920,7 @@ html, body {
 
 /* BOTÕES */
 #section-final .final-buttons {
+  bottom: 18px !important; /* sobe os botões */  
   margin-top: 24px;
   padding: 0 12px;
   gap: 16px;
@@ -1937,6 +1941,21 @@ html, body {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
 }
+   
+  #section-final .final-message,
+  #section-final .final-message p,
+  #section-final .typing-text,
+  #section-final .final-text {
+    direction: ltr !important;
+    unicode-bidi: plaintext !important;
+  }
+
+  #section-final .typing-text,
+  #section-final .final-text {
+    display: block !important;
+    width: 100% !important;
+    text-align: center !important;
+  }     
 
 }
 
