@@ -1843,20 +1843,12 @@ body.guia-arion #section-perguntas .btn.btn-stone {
 /* ========================================= SECTION-FINAL — BASE CORRIGIDA ========================================= */
 @media (min-width: 900px) {
 
-html, body {
-  width: 100%;
-  max-width: 100vw;
-  overflow-x: hidden;
-  margin: 0;
-  padding: 0;
-}
-
-/* SEÇÃO FINAL */
+/* SEÇÃO FINAL - CORREÇÕES */
 #section-final {
   margin-top: 18px !important;
-  margin-bottom: 18px !important; /* cria respiro dentro do painel */
-  padding-bottom: 6px !important; 
-  padding-top: 16px !important;   /* topo real */
+  margin-bottom: 30px !important; /* mais respiro na parte inferior da seção */
+  padding-bottom: 12px !important;
+  padding-top: 16px !important;
   min-height: auto !important;
   display: block !important;
   overflow: visible !important;
@@ -1876,14 +1868,9 @@ html, body {
   margin: 0 auto !important;
   width: 92% !important;
   max-width: 470px !important;
-  padding: 12px !important;
+  padding: 20px 12px 40px 12px !important; /* aumentei padding-bottom para dar mais espaço aos botões */
   position: relative;
-}
-
-/* ARO INTERNO */
-#section-final .j-panel-glow::before {
-  inset: 4px !important;
-  border-radius: 22px !important;
+  box-sizing: border-box;
 }
 
 /* PAINEL INTERNO */
@@ -1891,39 +1878,49 @@ html, body {
   width: 100%;
   border-radius: 18px;
   box-sizing: border-box;
-  padding-bottom: 22px !important; 
+  padding-bottom: 0 !important;
 }
 
-/* PERGAMINHO */
-#section-final .pergaminho,
-#section-final .final-pergaminho-wrapper {
-  margin: 0 auto !important;
-  left: 0 !important;
-  width: 100%;
-  max-width: 900px;
-}
-
-/* TEXTO */
-#section-final .final-title,
+/* TEXTO PRINCIPAL - FORÇAR LTR E ALINHAMENTO CORRETO */
 #section-final .final-message,
-#section-final .final-message p {
+#section-final .final-message p,
+#section-final .typing-text,
+#section-final .final-text {
+  direction: ltr !important;
+  unicode-bidi: plaintext !important;
+  text-align: center !important; /* texto final centralizado */
+}
+
+/* ELEMENTO DE DIGITAÇÃO - GARANTIR QUE O TEXTO CRESÇA DA ESQUERDA PARA DIREITA */
+#section-final .typing-text,
+#section-final .final-text {
+  display: inline-block !important; /* mudou para inline-block */
+  width: auto !important;
+  max-width: 92% !important;
+  margin: 0 auto !important;
+  text-align: left !important; /* durante a digitação, alinha à esquerda para crescer naturalmente LTR */
+  white-space: nowrap; /* evita quebra de linha durante digitação */
+  overflow: hidden; /* esconde o que ainda não foi "datilografado" */
+}
+
+/* Quando a digitação terminar, centralizar de verdade (adicione classe via JS no final, ex: .typing-complete) */
+#section-final .typing-text.typing-complete,
+#section-final .final-text.typing-complete {
+  white-space: normal;
   text-align: center !important;
+  width: 92% !important;
 }
 
-/* TAMANHO DE TEXTO AJUSTADO */
-#section-final .final-message p {
-  font-size: clamp(15px, 1.5vw, 16px);
-  line-height: 1.55;
-  max-width: 92%;
-  margin: 0 auto;
-}
-
-/* BOTÕES */
+/* BOTÕES - SUBIR MAIS */
 #section-final .final-buttons {
-  bottom: 18px !important; /* sobe os botões */  
-  margin-top: 24px;
+  position: relative !important;
+  bottom: auto !important; /* remove o posicionamento que colava na base */
+  margin-top: 32px !important; /* mais espaço acima dos botões */
   padding: 0 12px;
   gap: 16px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 #section-final .btn-final {
@@ -1931,7 +1928,7 @@ html, body {
   font-size: 16px;
 }
 
-/* GLOW + NÉVOA PRESERVADOS */
+/* GLOW PRESERVADO */
 #section-final .j-panel-glow {
   background:
     radial-gradient(circle at 50% 10%, rgba(255,255,255,0.18), transparent 55%),
@@ -1941,21 +1938,6 @@ html, body {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
 }
-   
-  #section-final .final-message,
-  #section-final .final-message p,
-  #section-final .typing-text,
-  #section-final .final-text {
-    direction: ltr !important;
-    unicode-bidi: plaintext !important;
-  }
-
-  #section-final .typing-text,
-  #section-final .final-text {
-    display: block !important;
-    width: 100% !important;
-    text-align: center !important;
-  }     
 
 }
 
