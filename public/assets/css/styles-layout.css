@@ -1883,7 +1883,7 @@ body.guia-arion #section-perguntas .btn.btn-stone {
     max-width: 470px !important;
     left: 50% !important;
     /* CHAVE: Subindo o painel MUITO mais (ex: -50px ou -60px) */
-    transform: translateX(-50%) translateY(-60px) !important; 
+    transform: translateX(-50%) translateY(-30px) !important; 
     margin-top: 0 !important;  
   }
 
