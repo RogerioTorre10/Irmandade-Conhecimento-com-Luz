@@ -1914,6 +1914,7 @@ body.guia-arion #section-perguntas .btn.btn-stone {
     gap: 14px !important;
     flex-wrap: nowrap !important;
     margin-top: 16px !important;
+    padding-right: 12px !important; 
   }
 
   #section-final .final-acoes button,
@@ -1924,30 +1925,14 @@ body.guia-arion #section-perguntas .btn.btn-stone {
     flex: 0 0 auto !important;
     white-space: nowrap !important;
   }
+
+   #section-final .pergaminho-content {
+  padding-left: 28px !important;
+  padding-right: 36px !important; /* MAIS respiro à direita */
+  box-sizing: border-box;
 }
-
-/* Mobile: pode empilhar (mais seguro), mas sem “jogar pra baixo” */
-@media (max-width: 600px) {
-  #section-final {
-    padding: 18px 14px 48px !important;
-    min-height: 100vh !important;
-    overflow: hidden !important;
-  }
-
-  #section-final .j-panel-glow {
-    margin-top: 0 !important;
-    transform: none !important;
-  }
-
-  #section-final #final-message,
-  #section-final #final-message p {
-    direction: ltr !important;
-    unicode-bidi: plaintext !important;
-    text-align: left !important;
-  }
+   
 }
-
-
 
 /* =========================================
    SECTION-FINAL MOBILE — PERFEITO 2025
