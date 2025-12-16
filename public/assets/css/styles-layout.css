@@ -1967,6 +1967,9 @@ body.guia-arion #section-perguntas .btn.btn-stone {
     text-align: left !important;
     }
 
+    #section-final #final-title { text-align: center !important; }
+    #section-final .final-message, 
+    #section-final .final-message p { text-align: left !important; }
    }
 
 
