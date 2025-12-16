@@ -1,205 +1,119 @@
-/* styles-final.css — FINAL (apenas “skin”)
-   Deixa o styles-layout.css controlar a vitrine/posicionamento.
-*/
+/* =========================================
+   STYLES-FINAL — Somente estética interna
+   (Layout/vitrine fica no styles-layout.css)
+   ========================================= */
 
-/* ==============================
-   FINAL — NÃO TOMAR A VITRINE
-   ============================== */
-#section-final{
+/* 1) NÃO deixar o styles-final controlar o palco */
+#section-final {
   position: relative !important;
   inset: auto !important;
-  width: 100% !important;
   height: auto !important;
-  min-height: 100dvh !important;
-
-  /* quem decide fundo/vitrine é o layout.css */
+  min-height: auto !important;
+  width: auto !important;
+  display: block !important;
   background: transparent !important;
-
-  display: flex !important;
-  align-items: flex-start !important;
-  justify-content: center !important;
-
-  padding: max(16px, env(safe-area-inset-top)) 16px
-           max(22px, env(safe-area-inset-bottom)) 16px !important;
-
   overflow: visible !important;
-  opacity: 1 !important;
-  transition: none !important;
-  z-index: auto !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
-/* wrapper não pode “forçar” 100dvh */
-.final-pergaminho-wrapper{
-  width: 100% !important;
-  min-height: auto !important;
-  display: flex !important;
-  align-items: flex-start !important;
-  justify-content: center !important;
-  padding:
-    max(14px, env(safe-area-inset-top))
-    max(14px, env(safe-area-inset-right))
-    max(14px, env(safe-area-inset-bottom))
-    max(14px, env(safe-area-inset-left)) !important;
+/* wrappers não devem “criar caixa preta” gigante */
+#section-final .final-pergaminho-wrapper,
+#section-final .final-panel,
+#section-final .j-perg-v-inner {
+  background: transparent !important;
+  overflow: visible !important;
+}
+
+/* 2) Conteúdo: manter elegante, mas sem forçar centralização global
+      (isso é o que fazia o texto “mudar”/centralizar) */
+#section-final .pergaminho-content {
+  text-align: left !important;            /* fixa LTR visual */
+  direction: ltr !important;
+  unicode-bidi: plaintext !important;
+  padding: 18px 18px 14px !important;
   box-sizing: border-box !important;
 }
 
-/* ==============================
-   TIPOGRAFIA (igualar às outras páginas)
-   ============================== */
-#section-final .pergaminho-content{
-  width: 100% !important;
-  height: auto !important;
-  overflow: visible !important;
-  pointer-events: auto !important;
-
-  /* Evita “efeito centralizando estranho” em alguns fluxos */
-  text-align: left !important;
-
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: flex-start !important;
-  gap: clamp(10px, 2.0vh, 18px) !important;
-}
-
-/* Título pode ficar centralizado sem afetar o resto */
+/* 3) Título e mensagens — tamanhos mais próximos das outras telas */
 #section-final .final-title,
-#section-final #final-title{
-  text-align: center !important;
+#section-final #final-title {
+  margin: 0 0 12px !important;
+  text-align: center !important;          /* título pode ser centro sem afetar LTR */
+  direction: ltr !important;
+  unicode-bidi: plaintext !important;
   font-size: clamp(22px, 2.0vw, 30px) !important;
-  line-height: 1.15 !important;
-  margin: 0 0 10px 0 !important;
+  line-height: 1.18 !important;
 }
 
-/* Texto um pouco menor (padrão das demais) */
-#section-final .final-message p{
-  font-size: clamp(15px, 1.15vw, 17px) !important;
+#section-final .final-message {
+  margin: 0 !important;
+}
+
+#section-final .final-message p {
+  margin: 0 0 12px !important;
+  text-align: center !important;          /* se quiser “oração” central, mantém */
+  direction: ltr !important;              /* garante datilografia esquerda→direita */
+  unicode-bidi: plaintext !important;
+  font-size: clamp(15px, 1.25vw, 17px) !important;
   line-height: 1.45 !important;
-  margin: 0 0 10px 0 !important;
-  text-align: center !important; /* se quiser tudo à esquerda, troque para left */
 }
 
-/* ==============================
-   BOTÕES — caber no zoom 100%
-   ============================== */
-.final-acoes{
+#section-final .final-message .final-bold {
+  font-weight: 800 !important;
+}
+
+/* 4) Botões — voltar a ficar lado a lado no desktop e “cabíveis” no zoom 100% */
+#section-final .final-acoes {
+  margin-top: 14px !important;
   display: flex !important;
-  flex-wrap: wrap !important;            /* chave: não estoura */
+  flex-direction: row !important;
   justify-content: center !important;
   align-items: stretch !important;
   gap: 12px !important;
-
-  width: 100% !important;
-  max-width: 460px !important;
-
-  margin: 14px auto 0 !important;
-  padding-bottom: max(10px, env(safe-area-inset-bottom)) !important;
-
-  pointer-events: auto !important;
+  flex-wrap: wrap !important;
+  padding-bottom: 6px !important;
 }
 
-.final-acoes .btn-gold,
-.final-acoes .btn-light{
-  flex: 1 1 200px !important;            /* quebra pra 2 linhas quando precisar */
-  min-width: 200px !important;
+#section-final .final-acoes > button,
+#section-final .final-acoes > a {
+  flex: 1 1 210px !important;            /* garante 2 colunas quando couber */
+  max-width: 260px !important;
   min-height: 52px !important;
-  padding: 14px 12px !important;
-
-  white-space: normal !important;        /* permite quebrar texto */
-  line-height: 1.1 !important;
-
-  touch-action: manipulation !important;
-  -webkit-tap-highlight-color: transparent !important;
-
-  position: relative !important;
-  z-index: 10 !important;
+  padding: 10px 14px !important;
+  box-sizing: border-box !important;
+  white-space: nowrap !important;
 }
 
-/* Feedback de toque */
-.final-acoes .btn-gold:active,
-.final-acoes .btn-light:active{
-  transform: translateY(1px) scale(0.98) !important;
+/* Caso em algum breakpoint o layout force 1 coluna, ainda fica bonito */
+@media (max-width: 520px) {
+  #section-final .final-acoes > button,
+  #section-final .final-acoes > a {
+    flex: 1 1 100% !important;
+    max-width: 100% !important;
+  }
 }
 
-/* ==============================
-   PULSO NA COR DO GUIA (mantém)
-   ============================== */
-:root{ --final-glow-color: #d4af37; }
-
-body[data-guia="zion"],
-#section-final[data-guia="zion"],
-.jp-video-overlay[data-guia="zion"],
-.guia-zion{ --final-glow-color: #2aa7ff; }
-
-body[data-guia="lumen"],
-#section-final[data-guia="lumen"],
-.jp-video-overlay[data-guia="lumen"],
-.guia-lumen{ --final-glow-color: #20e38a; }
-
-body[data-guia="arion"],
-body[data-guia="arian"],
-#section-final[data-guia="arion"],
-#section-final[data-guia="arian"],
-.jp-video-overlay[data-guia="arion"],
-.jp-video-overlay[data-guia="arian"],
-.guia-arion,
-.guia-arian{ --final-glow-color: #ff4fd8; }
-
-.final-acoes.show .btn-gold,
-.final-acoes.show .btn-light{
-  animation: finalPulseGuide 1.8s ease-in-out infinite !important;
-  box-shadow:
-    0 0 18px color-mix(in srgb, var(--final-glow-color) 85%, transparent),
-    0 0 34px color-mix(in srgb, var(--final-glow-color) 60%, transparent),
-    inset 0 0 12px rgba(255,255,255,0.50) !important;
-  filter: brightness(1.12) saturate(1.15) !important;
+/* 5) Datilografia: nunca “puxar” para RTL/centro inesperado */
+#section-final .typing-text,
+#section-final .typing-active,
+#section-final .typing-done {
+  direction: ltr !important;
+  unicode-bidi: plaintext !important;
 }
 
-@keyframes finalPulseGuide{
-  0%{ transform: scale(1); }
-  50%{ transform: scale(1.03); }
-  100%{ transform: scale(1); }
+/* 6) Evitar qualquer scroll lateral “fantasma” causado por sombras/glows */
+#section-final,
+#section-final * {
+  max-width: 100%;
 }
 
-/* ==============================
-   VÍDEO — overlay cinematográfico (mantém)
-   ============================== */
-#final-video-overlay{
-  position: fixed !important;
-  inset: 0 !important;
-  z-index: 99999 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  background: radial-gradient(circle at center,
-    rgba(0,0,0,0.45),
-    rgba(0,0,0,0.96)
-  ) !important;
+body.final-lock {
+  overflow-y: hidden !important; /* você pode manter isso */
 }
 
-#final-video{ display: block !important; }
-
-.final-video-frame{
-  width: min(92vw, 900px);
-  max-height: 92vh;
-  object-fit: contain;
-
-  border-radius: 18px;
-  overflow: hidden;
-
-  border: 2px solid transparent;
-  background:
-    linear-gradient(#000, #000) padding-box,
-    linear-gradient(45deg,
-      var(--final-glow-color),
-      rgba(255,255,255,0.6),
-      var(--final-glow-color)
-    ) border-box;
-
-  animation: jPanelGlowPulse 2.8s ease-in-out infinite;
-}
-
-@keyframes jPanelGlowPulse{
-  0%{ box-shadow: 0 0 18px var(--final-glow-color); }
-  50%{ box-shadow: 0 0 48px var(--final-glow-color); }
-  100%{ box-shadow: 0 0 18px var(--final-glow-color); }
+/* 7) Vídeo final: NÃO estilizar aqui se o video-transicao.js já cria overlay próprio.
+      Mantemos só um “fallback” seguro, sem criar barra de rolagem. */
+#final-video {
+  display: none !important;
 }
