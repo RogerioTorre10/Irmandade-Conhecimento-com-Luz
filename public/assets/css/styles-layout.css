@@ -1882,7 +1882,9 @@ body.guia-arion #section-perguntas .btn.btn-stone {
    height: auto !important;
    min-height: 0 !important;
    max-height: none !important;
-   align-self: flex-start !important;   
+   align-self: flex-start !important;
+   max-width: 520px !important;
+   padding-bottom: 22px !important; /* respiro */   
   }
 
   /* 3) NÃO limitar altura aqui (isso estava cortando o título/botões) */
@@ -1893,6 +1895,7 @@ body.guia-arion #section-perguntas .btn.btn-stone {
   min-height: 0 !important;
   max-height: none !important;
   overflow: visible !important;
+  padding-bottom: 18px !important;   
   }
 
   /* 4) Painel (glow) central e mais alto */
@@ -1918,26 +1921,25 @@ body.guia-arion #section-perguntas .btn.btn-stone {
 
   /* 6) Texto: compacto e legível */
   #section-final .final-message p {
-    font-size: 11px !important;
-    line-height: 1.45 !important;
-    margin: 0 0 12px !important;
-    direction: ltr !important; 
+    font-size: 15px !important;
+    line-height: 1.42 !important;
+    margin: 0 0 10px !important;
   }
 
   /* 7) BOTÕES — seletor correto */
   #section-final .final-acoes {
     margin-top: 14px !important;
-    padding-bottom: 6px !important;
+    padding-bottom: 10px !important;
     display: flex !important;
-    gap: 14px !important;
+    gap: 12px !important;
     justify-content: center !important;
     flex-wrap: wrap !important; /* se apertar, quebra linha sem cortar */
   }
 
   #section-final .final-acoes .btn {
-    min-height: 54px !important;
-    padding: 0 18px !important;
-    font-size: 16.5px !important;
+    min-height: 52px !important;
+    padding: 0 16px !important;
+    font-size: 15.5px !important;
     white-space: nowrap !important;
   }
 
@@ -1947,6 +1949,24 @@ body.guia-arion #section-perguntas .btn.btn-stone {
     direction: ltr !important;
     unicode-bidi: plaintext !important;
    }
+
+   /* A datilografia deve ficar LTR e alinhada à esquerda sempre */
+    #section-final #final-title,
+    #section-final .final-title,
+    #section-final #final-message,
+    #section-final .final-message,
+    #section-final .final-message p {
+    direction: ltr !important;
+    unicode-bidi: plaintext !important;
+    text-align: left !important;
+    }
+
+    /* Se existir alguma animação/efeito que aplique centralização ao concluir */
+    #section-final .typing-done,
+    #section-final .typing-active {
+    text-align: left !important;
+    }
+
    }
 
 
