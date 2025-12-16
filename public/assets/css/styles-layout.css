@@ -1882,9 +1882,7 @@ body.guia-arion #section-perguntas .btn.btn-stone {
    height: auto !important;
    min-height: 0 !important;
    max-height: none !important;
-   align-self: flex-start !important;
-   transform: translateX(-50%) translateY(-44px) !important; /* sobe */
-   left: 50% !important;   
+   align-self: flex-start !important;   
   }
 
   /* 3) NÃO limitar altura aqui (isso estava cortando o título/botões) */
