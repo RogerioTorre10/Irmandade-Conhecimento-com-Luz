@@ -663,7 +663,64 @@
 
   #section-selfie .j-panel-glow {
     transform: translate(-6px, -30px);
-  }   
+  }
+
+/* Área do preview/captura maior */
+  #section-selfie .selfie-preview,
+  #section-selfie .camera-frame,
+  #section-selfie .preview-frame {
+    width: min(92vw, 520px) !important;
+    height: clamp(260px, 46vh, 420px) !important;
+    margin: 12px auto 14px !important;
+    border-radius: 18px !important;
+    overflow: hidden !important;
+  }
+
+  /* Linha Zoom: label + slider + valor (mais espaço p/ slider) */
+  #section-selfie .zoom-row{
+    display: grid !important;
+    grid-template-columns: 140px 1fr 64px !important;
+    gap: 10px !important;
+    align-items: center !important;
+    padding: 8px 12px !important;
+  }
+
+  #section-selfie .zoom-row .zoom-label{
+    justify-self: start !important;
+    text-align: left !important;
+    opacity: .95 !important;
+  }
+
+  #section-selfie .zoom-row input[type="range"]{
+    width: 100% !important;
+  }
+
+  #section-selfie .zoom-row .zoom-value{
+    text-align: right !important;
+    white-space: nowrap !important;
+  }
+
+  /* Botões (troca câmera / capturar / confirmar) em 3 colunas SEM cortar */
+  #section-selfie .selfie-actions,
+  #section-selfie .camera-actions{
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 1fr !important;
+    gap: 10px !important;
+    padding: 10px 12px 14px !important;
+  }
+
+  #section-selfie .selfie-actions button,
+  #section-selfie .camera-actions button{
+    min-width: 0 !important;
+    width: 100% !important;
+    min-height: 48px !important;
+    padding: 10px 10px !important;
+    font-size: clamp(12px, 3.4vw, 15px) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+   
 }
 
 /* =========================================
@@ -1837,8 +1894,43 @@ body.guia-arion #section-perguntas .btn.btn-stone {
   box-shadow: 0 0 12px rgba(255,106,213,0.8) !important;
   border-color: #e04ab3 !important;
 }
+/* Container dos botões */
+  #section-perguntas .perg-actions,
+  #section-perguntas .actions,
+  #section-perguntas .botoes,
+  #section-perguntas .qa-actions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important; /* lado a lado */
+    gap: 10px !important;
+    padding: 10px 12px 14px !important;
+    align-items: stretch !important;
+  }
+
+  /* Se houver 3 botões e você quiser 3 colunas, troque a linha acima por:
+     grid-template-columns: 1fr 1fr 1fr !important;
+  */
+
+  #section-perguntas .perg-actions button,
+  #section-perguntas .actions button,
+  #section-perguntas .botoes button,
+  #section-perguntas .qa-actions button {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 50px !important;
+    padding: 10px 10px !important;
+    font-size: clamp(12px, 3.5vw, 15px) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* Garante que o botão continuar não fique “miúdo” */
+  #section-perguntas #btnContinuar,
+  #section-perguntas .btn-continuar {
+    font-weight: 700 !important;
+  }
    
-}
+   }
 
 /* =========================================================
    SECTION-FINAL — OVERRIDES DE VITRINE (layout manda)
@@ -2012,8 +2104,51 @@ body.guia-arion #section-perguntas .btn.btn-stone {
     line-height: 1.1 !important;
     white-space: nowrap !important;
     overflow: hidden !important;
+    text-overflow: ellipsis !important;  
+  }
+
+  #section-final{
+    width: 100% !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+    padding: 20px 0 56px !important;
+  }
+
+  /* palco central sempre dentro do viewport */
+  #section-final .j-perg-v-inner,
+  #section-final .final-pergaminho-wrapper{
+    width: min(92vw, 520px) !important;
+    margin: 0 auto !important;
+    transform: none !important;
+    left: 0 !important;
+  }
+
+  /* vidro levemente ajustado sem empurrar a tela */
+  #section-final .j-panel-glow{
+    width: 92% !important;
+    margin: 0 auto !important;
+    transform: translateX(-4px) !important; /* ajuste fino */
+    box-sizing: border-box !important;
+  }
+
+  /* botões: 2 colunas (se faltar espaço, eles truncam) */
+  #section-final .final-acoes{
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+    padding: 0 10px !important;
+  }
+
+  #section-final .final-acoes button{
+    min-width: 0 !important;
+    width: 100% !important;
+    min-height: 52px !important;
+    font-size: clamp(12px, 3.4vw, 15px) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
     text-overflow: ellipsis !important;
   }
 }
+   
 
 
