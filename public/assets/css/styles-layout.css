@@ -1851,6 +1851,11 @@ body.guia-arion #section-perguntas .btn.btn-stone {
     overscroll-behavior-x: none;
   }
 
+  #section-final,
+  #section-final.section {
+  background: transparent !important;
+ }
+   
  #section-final {
     min-height: 100vh !important;
     padding: 14px 20px 34px !important; /* menos padding = mais área útil */
@@ -1866,14 +1871,28 @@ body.guia-arion #section-perguntas .btn.btn-stone {
     justify-content: center !important;
     align-items: flex-start !important;
     padding-top: 6px !important; /* ajuste fino */
+    height: auto !important;
+    min-height: 0 !important;
+    background: transparent !important; 
+   }
+
+   /* A causa principal: painéis/glows com min-height/height agressivos */
+   #section-final .j-panel-glow.final-panel,
+   #section-final .j-panel-glow {
+   height: auto !important;
+   min-height: 0 !important;
+   max-height: none !important;
+   align-self: flex-start !important;
   }
 
   /* 3) NÃO limitar altura aqui (isso estava cortando o título/botões) */
   #section-final .j-perg-v-inner,
   #section-final .pergaminho,
   #section-final .pergaminho-content {
-    max-height: none !important;
-    overflow: visible !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
   }
 
   /* 4) Painel (glow) central e mais alto */
@@ -1883,14 +1902,18 @@ body.guia-arion #section-perguntas .btn.btn-stone {
     margin: 0 auto !important;
     left: 50% !important;
     transform: translateX(-50%) translateY(-54px) !important; /* SOBE AQUI */
-  }
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    align-self: flex-start !important; 
+    }
 
   /* 5) Título: levemente menor no desktop pra não estourar */
   #section-final #final-title,
   #section-final .final-title {
-    font-size: clamp(22px, 1.9vw, 30px) !important;
-    line-height: 1.15 !important;
-    margin: 6px 0 10px !important;
+  font-size: clamp(20px, 1.8vw, 28px) !important;
+  line-height: 1.15 !important;
+  margin: 6px 0 10px !important;
   }
 
   /* 6) Texto: compacto e legível */
@@ -1916,7 +1939,14 @@ body.guia-arion #section-perguntas .btn.btn-stone {
     font-size: 16.5px !important;
     white-space: nowrap !important;
   }
-}
+
+   /* Direção do texto: trava em LTR (evita bug de “direita→esquerda”) */
+    #section-final,
+    #section-final * {
+    direction: ltr !important;
+    unicode-bidi: plaintext !important;
+   }
+   }
 
 
 /* =========================================
