@@ -1851,95 +1851,72 @@ body.guia-arion #section-perguntas .btn.btn-stone {
     overscroll-behavior-x: none;
   }
 
-#section-final {
-    padding-bottom: 100px !important;
+ #section-final {
+    min-height: 100vh !important;
+    padding: 14px 20px 34px !important; /* menos padding = mais área útil */
+    overflow: hidden !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+  }
+
+  /* 2) Wrapper: sobe um pouco o conjunto inteiro */
+  #section-final .final-pergaminho-wrapper {
     display: flex !important;
     justify-content: center !important;
-    align-items: flex-start !important; /* começa do topo */
-    padding: 20px 20px 60px 20px !important; 
-    min-height: 100dvh !important;
-    box-sizing: border-box !important;
-    overflow: hidden !important;
+    align-items: flex-start !important;
+    padding-top: 6px !important; /* ajuste fino */
   }
 
-  /* Wrapper do pergaminho: sem empurrão extra e sem transform */
-  #section-final .j-perg-v-inner {
-    position: relative !important;
-    top: 0 !important;
-    margin: 0 auto !important;
-    margin-top: 0 !important;  
-    max-width: 850px !important;
-    width: 100% !important;
-    transform: none !important; /* CHAVE: Removido o transform pra ele ficar no topo */
-  }
-
-  /* Painel principal com glow - Puxado para cima para sobrepor o topo do pergaminho */
-  #section-final .j-panel-glow {
-    position: relative !important;
-    z-index: 10 !important;
-    margin: 0 auto !important;
-    padding: 10px !important;
-    width: 90% !important;
-    max-width: 470px !important;
-    left: 50% !important;
-    /* CHAVE: Subindo o painel MUITO mais (ex: -50px ou -60px) */
-    transform: translateX(-50%) translateY(-30px) !important; 
-    margin-top: 0 !important;  
-  }
-
-  /* Limita a altura do conteúdo pra caber perfeito como antes */
-  /* Nota: Mantendo este max-height, mas pode ser que não seja mais necessário */
+  /* 3) NÃO limitar altura aqui (isso estava cortando o título/botões) */
   #section-final .j-perg-v-inner,
-  #section-final .pergaminho {
-    max-height: 88vh !important; 
-    overflow: hidden !important;
-  }
-
-  /* Remove qualquer left extra que bagunça alinhamento */
-  #section-final .final-pergaminho-wrapper,
-  #section-final .pergaminho-content,
-  #section-final .final-panel,
-  #section-final .final-glass {
-    left: 0 !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    padding-left: 22px !important;
-    padding-right: 22px !important;
-    padding-bottom: 14px !important;
+  #section-final .pergaminho,
+  #section-final .pergaminho-content {
+    max-height: none !important;
     overflow: visible !important;
-    isolation: isolate !important;
   }
 
-  /* Garante que o texto não cresça demais (ajuste se necessário) */
-  #section-final .final-title,
-  #section-final #final-title {
-    font-size: clamp(25px, 2.1vw, 32px) !important;   /* era até 34px → agora até 30px */
-    line-height: 1.2 !important;
-    margin-bottom: 12px !important;
+  /* 4) Painel (glow) central e mais alto */
+  #section-final .j-panel-glow {
+    width: 90% !important;
+    max-width: 520px !important;        /* um pouco mais largo = cabe melhor */
+    margin: 0 auto !important;
+    left: 50% !important;
+    transform: translateX(-50%) translateY(-54px) !important; /* SOBE AQUI */
   }
 
+  /* 5) Título: levemente menor no desktop pra não estourar */
+  #section-final #final-title,
+  #section-final .final-title {
+    font-size: clamp(22px, 1.9vw, 30px) !important;
+    line-height: 1.15 !important;
+    margin: 6px 0 10px !important;
+  }
+
+  /* 6) Texto: compacto e legível */
   #section-final .final-message p {
-    font-size: 17px !important;   /* era 18px → 16.5px fica ótimo e legível */
-    line-height: 1.5 !important;
-    margin-bottom: 14px !important;
+    font-size: 16px !important;
+    line-height: 1.45 !important;
+    margin: 0 0 12px !important;
   }
 
-  /* Botões no fundo, sem corte */
-  #section-final .final-buttons {
-    margin-top: 18px !important;     /* mais espaço acima dos botões */
-    padding-bottom: 30px !important; /* mais ar no fundo pra clicar tranquilo */
-    gap: 18px !important;
+  /* 7) BOTÕES — seletor correto */
+  #section-final .final-acoes {
+    margin-top: 14px !important;
+    padding-bottom: 6px !important;
+    display: flex !important;
+    gap: 14px !important;
+    justify-content: center !important;
+    flex-wrap: wrap !important; /* se apertar, quebra linha sem cortar */
   }
 
-   /* Botões um pouco maiores e mais fáceis de acertar */
-  #section-final .btn-final {
-    min-height: 58px !important;     /* botão mais alto = mais fácil de clicar */
-    padding: 0 24px !important;
-    font-size: 17.5px !important;
+  #section-final .final-acoes .btn {
+    min-height: 54px !important;
+    padding: 0 18px !important;
+    font-size: 16.5px !important;
+    white-space: nowrap !important;
   }
-   
-
- }
+}
 
 
 /* =========================================
