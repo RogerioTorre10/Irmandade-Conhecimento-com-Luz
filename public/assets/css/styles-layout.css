@@ -1852,6 +1852,7 @@ body.guia-arion #section-perguntas .btn.btn-stone {
   }
 
 #section-final {
+    padding-bottom: 100px !important;
     display: flex !important;
     justify-content: center !important;
     align-items: flex-start !important; /* começa do topo */
@@ -1866,9 +1867,10 @@ body.guia-arion #section-perguntas .btn.btn-stone {
     position: relative !important;
     top: 0 !important;
     margin: 0 auto !important;
+    margin-top: -20px !important;  
     max-width: 850px !important;
     width: 100% !important;
-    transform: translateY(20px) !important; /* empurrão FIXO pequeno pra baixo (ajuste se quiser mais/menos) */
+    transform: translateY(40px) !important; /* empurrão FIXO pequeno pra baixo (ajuste se quiser mais/menos) */
   }
 
   /* Painel principal com glow - centralizado e com leve sobe pra sobrepor o pergaminho */
@@ -1880,7 +1882,8 @@ body.guia-arion #section-perguntas .btn.btn-stone {
     width: 90% !important;
     max-width: 470px !important;
     left: 50% !important;
-    transform: translateX(-50%) translateY(-20px) !important; /* sobe 20px fixo pra ficar sobreposto bonitinho */
+    transform: translateX(-50%) translateY(-70px) !important; /* sobe 20px fixo pra ficar sobreposto bonitinho */
+    margin-top: -30px !important; 
   }
 
   /* Limita a altura do conteúdo pra caber perfeito como antes */
@@ -1908,20 +1911,31 @@ body.guia-arion #section-perguntas .btn.btn-stone {
   /* Garante que o texto não cresça demais (ajuste se necessário) */
   #section-final .final-title,
   #section-final #final-title {
-    font-size: clamp(26px, 2.2vw, 34px) !important;
+    font-size: clamp(24px, 2vw, 30px) !important;   /* era até 34px → agora até 30px */
+    line-height: 1.2 !important;
+    margin-bottom: 8px !important;
   }
 
   #section-final .final-message p {
-    font-size: 18px !important; /* volta pro tamanho original que cabia */
-    line-height: 1.55 !important;
+    font-size: 16.5px !important;   /* era 18px → 16.5px fica ótimo e legível */
+    line-height: 1.52 !important;
+    margin-bottom: 12px !important;
   }
 
   /* Botões no fundo, sem corte */
   #section-final .final-buttons {
-    margin-top: 22px !important;
-    padding-bottom: 18px !important;
-    gap: 18px !important;
+    margin-top: 28px !important;     /* mais espaço acima dos botões */
+    padding-bottom: 40px !important; /* mais ar no fundo pra clicar tranquilo */
+    gap: 20px !important;
   }
+
+   /* Botões um pouco maiores e mais fáceis de acertar */
+  #section-final .btn-final {
+    min-height: 62px !important;     /* botão mais alto = mais fácil de clicar */
+    padding: 0 28px !important;
+    font-size: 18px !important;
+  }
+   
 
  }
 
