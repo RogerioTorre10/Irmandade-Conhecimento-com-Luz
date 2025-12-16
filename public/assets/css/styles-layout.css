@@ -1884,6 +1884,8 @@ body.guia-arion #section-perguntas .btn.btn-stone {
     left: auto !important;
     transform: none !important;
     width: min(520px, 92vw) !important;
+    padding-left: 18px !important;
+    padding-right: 26px !important; 
   }
 
   /* datilografia: fixa leitura ESQUERDA → DIREITA e NÃO recentraliza */
@@ -1928,7 +1930,7 @@ body.guia-arion #section-perguntas .btn.btn-stone {
 
    #section-final .pergaminho-content {
   padding-left: 28px !important;
-  padding-right: 56px !important; /* MAIS respiro à direita */
+  padding-right: 36px !important; /* MAIS respiro à direita */
   box-sizing: border-box;
 }
    
