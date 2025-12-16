@@ -1883,6 +1883,8 @@ body.guia-arion #section-perguntas .btn.btn-stone {
    min-height: 0 !important;
    max-height: none !important;
    align-self: flex-start !important;
+   transform: translateX(-50%) translateY(-44px) !important; /* sobe */
+   left: 50% !important;   
   }
 
   /* 3) NÃO limitar altura aqui (isso estava cortando o título/botões) */
@@ -1918,9 +1920,10 @@ body.guia-arion #section-perguntas .btn.btn-stone {
 
   /* 6) Texto: compacto e legível */
   #section-final .final-message p {
-    font-size: 16px !important;
+    font-size: 11px !important;
     line-height: 1.45 !important;
     margin: 0 0 12px !important;
+    direction: ltr !important; 
   }
 
   /* 7) BOTÕES — seletor correto */
