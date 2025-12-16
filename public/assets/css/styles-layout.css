@@ -1856,7 +1856,7 @@ body.guia-arion #section-perguntas .btn.btn-stone {
     display: flex !important;
     justify-content: center !important;
     align-items: flex-start !important; /* começa do topo */
-    padding: 30px 20px 80px 20px !important; /* 30px fixo no topo → espaço pequeno e consistente */
+    padding: 20px 20px 60px 20px !important; /* 30px fixo no topo → espaço pequeno e consistente */
     min-height: 100dvh !important; /* ou 100vh se preferir, mas dvh é mais estável */
     box-sizing: border-box !important;
     overflow: hidden !important;
@@ -1867,10 +1867,10 @@ body.guia-arion #section-perguntas .btn.btn-stone {
     position: relative !important;
     top: 0 !important;
     margin: 0 auto !important;
-    margin-top: -20px !important;  
+    margin-top: 0 !important; 
     max-width: 850px !important;
     width: 100% !important;
-    transform: translateY(40px) !important; /* empurrão FIXO pequeno pra baixo (ajuste se quiser mais/menos) */
+    transform: translateY(-15px) !important; /* empurrão FIXO pequeno pra baixo (ajuste se quiser mais/menos) */
   }
 
   /* Painel principal com glow - centralizado e com leve sobe pra sobrepor o pergaminho */
@@ -1882,8 +1882,8 @@ body.guia-arion #section-perguntas .btn.btn-stone {
     width: 90% !important;
     max-width: 470px !important;
     left: 50% !important;
-    transform: translateX(-50%) translateY(-70px) !important; /* sobe 20px fixo pra ficar sobreposto bonitinho */
-    margin-top: -30px !important; 
+    transform: translateX(-50%) translateY(-35px) !important; /* sobe 20px fixo pra ficar sobreposto bonitinho */
+    margin-top: 0 !important; 
   }
 
   /* Limita a altura do conteúdo pra caber perfeito como antes */
@@ -1911,29 +1911,29 @@ body.guia-arion #section-perguntas .btn.btn-stone {
   /* Garante que o texto não cresça demais (ajuste se necessário) */
   #section-final .final-title,
   #section-final #final-title {
-    font-size: clamp(24px, 2vw, 30px) !important;   /* era até 34px → agora até 30px */
+    font-size: clamp(25px, 2.1vw, 32px) !important;   /* era até 34px → agora até 30px */
     line-height: 1.2 !important;
-    margin-bottom: 8px !important;
+    margin-bottom: 12px !important;
   }
 
   #section-final .final-message p {
-    font-size: 16.5px !important;   /* era 18px → 16.5px fica ótimo e legível */
-    line-height: 1.52 !important;
-    margin-bottom: 12px !important;
+    font-size: 17px !important;   /* era 18px → 16.5px fica ótimo e legível */
+    line-height: 1.5 !important;
+    margin-bottom: 14px !important;
   }
 
   /* Botões no fundo, sem corte */
   #section-final .final-buttons {
-    margin-top: 28px !important;     /* mais espaço acima dos botões */
-    padding-bottom: 40px !important; /* mais ar no fundo pra clicar tranquilo */
-    gap: 20px !important;
+    margin-top: 18px !important;     /* mais espaço acima dos botões */
+    padding-bottom: 30px !important; /* mais ar no fundo pra clicar tranquilo */
+    gap: 18px !important;
   }
 
    /* Botões um pouco maiores e mais fáceis de acertar */
   #section-final .btn-final {
-    min-height: 62px !important;     /* botão mais alto = mais fácil de clicar */
-    padding: 0 28px !important;
-    font-size: 18px !important;
+    min-height: 58px !important;     /* botão mais alto = mais fácil de clicar */
+    padding: 0 24px !important;
+    font-size: 17.5px !important;
   }
    
 
