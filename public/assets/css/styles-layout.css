@@ -1856,24 +1856,24 @@ body.guia-arion #section-perguntas .btn.btn-stone {
     display: flex !important;
     justify-content: center !important;
     align-items: flex-start !important; /* começa do topo */
-    padding: 20px 20px 60px 20px !important; /* 30px fixo no topo → espaço pequeno e consistente */
-    min-height: 100dvh !important; /* ou 100vh se preferir, mas dvh é mais estável */
+    padding: 20px 20px 60px 20px !important; 
+    min-height: 100dvh !important;
     box-sizing: border-box !important;
     overflow: hidden !important;
   }
 
-  /* Wrapper do pergaminho - sem empurrão extra */
+  /* Wrapper do pergaminho: sem empurrão extra e sem transform */
   #section-final .j-perg-v-inner {
     position: relative !important;
     top: 0 !important;
     margin: 0 auto !important;
-    margin-top: 0 !important; 
+    margin-top: 0 !important;  
     max-width: 850px !important;
     width: 100% !important;
-    transform: translateY(-15px) !important; /* empurrão FIXO pequeno pra baixo (ajuste se quiser mais/menos) */
+    transform: none !important; /* CHAVE: Removido o transform pra ele ficar no topo */
   }
 
-  /* Painel principal com glow - centralizado e com leve sobe pra sobrepor o pergaminho */
+  /* Painel principal com glow - Puxado para cima para sobrepor o topo do pergaminho */
   #section-final .j-panel-glow {
     position: relative !important;
     z-index: 10 !important;
@@ -1882,14 +1882,16 @@ body.guia-arion #section-perguntas .btn.btn-stone {
     width: 90% !important;
     max-width: 470px !important;
     left: 50% !important;
-    transform: translateX(-50%) translateY(-35px) !important; /* sobe 20px fixo pra ficar sobreposto bonitinho */
-    margin-top: 0 !important; 
+    /* CHAVE: Subindo o painel MUITO mais (ex: -50px ou -60px) */
+    transform: translateX(-50%) translateY(-60px) !important; 
+    margin-top: 0 !important;  
   }
 
   /* Limita a altura do conteúdo pra caber perfeito como antes */
+  /* Nota: Mantendo este max-height, mas pode ser que não seja mais necessário */
   #section-final .j-perg-v-inner,
   #section-final .pergaminho {
-    max-height: 88vh !important; /* volta o seu "segredo" que fazia caber direitinho */
+    max-height: 88vh !important; 
     overflow: hidden !important;
   }
 
