@@ -1840,137 +1840,113 @@ body.guia-arion #section-perguntas .btn.btn-stone {
    
 }
 
-/* ========================================= SECTION-FINAL — BASE CORRIGIDA ========================================= */
+/* =========================================================
+   SECTION-FINAL — OVERRIDES DE VITRINE (layout manda)
+   Cole NO FINAL do styles-layout.css
+   ========================================================= */
+
+#section-final {
+  overflow: hidden !important;
+}
+
+/* Desktop */
 @media (min-width: 900px) {
-  html, body {
-    width: 100%;
-    max-width: 100vw;
-    overflow-x: hidden;
-    margin: 0;
-    padding: 0;
-    overscroll-behavior-x: none;
-  }
 
-  #section-final,
-  #section-final.section {
-  background: transparent !important;
- }
-   
- #section-final {
+  /* sobe o conjunto e evita “começar do meio da página” */
+  #section-final {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    padding: 32px 20px 72px !important;
     min-height: 100vh !important;
-    padding: 14px 20px 34px !important; /* menos padding = mais área útil */
-    overflow: hidden !important;
-    display: flex !important;
-    align-items: flex-start !important;
-    justify-content: center !important;
+    box-sizing: border-box !important;
   }
 
-  /* 2) Wrapper: sobe um pouco o conjunto inteiro */
+  /* wrapper do pergaminho/vidro segue o padrão das outras seções */
   #section-final .final-pergaminho-wrapper {
+    width: 100% !important;
     display: flex !important;
     justify-content: center !important;
     align-items: flex-start !important;
-    padding-top: 6px !important; /* ajuste fino */
-    height: auto !important;
-    min-height: 0 !important;
-    background: transparent !important; 
-   }
-
-   /* A causa principal: painéis/glows com min-height/height agressivos */
-   #section-final .j-panel-glow.final-panel,
-   #section-final .j-panel-glow {
-   height: auto !important;
-   min-height: 0 !important;
-   max-height: none !important;
-   align-self: flex-start !important;
-   max-width: 520px !important;
-   padding-bottom: 22px !important; /* respiro */   
   }
 
-  /* 3) NÃO limitar altura aqui (isso estava cortando o título/botões) */
-  #section-final .j-perg-v-inner,
-  #section-final .pergaminho,
-  #section-final .pergaminho-content {
-  height: auto !important;
-  min-height: 0 !important;
-  max-height: none !important;
-  overflow: visible !important;
-  padding-bottom: 18px !important;   
-  }
-
-  /* 4) Painel (glow) central e mais alto */
-  #section-final .j-panel-glow {
-    width: 90% !important;
-    max-width: 520px !important;        /* um pouco mais largo = cabe melhor */
+  #section-final .j-perg-v-inner {
+    width: 100% !important;
+    max-width: 900px !important;
     margin: 0 auto !important;
-    left: 50% !important;
-    transform: translateX(-50%) translateY(-54px) !important; /* SOBE AQUI */
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    align-self: flex-start !important; 
-    }
-
-  /* 5) Título: levemente menor no desktop pra não estourar */
-  #section-final #final-title,
-  #section-final .final-title {
-  font-size: clamp(20px, 1.8vw, 28px) !important;
-  line-height: 1.15 !important;
-  margin: 6px 0 10px !important;
+    transform: none !important;
   }
 
-  /* 6) Texto: compacto e legível */
-  #section-final .final-message p {
-    font-size: 15px !important;
-    line-height: 1.42 !important;
-    margin: 0 0 10px !important;
+  /* painél (vidro) centralizado sem “empurrar” para baixo */
+  #section-final .j-panel-glow {
+    position: relative !important;
+    margin: 0 auto !important;
+    left: auto !important;
+    transform: none !important;
+    width: min(520px, 92vw) !important;
   }
 
-  /* 7) BOTÕES — seletor correto */
+  /* datilografia: fixa leitura ESQUERDA → DIREITA e NÃO recentraliza */
+  #section-final #final-message,
+  #section-final #final-message p {
+    direction: ltr !important;
+    unicode-bidi: plaintext !important;
+    text-align: left !important;
+  }
+
+  /* título pode continuar centralizado (fica lindo) */
+  #section-final #final-title {
+    text-align: center !important;
+  }
+
+  /* fonte um pouco menor e consistente */
+  #section-final #final-message p {
+    font-size: 17px !important;
+    line-height: 1.55 !important;
+  }
+
+  /* BOTÕES LADO A LADO (desfaz o width:100% do styles-final.css) */
   #section-final .final-acoes {
-    margin-top: 14px !important;
-    padding-bottom: 10px !important;
     display: flex !important;
-    gap: 12px !important;
+    flex-direction: row !important;
     justify-content: center !important;
-    flex-wrap: wrap !important; /* se apertar, quebra linha sem cortar */
+    align-items: center !important;
+    gap: 14px !important;
+    flex-wrap: nowrap !important;
+    margin-top: 16px !important;
   }
 
-  #section-final .final-acoes .btn {
-    min-height: 52px !important;
-    padding: 0 16px !important;
-    font-size: 15.5px !important;
+  #section-final .final-acoes button,
+  #section-final .final-acoes a {
+    width: auto !important;
+    min-width: 220px !important;
+    max-width: 280px !important;
+    flex: 0 0 auto !important;
     white-space: nowrap !important;
   }
+}
 
-   /* Direção do texto: trava em LTR (evita bug de “direita→esquerda”) */
-    #section-final,
-    #section-final * {
-    direction: ltr !important;
-    unicode-bidi: plaintext !important;
-   }
+/* Mobile: pode empilhar (mais seguro), mas sem “jogar pra baixo” */
+@media (max-width: 600px) {
+  #section-final {
+    padding: 18px 14px 48px !important;
+    min-height: 100vh !important;
+    overflow: hidden !important;
+  }
 
-   /* A datilografia deve ficar LTR e alinhada à esquerda sempre */
-    #section-final #final-title,
-    #section-final .final-title,
-    #section-final #final-message,
-    #section-final .final-message,
-    #section-final .final-message p {
+  #section-final .j-panel-glow {
+    margin-top: 0 !important;
+    transform: none !important;
+  }
+
+  #section-final #final-message,
+  #section-final #final-message p {
     direction: ltr !important;
     unicode-bidi: plaintext !important;
     text-align: left !important;
-    }
+  }
+}
 
-    /* Se existir alguma animação/efeito que aplique centralização ao concluir */
-    #section-final .typing-done,
-    #section-final .typing-active {
-    text-align: left !important;
-    }
-
-    #section-final #final-title { text-align: center !important; }
-    #section-final .final-message, 
-    #section-final .final-message p { text-align: left !important; }
-   }
 
 
 /* =========================================
