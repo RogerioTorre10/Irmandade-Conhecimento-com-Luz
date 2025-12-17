@@ -665,17 +665,6 @@
     transform: translate(-6px, -30px);
   }
 
-/* Área do preview/captura maior */
-  #section-selfie .selfie-preview,
-  #section-selfie .camera-frame,
-  #section-selfie .preview-frame {
-    width: min(92vw, 520px) !important;
-    height: clamp(260px, 46vh, 420px) !important;
-    margin: 12px auto 14px !important;
-    border-radius: 18px !important;
-    overflow: hidden !important;
-  }
-
   /* Linha Zoom: label + slider + valor (mais espaço p/ slider) */
   #section-selfie .zoom-row{
     display: grid !important;
@@ -1900,7 +1889,7 @@ body.guia-arion #section-perguntas .btn.btn-stone {
   #section-perguntas .botoes,
   #section-perguntas .qa-actions {
     display: grid !important;
-    grid-template-columns: 1fr 1fr !important; /* lado a lado */
+    grid-template-columns: 1fr 1fr 1fr !important;/* lado a lado */
     gap: 10px !important;
     padding: 10px 12px 14px !important;
     align-items: stretch !important;
