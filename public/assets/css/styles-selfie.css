@@ -227,7 +227,7 @@ input[type=range]::-webkit-slider-thumb {
 
 .preview-hint {
   display: block;
-  text-align: center;
+  text-align: left !important ;
   color: #f9e7c2;
   font-family: 'Cardo', serif;
   font-size: 13px;
