@@ -1985,6 +1985,67 @@ body.guia-arion #section-perguntas .btn.btn-stone {
     font-weight: 700 !important;
   }
    
+    /* 2) BOTÕES (Falar/Apagar/Confirmar) lado a lado */
+  #section-perguntas .perguntas-acoes,
+  #section-perguntas .perguntas-actions,
+  #section-perguntas .qa-actions,
+  #section-perguntas .final-buttons,
+  #section-perguntas .actions {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 10px !important;
+    justify-content: space-between !important;
+    align-items: stretch !important;
+    flex-wrap: nowrap !important;
+    width: 100% !important;
+  }
+
+  #section-perguntas .perguntas-acoes button,
+  #section-perguntas .perguntas-actions button,
+  #section-perguntas .qa-actions button,
+  #section-perguntas .actions button,
+  #section-perguntas .btn-final,
+  #section-perguntas .btn-acao,
+  #section-perguntas .btn-pergunta {
+    flex: 1 1 0 !important;          /* divide em 3 colunas */
+    max-width: 33.33% !important;
+    min-width: 0 !important;         /* permite encolher */
+    padding: 10px 8px !important;
+    min-height: 46px !important;
+    font-size: 14px !important;      /* menor pra caber */
+    line-height: 1.1 !important;
+    white-space: nowrap !important;  /* evita quebrar e “estourar” */
+    text-overflow: ellipsis !important;
+    overflow: hidden !important;
+  }
+
+  /* Se algum botão estiver com width fixo herdado */
+  #section-perguntas .perguntas-acoes button,
+  #section-perguntas .perguntas-actions button,
+  #section-perguntas .qa-actions button {
+    width: auto !important;
+  }
+
+  /* 3) BARRA DE PROGRESSO (força aparecer e ficar no rodapé do painel) */
+  #section-perguntas .progress-wrap,
+  #section-perguntas .progress-container,
+  #section-perguntas .qa-progress,
+  #section-perguntas .j-progress,
+  #section-perguntas .progress-bar,
+  #section-perguntas [data-progress] {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  /* Caso a barra exista mas esteja “fora do lugar” */
+  #section-perguntas .progress-wrap,
+  #section-perguntas .progress-container,
+  #section-perguntas .qa-progress,
+  #section-perguntas .j-progress {
+    width: 100% !important;
+    margin: 10px auto 6px !important;
+  }
    }
 
 /* =========================================================
