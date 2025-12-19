@@ -1634,6 +1634,44 @@ body.guia-arion #section-perguntas .btn.btn-stone {
     overflow: hidden !important;
     text-overflow: ellipsis !important;
   }
+   
+   /* Camadas decorativas não podem “roubar” o toque */
+  #section-perguntas .j-panel-glow::before,
+  #section-perguntas .j-panel-glow::after,
+  #section-perguntas .jp-answer-bg,
+  #section-perguntas .pergaminho::before,
+  #section-perguntas .pergaminho::after {
+    pointer-events: none !important;
+  }
+
+  /* A moldura/answer-frame não pode bloquear botões posicionados por cima */
+  #section-perguntas .jp-answer-frame,
+  #section-perguntas .answer-box,
+  #section-perguntas .resposta-box,
+  #section-perguntas .textarea-wrapper {
+    position: relative !important;
+    overflow: visible !important;
+  }
+
+  /* Botão/ícone do microfone: sempre clicável e acima de tudo */
+  #section-perguntas #btn-mic,
+  #section-perguntas .btn-mic,
+  #section-perguntas .mic-btn,
+  #section-perguntas [data-mic],
+  #section-perguntas .microfone {
+    position: relative !important;
+    z-index: 9999 !important;
+    pointer-events: auto !important;
+    touch-action: manipulation !important;
+  }
+
+  /* Se o “microfone” que aparece for TEXTO antigo (label), some com ele */
+  #section-perguntas .mic-label,
+  #section-perguntas .microfone-label,
+  #section-perguntas .label-mic,
+  #section-perguntas .mic-text {
+    display: none !important;
+  }
 
   /* 7) Telas muito pequenas: mantém 3 botões clicáveis sem esmagar */
   @media (max-width: 380px){
