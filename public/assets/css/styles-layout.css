@@ -1539,15 +1539,18 @@ body.guia-arion #section-perguntas .btn.btn-stone {
     max-width: 460px !important;           /* mesmo corpo da intro */
     margin: 0 auto !important;
     padding: 32px 24px 52px 24px !important;             /* borda fininha */
-    border-radius: 26px !important;
+    border-radius: 20px !important;
     box-sizing: border-box !important;
      transform: none !important;
     -webkit-transform: translateY(0) translateZ(0) !important;
-    overflow: hidden !important;
+    overflow: visible !important;
   } 
   
   #section-perguntas .j-panel-glow {
     padding: 10px !important; /* igual Intro */
+    inset: 6px !important;            /* era mais “gordo” */
+    border-radius: 18px !important;
+    border-width: 1px !important;  
   }
   
   #section-perguntas .j-panel-glow::before {
