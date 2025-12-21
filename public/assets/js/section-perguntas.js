@@ -787,6 +787,32 @@ window.playBlockTransition = function(videoSrc, onDone) {
     });
   }
 
+  // ================================
+  // DELEGAÇÃO GLOBAL — MICROFONE
+  // (resolve mobile + DOM recriado)
+  // ================================
+  document.addEventListener('click', (e) => {
+  const btn = e.target.closest(
+    '#btn-mic, .btn-mic, .mic-btn, [data-mic], [data-action="mic"]'
+  );
+
+  if (!btn) return;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  console.log('[MIC CLICK] delegação global');
+
+  if (typeof startMic === 'function') {
+    startMic();
+  } else if (typeof initSpeechRecognition === 'function') {
+    initSpeechRecognition();
+  } else {
+    console.warn('[MIC] Função de microfone não encontrada');
+  }
+}, { passive: false });
+
+
   // ---- 5. Hooks de atualização ----
   //
   // A maioria dos seus scripts dispara eventos do JC quando troca de pergunta/bloco.
