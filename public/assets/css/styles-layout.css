@@ -1751,9 +1751,86 @@ body.guia-arion #section-perguntas .btn.btn-stone {
   #section-perguntas .mic-text {
     display: none !important;
   }
+/* Container dos botões de controle das perguntas */
+.perguntas-controls {
+  display: flex !important;
+  justify-content: center;     /* centraliza horizontalmente */
+  align-items: center;         /* centraliza verticalmente */
+  gap: 14px;                    /* espaço uniforme entre os botões */
+  margin-top: 24px;
+  padding: 10px 20px;          /* dá uma margem interna pra não encostar nas bordas */
+  flex-wrap: nowrap;           /* força os 3 na mesma linha */
+  width: 100%;
+  box-sizing: border-box;
+}
 
-  /* 7) Telas muito pequenas: mantém 3 botões clicáveis sem esmagar */
-  @media (max-width: 380px){
+/* Estilo base para todos os botões */
+.perguntas-controls .btn-perguntas {
+  flex: 1;                     /* distribui o espaço igualmente */
+  min-width: 100px;            /* tamanho mínimo bom */
+  max-width: 130px;            /* evita crescer demais */
+  height: 58px;                /* altura confortável pro toque */
+  padding: 8px 12px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 30px;         /* bem arredondado, estilo moderno */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;                    /* espaço entre emoji e texto */
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Botão Avança: maior e mais destacado */
+.perguntas-controls .btn-confirm {
+  flex: 1.4 !important;        /* 40% maior que os outros */
+  max-width: 160px !important;
+  background: linear-gradient(135deg, #00ff9d, #00cc7a) !important;
+  font-size: 16px !important;
+  font-weight: bold !important;
+  box-shadow: 0 6px 16px rgba(0, 255, 157, 0.4) !important;
+}
+
+/* Efeito ao tocar (feedback visual) */
+.perguntas-controls .btn-perguntas:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* Indicador forte quando microfone ativo */
+#jp-btn-falar.recording,
+.btn-perguntas[data-action="start-mic"].recording {
+  background: linear-gradient(135deg, #ff3333, #cc0000) !important;
+  box-shadow: 0 0 20px #ff0000, 0 0 30px #ff3333 !important;
+  animation: pulse-red 1.4s infinite;
+  transform: scale(1.08);
+}
+
+@keyframes pulse-red {
+  0% { box-shadow: 0 0 20px #ff0000; }
+  50% { box-shadow: 0 0 35px #ff4444; }
+  100% { box-shadow: 0 0 20px #ff0000; }
+}
+}
+
+/* Responsivo para telas menores (ex: iPhone SE, Android pequeno) */
+@media (max-width: 380px) {
+  .perguntas-controls {
+    gap: 10px;
+    padding: 10px;
+  }
+  .perguntas-controls .btn-perguntas {
+    min-width: 90px;
+    height: 54px;
+    font-size: 14px;
+  }
+  .perguntas-controls .btn-confirm {
+    font-size: 15px;
+    max-width: 140px;
+  }
+
     #section-perguntas .j-panel-glow{
       width: min(94vw, 460px) !important;
       padding: 12px 10px 14px !important;
@@ -1769,7 +1846,7 @@ body.guia-arion #section-perguntas .btn.btn-stone {
       font-size: 12px !important;
     }
   }
-}
+
 
 
 /* =========================================================
