@@ -483,98 +483,104 @@
   function bindUI(root) {
   root = root || document.getElementById(SECTION_ID) || document;
 
-  // Botão do MICROFONE (pode ter ID jp-btn-falar ou jp-btn-mic, ou classe btn-mic / btn-falar)
-  const btnMic = $('#jp-btn-falar', root) || $('#jp-btn-mic', root) || $('.btn-mic, .btn-falar', root);
+  // Botão "Falar" = microfone (ícone de alto-falante, mas função é ouvir o usuário)
+  const btnFalar = $('#jp-btn-falar', root) || $('.btn-falar', root);
 
   const btnApagar = $('#jp-btn-apagar', root);
   const btnConf   = $('#jp-btn-confirmar', root);
   const input     = $('#jp-answer-input', root);    
 
-  // ========= MICROFONE: Prioridade para JORNADA_MICRO + fallback nativo =========
-  let micAttached = false;
-  let micInstance = null;
-  let usingNative = false; // flag para saber se estamos no fallback
+  // ========= MICROFONE NATIVO ESTÁVEL (Web Speech API) =========
+  if (btnFalar && input) {
+    let recognition = null;
+    let isRecording = false;
 
-  if (btnMic && input) {
-    btnMic.addEventListener('click', (ev) => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      console.warn('Reconhecimento de voz não suportado neste navegador');
+      btnFalar.disabled = true;
+      return;
+    }
+
+    recognition = new SpeechRecognition();
+    recognition.lang = 'pt-BR';
+    recognition.continuous = false;     // uma fala por clique (mais estável no mobile)
+    recognition.interimResults = true;  // mostra texto enquanto fala (feedback imediato)
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => {
+      isRecording = true;
+      btnFalar.classList.add('rec', 'active'); // visual feedback (ex: pulsar ou mudar cor)
+      console.log('[MIC] Gravando...');
+    };
+
+    recognition.onresult = (event) => {
+      let finalTranscript = '';
+      let interimTranscript = '';
+
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript + ' ';
+        } else {
+          interimTranscript += transcript;
+        }
+      }
+
+      // Mostra interim em tempo real
+      if (interimTranscript) {
+        input.value = input.value + interimTranscript;
+      }
+
+      // Quando finaliza uma frase, adiciona e capitaliza próxima
+      if (finalTranscript) {
+        input.value = input.value.trim() + ' ' + finalTranscript.trim();
+        input.value = input.value.trim() + ' '; // espaço para continuar
+        input.focus();
+      }
+    };
+
+    recognition.onerror = (event) => {
+      console.warn('[MIC] Erro:', event.error);
+      isRecording = false;
+      btnFalar.classList.remove('rec', 'active');
+
+      if (event.error === 'no-speech') {
+        // Usuário não falou nada — ignora
+      } else if (event.error === 'audio-capture') {
+        alert('Microfone não acessível. Verifique permissões.');
+      } else if (event.error === 'not-allowed') {
+        alert('Permissão de microfone negada. Ative nas configurações do navegador.');
+      }
+    };
+
+    recognition.onend = () => {
+      isRecording = false;
+      btnFalar.classList.remove('rec', 'active');
+      console.log('[MIC] Parou');
+    };
+
+    // Clique no botão: toggle start/stop
+    btnFalar.addEventListener('click', (ev) => {
       ev.preventDefault();
       ev.stopPropagation();
 
-      // Proteção contra clique duplo (comum no mobile)
-      if (window.__MIC_START_LOCK__) return;
-      window.__MIC_START_LOCK__ = true;
-      setTimeout(() => (window.__MIC_START_LOCK__ = false), 600);
-
-      // 1) Tenta usar JORNADA_MICRO (seu módulo customizado)
-      if (!usingNative && window.JORNADA_MICRO && typeof window.JORNADA_MICRO.attach === 'function') {
-        if (!micAttached) {
-          micInstance = window.JORNADA_MICRO.attach(input, { mode: 'append' });
-          micAttached = true;
-        }
-
-        if (micInstance) {
-          const internalBtn = micInstance.button;
-          const isRecording = internalBtn?.classList.contains('rec');
-
-          if (isRecording) {
-            micInstance.stop?.();
-          } else {
-            micInstance.start?.();
-          }
-
-          // Failsafe: força stop se travar (10s)
-          clearTimeout(window.__MIC_FAILSAFE__);
-          window.__MIC_FAILSAFE__ = setTimeout(() => micInstance.stop?.(), 10000);
-
-          return; // sucesso com JORNADA_MICRO
-        }
-      }
-
-      // 2) Fallback: Web Speech API nativo (mais estável em alguns mobiles)
-      usingNative = true;
-      console.log('[MIC] Usando fallback nativo Web Speech API');
-
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRecognition) {
-        alert('Reconhecimento de voz não suportado neste navegador.');
+      if (isRecording) {
+        recognition.stop();
         return;
       }
 
-      let rec = window.__NATIVE_REC__ || new SpeechRecognition();
-      window.__NATIVE_REC__ = rec; // reutiliza instância
-
-      rec.lang = 'pt-BR';
-      rec.continuous = false; // uma frase por clique (mais estável no mobile)
-      rec.interimResults = true; // mostra texto em tempo real
-
-      rec.onresult = (event) => {
-        let transcript = '';
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          transcript += event.results[i][0].transcript;
-        }
-        input.value += transcript + ' '; // append (ou substitua se preferir input.value = transcript)
-        input.focus();
-      };
-
-      rec.onerror = (e) => {
-        console.warn('[MIC NATIVO] Erro:', e.error);
-        if (e.error === 'no-speech' || e.error === 'audio-capture') {
-          // tenta de novo ou ignora
-        }
-      };
-
-      rec.onend = () => {
-        console.log('[MIC NATIVO] Finalizado');
-        // Não reinicia automático para evitar loop infinito no mobile
-      };
+      // Proteção contra clique duplo
+      if (window.__MIC_START_LOCK__) return;
+      window.__MIC_START_LOCK__ = true;
+      setTimeout(() => window.__MIC_START_LOCK__ = false, 800);
 
       try {
-        rec.start();
-        // Visual feedback: muda classe do botão
-        btnMic.classList.add('rec');
-        rec.onend = () => btnMic.classList.remove('rec');
+        recognition.start();
       } catch (e) {
-        console.error('[MIC NATIVO] Falha ao start:', e);
+        console.warn('[MIC] Já iniciado ou erro:', e);
+        recognition.stop();
+        setTimeout(() => recognition.start(), 300); // retry comum no mobile
       }
     });
   }
@@ -607,7 +613,6 @@
       window.JORNADA_CHAMA.updateChamaFromText(input.value || '', 'chama-perguntas');
     });
   }
-
     
     // FIX: Atualiza áurea quando guia muda
     const guideColor = localStorage.getItem('JORNADA_GUIA_COLOR') || '#ffd700';
