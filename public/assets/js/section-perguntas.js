@@ -306,8 +306,8 @@ window.playBlockTransition = function(videoSrc, onDone) {
       window.JORNADA_CHAMA.ensureHeroFlame(SECTION_ID);
     }
   }
-   // ====== INJETAR CORES LUMINOSAS POR GUIA ======
-   // ====== INJETAR CORES LUMINOSAS POR GUIA ======
+  
+      // ====== INJETAR CORES LUMINOSAS POR GUIA ======
   (function applyGuideGlow() {
     const guia = sessionStorage.getItem('jornada.guia')?.toLowerCase() || 'lumen';
 
@@ -787,62 +787,106 @@ window.playBlockTransition = function(videoSrc, onDone) {
     });
   }
 
- // =====================================================
-// MIC — DELEGAÇÃO ROBUSTA (mobile estável)
-// Captura: pega o evento antes de overlays e handlers
-// =====================================================
+ /* ============================
+   MIC — Delegação robusta (mobile estável)
+   + Estabilidade do SpeechRecognition
+   ============================ */
 (function micDelegationRobusta() {
+  'use strict';
+
   if (window.__MIC_DELEGATION_BOUND__) return;
   window.__MIC_DELEGATION_BOUND__ = true;
 
   const MIC_SELECTOR =
-    '#btn-mic, .btn-mic, .mic-btn, [data-mic], [data-action="mic"], [aria-label*="microfone"], [title*="microfone"]';
+    '.btn-mic, .mic-btn, [data-mic], [data-action="mic"], [aria-label*="microfone"], [title*="microfone"]';
 
   const log = (...a) => console.log('[MIC]', ...a);
 
-  function callStartMic() {
-    // evita “duplo start” em toques rápidos
+  // ---- ESTABILIDADE: start "blindado" ----
+  function startMicStable() {
+    // trava anti-duplo clique/toque (muito comum no mobile)
     if (window.__MIC_START_LOCK__) return;
     window.__MIC_START_LOCK__ = true;
-    setTimeout(() => (window.__MIC_START_LOCK__ = false), 400);
+    setTimeout(() => (window.__MIC_START_LOCK__ = false), 450);
 
     try {
+      // 1) Se você já tem uma função oficial, chame ela:
+      // (use o nome REAL do seu projeto)
       if (typeof window.startMic === 'function') return window.startMic();
+
       if (typeof window.initSpeechRecognition === 'function') return window.initSpeechRecognition();
-      log('Função startMic/initSpeechRecognition não encontrada');
+
+      // 2) Caso você controle a instância global do recognition:
+      // Se existir __REC__ e estiver "rodando", reseta antes de iniciar de novo
+      if (window.__REC__ && window.__REC_RUNNING__) {
+        try { window.__REC__.stop(); } catch (e) {}
+        window.__REC_RUNNING__ = false;
+      }
+
+      // Cria recognition se não existir (fallback)
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) {
+        console.warn('[MIC] SpeechRecognition não suportado neste navegador.');
+        return;
+      }
+
+      if (!window.__REC__) {
+        const rec = new SR();
+        rec.lang = document.documentElement.lang || 'pt-BR';
+        rec.continuous = false;
+        rec.interimResults = true;
+
+        rec.onend = () => { window.__REC_RUNNING__ = false; log('onend'); };
+        rec.onerror = (e) => { window.__REC_RUNNING__ = false; console.warn('[MIC] onerror', e); };
+
+        // Opcional: onresult -> você liga na sua função de preencher textarea
+        // rec.onresult = (ev) => { ... };
+
+        window.__REC__ = rec;
+      }
+
+      // Marca como rodando e inicia
+      window.__REC_RUNNING__ = true;
+
+      // Segurança extra: se travar sem onend/onerror, libera depois de Xs
+      clearTimeout(window.__REC_FAILSAFE_T__);
+      window.__REC_FAILSAFE_T__ = setTimeout(() => {
+        if (window.__REC_RUNNING__) {
+          try { window.__REC__.stop(); } catch (e) {}
+          window.__REC_RUNNING__ = false;
+          console.warn('[MIC] failsafe: stop() por travamento silencioso.');
+        }
+      }, 9000);
+
+      window.__REC__.start();
+      log('start()');
     } catch (e) {
+      window.__REC_RUNNING__ = false;
       console.error('[MIC] erro ao iniciar', e);
-      window.__MIC_START_LOCK__ = false;
     }
   }
 
   function handler(e) {
-    const btn = e.target?.closest?.(MIC_SELECTOR);
+    const btn = e.target.closest(MIC_SELECTOR);
     if (!btn) return;
 
-    // se algum overlay estiver “pegando” o toque, aqui ainda capturamos
+    // evita conflitos com overlays / cliques duplicados
     e.preventDefault();
     e.stopPropagation();
 
-    // debug: confirma que o evento chegou
-    log('evento', e.type, 'ok; target=', btn);
+    // se tiver disabled/aria-disabled, não tenta iniciar
+    if (btn.disabled || btn.getAttribute('aria-disabled') === 'true') return;
 
-    // se o botão estiver disabled ou com aria-disabled, não chama
-    if (btn.disabled || btn.getAttribute('aria-disabled') === 'true') {
-      log('botão está disabled/aria-disabled');
-      return;
-    }
-
-    callStartMic();
+    startMicStable();
   }
 
-  // CAPTURE = true (muito importante)
+  // CAPTURE = true ajuda quando tem overlay por cima “roubando” o toque
   document.addEventListener('pointerdown', handler, { capture: true, passive: false });
   document.addEventListener('touchstart', handler, { capture: true, passive: false });
   document.addEventListener('click', handler, { capture: true, passive: false });
+
+  log('delegação ativa');
 })();
-
-
 
   // ---- 5. Hooks de atualização ----
   //
