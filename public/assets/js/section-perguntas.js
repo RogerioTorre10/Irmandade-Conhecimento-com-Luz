@@ -38,51 +38,50 @@
   let completed = false;
 
   // --------------------------------------------------
-// OVERLAY DE VÍDEO (entre blocos e final) — PORTAL GLOBAL
-// --------------------------------------------------
+  // OVERLAY DE VÍDEO (entre blocos e final) — PORTAL GLOBAL
+  // --------------------------------------------------
 
-function resolveVideoSrc(src) {
-  if (!src) return null;
-  let url = String(src).trim();
-  if (url.startsWith('/assets/img/') && url.endsWith('.mp4')) {
-    url = url.replace('/assets/img/', '/assets/videos/');
-  }
-  return url;
-}
-
-// usa o portal dourado FULL + limelight
-function playVideoWithCallback(src, onEnded, nextSectionId = null) {
-  src = resolveVideoSrc(src);
-  if (!src) {
-    if (typeof onEnded === 'function') onEnded();
-    return;
+  function resolveVideoSrc(src) {
+    if (!src) return null;
+    let url = String(src).trim();
+    if (url.startsWith('/assets/img/') && url.endsWith('.mp4')) {
+      url = url.replace('/assets/img/', '/assets/videos/');
+    }
+    return url;
   }
 
-  // Se existir player global cinematográfico, usa ele
-  if (typeof window.playTransitionVideo === 'function') {
-    window.playTransitionVideo(src, nextSectionId);
-    // quando o portal fecha ele navega; aqui só chamamos callback depois
-    document.addEventListener('transition:ended', function handler() {
-      document.removeEventListener('transition:ended', handler);
+  // usa o portal dourado FULL + limelight
+  function playVideoWithCallback(src, onEnded, nextSectionId = null) {
+    src = resolveVideoSrc(src);
+    if (!src) {
       if (typeof onEnded === 'function') onEnded();
-    });
-    return;
+      return;
+    }
+
+    // Se existir player global cinematográfico, usa ele
+    if (typeof window.playTransitionVideo === 'function') {
+      window.playTransitionVideo(src, nextSectionId);
+      // quando o portal fecha ele navega; aqui só chamamos callback depois
+      document.addEventListener('transition:ended', function handler() {
+        document.removeEventListener('transition:ended', handler);
+        if (typeof onEnded === 'function') onEnded();
+      });
+      return;
+    }
+
+    // fallback (raríssimo): sem portal → só chama callback
+    if (typeof onEnded === 'function') onEnded();
   }
 
-  // fallback (raríssimo): sem portal → só chama callback
-  if (typeof onEnded === 'function') onEnded();
-}
-
-window.playBlockTransition = function(videoSrc, onDone) {
-  const src = resolveVideoSrc(videoSrc);
-  if (!src) {
-    if (typeof onDone === 'function') onDone();
-    return;
-  }
-  log('Transição entre blocos (PORTAL GLOBAL):', src);
-  playVideoWithCallback(src, onDone);
-};
-
+  window.playBlockTransition = function(videoSrc, onDone) {
+    const src = resolveVideoSrc(videoSrc);
+    if (!src) {
+      if (typeof onDone === 'function') onDone();
+      return;
+    }
+    log('Transição entre blocos (PORTAL GLOBAL):', src);
+    playVideoWithCallback(src, onDone);
+  };
 
   // --------------------------------------------------
   // BLOCS / PERGUNTAS
@@ -137,7 +136,7 @@ window.playBlockTransition = function(videoSrc, onDone) {
     if (el) el.style.width = val;
   }
 
-    function updateCounters() {
+  function updateCounters() {
     const blocks = State.blocks || [];
     if (!blocks.length) return;
 
@@ -218,7 +217,6 @@ window.playBlockTransition = function(videoSrc, onDone) {
       elTotal.textContent = `${currentGlobalNum} / ${totalQuestions}`;
     }
   }
-
 
   async function typeQuestion(text) {
     if (completed) return;
@@ -307,7 +305,7 @@ window.playBlockTransition = function(videoSrc, onDone) {
     }
   }
   
-      // ====== INJETAR CORES LUMINOSAS POR GUIA ======
+  // ====== INJETAR CORES LUMINOSAS POR GUIA ======
   (function applyGuideGlow() {
     const guia = sessionStorage.getItem('jornada.guia')?.toLowerCase() || 'lumen';
 
@@ -356,7 +354,6 @@ window.playBlockTransition = function(videoSrc, onDone) {
         b.style.borderColor = color;
       });
   })();
-
 
   // --------------------------------------------------
   // RESPOSTAS
@@ -421,64 +418,63 @@ window.playBlockTransition = function(videoSrc, onDone) {
     }
   }
 
-
   function finishAll() {
-  if (completed) return;
-  completed = true;
+    if (completed) return;
+    completed = true;
 
-  const finishedAt = new Date().toISOString();
-  const guia = window.JC?.state?.guia || {};
-  const selfie = window.__SELFIE_DATA_URL__ || null;
+    const finishedAt = new Date().toISOString();
+    const guia = window.JC?.state?.guia || {};
+    const selfie = window.__SELFIE_DATA_URL__ || null;
 
-  State.meta = {
-    startedAt: State.startedAt,
-    finishedAt,
-    guia,
-    selfieUsed: !!selfie,
-    version: window.APP_CONFIG?.version || 'v1'
-  };
+    State.meta = {
+      startedAt: State.startedAt,
+      finishedAt,
+      guia,
+      selfieUsed: !!selfie,
+      version: window.APP_CONFIG?.version || 'v1'
+    };
 
-  window.__QA_ANSWERS__ = State.answers;
-  window.__QA_META__    = State.meta;
+    window.__QA_ANSWERS__ = State.answers;
+    window.__QA_META__    = State.meta;
 
-  log('Jornada de perguntas concluída.', {
-    total: State.totalQuestions,
-    respondidas: Object.keys(State.answers).length
-  });
+    log('Jornada de perguntas concluída.', {
+      total: State.totalQuestions,
+      respondidas: Object.keys(State.answers).length
+    });
 
-  if (window.JORNADA_CHAMA) {
-    window.JORNADA_CHAMA.setChamaIntensidade('chama-perguntas', 'forte');
-  }
+    if (window.JORNADA_CHAMA) {
+      window.JORNADA_CHAMA.setChamaIntensidade('chama-perguntas', 'forte');
+    }
 
-  // ---------------- VÍDEO FINAL + NAVEGAÇÃO ---------------- 
-  const finalVideoSrc   = window.JORNADA_FINAL_VIDEO || FINAL_VIDEO_FALLBACK;
-  const targetSectionId = FINAL_SECTION_ID; // 'section-final'
+    // ---------------- VÍDEO FINAL + NAVEGAÇÃO ---------------- 
+    const finalVideoSrc   = window.JORNADA_FINAL_VIDEO || FINAL_VIDEO_FALLBACK;
+    const targetSectionId = FINAL_SECTION_ID; // 'section-final'
 
-  if (finalVideoSrc && typeof window.playTransitionVideo === 'function') {
-    log('Iniciando vídeo final (portal → section-final):', finalVideoSrc);
-    window.playTransitionVideo(finalVideoSrc, targetSectionId);
-  } else {
-    log('Sem vídeo de transição final; indo direto para section-final');
-
-    if (window.JC && typeof window.JC.show === 'function') {
-      window.JC.show(targetSectionId);
+    if (finalVideoSrc && typeof window.playTransitionVideo === 'function') {
+      log('Iniciando vídeo final (portal → section-final):', finalVideoSrc);
+      window.playTransitionVideo(finalVideoSrc, targetSectionId);
     } else {
-      document.querySelectorAll('section.section').forEach(sec => {
-        sec.style.display = (sec.id === targetSectionId) ? 'block' : 'none';
-      });
-      const finalEl = document.getElementById(targetSectionId);
-      if (finalEl) finalEl.scrollIntoView({ behavior: 'smooth' });
+      log('Sem vídeo de transição final; indo direto para section-final');
+
+      if (window.JC && typeof window.JC.show === 'function') {
+        window.JC.show(targetSectionId);
+      } else {
+        document.querySelectorAll('section.section').forEach(sec => {
+          sec.style.display = (sec.id === targetSectionId) ? 'block' : 'none';
+        });
+        const finalEl = document.getElementById(targetSectionId);
+        if (finalEl) finalEl.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    try {
+      document.dispatchEvent(new CustomEvent('qa:completed', {
+        detail: { answers: State.answers, meta: State.meta }
+      }));
+    } catch (e) {
+      warn('Falha ao disparar qa:completed:', e);
     }
   }
-
-  try {
-    document.dispatchEvent(new CustomEvent('qa:completed', {
-      detail: { answers: State.answers, meta: State.meta }
-    }));
-  } catch (e) {
-    warn('Falha ao disparar qa:completed:', e);
-  }
-}
 
   // --------------------------------------------------
   // BIND UI
@@ -487,25 +483,47 @@ window.playBlockTransition = function(videoSrc, onDone) {
   function bindUI(root) {
     root = root || document.getElementById(SECTION_ID) || document;
 
-    const btnFalar  = $('#jp-btn-falar', root);
+    const btnTTS    = $('#jp-btn-falar', root);  // FIX: Renomeado para clareza - agora só TTS
+    const btnMic    = $('#jp-btn-mic', root);    // FIX: Novo - botão separado para mic (adicione no HTML se não existir)
     const btnApagar = $('#jp-btn-apagar', root);
     const btnConf   = $('#jp-btn-confirmar', root);
     const input     = $('#jp-answer-input', root);    
 
     // ================================
-    // MICROFONE controlado pelo botão
+    // TTS (LER PERGUNTA) - agora no btnTTS (#jp-btn-falar)
+    // ================================
+    if (btnTTS && 'speechSynthesis' in window) {
+      btnTTS.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+        const perguntaEl = $('#jp-question-typed', root) || $('#jp-question-raw', root);
+        if (!perguntaEl) return;
+        const text = perguntaEl.textContent.trim();
+        if (!text) return;
+        const synth = window.speechSynthesis;
+        synth.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'pt-BR';
+        utter.rate = 0.9;
+        utter.pitch = 1;
+        synth.speak(utter);
+      });
+    }
+
+    // ================================
+    // MICROFONE - agora separado no btnMic, com estabilidade do patch
     // ================================
     let micAttached = false;
     let micInstance = null;
 
-    if (btnFalar && input && window.JORNADA_MICRO) {
+    if (btnMic && input && window.JORNADA_MICRO) {
       const Micro = window.JORNADA_MICRO;
 
-      btnFalar.addEventListener('click', (ev) => {
+      btnMic.addEventListener('click', (ev) => {
         ev.preventDefault();
         ev.stopPropagation();
 
-        // 1) Garante que o input está "conectado" ao módulo de voz
+        // FIX: Garante attach só uma vez
         if (!micAttached && typeof Micro.attach === 'function') {
           micInstance = Micro.attach(input, { mode: 'append' });
           micAttached = true;
@@ -513,19 +531,25 @@ window.playBlockTransition = function(videoSrc, onDone) {
 
         if (!micInstance) return;
 
-        // 2) Liga / desliga a captura de voz (toggle manual)
-        const btnMic = micInstance.button;
-        const isRec  = btnMic && btnMic.classList.contains('rec');
+        // FIX: Toggle estável com trava anti-duplo clique
+        if (window.__MIC_START_LOCK__) return;
+        window.__MIC_START_LOCK__ = true;
+        setTimeout(() => (window.__MIC_START_LOCK__ = false), 450);
+
+        const btnMicInternal = micInstance.button;
+        const isRec = btnMicInternal && btnMicInternal.classList.contains('rec');
 
         if (isRec) {
-          if (typeof micInstance.stop === 'function') {
-            micInstance.stop();
-          }
+          if (typeof micInstance.stop === 'function') micInstance.stop();
         } else {
-          if (typeof micInstance.start === 'function') {
-            micInstance.start();
-          }
+          if (typeof micInstance.start === 'function') micInstance.start();
         }
+
+        // FIX: Failsafe se travar (limpa após 9s)
+        clearTimeout(window.__MIC_FAILSAFE_T__);
+        window.__MIC_FAILSAFE_T__ = setTimeout(() => {
+          if (typeof micInstance.stop === 'function') micInstance.stop();
+        }, 9000);
       });
     }
 
@@ -563,13 +587,11 @@ window.playBlockTransition = function(videoSrc, onDone) {
       });
     }
     
-    // FIX 5: Atualiza áurea quando guia muda
-      const guideColor = localStorage.getItem('JORNADA_GUIA_COLOR') || '#ffd700';
-      document.querySelectorAll('.btn').forEach(b => {
+    // FIX: Atualiza áurea quando guia muda
+    const guideColor = localStorage.getItem('JORNADA_GUIA_COLOR') || '#ffd700';
+    document.querySelectorAll('.btn').forEach(b => {
       b.style.setProperty('--guide-color', guideColor);
-   });
-
-    // (opcional) nada de attach automático aqui, só pelo botão falar
+    });
   }
 
   // --------------------------------------------------
@@ -628,6 +650,9 @@ window.playBlockTransition = function(videoSrc, onDone) {
     }
   };
   log(MOD, 'carregado');
+
+  // FIX: Exporta State levemente para o patch usar
+  window.PERGUNTAS_STATE = State;
 })();
 
 /* ============================================================
@@ -670,8 +695,8 @@ window.playBlockTransition = function(videoSrc, onDone) {
   // container da pergunta (para tingir com a cor do guia)
   const perguntaBox = rootSection.querySelector('.perg-pergunta-titulo, .perguntas-pergunta-titulo');
 
-  // botão Falar
-  const btnFalar = rootSection.querySelector('[data-action="tts"], .btn-tts, .btn-falar');
+  // botão TTS (agora separado do mic)
+  const btnTTS = rootSection.querySelector('[data-action="tts"], .btn-tts, .btn-falar');
 
   // ---- 2. Funções utilitárias ----
 
@@ -683,11 +708,15 @@ window.playBlockTransition = function(videoSrc, onDone) {
 
     fillEl.style.width = pct + '%';
 
-    // FIX 2: Luz do guia no progresso
+    // FIX: Corrigi bug - qBar era fillEl, qBadge era labelEl (copypaste errado)
+    const qBar = fillEl;
+    const qBadge = labelEl;
     const guideColor = localStorage.getItem('JORNADA_GUIA_COLOR') || '#ffd700'; // pega cor do guia salvo
-    qBar.style.background = `linear-gradient(to right, transparent, ${guideColor})`; // luz preenchendo
-    qBar.style.boxShadow = `0 0 10px ${guideColor}`; // emite luz
-    qBadge.style.color = guideColor; // badge reflete cor do guia
+    if (qBar) {
+      qBar.style.background = `linear-gradient(to right, transparent, ${guideColor})`; // luz preenchendo
+      qBar.style.boxShadow = `0 0 10px ${guideColor}`; // emite luz
+    }
+    if (qBadge) qBadge.style.color = guideColor; // badge reflete cor do guia
 
     if (labelEl) {
       labelEl.textContent = `${nAtual} / ${nTotal}`;
@@ -714,18 +743,17 @@ window.playBlockTransition = function(videoSrc, onDone) {
 
   // ---- 3. Integração com o State existente ----
   //
-  // Este patch tenta ler o objeto State exportado pelo section-perguntas.js.
-  // Se ele não existir, caímos em um modo mais simples baseado em data-atributos.
+  // FIX: Agora usa window.PERGUNTAS_STATE (exportado no core)
 
   function getStateSnapshot() {
-    const S = window.PERGUNTAS_STATE || window.SectionPerguntasState || window.State || {};
+    const S = window.PERGUNTAS_STATE || {};
     const snap = {
-      blocoAtual:   S.currentBlockIndex ?? S.blocoAtual ?? 0,
-      blocosTotal:  S.totalBlocks      ?? S.blocosTotal ?? 1,
-      perguntaIdx:  S.currentIndex     ?? S.perguntaIdx ?? 0,
-      perguntasBloco: S.questionsPerBlock ?? S.perguntasBloco ?? 1,
-      perguntaGlobal: S.currentGlobalIndex ?? S.perguntaGlobal ?? 0,
-      perguntasTotal: S.totalQuestions     ?? S.perguntasTotal ?? 1,
+      blocoAtual:   S.blocoIdx ?? 0,
+      blocosTotal:  S.totalBlocks ?? 1,
+      perguntaIdx:  S.qIdx ?? 0,
+      perguntasBloco: (S.blocks[S.blocoIdx]?.questions?.length) ?? 1,
+      perguntaGlobal: S.globalIdx ?? 0,
+      perguntasTotal: S.totalQuestions ?? 1,
     };
     return snap;
   }
@@ -780,113 +808,113 @@ window.playBlockTransition = function(videoSrc, onDone) {
     }
   }
 
-  if (btnFalar) {
-    btnFalar.addEventListener('click', function (ev) {
+  if (btnTTS) {
+    btnTTS.addEventListener('click', function (ev) {
       ev.preventDefault();
       speakCurrentQuestion();
     });
   }
 
- /* ============================
+  /* ============================
    MIC — Delegação robusta (mobile estável)
    + Estabilidade do SpeechRecognition
    ============================ */
-(function micDelegationRobusta() {
-  'use strict';
+  (function micDelegationRobusta() {
+    'use strict';
 
-  if (window.__MIC_DELEGATION_BOUND__) return;
-  window.__MIC_DELEGATION_BOUND__ = true;
+    if (window.__MIC_DELEGATION_BOUND__) return;
+    window.__MIC_DELEGATION_BOUND__ = true;
 
-  const MIC_SELECTOR =
-    '.btn-mic, .mic-btn, [data-mic], [data-action="mic"], [aria-label*="microfone"], [title*="microfone"]';
+    const MIC_SELECTOR =
+      '.btn-mic, .mic-btn, [data-mic], [data-action="mic"], [aria-label*="microfone"], [title*="microfone"]';
 
-  const log = (...a) => console.log('[MIC]', ...a);
+    const log = (...a) => console.log('[MIC]', ...a);
 
-  // ---- ESTABILIDADE: start "blindado" ----
-  function startMicStable() {
-    // trava anti-duplo clique/toque (muito comum no mobile)
-    if (window.__MIC_START_LOCK__) return;
-    window.__MIC_START_LOCK__ = true;
-    setTimeout(() => (window.__MIC_START_LOCK__ = false), 450);
+    // ---- ESTABILIDADE: start "blindado" ----
+    function startMicStable() {
+      // trava anti-duplo clique/toque (muito comum no mobile)
+      if (window.__MIC_START_LOCK__) return;
+      window.__MIC_START_LOCK__ = true;
+      setTimeout(() => (window.__MIC_START_LOCK__ = false), 450);
 
-    try {
-      // 1) Se você já tem uma função oficial, chame ela:
-      // (use o nome REAL do seu projeto)
-      if (typeof window.startMic === 'function') return window.startMic();
+      try {
+        // 1) Se você já tem uma função oficial, chame ela:
+        // (use o nome REAL do seu projeto)
+        if (typeof window.startMic === 'function') return window.startMic();
 
-      if (typeof window.initSpeechRecognition === 'function') return window.initSpeechRecognition();
+        if (typeof window.initSpeechRecognition === 'function') return window.initSpeechRecognition();
 
-      // 2) Caso você controle a instância global do recognition:
-      // Se existir __REC__ e estiver "rodando", reseta antes de iniciar de novo
-      if (window.__REC__ && window.__REC_RUNNING__) {
-        try { window.__REC__.stop(); } catch (e) {}
-        window.__REC_RUNNING__ = false;
-      }
-
-      // Cria recognition se não existir (fallback)
-      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SR) {
-        console.warn('[MIC] SpeechRecognition não suportado neste navegador.');
-        return;
-      }
-
-      if (!window.__REC__) {
-        const rec = new SR();
-        rec.lang = document.documentElement.lang || 'pt-BR';
-        rec.continuous = false;
-        rec.interimResults = true;
-
-        rec.onend = () => { window.__REC_RUNNING__ = false; log('onend'); };
-        rec.onerror = (e) => { window.__REC_RUNNING__ = false; console.warn('[MIC] onerror', e); };
-
-        // Opcional: onresult -> você liga na sua função de preencher textarea
-        // rec.onresult = (ev) => { ... };
-
-        window.__REC__ = rec;
-      }
-
-      // Marca como rodando e inicia
-      window.__REC_RUNNING__ = true;
-
-      // Segurança extra: se travar sem onend/onerror, libera depois de Xs
-      clearTimeout(window.__REC_FAILSAFE_T__);
-      window.__REC_FAILSAFE_T__ = setTimeout(() => {
-        if (window.__REC_RUNNING__) {
+        // 2) Caso você controle a instância global do recognition:
+        // Se existir __REC__ e estiver "rodando", reseta antes de iniciar de novo
+        if (window.__REC__ && window.__REC_RUNNING__) {
           try { window.__REC__.stop(); } catch (e) {}
           window.__REC_RUNNING__ = false;
-          console.warn('[MIC] failsafe: stop() por travamento silencioso.');
         }
-      }, 9000);
 
-      window.__REC__.start();
-      log('start()');
-    } catch (e) {
-      window.__REC_RUNNING__ = false;
-      console.error('[MIC] erro ao iniciar', e);
+        // Cria recognition se não existir (fallback)
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SR) {
+          console.warn('[MIC] SpeechRecognition não suportado neste navegador.');
+          return;
+        }
+
+        if (!window.__REC__) {
+          const rec = new SR();
+          rec.lang = document.documentElement.lang || 'pt-BR';
+          rec.continuous = false;
+          rec.interimResults = true;
+
+          rec.onend = () => { window.__REC_RUNNING__ = false; log('onend'); };
+          rec.onerror = (e) => { window.__REC_RUNNING__ = false; console.warn('[MIC] onerror', e); };
+
+          // Opcional: onresult -> você liga na sua função de preencher textarea
+          // rec.onresult = (ev) => { ... };
+
+          window.__REC__ = rec;
+        }
+
+        // Marca como rodando e inicia
+        window.__REC_RUNNING__ = true;
+
+        // Segurança extra: se travar sem onend/onerror, libera depois de Xs
+        clearTimeout(window.__REC_FAILSAFE_T__);
+        window.__REC_FAILSAFE_T__ = setTimeout(() => {
+          if (window.__REC_RUNNING__) {
+            try { window.__REC__.stop(); } catch (e) {}
+            window.__REC_RUNNING__ = false;
+            console.warn('[MIC] failsafe: stop() por travamento silencioso.');
+          }
+        }, 9000);
+
+        window.__REC__.start();
+        log('start()');
+      } catch (e) {
+        window.__REC_RUNNING__ = false;
+        console.error('[MIC] erro ao iniciar', e);
+      }
     }
-  }
 
-  function handler(e) {
-    const btn = e.target.closest(MIC_SELECTOR);
-    if (!btn) return;
+    function handler(e) {
+      const btn = e.target.closest(MIC_SELECTOR);
+      if (!btn) return;
 
-    // evita conflitos com overlays / cliques duplicados
-    e.preventDefault();
-    e.stopPropagation();
+      // evita conflitos com overlays / cliques duplicados
+      e.preventDefault();
+      e.stopPropagation();
 
-    // se tiver disabled/aria-disabled, não tenta iniciar
-    if (btn.disabled || btn.getAttribute('aria-disabled') === 'true') return;
+      // se tiver disabled/aria-disabled, não tenta iniciar
+      if (btn.disabled || btn.getAttribute('aria-disabled') === 'true') return;
 
-    startMicStable();
-  }
+      startMicStable();
+    }
 
-  // CAPTURE = true ajuda quando tem overlay por cima “roubando” o toque
-  document.addEventListener('pointerdown', handler, { capture: true, passive: false });
-  document.addEventListener('touchstart', handler, { capture: true, passive: false });
-  document.addEventListener('click', handler, { capture: true, passive: false });
+    // CAPTURE = true ajuda quando tem overlay por cima “roubando” o toque
+    document.addEventListener('pointerdown', handler, { capture: true, passive: false });
+    document.addEventListener('touchstart', handler, { capture: true, passive: false });
+    document.addEventListener('click', handler, { capture: true, passive: false });
 
-  log('delegação ativa');
-})();
+    log('delegação ativa');
+  })();
 
   // ---- 5. Hooks de atualização ----
   //
@@ -911,4 +939,3 @@ window.playBlockTransition = function(videoSrc, onDone) {
 
   log('Patch de mimos inicializado.');
 })();
-
