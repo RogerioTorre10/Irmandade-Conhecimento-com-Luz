@@ -787,30 +787,61 @@ window.playBlockTransition = function(videoSrc, onDone) {
     });
   }
 
-  // ================================
-  // DELEGAÇÃO GLOBAL — MICROFONE
-  // (resolve mobile + DOM recriado)
-  // ================================
-  document.addEventListener('click', (e) => {
-  const btn = e.target.closest(
-    '#btn-mic, .btn-mic, .mic-btn, [data-mic], [data-action="mic"]'
-  );
+ // =====================================================
+// MIC — DELEGAÇÃO ROBUSTA (mobile estável)
+// Captura: pega o evento antes de overlays e handlers
+// =====================================================
+(function micDelegationRobusta() {
+  if (window.__MIC_DELEGATION_BOUND__) return;
+  window.__MIC_DELEGATION_BOUND__ = true;
 
-  if (!btn) return;
+  const MIC_SELECTOR =
+    '#btn-mic, .btn-mic, .mic-btn, [data-mic], [data-action="mic"], [aria-label*="microfone"], [title*="microfone"]';
 
-  e.preventDefault();
-  e.stopPropagation();
+  const log = (...a) => console.log('[MIC]', ...a);
 
-  console.log('[MIC CLICK] delegação global');
+  function callStartMic() {
+    // evita “duplo start” em toques rápidos
+    if (window.__MIC_START_LOCK__) return;
+    window.__MIC_START_LOCK__ = true;
+    setTimeout(() => (window.__MIC_START_LOCK__ = false), 400);
 
-  if (typeof startMic === 'function') {
-    startMic();
-  } else if (typeof initSpeechRecognition === 'function') {
-    initSpeechRecognition();
-  } else {
-    console.warn('[MIC] Função de microfone não encontrada');
+    try {
+      if (typeof window.startMic === 'function') return window.startMic();
+      if (typeof window.initSpeechRecognition === 'function') return window.initSpeechRecognition();
+      log('Função startMic/initSpeechRecognition não encontrada');
+    } catch (e) {
+      console.error('[MIC] erro ao iniciar', e);
+      window.__MIC_START_LOCK__ = false;
+    }
   }
-}, { passive: false });
+
+  function handler(e) {
+    const btn = e.target?.closest?.(MIC_SELECTOR);
+    if (!btn) return;
+
+    // se algum overlay estiver “pegando” o toque, aqui ainda capturamos
+    e.preventDefault();
+    e.stopPropagation();
+
+    // debug: confirma que o evento chegou
+    log('evento', e.type, 'ok; target=', btn);
+
+    // se o botão estiver disabled ou com aria-disabled, não chama
+    if (btn.disabled || btn.getAttribute('aria-disabled') === 'true') {
+      log('botão está disabled/aria-disabled');
+      return;
+    }
+
+    callStartMic();
+  }
+
+  // CAPTURE = true (muito importante)
+  document.addEventListener('pointerdown', handler, { capture: true, passive: false });
+  document.addEventListener('touchstart', handler, { capture: true, passive: false });
+  document.addEventListener('click', handler, { capture: true, passive: false });
+})();
+
 
 
   // ---- 5. Hooks de atualização ----
