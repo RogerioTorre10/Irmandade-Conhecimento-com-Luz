@@ -698,7 +698,7 @@
   const perguntaBox = rootSection.querySelector('.perg-pergunta-titulo, .perguntas-pergunta-titulo');
 
   // botão TTS (agora separado do mic)
-  const btnTTS = rootSection.querySelector('[data-action="tts"], .btn-tts, .btn-falar');
+ // const btnTTS = rootSection.querySelector('[data-action="tts"], .btn-tts, .btn-falar');
 
   // ---- 2. Funções utilitárias ----
 
