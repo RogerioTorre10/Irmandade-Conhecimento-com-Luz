@@ -484,6 +484,120 @@ window.playBlockTransition = function(videoSrc, onDone) {
   // BIND UI
   // --------------------------------------------------
 
+  // ==================================================
+// MIC — Delegação robusta + estabilidade (mobile)
+// ==================================================
+(function micDelegationRobusta() {
+  'use strict';
+
+  if (window.__MIC_DELEGATION_BOUND__) return;
+  window.__MIC_DELEGATION_BOUND__ = true;
+
+  // Ajuste estes seletores para bater com o seu botão real de mic.
+  // Se o JORNADA_MICRO injeta um botão, dê uma classe nele (ex: .btn-mic).
+  const MIC_SELECTOR =
+    '.btn-mic, .mic-btn, [data-mic], [data-action="mic"], [aria-label*="microfone"], [title*="microfone"]';
+
+  const log = (...a) => console.log('[MIC]', ...a);
+
+  function startMicStable() {
+    // anti “duplo toque”
+    if (window.__MIC_START_LOCK__) return;
+    window.__MIC_START_LOCK__ = true;
+    setTimeout(() => (window.__MIC_START_LOCK__ = false), 450);
+
+    try {
+      // 1) Se existir módulo oficial do projeto, usar ele
+      if (window.JORNADA_MICRO && typeof window.JORNADA_MICRO.startFromUI === 'function') {
+        return window.JORNADA_MICRO.startFromUI();
+      }
+
+      // 2) Fallback: SpeechRecognition direto
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) {
+        console.warn('[MIC] SpeechRecognition não suportado neste navegador.');
+        return;
+      }
+
+      // Se já estava preso, reseta
+      if (window.__REC__ && window.__REC_RUNNING__) {
+        try { window.__REC__.stop(); } catch (e) {}
+        window.__REC_RUNNING__ = false;
+      }
+
+      if (!window.__REC__) {
+        const rec = new SR();
+        rec.lang = document.documentElement.lang || 'pt-BR';
+        rec.continuous = false;
+        rec.interimResults = true;
+
+        rec.onend = () => { window.__REC_RUNNING__ = false; log('onend'); };
+        rec.onerror = (e) => { window.__REC_RUNNING__ = false; console.warn('[MIC] onerror', e); };
+
+        // Joga transcrição no textarea atual
+        rec.onresult = (ev) => {
+          const input = document.getElementById('jp-answer-input');
+          if (!input) return;
+
+          let finalTxt = '';
+          let interim = '';
+          for (let i = ev.resultIndex; i < ev.results.length; i++) {
+            const r = ev.results[i];
+            if (r.isFinal) finalTxt += r[0].transcript;
+            else interim += r[0].transcript;
+          }
+
+          // Apêndice simples (sem apagar o que já foi escrito)
+          if (finalTxt.trim()) {
+            input.value = (input.value ? input.value + ' ' : '') + finalTxt.trim();
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+          }
+        };
+
+        window.__REC__ = rec;
+      }
+
+      window.__REC_RUNNING__ = true;
+
+      // failsafe contra “travamento silencioso”
+      clearTimeout(window.__REC_FAILSAFE_T__);
+      window.__REC_FAILSAFE_T__ = setTimeout(() => {
+        if (window.__REC_RUNNING__) {
+          try { window.__REC__.stop(); } catch (e) {}
+          window.__REC_RUNNING__ = false;
+          console.warn('[MIC] failsafe: stop() por travamento silencioso.');
+        }
+      }, 9000);
+
+      window.__REC__.start();
+      log('start()');
+    } catch (e) {
+      window.__REC_RUNNING__ = false;
+      console.error('[MIC] erro ao iniciar', e);
+    }
+  }
+
+  function handler(e) {
+    const btn = e.target.closest(MIC_SELECTOR);
+    if (!btn) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (btn.disabled || btn.getAttribute('aria-disabled') === 'true') return;
+
+    startMicStable();
+  }
+
+  // CAPTURE true ajuda quando overlay “rouba” o toque
+  document.addEventListener('pointerdown', handler, { capture: true, passive: false });
+  document.addEventListener('touchstart', handler, { capture: true, passive: false });
+  document.addEventListener('click', handler, { capture: true, passive: false });
+
+  log('delegação ativa');
+})();
+
+ 
   function bindUI(root) {
     root = root || document.getElementById(SECTION_ID) || document;
 
@@ -501,33 +615,31 @@ window.playBlockTransition = function(videoSrc, onDone) {
     if (btnFalar && input && window.JORNADA_MICRO) {
       const Micro = window.JORNADA_MICRO;
 
-      btnFalar.addEventListener('click', (ev) => {
-        ev.preventDefault();
-        ev.stopPropagation();
+     if (btnFalar) {
+  btnFalar.addEventListener('click', (ev) => {
+    ev.preventDefault();
+    ev.stopPropagation();
 
-        // 1) Garante que o input está "conectado" ao módulo de voz
-        if (!micAttached && typeof Micro.attach === 'function') {
-          micInstance = Micro.attach(input, { mode: 'append' });
-          micAttached = true;
-        }
+    try {
+      const pergunta = document.getElementById('jp-question-raw')?.textContent
+        || document.getElementById('jp-question-typed')?.textContent
+        || '';
 
-        if (!micInstance) return;
+      const text = (pergunta || '').trim();
+      if (!text) return;
 
-        // 2) Liga / desliga a captura de voz (toggle manual)
-        const btnMic = micInstance.button;
-        const isRec  = btnMic && btnMic.classList.contains('rec');
+      if (!('speechSynthesis' in window)) return;
 
-        if (isRec) {
-          if (typeof micInstance.stop === 'function') {
-            micInstance.stop();
-          }
-        } else {
-          if (typeof micInstance.start === 'function') {
-            micInstance.start();
-          }
-        }
-      });
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = document.documentElement.lang || 'pt-BR';
+      utter.rate = 0.9;
+      window.speechSynthesis.speak(utter);
+    } catch (e) {
+      console.error('[PERGUNTAS:TTS] erro ao falar', e);
     }
+  });
+}
 
     // APAGAR
     if (btnApagar && input) {
