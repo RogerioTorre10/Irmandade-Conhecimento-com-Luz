@@ -480,107 +480,95 @@
   // BIND UI
   // --------------------------------------------------
 
-  function bindUI(root) {
+ function bindUI(root) {
   root = root || document.getElementById(SECTION_ID) || document;
 
-  // Botão "Falar" = microfone (ícone de alto-falante, mas função é ouvir o usuário)
   const btnFalar = $('#jp-btn-falar', root) || $('.btn-falar', root);
-
   const btnApagar = $('#jp-btn-apagar', root);
   const btnConf   = $('#jp-btn-confirmar', root);
   const input     = $('#jp-answer-input', root);    
 
-  // ========= MICROFONE NATIVO ESTÁVEL (Web Speech API) =========
+  // ========= MICROFONE NATIVO COM TOGGLE REAL (fica ligado até clicar de novo) =========
   if (btnFalar && input) {
-    let recognition = null;
-    let isRecording = false;
-
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      console.warn('Reconhecimento de voz não suportado neste navegador');
-      btnFalar.disabled = true;
+      console.warn('Reconhecimento de voz não suportado');
+      btnFalar.style.opacity = '0.5';
       return;
     }
 
-    recognition = new SpeechRecognition();
-    recognition.lang = 'pt-BR';
-    recognition.continuous = false;     // uma fala por clique (mais estável no mobile)
-    recognition.interimResults = true;  // mostra texto enquanto fala (feedback imediato)
-    recognition.maxAlternatives = 1;
+    // Instância única global — importante para reutilizar entre perguntas
+    if (!window.__GLOBAL_RECOGNITION__) {
+      window.__GLOBAL_RECOGNITION__ = new SpeechRecognition();
+      window.__GLOBAL_RECOGNITION__.lang = 'pt-BR';
+      window.__GLOBAL_RECOGNITION__.continuous = true;      // FICA LIGADO ATÉ PARAR MANUALMENTE
+      window.__GLOBAL_RECOGNITION__.interimResults = true;  // texto em tempo real
+      window.__GLOBAL_RECOGNITION__.maxAlternatives = 1;
 
-    recognition.onstart = () => {
-      isRecording = true;
-      btnFalar.classList.add('rec', 'active'); // visual feedback (ex: pulsar ou mudar cor)
-      console.log('[MIC] Gravando...');
-    };
-
-    recognition.onresult = (event) => {
       let finalTranscript = '';
-      let interimTranscript = '';
 
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0].transcript;
-        if (event.results[i].isFinal) {
-          finalTranscript += transcript + ' ';
-        } else {
-          interimTranscript += transcript;
+      window.__GLOBAL_RECOGNITION__.onstart = () => {
+        console.log('[MIC] Ativo - gravando');
+        btnFalar.classList.add('recording');
+        // O sistema Android vai mostrar "microphone" automaticamente aqui
+      };
+
+      window.__GLOBAL_RECOGNITION__.onresult = (event) => {
+        let interimTranscript = '';
+
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalTranscript += transcript + ' ';
+          } else {
+            interimTranscript = transcript;
+          }
         }
-      }
 
-      // Mostra interim em tempo real
-      if (interimTranscript) {
-        input.value = input.value + interimTranscript;
-      }
-
-      // Quando finaliza uma frase, adiciona e capitaliza próxima
-      if (finalTranscript) {
-        input.value = input.value.trim() + ' ' + finalTranscript.trim();
-        input.value = input.value.trim() + ' '; // espaço para continuar
+        // Atualiza o campo com texto final + interim
+        input.value = (input.value + finalTranscript + interimTranscript).trim() + ' ';
+        finalTranscript = ''; // reseta para próxima frase final
         input.focus();
-      }
-    };
+        input.scrollTop = input.scrollHeight; // rola automático
+      };
 
-    recognition.onerror = (event) => {
-      console.warn('[MIC] Erro:', event.error);
-      isRecording = false;
-      btnFalar.classList.remove('rec', 'active');
+      window.__GLOBAL_RECOGNITION__.onerror = (event) => {
+        console.warn('[MIC] Erro:', event.error);
+        btnFalar.classList.remove('recording');
+        if (event.error === 'not-allowed') {
+          alert('Permissão de microfone negada. Vá em Configurações > Permissões e permita.');
+        }
+      };
 
-      if (event.error === 'no-speech') {
-        // Usuário não falou nada — ignora
-      } else if (event.error === 'audio-capture') {
-        alert('Microfone não acessível. Verifique permissões.');
-      } else if (event.error === 'not-allowed') {
-        alert('Permissão de microfone negada. Ative nas configurações do navegador.');
-      }
-    };
+      window.__GLOBAL_RECOGNITION__.onend = () => {
+        console.log('[MIC] Desligado');
+        btnFalar.classList.remove('recording');
+      };
+    }
 
-    recognition.onend = () => {
-      isRecording = false;
-      btnFalar.classList.remove('rec', 'active');
-      console.log('[MIC] Parou');
-    };
+    const recognition = window.__GLOBAL_RECOGNITION__;
 
-    // Clique no botão: toggle start/stop
+    // Toggle: clique liga/desliga
     btnFalar.addEventListener('click', (ev) => {
       ev.preventDefault();
       ev.stopPropagation();
 
-      if (isRecording) {
-        recognition.stop();
-        return;
-      }
+      // Anti-clique duplo
+      if (window.__MIC_TOGGLE_LOCK__) return;
+      window.__MIC_TOGGLE_LOCK__ = true;
+      setTimeout(() => window.__MIC_TOGGLE_LOCK__ = false, 600);
 
-      // Proteção contra clique duplo
-      if (window.__MIC_START_LOCK__) return;
-      window.__MIC_START_LOCK__ = true;
-      setTimeout(() => window.__MIC_START_LOCK__ = false, 800);
-
-      try {
-        recognition.start();
-      } catch (e) {
-        console.warn('[MIC] Já iniciado ou erro:', e);
+      if (btnFalar.classList.contains('recording')) {
+        // Já está gravando → desliga
         recognition.stop();
-        setTimeout(() => recognition.start(), 300); // retry comum no mobile
+      } else {
+        // Liga o mic
+        try {
+          recognition.start();
+        } catch (e) {
+          // Se der erro "already started", ignora (já está rodando)
+          console.log('[MIC] Já ativo ou retry');
+        }
       }
     });
   }
@@ -613,8 +601,8 @@
       window.JORNADA_CHAMA.updateChamaFromText(input.value || '', 'chama-perguntas');
     });
   }
-    
-    // FIX: Atualiza áurea quando guia muda
+
+        // FIX: Atualiza áurea quando guia muda
     const guideColor = localStorage.getItem('JORNADA_GUIA_COLOR') || '#ffd700';
     document.querySelectorAll('.btn').forEach(b => {
       b.style.setProperty('--guide-color', guideColor);
