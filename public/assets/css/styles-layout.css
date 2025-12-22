@@ -164,20 +164,24 @@
   }
   
    #section-termos1 .j-panel-glow::before {
-    inset: 4px !important;    /* afina o aro interno */
-    border-radius: 22px !important;
+    content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid rgba(212,175,55,0.55);
+  box-shadow:
+    0 0 28px rgba(212,175,55,0.55),
+    inset 0 0 18px rgba(255,230,150,0.25);     
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.16),
+    transparent 45%,
+    transparent 100%
+  ) !important;
   }
-  
-   #section-termos1 .senha-panel {
-    width: 100% !important;
-    max-width: 100% !important;
-    border: 1px solid rgba(255, 210, 140, 0.35) !important;
-    box-shadow:
-      0 0 14px rgba(255, 190, 120, 0.25),
-      inset 0 0 18px rgba(0, 0, 0, 0.45) !important;
-    border-radius: 18px !important;
-    box-sizing: border-box !important;
-  }
+    
     /* Guia (mesmo problema) */
   #section-termos1 .j-arcane-card {
     margin-top: -18px !important;
@@ -249,21 +253,25 @@
   }
 
   #section-termos1 .j-panel-glow::before {
-    inset: 4px !important;    /* afina o aro interno */
-    border-radius: 22px !important;
-  }
-
-  #section-termos1 .termos-panel {
-    width: 100% !important;
-    max-width: 100% !important;
-    border: 1px solid rgba(255, 210, 140, 0.35) !important;
-    box-shadow:
-      0 0 14px rgba(255, 190, 120, 0.25),
-      inset 0 0 18px rgba(0, 0, 0, 0.45) !important;
-    border-radius: 18px !important;
-    box-sizing: border-box !important;
-  }   
+   content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid rgba(212,175,55,0.55);
+  box-shadow:
+    0 0 28px rgba(212,175,55,0.55),
+    inset 0 0 18px rgba(255,230,150,0.25);     
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.16),
+    transparent 45%,
+    transparent 100%
+  ) !important;
+  } 
 }
+
 /* ---- TERMOS 2: sobem um pouco mais ainda ---- */
 @media (min-width: 900px) {
 
@@ -296,20 +304,24 @@
   }
   
     #section-termos2 .j-panel-glow::before {
-    inset: 4px !important;    /* afina o aro interno */
-    border-radius: 22px !important;
+    content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid rgba(212,175,55,0.55);
+  box-shadow:
+    0 0 28px rgba(212,175,55,0.55),
+    inset 0 0 18px rgba(255,230,150,0.25);     
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.16),
+    transparent 45%,
+    transparent 100%
+  ) !important;
   }
-  
-    #section-termos2 .senha-panel {
-    width: 100% !important;
-    max-width: 100% !important;
-    border: 1px solid rgba(255, 210, 140, 0.35) !important;
-    box-shadow:
-      0 0 14px rgba(255, 190, 120, 0.25),
-      inset 0 0 18px rgba(0, 0, 0, 0.45) !important;
-    border-radius: 18px !important;
-    box-sizing: border-box !important;
-  }
+      
     /* Guia (mesmo problema) */
    #section-termos2 .j-arcane-card {
    margin-top: -18px !important;
@@ -381,19 +393,22 @@
   }
 
     #section-termos2 .j-panel-glow::before {
-    inset: 4px !important;    /* afina o aro interno */
-    border-radius: 22px !important;
-  }
-  
-  #section-termos2 .termos-panel {
-    width: 100% !important;
-    max-width: 100% !important;
-    border: 1px solid rgba(255, 210, 140, 0.35) !important;
-    box-shadow:
-      0 0 14px rgba(255, 190, 120, 0.25),
-      inset 0 0 18px rgba(0, 0, 0, 0.45) !important;
-    border-radius: 18px !important;
-    box-sizing: border-box !important;
+   content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid rgba(212,175,55,0.55);
+  box-shadow:
+    0 0 28px rgba(212,175,55,0.55),
+    inset 0 0 18px rgba(255,230,150,0.25);     
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.16),
+    transparent 45%,
+    transparent 100%
+  ) !important;
   }   
 }
 
@@ -468,20 +483,23 @@
   }
   
   #section-senha .j-panel-glow::before {
-    inset: 4px !important;    /* afina o aro interno */
-    border-radius: 22px !important;
-  }
-  
-  #section-senha .senha-panel {
-    width: 100% !important;
-    max-width: 100% !important;
-    border: 1px solid rgba(255, 210, 140, 0.35) !important;
-    box-shadow:
-      0 0 14px rgba(255, 190, 120, 0.25),
-      inset 0 0 18px rgba(0, 0, 0, 0.45) !important;
-    border-radius: 18px !important;
-    box-sizing: border-box !important;
-  }
+   content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid rgba(212,175,55,0.55);
+  box-shadow:
+    0 0 28px rgba(212,175,55,0.55),
+    inset 0 0 18px rgba(255,230,150,0.25);     
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.16),
+    transparent 45%,
+    transparent 100%
+  ) !important;
+  } 
 
    /* Guia (mesmo problema) */
   #section-senha .j-arcane-card {
@@ -521,20 +539,23 @@
   }
   
   #section-senha .j-panel-glow::before {
-    inset: 4px !important;    /* afina o aro interno */
-    border-radius: 22px !important;
-  }
-  
-  #section-senha .senha-panel {
-    width: 100% !important;
-    max-width: 100% !important;
-    border: 1px solid rgba(255, 210, 140, 0.35) !important;
-    box-shadow:
-      0 0 14px rgba(255, 190, 120, 0.25),
-      inset 0 0 18px rgba(0, 0, 0, 0.45) !important;
-    border-radius: 18px !important;
-    box-sizing: border-box !important;
-  }
+   content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid rgba(212,175,55,0.55);
+  box-shadow:
+    0 0 28px rgba(212,175,55,0.55),
+    inset 0 0 18px rgba(255,230,150,0.25);     
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.16),
+    transparent 45%,
+    transparent 100%
+  ) !important;
+  }  
 
   /* Opcional: título e conteúdo respirando igual intro */
   #section-senha .senha-panel-inner {
@@ -592,20 +613,23 @@
   }
   
   #section-selfie .j-panel-glow::before {
-    inset: 4px !important;    /* afina o aro interno */
-    border-radius: 22px !important;
-  }
-  
-  #section-selfie .senha-panel {
-    width: 100% !important;
-    max-width: 100% !important;
-    border: 1px solid rgba(255, 210, 140, 0.35) !important;
-    box-shadow:
-      0 0 14px rgba(255, 190, 120, 0.25),
-      inset 0 0 18px rgba(0, 0, 0, 0.45) !important;
-    border-radius: 18px !important;
-    box-sizing: border-box !important;
-  }
+    content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid rgba(212,175,55,0.55);
+  box-shadow:
+    0 0 28px rgba(212,175,55,0.55),
+    inset 0 0 18px rgba(255,230,150,0.25);     
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.16),
+    transparent 45%,
+    transparent 100%
+  ) !important;
+  }  
    
    #section-selfie .j-arcane-card {
     margin-top: -18px !important;   /* 👈 sobe a caixa */
@@ -647,20 +671,23 @@
   }
   
   #section-selfie .j-panel-glow::before {
-    inset: 4px !important;    /* afina o aro interno */
-    border-radius: 22px !important;
-  }
-  
-  #section-selfie .senha-panel {
-    width: 100% !important;
-    max-width: 100% !important;
-    border: 1px solid rgba(255, 210, 140, 0.35) !important;
-    box-shadow:
-      0 0 14px rgba(255, 190, 120, 0.25),
-      inset 0 0 18px rgba(0, 0, 0, 0.45) !important;
-    border-radius: 18px !important;
-    box-sizing: border-box !important;
-  }
+    content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid rgba(212,175,55,0.55);
+  box-shadow:
+    0 0 28px rgba(212,175,55,0.55),
+    inset 0 0 18px rgba(255,230,150,0.25);     
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.16),
+    transparent 45%,
+    transparent 100%
+  ) !important;
+  } 
 
   /* Opcional: título e conteúdo respirando igual intro */
   #section-selfie .senha-panel-inner {
@@ -843,21 +870,24 @@
   }
   
   #section-guia .j-panel-glow::before {
-    inset: 4px !important;    /* afina o aro interno */
-    border-radius: 22px !important;
+    content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid rgba(212,175,55,0.55);
+  box-shadow:
+    0 0 28px rgba(212,175,55,0.55),
+    inset 0 0 18px rgba(255,230,150,0.25);     
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.16),
+    transparent 45%,
+    transparent 100%
+  ) !important;
   }
   
-  #section-guia .senha-panel {
-    width: 100% !important;
-    max-width: 100% !important;
-    border: 1px solid rgba(255, 210, 140, 0.35) !important;
-    box-shadow:
-      0 0 14px rgba(255, 190, 120, 0.25),
-      inset 0 0 18px rgba(0, 0, 0, 0.45) !important;
-    border-radius: 18px !important;
-    box-sizing: border-box !important;
-  }
-
    /* Guia (mesmo problema) */
   #section-guia .j-arcane-card {
     margin-top: -18px !important;
@@ -903,26 +933,28 @@
     padding: 12px 10px 0 10px !important;
     box-sizing: border-box !important;
   }
-
-  /* Painel interno do conteúdo */
-  #section-guia .guia-panel {
-    width: 100% !important;
-    max-width: 100% !important;
-    border: 1px solid rgba(255, 210, 140, 0.35) !important;
-    box-shadow:
-      0 0 14px rgba(255, 190, 120, 0.25),
-      inset 0 0 18px rgba(0, 0, 0, 0.45) !important;
-    border-radius: 18px !important;
-    box-sizing: border-box !important;
-  }
    
    #section-guia .j-panel-glow {
     padding: 10px !important; /* igual Intro */
   }
   
   #section-guia .j-panel-glow::before {
-    inset: 4px !important;    /* afina o aro interno */
-    border-radius: 22px !important;
+    content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid rgba(212,175,55,0.55);
+  box-shadow:
+    0 0 28px rgba(212,175,55,0.55),
+    inset 0 0 18px rgba(255,230,150,0.25);     
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.16),
+    transparent 45%,
+    transparent 100%
+  ) !important;
   }
 
   /* Se tiver um wrapper interno tipo .guia-panel-inner */
@@ -1012,6 +1044,25 @@
   content: none !important;
 }
 
+#section-card .j-panel-glow::before {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid rgba(212,175,55,0.55);
+  box-shadow:
+    0 0 28px rgba(212,175,55,0.55),
+    inset 0 0 18px rgba(255,230,150,0.25);     
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.16),
+    transparent 45%,
+    transparent 100%
+  ) !important;
+}
+
 /* 0) Card-stage com espaço garantido pro botão (desktop + base) */
 #section-card .card-stage {
   position: relative;
@@ -1084,21 +1135,24 @@
   }
   
   #section-card .j-panel-glow::before {
-    inset: 4px !important;    /* afina o aro interno */
-    border-radius: 22px !important;
+    content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid rgba(212,175,55,0.55);
+  box-shadow:
+    0 0 28px rgba(212,175,55,0.55),
+    inset 0 0 18px rgba(255,230,150,0.25);     
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.16),
+    transparent 45%,
+    transparent 100%
+  ) !important;
   }
-  
-  #section-card .senha-panel {
-    width: 100% !important;
-    max-width: 100% !important;
-    border: 1px solid rgba(255, 210, 140, 0.35) !important;
-    box-shadow:
-      0 0 14px rgba(255, 190, 120, 0.25),
-      inset 0 0 18px rgba(0, 0, 0, 0.45) !important;
-    border-radius: 18px !important;
-    box-sizing: border-box !important;
-  }
-
+   
   /* Opcional: título e conteúdo respirando igual intro */
   #section-card .senha-panel-inner {
     padding: 0 10px !important;
@@ -1154,20 +1208,24 @@
   }
   
   #section-perguntas .j-panel-glow::before {
-    inset: 4px !important;    /* afina o aro interno */
-    border-radius: 22px !important;
+    content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid rgba(212,175,55,0.55);
+  box-shadow:
+    0 0 28px rgba(212,175,55,0.55),
+    inset 0 0 18px rgba(255,230,150,0.25);     
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.16),
+    transparent 45%,
+    transparent 100%
+  ) !important;
   }
-  
-  #section-perguntas .perguntas-panel {
-    width: 100% !important;
-    max-width: 100% !important;
-    border: 1px solid rgba(255, 210, 140, 0.35) !important;
-    box-shadow:
-      0 0 14px rgba(255, 190, 120, 0.25),
-      inset 0 0 18px rgba(0, 0, 0, 0.45) !important;
-    border-radius: 18px !important;
-    box-sizing: border-box !important;
-  }
+   
 
    /* Guia (mesmo problema) */
   #section-perguntas .j-arcane-card {
@@ -1555,9 +1613,22 @@ body.guia-arion #section-perguntas .btn.btn-stone {
 
   /* aro interno (slim) */
   #section-perguntas .j-panel-glow::before{
-    inset: 6px !important;
-    border-radius: 18px !important;
-    border-width: 1px !important;
+   content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid rgba(212,175,55,0.55);
+  box-shadow:
+    0 0 28px rgba(212,175,55,0.55),
+    inset 0 0 18px rgba(255,230,150,0.25);     
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.16),
+    transparent 45%,
+    transparent 100%
+  ) !important;
   }
 
   /* painel interno (mantém sua magia de sombras) */
