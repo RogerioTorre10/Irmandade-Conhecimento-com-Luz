@@ -483,80 +483,99 @@
   function bindUI(root) {
   root = root || document.getElementById(SECTION_ID) || document;
 
-  // Botão para LER A PERGUNTA em voz alta (TTS)
-  const btnLerPergunta = $('#jp-btn-falar', root) || $('.btn-falar, .btn-tts', root);
-
-  // Botão para ATIVAR MICROFONE (reconhecimento de voz)
-  const btnMic = $('#jp-btn-mic', root) || $('.btn-mic', root);
+  // Botão do MICROFONE (pode ter ID jp-btn-falar ou jp-btn-mic, ou classe btn-mic / btn-falar)
+  const btnMic = $('#jp-btn-falar', root) || $('#jp-btn-mic', root) || $('.btn-mic, .btn-falar', root);
 
   const btnApagar = $('#jp-btn-apagar', root);
   const btnConf   = $('#jp-btn-confirmar', root);
   const input     = $('#jp-answer-input', root);    
 
-  // ========= TTS: Ler a pergunta em voz alta =========
-  if (btnLerPergunta) {
-    btnLerPergunta.addEventListener('click', (ev) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-
-      const perguntaTexto = $('#jp-question-typed', root)?.textContent?.trim() 
-                         || $('#jp-question-raw', root)?.textContent?.trim() 
-                         || '';
-
-      if (!perguntaTexto) return;
-
-      if ('speechSynthesis' in window) {
-        speechSynthesis.cancel(); // cancela qualquer leitura anterior
-        const utter = new SpeechSynthesisUtterance(perguntaTexto);
-        utter.lang = 'pt-BR';
-        utter.rate = 0.9;
-        utter.pitch = 1;
-        speechSynthesis.speak(utter);
-      }
-    });
-  }
-
-  // ========= MICROFONE: Reconhecimento de voz (transcrever fala) =========
+  // ========= MICROFONE: Prioridade para JORNADA_MICRO + fallback nativo =========
   let micAttached = false;
   let micInstance = null;
+  let usingNative = false; // flag para saber se estamos no fallback
 
-  if (btnMic && input && window.JORNADA_MICRO) {
-    const Micro = window.JORNADA_MICRO;
-
+  if (btnMic && input) {
     btnMic.addEventListener('click', (ev) => {
       ev.preventDefault();
       ev.stopPropagation();
 
-      // Attach só uma vez
-      if (!micAttached && typeof Micro.attach === 'function') {
-        micInstance = Micro.attach(input, { mode: 'append' });
-        micAttached = true;
+      // Proteção contra clique duplo (comum no mobile)
+      if (window.__MIC_START_LOCK__) return;
+      window.__MIC_START_LOCK__ = true;
+      setTimeout(() => (window.__MIC_START_LOCK__ = false), 600);
+
+      // 1) Tenta usar JORNADA_MICRO (seu módulo customizado)
+      if (!usingNative && window.JORNADA_MICRO && typeof window.JORNADA_MICRO.attach === 'function') {
+        if (!micAttached) {
+          micInstance = window.JORNADA_MICRO.attach(input, { mode: 'append' });
+          micAttached = true;
+        }
+
+        if (micInstance) {
+          const internalBtn = micInstance.button;
+          const isRecording = internalBtn?.classList.contains('rec');
+
+          if (isRecording) {
+            micInstance.stop?.();
+          } else {
+            micInstance.start?.();
+          }
+
+          // Failsafe: força stop se travar (10s)
+          clearTimeout(window.__MIC_FAILSAFE__);
+          window.__MIC_FAILSAFE__ = setTimeout(() => micInstance.stop?.(), 10000);
+
+          return; // sucesso com JORNADA_MICRO
+        }
       }
 
-      if (!micInstance) {
-        console.warn('[MIC] Instância do JORNADA_MICRO não disponível');
+      // 2) Fallback: Web Speech API nativo (mais estável em alguns mobiles)
+      usingNative = true;
+      console.log('[MIC] Usando fallback nativo Web Speech API');
+
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        alert('Reconhecimento de voz não suportado neste navegador.');
         return;
       }
 
-      // Toggle com proteção contra clique duplo
-      if (window.__MIC_START_LOCK__) return;
-      window.__MIC_START_LOCK__ = true;
-      setTimeout(() => window.__MIC_START_LOCK__ = false, 500);
+      let rec = window.__NATIVE_REC__ || new SpeechRecognition();
+      window.__NATIVE_REC__ = rec; // reutiliza instância
 
-      const internalBtn = micInstance.button;
-      const isRecording = internalBtn?.classList.contains('rec');
+      rec.lang = 'pt-BR';
+      rec.continuous = false; // uma frase por clique (mais estável no mobile)
+      rec.interimResults = true; // mostra texto em tempo real
 
-      if (isRecording) {
-        micInstance.stop?.();
-      } else {
-        micInstance.start?.();
+      rec.onresult = (event) => {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        input.value += transcript + ' '; // append (ou substitua se preferir input.value = transcript)
+        input.focus();
+      };
+
+      rec.onerror = (e) => {
+        console.warn('[MIC NATIVO] Erro:', e.error);
+        if (e.error === 'no-speech' || e.error === 'audio-capture') {
+          // tenta de novo ou ignora
+        }
+      };
+
+      rec.onend = () => {
+        console.log('[MIC NATIVO] Finalizado');
+        // Não reinicia automático para evitar loop infinito no mobile
+      };
+
+      try {
+        rec.start();
+        // Visual feedback: muda classe do botão
+        btnMic.classList.add('rec');
+        rec.onend = () => btnMic.classList.remove('rec');
+      } catch (e) {
+        console.error('[MIC NATIVO] Falha ao start:', e);
       }
-
-      // Failsafe
-      clearTimeout(window.__MIC_FAILSAFE__);
-      window.__MIC_FAILSAFE__ = setTimeout(() => {
-        if (micInstance.stop) micInstance.stop();
-      }, 10000);
     });
   }
 
@@ -588,6 +607,7 @@
       window.JORNADA_CHAMA.updateChamaFromText(input.value || '', 'chama-perguntas');
     });
   }
+
     
     // FIX: Atualiza áurea quando guia muda
     const guideColor = localStorage.getItem('JORNADA_GUIA_COLOR') || '#ffd700';
