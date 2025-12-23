@@ -1749,110 +1749,371 @@ body.guia-arion #section-perguntas .btn.btn-stone {
 }
 
 /* =========================================================
-   RESPONSIVO MOBILE PERFEITO - NADA CORTA, NADA SOME
+   SECTION-PERGUNTAS — MOBILE LIMPO (vitrine + botões 3 colunas + progresso visível)
    ========================================================= */
-@media (max-width: 768px) {
-  #section-perguntas {
-    padding: 20px 10px 140px 10px !important; /* espaço grande na base pros botões */
+@media (max-width: 600px) {
+
+  /* 1) Seção: sem cortar conteúdo (progresso/rodapé) */
+  #section-perguntas{
+    padding: 10px 0 110px !important;
     min-height: 100vh !important;
     height: auto !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
+    overflow: visible !important;            /* CHAVE: não corta barra */
+  }
+
+  /* 2) Painel “vidro” centralizado e com aro slim */
+  #section-perguntas .j-panel-glow{
+    position: relative !important;
+    margin: 0 auto !important;
+    width: min(92vw, 460px) !important;      /* responsivo e estável */
+    box-sizing: border-box !important;
+    padding: 14px 12px 16px !important;
+    border-radius: 20px !important;
+    transform: translateY(-10px) !important; /* sobe um pouco */
+    overflow: visible !important;
+    left: auto !important;
+    right: auto !important;
+  }
+
+  /* aro interno (slim) */
+  #section-perguntas .j-panel-glow::before{
+   content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid rgba(212,175,55,0.55);
+  box-shadow:
+    0 0 28px rgba(212,175,55,0.55),
+    inset 0 0 18px rgba(255,230,150,0.25);     
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.16),
+    transparent 45%,
+    transparent 100%
+  ) !important;
+  }
+
+  /* painel interno (mantém sua magia de sombras) */
+  #section-perguntas .perguntas-panel{
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 18px !important;
     box-sizing: border-box !important;
   }
 
-  /* Painel central: não transborda, não corta topo/base */
-  #section-perguntas .j-panel-glow {
-    position: relative !important;
-    margin: 20px auto 40px !important;
-    width: 94vw !important;
-    max-width: 460px !important;
-    transform: none !important;
-    left: auto !important;
-    top: auto !important;
-    padding: 16px 14px !important;
+  /* 3) Pergaminho/inner: não “travar” layout lateral */
+  #section-perguntas .pergaminho,
+  #section-perguntas .pergaminho-v,
+  #section-perguntas .pergaminho-content,
+  #section-perguntas .j-perg-v-inner{
+    overflow: visible !important;
+    max-width: 100% !important;
     box-sizing: border-box !important;
+  }
+
+  /* 4) Texto da pergunta: respiro do topo (sem duplicar regra) */
+  #section-perguntas #jp-question-typed,
+  #section-perguntas .jp-question-typed{
+    display: block !important;
+    margin-top: 10px !important;
+    line-height: 1.35 !important;
+    font-size: 1rem !important;
+    text-align: left !important;
+  }
+
+  /* 5) PROGRESSO: força aparecer (se existir no DOM) */
+  #section-perguntas .progress-top,
+  #section-perguntas .progress-middle,
+  #section-perguntas .progress-wrap,
+  #section-perguntas .progress-container,
+  #section-perguntas .qa-progress,
+  #section-perguntas .j-progress,
+  #section-perguntas .progress-bar{
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  /* barra fica mais “comportada” no mobile */
+  #section-perguntas .progress-bar{
+    height: 8px !important;
+    border-radius: 999px !important;
+    overflow: hidden !important;
+  }
+
+  /* 6) BOTÕES: 3 lado a lado (Falar / Apagar / Confirmar) */
+  /* Se o seu wrapper REAL for outro, me diga o seletor e eu ajusto 100% certeiro.
+     Este bloco cobre os nomes mais prováveis sem conflito. */
+  #section-perguntas .perguntas-controls,
+  #section-perguntas .perguntas-actions,
+  #section-perguntas .perguntas-acoes,
+  #section-perguntas .qa-actions,
+  #section-perguntas .perg-actions,
+  #section-perguntas .actions{
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 10px !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    margin-top: 10px !important;
+  }
+
+  #section-perguntas .perguntas-controls button,
+  #section-perguntas .perguntas-actions button,
+  #section-perguntas .perguntas-acoes button,
+  #section-perguntas .qa-actions button,
+  #section-perguntas .perg-actions button,
+  #section-perguntas .actions button,
+  #section-perguntas .btn-perguntas{
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 48px !important;
+    padding: 10px 8px !important;
+    font-size: clamp(12px, 3.2vw, 14px) !important;
+    line-height: 1.1 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+   
+   /* Camadas decorativas não podem “roubar” o toque */
+  #section-perguntas .j-panel-glow::before,
+  #section-perguntas .j-panel-glow::after,
+  #section-perguntas .jp-answer-bg,
+  #section-perguntas .pergaminho::before,
+  #section-perguntas .pergaminho::after {
+    pointer-events: none !important;
+  }
+
+  /* A moldura/answer-frame não pode bloquear botões posicionados por cima */
+  #section-perguntas .jp-answer-frame,
+  #section-perguntas .answer-box,
+  #section-perguntas .resposta-box,
+  #section-perguntas .textarea-wrapper {
+    position: relative !important;
     overflow: visible !important;
   }
 
-  /* Progresso do topo: sempre visível */
-  #section-perguntas .progress-top,
-  #section-perguntas .progress-total,
-  #section-perguntas .perguntas-counter-top {
-    margin-top: 10px !important;
-    margin-bottom: 12px !important;
-    padding: 0 8px !important;
+  /* Botão/ícone do microfone: sempre clicável e acima de tudo */
+  #section-perguntas #btn-mic,
+  #section-perguntas .btn-mic,
+  #section-perguntas .mic-btn,
+  #section-perguntas [data-mic],
+  #section-perguntas .microfone {
+    position: relative !important;
+    z-index: 9999 !important;
+    pointer-events: auto !important;
+    touch-action: manipulation !important;
   }
 
-  /* Pergunta: respiro suficiente */
-  #section-perguntas #jp-question-typed {
-    margin-top: 16px !important;
-    margin-bottom: 20px !important;
-    padding: 0 10px !important;
+  /* Se o “microfone” que aparece for TEXTO antigo (label), some com ele */
+  #section-perguntas .mic-label,
+  #section-perguntas .microfone-label,
+  #section-perguntas .label-mic,
+  #section-perguntas .mic-text {
+    display: none !important;
   }
+   
 
-  /* Caixa de resposta: não corta */
-  #section-perguntas .jp-answer-frame,
-  #section-perguntas .answer-box {
-    margin: 20px 0 !important;
-    padding: 20px !important;
-  }
+/* =======================================================
+   BOTÕES PERGUNTAS - TEXTURA PEDRA + COR DO GUIA
+   ======================================================= */
 
-  /* BOTÕES: 3 lado a lado, SEMPRE visíveis na base */
+/* FORÇA 3 BOTÕES LADO A LADO - MOBILE E DESKTOP */
+.perguntas-controls {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 16px !important;
+  margin: 28px auto 0 !important;
+  padding: 10px 20px !important;
+  width: 100% !important;
+  max-width: 600px !important;
+  box-sizing: border-box !important;
+}
+
+/* BOTÕES BASE - TEXTURA DE PEDRA OBRIGATÓRIA */
+.perguntas-controls .btn-perguntas {
+  flex: 1 !important;
+  min-width: 100px !important;
+  max-width: 140px !important;
+  height: 64px !important;
+  padding: 10px !important;
+  font-size: 15px !important;
+  font-weight: bold !important;
+  border-radius: 32px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 4px !important;
+  position: relative !important;
+  overflow: hidden !important;
+
+  /* TEXTURA DE PEDRA FORÇADA - NUNCA SOME */
+  background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.3)),
+              url('/assets/img/textura-de-pedra.jpg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+
+  border: 3px solid transparent !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.6) !important;
+  transition: all 0.4s ease !important;
+  text-shadow: 1px 1px 2px black !important;
+  color: white !important;
+}
+
+/* AVANÇA MAIOR */
+.perguntas-controls .btn-confirm {
+  flex: 1.6 !important;
+  max-width: 170px !important;
+  height: 70px !important;
+  font-size: 17px !important;
+}
+
+/* AURA DO GUIA NOS BOTÕES (borda + glow) */
+body[data-guia="lumen"] .perguntas-controls .btn-perguntas {
+  border-color: #00ff9d !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.6), 0 0 20px rgba(0,255,157,0.7) !important;
+}
+
+body[data-guia="zion"] .perguntas-controls .btn-perguntas {
+  border-color: #00aaff !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.6), 0 0 20px rgba(0,170,255,0.7), 0 0 30px rgba(255,214,91,0.5) !important;
+}
+
+body[data-guia="arian"] .perguntas-controls .btn-perguntas {
+  border-color: #ff00ff !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.6), 0 0 25px rgba(255,0,255,0.8) !important;
+}
+
+/* EFEITO AO CLICAR EM AVANÇA - EXPLOSÃO DE LUZ DO GUIA */
+.perguntas-controls .btn-confirm:active {
+  transform: scale(0.94) !important;
+  box-shadow: 0 0 50px var(--progress-main), 0 0 80px var(--progress-glow-1) !important;
+}
+
+/* MICROFONE GRAVANDO - VERMELHO PULSANDO */
+#jp-btn-falar.recording {
+  background: linear-gradient(rgba(255,0,0,0.8), rgba(200,0,0,0.7)),
+              url('/assets/img/textura-de-pedra.jpg') !important;
+  border-color: #ff0000 !important;
+  box-shadow: 0 0 30px #ff0000, 0 0 50px #ff4444 !important;
+  animation: pulse-rec 1.2s infinite !important;
+  transform: scale(1.1) !important;
+}
+
+@keyframes pulse-rec {
+  0% { box-shadow: 0 0 30px #ff0000, 0 0 50px #ff4444; }
+  50% { box-shadow: 0 0 45px #ff3333, 0 0 70px #ff6666; }
+  100% { box-shadow: 0 0 30px #ff0000, 0 0 50px #ff4444; }
+}
+/* BARRAS DE PROGRESSO - TEXTURA PEDRA + AURA DO GUIA */
+
+/* Container/base das barras (topo e meio) */
+.progress-block-fill,
+.progress-question-fill,
+#progress-block-fill,
+#progress-question-fill {
+  height: 100% !important;
+  border-radius: inherit !important;
+  position: relative !important;
+  overflow: hidden !important;
+
+  /* TEXTURA DE PEDRA NO PREENCHIMENTO */
+  background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.2)),
+              url('/assets/img/textura-pedra-btn.jpg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+
+  /* AURA LUMINOSA DO GUIA (mesma lógica dos botões) */
+  box-shadow: 
+    0 0 20px var(--progress-main),
+    0 0 40px var(--progress-glow-1),
+    inset 0 0 20px var(--progress-glow-2) !important;
+  animation: glow-pulse 3s infinite alternate !important;
+}
+
+/* Aura mais forte por guia específico */
+body[data-guia="lumen"] .progress-block-fill,
+body[data-guia="lumen"] .progress-question-fill {
+  box-shadow: 0 0 25px #00ff9d, 0 0 50px rgba(0,255,157,0.8), inset 0 0 25px rgba(120,255,200,0.6) !important;
+}
+
+body[data-guia="zion"] .progress-block-fill,
+body[data-guia="zion"] .progress-question-fill {
+  box-shadow: 0 0 25px #00aaff, 0 0 50px rgba(0,170,255,0.8), 0 0 35px rgba(255,214,91,0.6) !important;
+}
+
+body[data-guia="arian"] .progress-block-fill,
+body[data-guia="arian"] .progress-question-fill {
+  box-shadow: 0 0 30px #ff00ff, 0 0 55px rgba(255,120,255,0.9), inset 0 0 30px rgba(255,180,255,0.7) !important;
+}
+
+/* Animação suave de pulsação */
+@keyframes glow-pulse {
+  0% { box-shadow: 0 0 20px var(--progress-main), 0 0 40px var(--progress-glow-1); }
+  100% { box-shadow: 0 0 30px var(--progress-main), 0 0 60px var(--progress-glow-1); }
+}
+
+/* Barra externa (fundo vazio) também com pedra sutil */
+.progress-block-outer,
+.progress-question-outer,
+.perg-progress-outer {
+  background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.5)),
+              url('/assets/img/textura-pedra-btn.jpg') !important;
+  background-size: cover !important;
+  border-radius: 20px !important;
+  box-shadow: inset 0 4px 10px rgba(0,0,0,0.6) !important;
+}
+
+   
+/* MOBILE FORÇADO */
+@media (max-width: 500px) {
   .perguntas-controls {
-    position: relative !important;
-    bottom: auto !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
     gap: 12px !important;
-    padding: 16px 12px 20px !important;
-    margin: 0 auto !important;
-    width: 100% !important;
-    max-width: 500px !important;
-    box-sizing: border-box !important;
-    z-index: 100 !important;
+    padding: 10px !important;
   }
-
   .perguntas-controls .btn-perguntas {
-    flex: 1 !important;
-    min-width: 85px !important;
-    max-width: none !important;
-    height: 58px !important;
-    font-size: 14px !important;
-    padding: 8px !important;
+    min-width: 90px !important;
+    height: 60px !important;
+    font-size: 14.5px !important;
   }
-
   .perguntas-controls .btn-confirm {
-    flex: 1.5 !important;
-    font-size: 15.5px !important;
-    height: 62px !important;
-  }
-
-  /* Garante que nada sobreponha os botões */
-  #section-perguntas * {
-    position: relative !important;
-    z-index: auto !important;
-  }
-  .perguntas-controls * {
-    z-index: 999 !important;
+    font-size: 16px !important;
   }
 }
 
-/* Telas muito pequenas (Motorola antigo, iPhone SE, etc.) */
-@media (max-width: 380px) {
+/* RESPONSIVO MOBILE (testado em 320px até 1920px) */
+@media (max-width: 400px) {
   .perguntas-controls {
-    gap: 10px !important;
-    padding: 12px 8px 16px !important;
+    gap: 12px !important;
+    padding: 10px 12px !important;
   }
   .perguntas-controls .btn-perguntas {
-    min-width: 78px !important;
-    font-size: 13.5px !important;
-    height: 56px !important;
+    min-width: 95px !important;
+    height: 58px !important;
+    font-size: 14.5px !important;
+    max-width: 125px !important;
   }
   .perguntas-controls .btn-confirm {
-    font-size: 15px !important;
+    max-width: 150px !important;
+    height: 64px !important;
+    font-size: 16px !important;
   }
+}
+
+@media (max-width: 360px) {
+  .perguntas-controls {
+    gap: 10px !important;
+  }
+  .perguntas-controls .btn-perguntas {
+    min-width: 90px !important;
+    font-size: 14px !important;
+  }
+}
 }
 
 /* =========================================================
