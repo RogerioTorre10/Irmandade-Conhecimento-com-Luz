@@ -489,57 +489,69 @@
   const input       = $('#jp-answer-input', root);    
 
   // ========= MICROFONE FINAL ESTÁVEL PARA MOBILE =========
+// ========= MICROFONE FINAL - SUPER ESTÁVEL PARA ANDROID/MOTOROLA =========
 if (btnFalar && input) {
   let recognition = null;
   let isRecording = false;
 
-  const startRecognition = () => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      alert('Reconhecimento de voz não suportado neste navegador.');
-      return;
-    }
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition || window.mozSpeechRecognition || window.msSpeechRecognition;
 
+  if (!SpeechRecognition) {
+    console.warn('Reconhecimento de voz não suportado neste navegador');
+    btnFalar.style.opacity = '0.5';
+    btnFalar.title = 'Microfone não suportado';
+    return;
+  }
+
+  const startMic = () => {
     recognition = new SpeechRecognition();
     recognition.lang = 'pt-BR';
-    recognition.continuous = false;  // uma sessão por clique (mais estável)
+    recognition.continuous = false;
     recognition.interimResults = true;
+    recognition.maxAlternatives = 1;
 
     recognition.onstart = () => {
       isRecording = true;
       btnFalar.classList.add('recording');
-      console.log('[MIC] Gravando...');
+      console.log('[MIC] Gravando... (Android: "microphone" deve aparecer)');
     };
 
     recognition.onresult = (event) => {
       let transcript = '';
       for (let i = event.resultIndex; i < event.results.length; i++) {
-        transcript += event.results[i][0].transcript;
+        const res = event.results[i][0].transcript;
+        transcript += res;
         if (event.results[i].isFinal) transcript += ' ';
       }
       input.value += transcript;
       input.focus();
+      input.dispatchEvent(new Event('input')); // atualiza chama se necessário
     };
 
     recognition.onerror = (event) => {
       console.warn('[MIC] Erro:', event.error);
       isRecording = false;
       btnFalar.classList.remove('recording');
-      if (event.error === 'not-allowed') {
-        alert('Permissão de microfone negada. Ative nas configurações do navegador.');
+
+      // Erros comuns no Android: retry automático
+      if (event.error === 'no-speech' || event.error === 'audio-capture' || event.error === 'network') {
+        setTimeout(startMic, 800);
+      } else if (event.error === 'not-allowed') {
+        alert('Permissão de microfone negada. Vá em Configurações > Sites > Microfone e permita.');
       }
     };
 
     recognition.onend = () => {
       isRecording = false;
       btnFalar.classList.remove('recording');
-      console.log('[MIC] Parou');
+      console.log('[MIC] Sessão finalizada');
     };
 
     try {
       recognition.start();
     } catch (e) {
-      setTimeout(startRecognition, 500); // retry automático
+      console.warn('[MIC] Start falhou, retry em 500ms', e);
+      setTimeout(startMic, 500);
     }
   };
 
@@ -550,9 +562,12 @@ if (btnFalar && input) {
     if (isRecording) {
       if (recognition) recognition.stop();
     } else {
-      startRecognition();
+      startMic();
     }
   });
+
+  // Feedback visual extra no mobile
+  btnFalar.addEventListener('touchstart', (ev) => ev.preventDefault(), { passive: false });
 }
 
   // ========= APAGAR =========
