@@ -152,7 +152,7 @@
     transform: translate(-16px, -70px) !important; /* antes 40px */
     top: 10px !important;                   /* antes 40px */
     margin-top: 0 !important;
-    width: 90% !important;
+    width: min(520px, 92vw) !important;
     max-width: 470px !important;
     margin-left: auto !important;
     margin-right: auto !important;
@@ -292,7 +292,7 @@
     transform: translate(-16px, -70px) !important; /* antes 40px */
     top: 10px !important;                   /* antes 40px */
     margin-top: 0 !important;
-    width: 90% !important;
+    width: min(520px, 92vw) !important;
     max-width: 470px !important;
     margin-left: auto !important;
     margin-right: auto !important;
