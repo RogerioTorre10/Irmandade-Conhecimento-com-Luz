@@ -1752,101 +1752,183 @@ body.guia-arion #section-perguntas .btn.btn-stone {
     display: none !important;
   }
    
-/* Container dos 3 botões - lado a lado */
+/* =======================================================
+   BOTÕES PERGUNTAS - TEXTURA PEDRA + COR DO GUIA
+   ======================================================= */
+
+/* Container - 3 botões lado a lado (perfeito no mobile) */
 .perguntas-controls {
   display: flex !important;
-  justify-content: center;
-  align-items: center;
-  gap: 16px;
-  margin-top: 24px;
-  padding: 8px 16px;
-  width: 100%;
-  box-sizing: border-box;
+  justify-content: center !important;
+  align-items: stretch !important;  /* alinha perfeitamente na vertical */
+  gap: 14px !important;
+  margin-top: 28px !important;
+  padding: 12px 18px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  flex-wrap: nowrap !important;  /* força linha única */
 }
 
-/* Botões base - mantém textura de pedra original */
+/* BASE: Textura de pedra ORIGINAL (mantém em TODOS os guias) */
 .perguntas-controls .btn-perguntas {
-  flex: 1;
-  min-width: 100px;
-  max-width: 130px;
-  height: 60px;
-  padding: 8px 12px;
-  font-size: 15px;
-  font-weight: 600;
-  border-radius: 30px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 5px;
-  background-image: url('/assets/img/textura-pedra-btn.jpg'); /* mantém sua textura original */
-  background-size: cover;
-  background-position: center;
-  border: 2px solid;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  flex: 1 !important;
+  min-width: 105px !important;
+  max-width: 135px !important;
+  height: 62px !important;  /* altura perfeita pro toque */
+  padding: 10px 14px !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  border-radius: 32px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 3px !important;
+  position: relative !important;
+  overflow: hidden !important;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  
+  /* TEXTURA PEDRA ORIGINAL - NUNCA SOBRESCREVE */
+  background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.4)), 
+                    url('/assets/img/textura-pedra-btn.jpg') !important;
+  background-size: cover, cover !important;
+  background-position: center, center !important;
+  background-blend-mode: overlay !important;
+  
+  border: 3px solid !important;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.1) !important;
 }
 
-/* Aura do guia no estado normal (borda e leve glow) */
+/* AVANÇA: Maior + Aura explosiva do GUIA quando clicado */
+.perguntas-controls .btn-confirm {
+  flex: 1.5 !important;
+  max-width: 165px !important;
+  height: 68px !important;
+  font-size: 16.5px !important;
+  letter-spacing: 0.5px !important;
+}
+
+/* =======================================================
+   AURA POR GUIA - Overlay luminoso SOBRE a textura pedra
+   ======================================================= */
 body[data-guia="lumen"] .perguntas-controls .btn-perguntas {
-  border-color: var(--progress-main);
-  box-shadow: 0 4px 15px var(--progress-glow-2), 0 0 10px var(--progress-glow-1);
+  border-color: var(--progress-main, #00ff9d) !important;
+  box-shadow: 
+    0 6px 20px rgba(0,0,0,0.5), 
+    0 0 20px var(--progress-glow-1, rgba(0,255,157,0.8)),
+    0 0 35px var(--progress-glow-2, rgba(120,255,200,0.6)),
+    inset 0 2px 8px rgba(0,255,157,0.3) !important;
+}
+
+body[data-guia="lumen"] .perguntas-controls .btn-confirm:active,
+body[data-guia="lumen"] .perguntas-controls .btn-confirm:focus {
+  background-image: linear-gradient(rgba(0,255,157,0.25), rgba(0,255,157,0.1)), 
+                    linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.4)), 
+                    url('/assets/img/textura-pedra-btn.jpg') !important;
+  box-shadow: 
+    0 0 40px var(--progress-glow-1, #00ff9d),
+    0 0 70px var(--progress-glow-2, rgba(120,255,200,0.9)),
+    inset 0 0 30px var(--progress-main, #00ff9d) !important;
+  transform: scale(0.96) !important;
+  border-color: #00ff9d !important;
 }
 
 body[data-guia="zion"] .perguntas-controls .btn-perguntas {
-  border-color: var(--progress-main);
-  box-shadow: 0 4px 15px rgba(255,214,91,.6), 0 0 10px var(--progress-main);
+  border-color: var(--progress-main, #00aaff) !important;
+  box-shadow: 
+    0 6px 20px rgba(0,0,0,0.5), 
+    0 0 18px var(--progress-glow-1, rgba(255,214,91,0.7)),
+    0 0 30px var(--progress-main, #00aaff),
+    inset 0 2px 8px rgba(0,170,255,0.2) !important;
+}
+
+body[data-guia="zion"] .perguntas-controls .btn-confirm:active,
+body[data-guia="zion"] .perguntas-controls .btn-confirm:focus {
+  background-image: linear-gradient(rgba(0,170,255,0.2), rgba(255,214,91,0.15)), 
+                    linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.4)), 
+                    url('/assets/img/textura-pedra-btn.jpg') !important;
+  box-shadow: 
+    0 0 45px #00aaff,
+    0 0 65px rgba(255,214,91,0.85),
+    inset 0 0 35px #00aaff !important;
+  transform: scale(0.96) !important;
+  border-color: #00aaff !important;
 }
 
 body[data-guia="arian"] .perguntas-controls .btn-perguntas {
-  border-color: var(--progress-main);
-  box-shadow: 0 4px 15px var(--progress-glow-2), 0 0 10px var(--progress-glow-1);
-}
-
-/* Botão Avança: maior + aura forte quando clicado (:active) */
-.perguntas-controls .btn-confirm {
-  flex: 1.4 !important;
-  max-width: 160px !important;
-  font-size: 16.5px !important;
-  font-weight: bold !important;
-}
-
-.perguntas-controls .btn-confirm:active {
-  transform: scale(0.95);
+  border-color: var(--progress-main, #ff00ff) !important;
   box-shadow: 
-    0 0 30px var(--progress-glow-1),
-    0 0 50px var(--progress-glow-2),
-    inset 0 0 20px var(--progress-main);
-  border-color: var(--progress-main) !important;
-  filter: brightness(1.3);
+    0 6px 20px rgba(0,0,0,0.5), 
+    0 0 22px var(--progress-glow-1, rgba(255,120,255,0.85)),
+    0 0 38px var(--progress-glow-2, rgba(255,180,255,0.7)),
+    inset 0 2px 8px rgba(255,100,255,0.25) !important;
 }
 
-/* Indicador de gravação - Falar */
-#jp-btn-falar.recording {
-  background: radial-gradient(circle, #ff0000, #aa0000) !important;
-  border-color: #ff0000 !important;
-  box-shadow: 0 0 25px #ff0000, 0 0 40px #ff3333 !important;
-  animation: pulse-red 1.2s infinite;
-  transform: scale(1.1);
+body[data-guia="arian"] .perguntas-controls .btn-confirm:active,
+body[data-guia="arian"] .perguntas-controls .btn-confirm:focus {
+  background-image: linear-gradient(rgba(255,100,255,0.3), rgba(255,0,255,0.15)), 
+                    linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.4)), 
+                    url('/assets/img/textura-pedra-btn.jpg') !important;
+  box-shadow: 
+    0 0 50px #ff00ff,
+    0 0 75px rgba(255,120,255,0.9),
+    inset 0 0 40px #ff00ff !important;
+  transform: scale(0.96) !important;
+  border-color: #ff00ff !important;
+}
+
+/* EFEITO TOQUE (todos os botões) */
+.perguntas-controls .btn-perguntas:active {
+  transform: scale(0.94) !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.6) !important;
+}
+
+/* MICROFONE ATIVO - Vermelho universal (independente do guia) */
+#jp-btn-falar.recording,
+.perguntas-controls [data-action="start-mic"].recording {
+  background: linear-gradient(135deg, rgba(255,50,50,0.95), rgba(200,0,0,0.9)) !important,
+              linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.5)) !important,
+              url('/assets/img/textura-pedra-btn.jpg') !important;
+  border-color: #ff3333 !important;
+  box-shadow: 
+    0 0 30px #ff0000,
+    0 0 50px #ff4444,
+    inset 0 0 25px rgba(255,50,50,0.6) !important;
+  animation: pulse-red 1.3s infinite !important;
+  transform: scale(1.12) !important;
 }
 
 @keyframes pulse-red {
-  0%, 100% { box-shadow: 0 0 25px #ff0000, 0 0 40px #ff3333; }
-  50% { box-shadow: 0 0 35px #ff4444, 0 0 55px #ff6666; }
+  0%, 100% { box-shadow: 0 0 30px #ff0000, 0 0 50px #ff4444; }
+  50% { box-shadow: 0 0 45px #ff3333, 0 0 70px #ff6666; }
 }
 
-/* Responsivo */
-@media (max-width: 380px) {
+/* RESPONSIVO MOBILE (testado em 320px até 1920px) */
+@media (max-width: 400px) {
   .perguntas-controls {
-    gap: 10px;
+    gap: 12px !important;
+    padding: 10px 12px !important;
   }
   .perguntas-controls .btn-perguntas {
-    min-width: 90px;
-    height: 56px;
-    font-size: 14px;
+    min-width: 95px !important;
+    height: 58px !important;
+    font-size: 14.5px !important;
+    max-width: 125px !important;
   }
   .perguntas-controls .btn-confirm {
-    font-size: 15.5px;
+    max-width: 150px !important;
+    height: 64px !important;
+    font-size: 16px !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .perguntas-controls {
+    gap: 10px !important;
+  }
+  .perguntas-controls .btn-perguntas {
+    min-width: 90px !important;
+    font-size: 14px !important;
   }
 }
 
