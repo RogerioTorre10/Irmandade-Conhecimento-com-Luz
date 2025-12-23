@@ -1553,6 +1553,172 @@ body.guia-arion #section-perguntas .progress-fill {
   background: #ff6ad5;
   box-shadow: 0 0 12px rgba(255,106,213,0.9);
 }
+/* FORÇA 3 BOTÕES LADO A LADO - MOBILE E DESKTOP */
+.perguntas-controls {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 16px !important;
+  margin: 28px auto 0 !important;
+  padding: 10px 20px !important;
+  width: 100% !important;
+  max-width: 600px !important;
+  box-sizing: border-box !important;
+}
+
+/* BOTÕES BASE - TEXTURA DE PEDRA OBRIGATÓRIA */
+.perguntas-controls .btn-perguntas {
+  flex: 1 !important;
+  min-width: 100px !important;
+  max-width: 140px !important;
+  height: 64px !important;
+  padding: 10px !important;
+  font-size: 15px !important;
+  font-weight: bold !important;
+  border-radius: 32px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 4px !important;
+  position: relative !important;
+  overflow: hidden !important;
+
+  /* TEXTURA DE PEDRA FORÇADA - NUNCA SOME */
+  background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.3)),
+              url('/assets/img/textura-pedra-btn.jpg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+
+  border: 3px solid transparent !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.6) !important;
+  transition: all 0.4s ease !important;
+  text-shadow: 1px 1px 2px black !important;
+  color: white !important;
+}
+
+/* AVANÇA MAIOR */
+.perguntas-controls .btn-confirm {
+  flex: 1.6 !important;
+  max-width: 170px !important;
+  height: 70px !important;
+  font-size: 17px !important;
+}
+
+/* AURA DO GUIA NOS BOTÕES (borda + glow) */
+body[data-guia="lumen"] .perguntas-controls .btn-perguntas {
+  border-color: #00ff9d !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.6), 0 0 20px rgba(0,255,157,0.7) !important;
+}
+
+body[data-guia="zion"] .perguntas-controls .btn-perguntas {
+  border-color: #00aaff !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.6), 0 0 20px rgba(0,170,255,0.7), 0 0 30px rgba(255,214,91,0.5) !important;
+}
+
+body[data-guia="arian"] .perguntas-controls .btn-perguntas {
+  border-color: #ff00ff !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.6), 0 0 25px rgba(255,0,255,0.8) !important;
+}
+
+/* EFEITO AO CLICAR EM AVANÇA - EXPLOSÃO DE LUZ DO GUIA */
+.perguntas-controls .btn-confirm:active {
+  transform: scale(0.94) !important;
+  box-shadow: 0 0 50px var(--progress-main), 0 0 80px var(--progress-glow-1) !important;
+}
+
+/* MICROFONE GRAVANDO - VERMELHO PULSANDO */
+#jp-btn-falar.recording {
+  background: linear-gradient(rgba(255,0,0,0.8), rgba(200,0,0,0.7)),
+              url('/assets/img/textura-pedra-btn.jpg') !important;
+  border-color: #ff0000 !important;
+  box-shadow: 0 0 30px #ff0000, 0 0 50px #ff4444 !important;
+  animation: pulse-rec 1.2s infinite !important;
+  transform: scale(1.1) !important;
+}
+
+@keyframes pulse-rec {
+  0% { box-shadow: 0 0 30px #ff0000, 0 0 50px #ff4444; }
+  50% { box-shadow: 0 0 45px #ff3333, 0 0 70px #ff6666; }
+  100% { box-shadow: 0 0 30px #ff0000, 0 0 50px #ff4444; }
+}
+
+/* MOBILE FORÇADO */
+@media (max-width: 500px) {
+  .perguntas-controls {
+    gap: 12px !important;
+    padding: 10px !important;
+  }
+  .perguntas-controls .btn-perguntas {
+    min-width: 90px !important;
+    height: 60px !important;
+    font-size: 14.5px !important;
+  }
+  .perguntas-controls .btn-confirm {
+    font-size: 16px !important;
+  }
+}
+/* BARRAS DE PROGRESSO - TEXTURA PEDRA + AURA DO GUIA */
+
+/* Container/base das barras (topo e meio) */
+.progress-block-fill,
+.progress-question-fill,
+#progress-block-fill,
+#progress-question-fill {
+  height: 100% !important;
+  border-radius: inherit !important;
+  position: relative !important;
+  overflow: hidden !important;
+
+  /* TEXTURA DE PEDRA NO PREENCHIMENTO */
+  background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.2)),
+              url('/assets/img/textura-pedra-btn.jpg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+
+  /* AURA LUMINOSA DO GUIA (mesma lógica dos botões) */
+  box-shadow: 
+    0 0 20px var(--progress-main),
+    0 0 40px var(--progress-glow-1),
+    inset 0 0 20px var(--progress-glow-2) !important;
+  animation: glow-pulse 3s infinite alternate !important;
+}
+
+/* Aura mais forte por guia específico */
+body[data-guia="lumen"] .progress-block-fill,
+body[data-guia="lumen"] .progress-question-fill {
+  box-shadow: 0 0 25px #00ff9d, 0 0 50px rgba(0,255,157,0.8), inset 0 0 25px rgba(120,255,200,0.6) !important;
+}
+
+body[data-guia="zion"] .progress-block-fill,
+body[data-guia="zion"] .progress-question-fill {
+  box-shadow: 0 0 25px #00aaff, 0 0 50px rgba(0,170,255,0.8), 0 0 35px rgba(255,214,91,0.6) !important;
+}
+
+body[data-guia="arian"] .progress-block-fill,
+body[data-guia="arian"] .progress-question-fill {
+  box-shadow: 0 0 30px #ff00ff, 0 0 55px rgba(255,120,255,0.9), inset 0 0 30px rgba(255,180,255,0.7) !important;
+}
+
+/* Animação suave de pulsação */
+@keyframes glow-pulse {
+  0% { box-shadow: 0 0 20px var(--progress-main), 0 0 40px var(--progress-glow-1); }
+  100% { box-shadow: 0 0 30px var(--progress-main), 0 0 60px var(--progress-glow-1); }
+}
+
+/* Barra externa (fundo vazio) também com pedra sutil */
+.progress-block-outer,
+.progress-question-outer,
+.perg-progress-outer {
+  background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.5)),
+              url('/assets/img/textura-pedra-btn.jpg') !important;
+  background-size: cover !important;
+  border-radius: 20px !important;
+  box-shadow: inset 0 4px 10px rgba(0,0,0,0.6) !important;
+}
+   
+}
+   
 
 /* ===========================
    TEMA POR GUIA — PERGUNTAS
@@ -1846,7 +2012,66 @@ body[data-guia="arian"] .perguntas-controls .btn-perguntas {
   50% { box-shadow: 0 0 45px #ff3333, 0 0 70px #ff6666; }
   100% { box-shadow: 0 0 30px #ff0000, 0 0 50px #ff4444; }
 }
+/* BARRAS DE PROGRESSO - TEXTURA PEDRA + AURA DO GUIA */
 
+/* Container/base das barras (topo e meio) */
+.progress-block-fill,
+.progress-question-fill,
+#progress-block-fill,
+#progress-question-fill {
+  height: 100% !important;
+  border-radius: inherit !important;
+  position: relative !important;
+  overflow: hidden !important;
+
+  /* TEXTURA DE PEDRA NO PREENCHIMENTO */
+  background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.2)),
+              url('/assets/img/textura-pedra-btn.jpg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+
+  /* AURA LUMINOSA DO GUIA (mesma lógica dos botões) */
+  box-shadow: 
+    0 0 20px var(--progress-main),
+    0 0 40px var(--progress-glow-1),
+    inset 0 0 20px var(--progress-glow-2) !important;
+  animation: glow-pulse 3s infinite alternate !important;
+}
+
+/* Aura mais forte por guia específico */
+body[data-guia="lumen"] .progress-block-fill,
+body[data-guia="lumen"] .progress-question-fill {
+  box-shadow: 0 0 25px #00ff9d, 0 0 50px rgba(0,255,157,0.8), inset 0 0 25px rgba(120,255,200,0.6) !important;
+}
+
+body[data-guia="zion"] .progress-block-fill,
+body[data-guia="zion"] .progress-question-fill {
+  box-shadow: 0 0 25px #00aaff, 0 0 50px rgba(0,170,255,0.8), 0 0 35px rgba(255,214,91,0.6) !important;
+}
+
+body[data-guia="arian"] .progress-block-fill,
+body[data-guia="arian"] .progress-question-fill {
+  box-shadow: 0 0 30px #ff00ff, 0 0 55px rgba(255,120,255,0.9), inset 0 0 30px rgba(255,180,255,0.7) !important;
+}
+
+/* Animação suave de pulsação */
+@keyframes glow-pulse {
+  0% { box-shadow: 0 0 20px var(--progress-main), 0 0 40px var(--progress-glow-1); }
+  100% { box-shadow: 0 0 30px var(--progress-main), 0 0 60px var(--progress-glow-1); }
+}
+
+/* Barra externa (fundo vazio) também com pedra sutil */
+.progress-block-outer,
+.progress-question-outer,
+.perg-progress-outer {
+  background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.5)),
+              url('/assets/img/textura-pedra-btn.jpg') !important;
+  background-size: cover !important;
+  border-radius: 20px !important;
+  box-shadow: inset 0 4px 10px rgba(0,0,0,0.6) !important;
+}
+
+   
 /* MOBILE FORÇADO */
 @media (max-width: 500px) {
   .perguntas-controls {
