@@ -488,69 +488,81 @@
   const btnConfirmar = $('#jp-btn-confirmar', root);
   const input       = $('#jp-answer-input', root);    
 
-  // ========= MICROFONE NATIVO COM TOGGLE CONTÍNUO (funciona em todas as perguntas) =========
-  if (btnFalar && input) {
+  // ========= MICROFONE ULTRA-ESTÁVEL (funciona em todas as perguntas no mobile) =========
+if (btnFalar && input) {
+  let recognition = null;
+  let isRecording = false;
+
+  const createRecognition = () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      btnFalar.disabled = true;
-      btnFalar.style.opacity = '0.5';
       console.warn('SpeechRecognition não suportado');
+      btnFalar.disabled = true;
+      return null;
+    }
+
+    const rec = new SpeechRecognition();
+    rec.lang = 'pt-BR';
+    rec.continuous = false;       // uma sessão por clique (mais estável no mobile)
+    rec.interimResults = true;
+
+    rec.onstart = () => {
+      isRecording = true;
+      btnFalar.classList.add('recording');
+      console.log('[MIC] Iniciado');
+    };
+
+    rec.onresult = (event) => {
+      let transcript = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        transcript += event.results[i][0].transcript;
+        if (event.results[i].isFinal) transcript += ' ';
+      }
+      input.value = (input.value + transcript).trim() + ' ';
+      input.focus();
+    };
+
+    rec.onerror = (event) => {
+      console.warn('[MIC] Erro:', event.error);
+      isRecording = false;
+      btnFalar.classList.remove('recording');
+      if (event.error === 'not-allowed') {
+        alert('Permissão de microfone negada. Vá em Configurações do navegador > Permissões.');
+      }
+    };
+
+    rec.onend = () => {
+      isRecording = false;
+      btnFalar.classList.remove('recording');
+      console.log('[MIC] Finalizado');
+    };
+
+    return rec;
+  };
+
+  btnFalar.addEventListener('click', (ev) => {
+    ev.preventDefault();
+    ev.stopPropagation();
+
+    if (isRecording) {
+      if (recognition) recognition.stop();
       return;
     }
 
-    // Instância única global reutilizável
-    let recognition = window.__GLOBAL_MIC__;
+    // Cria nova instância a cada clique (mais confiável no mobile)
+    recognition = createRecognition();
+    if (!recognition) return;
 
-    if (!recognition) {
-      recognition = new SpeechRecognition();
-      recognition.lang = 'pt-BR';
-      recognition.continuous = true;       // FICA ATIVO ATÉ PARAR MANUALMENTE
-      recognition.interimResults = true;
-
-      recognition.onstart = () => {
-        btnFalar.classList.add('recording');
-        console.log('[MIC] Gravando continuamente');
-      };
-
-      recognition.onresult = (event) => {
-        let transcript = '';
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          transcript += event.results[i][0].transcript;
-          if (event.results[i].isFinal) transcript += ' ';
-        }
-        input.value = (input.value + transcript).trim() + ' ';
-        input.focus();
-        input.scrollTop = input.scrollHeight;
-      };
-
-      recognition.onerror = (event) => {
-        console.warn('[MIC] Erro:', event.error);
-        btnFalar.classList.remove('recording');
-        if (event.error === 'not-allowed') {
-          alert('Permissão de microfone negada. Ative nas configurações do navegador.');
-        }
-      };
-
-      recognition.onend = () => {
-        btnFalar.classList.remove('recording');
-        console.log('[MIC] Parou');
-      };
-
-      window.__GLOBAL_MIC__ = recognition;
+    try {
+      recognition.start();
+    } catch (e) {
+      console.warn('[MIC] Erro ao start, retry em 300ms', e);
+      setTimeout(() => {
+        try { recognition.start(); } catch {} 
+      }, 300);
     }
-
-    // Toggle: liga/desliga com um clique
-    btnFalar.addEventListener('click', (ev) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-
-      if (btnFalar.classList.contains('recording')) {
-        recognition.stop();
-      } else {
-        recognition.start(); // funciona mesmo após várias perguntas
-      }
-    });
-  }
+  });
+}
 
   // ========= APAGAR =========
   if (btnApagar && input) {
