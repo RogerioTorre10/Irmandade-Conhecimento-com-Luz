@@ -1586,7 +1586,7 @@ body.guia-arion #section-perguntas .progress-fill {
 
   /* TEXTURA DE PEDRA FORÇADA - NUNCA SOME */
   background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.3)),
-              url('/assets/img/textura-pedra-btn.jpg') !important;
+              url('/assets/img/textura-de-pedra.jpg') !important;
   background-size: cover !important;
   background-position: center !important;
 
@@ -1630,7 +1630,7 @@ body[data-guia="arian"] .perguntas-controls .btn-perguntas {
 /* MICROFONE GRAVANDO - VERMELHO PULSANDO */
 #jp-btn-falar.recording {
   background: linear-gradient(rgba(255,0,0,0.8), rgba(200,0,0,0.7)),
-              url('/assets/img/textura-pedra-btn.jpg') !important;
+              url('/assets/img/textura-de-pedra.jpg') !important;
   border-color: #ff0000 !important;
   box-shadow: 0 0 30px #ff0000, 0 0 50px #ff4444 !important;
   animation: pulse-rec 1.2s infinite !important;
