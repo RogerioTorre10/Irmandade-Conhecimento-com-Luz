@@ -483,92 +483,71 @@
  function bindUI(root) {
   root = root || document.getElementById(SECTION_ID) || document;
 
-  const btnFalar = $('#jp-btn-falar', root) || $('.btn-falar', root);
-  const btnApagar = $('#jp-btn-apagar', root);
-  const btnConf   = $('#jp-btn-confirmar', root);
-  const input     = $('#jp-answer-input', root);    
+  const btnFalar    = $('#jp-btn-falar', root);
+  const btnApagar   = $('#jp-btn-apagar', root);
+  const btnConfirmar = $('#jp-btn-confirmar', root);
+  const input       = $('#jp-answer-input', root);    
 
-  // ========= MICROFONE NATIVO COM TOGGLE REAL (fica ligado até clicar de novo) =========
+  // ========= MICROFONE NATIVO COM TOGGLE CONTÍNUO (funciona em todas as perguntas) =========
   if (btnFalar && input) {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      console.warn('Reconhecimento de voz não suportado');
+      btnFalar.disabled = true;
       btnFalar.style.opacity = '0.5';
+      console.warn('SpeechRecognition não suportado');
       return;
     }
 
-    // Instância única global — importante para reutilizar entre perguntas
-    if (!window.__GLOBAL_RECOGNITION__) {
-      window.__GLOBAL_RECOGNITION__ = new SpeechRecognition();
-      window.__GLOBAL_RECOGNITION__.lang = 'pt-BR';
-      window.__GLOBAL_RECOGNITION__.continuous = true;      // FICA LIGADO ATÉ PARAR MANUALMENTE
-      window.__GLOBAL_RECOGNITION__.interimResults = true;  // texto em tempo real
-      window.__GLOBAL_RECOGNITION__.maxAlternatives = 1;
+    // Instância única global reutilizável
+    let recognition = window.__GLOBAL_MIC__;
 
-      let finalTranscript = '';
+    if (!recognition) {
+      recognition = new SpeechRecognition();
+      recognition.lang = 'pt-BR';
+      recognition.continuous = true;       // FICA ATIVO ATÉ PARAR MANUALMENTE
+      recognition.interimResults = true;
 
-      window.__GLOBAL_RECOGNITION__.onstart = () => {
-        console.log('[MIC] Ativo - gravando');
+      recognition.onstart = () => {
         btnFalar.classList.add('recording');
-        // O sistema Android vai mostrar "microphone" automaticamente aqui
+        console.log('[MIC] Gravando continuamente');
       };
 
-      window.__GLOBAL_RECOGNITION__.onresult = (event) => {
-        let interimTranscript = '';
-
+      recognition.onresult = (event) => {
+        let transcript = '';
         for (let i = event.resultIndex; i < event.results.length; i++) {
-          const transcript = event.results[i][0].transcript;
-          if (event.results[i].isFinal) {
-            finalTranscript += transcript + ' ';
-          } else {
-            interimTranscript = transcript;
-          }
+          transcript += event.results[i][0].transcript;
+          if (event.results[i].isFinal) transcript += ' ';
         }
-
-        // Atualiza o campo com texto final + interim
-        input.value = (input.value + finalTranscript + interimTranscript).trim() + ' ';
-        finalTranscript = ''; // reseta para próxima frase final
+        input.value = (input.value + transcript).trim() + ' ';
         input.focus();
-        input.scrollTop = input.scrollHeight; // rola automático
+        input.scrollTop = input.scrollHeight;
       };
 
-      window.__GLOBAL_RECOGNITION__.onerror = (event) => {
+      recognition.onerror = (event) => {
         console.warn('[MIC] Erro:', event.error);
         btnFalar.classList.remove('recording');
         if (event.error === 'not-allowed') {
-          alert('Permissão de microfone negada. Vá em Configurações > Permissões e permita.');
+          alert('Permissão de microfone negada. Ative nas configurações do navegador.');
         }
       };
 
-      window.__GLOBAL_RECOGNITION__.onend = () => {
-        console.log('[MIC] Desligado');
+      recognition.onend = () => {
         btnFalar.classList.remove('recording');
+        console.log('[MIC] Parou');
       };
+
+      window.__GLOBAL_MIC__ = recognition;
     }
 
-    const recognition = window.__GLOBAL_RECOGNITION__;
-
-    // Toggle: clique liga/desliga
+    // Toggle: liga/desliga com um clique
     btnFalar.addEventListener('click', (ev) => {
       ev.preventDefault();
       ev.stopPropagation();
 
-      // Anti-clique duplo
-      if (window.__MIC_TOGGLE_LOCK__) return;
-      window.__MIC_TOGGLE_LOCK__ = true;
-      setTimeout(() => window.__MIC_TOGGLE_LOCK__ = false, 600);
-
       if (btnFalar.classList.contains('recording')) {
-        // Já está gravando → desliga
         recognition.stop();
       } else {
-        // Liga o mic
-        try {
-          recognition.start();
-        } catch (e) {
-          // Se der erro "already started", ignora (já está rodando)
-          console.log('[MIC] Já ativo ou retry');
-        }
+        recognition.start(); // funciona mesmo após várias perguntas
       }
     });
   }
@@ -585,9 +564,9 @@
     });
   }
 
-  // ========= CONFIRMAR =========
-  if (btnConf) {
-    btnConf.addEventListener('click', (ev) => {
+  // ========= AVANÇA =========
+  if (btnConfirmar) {
+    btnConfirmar.addEventListener('click', (ev) => {
       ev.preventDefault();
       if (completed) return;
       saveCurrentAnswer();
