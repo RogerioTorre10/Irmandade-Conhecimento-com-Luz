@@ -488,56 +488,59 @@
   const btnConfirmar = $('#jp-btn-confirmar', root);
   const input       = $('#jp-answer-input', root);    
 
-  // ========= MICROFONE ULTRA-ESTÁVEL (funciona em todas as perguntas no mobile) =========
+  // ========= MICROFONE FINAL ESTÁVEL PARA MOBILE =========
 if (btnFalar && input) {
   let recognition = null;
   let isRecording = false;
 
-  const createRecognition = () => {
+  const startRecognition = () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      console.warn('SpeechRecognition não suportado');
-      btnFalar.disabled = true;
-      return null;
+      alert('Reconhecimento de voz não suportado neste navegador.');
+      return;
     }
 
-    const rec = new SpeechRecognition();
-    rec.lang = 'pt-BR';
-    rec.continuous = false;       // uma sessão por clique (mais estável no mobile)
-    rec.interimResults = true;
+    recognition = new SpeechRecognition();
+    recognition.lang = 'pt-BR';
+    recognition.continuous = false;  // uma sessão por clique (mais estável)
+    recognition.interimResults = true;
 
-    rec.onstart = () => {
+    recognition.onstart = () => {
       isRecording = true;
       btnFalar.classList.add('recording');
-      console.log('[MIC] Iniciado');
+      console.log('[MIC] Gravando...');
     };
 
-    rec.onresult = (event) => {
+    recognition.onresult = (event) => {
       let transcript = '';
       for (let i = event.resultIndex; i < event.results.length; i++) {
         transcript += event.results[i][0].transcript;
         if (event.results[i].isFinal) transcript += ' ';
       }
-      input.value = (input.value + transcript).trim() + ' ';
+      input.value += transcript;
       input.focus();
     };
 
-    rec.onerror = (event) => {
+    recognition.onerror = (event) => {
       console.warn('[MIC] Erro:', event.error);
       isRecording = false;
       btnFalar.classList.remove('recording');
       if (event.error === 'not-allowed') {
-        alert('Permissão de microfone negada. Vá em Configurações do navegador > Permissões.');
+        alert('Permissão de microfone negada. Ative nas configurações do navegador.');
       }
     };
 
-    rec.onend = () => {
+    recognition.onend = () => {
       isRecording = false;
       btnFalar.classList.remove('recording');
-      console.log('[MIC] Finalizado');
+      console.log('[MIC] Parou');
     };
 
-    return rec;
+    try {
+      recognition.start();
+    } catch (e) {
+      setTimeout(startRecognition, 500); // retry automático
+    }
   };
 
   btnFalar.addEventListener('click', (ev) => {
@@ -546,20 +549,8 @@ if (btnFalar && input) {
 
     if (isRecording) {
       if (recognition) recognition.stop();
-      return;
-    }
-
-    // Cria nova instância a cada clique (mais confiável no mobile)
-    recognition = createRecognition();
-    if (!recognition) return;
-
-    try {
-      recognition.start();
-    } catch (e) {
-      console.warn('[MIC] Erro ao start, retry em 300ms', e);
-      setTimeout(() => {
-        try { recognition.start(); } catch {} 
-      }, 300);
+    } else {
+      startRecognition();
     }
   });
 }
