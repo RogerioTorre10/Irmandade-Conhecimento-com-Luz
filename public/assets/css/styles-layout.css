@@ -1658,92 +1658,82 @@ body[data-guia="arian"] .perguntas-controls .btn-perguntas {
     font-size: 16px !important;
   }
 }
-/* BARRAS DE PROGRESSO - TEXTURA PEDRA + AURA DO GUIA */
+/* BARRAS DE PROGRESSO - TEXTURA PEDRA + AURA DO GUIA (igual aos botões) */
 
-/* Container/base das barras (topo e meio) */
+/* Barra externa (fundo vazio) - pedra sutil */
+#progress-block-outer,
+#progress-question-outer,
+.progress-block-outer,
+.progress-question-outer,
+.perg-progress-outer,
+.progress-bar {
+  background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.4)),
+              url('/assets/img/textura-de-pedra.jpg') !important; /* ajuste o nome exato se for diferente */
+  background-size: cover !important;
+  background-position: center !important;
+  border-radius: 20px !important;
+  box-shadow: inset 0 4px 12px rgba(0,0,0,0.7) !important;
+  height: 12px !important; /* um pouco mais grossa pra textura aparecer melhor */
+}
+
+/* Preenchimento da barra (o que cresce com JS) */
+#progress-block-fill,
+#progress-question-fill,
 .progress-block-fill,
 .progress-question-fill,
-#progress-block-fill,
-#progress-question-fill {
+.perg-progress-inner,
+.progress-fill {
   height: 100% !important;
   border-radius: inherit !important;
   position: relative !important;
   overflow: hidden !important;
 
   /* TEXTURA DE PEDRA NO PREENCHIMENTO */
-  background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.2)),
+  background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.3)),
               url('/assets/img/textura-de-pedra.jpg') !important;
   background-size: cover !important;
   background-position: center !important;
 
-  /* AURA LUMINOSA DO GUIA (mesma lógica dos botões) */
+  /* AURA LUMINOSA PULSANDO NA COR DO GUIA */
   box-shadow: 
     0 0 20px var(--progress-main),
     0 0 40px var(--progress-glow-1),
-    inset 0 0 20px var(--progress-glow-2) !important;
-  animation: glow-pulse 3s infinite alternate !important;
+    inset 0 0 25px var(--progress-glow-2) !important;
+  animation: barra-glow 4s infinite alternate !important;
 }
 
-/* Aura mais forte por guia específico */
-body[data-guia="lumen"] .progress-block-fill,
-body[data-guia="lumen"] .progress-question-fill {
-  box-shadow: 0 0 25px #00ff9d, 0 0 50px rgba(0,255,157,0.8), inset 0 0 25px rgba(120,255,200,0.6) !important;
+@keyframes barra-glow {
+  0% { 
+    box-shadow: 0 0 15px var(--progress-main), 0 0 30px var(--progress-glow-1); 
+  }
+  100% { 
+    box-shadow: 0 0 30px var(--progress-main), 0 0 60px var(--progress-glow-1), inset 0 0 35px var(--progress-glow-2); 
+  }
 }
 
-body[data-guia="zion"] .progress-block-fill,
-body[data-guia="zion"] .progress-question-fill {
-  box-shadow: 0 0 25px #00aaff, 0 0 50px rgba(0,170,255,0.8), 0 0 35px rgba(255,214,91,0.6) !important;
+/* AURA ESPECÍFICA POR GUIA (mais forte e precisa) */
+body[data-guia="lumen"] #progress-block-fill,
+body[data-guia="lumen"] #progress-question-fill {
+  box-shadow: 0 0 30px #00ff9d, 0 0 60px rgba(0,255,157,0.9), inset 0 0 30px rgba(120,255,200,0.7) !important;
 }
 
-body[data-guia="arian"] .progress-block-fill,
-body[data-guia="arian"] .progress-question-fill {
-  box-shadow: 0 0 30px #ff00ff, 0 0 55px rgba(255,120,255,0.9), inset 0 0 30px rgba(255,180,255,0.7) !important;
+body[data-guia="zion"] #progress-block-fill,
+body[data-guia="zion"] #progress-question-fill {
+  box-shadow: 0 0 30px #00aaff, 0 0 60px rgba(0,170,255,0.9), 0 0 45px rgba(255,214,91,0.7) !important;
 }
 
-/* Animação suave de pulsação */
-@keyframes glow-pulse {
-  0% { box-shadow: 0 0 20px var(--progress-main), 0 0 40px var(--progress-glow-1); }
-  100% { box-shadow: 0 0 30px var(--progress-main), 0 0 60px var(--progress-glow-1); }
+body[data-guia="arian"] #progress-block-fill,
+body[data-guia="arian"] #progress-question-fill {
+  box-shadow: 0 0 35px #ff00ff, 0 0 70px rgba(255,120,255,0.95), inset 0 0 35px rgba(255,180,255,0.8) !important;
 }
 
-/* Barra externa (fundo vazio) também com pedra sutil */
-.progress-block-outer,
-.progress-question-outer,
-.perg-progress-outer {
-  background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.5)),
-              url('/assets/img/textura-de-pedra.jpg') !important;
-  background-size: cover !important;
-  border-radius: 20px !important;
-  box-shadow: inset 0 4px 10px rgba(0,0,0,0.6) !important;
-}
-   
-
-/* ===========================
-   TEMA POR GUIA — PERGUNTAS
-   =========================== */
-
-body.guia-lumen #section-perguntas .perguntas-progress-fill,
-body.guia-lumen #section-perguntas .btn.btn-primary,
-body.guia-lumen #section-perguntas .btn.btn-stone {
-  background: #38d996 !important;        /* verde Lumen */
-  box-shadow: 0 0 12px rgba(56,217,150,0.8) !important;
-  border-color: #2ea87a !important;
-}
-
-body.guia-zion #section-perguntas .perguntas-progress-fill,
-body.guia-zion #section-perguntas .btn.btn-primary,
-body.guia-zion #section-perguntas .btn.btn-stone {
-  background: #ffd166 !important;        /* dourado Zion */
-  box-shadow: 0 0 12px rgba(255,209,102,0.8) !important;
-  border-color: #e5b93c !important;
-}
-
-body.guia-arion #section-perguntas .perguntas-progress-fill,
-body.guia-arion #section-perguntas .btn.btn-primary,
-body.guia-arion #section-perguntas .btn.btn-stone {
-  background: #ff6ad5 !important;        /* magenta Arion */
-  box-shadow: 0 0 12px rgba(255,106,213,0.8) !important;
-  border-color: #e04ab3 !important;
+/* Texto dos contadores (1/14, 1 de 5, etc.) com glow sutil do guia */
+#progress-block-value,
+#progress-question-value,
+.progress-total-value,
+.progress-label {
+  color: white !important;
+  text-shadow: 0 0 10px var(--progress-main), 0 0 20px var(--progress-glow-1) !important;
 }
    
 }
@@ -2037,63 +2027,82 @@ body[data-guia="arian"] .perguntas-controls .btn-perguntas {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.3; }
 }
-/* BARRAS DE PROGRESSO - TEXTURA PEDRA + AURA DO GUIA */
+/* BARRAS DE PROGRESSO - TEXTURA PEDRA + AURA DO GUIA (igual aos botões) */
 
-/* Container/base das barras (topo e meio) */
+/* Barra externa (fundo vazio) - pedra sutil */
+#progress-block-outer,
+#progress-question-outer,
+.progress-block-outer,
+.progress-question-outer,
+.perg-progress-outer,
+.progress-bar {
+  background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.4)),
+              url('/assets/img/textura-de-pedra.jpg') !important; /* ajuste o nome exato se for diferente */
+  background-size: cover !important;
+  background-position: center !important;
+  border-radius: 20px !important;
+  box-shadow: inset 0 4px 12px rgba(0,0,0,0.7) !important;
+  height: 12px !important; /* um pouco mais grossa pra textura aparecer melhor */
+}
+
+/* Preenchimento da barra (o que cresce com JS) */
+#progress-block-fill,
+#progress-question-fill,
 .progress-block-fill,
 .progress-question-fill,
-#progress-block-fill,
-#progress-question-fill {
+.perg-progress-inner,
+.progress-fill {
   height: 100% !important;
   border-radius: inherit !important;
   position: relative !important;
   overflow: hidden !important;
 
   /* TEXTURA DE PEDRA NO PREENCHIMENTO */
-  background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.2)),
+  background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.3)),
               url('/assets/img/textura-de-pedra.jpg') !important;
   background-size: cover !important;
   background-position: center !important;
 
-  /* AURA LUMINOSA DO GUIA (mesma lógica dos botões) */
+  /* AURA LUMINOSA PULSANDO NA COR DO GUIA */
   box-shadow: 
     0 0 20px var(--progress-main),
     0 0 40px var(--progress-glow-1),
-    inset 0 0 20px var(--progress-glow-2) !important;
-  animation: glow-pulse 3s infinite alternate !important;
+    inset 0 0 25px var(--progress-glow-2) !important;
+  animation: barra-glow 4s infinite alternate !important;
 }
 
-/* Aura mais forte por guia específico */
-body[data-guia="lumen"] .progress-block-fill,
-body[data-guia="lumen"] .progress-question-fill {
-  box-shadow: 0 0 25px #00ff9d, 0 0 50px rgba(0,255,157,0.8), inset 0 0 25px rgba(120,255,200,0.6) !important;
+@keyframes barra-glow {
+  0% { 
+    box-shadow: 0 0 15px var(--progress-main), 0 0 30px var(--progress-glow-1); 
+  }
+  100% { 
+    box-shadow: 0 0 30px var(--progress-main), 0 0 60px var(--progress-glow-1), inset 0 0 35px var(--progress-glow-2); 
+  }
 }
 
-body[data-guia="zion"] .progress-block-fill,
-body[data-guia="zion"] .progress-question-fill {
-  box-shadow: 0 0 25px #00aaff, 0 0 50px rgba(0,170,255,0.8), 0 0 35px rgba(255,214,91,0.6) !important;
+/* AURA ESPECÍFICA POR GUIA (mais forte e precisa) */
+body[data-guia="lumen"] #progress-block-fill,
+body[data-guia="lumen"] #progress-question-fill {
+  box-shadow: 0 0 30px #00ff9d, 0 0 60px rgba(0,255,157,0.9), inset 0 0 30px rgba(120,255,200,0.7) !important;
 }
 
-body[data-guia="arian"] .progress-block-fill,
-body[data-guia="arian"] .progress-question-fill {
-  box-shadow: 0 0 30px #ff00ff, 0 0 55px rgba(255,120,255,0.9), inset 0 0 30px rgba(255,180,255,0.7) !important;
+body[data-guia="zion"] #progress-block-fill,
+body[data-guia="zion"] #progress-question-fill {
+  box-shadow: 0 0 30px #00aaff, 0 0 60px rgba(0,170,255,0.9), 0 0 45px rgba(255,214,91,0.7) !important;
 }
 
-/* Animação suave de pulsação */
-@keyframes glow-pulse {
-  0% { box-shadow: 0 0 20px var(--progress-main), 0 0 40px var(--progress-glow-1); }
-  100% { box-shadow: 0 0 30px var(--progress-main), 0 0 60px var(--progress-glow-1); }
+body[data-guia="arian"] #progress-block-fill,
+body[data-guia="arian"] #progress-question-fill {
+  box-shadow: 0 0 35px #ff00ff, 0 0 70px rgba(255,120,255,0.95), inset 0 0 35px rgba(255,180,255,0.8) !important;
 }
 
-/* Barra externa (fundo vazio) também com pedra sutil */
-.progress-block-outer,
-.progress-question-outer,
-.perg-progress-outer {
-  background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.5)),
-              url('/assets/img/textura-de-pedra.jpg') !important;
-  background-size: cover !important;
-  border-radius: 20px !important;
-  box-shadow: inset 0 4px 10px rgba(0,0,0,0.6) !important;
+/* Texto dos contadores (1/14, 1 de 5, etc.) com glow sutil do guia */
+#progress-block-value,
+#progress-question-value,
+.progress-total-value,
+.progress-label {
+  color: white !important;
+  text-shadow: 0 0 10px var(--progress-main), 0 0 20px var(--progress-glow-1) !important;
 }
 }
    
