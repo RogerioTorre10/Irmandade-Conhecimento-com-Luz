@@ -1995,20 +1995,47 @@ body[data-guia="arian"] .perguntas-controls .btn-perguntas {
   box-shadow: 0 0 50px var(--progress-main), 0 0 80px var(--progress-glow-1) !important;
 }
 
-/* MICROFONE GRAVANDO - VERMELHO PULSANDO */
-#jp-btn-falar.recording {
-  background: linear-gradient(rgba(255,0,0,0.8), rgba(200,0,0,0.7)),
-              url('/assets/img/textura-de-pedra.jpg') !important;
-  border-color: #ff0000 !important;
-  box-shadow: 0 0 30px #ff0000, 0 0 50px #ff4444 !important;
-  animation: pulse-rec 1.2s infinite !important;
-  transform: scale(1.1) !important;
+/* MICROFONE ATIVO - VERMELHO FORTE E PULSANDO (prioridade máxima) */
+#jp-btn-falar.recording,
+.perguntas-controls #jp-btn-falar.recording,
+.perguntas-controls .btn-perguntas.recording,
+.btn-perguntas[data-action="start-mic"].recording {
+  background: linear-gradient(135deg, #ff1744, #d50000) !important;
+  background-color: #f44336 !important; /* fallback sólido */
+  border-color: #ff1744 !important;
+  color: white !important;
+  box-shadow: 
+    0 0 30px #ff1744,
+    0 0 60px #ff4444,
+    0 0 90px rgba(255, 23, 68, 0.8) !important;
+  animation: pulse-recording 1.4s infinite !important;
+  transform: scale(1.12) !important;
+  z-index: 9999 !important;
 }
 
-@keyframes pulse-rec {
-  0% { box-shadow: 0 0 30px #ff0000, 0 0 50px #ff4444; }
-  50% { box-shadow: 0 0 45px #ff3333, 0 0 70px #ff6666; }
-  100% { box-shadow: 0 0 30px #ff0000, 0 0 50px #ff4444; }
+@keyframes pulse-recording {
+  0% {
+    box-shadow: 0 0 30px #ff1744, 0 0 60px #ff4444, 0 0 90px rgba(255, 23, 68, 0.8);
+  }
+  50% {
+    box-shadow: 0 0 45px #ff1744, 0 0 80px #ff6666, 0 0 120px rgba(255, 23, 68, 1);
+  }
+  100% {
+    box-shadow: 0 0 30px #ff1744, 0 0 60px #ff4444, 0 0 90px rgba(255, 23, 68, 0.8);
+  }
+}
+
+/* Opcional: texto "Gravando" enquanto ativo */
+#jp-btn-falar.recording::after {
+  content: " ● Gravando";
+  font-size: 0.8em;
+  margin-left: 6px;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
 }
 /* BARRAS DE PROGRESSO - TEXTURA PEDRA + AURA DO GUIA */
 
