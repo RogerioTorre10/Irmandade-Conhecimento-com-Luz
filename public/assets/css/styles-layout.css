@@ -1672,7 +1672,7 @@ body[data-guia="arian"] .perguntas-controls .btn-perguntas {
 
   /* TEXTURA DE PEDRA NO PREENCHIMENTO */
   background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.2)),
-              url('/assets/img/textura-pedra-btn.jpg') !important;
+              url('/assets/img/textura-de-pedra.jpg') !important;
   background-size: cover !important;
   background-position: center !important;
 
@@ -1711,7 +1711,7 @@ body[data-guia="arian"] .progress-question-fill {
 .progress-question-outer,
 .perg-progress-outer {
   background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.5)),
-              url('/assets/img/textura-pedra-btn.jpg') !important;
+              url('/assets/img/textura-de-pedra.jpg') !important;
   background-size: cover !important;
   border-radius: 20px !important;
   box-shadow: inset 0 4px 10px rgba(0,0,0,0.6) !important;
@@ -2024,7 +2024,7 @@ body[data-guia="arian"] .perguntas-controls .btn-perguntas {
 
   /* TEXTURA DE PEDRA NO PREENCHIMENTO */
   background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.2)),
-              url('/assets/img/textura-pedra-btn.jpg') !important;
+              url('/assets/img/textura-de-pedra.jpg') !important;
   background-size: cover !important;
   background-position: center !important;
 
@@ -2063,12 +2063,12 @@ body[data-guia="arian"] .progress-question-fill {
 .progress-question-outer,
 .perg-progress-outer {
   background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.5)),
-              url('/assets/img/textura-pedra-btn.jpg') !important;
+              url('/assets/img/textura-de-pedra.jpg') !important;
   background-size: cover !important;
   border-radius: 20px !important;
   box-shadow: inset 0 4px 10px rgba(0,0,0,0.6) !important;
 }
-
+}
    
 /* MOBILE FORÇADO */
 @media (max-width: 500px) {
@@ -2114,7 +2114,7 @@ body[data-guia="arian"] .progress-question-fill {
     font-size: 14px !important;
   }
 }
-}
+
 
 /* =========================================================
    SECTION-FINAL — OVERRIDES DE VITRINE (layout manda)
