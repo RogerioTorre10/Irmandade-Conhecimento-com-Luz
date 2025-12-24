@@ -1170,6 +1170,57 @@
   #section-card .placeholder-wrapper {
     max-width: 240px;
     margin-top: -20px;
+  }  
+}
+/* =========================================================
+   AJUSTE EXTRA PARA TELAS MUITO PEQUENAS (Motorola antigo, iPhone SE, etc.)
+   ========================================================= */
+@media (max-width: 400px) {
+  #section-card {
+    padding: 20px 8px 260px 8px !important; /* ainda mais espaço na base */
+    padding-bottom: calc(260px + env(safe-area-inset-bottom)) !important;
+  }
+
+  #section-card .j-panel-glow {
+    width: calc(100vw - 24px) !important; /* mais respiro lateral */
+    padding: 28px 16px 100px 16px !important; /* padding gigante na base */
+    margin: 20px auto 80px auto !important;
+  }
+
+  #section-card .card-stage {
+    padding-bottom: 300px !important; /* espaço absurdo pra botão nunca sumir */
+  }
+
+  /* Botão Continuar: maior e mais fácil de tocar em tela pequena */
+  #section-card .btn-continuar,
+  #section-card .btn-confirm,
+  #section-card .btn-primary,
+  #section-card [data-action="continuar"] {
+    min-height: 64px !important;
+    font-size: 16.5px !important;
+    padding: 18px !important;
+    margin-top: 40px !important;
+  }
+}
+
+/* Se o Motorola for EXTREMAMENTE pequeno (320-350px), reforço final */
+@media (max-width: 360px) {
+  #section-card {
+    padding-bottom: calc(300px + env(safe-area-inset-bottom)) !important;
+  }
+
+  #section-card .j-panel-glow {
+    padding-bottom: 120px !important;
+  }
+
+  #section-card .card-stage {
+    padding-bottom: 340px !important;
+  }
+
+  #section-card .btn-continuar,
+  #section-card .btn-confirm {
+    font-size: 17px !important;
+    min-height: 70px !important;
   }
 }
 
