@@ -488,8 +488,7 @@
   const btnConfirmar = $('#jp-btn-confirmar', root);
   const input       = $('#jp-answer-input', root);    
 
-  // ========= MICROFONE FINAL ESTÁVEL PARA MOBILE =========
-// ========= MICROFONE FINAL - SUPER ESTÁVEL PARA ANDROID/MOTOROLA =========
+  // ========= MICROFONE FINAL - SUPER ESTÁVEL PARA ANDROID/MOTOROLA =========
 if (btnFalar && input) {
   let recognition = null;
   let isRecording = false;
