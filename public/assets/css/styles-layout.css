@@ -1105,73 +1105,99 @@
   justify-content: center;
 }
 
-/* Mobile: ajusta o palco, mas mantém a lógica */
+/* =========================================================
+   SECTION-CARD MOBILE - BOTÃO CONTINUAR SEMPRE CLICÁVEL
+   ========================================================= */
 @media (max-width: 600px) {
-   /* Seção senha: ocupa a tela com respiro */
- #section-card {
-    padding: 8px 0 140px !important;
+  /* Seção inteira: muito espaço na base + safe-area */
+  #section-card {
+    padding: 20px 12px 220px 12px !important; /* espaço EXTRA na base (220px cobre teclado + barra do Android) */
     min-height: 100vh !important;
-    overflow: hidden !important;
+    height: auto !important;
+    overflow-x: hidden !important;
+    overflow-y: visible !important; /* permite que botões fiquem visíveis mesmo "fora" */
+    box-sizing: border-box !important;
+    padding-bottom: env(safe-area-inset-bottom, 220px) !important; /* respeita notch/barra inferior do celular */
+    padding-bottom: calc(220px + env(safe-area-inset-bottom)) !important;
   }
 
-  /* Painel de vidro (MESMA FAMÍLIA DO INTRO/TERMOS) */
+  /* Painel de vidro: centralizado, sem transborda, respiro bom */
   #section-card .j-panel-glow {
     position: relative !important;
-    left: 0 !important;
-    right: 0 !important;
-    width: calc(100vw - 84px) !important;  /* um pouco menor p/ não “explodir” */
-    max-width: 460px !important;           /* mesmo corpo da intro */
-    margin: 0 auto !important;
-    padding: 32px 24px 52px 24px !important;             /* borda fininha */
-    border-radius: 26px !important;
+    margin: 30px auto 60px auto !important; /* margem grande na base */
+    width: calc(100vw - 40px) !important; /* respiro lateral */
+    max-width: 460px !important;
+    padding: 32px 24px 80px 24px !important; /* padding extra na base pro botão respirar */
+    border-radius: 28px !important;
     box-sizing: border-box !important;
-     transform: none !important;
-    -webkit-transform: translateY(0) translateZ(0) !important;
-    overflow: hidden !important;
-  } 
-  
-  #section-card .j-panel-glow {
-    padding: 10px !important; /* igual Intro */
+    transform: none !important;
+    overflow: visible !important; /* importante: permite botão sair do painel se necessário */
+    z-index: 10 !important;
   }
-  
+
+  /* Aro dourado interno (mantém a magia) */
   #section-card .j-panel-glow::before {
     content: '';
-  position: absolute;
-  pointer-events: none;
-  z-index: 1;
-  inset: 0;
-  border-radius: inherit;
-  border: 2px solid rgba(212,175,55,0.55);
-  box-shadow:
-    0 0 28px rgba(212,175,55,0.55),
-    inset 0 0 18px rgba(255,230,150,0.25);     
-  background: linear-gradient(
-    to bottom,
-    rgba(255,255,255,0.16),
-    transparent 45%,
-    transparent 100%
-  ) !important;
+    position: absolute;
+    pointer-events: none;
+    z-index: 1;
+    inset: 0;
+    border-radius: inherit;
+    border: 2px solid rgba(212,175,55,0.55);
+    box-shadow:
+      0 0 28px rgba(212,175,55,0.55),
+      inset 0 0 18px rgba(255,230,150,0.25);
+    background: linear-gradient(to bottom, rgba(255,255,255,0.16), transparent 45%, transparent 100%);
   }
-   
-  /* Opcional: título e conteúdo respirando igual intro */
-  #section-card .senha-panel-inner {
-    padding: 0 10px !important;
-    box-sizing: border-box !important;
-  }
+
+  /* Conteúdo interno: não corta */
+  #section-card .senha-panel-inner,
   #section-card .pergaminho,
   #section-card .pergaminho-v {
-  overflow-x: hidden !important;
-}   
+    overflow: visible !important;
+    padding-bottom: 40px !important;
+  }
+
+  /* Botão Continuar (ou qualquer botão na base): sempre clicável e visível */
+  #section-card .btn-continuar,
+  #section-card .btn-confirm,
+  #section-card .btn-primary,
+  #section-card [data-action="continuar"],
+  #section-card .perguntas-controls button,
+  #section-card .actions button {
+    position: relative !important;
+    z-index: 9999 !important;
+    pointer-events: auto !important;
+    touch-action: manipulation !important;
+    margin-top: 30px !important;
+    min-height: 60px !important;
+    padding: 16px !important;
+    font-size: 16px !important;
+  }
+
+  /* Stage e placeholder: não interferem no clique */
   #section-card .card-stage {
-    max-width: 380px;
-    padding-bottom: 200px;
+    padding-bottom: 260px !important; /* espaço gigante pra botão nunca sumir */
+    overflow: visible !important;
   }
 
   #section-card .placeholder-wrapper {
-    max-width: 240px;
-    margin-top: -20px;
-  }  
+    max-width: 260px !important;
+    margin-top: -10px !important;
+  }
+
+  /* Garante que nada sobreponha o botão */
+  #section-card * {
+    pointer-events: none !important;
+  }
+  #section-card button,
+  #section-card input,
+  #section-card textarea,
+  #section-card a {
+    pointer-events: auto !important;
+  }
 }
+
 /* =========================================================
    AJUSTE EXTRA PARA TELAS MUITO PEQUENAS (Motorola antigo, iPhone SE, etc.)
    ========================================================= */
