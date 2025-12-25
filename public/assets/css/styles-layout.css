@@ -1173,7 +1173,40 @@
   #section-card .placeholder-wrapper {
     max-width: 240px;
     margin-top: -20px;
-  }  
+  }
+/* =========================================================
+   FIX ANDROID/MOTOROLA — Botão continuar no CARD
+   ========================================================= */
+ /* 1) Reserva espaço REAL embaixo (inclusive safe-area) */
+  #section-card{
+    padding-bottom: calc(140px + env(safe-area-inset-bottom, 0px)) !important;
+    overflow: visible !important;
+  }
+
+  /* 2) Se o seu botão for .btn-continuar ou #btn-continuar */
+  #section-card .btn-continuar,
+  #section-card #btn-continuar,
+  #section-card .btn-primary{
+    position: sticky !important; /* fica “grudado” ao rolar sem quebrar layout */
+    bottom: calc(18px + env(safe-area-inset-bottom, 0px)) !important;
+    z-index: 50 !important;
+    margin-top: 14px !important;
+    touch-action: manipulation !important; /* melhora toque no Android */
+  }
+
+  /* 3) Garante que nenhum overlay esteja bloqueando o clique */
+  #section-card .card-stage,
+  #section-card .j-panel-glow,
+  #section-card .j-perg-v-inner{
+    overflow: visible !important;
+  }
+
+  /* Se você tiver pseudo-camadas por cima (fog/glow) */
+  #section-card .j-panel-glow::before,
+  #section-card .j-panel-glow::after{
+    pointer-events: none !important;
+  }
+   
 }
 
 /* =========================================================
