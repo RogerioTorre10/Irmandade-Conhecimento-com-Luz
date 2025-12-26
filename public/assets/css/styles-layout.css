@@ -1661,29 +1661,30 @@ body[data-guia="arian"] .perguntas-controls .btn-perguntas {
   }
 }
 
-/* AURA ESPECÍFICA POR GUIA (mais forte e precisa) */
-body[data-guia="lumen"] #progress-block-fill,
-body[data-guia="lumen"] #progress-question-fill {
-  box-shadow: 0 0 30px #00ff9d, 0 0 60px rgba(0,255,157,0.9), inset 0 0 30px rgba(120,255,200,0.7) !important;
+/* Garante aura do guia na barra movida (qualquer tela) */
+.progress-inline .progress-question-fill,
+#progress-question-fill {
+  background: var(--progress-main, #00ff9d) !important;
+  box-shadow: var(--progress-glow-1, 0 0 20px #00ff9d), var(--progress-glow-2, 0 0 40px rgba(0,255,157,0.8)) !important;
 }
 
-body[data-guia="zion"] #progress-block-fill,
-body[data-guia="zion"] #progress-question-fill {
-  box-shadow: 0 0 30px #00aaff, 0 0 60px rgba(0,170,255,0.9), 0 0 45px rgba(255,214,91,0.7) !important;
+/* Aura específica por guia (reforçada) */
+body[data-guia="lumen"] .progress-inline .progress-question-fill {
+  box-shadow: 0 0 25px #00ff9d, 0 0 50px rgba(0,255,157,0.9) !important;
+}
+body[data-guia="zion"] .progress-inline .progress-question-fill {
+  box-shadow: 0 0 25px #00aaff, 0 0 50px rgba(0,170,255,0.9), 0 0 35px rgba(255,214,91,0.7) !important;
+}
+body[data-guia="arian"] .progress-inline .progress-question-fill {
+  box-shadow: 0 0 30px #ff00ff, 0 0 60px rgba(255,120,255,0.95) !important;
 }
 
-body[data-guia="arian"] #progress-block-fill,
-body[data-guia="arian"] #progress-question-fill {
-  box-shadow: 0 0 35px #ff00ff, 0 0 70px rgba(255,120,255,0.95), inset 0 0 35px rgba(255,180,255,0.8) !important;
-}
-
-/* Texto dos contadores (1/14, 1 de 5, etc.) com glow sutil do guia */
-#progress-block-value,
-#progress-question-value,
-.progress-total-value,
-.progress-label {
-  color: white !important;
-  text-shadow: 0 0 10px var(--progress-main), 0 0 20px var(--progress-glow-1) !important;
+/* Wrapper da barra movida - sempre bonito */
+.progress-inline {
+  background: rgba(0,0,0,0.5) !important;
+  border-radius: 20px !important;
+  padding: 8px 16px !important;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.6) !important;
 }
 }
 
