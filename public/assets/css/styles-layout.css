@@ -1262,6 +1262,60 @@
     min-height: 70px !important;
   }
 }
+   /* =========================================================
+   CARD — ANDROID/MOTOROLA: botão não pode sumir na base
+   (apenas telas pequenas)
+   ========================================================= */
+
+/* 1) Garante espaço no final do card para não cortar */
+@media (max-width: 420px){
+  #section-card{
+    padding-bottom: calc(220px + env(safe-area-inset-bottom, 0px)) !important;
+    min-height: 100svh !important;  /* viewport estável no Android */
+    overflow: visible !important;
+  }
+
+  /* 2) Camadas do glow nunca podem bloquear toque */
+  #section-card .j-panel-glow::before,
+  #section-card .j-panel-glow::after,
+  #section-card .glow-fog{
+    pointer-events: none !important;
+  }
+
+  /* 3) BOTÃO: força aparecer sempre acima da barra inferior */
+  #section-card .btn-continuar,
+  #section-card #btn-continuar,
+  #section-card .btn-primary,
+  #section-card .btn-stone-espinhos{
+    position: fixed !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
+
+    z-index: 99999 !important;
+    width: min(88vw, 340px) !important;
+    max-width: 340px !important;
+
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+
+    touch-action: manipulation !important;
+  }
+}
+
+/* extra: telas muito pequenas (360/320) sobe mais um pouco */
+@media (max-width: 360px){
+  #section-card .btn-continuar,
+  #section-card #btn-continuar,
+  #section-card .btn-primary,
+  #section-card .btn-stone-espinhos{
+    bottom: calc(24px + env(safe-area-inset-bottom, 0px)) !important;
+    width: min(92vw, 320px) !important;
+    max-width: 320px !important;
+  }
+}
+
 
 /* =========================================================
    AJUSTE FINO – LAYOUT DA PÁGINA PERGUNTAS (DESKTOP)
