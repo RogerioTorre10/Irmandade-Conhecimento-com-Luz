@@ -1,9 +1,10 @@
 /* /assets/js/jornada-progress-inline.js
- * v1.3 — Charm progress inline, sem travar datilografia / TTS
- * - One-shot: só move quando a section-perguntas estiver pronta e visível
- * - Não cria loops, não fica espionando a página inteira
- * - Usa elementos já existentes: badge, barra, meta
+ * v1.4 — Progress inline corrigido + cor do guia aplicada
+ * - Corrige erro findBadge/findBar/findMeta não definidos
+ * - Aplica cor do guia na barra movida
+ * - Mantém tudo leve e one-shot
  */
+
 (function () {
   'use strict';
 
@@ -13,49 +14,82 @@
   }
   window.__JPROG_INLINE_BOUND__ = true;
 
-  var POS = 'above'; // 'above' = abaixo da chama / título | 'below' = acima dos botões do footer
-  var done = false;
-  var obs  = null;
-  var MOD  = '[JPROG-INLINE]';
+  const MOD = '[JPROG-INLINE]';
+  const POS = 'above'; // 'above' = abaixo do título | 'below' = acima dos botões
 
-  function q(sel, root){ return (root || document).querySelector(sel); }
-  function byId(id){ return document.getElementById(id); }
+  let done = false;
+  let obs = null;
 
- // depois do bloco principal
-const qBadge = document.getElementById('progress-question-value');
-const qBar   = document.getElementById('progress-question-fill');
+  const q = (sel, root = document) => root.querySelector(sel);
+  const byId = (id) => document.getElementById(id);
 
+  // =========================================================
+  // FIX 1: Funções de busca explícitas (não dependem de nada externo)
+  // =========================================================
+  function findBadge() {
+    return byId('progress-question-value') || q('.progress-question-value');
+  }
 
-  function ensureWrap(){
-    var wrap = byId('progress-inline');
-    if (!wrap){
+  function findBar() {
+    return byId('progress-question-fill') || q('.progress-question-fill');
+  }
+
+  function findMeta() {
+    // Meta pode ser o label "Perguntas no Bloco" ou o container
+    return q('.progress-middle .progress-label') || 
+           q('.progress-middle') || 
+           byId('progress-question-label') ||
+           q('.perguntas-no-bloco-label');
+  }
+
+  // =========================================================
+  // FIX 2: Aplica cor do guia na barra (depois de mover)
+  // =========================================================
+  function applyGuideColor(barFill) {
+    if (!barFill) return;
+
+    const guia = document.body.getAttribute('data-guia') || 
+                 sessionStorage.getItem('jornada.guia') || 
+                 'lumen';
+
+    let color = '#00ff9d';      // fallback Lumen
+    let glow = '0 0 20px #00ff9d, 0 0 40px rgba(0,255,157,0.8)';
+
+    if (guia.toLowerCase() === 'zion') {
+      color = '#00aaff';
+      glow = '0 0 20px #00aaff, 0 0 40px rgba(0,170,255,0.8), 0 0 30px rgba(255,214,91,0.6)';
+    } else if (guia.toLowerCase() === 'arian') {
+      color = '#ff00ff';
+      glow = '0 0 25px #ff00ff, 0 0 50px rgba(255,120,255,0.9)';
+    }
+
+    barFill.style.background = color;
+    barFill.style.boxShadow = glow;
+    barFill.style.backgroundImage = 'none'; // remove textura temporariamente se conflitar
+  }
+
+  // =========================================================
+  // Restante do código (mantido e melhorado)
+  // =========================================================
+  function ensureWrap() {
+    let wrap = byId('progress-inline');
+    if (!wrap) {
       wrap = document.createElement('div');
       wrap.id = 'progress-inline';
       wrap.className = 'progress-inline';
     } else {
-      // limpa se já existir algo antigo
       while (wrap.firstChild) wrap.removeChild(wrap.firstChild);
     }
     return wrap;
   }
 
-  function alreadyPlaced(wrap, badge, bar, meta){
-    return (
-      wrap &&
-      badge && bar && meta &&
-      wrap.contains(badge) &&
-      wrap.contains(bar) &&
-      wrap.contains(meta)
-    );
+  function alreadyPlaced(wrap, badge, bar, meta) {
+    return wrap && badge && bar && meta &&
+           wrap.contains(badge) && wrap.contains(bar) && wrap.contains(meta);
   }
 
-  // ancora “charmosa” logo abaixo do topo da seção de perguntas
-  function placeAbove(sec, wrap){
-    // tenta ancorar após chama / título / pergunta digitada
-    var anchor =
-  document.getElementById('jp-question-typed') ||
-  sec.firstElementChild;
-
+  function placeAbove(sec, wrap) {
+    const anchor = byId('jp-question-typed') || sec.firstElementChild;
     if (anchor && anchor.parentNode) {
       anchor.insertAdjacentElement('afterend', wrap);
     } else {
@@ -63,13 +97,8 @@ const qBar   = document.getElementById('progress-question-fill');
     }
   }
 
-  // alternativa: encostar acima do bloco de ações / botões finais
-  function placeBelow(sec, wrap){
-    var footer =
-      q('.footer-actions', sec) ||
-      q('.jp-actions', sec) ||
-      q('.perguntas-actions', sec);
-
+  function placeBelow(sec, wrap) {
+    const footer = q('.footer-actions', sec) || q('.jp-actions', sec) || q('.perguntas-actions', sec);
     if (footer && footer.parentNode) {
       footer.parentNode.insertBefore(wrap, footer);
     } else {
@@ -77,88 +106,75 @@ const qBar   = document.getElementById('progress-question-fill');
     }
   }
 
-  // ---- Ação principal (executa uma única vez) ----
-  function relocateOnce(){
+  function relocateOnce() {
     if (done) return;
 
-    var sec   = byId('section-perguntas');
+    const sec = byId('section-perguntas');
     if (!sec) return;
 
-    var badge = findBadge();
-    var bar   = findBar();
-    var meta  = findMeta();
+    const badge = findBadge();
+    const bar = findBar();
+    const meta = findMeta();
 
-    // se ainda não existem (carregando blocos / JS), esperamos
     if (!badge || !bar || !meta) {
+      console.log(MOD, 'Elementos ainda não prontos, aguardando...');
       return;
     }
 
-    var wrap = byId('progress-inline');
+    let wrap = byId('progress-inline');
 
-    // se já está tudo dentro do wrap, encerra
     if (alreadyPlaced(wrap, badge, bar, meta)) {
-      console.log(MOD, 'Já posicionado, encerrando.');
+      console.log(MOD, 'Já posicionado corretamente.');
       done = true;
       if (obs) { obs.disconnect(); obs = null; }
       return;
     }
 
-    // monta / limpa o wrapper
     wrap = ensureWrap();
 
-    // classe opcional pra estilo compacto
-    badge.classList.add('inline');
-
-    // pausa observer enquanto mexe no DOM
     if (obs) { obs.disconnect(); obs = null; }
 
-    // injeta na ordem desejada
-    wrap.appendChild(badge);
-    wrap.appendChild(bar);
+    // Ordem: meta (texto) + barra + badge (número)
     wrap.appendChild(meta);
+    wrap.appendChild(bar);
+    wrap.appendChild(badge);
 
-    if (POS === 'below') placeBelow(sec, wrap);
-    else placeAbove(sec, wrap);
+    // Posiciona
+    if (POS === 'below') {
+      placeBelow(sec, wrap);
+    } else {
+      placeAbove(sec, wrap);
+    }
+
+    // FIX 2: Força cor do guia na barra movida
+    applyGuideColor(bar);
 
     done = true;
-    console.log(MOD, 'Progress inline posicionado com sucesso.');
+    console.log(MOD, 'Progress inline reposicionado + cor do guia aplicada com sucesso.');
   }
 
-  // ---- Observa apenas a section-perguntas até ficar pronta ----
-  function watch(){
-    var sec = byId('section-perguntas');
+  function watch() {
+    const sec = byId('section-perguntas');
     if (!sec) {
-      console.log(MOD, 'section-perguntas ainda não existe, abortando watcher.');
+      console.log(MOD, 'section-perguntas não encontrada.');
       return;
     }
 
-    // Se a seção já está visível e marcada como inicializada,
-    // tenta posicionar direto (evita atrasos)
-    var isVisible = !sec.classList.contains('hidden');
-    var isReady =
-      sec.dataset.initialized === 'true' ||
-      sec.getAttribute('data-initialized') === 'true' ||
-      sec.classList.contains('j-loaded');
+    const isVisible = !sec.classList.contains('hidden');
+    const isReady = sec.dataset.initialized === 'true' || sec.classList.contains('j-loaded');
 
     if (isVisible && isReady) {
       relocateOnce();
       return;
     }
 
-    // Caso contrário, observa só essa seção por mudanças de status
-    obs = new MutationObserver(function(muts){
+    obs = new MutationObserver(() => {
       if (done) {
-        if (obs){ obs.disconnect(); obs = null; }
+        if (obs) obs.disconnect();
         return;
       }
-
-      var nowVisible = !sec.classList.contains('hidden');
-      var nowReady =
-        sec.dataset.initialized === 'true' ||
-        sec.getAttribute('data-initialized') === 'true' ||
-        sec.classList.contains('j-loaded');
-
-      // só quando a seção aparecer E estiver carregada é que movemos
+      const nowVisible = !sec.classList.contains('hidden');
+      const nowReady = sec.dataset.initialized === 'true' || sec.classList.contains('j-loaded');
       if (nowVisible && nowReady) {
         relocateOnce();
       }
@@ -170,16 +186,24 @@ const qBar   = document.getElementById('progress-question-fill');
     });
   }
 
+  // Inicialização
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', watch);
   } else {
     watch();
   }
-   // FIX 1: Reinit quando section-perguntas vira active
-      document.addEventListener('sectionLoaded', (e) => {
-      if (e.detail.sectionId === 'section-perguntas') {
-      relocateOnce(); // força reposicionamento do badge/bloco
+
+  // Re-posiciona se a seção for recarregada
+  document.addEventListener('sectionLoaded', (e) => {
+    if (e.detail && e.detail.sectionId === 'section-perguntas') {
+      setTimeout(relocateOnce, 100); // pequeno delay pra DOM estar pronto
     }
-});
-  
+  });
+
+  // Atualiza cor do guia se mudar durante a sessão
+  document.addEventListener('guia:changed', () => {
+    const bar = findBar();
+    if (bar) applyGuideColor(bar);
+  });
+
 })();
