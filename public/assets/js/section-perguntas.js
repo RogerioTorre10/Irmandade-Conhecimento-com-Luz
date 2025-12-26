@@ -480,28 +480,50 @@
   // BIND UI
   // --------------------------------------------------
 
- function bindUI(root) {
-  root = root || document.getElementById(SECTION_ID) || document;
+  function bindUI(root) {
+    root = root || document.getElementById(SECTION_ID) || document;
 
-  const btnFalar    = $('#jp-btn-falar', root);
-  const btnApagar   = $('#jp-btn-apagar', root);
-  const btnConfirmar = $('#jp-btn-confirmar', root);
-  const input       = $('#jp-answer-input', root);    
+    const btnTTS    = $('#jp-btn-falar', root);  // FIX: Renomeado para clareza - agora só TTS
+    const btnMic    = $('#jp-btn-mic', root);    // FIX: Novo - botão separado para mic (adicione no HTML se não existir)
+    const btnApagar = $('#jp-btn-apagar', root);
+    const btnConf   = $('#jp-btn-confirmar', root);
+    const input     = $('#jp-answer-input', root);    
 
- // ================================
-    // MICROFONE controlado pelo botão
+    // ================================
+    // TTS (LER PERGUNTA) - agora no btnTTS (#jp-btn-falar)
+    // ================================
+    if (btnTTS && 'speechSynthesis' in window) {
+      btnTTS.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+        const perguntaEl = $('#jp-question-typed', root) || $('#jp-question-raw', root);
+        if (!perguntaEl) return;
+        const text = perguntaEl.textContent.trim();
+        if (!text) return;
+        const synth = window.speechSynthesis;
+        synth.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'pt-BR';
+        utter.rate = 0.9;
+        utter.pitch = 1;
+        synth.speak(utter);
+      });
+    }
+
+    // ================================
+    // MICROFONE - agora separado no btnMic, com estabilidade do patch
     // ================================
     let micAttached = false;
     let micInstance = null;
 
-    if (btnFalar && input && window.JORNADA_MICRO) {
+    if (btnMic && input && window.JORNADA_MICRO) {
       const Micro = window.JORNADA_MICRO;
 
-      btnFalar.addEventListener('click', (ev) => {
+      btnMic.addEventListener('click', (ev) => {
         ev.preventDefault();
         ev.stopPropagation();
 
-        // 1) Garante que o input está "conectado" ao módulo de voz
+        // FIX: Garante attach só uma vez
         if (!micAttached && typeof Micro.attach === 'function') {
           micInstance = Micro.attach(input, { mode: 'append' });
           micAttached = true;
@@ -509,53 +531,63 @@
 
         if (!micInstance) return;
 
-        // 2) Liga / desliga a captura de voz (toggle manual)
-        const btnMic = micInstance.button;
-        const isRec  = btnMic && btnMic.classList.contains('rec');
+        // FIX: Toggle estável com trava anti-duplo clique
+        if (window.__MIC_START_LOCK__) return;
+        window.__MIC_START_LOCK__ = true;
+        setTimeout(() => (window.__MIC_START_LOCK__ = false), 450);
+
+        const btnMicInternal = micInstance.button;
+        const isRec = btnMicInternal && btnMicInternal.classList.contains('rec');
 
         if (isRec) {
-          if (typeof micInstance.stop === 'function') {
-            micInstance.stop();
-          }
+          if (typeof micInstance.stop === 'function') micInstance.stop();
         } else {
-          if (typeof micInstance.start === 'function') {
-            micInstance.start();
-          }
+          if (typeof micInstance.start === 'function') micInstance.start();
+        }
+
+        // FIX: Failsafe se travar (limpa após 9s)
+        clearTimeout(window.__MIC_FAILSAFE_T__);
+        window.__MIC_FAILSAFE_T__ = setTimeout(() => {
+          if (typeof micInstance.stop === 'function') micInstance.stop();
+        }, 9000);
+      });
+    }
+
+    // APAGAR
+    if (btnApagar && input) {
+      btnApagar.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+        input.value = '';
+        input.focus();
+        if (window.JORNADA_CHAMA) {
+          window.JORNADA_CHAMA.setChamaIntensidade('chama-perguntas', 'media');
         }
       });
     }
 
+    // CONFIRMAR
+    if (btnConf) {
+      btnConf.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        if (completed) {
+          log('Clique em confirmar após conclusão; ignorado.');
+          return;
+        }
+        saveCurrentAnswer();
+        nextStep();
+      });
+    }
 
-  // ========= APAGAR =========
-  if (btnApagar && input) {
-    btnApagar.addEventListener('click', (ev) => {
-      ev.preventDefault();
-      input.value = '';
-      input.focus();
-      if (window.JORNADA_CHAMA) {
-        window.JORNADA_CHAMA.setChamaIntensidade('chama-perguntas', 'media');
-      }
-    });
-  }
-
-  // ========= AVANÇA =========
-  if (btnConfirmar) {
-    btnConfirmar.addEventListener('click', (ev) => {
-      ev.preventDefault();
-      if (completed) return;
-      saveCurrentAnswer();
-      nextStep();
-    });
-  }
-
-  // ========= INPUT + CHAMA =========
-  if (input && window.JORNADA_CHAMA) {
-    input.addEventListener('input', () => {
-      window.JORNADA_CHAMA.updateChamaFromText(input.value || '', 'chama-perguntas');
-    });
-  }
-
-        // FIX: Atualiza áurea quando guia muda
+    // INPUT CHAMA
+    if (input && window.JORNADA_CHAMA) {
+      input.addEventListener('input', () => {
+        const txt = input.value || '';
+        window.JORNADA_CHAMA.updateChamaFromText(txt, 'chama-perguntas');
+      });
+    }
+    
+    // FIX: Atualiza áurea quando guia muda
     const guideColor = localStorage.getItem('JORNADA_GUIA_COLOR') || '#ffd700';
     document.querySelectorAll('.btn').forEach(b => {
       b.style.setProperty('--guide-color', guideColor);
@@ -664,7 +696,7 @@
   const perguntaBox = rootSection.querySelector('.perg-pergunta-titulo, .perguntas-pergunta-titulo');
 
   // botão TTS (agora separado do mic)
- // const btnTTS = rootSection.querySelector('[data-action="tts"], .btn-tts, .btn-falar');
+  const btnTTS = rootSection.querySelector('[data-action="tts"], .btn-tts, .btn-falar');
 
   // ---- 2. Funções utilitárias ----
 
