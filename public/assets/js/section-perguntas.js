@@ -480,112 +480,114 @@
   // BIND UI
   // --------------------------------------------------
 
-  function bindUI(root) {
-    root = root || document.getElementById(SECTION_ID) || document;
+ function bindUI(root) {
+  root = root || document.getElementById(SECTION_ID) || document;
 
-    const btnTTS    = $('#jp-btn-falar', root);  // FIX: Renomeado para clareza - agora só TTS
-    const btnMic    = $('#jp-btn-mic', root);    // FIX: Novo - botão separado para mic (adicione no HTML se não existir)
-    const btnApagar = $('#jp-btn-apagar', root);
-    const btnConf   = $('#jp-btn-confirmar', root);
-    const input     = $('#jp-answer-input', root);    
+  // Botão para LER A PERGUNTA em voz alta (TTS)
+  const btnLerPergunta = $('#jp-btn-falar', root) || $('.btn-falar, .btn-tts', root);
 
-    // ================================
-    // TTS (LER PERGUNTA) - agora no btnTTS (#jp-btn-falar)
-    // ================================
-    if (btnTTS && 'speechSynthesis' in window) {
-      btnTTS.addEventListener('click', (ev) => {
-        ev.preventDefault();
-        ev.stopPropagation();
-        const perguntaEl = $('#jp-question-typed', root) || $('#jp-question-raw', root);
-        if (!perguntaEl) return;
-        const text = perguntaEl.textContent.trim();
-        if (!text) return;
-        const synth = window.speechSynthesis;
-        synth.cancel();
-        const utter = new SpeechSynthesisUtterance(text);
+  // Botão para ATIVAR MICROFONE (reconhecimento de voz)
+  const btnMic = $('#jp-btn-mic', root) || $('.btn-mic', root);
+
+  const btnApagar = $('#jp-btn-apagar', root);
+  const btnConf   = $('#jp-btn-confirmar', root);
+  const input     = $('#jp-answer-input', root);    
+
+  // ========= TTS: Ler a pergunta em voz alta =========
+  if (btnLerPergunta) {
+    btnLerPergunta.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+
+      const perguntaTexto = $('#jp-question-typed', root)?.textContent?.trim() 
+                         || $('#jp-question-raw', root)?.textContent?.trim() 
+                         || '';
+
+      if (!perguntaTexto) return;
+
+      if ('speechSynthesis' in window) {
+        speechSynthesis.cancel(); // cancela qualquer leitura anterior
+        const utter = new SpeechSynthesisUtterance(perguntaTexto);
         utter.lang = 'pt-BR';
         utter.rate = 0.9;
         utter.pitch = 1;
-        synth.speak(utter);
-      });
-    }
+        speechSynthesis.speak(utter);
+      }
+    });
+  }
 
-    // ================================
-    // MICROFONE - agora separado no btnMic, com estabilidade do patch
-    // ================================
-    let micAttached = false;
-    let micInstance = null;
+  // ========= MICROFONE: Reconhecimento de voz (transcrever fala) =========
+  let micAttached = false;
+  let micInstance = null;
 
-    if (btnMic && input && window.JORNADA_MICRO) {
-      const Micro = window.JORNADA_MICRO;
+  if (btnMic && input && window.JORNADA_MICRO) {
+    const Micro = window.JORNADA_MICRO;
 
-      btnMic.addEventListener('click', (ev) => {
-        ev.preventDefault();
-        ev.stopPropagation();
+    btnMic.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
 
-        // FIX: Garante attach só uma vez
-        if (!micAttached && typeof Micro.attach === 'function') {
-          micInstance = Micro.attach(input, { mode: 'append' });
-          micAttached = true;
-        }
+      // Attach só uma vez
+      if (!micAttached && typeof Micro.attach === 'function') {
+        micInstance = Micro.attach(input, { mode: 'append' });
+        micAttached = true;
+      }
 
-        if (!micInstance) return;
+      if (!micInstance) {
+        console.warn('[MIC] Instância do JORNADA_MICRO não disponível');
+        return;
+      }
 
-        // FIX: Toggle estável com trava anti-duplo clique
-        if (window.__MIC_START_LOCK__) return;
-        window.__MIC_START_LOCK__ = true;
-        setTimeout(() => (window.__MIC_START_LOCK__ = false), 450);
+      // Toggle com proteção contra clique duplo
+      if (window.__MIC_START_LOCK__) return;
+      window.__MIC_START_LOCK__ = true;
+      setTimeout(() => window.__MIC_START_LOCK__ = false, 500);
 
-        const btnMicInternal = micInstance.button;
-        const isRec = btnMicInternal && btnMicInternal.classList.contains('rec');
+      const internalBtn = micInstance.button;
+      const isRecording = internalBtn?.classList.contains('rec');
 
-        if (isRec) {
-          if (typeof micInstance.stop === 'function') micInstance.stop();
-        } else {
-          if (typeof micInstance.start === 'function') micInstance.start();
-        }
+      if (isRecording) {
+        micInstance.stop?.();
+      } else {
+        micInstance.start?.();
+      }
 
-        // FIX: Failsafe se travar (limpa após 9s)
-        clearTimeout(window.__MIC_FAILSAFE_T__);
-        window.__MIC_FAILSAFE_T__ = setTimeout(() => {
-          if (typeof micInstance.stop === 'function') micInstance.stop();
-        }, 9000);
-      });
-    }
+      // Failsafe
+      clearTimeout(window.__MIC_FAILSAFE__);
+      window.__MIC_FAILSAFE__ = setTimeout(() => {
+        if (micInstance.stop) micInstance.stop();
+      }, 10000);
+    });
+  }
 
-    // APAGAR
-    if (btnApagar && input) {
-      btnApagar.addEventListener('click', (ev) => {
-        ev.preventDefault();
-        ev.stopPropagation();
-        input.value = '';
-        input.focus();
-        if (window.JORNADA_CHAMA) {
-          window.JORNADA_CHAMA.setChamaIntensidade('chama-perguntas', 'media');
-        }
-      });
-    }
+  // ========= APAGAR =========
+  if (btnApagar && input) {
+    btnApagar.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      input.value = '';
+      input.focus();
+      if (window.JORNADA_CHAMA) {
+        window.JORNADA_CHAMA.setChamaIntensidade('chama-perguntas', 'media');
+      }
+    });
+  }
 
-    // CONFIRMAR
-    if (btnConf) {
-      btnConf.addEventListener('click', (ev) => {
-        ev.preventDefault();
-        if (completed) {
-          log('Clique em confirmar após conclusão; ignorado.');
-          return;
-        }
-        saveCurrentAnswer();
-        nextStep();
-      });
-    }
+  // ========= CONFIRMAR =========
+  if (btnConf) {
+    btnConf.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      if (completed) return;
+      saveCurrentAnswer();
+      nextStep();
+    });
+  }
 
-    // INPUT CHAMA
-    if (input && window.JORNADA_CHAMA) {
-      input.addEventListener('input', () => {
-        const txt = input.value || '';
-        window.JORNADA_CHAMA.updateChamaFromText(txt, 'chama-perguntas');
-      });
-    }
+  // ========= INPUT + CHAMA =========
+  if (input && window.JORNADA_CHAMA) {
+    input.addEventListener('input', () => {
+      window.JORNADA_CHAMA.updateChamaFromText(input.value || '', 'chama-perguntas');
+    });
+  }
     
     // FIX: Atualiza áurea quando guia muda
     const guideColor = localStorage.getItem('JORNADA_GUIA_COLOR') || '#ffd700';
