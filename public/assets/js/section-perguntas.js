@@ -353,7 +353,25 @@
         b.style.boxShadow  = glow;
         b.style.borderColor = color;
       });
-  })();
+    
+    // 🔁 reaplica efeitos após resize/orientação
+      function reapplyGuiaEffects(){
+      const guia = document.body.dataset.guia;
+      if(!guia) return;
+
+      document.body.classList.remove('guia-lumen','guia-zion','guia-arion');
+      document.body.classList.add(`guia-${guia}`);
+      }
+
+      // dispara ao carregar
+      window.addEventListener('load', reapplyGuiaEffects);
+
+      // dispara ao redimensionar
+      window.addEventListener('resize', () => {
+      clearTimeout(window.__rgT);
+      window.__rgT = setTimeout(reapplyGuiaEffects, 120);
+      });    
+    })();
 
   // --------------------------------------------------
   // RESPOSTAS
