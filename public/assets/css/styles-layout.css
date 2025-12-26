@@ -1177,6 +1177,8 @@
 /* =========================================================
    FIX ANDROID/MOTOROLA — Botão continuar no CARD
    ========================================================= */
+@media (max-width: 600px){
+   
  /* 1) Reserva espaço REAL embaixo (inclusive safe-area) */
   #section-card{
     padding-bottom: calc(140px + env(safe-area-inset-bottom, 0px)) !important;
