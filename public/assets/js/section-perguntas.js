@@ -488,86 +488,43 @@
   const btnConfirmar = $('#jp-btn-confirmar', root);
   const input       = $('#jp-answer-input', root);    
 
-  // ========= MICROFONE FINAL - SUPER ESTÁVEL PARA ANDROID/MOTOROLA =========
-if (btnFalar && input) {
-  let recognition = null;
-  let isRecording = false;
+ // ================================
+    // MICROFONE controlado pelo botão
+    // ================================
+    let micAttached = false;
+    let micInstance = null;
 
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition || window.mozSpeechRecognition || window.msSpeechRecognition;
+    if (btnFalar && input && window.JORNADA_MICRO) {
+      const Micro = window.JORNADA_MICRO;
 
-  if (!SpeechRecognition) {
-    console.warn('Reconhecimento de voz não suportado neste navegador');
-    btnFalar.style.opacity = '0.5';
-    btnFalar.title = 'Microfone não suportado';
-    return;
-  }
+      btnFalar.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
 
-  const startMic = () => {
-    recognition = new SpeechRecognition();
-    recognition.lang = 'pt-BR';
-    recognition.continuous = false;
-    recognition.interimResults = true;
-    recognition.maxAlternatives = 1;
+        // 1) Garante que o input está "conectado" ao módulo de voz
+        if (!micAttached && typeof Micro.attach === 'function') {
+          micInstance = Micro.attach(input, { mode: 'append' });
+          micAttached = true;
+        }
 
-    recognition.onstart = () => {
-      isRecording = true;
-      btnFalar.classList.add('recording');
-      console.log('[MIC] Gravando... (Android: "microphone" deve aparecer)');
-    };
+        if (!micInstance) return;
 
-    recognition.onresult = (event) => {
-      let transcript = '';
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const res = event.results[i][0].transcript;
-        transcript += res;
-        if (event.results[i].isFinal) transcript += ' ';
-      }
-      input.value += transcript;
-      input.focus();
-      input.dispatchEvent(new Event('input')); // atualiza chama se necessário
-    };
+        // 2) Liga / desliga a captura de voz (toggle manual)
+        const btnMic = micInstance.button;
+        const isRec  = btnMic && btnMic.classList.contains('rec');
 
-    recognition.onerror = (event) => {
-      console.warn('[MIC] Erro:', event.error);
-      isRecording = false;
-      btnFalar.classList.remove('recording');
-
-      // Erros comuns no Android: retry automático
-      if (event.error === 'no-speech' || event.error === 'audio-capture' || event.error === 'network') {
-        setTimeout(startMic, 800);
-      } else if (event.error === 'not-allowed') {
-        alert('Permissão de microfone negada. Vá em Configurações > Sites > Microfone e permita.');
-      }
-    };
-
-    recognition.onend = () => {
-      isRecording = false;
-      btnFalar.classList.remove('recording');
-      console.log('[MIC] Sessão finalizada');
-    };
-
-    try {
-      recognition.start();
-    } catch (e) {
-      console.warn('[MIC] Start falhou, retry em 500ms', e);
-      setTimeout(startMic, 500);
+        if (isRec) {
+          if (typeof micInstance.stop === 'function') {
+            micInstance.stop();
+          }
+        } else {
+          if (typeof micInstance.start === 'function') {
+            micInstance.start();
+          }
+        }
+      });
     }
-  };
 
-  btnFalar.addEventListener('click', (ev) => {
-    ev.preventDefault();
-    ev.stopPropagation();
-
-    if (isRecording) {
-      if (recognition) recognition.stop();
-    } else {
-      startMic();
-    }
-  });
-
-  // Feedback visual extra no mobile
-  btnFalar.addEventListener('touchstart', (ev) => ev.preventDefault(), { passive: false });
-}
 
   // ========= APAGAR =========
   if (btnApagar && input) {
