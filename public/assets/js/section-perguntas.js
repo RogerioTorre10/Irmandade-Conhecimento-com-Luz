@@ -483,80 +483,72 @@
  function bindUI(root) {
   root = root || document.getElementById(SECTION_ID) || document;
 
-  // Botão para LER A PERGUNTA em voz alta (TTS)
-  const btnLerPergunta = $('#jp-btn-falar', root) || $('.btn-falar, .btn-tts', root);
+  const btnFalar    = $('#jp-btn-falar', root);
+  const btnApagar   = $('#jp-btn-apagar', root);
+  const btnConfirmar = $('#jp-btn-confirmar', root);
+  const input       = $('#jp-answer-input', root);    
 
-  // Botão para ATIVAR MICROFONE (reconhecimento de voz)
-  const btnMic = $('#jp-btn-mic', root) || $('.btn-mic', root);
+  // ========= MICROFONE NATIVO COM TOGGLE CONTÍNUO (funciona em todas as perguntas) =========
+  if (btnFalar && input) {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      btnFalar.disabled = true;
+      btnFalar.style.opacity = '0.5';
+      console.warn('SpeechRecognition não suportado');
+      return;
+    }
 
-  const btnApagar = $('#jp-btn-apagar', root);
-  const btnConf   = $('#jp-btn-confirmar', root);
-  const input     = $('#jp-answer-input', root);    
+    // Instância única global reutilizável
+    let recognition = window.__GLOBAL_MIC__;
 
-  // ========= TTS: Ler a pergunta em voz alta =========
-  if (btnLerPergunta) {
-    btnLerPergunta.addEventListener('click', (ev) => {
+    if (!recognition) {
+      recognition = new SpeechRecognition();
+      recognition.lang = 'pt-BR';
+      recognition.continuous = true;       // FICA ATIVO ATÉ PARAR MANUALMENTE
+      recognition.interimResults = true;
+
+      recognition.onstart = () => {
+        btnFalar.classList.add('recording');
+        console.log('[MIC] Gravando continuamente');
+      };
+
+      recognition.onresult = (event) => {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+          if (event.results[i].isFinal) transcript += ' ';
+        }
+        input.value = (input.value + transcript).trim() + ' ';
+        input.focus();
+        input.scrollTop = input.scrollHeight;
+      };
+
+      recognition.onerror = (event) => {
+        console.warn('[MIC] Erro:', event.error);
+        btnFalar.classList.remove('recording');
+        if (event.error === 'not-allowed') {
+          alert('Permissão de microfone negada. Ative nas configurações do navegador.');
+        }
+      };
+
+      recognition.onend = () => {
+        btnFalar.classList.remove('recording');
+        console.log('[MIC] Parou');
+      };
+
+      window.__GLOBAL_MIC__ = recognition;
+    }
+
+    // Toggle: liga/desliga com um clique
+    btnFalar.addEventListener('click', (ev) => {
       ev.preventDefault();
       ev.stopPropagation();
 
-      const perguntaTexto = $('#jp-question-typed', root)?.textContent?.trim() 
-                         || $('#jp-question-raw', root)?.textContent?.trim() 
-                         || '';
-
-      if (!perguntaTexto) return;
-
-      if ('speechSynthesis' in window) {
-        speechSynthesis.cancel(); // cancela qualquer leitura anterior
-        const utter = new SpeechSynthesisUtterance(perguntaTexto);
-        utter.lang = 'pt-BR';
-        utter.rate = 0.9;
-        utter.pitch = 1;
-        speechSynthesis.speak(utter);
-      }
-    });
-  }
-
-  // ========= MICROFONE: Reconhecimento de voz (transcrever fala) =========
-  let micAttached = false;
-  let micInstance = null;
-
-  if (btnMic && input && window.JORNADA_MICRO) {
-    const Micro = window.JORNADA_MICRO;
-
-    btnMic.addEventListener('click', (ev) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-
-      // Attach só uma vez
-      if (!micAttached && typeof Micro.attach === 'function') {
-        micInstance = Micro.attach(input, { mode: 'append' });
-        micAttached = true;
-      }
-
-      if (!micInstance) {
-        console.warn('[MIC] Instância do JORNADA_MICRO não disponível');
-        return;
-      }
-
-      // Toggle com proteção contra clique duplo
-      if (window.__MIC_START_LOCK__) return;
-      window.__MIC_START_LOCK__ = true;
-      setTimeout(() => window.__MIC_START_LOCK__ = false, 500);
-
-      const internalBtn = micInstance.button;
-      const isRecording = internalBtn?.classList.contains('rec');
-
-      if (isRecording) {
-        micInstance.stop?.();
+      if (btnFalar.classList.contains('recording')) {
+        recognition.stop();
       } else {
-        micInstance.start?.();
+        recognition.start(); // funciona mesmo após várias perguntas
       }
-
-      // Failsafe
-      clearTimeout(window.__MIC_FAILSAFE__);
-      window.__MIC_FAILSAFE__ = setTimeout(() => {
-        if (micInstance.stop) micInstance.stop();
-      }, 10000);
     });
   }
 
@@ -572,9 +564,9 @@
     });
   }
 
-  // ========= CONFIRMAR =========
-  if (btnConf) {
-    btnConf.addEventListener('click', (ev) => {
+  // ========= AVANÇA =========
+  if (btnConfirmar) {
+    btnConfirmar.addEventListener('click', (ev) => {
       ev.preventDefault();
       if (completed) return;
       saveCurrentAnswer();
