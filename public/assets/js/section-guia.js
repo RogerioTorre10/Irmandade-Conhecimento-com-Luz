@@ -691,4 +691,4 @@ function applyGuiaTheme(guiaIdOrNull) {
   console.log('[GUIA DEMO] Demo automática mantida + tema dourado inicial + botões liberados no final');
 })();  
 
-
+})();
