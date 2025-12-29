@@ -305,74 +305,57 @@
     }
   }
   
-  // ====== INJETAR CORES LUMINOSAS POR GUIA ======
-  (function applyGuideGlow() {
-    const guia = sessionStorage.getItem('jornada.guia')?.toLowerCase() || 'lumen';
+    // ====== APLICAR TEMA DO GUIA CORRETAMENTE (MODERNO) ======
+  (function applyGuiaTheme() {
+    // Lê o guia salvo pelo usuário (sessionStorage é o padrão da jornada)
+    const guiaRaw = sessionStorage.getItem('jornada.guia') || 'lumen';
+    const guia = guiaRaw.toLowerCase().trim();
 
-    const style = document.createElement('style');
-    style.id = 'progress-glow-style';
+    // Remove atributos/classes antigos para evitar conflito
+    document.body.removeAttribute('data-guia');
+    document.body.classList.remove('guia-lumen', 'guia-zion', 'guia-arian');
 
-    let color = '#00ff9d';    // padrão: Lumen
-    let glow  = '0 0 12px #00ff9d, 0 0 24px #00ff9d';
+    // Define o atributo principal que ativa todo o CSS moderno
+    document.body.setAttribute('data-guia', guia);
+    document.body.classList.add(`guia-${guia}`);
 
-    if (guia === 'arian') {
-      color = '#ff00ff';
-      glow  = '0 0 12px #ff00ff, 0 0 24px #ff55ff';
+    // Define as variáveis CSS no :root para fallback e reforço
+    let mainColor, glow1, glow2;
+
+    switch (guia) {
+      case 'lumen':
+        mainColor = '#00ff9d';
+        glow1 = 'rgba(0,255,157,0.9)';
+        glow2 = 'rgba(120,255,200,0.7)';
+        break;
+      case 'zion':
+        mainColor = '#00aaff';
+        glow1 = 'rgba(0,170,255,0.9)';
+        glow2 = 'rgba(255,214,91,0.7)';
+        break;
+      case 'arian':
+        mainColor = '#ff00ff';
+        glow1 = 'rgba(255,120,255,0.95)';
+        glow2 = 'rgba(255,180,255,0.8)';
+        break;
+      default: // fallback dourado clássico
+        mainColor = '#d4af37';
+        glow1 = 'rgba(255,230,180,0.85)';
+        glow2 = 'rgba(255,210,120,0.75)';
     }
-    if (guia === 'zion') {
-      color = '#00aaff';
-      glow  = '0 0 10px #ffd65b, 0 0 18px #ffd65b, 0 0 30px #00aaff';
-    }
 
-    style.textContent = `
-      #progress-block-fill,
-      #progress-question-fill {
-        background: ${color} !important;
-        box-shadow: ${glow} !important;
-      }
-    `;
+    document.documentElement.style.setProperty('--theme-main-color', mainColor);
+    document.documentElement.style.setProperty('--progress-main', mainColor);
+    document.documentElement.style.setProperty('--progress-glow-1', glow1);
+    document.documentElement.style.setProperty('--progress-glow-2', glow2);
 
-    // remove estilo antigo se existir
-    const old = document.getElementById('progress-glow-style');
-    if (old) old.remove();
+    // Remove qualquer <style id="progress-glow-style"> antigo injetado
+    const oldStyle = document.getElementById('progress-glow-style');
+    if (oldStyle) oldStyle.remove();
 
-    document.head.appendChild(style);
-
-    // reforço direto na barra (garante a cor mesmo com outros CSS)
-    document
-      .querySelectorAll('#progress-block-fill, #progress-question-fill')
-      .forEach((f) => {
-        f.style.background = color;
-        f.style.boxShadow  = glow;
-      });
-
-    // AURA nos botões da página de perguntas
-    document
-      .querySelectorAll('#section-perguntas .btn')
-      .forEach((b) => {
-        b.style.boxShadow  = glow;
-        b.style.borderColor = color;
-      });
-    
-    // 🔁 reaplica efeitos após resize/orientação
-      function reapplyGuiaEffects(){
-      const guia = document.body.dataset.guia;
-      if(!guia) return;
-
-      document.body.classList.remove('guia-lumen','guia-zion','guia-arion');
-      document.body.classList.add(`guia-${guia}`);
-      }
-
-      // dispara ao carregar
-      window.addEventListener('load', reapplyGuiaEffects);
-
-      // dispara ao redimensionar
-      window.addEventListener('resize', () => {
-      clearTimeout(window.__rgT);
-      window.__rgT = setTimeout(reapplyGuiaEffects, 120);
-      });    
-    })();
-
+    console.log('[PERGUNTAS] Tema do guia aplicado:', guia, mainColor);
+  })();
+  
   // --------------------------------------------------
   // RESPOSTAS
   // --------------------------------------------------
