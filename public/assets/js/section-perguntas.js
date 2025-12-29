@@ -581,6 +581,12 @@
       window.JORNADA_CHAMA.updateChamaFromText(input.value || '', 'chama-perguntas');
     });
   }
+   
+       // FIX: Atualiza áurea quando guia muda
+    const guideColor = localStorage.getItem('JORNADA_GUIA_COLOR') || '#ffd700';
+    document.querySelectorAll('.btn').forEach(b => {
+      b.style.setProperty('--guide-color', guideColor);
+    });
  }
 
   // --------------------------------------------------
