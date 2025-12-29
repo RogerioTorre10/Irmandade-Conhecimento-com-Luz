@@ -542,7 +542,7 @@ function applyGuiaTheme(guiaIdOrNull) {
     : bind();
   
 /* =========================================================
-   GUIA – Nome primeiro + DEMO automática dos 3 guias
+   GUIA – Nome primeiro + DEMO automática dos 3 guias (INTEGRADA COM TEMA DOURADO INICIAL)
    ========================================================= */
 (function () {
   'use strict';
@@ -568,6 +568,16 @@ function applyGuiaTheme(guiaIdOrNull) {
   }
 
   let demoDone = false;
+
+  // Começa com tema dourado padrão (sem data-guia no body)
+  document.body.removeAttribute('data-guia');
+  document.body.classList.remove('guia-lumen', 'guia-zion', 'guia-arian');
+  
+  // Força variáveis douradas no início (garante que tudo brilhe em ouro antes da demo)
+  document.documentElement.style.setProperty('--theme-main-color', '#d4af37');
+  document.documentElement.style.setProperty('--progress-main', '#ffd700');
+  document.documentElement.style.setProperty('--progress-glow-1', 'rgba(255,230,180,0.85)');
+  document.documentElement.style.setProperty('--progress-glow-2', 'rgba(255,210,120,0.75)');
 
   // 1) Começa com Confirmar desabilitado
   btnConfirm.disabled = true;
@@ -601,16 +611,19 @@ function applyGuiaTheme(guiaIdOrNull) {
 
   lockGuides();
 
-  // 3) Habilita Confirmar quando tiver pelo menos 1 caractere
+  // 3) Habilita Confirmar quando tiver pelo menos 1 caractere (guardião anti-trava integrado)
   input.addEventListener('input', () => {
     const hasName = input.value.trim().length > 0;
     btnConfirm.disabled = !hasName;
   });
 
-  // 4) Clique no Confirmar → roda a demo (se ainda não rodou)
-  btnConfirm.addEventListener('click', () => {
+  // 4) Clique no Confirmar → roda a demo (se ainda não rodou) + anti-trava se nome vazio
+  btnConfirm.addEventListener('click', (ev) => {
     const nome = input.value.trim();
     if (!nome) {
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+      ev.stopPropagation();
       input.focus();
       return;
     }
@@ -665,7 +678,19 @@ function applyGuiaTheme(guiaIdOrNull) {
 
     playStep();
   });
+
+  // ===== APLICAÇÃO DO TEMA DEFINITIVO AO ESCOLHER (integra com applyGuiaTheme do bloco principal) =====
+  guideButtons.forEach(btn => {
+    btn.addEventListener('click', (ev) => {
+      // ... (mantenha a lógica de arm/confirm que já existe no arquivo)
+      // Mas no final da confirmação (dentro de confirmGuide), chame isso:
+      applyGuiaTheme(guiaId); // aplica o tema definitivo
+    });
+  });
+
+  console.log('[GUIA DEMO] Demo automática mantida + tema dourado inicial + botões liberados no final');
 })();
+  
   /* ============================================
    GUARDIÃO DO BOTÃO CONFIRMAR – ANTI-TRAVA
    ============================================ */
