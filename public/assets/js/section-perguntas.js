@@ -305,21 +305,32 @@
     }
   }
   
-    // ====== APLICAR TEMA DO GUIA CORRETAMENTE (MODERNO) ======
+    // ====== APLICAR TEMA DO GUIA CORRETAMENTE (COM FALLBACK DOURADO NO INÍCIO) ======
   (function applyGuiaTheme() {
-    // Lê o guia salvo pelo usuário (sessionStorage é o padrão da jornada)
-    const guiaRaw = sessionStorage.getItem('jornada.guia') || 'lumen';
-    const guia = guiaRaw.toLowerCase().trim();
+    // 1. Lê o guia salvo – SE NÃO EXISTIR, usa null (para fallback dourado)
+    const guiaRaw = sessionStorage.getItem('jornada.guia');
+    const guia = guiaRaw ? guiaRaw.toLowerCase().trim() : null;
 
-    // Remove atributos/classes antigos para evitar conflito
+    // Remove qualquer tema anterior para evitar conflito
     document.body.removeAttribute('data-guia');
     document.body.classList.remove('guia-lumen', 'guia-zion', 'guia-arian');
 
-    // Define o atributo principal que ativa todo o CSS moderno
+    // Se não tem guia escolhido ainda → força o fallback dourado clássico
+    if (!guia) {
+      // Aplica as variáveis douradas padrão (já definidas no CSS, mas reforçamos)
+      document.documentElement.style.setProperty('--theme-main-color', '#d4af37');
+      document.documentElement.style.setProperty('--progress-main', '#ffd700');
+      document.documentElement.style.setProperty('--progress-glow-1', 'rgba(255,230,180,0.85)');
+      document.documentElement.style.setProperty('--progress-glow-2', 'rgba(255,210,120,0.75)');
+      
+      console.log('[PERGUNTAS] Nenhum guia escolhido ainda → tema dourado padrão aplicado');
+      return; // não coloca data-guia, deixa o CSS usar o fallback natural
+    }
+
+    // Se tem guia escolhido → aplica normalmente
     document.body.setAttribute('data-guia', guia);
     document.body.classList.add(`guia-${guia}`);
 
-    // Define as variáveis CSS no :root para fallback e reforço
     let mainColor, glow1, glow2;
 
     switch (guia) {
@@ -338,7 +349,7 @@
         glow1 = 'rgba(255,120,255,0.95)';
         glow2 = 'rgba(255,180,255,0.8)';
         break;
-      default: // fallback dourado clássico
+      default:
         mainColor = '#d4af37';
         glow1 = 'rgba(255,230,180,0.85)';
         glow2 = 'rgba(255,210,120,0.75)';
@@ -349,7 +360,7 @@
     document.documentElement.style.setProperty('--progress-glow-1', glow1);
     document.documentElement.style.setProperty('--progress-glow-2', glow2);
 
-    // Remove qualquer <style id="progress-glow-style"> antigo injetado
+    // Remove estilo injetado antigo, se existir
     const oldStyle = document.getElementById('progress-glow-style');
     if (oldStyle) oldStyle.remove();
 
