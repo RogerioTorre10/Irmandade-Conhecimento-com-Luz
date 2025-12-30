@@ -40,7 +40,7 @@
       setImp(middleContainer, 'position', 'absolute');
       setImp(middleContainer, 'left', '50%');
       setImp(middleContainer, 'transform', 'translateX(-50%)');
-      setImp(middleContainer, 'bottom', '140px'); // ajuste fino: experimente 80px a 110px se precisar subir/descer mais
+      setImp(middleContainer, 'bottom', '70px'); // ajuste fino: experimente 80px a 110px se precisar subir/descer mais
       setImp(middleContainer, 'z-index', '40');
 
       // mantém estilo bonito com glow do guia
