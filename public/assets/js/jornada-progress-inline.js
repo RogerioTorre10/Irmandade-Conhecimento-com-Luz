@@ -13,7 +13,7 @@
     // 1. ESPAÇO NO TOPO para a pergunta respirar (resolve "coberta")
     const topBar = q('.progress-top');
     if (topBar) {
-      topBar.style.marginBottom = '50px !important';
+      topBar.style.marginBottom = '100px !important';
     }
 
     // Container principal das perguntas ganha padding top extra
