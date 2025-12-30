@@ -121,7 +121,7 @@
     // === ESPAÇO EXTRA NO TOPO PARA A PERGUNTA RESPIRAR ===
     const topBar = q('.progress-top');
     if (topBar) {
-      topBar.style.marginBottom = '60px'; // Agora sim, espaço total!
+      topBar.style.marginBottom = '80px'; // Agora sim, espaço total!
     }
 
     applyGuiaAura();
