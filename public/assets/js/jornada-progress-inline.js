@@ -40,7 +40,7 @@
     setImp(middleContainer, 'position', 'absolute');
     setImp(middleContainer, 'left', '50%');
     setImp(middleContainer, 'transform', 'translateX(-50%)');
-    setImp(middleContainer, 'bottom', '110px');   // ajuste fino: sobe/ desce o marcador
+    setImp(middleContainer, 'bottom', '78px');   // ajuste fino: sobe/ desce o marcador
     setImp(middleContainer, 'z-index', '40');
 
     // mantém seu estilo (sem quebrar position)
