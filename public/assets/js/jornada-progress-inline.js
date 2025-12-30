@@ -1,43 +1,31 @@
 /* /assets/js/jornada-progress-inline.js
- * v1.5 — Posicionamento fixo correto + auras preservadas em qualquer tela
+ * v1.6 — Correção de posicionamento + glow do guia dinâmico + anti-sobreposição
  */
-
 (function () {
   'use strict';
-
   if (window.__JPROG_INLINE_BOUND__) return;
   window.__JPROG_INLINE_BOUND__ = true;
-
   const MOD = '[JPROG-INLINE]';
   let done = false;
-
   const byId = (id) => document.getElementById(id);
   const q = (sel, root = document) => root.querySelector(sel);
-
   function findBadge() {
     return byId('progress-question-value') || q('.progress-question-value');
   }
-
   function findBar() {
     return byId('progress-question-fill') || q('.progress-question-fill');
   }
-
   function findLabel() {
     return q('.progress-middle .progress-label') || q('.progress-middle');
   }
-
   function relocateOnce() {
     if (done) return;
-
     const sec = byId('section-perguntas');
     if (!sec) return;
-
     const badge = findBadge();
     const bar = findBar();
     const label = findLabel();
-
     if (!badge || !bar || !label) return;
-
     let wrap = byId('progress-inline');
     if (!wrap) {
       wrap = document.createElement('div');
@@ -48,7 +36,7 @@
         align-items: center !important;
         justify-content: center !important;
         gap: 10px !important;
-        margin: 20px auto !important;
+        margin: 12px auto 16px !important; /* Espaço extra abaixo do título do bloco */
         width: fit-content !important;
         padding: 8px 16px !important;
         background: rgba(0,0,0,0.4) !important;
@@ -59,36 +47,43 @@
     } else {
       wrap.innerHTML = '';
     }
-
-    // Ordem: label + barra + badge
+    // Ordem: label + barra + badge (contador junto da barra)
     wrap.appendChild(label);
     wrap.appendChild(bar);
     wrap.appendChild(badge);
-
-    // POSICIONAMENTO FIXO: sempre logo abaixo do título da pergunta
-    const title = byId('jp-question-typed') || q('.perguntas-titulo');
-    if (title && title.parentNode) {
-      title.insertAdjacentElement('afterend', wrap);
+    // POSICIONAMENTO CORRETO: logo abaixo do título do bloco (não da pergunta), para ficar acima da pergunta e evitar sobreposição
+    const blockTitle = q('.titulo-bloco, h3, .bloco-titulo'); // Seletor para o título "Bloco 1 - Raízes"
+    if (blockTitle && blockTitle.parentNode) {
+      blockTitle.insertAdjacentElement('afterend', wrap);
     } else {
-      sec.insertBefore(wrap, sec.children[2] || sec.firstChild);
+      // Fallback: abaixo da barra superior
+      const topBar = q('.progress-top');
+      if (topBar) topBar.insertAdjacentElement('afterend', wrap);
+      else sec.insertBefore(wrap, sec.firstChild.nextSibling); // Logo abaixo da HUD superior
     }
-
-    // Reforça aura do guia na barra (caso CSS não pegue após mover)
-    const guia = (document.body.getAttribute('data-guia') || 'lumen').toLowerCase();
-    let glow = '';
-    if (guia === 'lumen') glow = '0 0 20px #00ff9d, 0 0 40px rgba(0,255,157,0.8)';
-    if (guia === 'zion') glow = '0 0 20px #00aaff, 0 0 40px rgba(0,170,255,0.8)';
-    if (guia === 'arian') glow = '0 0 25px #ff00ff, 0 0 50px rgba(255,120,255,0.9)';
-
-    if (glow && bar) {
-      bar.style.boxShadow = glow;
-      bar.style.background = 'var(--progress-main, #00ff9d)';
+    // Adiciona margem na barra superior para descolar da pergunta (anti-sobreposição)
+    const topBar = q('.progress-top');
+    if (topBar) {
+      topBar.style.marginBottom = '18px'; // Espaço extra abaixo da barra superior
     }
-
+    // Reforça glow do guia DINÂMICO (usa variáveis CSS, não hardcode)
+    const guia = (document.body.getAttribute('data-guia') || 'default').toLowerCase();
+    if (bar) {
+      bar.style.background = 'var(--progress-main, #ffd700)'; // Fallback dourado
+      bar.style.boxShadow = `
+        var(--progress-glow-1, 0 0 20px #ffd700),
+        var(--progress-glow-2, 0 0 40px rgba(255,210,120,0.75))
+      `;
+      // Aplica também na barra superior para consistência
+      const topFill = q('.progress-top .progress-fill');
+      if (topFill) {
+        topFill.style.background = bar.style.background;
+        topFill.style.boxShadow = bar.style.boxShadow;
+      }
+    }
     done = true;
-    console.log(MOD, 'Barra reposicionada corretamente em qualquer tela.');
+    console.log(MOD, 'Barra reposicionada: abaixo do título do bloco, com glow do guia e anti-sobreposição.');
   }
-
   // Executa quando a seção estiver pronta
   const tryRelocate = () => {
     if (done) return;
@@ -97,13 +92,12 @@
       relocateOnce();
     }
   };
-
-  // Múltiplos gatilhos
+  // Múltiplos gatilhos + re-aplicação ao mudar guia/pergunta
   document.addEventListener('DOMContentLoaded', tryRelocate);
   document.addEventListener('sectionLoaded', (e) => {
     if (e.detail?.sectionId === 'section-perguntas') setTimeout(tryRelocate, 100);
   });
-  window.addEventListener('resize', () => setTimeout(tryRelocate, 200)); // reposiciona ao redimensionar
-
+  document.addEventListener('guia:changed', tryRelocate); // Reaplica glow se guia mudar
+  window.addEventListener('resize', () => setTimeout(tryRelocate, 200));
   tryRelocate();
 })();
