@@ -24,13 +24,13 @@
       '.perguntas-wrap .pergunta-area, .perguntas-wrap .perguntas-inner, ' +
       '#section-perguntas .perguntas-content, #section-perguntas .perg-content'
     );
-    if (content) {
-      setImp(content, 'padding-top', '42px'); // desce o bloco todo
-      setImp(content, 'margin-top', '10px'); // reforço
+       if (content) {
+      setImp(content, 'padding-top', '80px'); // AUMENTADO: desce mais o conteúdo da pergunta
+      setImp(content, 'margin-top', '20px'); // reforço maior
     } else {
       // fallback: se não achar o content, desce o wrap
       const perguntasWrap = q('.perguntas-wrap, .section-perguntas');
-      if (perguntasWrap) setImp(perguntasWrap, 'padding-top', '46px');
+      if (perguntasWrap) setImp(perguntasWrap, 'padding-top', '100px'); // AUMENTADO forte
     }
 
     // 2) MARCADOR "PERGUNTAS NO BLOCO" deve ficar perto dos botões (acima da barra inferior)
@@ -40,7 +40,7 @@
       setImp(middleContainer, 'position', 'absolute');
       setImp(middleContainer, 'left', '50%');
       setImp(middleContainer, 'transform', 'translateX(-50%)');
-      setImp(middleContainer, 'bottom', '92px'); // ajuste fino: experimente 80px a 110px se precisar subir/descer mais
+      setImp(middleContainer, 'bottom', '140px'); // ajuste fino: experimente 80px a 110px se precisar subir/descer mais
       setImp(middleContainer, 'z-index', '40');
 
       // mantém estilo bonito com glow do guia
