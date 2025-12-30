@@ -1,5 +1,5 @@
 /* /assets/js/jornada-progress-inline.js
- * v1.6 — Correção de posicionamento + glow do guia dinâmico + anti-sobreposição
+ * v1.7 — Contador de perguntas movido para BAIXO (próximo dos botões) + glow perfeito
  */
 (function () {
   'use strict';
@@ -7,8 +7,10 @@
   window.__JPROG_INLINE_BOUND__ = true;
   const MOD = '[JPROG-INLINE]';
   let done = false;
+
   const byId = (id) => document.getElementById(id);
   const q = (sel, root = document) => root.querySelector(sel);
+
   function findBadge() {
     return byId('progress-question-value') || q('.progress-question-value');
   }
@@ -16,75 +18,93 @@
     return byId('progress-question-fill') || q('.progress-question-fill');
   }
   function findLabel() {
-    return q('.progress-middle .progress-label') || q('.progress-middle');
+    return q('.progress-middle .progress-label') || q('.progress-middle .progress-label-text') || q('.progress-middle');
   }
+
   function relocateOnce() {
     if (done) return;
+
     const sec = byId('section-perguntas');
     if (!sec) return;
+
     const badge = findBadge();
     const bar = findBar();
     const label = findLabel();
+
     if (!badge || !bar || !label) return;
-    let wrap = byId('progress-inline');
+
+    let wrap = byId('progress-inline-bottom');
     if (!wrap) {
       wrap = document.createElement('div');
-      wrap.id = 'progress-inline';
-      wrap.className = 'progress-inline progress-middle-inline';
+      wrap.id = 'progress-inline-bottom';
+      wrap.className = 'progress-inline progress-bottom-inline';
       wrap.style.cssText = `
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        gap: 10px !important;
-        margin: 12px auto 16px !important; /* Espaço extra abaixo do título do bloco */
+        gap: 12px !important;
+        margin: 20px auto 16px !important; /* Espaço acima dos botões */
         width: fit-content !important;
-        padding: 8px 16px !important;
-        background: rgba(0,0,0,0.4) !important;
-        border-radius: 20px !important;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.6) !important;
-        z-index: 10 !important;
+        max-width: 90% !important;
+        padding: 10px 20px !important;
+        background: rgba(0,0,0,0.5) !important;
+        border-radius: 30px !important;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.7) !important;
+        z-index: 15 !important;
+        font-size: 15px !important;
       `;
     } else {
       wrap.innerHTML = '';
     }
-    // Ordem: label + barra + badge (contador junto da barra)
+
+    // Ordem: label + barra + badge
     wrap.appendChild(label);
     wrap.appendChild(bar);
     wrap.appendChild(badge);
-    // POSICIONAMENTO CORRETO: logo abaixo do título do bloco (não da pergunta), para ficar acima da pergunta e evitar sobreposição
-    const blockTitle = q('.titulo-bloco, h3, .bloco-titulo'); // Seletor para o título "Bloco 1 - Raízes"
-    if (blockTitle && blockTitle.parentNode) {
-      blockTitle.insertAdjacentElement('afterend', wrap);
+
+    // POSICIONAMENTO FINAL: logo acima dos botões inferiores
+    const controls = q('.perguntas-controls, .jp-controls, .bottom-buttons, #jp-buttons-wrapper');
+    if (controls && controls.parentNode) {
+      controls.insertAdjacentElement('beforebegin', wrap);
     } else {
-      // Fallback: abaixo da barra superior
-      const topBar = q('.progress-top');
-      if (topBar) topBar.insertAdjacentElement('afterend', wrap);
-      else sec.insertBefore(wrap, sec.firstChild.nextSibling); // Logo abaixo da HUD superior
-    }
-    // Adiciona margem na barra superior para descolar da pergunta (anti-sobreposição)
-    const topBar = q('.progress-top');
-    if (topBar) {
-      topBar.style.marginBottom = '18px'; // Espaço extra abaixo da barra superior
-    }
-    // Reforça glow do guia DINÂMICO (usa variáveis CSS, não hardcode)
-    const guia = (document.body.getAttribute('data-guia') || 'default').toLowerCase();
-    if (bar) {
-      bar.style.background = 'var(--progress-main, #ffd700)'; // Fallback dourado
-      bar.style.boxShadow = `
-        var(--progress-glow-1, 0 0 20px #ffd700),
-        var(--progress-glow-2, 0 0 40px rgba(255,210,120,0.75))
-      `;
-      // Aplica também na barra superior para consistência
-      const topFill = q('.progress-top .progress-fill');
-      if (topFill) {
-        topFill.style.background = bar.style.background;
-        topFill.style.boxShadow = bar.style.boxShadow;
+      // Fallback: acima da base da seção
+      const bottomHud = q('.progress-bottom, .hud-bottom');
+      if (bottomHud) {
+        bottomHud.insertAdjacentElement('beforebegin', wrap);
+      } else {
+        sec.appendChild(wrap); // último recurso
       }
     }
+
+    // Garante espaço extra no topo para evitar qualquer sobreposição residual
+    const topBar = q('.progress-top');
+    if (topBar) {
+      topBar.style.marginBottom = '30px';
+    }
+
+    // Glow do guia dinâmico e pulsante (usa variáveis CSS + reforço)
+    if (bar) {
+      bar.style.background = 'var(--progress-main, #ffd700) !important';
+      bar.style.boxShadow = `
+        0 0 20px var(--progress-main, #ffd700),
+        0 0 40px var(--progress-glow-1, rgba(255,210,120,0.85)),
+        inset 0 0 25px var(--progress-glow-2, rgba(255,210,120,0.75))
+      !important`;
+
+      // Adiciona pulsação sutil (já tem animação no CSS, mas reforça)
+      bar.style.animation = 'barra-glow 4s infinite alternate !important';
+    }
+
+    // Aplica glow também no wrapper para ficar mágico
+    wrap.style.boxShadow = `
+      0 0 20px var(--progress-main, #ffd700),
+      0 0 40px var(--progress-glow-1, rgba(255,210,120,0.85))
+    !important`;
+
     done = true;
-    console.log(MOD, 'Barra reposicionada: abaixo do título do bloco, com glow do guia e anti-sobreposição.');
+    console.log(MOD, 'Contador de perguntas movido para BAIXO (próximo dos botões) com glow do guia aplicado.');
   }
-  // Executa quando a seção estiver pronta
+
   const tryRelocate = () => {
     if (done) return;
     const sec = byId('section-perguntas');
@@ -92,12 +112,15 @@
       relocateOnce();
     }
   };
-  // Múltiplos gatilhos + re-aplicação ao mudar guia/pergunta
+
+  // Gatilhos múltiplos + reaplicação ao mudar pergunta/guia
   document.addEventListener('DOMContentLoaded', tryRelocate);
   document.addEventListener('sectionLoaded', (e) => {
-    if (e.detail?.sectionId === 'section-perguntas') setTimeout(tryRelocate, 100);
+    if (e.detail?.sectionId === 'section-perguntas') setTimeout(tryRelocate, 150);
   });
-  document.addEventListener('guia:changed', tryRelocate); // Reaplica glow se guia mudar
-  window.addEventListener('resize', () => setTimeout(tryRelocate, 200));
+  document.addEventListener('perguntas:state-changed', tryRelocate);
+  document.addEventListener('guia:changed', tryRelocate);
+  window.addEventListener('resize', () => setTimeout(tryRelocate, 250));
+
   tryRelocate();
 })();
