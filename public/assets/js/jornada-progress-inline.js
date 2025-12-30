@@ -13,13 +13,13 @@
     // 1. ESPAÇO NO TOPO para a pergunta respirar (resolve "coberta")
     const topBar = q('.progress-top');
     if (topBar) {
-      topBar.style.marginBottom = '100px !important';
+      topBar.style.marginBottom = '80px !important';
     }
 
     // Container principal das perguntas ganha padding top extra
     const perguntasWrap = q('.perguntas-wrap, .section-perguntas');
     if (perguntasWrap) {
-      perguntasWrap.style.paddingTop = '40px !important';
+      perguntasWrap.style.paddingTop = '60px !important';
     }
 
     // 2. MELHORA O CONTADOR NATIVO (o pequeno com barra + "1 / 3")
@@ -29,15 +29,15 @@
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        gap: 12px !important;
-        margin: 20px auto !important;
-        padding: 10px 20px !important;
+        gap: 14px !important;
+        margin: 60px auto 30px !important;  /* AQUI: desce bastante a barra (60px de margem superior) */
+        padding: 12px 24px !important;
         background: rgba(0,0,0,0.5) !important;
-        border-radius: 30px !important;
+        border-radius: 40px !important;
         box-shadow: 
-          0 0 20px var(--progress-main, #ffd700),
-          0 0 40px var(--progress-glow-1, rgba(255,210,120,0.85)),
-          0 6px 20px rgba(0,0,0,0.7) !important;
+          0 0 25px var(--progress-main, #ffd700),
+          0 0 50px var(--progress-glow-1, rgba(255,210,120,0.85)),
+          0 8px 25px rgba(0,0,0,0.7) !important;
         border: 2px solid var(--progress-main, #ffd700) !important;
       `;
 
