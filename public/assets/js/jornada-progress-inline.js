@@ -1,5 +1,5 @@
 /* /assets/js/jornada-progress-inline.js
- * v1.8 — Versão FINAL: contador em linha única, aura total do guia, sem sobreposição
+ * v1.9 — VERSÃO FINAL: espaço total no topo + contador dinâmico correto (ex: 2 / 3)
  */
 (function () {
   'use strict';
@@ -21,50 +21,48 @@
     return q('.progress-middle .progress-label') || q('.progress-middle');
   }
 
-  function applyGuiaAura() {
-    const guia = (document.body.getAttribute('data-guia') || 'default').toLowerCase();
+  function updateBottomLabel() {
+    const badge = findBadge();
+    const label = findLabel();
+    if (!badge || !label) return;
 
-    // Aplica aura no título do bloco e na pergunta (sutil)
+    // Pega o valor real do contador (ex: "2 / 3" ou "1 / 14")
+    const countText = badge.textContent.trim(); // ex: "2 / 3"
+
+    // Atualiza o label para "Perguntas no Bloco 2 / 3"
+    label.textContent = `Perguntas no Bloco ${countText}`;
+    label.style.whiteSpace = 'nowrap';
+    label.style.fontWeight = '600';
+    label.style.marginRight = '16px';
+    label.style.fontSize = '16px';
+  }
+
+  function applyGuiaAura() {
+    // Aura nos títulos (bloco e pergunta)
     const blockTitle = q('.titulo-bloco, h3, .bloco-titulo');
     const questionTitle = byId('jp-question-typed') || q('.perguntas-titulo, .question-text');
 
     if (blockTitle) {
-      blockTitle.style.textShadow = `
-        0 0 10px var(--progress-main, #ffd700),
-        0 0 20px var(--progress-glow-1, rgba(255,210,120,0.85))
-      `;
+      blockTitle.style.textShadow = `0 0 12px var(--progress-main, #ffd700), 0 0 24px var(--progress-glow-1)`;
       blockTitle.style.color = 'var(--progress-main, #ffd700)';
     }
     if (questionTitle) {
-      questionTitle.style.textShadow = `
-        0 0 8px var(--progress-main, #ffd700),
-        0 0 16px var(--progress-glow-1, rgba(255,210,120,0.85))
-      `;
+      questionTitle.style.textShadow = `0 0 10px var(--progress-main, #ffd700), 0 0 20px var(--progress-glow-1)`;
     }
 
-    // Barra superior (blocos)
-    const topFill = q('.progress-top .progress-fill, #progress-block-fill');
-    if (topFill) {
-      topFill.style.background = 'var(--progress-main, #ffd700) !important';
-      topFill.style.boxShadow = `
-        0 0 20px var(--progress-main, #ffd700),
-        0 0 40px var(--progress-glow-1, rgba(255,210,120,0.85)),
-        inset 0 0 30px var(--progress-glow-2, rgba(255,210,120,0.75))
-      !important`;
-      topFill.style.animation = 'barra-glow 4s infinite alternate !important';
-    }
-
-    // Barra inferior (perguntas no bloco)
-    const bottomBar = findBar();
-    if (bottomBar) {
-      bottomBar.style.background = 'var(--progress-main, #ffd700) !important';
-      bottomBar.style.boxShadow = `
-        0 0 20px var(--progress-main, #ffd700),
-        0 0 40px var(--progress-glow-1, rgba(255,210,120,0.85)),
-        inset 0 0 30px var(--progress-glow-2, rgba(255,210,120,0.75))
-      !important`;
-      bottomBar.style.animation = 'barra-glow 4s infinite alternate !important';
-    }
+    // Barras com glow forte
+    ['.progress-top .progress-fill, #progress-block-fill', '.progress-question-fill'].forEach(selector => {
+      const el = q(selector);
+      if (el) {
+        el.style.background = 'var(--progress-main, #ffd700) !important';
+        el.style.boxShadow = `
+          0 0 20px var(--progress-main, #ffd700),
+          0 0 40px var(--progress-glow-1),
+          inset 0 0 30px var(--progress-glow-2)
+        !important`;
+        el.style.animation = 'barra-glow 4s infinite alternate';
+      }
+    });
   }
 
   function relocateOnce() {
@@ -77,18 +75,10 @@
     const bar = findBar();
     let label = findLabel();
 
-    if (!badge || !bar) return;
+    if (!badge || !bar || !label) return;
 
-    // === MODIFICA O LABEL PARA FICAR EM UMA LINHA SÓ ===
-    if (label) {
-      // Força o texto em uma linha: "Perguntas no Bloco 1 / 3"
-      const currentText = label.textContent || 'Perguntas no Bloco';
-      const currentValue = badge.textContent || '1 / 3';
-      label.textContent = `${currentText} ${currentValue}`;
-      label.style.whiteSpace = 'nowrap';
-      label.style.fontWeight = '600';
-      label.style.marginRight = '12px';
-    }
+    // Atualiza o label com o contador real
+    updateBottomLabel();
 
     let wrap = byId('progress-inline-bottom');
     if (!wrap) {
@@ -100,30 +90,27 @@
         align-items: center !important;
         justify-content: center !important;
         gap: 0 !important;
-        margin: 24px auto 18px !important;
+        margin: 28px auto 20px !important;
         width: fit-content !important;
-        max-width: 90% !important;
-        padding: 12px 24px !important;
-        background: rgba(0,0,0,0.55) !important;
-        border-radius: 40px !important;
+        padding: 14px 28px !important;
+        background: rgba(0,0,0,0.6) !important;
+        border-radius: 50px !important;
         box-shadow: 
-          0 0 20px var(--progress-main, #ffd700),
-          0 0 40px var(--progress-glow-1, rgba(255,210,120,0.85)),
-          0 6px 20px rgba(0,0,0,0.8) !important;
+          0 0 25px var(--progress-main, #ffd700),
+          0 0 50px var(--progress-glow-1),
+          0 8px 25px rgba(0,0,0,0.8) !important;
+        border: 2px solid var(--progress-main, #ffd700);
         z-index: 20 !important;
-        animation: barra-glow 4s infinite alternate !important;
-        border: 1px solid var(--progress-main, #ffd700);
+        animation: barra-glow 4s infinite alternate;
       `;
     } else {
       wrap.innerHTML = '';
     }
 
-    // Ordem: só label (já com o contador dentro) + barra
     wrap.appendChild(label);
     wrap.appendChild(bar);
-    // badge não precisa mais aparecer separado
 
-    // Posiciona logo acima dos botões
+    // Posiciona acima dos botões
     const controls = q('.perguntas-controls, .jp-controls, .bottom-buttons, #jp-buttons-wrapper');
     if (controls && controls.parentNode) {
       controls.insertAdjacentElement('beforebegin', wrap);
@@ -131,17 +118,16 @@
       sec.appendChild(wrap);
     }
 
-    // === ESPAÇO EXTRA NO TOPO PARA NÃO COBRIR A PERGUNTA ===
+    // === ESPAÇO EXTRA NO TOPO PARA A PERGUNTA RESPIRAR ===
     const topBar = q('.progress-top');
     if (topBar) {
-      topBar.style.marginBottom = '40px'; // dá respiro total para a pergunta
+      topBar.style.marginBottom = '60px'; // Agora sim, espaço total!
     }
 
-    // Aplica aura completa do guia
     applyGuiaAura();
 
     done = true;
-    console.log(MOD, 'Versão FINAL: contador em linha única, aura total do guia, sem sobreposição.');
+    console.log(MOD, 'VERSÃO FINAL: espaço total no topo + contador dinâmico correto (ex: 2 / 3)');
   }
 
   const tryRelocate = () => {
@@ -152,36 +138,20 @@
     }
   };
 
-  // Gatilhos
+  // Atualiza o contador sempre que mudar pergunta
+  document.addEventListener('perguntas:state-changed', () => {
+    updateBottomLabel();
+    applyGuiaAura();
+  });
+
+  document.addEventListener('guia:changed', applyGuiaAura);
+
+  // Gatilhos iniciais
   document.addEventListener('DOMContentLoaded', tryRelocate);
   document.addEventListener('sectionLoaded', (e) => {
-    if (e.detail?.sectionId === 'section-perguntas') setTimeout(tryRelocate, 150);
+    if (e.detail?.sectionId === 'section-perguntas') setTimeout(tryRelocate, 200);
   });
-  document.addEventListener('perguntas:state-changed', () => {
-    // Atualiza o texto do label quando mudar pergunta
-    if (!done) tryRelocate();
-    else {
-      const label = findLabel();
-      const badge = findBadge();
-      if (label && badge) {
-        label.textContent = `Perguntas no Bloco ${badge.textContent}`;
-      }
-      applyGuiaAura();
-    }
-  });
-  document.addEventListener('guia:changed', () => {
-    applyGuiaAura();
-    const wrap = byId('progress-inline-bottom');
-    if (wrap) {
-      wrap.style.boxShadow = `
-        0 0 20px var(--progress-main, #ffd700),
-        0 0 40px var(--progress-glow-1, rgba(255,210,120,0.85)),
-        0 6px 20px rgba(0,0,0,0.8)
-      !important`;
-      wrap.style.borderColor = 'var(--progress-main, #ffd700)';
-    }
-  });
-  window.addEventListener('resize', () => setTimeout(tryRelocate, 250));
+  window.addEventListener('resize', () => setTimeout(tryRelocate, 300));
 
   tryRelocate();
 })();
