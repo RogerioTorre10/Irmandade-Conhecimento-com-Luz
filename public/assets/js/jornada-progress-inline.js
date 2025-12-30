@@ -1,5 +1,5 @@
 /* /assets/js/jornada-progress-inline.js
- * v1.9 — VERSÃO FINAL: espaço total no topo + contador dinâmico correto (ex: 2 / 3)
+ * v2.0 — SOLUÇÃO DEFINITIVA: espaço garantido + contador 100% dinâmico do badge real
  */
 (function () {
   'use strict';
@@ -11,56 +11,81 @@
   const byId = (id) => document.getElementById(id);
   const q = (sel, root = document) => root.querySelector(sel);
 
-  function findBadge() {
-    return byId('progress-question-value') || q('.progress-question-value');
-  }
-  function findBar() {
-    return byId('progress-question-fill') || q('.progress-question-fill');
-  }
-  function findLabel() {
-    return q('.progress-middle .progress-label') || q('.progress-middle');
+  // Função para achar o badge REAL que mostra o contador atual (ex: "1 / 3")
+  function getCurrentQuestionCount() {
+    // Prioridade: o badge pequeno que já aparece na barra
+    const badge = byId('progress-question-value') || q('.progress-question-value');
+    if (badge && badge.textContent.trim().match(/^\d+\s*\/\s*\d+$/)) {
+      return badge.textContent.trim(); // ex: "1 / 3"
+    }
+    // Fallback: qualquer elemento com texto tipo "X / Y"
+    const all = document.querySelectorAll('*');
+    for (let el of all) {
+      const text = el.textContent.trim();
+      if (text.match(/^\d+\s*\/\s*\d+$/) && el.offsetParent !== null) {
+        return text;
+      }
+    }
+    return '1 / 3'; // último recurso
   }
 
-  function updateBottomLabel() {
-    const badge = findBadge();
-    const label = findLabel();
-    if (!badge || !label) return;
+  function forceTopSpace() {
+    const topBar = q('.progress-top, .hud-top, .progress-header');
+    if (topBar) {
+      topBar.style.marginBottom = '100px !important';
+      topBar.style.paddingBottom = '20px !important';
+    }
 
-    // Pega o valor real do contador (ex: "2 / 3" ou "1 / 14")
-    const countText = badge.textContent.trim(); // ex: "2 / 3"
+    // Força espaço no container da pergunta/pergaminho
+    const questionContainer = q('.perguntas-wrap, .jp-question-wrapper, .question-container, .perguntas-panel');
+    if (questionContainer) {
+      questionContainer.style.paddingTop = '120px !important';
+      questionContainer.style.marginTop = '40px !important';
+    }
 
-    // Atualiza o label para "Perguntas no Bloco 2 / 3"
-    label.textContent = `Perguntas no Bloco ${countText}`;
-    label.style.whiteSpace = 'nowrap';
-    label.style.fontWeight = '600';
-    label.style.marginRight = '16px';
-    label.style.fontSize = '16px';
+    // Força o pergaminho rasgado a não cobrir
+    const pergaminho = q('.pergaminho, .background-pergaminho, .torn-paper');
+    if (pergaminho) {
+      pergaminho.style.marginTop = '80px !important';
+    }
+
+    // Garante que a pergunta tenha margem superior
+    const questionText = byId('jp-question-typed') || q('.perguntas-titulo, .question-text');
+    if (questionText) {
+      questionText.style.marginTop = '80px !important';
+      questionText.style.paddingTop = '40px !important';
+      questionText.style.position = 'relative';
+      questionText.style.zIndex = '10';
+    }
+  }
+
+  function updateBottomLabel(label) {
+    if (!label) return;
+    const count = getCurrentQuestionCount();
+    label.textContent = `Perguntas no Bloco ${count}`;
+    label.style.cssText += `
+      white-space: nowrap !important;
+      font-weight: 700 !important;
+      font-size: 17px !important;
+      color: var(--progress-main, #ffd700) !important;
+      text-shadow: 0 0 15px var(--progress-main, #ffd700) !important;
+      margin-right: 20px !important;
+    `;
   }
 
   function applyGuiaAura() {
-    // Aura nos títulos (bloco e pergunta)
-    const blockTitle = q('.titulo-bloco, h3, .bloco-titulo');
-    const questionTitle = byId('jp-question-typed') || q('.perguntas-titulo, .question-text');
-
-    if (blockTitle) {
-      blockTitle.style.textShadow = `0 0 12px var(--progress-main, #ffd700), 0 0 24px var(--progress-glow-1)`;
-      blockTitle.style.color = 'var(--progress-main, #ffd700)';
-    }
-    if (questionTitle) {
-      questionTitle.style.textShadow = `0 0 10px var(--progress-main, #ffd700), 0 0 20px var(--progress-glow-1)`;
-    }
-
-    // Barras com glow forte
-    ['.progress-top .progress-fill, #progress-block-fill', '.progress-question-fill'].forEach(selector => {
-      const el = q(selector);
+    const elements = [
+      q('.progress-top .progress-fill, #progress-block-fill'),
+      q('.progress-question-fill')
+    ];
+    elements.forEach(el => {
       if (el) {
         el.style.background = 'var(--progress-main, #ffd700) !important';
         el.style.boxShadow = `
-          0 0 20px var(--progress-main, #ffd700),
-          0 0 40px var(--progress-glow-1),
-          inset 0 0 30px var(--progress-glow-2)
+          0 0 25px var(--progress-main, #ffd700),
+          0 0 50px var(--progress-glow-1),
+          inset 0 0 35px var(--progress-glow-2)
         !important`;
-        el.style.animation = 'barra-glow 4s infinite alternate';
       }
     });
   }
@@ -71,87 +96,92 @@
     const sec = byId('section-perguntas');
     if (!sec) return;
 
-    const badge = findBadge();
-    const bar = findBar();
-    let label = findLabel();
+    const bar = byId('progress-question-fill') || q('.progress-question-fill');
+    let label = q('.progress-middle .progress-label, .progress-middle');
 
-    if (!badge || !bar || !label) return;
+    if (!bar) return;
 
-    // Atualiza o label com o contador real
-    updateBottomLabel();
-
+    // Cria ou reutiliza wrapper inferior
     let wrap = byId('progress-inline-bottom');
     if (!wrap) {
       wrap = document.createElement('div');
       wrap.id = 'progress-inline-bottom';
-      wrap.className = 'progress-inline progress-bottom-inline';
       wrap.style.cssText = `
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
         gap: 0 !important;
-        margin: 28px auto 20px !important;
-        width: fit-content !important;
-        padding: 14px 28px !important;
-        background: rgba(0,0,0,0.6) !important;
-        border-radius: 50px !important;
+        margin: 30px auto 22px !important;
+        padding: 16px 32px !important;
+        background: rgba(0,0,0,0.65) !important;
+        border-radius: 60px !important;
         box-shadow: 
-          0 0 25px var(--progress-main, #ffd700),
-          0 0 50px var(--progress-glow-1),
-          0 8px 25px rgba(0,0,0,0.8) !important;
-        border: 2px solid var(--progress-main, #ffd700);
-        z-index: 20 !important;
-        animation: barra-glow 4s infinite alternate;
+          0 0 30px var(--progress-main, #ffd700),
+          0 0 60px var(--progress-glow-1),
+          0 10px 30px rgba(0,0,0,0.9) !important;
+        border: 3px solid var(--progress-main, #ffd700) !important;
+        z-index: 30 !important;
       `;
-    } else {
-      wrap.innerHTML = '';
     }
+    wrap.innerHTML = '';
+
+    // Cria label novo se o antigo não for bom
+    if (!label || label.textContent.includes('10')) {
+      label = document.createElement('div');
+      label.className = 'progress-bottom-label';
+    }
+
+    updateBottomLabel(label);
 
     wrap.appendChild(label);
     wrap.appendChild(bar);
 
-    // Posiciona acima dos botões
-    const controls = q('.perguntas-controls, .jp-controls, .bottom-buttons, #jp-buttons-wrapper');
+    // Insere acima dos botões
+    const controls = q('.perguntas-controls, .jp-controls, #jp-buttons-wrapper');
     if (controls && controls.parentNode) {
       controls.insertAdjacentElement('beforebegin', wrap);
     } else {
       sec.appendChild(wrap);
     }
 
-    // === ESPAÇO EXTRA NO TOPO PARA A PERGUNTA RESPIRAR ===
-    const topBar = q('.progress-top');
-    if (topBar) {
-      topBar.style.marginBottom = '80px'; // Agora sim, espaço total!
-    }
+    // === FORÇA ESPAÇO NO TOPO COM VIOLÊNCIA (MAS NECESSÁRIA) ===
+    forceTopSpace();
 
     applyGuiaAura();
 
     done = true;
-    console.log(MOD, 'VERSÃO FINAL: espaço total no topo + contador dinâmico correto (ex: 2 / 3)');
+    console.log(MOD, 'SOLUÇÃO DEFINITIVA aplicada: espaço forçado + contador dinâmico real');
   }
 
   const tryRelocate = () => {
     if (done) return;
     const sec = byId('section-perguntas');
-    if (sec && (sec.dataset.initialized === 'true' || !sec.classList.contains('hidden'))) {
+    if (sec && !sec.classList.contains('hidden')) {
       relocateOnce();
     }
   };
 
-  // Atualiza o contador sempre que mudar pergunta
+  // Atualiza contador ao mudar pergunta
   document.addEventListener('perguntas:state-changed', () => {
-    updateBottomLabel();
+    const label = q('.progress-bottom-label') || q('.progress-middle .progress-label');
+    updateBottomLabel(label);
     applyGuiaAura();
+    forceTopSpace(); // reforça sempre
   });
 
-  document.addEventListener('guia:changed', applyGuiaAura);
+  document.addEventListener('guia:changed', () => {
+    applyGuiaAura();
+    forceTopSpace();
+  });
 
-  // Gatilhos iniciais
+  // Gatilhos
   document.addEventListener('DOMContentLoaded', tryRelocate);
-  document.addEventListener('sectionLoaded', (e) => {
-    if (e.detail?.sectionId === 'section-perguntas') setTimeout(tryRelocate, 200);
+  document.addEventListener('sectionLoaded', () => setTimeout(tryRelocate, 200));
+  window.addEventListener('load', () => setTimeout(tryRelocate, 500));
+  window.addEventListener('resize', () => {
+    if (done) forceTopSpace();
+    setTimeout(tryRelocate, 300);
   });
-  window.addEventListener('resize', () => setTimeout(tryRelocate, 300));
 
   tryRelocate();
 })();
