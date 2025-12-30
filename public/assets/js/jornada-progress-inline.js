@@ -1,5 +1,5 @@
 /* /assets/js/jornada-progress-inline.js
- * v3.0 — VERSÃO FINAL SIMPLES: melhora o contador nativo + glow do guia + espaço no topo
+ * v3.1 — VERSÃO FINAL COM !important REAL + marcador perto dos botões + espaço no pergaminho
  */
 (function () {
   'use strict';
@@ -10,83 +10,99 @@
   const q = (sel) => document.querySelector(sel);
 
   function applyImprovements() {
-    // 1. ESPAÇO NO TOPO para a pergunta respirar (resolve "coberta")
+    const setImp = (el, prop, val) => el && el.style.setProperty(prop, val, 'important');
+
+    // 1) ESPAÇO NO TOPO: barra superior + conteúdo da pergunta desce
     const topBar = q('.progress-top');
     if (topBar) {
-      topBar.style.marginBottom = '80px !important';
+      setImp(topBar, 'margin-bottom', '18px'); // só um respiro; o "desce tudo" vai no conteúdo
     }
 
-    // Container principal das perguntas ganha padding top extra
-    const perguntasWrap = q('.perguntas-wrap, .section-perguntas');
-    if (perguntasWrap) {
-      perguntasWrap.style.paddingTop = '60px !important';
+    // 🔽 ESTE É O PONTO-CHAVE: desce o CONJUNTO do conteúdo (títulos + pergunta)
+    const content = q(
+      '.perguntas-wrap .perguntas-content, .perguntas-wrap .perg-content, ' +
+      '.perguntas-wrap .pergunta-area, .perguntas-wrap .perguntas-inner, ' +
+      '#section-perguntas .perguntas-content, #section-perguntas .perg-content'
+    );
+    if (content) {
+      setImp(content, 'padding-top', '42px'); // desce o bloco todo
+      setImp(content, 'margin-top', '10px'); // reforço
+    } else {
+      // fallback: se não achar o content, desce o wrap
+      const perguntasWrap = q('.perguntas-wrap, .section-perguntas');
+      if (perguntasWrap) setImp(perguntasWrap, 'padding-top', '46px');
     }
 
-    // 2. MELHORA O CONTADOR NATIVO (o pequeno com barra + "1 / 3")
-    const middleContainer = q('.progress-middle'); // container original do label + barra + badge
+    // 2) MARCADOR "PERGUNTAS NO BLOCO" deve ficar perto dos botões (acima da barra inferior)
+    const middleContainer = q('.progress-middle');
     if (middleContainer) {
-      middleContainer.style.cssText += `
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        gap: 14px !important;
-        margin: 60px auto 30px !important;  /* AQUI: desce bastante a barra (60px de margem superior) */
-        padding: 12px 24px !important;
-        background: rgba(0,0,0,0.5) !important;
-        border-radius: 40px !important;
-        box-shadow: 
-          0 0 25px var(--progress-main, #ffd700),
-          0 0 50px var(--progress-glow-1, rgba(255,210,120,0.85)),
-          0 8px 25px rgba(0,0,0,0.7) !important;
-        border: 2px solid var(--progress-main, #ffd700) !important;
-      `;
+      // fixa no "rodapé" do pergaminho, acima dos botões
+      setImp(middleContainer, 'position', 'absolute');
+      setImp(middleContainer, 'left', '50%');
+      setImp(middleContainer, 'transform', 'translateX(-50%)');
+      setImp(middleContainer, 'bottom', '92px'); // ajuste fino: experimente 80px a 110px se precisar subir/descer mais
+      setImp(middleContainer, 'z-index', '40');
 
-      // Label: "Perguntas no Bloco"
+      // mantém estilo bonito com glow do guia
+      setImp(middleContainer, 'display', 'flex');
+      setImp(middleContainer, 'align-items', 'center');
+      setImp(middleContainer, 'justify-content', 'center');
+      setImp(middleContainer, 'gap', '12px');
+      setImp(middleContainer, 'padding', '10px 20px');
+      setImp(middleContainer, 'background', 'rgba(0,0,0,0.50)');
+      setImp(middleContainer, 'border-radius', '30px');
+      setImp(middleContainer, 'border', '2px solid var(--progress-main, #ffd700)');
+      setImp(middleContainer, 'box-shadow',
+        '0 0 20px var(--progress-main, #ffd700), ' +
+        '0 0 40px var(--progress-glow-1, rgba(255,210,120,0.85)), ' +
+        '0 6px 20px rgba(0,0,0,0.7)'
+      );
+
       const label = q('.progress-middle .progress-label');
       if (label) {
-        label.style.color = 'var(--progress-main, #ffd700) !important';
-        label.style.fontWeight = '700 !important';
-        label.style.textShadow = '0 0 15px var(--progress-main, #ffd700) !important';
+        setImp(label, 'color', 'var(--progress-main, #ffd700)');
+        setImp(label, 'font-weight', '700');
+        setImp(label, 'text-shadow', '0 0 15px var(--progress-main, #ffd700)');
       }
 
-      // Badge: "1 / 3" (já é dinâmico!)
       const badge = q('.progress-question-value');
       if (badge) {
-        badge.style.color = 'var(--progress-main, #ffd700) !important';
-        badge.style.fontWeight = '700 !important';
-        badge.style.fontSize = '18px !important';
-        badge.style.textShadow = '0 0 15px var(--progress-main, #ffd700) !important';
+        setImp(badge, 'color', 'var(--progress-main, #ffd700)');
+        setImp(badge, 'font-weight', '700');
+        setImp(badge, 'font-size', '18px');
+        setImp(badge, 'text-shadow', '0 0 15px var(--progress-main, #ffd700)');
       }
     }
 
-    // 3. GLOW FORTE NAS BARRAS (superior e do bloco)
-    const bars = [
-      q('.progress-top .progress-fill, #progress-block-fill'),
-      q('.progress-question-fill')
-    ];
-    bars.forEach(bar => {
-      if (bar) {
-        bar.style.background = 'var(--progress-main, #ffd700) !important';
-        bar.style.boxShadow = `
-          0 0 25px var(--progress-main, #ffd700),
-          0 0 50px var(--progress-glow-1),
-          inset 0 0 35px var(--progress-glow-2)
-        !important`;
-      }
+    // 3) GLOW NAS BARRAS (superior e do bloco)
+    const topFill = q('.progress-top .progress-fill, #progress-block-fill');
+    const blockFill = q('.progress-question-fill');
+    [topFill, blockFill].forEach(bar => {
+      if (!bar) return;
+      setImp(bar, 'background', 'var(--progress-main, #ffd700)');
+      setImp(bar, 'box-shadow',
+        '0 0 25px var(--progress-main, #ffd700), ' +
+        '0 0 50px var(--progress-glow-1, rgba(255,210,120,0.85)), ' +
+        'inset 0 0 35px var(--progress-glow-2, rgba(255,230,150,0.25))'
+      );
     });
 
-    // 4. Aura nos títulos (bloco e pergunta)
+    // 4) Aura nos títulos
     const blockTitle = q('.titulo-bloco, h3');
     const questionTitle = q('#jp-question-typed, .perguntas-titulo');
     if (blockTitle) {
-      blockTitle.style.color = 'var(--progress-main, #ffd700) !important';
-      blockTitle.style.textShadow = '0 0 15px var(--progress-main, #ffd700), 0 0 30px var(--progress-glow-1) !important';
+      setImp(blockTitle, 'color', 'var(--progress-main, #ffd700)');
+      setImp(blockTitle, 'text-shadow',
+        '0 0 15px var(--progress-main, #ffd700), 0 0 30px var(--progress-glow-1, rgba(255,210,120,0.85))'
+      );
     }
     if (questionTitle) {
-      questionTitle.style.textShadow = '0 0 12px var(--progress-main, #ffd700), 0 0 25px var(--progress-glow-1) !important';
+      setImp(questionTitle, 'text-shadow',
+        '0 0 12px var(--progress-main, #ffd700), 0 0 25px var(--progress-glow-1, rgba(255,210,120,0.85))'
+      );
     }
 
-    console.log(MOD, 'Melhorias aplicadas: contador nativo aprimorado + espaço + glow do guia');
+    console.log(MOD, 'Melhorias aplicadas: layout (desceu) + marcador no rodapé + glow do guia');
   }
 
   // Executa quando a seção aparece
@@ -97,7 +113,7 @@
     }
   };
 
-  // Gatilhos
+  // Gatilhos múltiplos
   document.addEventListener('DOMContentLoaded', tryApply);
   document.addEventListener('sectionLoaded', () => setTimeout(tryApply, 200));
   document.addEventListener('perguntas:state-changed', applyImprovements);
