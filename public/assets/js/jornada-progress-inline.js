@@ -1,5 +1,5 @@
 /* /assets/js/jornada-progress-inline.js
- * v3.1 — VERSÃO FINAL COM !important REAL + marcador perto dos botões + espaço no pergaminho
+ * v3.3 — VERSÃO FINAL DEFINITIVA: pergunta TOTALMENTE livre da barra superior + marcador fora do pergaminho
  */
 (function () {
   'use strict';
@@ -12,38 +12,53 @@
   function applyImprovements() {
     const setImp = (el, prop, val) => el && el.style.setProperty(prop, val, 'important');
 
-    // 1) ESPAÇO NO TOPO: barra superior + conteúdo da pergunta desce
+    // 1) ESPAÇO NO TOPO
     const topBar = q('.progress-top');
     if (topBar) {
-      setImp(topBar, 'margin-bottom', '18px'); // só um respiro; o "desce tudo" vai no conteúdo
+      setImp(topBar, 'margin-bottom', '18px');
     }
 
-    // 🔽 ESTE É O PONTO-CHAVE: desce o CONJUNTO do conteúdo (títulos + pergunta)
     const content = q(
       '.perguntas-wrap .perguntas-content, .perguntas-wrap .perg-content, ' +
       '.perguntas-wrap .pergunta-area, .perguntas-wrap .perguntas-inner, ' +
       '#section-perguntas .perguntas-content, #section-perguntas .perg-content'
     );
-       if (content) {
-      setImp(content, 'padding-top', '80px'); // AUMENTADO: desce mais o conteúdo da pergunta
-      setImp(content, 'margin-top', '20px'); // reforço maior
+    if (content) {
+      setImp(content, 'padding-top', '80px');
+      setImp(content, 'margin-top', '20px');
     } else {
-      // fallback: se não achar o content, desce o wrap
       const perguntasWrap = q('.perguntas-wrap, .section-perguntas');
-      if (perguntasWrap) setImp(perguntasWrap, 'padding-top', '100px'); // AUMENTADO forte
+      if (perguntasWrap) setImp(perguntasWrap, 'padding-top', '100px');
     }
 
-    // 2) MARCADOR "PERGUNTAS NO BLOCO" deve ficar perto dos botões (acima da barra inferior)
+    // 5) FORÇA ESPAÇO ESPECÍFICO NA CAIXA DA PERGUNTA (resolve cobertura final)
+    const questionBox = q('.jp-question-box, .pergunta-box, .question-card, .perguntas-caixa, .response-box');
+    if (questionBox) {
+      setImp(questionBox, 'margin-top', '80px');
+      setImp(questionBox, 'padding-top', '20px');
+    }
+
+    const typedQuestion = q('#jp-question-typed, .perguntas-titulo, .question-typed');
+    if (typedQuestion) {
+      setImp(typedQuestion, 'margin-top', '100px');
+      setImp(typedQuestion, 'position', 'relative');
+      setImp(typedQuestion, 'top', '20px');
+    }
+
+    const pergaminho = q('.pergaminho, .torn-paper-background, .pergaminho-bg');
+    if (pergaminho) {
+      setImp(pergaminho, 'margin-top', '120px');
+    }
+
+    // 2) MARCADOR FORA DO PERGAMINHO
     const middleContainer = q('.progress-middle');
     if (middleContainer) {
-      // fixa no "rodapé" do pergaminho, acima dos botões
       setImp(middleContainer, 'position', 'absolute');
       setImp(middleContainer, 'left', '50%');
       setImp(middleContainer, 'transform', 'translateX(-50%)');
-      setImp(middleContainer, 'bottom', '0.5px'); // ajuste fino: experimente 80px a 110px se precisar subir/descer mais
+      setImp(middleContainer, 'bottom', '140px'); // ajuste se precisar
       setImp(middleContainer, 'z-index', '40');
 
-      // mantém estilo bonito com glow do guia
       setImp(middleContainer, 'display', 'flex');
       setImp(middleContainer, 'align-items', 'center');
       setImp(middleContainer, 'justify-content', 'center');
@@ -74,7 +89,7 @@
       }
     }
 
-    // 3) GLOW NAS BARRAS (superior e do bloco)
+    // 3) GLOW NAS BARRAS
     const topFill = q('.progress-top .progress-fill, #progress-block-fill');
     const blockFill = q('.progress-question-fill');
     [topFill, blockFill].forEach(bar => {
@@ -102,10 +117,9 @@
       );
     }
 
-    console.log(MOD, 'Melhorias aplicadas: layout (desceu) + marcador no rodapé + glow do guia');
+    console.log(MOD, 'VERSÃO FINAL DEFINITIVA: pergunta livre + marcador fora + glow perfeito');
   }
 
-  // Executa quando a seção aparece
   const tryApply = () => {
     const sec = document.getElementById('section-perguntas');
     if (sec && !sec.classList.contains('hidden')) {
@@ -113,7 +127,6 @@
     }
   };
 
-  // Gatilhos múltiplos
   document.addEventListener('DOMContentLoaded', tryApply);
   document.addEventListener('sectionLoaded', () => setTimeout(tryApply, 200));
   document.addEventListener('perguntas:state-changed', applyImprovements);
