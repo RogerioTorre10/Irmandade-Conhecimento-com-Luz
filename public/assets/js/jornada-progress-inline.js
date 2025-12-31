@@ -1,5 +1,5 @@
 /* /assets/js/jornada-progress-inline.js
- * v3.4 — VERSÃO FINAL EQUILIBRADA: container subido + espaço perfeito + botões no lugar
+ * v3.3 — VERSÃO FINAL DEFINITIVA: pergunta TOTALMENTE livre da barra superior + marcador fora do pergaminho
  */
 (function () {
   'use strict';
@@ -12,10 +12,10 @@
   function applyImprovements() {
     const setImp = (el, prop, val) => el && el.style.setProperty(prop, val, 'important');
 
-    // 1) ESPAÇO NO TOPO EQUILIBRADO
+    // 1) ESPAÇO NO TOPO
     const topBar = q('.progress-top');
     if (topBar) {
-      setImp(topBar, 'margin-bottom', '30px');
+      setImp(topBar, 'margin-bottom', '18px');
     }
 
     const content = q(
@@ -24,20 +24,39 @@
       '#section-perguntas .perguntas-content, #section-perguntas .perg-content'
     );
     if (content) {
-      setImp(content, 'padding-top', '30px'); // valor equilibrado: sobe o conteúdo
-      setImp(content, 'margin-top', '0px');
+      setImp(content, 'padding-top', '80px');
+      setImp(content, 'margin-top', '20px');
     } else {
       const perguntasWrap = q('.perguntas-wrap, .section-perguntas');
-      if (perguntasWrap) setImp(perguntasWrap, 'padding-top', '40px');
+      if (perguntasWrap) setImp(perguntasWrap, 'padding-top', '100px');
     }
 
-    // 2) MARCADOR FORA DO PERGAMINHO, mas não tão baixo
+    // 5) FORÇA ESPAÇO ESPECÍFICO NA CAIXA DA PERGUNTA (resolve cobertura final)
+    const questionBox = q('.jp-question-box, .pergunta-box, .question-card, .perguntas-caixa, .response-box');
+    if (questionBox) {
+      setImp(questionBox, 'margin-top', '80px');
+      setImp(questionBox, 'padding-top', '20px');
+    }
+
+    const typedQuestion = q('#jp-question-typed, .perguntas-titulo, .question-typed');
+    if (typedQuestion) {
+      setImp(typedQuestion, 'margin-top', '100px');
+      setImp(typedQuestion, 'position', 'relative');
+      setImp(typedQuestion, 'top', '20px');
+    }
+
+    const pergaminho = q('.pergaminho, .torn-paper-background, .pergaminho-bg');
+    if (pergaminho) {
+      setImp(pergaminho, 'margin-top', '120px');
+    }
+
+    // 2) MARCADOR FORA DO PERGAMINHO
     const middleContainer = q('.progress-middle');
     if (middleContainer) {
       setImp(middleContainer, 'position', 'absolute');
       setImp(middleContainer, 'left', '50%');
       setImp(middleContainer, 'transform', 'translateX(-50%)');
-      setImp(middleContainer, 'bottom', '120px'); // sobe o marcador (ajuste fino aqui)
+      setImp(middleContainer, 'bottom', '140px'); // ajuste se precisar
       setImp(middleContainer, 'z-index', '40');
 
       setImp(middleContainer, 'display', 'flex');
@@ -70,7 +89,7 @@
       }
     }
 
-    // 3) GLOW NAS BARRAS (mantido)
+    // 3) GLOW NAS BARRAS
     const topFill = q('.progress-top .progress-fill, #progress-block-fill');
     const blockFill = q('.progress-question-fill');
     [topFill, blockFill].forEach(bar => {
@@ -83,7 +102,7 @@
       );
     });
 
-    // 4) Aura nos títulos (mantido)
+    // 4) Aura nos títulos
     const blockTitle = q('.titulo-bloco, h3');
     const questionTitle = q('#jp-question-typed, .perguntas-titulo');
     if (blockTitle) {
@@ -98,7 +117,7 @@
       );
     }
 
-    console.log(MOD, 'VERSÃO FINAL EQUILIBRADA: container subido + botões no lugar + caixa de resposta livre');
+    console.log(MOD, 'VERSÃO FINAL DEFINITIVA: pergunta livre + marcador fora + glow perfeito');
   }
 
   const tryApply = () => {
