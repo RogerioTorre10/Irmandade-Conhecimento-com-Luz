@@ -15,7 +15,7 @@
     // 1) ESPAÇO NO TOPO
     const topBar = q('.progress-top');
     if (topBar) {
-      setImp(topBar, 'margin-bottom', '18px');
+      setImp(topBar, 'margin-bottom', '24px');
     }
 
     const content = q(
@@ -24,11 +24,11 @@
       '#section-perguntas .perguntas-content, #section-perguntas .perg-content'
     );
     if (content) {
-      setImp(content, 'padding-top', '80px');
-      setImp(content, 'margin-top', '20px');
+      setImp(content, 'padding-top', '50px');
+      setImp(content, 'margin-top', '10px');
     } else {
       const perguntasWrap = q('.perguntas-wrap, .section-perguntas');
-      if (perguntasWrap) setImp(perguntasWrap, 'padding-top', '100px');
+      if (perguntasWrap) setImp(perguntasWrap, 'padding-top', '60px');
     }
 
     // 5) FORÇA ESPAÇO ESPECÍFICO NA CAIXA DA PERGUNTA (resolve cobertura final)
@@ -56,7 +56,7 @@
       setImp(middleContainer, 'position', 'absolute');
       setImp(middleContainer, 'left', '50%');
       setImp(middleContainer, 'transform', 'translateX(-50%)');
-      setImp(middleContainer, 'bottom', '140px'); // ajuste se precisar
+      setImp(middleContainer, 'bottom', '40px'); // ajuste se precisar
       setImp(middleContainer, 'z-index', '40');
 
       setImp(middleContainer, 'display', 'flex');
