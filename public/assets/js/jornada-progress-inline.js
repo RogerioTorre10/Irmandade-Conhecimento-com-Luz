@@ -24,12 +24,17 @@
       '#section-perguntas .perguntas-content, #section-perguntas .perg-content'
     );
     if (content) {
-      setImp(content, 'padding-top', '8px');
-      setImp(content, 'margin-top', '-12px');
+      setImp(content, 'padding-top', '18px');
+      setImp(content, 'margin-top', '-6px');
     } else {
       const perguntasWrap = q('.perguntas-wrap, .section-perguntas');
       if (perguntasWrap) setImp(perguntasWrap, 'padding-top', '30px');
     }
+      const questionTitle2 = q('#jp-question-typed, .perguntas-titulo');
+      if (questionTitle2) {
+      setImp(questionTitle2, 'margin-top', '10px');
+     }
+
 
     // 5) FORÇA ESPAÇO ESPECÍFICO NA CAIXA DA PERGUNTA (resolve cobertura final)
     const questionBox = q('.jp-question-box, .pergunta-box, .question-card, .perguntas-caixa, .response-box');
@@ -106,6 +111,19 @@ if (middleContainer) {
         'inset 0 0 35px var(--progress-glow-2, rgba(255,230,150,0.25))'
       );
     });
+    // 3.1) ANEL/CONTORNO DA BARRA "PERGUNTAS NO BLOCO"
+    const qBar = q('.progress-question, .progress-question-bar, .progress-question-wrap, #progress-question');
+    if (qBar) {
+    setImp(qBar, 'background', 'rgba(0,0,0,0.35)');
+    setImp(qBar, 'border', '2px solid var(--progress-main, #ffd700)');   // anel
+    setImp(qBar, 'border-radius', '999px');
+    setImp(qBar, 'padding', '8px 14px');                                  // “corpo” do anel
+    setImp(qBar, 'box-shadow',
+     '0 0 18px var(--progress-main, #ffd700), ' +
+     '0 0 30px var(--progress-glow-1, rgba(255,210,120,0.65)), ' +
+     'inset 0 0 18px rgba(255,230,150,0.18)'
+    );
+   } 
 
     // 4) Aura nos títulos
     const blockTitle = q('.titulo-bloco, h3');
