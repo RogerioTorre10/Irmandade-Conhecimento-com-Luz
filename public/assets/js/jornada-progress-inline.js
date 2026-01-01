@@ -34,8 +34,8 @@
     // 5) FORÇA ESPAÇO ESPECÍFICO NA CAIXA DA PERGUNTA (resolve cobertura final)
     const questionBox = q('.jp-question-box, .pergunta-box, .question-card, .perguntas-caixa, .response-box');
     if (questionBox) {
-      setImp(questionBox, 'margin-top', '80px');
-      setImp(questionBox, 'padding-top', '20px');
+      setImp(questionBox, 'margin-top', '40px');
+      setImp(questionBox, 'padding-top', '10px');
     }
 
     const typedQuestion = q('#jp-question-typed, .perguntas-titulo, .question-typed');
@@ -56,7 +56,7 @@
       setImp(middleContainer, 'position', 'absolute');
       setImp(middleContainer, 'left', '50%');
       setImp(middleContainer, 'transform', 'translateX(-50%)');
-      setImp(middleContainer, 'bottom', '10px'); // ajuste se precisar
+      setImp(middleContainer, 'bottom', '50px'); // ajuste se precisar
       setImp(middleContainer, 'z-index', '40');
 
       setImp(middleContainer, 'display', 'flex');
