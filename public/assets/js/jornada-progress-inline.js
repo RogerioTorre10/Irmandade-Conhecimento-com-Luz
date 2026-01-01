@@ -141,7 +141,7 @@ if (middleContainer) {
     }
 
     console.log(MOD, 'VERSÃO FINAL DEFINITIVA: pergunta livre + marcador fora + glow perfeito');
-  }
+ 
 
   const tryApply = () => {
     const sec = document.getElementById('section-perguntas');
