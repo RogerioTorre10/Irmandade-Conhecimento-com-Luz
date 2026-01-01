@@ -1,5 +1,5 @@
 /* /assets/js/jornada-progress-inline.js
- * v3.3 — VERSÃO FINAL DEFINITIVA: pergunta TOTALMENTE livre da barra superior + marcador fora do pergaminho
+ * v3.4 — VERSÃO FINAL EQUILIBRADA: container subido + espaço perfeito + botões no lugar
  */
 (function () {
   'use strict';
@@ -12,10 +12,10 @@
   function applyImprovements() {
     const setImp = (el, prop, val) => el && el.style.setProperty(prop, val, 'important');
 
-    // 1) ESPAÇO NO TOPO
+    // 1) ESPAÇO NO TOPO EQUILIBRADO
     const topBar = q('.progress-top');
     if (topBar) {
-      setImp(topBar, 'margin-bottom', '24px');
+      setImp(topBar, 'margin-bottom', '30px');
     }
 
     const content = q(
@@ -24,64 +24,35 @@
       '#section-perguntas .perguntas-content, #section-perguntas .perg-content'
     );
     if (content) {
-      setImp(content, 'padding-top', '18px');
-      setImp(content, 'margin-top', '-6px');
+      setImp(content, 'padding-top', '30px'); // valor equilibrado: sobe o conteúdo
+      setImp(content, 'margin-top', '0px');
     } else {
       const perguntasWrap = q('.perguntas-wrap, .section-perguntas');
-      if (perguntasWrap) setImp(perguntasWrap, 'padding-top', '30px');
-    }
-      const questionTitle2 = q('#jp-question-typed, .perguntas-titulo');
-      if (questionTitle2) {
-      setImp(questionTitle2, 'margin-top', '10px');
-     }
-
-
-    // 5) FORÇA ESPAÇO ESPECÍFICO NA CAIXA DA PERGUNTA (resolve cobertura final)
-    const questionBox = q('.jp-question-box, .pergunta-box, .question-card, .perguntas-caixa, .response-box');
-    if (questionBox) {
-      setImp(questionBox, 'margin-top', '40px');
-      setImp(questionBox, 'padding-top', '10px');
+      if (perguntasWrap) setImp(perguntasWrap, 'padding-top', '40px');
     }
 
-    const typedQuestion = q('#jp-question-typed, .perguntas-titulo, .question-typed');
-    if (typedQuestion) {
-      setImp(typedQuestion, 'margin-top', '100px');
-      setImp(typedQuestion, 'position', 'relative');
-      setImp(typedQuestion, 'top', '20px');
-    }
+    // 2) MARCADOR FORA DO PERGAMINHO, mas não tão baixo
+    const middleContainer = q('.progress-middle');
+    if (middleContainer) {
+      setImp(middleContainer, 'position', 'absolute');
+      setImp(middleContainer, 'left', '50%');
+      setImp(middleContainer, 'transform', 'translateX(-50%)');
+      setImp(middleContainer, 'bottom', '120px'); // sobe o marcador (ajuste fino aqui)
+      setImp(middleContainer, 'z-index', '40');
 
-    const pergaminho = q('.pergaminho, .torn-paper-background, .pergaminho-bg');
-    if (pergaminho) {
-      setImp(pergaminho, 'margin-top', '120px');
-    }
-
-    // 2) MARCADOR FIXO NO FLUXO, ACIMA DOS BOTÕES
-const middleContainer = q('.progress-middle');
-if (middleContainer) {
-  setImp(middleContainer, 'position', 'relative');   // 🔥 CRÍTICO
-  setImp(middleContainer, 'bottom', 'auto');
-  setImp(middleContainer, 'left', 'auto');
-  setImp(middleContainer, 'transform', 'none');
-
-  setImp(middleContainer, 'margin', '18px auto 10px'); // entre pergunta e botões
-  setImp(middleContainer, 'z-index', '20');
-
-  setImp(middleContainer, 'display', 'flex');
-  setImp(middleContainer, 'align-items', 'center');
-  setImp(middleContainer, 'justify-content', 'center');
-  setImp(middleContainer, 'gap', '12px');
-  setImp(middleContainer, 'padding', '8px 18px');
-
-  setImp(middleContainer, 'background', 'rgba(0,0,0,0.45)');
-  setImp(middleContainer, 'border-radius', '30px');
-  setImp(middleContainer, 'border', '2px solid var(--progress-main, #ffd700)');
-  setImp(middleContainer, 'box-shadow',
-    '0 0 18px var(--progress-main, #ffd700), ' +
-    '0 0 30px var(--progress-glow-1, rgba(255,210,120,0.7)), ' +
-    '0 6px 18px rgba(0,0,0,0.6)'
-  );
-}
-
+      setImp(middleContainer, 'display', 'flex');
+      setImp(middleContainer, 'align-items', 'center');
+      setImp(middleContainer, 'justify-content', 'center');
+      setImp(middleContainer, 'gap', '12px');
+      setImp(middleContainer, 'padding', '10px 20px');
+      setImp(middleContainer, 'background', 'rgba(0,0,0,0.50)');
+      setImp(middleContainer, 'border-radius', '30px');
+      setImp(middleContainer, 'border', '2px solid var(--progress-main, #ffd700)');
+      setImp(middleContainer, 'box-shadow',
+        '0 0 20px var(--progress-main, #ffd700), ' +
+        '0 0 40px var(--progress-glow-1, rgba(255,210,120,0.85)), ' +
+        '0 6px 20px rgba(0,0,0,0.7)'
+      );
 
       const label = q('.progress-middle .progress-label');
       if (label) {
@@ -99,7 +70,7 @@ if (middleContainer) {
       }
     }
 
-    // 3) GLOW NAS BARRAS
+    // 3) GLOW NAS BARRAS (mantido)
     const topFill = q('.progress-top .progress-fill, #progress-block-fill');
     const blockFill = q('.progress-question-fill');
     [topFill, blockFill].forEach(bar => {
@@ -111,21 +82,8 @@ if (middleContainer) {
         'inset 0 0 35px var(--progress-glow-2, rgba(255,230,150,0.25))'
       );
     });
-    // 3.1) ANEL/CONTORNO DA BARRA "PERGUNTAS NO BLOCO"
-    const qBar = q('.progress-question, .progress-question-bar, .progress-question-wrap, #progress-question');
-    if (qBar) {
-    setImp(qBar, 'background', 'rgba(0,0,0,0.35)');
-    setImp(qBar, 'border', '2px solid var(--progress-main, #ffd700)');   // anel
-    setImp(qBar, 'border-radius', '999px');
-    setImp(qBar, 'padding', '8px 14px');                                  // “corpo” do anel
-    setImp(qBar, 'box-shadow',
-     '0 0 18px var(--progress-main, #ffd700), ' +
-     '0 0 30px var(--progress-glow-1, rgba(255,210,120,0.65)), ' +
-     'inset 0 0 18px rgba(255,230,150,0.18)'
-    );
-   } 
 
-    // 4) Aura nos títulos
+    // 4) Aura nos títulos (mantido)
     const blockTitle = q('.titulo-bloco, h3');
     const questionTitle = q('#jp-question-typed, .perguntas-titulo');
     if (blockTitle) {
@@ -140,8 +98,8 @@ if (middleContainer) {
       );
     }
 
-    console.log(MOD, 'VERSÃO FINAL DEFINITIVA: pergunta livre + marcador fora + glow perfeito');
- 
+    console.log(MOD, 'VERSÃO FINAL EQUILIBRADA: container subido + botões no lugar + caixa de resposta livre');
+  }
 
   const tryApply = () => {
     const sec = document.getElementById('section-perguntas');
