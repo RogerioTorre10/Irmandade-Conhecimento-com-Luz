@@ -24,8 +24,8 @@
       '#section-perguntas .perguntas-content, #section-perguntas .perg-content'
     );
     if (content) {
-      setImp(content, 'padding-top', '20px');
-      setImp(content, 'margin-top', '0px');
+      setImp(content, 'padding-top', '8px');
+      setImp(content, 'margin-top', '-12px');
     } else {
       const perguntasWrap = q('.perguntas-wrap, .section-perguntas');
       if (perguntasWrap) setImp(perguntasWrap, 'padding-top', '30px');
@@ -50,28 +50,33 @@
       setImp(pergaminho, 'margin-top', '120px');
     }
 
-    // 2) MARCADOR FORA DO PERGAMINHO
-    const middleContainer = q('.progress-middle');
-    if (middleContainer) {
-      setImp(middleContainer, 'position', 'absolute');
-      setImp(middleContainer, 'left', '50%');
-      setImp(middleContainer, 'transform', 'translateX(-50%)');
-      setImp(middleContainer, 'bottom', '50px'); // ajuste se precisar
-      setImp(middleContainer, 'z-index', '40');
+    // 2) MARCADOR FIXO NO FLUXO, ACIMA DOS BOTÕES
+const middleContainer = q('.progress-middle');
+if (middleContainer) {
+  setImp(middleContainer, 'position', 'relative');   // 🔥 CRÍTICO
+  setImp(middleContainer, 'bottom', 'auto');
+  setImp(middleContainer, 'left', 'auto');
+  setImp(middleContainer, 'transform', 'none');
 
-      setImp(middleContainer, 'display', 'flex');
-      setImp(middleContainer, 'align-items', 'center');
-      setImp(middleContainer, 'justify-content', 'center');
-      setImp(middleContainer, 'gap', '12px');
-      setImp(middleContainer, 'padding', '10px 20px');
-      setImp(middleContainer, 'background', 'rgba(0,0,0,0.50)');
-      setImp(middleContainer, 'border-radius', '30px');
-      setImp(middleContainer, 'border', '2px solid var(--progress-main, #ffd700)');
-      setImp(middleContainer, 'box-shadow',
-        '0 0 20px var(--progress-main, #ffd700), ' +
-        '0 0 40px var(--progress-glow-1, rgba(255,210,120,0.85)), ' +
-        '0 6px 20px rgba(0,0,0,0.7)'
-      );
+  setImp(middleContainer, 'margin', '18px auto 10px'); // entre pergunta e botões
+  setImp(middleContainer, 'z-index', '20');
+
+  setImp(middleContainer, 'display', 'flex');
+  setImp(middleContainer, 'align-items', 'center');
+  setImp(middleContainer, 'justify-content', 'center');
+  setImp(middleContainer, 'gap', '12px');
+  setImp(middleContainer, 'padding', '8px 18px');
+
+  setImp(middleContainer, 'background', 'rgba(0,0,0,0.45)');
+  setImp(middleContainer, 'border-radius', '30px');
+  setImp(middleContainer, 'border', '2px solid var(--progress-main, #ffd700)');
+  setImp(middleContainer, 'box-shadow',
+    '0 0 18px var(--progress-main, #ffd700), ' +
+    '0 0 30px var(--progress-glow-1, rgba(255,210,120,0.7)), ' +
+    '0 6px 18px rgba(0,0,0,0.6)'
+  );
+}
+
 
       const label = q('.progress-middle .progress-label');
       if (label) {
