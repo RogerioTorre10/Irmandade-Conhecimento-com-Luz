@@ -28,7 +28,7 @@
       setImp(content, 'margin-top', '0px');
     } else {
       const perguntasWrap = q('.perguntas-wrap, .section-perguntas');
-      if (perguntasWrap) setImp(perguntasWrap, 'padding-top', '160px');
+      if (perguntasWrap) setImp(perguntasWrap, 'padding-top', '40px');
     }
     const questionTitle2 = q('#jp-question-typed, .perguntas-titulo');
      if (questionTitle2) {
