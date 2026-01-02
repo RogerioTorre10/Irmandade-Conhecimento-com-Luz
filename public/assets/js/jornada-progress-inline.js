@@ -24,8 +24,8 @@
       '#section-perguntas .perguntas-content, #section-perguntas .perg-content'
     );
     if (content) {
-      setImp(content, 'padding-top', '18px'); // valor equilibrado: sobe o conteúdo
-      setImp(content, 'margin-top', '-6px');
+      setImp(content, 'padding-top', '32px'); // valor equilibrado: sobe o conteúdo
+      setImp(content, 'margin-top', '0px');
     } else {
       const perguntasWrap = q('.perguntas-wrap, .section-perguntas');
       if (perguntasWrap) setImp(perguntasWrap, 'padding-top', '40px');
@@ -90,7 +90,7 @@
     const qBar = q('.progress-question, .progress-question-bar, .progress-question-wrap, #progress-question');
     if (qBar) {
     setImp(qBar, 'position', 'relative');
-    setImp(qBar, 'top', '18px');                 // empurra para fora do pergaminho
+    setImp(qBar, 'top', '32px');                 // empurra para fora do pergaminho
     setImp(qBar, 'margin', '0 auto 6px');        // aproxima dos botões
     setImp(qBar, 'z-index', '30');
 
