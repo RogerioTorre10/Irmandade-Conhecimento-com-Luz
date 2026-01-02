@@ -534,6 +534,15 @@
         input.focus();
         input.scrollTop = input.scrollHeight;
       };
+      
+      // FORÇA A ATUALIZAÇÃO NO MOBILE (truque que resolve em 90% dos casos)
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+        
+        // Se for textarea, força seleção no final
+        if (input.selectionStart !== undefined) {
+          input.selectionStart = input.selectionEnd = input.value.length;
+        }
 
       recognition.onerror = (event) => {
         console.warn('[MIC] Erro:', event.error);
