@@ -39,7 +39,7 @@
     const middleContainer = q('.progress-middle');
     if (middleContainer) {
       setImp(middleContainer, 'position', 'relative');   // 🔥 CRÍTICO
-      setImp(middleContainer, 'bottom', '60px'); // valor clássico: coloca o marcador dentro do pergaminho, logo acima da caixa de resposta
+      setImp(middleContainer, 'bottom', '100px'); // valor clássico: coloca o marcador dentro do pergaminho, logo acima da caixa de resposta
       setImp(middleContainer, 'left', 'auto');
       setImp(middleContainer, 'transform', 'none');
       setImp(middleContainer, 'margin', '18px auto 10px'); // entre pergunta e botões
