@@ -15,7 +15,7 @@
     // 1) ESPAÇO NO TOPO EQUILIBRADO
     const topBar = q('.progress-top');
     if (topBar) {
-      setImp(topBar, 'margin-bottom', '80px');
+      setImp(topBar, 'margin-bottom', '40px');
     }
 
     const content = q(
@@ -24,15 +24,15 @@
       '#section-perguntas .perguntas-content, #section-perguntas .perg-content'
     );
     if (content) {
-      setImp(content, 'padding-top', '110px'); // valor equilibrado: sobe o conteúdo
+      setImp(content, 'padding-top', '150px'); // valor equilibrado: sobe o conteúdo
       setImp(content, 'margin-top', '0px');
     } else {
       const perguntasWrap = q('.perguntas-wrap, .section-perguntas');
-      if (perguntasWrap) setImp(perguntasWrap, 'padding-top', '40px');
+      if (perguntasWrap) setImp(perguntasWrap, 'padding-top', '160px');
     }
     const questionTitle2 = q('#jp-question-typed, .perguntas-titulo');
      if (questionTitle2) {
-     setImp(questionTitle2, 'margin-top', '10px');
+     setImp(questionTitle2, 'margin-top', '60px');
     }
 
     // 2) MARCADOR FORA DO PERGAMINHO, mas não tão baixo
