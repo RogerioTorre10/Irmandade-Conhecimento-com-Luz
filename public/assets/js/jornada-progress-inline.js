@@ -15,7 +15,7 @@
     // 1) ESPAÇO NO TOPO EQUILIBRADO
     const topBar = q('.progress-top');
     if (topBar) {
-      setImp(topBar, 'margin-bottom', '20px');
+      setImp(topBar, 'margin-bottom', '40px');
     }
 
     const content = q(
@@ -39,7 +39,7 @@
     const middleContainer = q('.progress-middle');
     if (middleContainer) {
       setImp(middleContainer, 'position', 'relative');   // 🔥 CRÍTICO
-      setImp(middleContainer, 'bottom', '-150px'); // valor clássico: coloca o marcador dentro do pergaminho, logo acima da caixa de resposta
+      setImp(middleContainer, 'bottom', '-140px'); // valor clássico: coloca o marcador dentro do pergaminho, logo acima da caixa de resposta
       setImp(middleContainer, 'left', 'auto');
       setImp(middleContainer, 'transform', 'none');
       setImp(middleContainer, 'margin', '18px auto 10px'); // entre pergunta e botões
