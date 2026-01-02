@@ -1700,7 +1700,7 @@
   .perguntas-panel,
   .jp-container {
     min-height: 100vh !important;
-    padding-bottom: 120px !important; /* espaço extra para os botões não ficarem cortados */
+    padding-bottom: 60px !important; /* espaço extra para os botões não ficarem cortados */
     box-sizing: border-box !important;
   }
 
