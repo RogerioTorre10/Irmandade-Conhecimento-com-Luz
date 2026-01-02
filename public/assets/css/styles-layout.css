@@ -1692,7 +1692,39 @@
     font-size: 16px !important;
   }
 }
+   
+/* Responsivo mobile: garante que os botões fiquem visíveis e o conteúdo não corte */
+@media (max-width: 768px) {
+  #section-perguntas,
+  .perguntas-wrap,
+  .perguntas-panel,
+  .jp-container {
+    min-height: 100vh !important;
+    padding-bottom: 120px !important; /* espaço extra para os botões não ficarem cortados */
+    box-sizing: border-box !important;
+  }
 
+  .perguntas-controls,
+  .jp-controls,
+  .bottom-buttons,
+  #jp-buttons-wrapper {
+    position: fixed !important;
+    bottom: 20px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 90% !important;
+    z-index: 100 !important;
+    padding: 10px !important;
+    background: rgba(0,0,0,0.3) !important;
+    border-radius: 20px !important;
+  }
+
+  /* Garante que o body não corte o conteúdo */
+  body, html {
+    height: auto !important;
+    overflow-x: hidden !important;
+  }
+}
 @media (max-width: 360px) {
   .perguntas-controls {
     gap: 10px !important;
