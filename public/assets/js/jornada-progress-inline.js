@@ -24,7 +24,7 @@
       '#section-perguntas .perguntas-content, #section-perguntas .perg-content'
     );
     if (content) {
-      setImp(content, 'padding-top', '32px'); // valor equilibrado: sobe o conteúdo
+      setImp(content, 'padding-top', '42px'); // valor equilibrado: sobe o conteúdo
       setImp(content, 'margin-top', '0px');
     } else {
       const perguntasWrap = q('.perguntas-wrap, .section-perguntas');
@@ -39,7 +39,7 @@
     const middleContainer = q('.progress-middle');
     if (middleContainer) {
       setImp(middleContainer, 'position', 'relative');   // 🔥 CRÍTICO
-      setImp(middleContainer, 'bottom', '-140px'); // valor clássico: coloca o marcador dentro do pergaminho, logo acima da caixa de resposta
+      setImp(middleContainer, 'bottom', '-145px'); // valor clássico: coloca o marcador dentro do pergaminho, logo acima da caixa de resposta
       setImp(middleContainer, 'left', 'auto');
       setImp(middleContainer, 'transform', 'none');
       setImp(middleContainer, 'margin', '18px auto 10px'); // entre pergunta e botões
