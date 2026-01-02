@@ -24,7 +24,7 @@
       '#section-perguntas .perguntas-content, #section-perguntas .perg-content'
     );
     if (content) {
-      setImp(content, 'padding-top', '150px'); // valor equilibrado: sobe o conteúdo
+      setImp(content, 'padding-top', '130px'); // valor equilibrado: sobe o conteúdo
       setImp(content, 'margin-top', '0px');
     } else {
       const perguntasWrap = q('.perguntas-wrap, .section-perguntas');
@@ -32,7 +32,7 @@
     }
     const questionTitle2 = q('#jp-question-typed, .perguntas-titulo');
      if (questionTitle2) {
-     setImp(questionTitle2, 'margin-top', '60px');
+     setImp(questionTitle2, 'margin-top', '30px');
     }
 
     // 2) MARCADOR FORA DO PERGAMINHO, mas não tão baixo
