@@ -24,7 +24,7 @@
       '#section-perguntas .perguntas-content, #section-perguntas .perg-content'
     );
     if (content) {
-      setImp(content, 'padding-top', '82px'); // valor equilibrado: sobe o conteúdo
+      setImp(content, 'padding-top', '110px'); // valor equilibrado: sobe o conteúdo
       setImp(content, 'margin-top', '0px');
     } else {
       const perguntasWrap = q('.perguntas-wrap, .section-perguntas');
