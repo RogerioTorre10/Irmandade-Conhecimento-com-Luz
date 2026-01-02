@@ -25,7 +25,7 @@
     );
     if (content) {
       setImp(content, 'padding-top', '18px'); // valor equilibrado: sobe o conteúdo
-      setImp(content, 'margin-top', '-12px');
+      setImp(content, 'margin-top', '-6px');
     } else {
       const perguntasWrap = q('.perguntas-wrap, .section-perguntas');
       if (perguntasWrap) setImp(perguntasWrap, 'padding-top', '40px');
@@ -86,19 +86,26 @@
         'inset 0 0 35px var(--progress-glow-2, rgba(255,230,150,0.25))'
       );
     });
-    // 3.1) ANEL/CONTORNO DA BARRA "PERGUNTAS NO BLOCO"
+    // 3.1) BARRA "PERGUNTAS NO BLOCO" — FORA DO PERGAMINHO
     const qBar = q('.progress-question, .progress-question-bar, .progress-question-wrap, #progress-question');
     if (qBar) {
-    setImp(qBar, 'background', 'rgba(0,0,0,0.35)');
-    setImp(qBar, 'border', '2px solid var(--progress-main, #ffd700)');   // anel
+    setImp(qBar, 'position', 'relative');
+    setImp(qBar, 'top', '18px');                 // empurra para fora do pergaminho
+    setImp(qBar, 'margin', '0 auto 6px');        // aproxima dos botões
+    setImp(qBar, 'z-index', '30');
+
+    setImp(qBar, 'background', 'rgba(0,0,0,0.45)');
+    setImp(qBar, 'border', '2px solid var(--progress-main, #ffd700)');
     setImp(qBar, 'border-radius', '999px');
-    setImp(qBar, 'padding', '8px 14px');                                  // “corpo” do anel
+    setImp(qBar, 'padding', '10px 18px');
+
     setImp(qBar, 'box-shadow',
-    '0 0 18px var(--progress-main, #ffd700), ' +
-    '0 0 30px var(--progress-glow-1, rgba(255,210,120,0.65)), ' +
-    'inset 0 0 18px rgba(255,230,150,0.18)'
-   );
+      '0 0 20px var(--progress-main, #ffd700), ' +
+      '0 0 36px var(--progress-glow-1, rgba(255,210,120,0.75)), ' +
+      'inset 0 0 20px rgba(255,230,150,0.2)'
+    );
    }
+
     
     // 4) Aura nos títulos (mantido)
     const blockTitle = q('.titulo-bloco, h3');
