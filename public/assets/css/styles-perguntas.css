@@ -352,50 +352,6 @@
   box-shadow: 0 8px 18px rgba(0,0,0,0.95);
 }
 
-/* ===========================================================
-   MOBILE
-   =========================================================== */
-@media (max-width: 600px){
-  .section-perguntas{
-    padding: 20px 6px 14px;
-  }
-
-  .section-perguntas .perguntas-wrap{
-    padding: 64px 8px 72px;
-    padding-bottom: 92px; 
-  }
-
-  .perguntas-pergaminho{
-    padding: 10px 6px 8px;
-  }
-
-  .progress-top .progress-label{ display: none; }
-  .progress-top{
-    left: 10px;
-    right: 72px;
-  }
-
-  .progress-middle{
-    width: min(92%, 440px);
-    bottom: -4px;
-    font-size: 12px; 
-  }
-
-  .perguntas-controls{
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  #jp-btn-confirmar{
-    grid-column: 1 / -1;
-    width: 50%;
-    justify-self: center;
-  }
-
-  .progress-top .progress-value{
-    top: -4px !important;
-    font-size: 12px !important;
-  }
-}
 
 /* ===========================================================
    PULSO DO GUIA — MAIS INTENSO E VIVO
