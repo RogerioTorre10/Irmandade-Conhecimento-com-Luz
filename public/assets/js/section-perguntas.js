@@ -500,7 +500,7 @@
   const btnConfirmar = $('#jp-btn-confirmar', root);
   const input       = $('#jp-answer-input', root);    
 
-  // ========= MICROFONE NATIVO COM TOGGLE CONTÍNUO (funciona em todas as perguntas) =========
+   // ========= MICROFONE NATIVO COM TOGGLE CONTÍNUO (CORRIGIDO PARA MOBILE) =========
   if (btnFalar && input) {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
@@ -520,10 +520,7 @@
       recognition.onstart = () => {
         btnFalar.classList.add('recording');
         console.log('[MIC] Gravando continuamente');
-
-        // 🔥 MANTER FOCO NA CAIXA (cursor pisca + texto insere direito)
-        input.focus();
-        input.click(); // força teclado virtual aberto no mobile
+        // NÃO mexemos no foco aqui — deixamos o toggle funcionar naturalmente
       };
 
       recognition.onresult = (event) => {
@@ -532,14 +529,20 @@
           transcript += event.results[i][0].transcript;
           if (event.results[i].isFinal) transcript += ' ';
         }
-        input.value = (input.value + transcript).trim() + ' ';
 
-        // 🔥 FORÇA ATUALIZAÇÃO E MANTÉM CURSOR NO FINAL
-        input.focus();
+        // Insere o texto de forma segura
+        const currentValue = input.value;
+        input.value = (currentValue + ' ' + transcript).trim() + ' ';
+
+        // Força atualização e mantém cursor no final (sem tirar foco)
         input.scrollTop = input.scrollHeight;
         if (input.selectionStart !== undefined) {
           input.selectionStart = input.selectionEnd = input.value.length;
         }
+
+        // Dispara eventos para o app reagir (resolve duplicidade no mobile)
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
       };
 
       recognition.onerror = (event) => {
@@ -558,19 +561,17 @@
       window.__GLOBAL_MIC__ = recognition;
     }
 
+    // Toggle corrigido: garante stop/start limpo
     btnFalar.addEventListener('click', (ev) => {
       ev.preventDefault();
       ev.stopPropagation();
 
       if (btnFalar.classList.contains('recording')) {
         recognition.stop();
+        console.log('[MIC] Parando manualmente');
       } else {
         recognition.start();
-        // 🔥 GARANTE FOCO LOGO APÓS INICIAR
-        setTimeout(() => {
-          input.focus();
-          input.click();
-        }, 300);
+        console.log('[MIC] Iniciando gravação');
       }
     });
   }
