@@ -510,18 +510,20 @@
       return;
     }
 
-    // Instância única global reutilizável
     let recognition = window.__GLOBAL_MIC__;
-
     if (!recognition) {
       recognition = new SpeechRecognition();
       recognition.lang = 'pt-BR';
-      recognition.continuous = true;       // FICA ATIVO ATÉ PARAR MANUALMENTE
+      recognition.continuous = true;
       recognition.interimResults = true;
 
       recognition.onstart = () => {
         btnFalar.classList.add('recording');
         console.log('[MIC] Gravando continuamente');
+
+        // 🔥 MANTER FOCO NA CAIXA (cursor pisca + texto insere direito)
+        input.focus();
+        input.click(); // força teclado virtual aberto no mobile
       };
 
       recognition.onresult = (event) => {
@@ -531,18 +533,14 @@
           if (event.results[i].isFinal) transcript += ' ';
         }
         input.value = (input.value + transcript).trim() + ' ';
+
+        // 🔥 FORÇA ATUALIZAÇÃO E MANTÉM CURSOR NO FINAL
         input.focus();
         input.scrollTop = input.scrollHeight;
-      };
-      
-      // FORÇA A ATUALIZAÇÃO NO MOBILE (truque que resolve em 90% dos casos)
-        input.dispatchEvent(new Event('input', { bubbles: true }));
-        input.dispatchEvent(new Event('change', { bubbles: true }));
-        
-        // Se for textarea, força seleção no final
         if (input.selectionStart !== undefined) {
           input.selectionStart = input.selectionEnd = input.value.length;
         }
+      };
 
       recognition.onerror = (event) => {
         console.warn('[MIC] Erro:', event.error);
@@ -560,7 +558,6 @@
       window.__GLOBAL_MIC__ = recognition;
     }
 
-    // Toggle: liga/desliga com um clique
     btnFalar.addEventListener('click', (ev) => {
       ev.preventDefault();
       ev.stopPropagation();
@@ -568,7 +565,12 @@
       if (btnFalar.classList.contains('recording')) {
         recognition.stop();
       } else {
-        recognition.start(); // funciona mesmo após várias perguntas
+        recognition.start();
+        // 🔥 GARANTE FOCO LOGO APÓS INICIAR
+        setTimeout(() => {
+          input.focus();
+          input.click();
+        }, 300);
       }
     });
   }
