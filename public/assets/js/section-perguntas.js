@@ -305,67 +305,59 @@
     }
   }
   
-    // ====== APLICAR TEMA DO GUIA CORRETAMENTE (COM FALLBACK DOURADO NO INÍCIO) ======
-  (function applyGuiaTheme() {
-    // 1. Lê o guia salvo – SE NÃO EXISTIR, usa null (para fallback dourado)
+     // ====== APLICAR TEMA DO GUIA (FUNÇÃO GLOBAL E REUTILIZÁVEL) ======
+  function aplicarTemaGuia() {
     const guiaRaw = sessionStorage.getItem('jornada.guia');
     const guia = guiaRaw ? guiaRaw.toLowerCase().trim() : null;
 
-    // Remove qualquer tema anterior para evitar conflito
+    // Limpa atributos antigos
     document.body.removeAttribute('data-guia');
     document.body.classList.remove('guia-lumen', 'guia-zion', 'guia-arian');
 
-    // Se não tem guia escolhido ainda → força o fallback dourado clássico
-    if (!guia) {
-      // Aplica as variáveis douradas padrão (já definidas no CSS, mas reforçamos)
-      document.documentElement.style.setProperty('--theme-main-color', '#d4af37');
-      document.documentElement.style.setProperty('--progress-main', '#ffd700');
-      document.documentElement.style.setProperty('--progress-glow-1', 'rgba(255,230,180,0.85)');
-      document.documentElement.style.setProperty('--progress-glow-2', 'rgba(255,210,120,0.75)');
-      
-      console.log('[PERGUNTAS] Nenhum guia escolhido ainda → tema dourado padrão aplicado');
-      return; // não coloca data-guia, deixa o CSS usar o fallback natural
-    }
+    let mainColor = '#d4af37';
+    let glow1 = 'rgba(255,230,180,0.85)';
+    let glow2 = 'rgba(255,210,120,0.75)';
 
-    // Se tem guia escolhido → aplica normalmente
-    document.body.setAttribute('data-guia', guia);
-    document.body.classList.add(`guia-${guia}`);
+    if (guia) {
+      document.body.setAttribute('data-guia', guia);
+      document.body.classList.add(`guia-${guia}`);
 
-    let mainColor, glow1, glow2;
-
-    switch (guia) {
-      case 'lumen':
+      if (guia === 'lumen') {
         mainColor = '#00ff9d';
         glow1 = 'rgba(0,255,157,0.9)';
         glow2 = 'rgba(120,255,200,0.7)';
-        break;
-      case 'zion':
+      } else if (guia === 'zion') {
         mainColor = '#00aaff';
         glow1 = 'rgba(0,170,255,0.9)';
         glow2 = 'rgba(255,214,91,0.7)';
-        break;
-      case 'arian':
+      } else if (guia === 'arian') {
         mainColor = '#ff00ff';
         glow1 = 'rgba(255,120,255,0.95)';
         glow2 = 'rgba(255,180,255,0.8)';
-        break;
-      default:
-        mainColor = '#d4af37';
-        glow1 = 'rgba(255,230,180,0.85)';
-        glow2 = 'rgba(255,210,120,0.75)';
+      }
     }
 
+    // Aplica as variáveis no :root
     document.documentElement.style.setProperty('--theme-main-color', mainColor);
     document.documentElement.style.setProperty('--progress-main', mainColor);
     document.documentElement.style.setProperty('--progress-glow-1', glow1);
     document.documentElement.style.setProperty('--progress-glow-2', glow2);
 
-    // Remove estilo injetado antigo, se existir
+    // Remove estilo injetado antigo
     const oldStyle = document.getElementById('progress-glow-style');
     if (oldStyle) oldStyle.remove();
 
-    console.log('[PERGUNTAS] Tema do guia aplicado:', guia, mainColor);
-  })();
+    console.log('[TEMA GUIA] Aplicado:', guia || 'dourado padrão', mainColor);
+  }
+
+  // Executa ao carregar
+  aplicarTemaGuia();
+
+  // Reaplica quando mudar pergunta ou guia
+  document.addEventListener('perguntas:state-changed', aplicarTemaGuia);
+  document.addEventListener('guia:changed', aplicarTemaGuia);
+  // Caso o guia mude em outra seção e recarregue
+  window.addEventListener('load', aplicarTemaGuia);
   
   // --------------------------------------------------
   // RESPOSTAS
