@@ -305,59 +305,65 @@
     }
   }
   
-     // ====== APLICAR TEMA DO GUIA (FUNÇÃO GLOBAL E REUTILIZÁVEL) ======
-  function aplicarTemaGuia() {
+     // ====== APLICAR TEMA DO GUIA CORRETAMENTE (COM FALLBACK DOURADO NO INÍCIO) ======
+  (function applyGuiaTheme() {
     const guiaRaw = sessionStorage.getItem('jornada.guia');
     const guia = guiaRaw ? guiaRaw.toLowerCase().trim() : null;
 
-    // Limpa atributos antigos
+    // Remove qualquer tema anterior
     document.body.removeAttribute('data-guia');
     document.body.classList.remove('guia-lumen', 'guia-zion', 'guia-arian');
 
-    let mainColor = '#d4af37';
-    let glow1 = 'rgba(255,230,180,0.85)';
-    let glow2 = 'rgba(255,210,120,0.75)';
+    // Fallback dourado se não tem guia
+    if (!guia) {
+      document.documentElement.style.setProperty('--theme-main-color', '#d4af37');
+      document.documentElement.style.setProperty('--progress-main', '#ffd700');
+      document.documentElement.style.setProperty('--progress-glow-1', 'rgba(255,230,180,0.85)');
+      document.documentElement.style.setProperty('--progress-glow-2', 'rgba(255,210,120,0.75)');
+      
+      console.log('[PERGUNTAS] Nenhum guia escolhido ainda → tema dourado padrão aplicado');
+      return;
+    }
 
-    if (guia) {
-      document.body.setAttribute('data-guia', guia);
-      document.body.classList.add(`guia-${guia}`);
+    // Aplica o guia escolhido
+    document.body.setAttribute('data-guia', guia);
+    document.body.classList.add(`guia-${guia}`);
 
-      if (guia === 'lumen') {
+    let mainColor, glow1, glow2;
+
+    switch (guia) {
+      case 'lumen':
         mainColor = '#00ff9d';
         glow1 = 'rgba(0,255,157,0.9)';
         glow2 = 'rgba(120,255,200,0.7)';
-      } else if (guia === 'zion') {
+        break;
+      case 'zion':
         mainColor = '#00aaff';
         glow1 = 'rgba(0,170,255,0.9)';
         glow2 = 'rgba(255,214,91,0.7)';
-      } else if (guia === 'arian') {
+        break;
+      case 'arian':
         mainColor = '#ff00ff';
         glow1 = 'rgba(255,120,255,0.95)';
         glow2 = 'rgba(255,180,255,0.8)';
-      }
+        break;
+      default:
+        mainColor = '#d4af37';
+        glow1 = 'rgba(255,230,180,0.85)';
+        glow2 = 'rgba(255,210,120,0.75)';
     }
 
-    // Aplica as variáveis no :root
     document.documentElement.style.setProperty('--theme-main-color', mainColor);
     document.documentElement.style.setProperty('--progress-main', mainColor);
     document.documentElement.style.setProperty('--progress-glow-1', glow1);
     document.documentElement.style.setProperty('--progress-glow-2', glow2);
 
-    // Remove estilo injetado antigo
+    // Remove estilo antigo injetado
     const oldStyle = document.getElementById('progress-glow-style');
     if (oldStyle) oldStyle.remove();
 
-    console.log('[TEMA GUIA] Aplicado:', guia || 'dourado padrão', mainColor);
-  }
-
-  // Executa ao carregar
-  aplicarTemaGuia();
-
-  // Reaplica quando mudar pergunta ou guia
-  document.addEventListener('perguntas:state-changed', aplicarTemaGuia);
-  document.addEventListener('guia:changed', aplicarTemaGuia);
-  // Caso o guia mude em outra seção e recarregue
-  window.addEventListener('load', aplicarTemaGuia);
+    console.log('[PERGUNTAS] Tema do guia aplicado:', guia, mainColor);
+  })();
   
   // --------------------------------------------------
   // RESPOSTAS
