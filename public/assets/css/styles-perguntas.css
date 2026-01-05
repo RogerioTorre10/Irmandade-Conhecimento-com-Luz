@@ -708,24 +708,25 @@ body[data-guia="arian"] .progress-inline .progress-question-fill {
   box-shadow:
     0 0 26px color-mix(in srgb, var(--guide-color, #ffd700) 75%, transparent);
 }
+
 /* ===========================================================
-   AURA DO GUIA — CONSISTENTE EM TODOS OS ELEMENTOS PRINCIPAIS
+   AURA DO GUIA — IGUALZINHA À DOS BOTÕES (Falar, Apagar, Avançar)
    =========================================================== */
 
-/* 1. Barra superior de blocos (a de cima: "1 de 5") */
+/* Barra superior de blocos */
 .progress-top,
 .progress-top .progress-fill,
 #progress-block-fill {
-  background: var(--progress-main, #ffd700) !important;
-  box-shadow: 
+  background: linear-gradient(90deg, rgba(0,0,0,0.8), var(--progress-main, #ffd700)) !important;
+  border: 2px solid var(--progress-main, #ffd700) !important;
+  box-shadow:
     0 0 20px var(--progress-main, #ffd700),
     0 0 40px var(--progress-glow-1, rgba(255,210,120,0.85)),
-    inset 0 0 30px var(--progress-glow-2, rgba(255,210,120,0.75)) !important;
-  border: 1px solid var(--progress-main, #ffd700) !important;
-  animation: barra-glow 4s infinite alternate !important;
+    0 0 60px var(--progress-glow-2, rgba(255,210,120,0.6)) !important;
+  animation: btn-glow 3s infinite alternate !important;
 }
 
-/* 2. Caixa de resposta (a caixa preta onde digita) */
+/* Caixa de resposta */
 .jp-question-box,
 .pergunta-box,
 .question-card,
@@ -734,44 +735,44 @@ body[data-guia="arian"] .progress-inline .progress-question-fill {
 #jp-response-input,
 textarea {
   border: 3px solid var(--progress-main, #ffd700) !important;
-  box-shadow: 
-    0 0 25px var(--progress-main, #ffd700),
-    0 0 50px var(--progress-glow-1, rgba(255,210,120,0.85)),
-    inset 0 0 30px rgba(0,0,0,0.6) !important;
-  background: rgba(0,0,0,0.85) !important;
-  animation: barra-glow 5s infinite alternate !important;
+  box-shadow:
+    0 0 20px var(--progress-main, #ffd700),
+    0 0 40px var(--progress-glow-1, rgba(255,210,120,0.85)),
+    inset 0 0 40px rgba(0,0,0,0.7) !important;
+  background: rgba(0,0,0,0.9) !important;
+  animation: btn-glow 3s infinite alternate !important;
 }
 
-/* 3. Texto da pergunta datilografada (o que aparece letra por letra) */
+/* Texto da pergunta datilografada */
 #jp-question-typed,
 .perguntas-titulo,
 .question-typed,
 .titulo-pergunta {
   color: var(--progress-main, #ffd700) !important;
-  text-shadow: 
-    0 0 15px var(--progress-main, #ffd700),
-    0 0 30px var(--progress-glow-1, rgba(255,210,120,0.85)),
-    0 0 45px var(--progress-glow-2, rgba(255,210,120,0.75)) !important;
-  animation: text-glow 4s infinite alternate !important;
+  text-shadow:
+    0 0 12px var(--progress-main, #ffd700),
+    0 0 25px var(--progress-glow-1, rgba(255,210,120,0.85)),
+    0 0 40px var(--progress-glow-2, rgba(255,210,120,0.6)) !important;
+  animation: text-pulse 3s infinite alternate !important;
 }
 
-/* Animação suave de pulsação (já usada nas barras) */
-@keyframes barra-glow {
-  0% { 
-    box-shadow: 
-      0 0 20px var(--progress-main),
-      0 0 40px var(--progress-glow-1),
-      inset 0 0 30px var(--progress-glow-2);
+/* Animações iguais aos botões */
+@keyframes btn-glow {
+  0% {
+    box-shadow:
+      0 0 15px var(--progress-main),
+      0 0 30px var(--progress-glow-1),
+      0 0 50px var(--progress-glow-2);
   }
-  100% { 
-    box-shadow: 
-      0 0 30px var(--progress-main),
-      0 0 60px var(--progress-glow-1),
-      inset 0 0 40px var(--progress-glow-2);
+  100% {
+    box-shadow:
+      0 0 25px var(--progress-main),
+      0 0 50px var(--progress-glow-1),
+      0 0 80px var(--progress-glow-2);
   }
 }
 
-@keyframes text-glow {
-  0% { text-shadow: 0 0 15px var(--progress-main), 0 0 30px var(--progress-glow-1); }
-  100% { text-shadow: 0 0 25px var(--progress-main), 0 0 50px var(--progress-glow-1); }
+@keyframes text-pulse {
+  0% { text-shadow: 0 0 10px var(--progress-main), 0 0 20px var(--progress-glow-1); }
+  100% { text-shadow: 0 0 20px var(--progress-main), 0 0 40px var(--progress-glow-1); }
 }
