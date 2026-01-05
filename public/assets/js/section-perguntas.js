@@ -305,27 +305,28 @@
     }
   }
   
-     // ====== APLICAR TEMA DO GUIA CORRETAMENTE (COM FALLBACK DOURADO NO INÍCIO) ======
+      // ====== APLICAR TEMA DO GUIA CORRETAMENTE (COM FALLBACK DOURADO NO INÍCIO) ======
   (function applyGuiaTheme() {
     const guiaRaw = sessionStorage.getItem('jornada.guia');
     const guia = guiaRaw ? guiaRaw.toLowerCase().trim() : null;
 
-    // Remove qualquer tema anterior
+    // Remove qualquer tema anterior para evitar conflito
     document.body.removeAttribute('data-guia');
     document.body.classList.remove('guia-lumen', 'guia-zion', 'guia-arian');
 
-    // Fallback dourado se não tem guia
+    // Se não tem guia escolhido ainda → força o fallback dourado clássico
     if (!guia) {
       document.documentElement.style.setProperty('--theme-main-color', '#d4af37');
       document.documentElement.style.setProperty('--progress-main', '#ffd700');
       document.documentElement.style.setProperty('--progress-glow-1', 'rgba(255,230,180,0.85)');
       document.documentElement.style.setProperty('--progress-glow-2', 'rgba(255,210,120,0.75)');
-      
+      document.documentElement.style.setProperty('--guide-color', '#ffd700'); // ← ADICIONADO: alinha com o CSS
+
       console.log('[PERGUNTAS] Nenhum guia escolhido ainda → tema dourado padrão aplicado');
-      return;
+      return; // não coloca data-guia, deixa o CSS usar o fallback natural
     }
 
-    // Aplica o guia escolhido
+    // Se tem guia escolhido → aplica normalmente
     document.body.setAttribute('data-guia', guia);
     document.body.classList.add(`guia-${guia}`);
 
@@ -357,8 +358,9 @@
     document.documentElement.style.setProperty('--progress-main', mainColor);
     document.documentElement.style.setProperty('--progress-glow-1', glow1);
     document.documentElement.style.setProperty('--progress-glow-2', glow2);
+    document.documentElement.style.setProperty('--guide-color', mainColor); // ← ADICIONADO: agora o CSS usa a cor do guia
 
-    // Remove estilo antigo injetado
+    // Remove estilo injetado antigo, se existir
     const oldStyle = document.getElementById('progress-glow-style');
     if (oldStyle) oldStyle.remove();
 
