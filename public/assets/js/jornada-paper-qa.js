@@ -373,19 +373,97 @@ updateProgress(currentBlock, currentQuestion);
 
     log('Pergunta renderizada com sucesso');
   }
- 
-  async function loadDynamicBlocks() {
+  
+async function loadDynamicBlocks() {
+  // ==============================
+  // MODO TESTE (14 PERGUNTAS)
+  // ==============================
+  const TEST_MODE = true; // <<< deixe true enquanto o Paper QA ainda não tem 50 perguntas
+
+  // 5 blocos: 3,3,3,3,2 = 14
+  // IMPORTANTE: coloque aqui as SUAS perguntas reais de teste (as 14)
+  const TEST_BLOCKS_PTBR = [
+    { id: 1, title: 'Bloco 1 — Raízes', questions: [
+      'Pergunta 1 do Bloco 1',
+      'Pergunta 2 do Bloco 1',
+      'Pergunta 3 do Bloco 1',
+    ]},
+    { id: 2, title: 'Bloco 2 — Reflexões', questions: [
+      'Pergunta 1 do Bloco 2',
+      'Pergunta 2 do Bloco 2',
+      'Pergunta 3 do Bloco 2',
+    ]},
+    { id: 3, title: 'Bloco 3 — Crescimento', questions: [
+      'Pergunta 1 do Bloco 3',
+      'Pergunta 2 do Bloco 3',
+      'Pergunta 3 do Bloco 3',
+    ]},
+    { id: 4, title: 'Bloco 4 — Integração', questions: [
+      'Pergunta 1 do Bloco 4',
+      'Pergunta 2 do Bloco 4',
+      'Pergunta 3 do Bloco 4',
+    ]},
+    { id: 5, title: 'Bloco 5 — Síntese e Entrega', questions: [
+      'Pergunta 1 do Bloco 5',
+      'Pergunta 2 do Bloco 5',
+    ]},
+  ];
+
+  // Se quiser que o teste também respeite i18n no futuro:
+  // você pode criar TEST_BLOCKS_ENUS, etc. Por enquanto PT-BR resolve.
+
+  // ------------------------------
+  // 1) Evita crash: i18n.waitForReady pode não existir
+  // ------------------------------
+  if (typeof i18n?.waitForReady === 'function') {
     await i18n.waitForReady(10000);
-    const lang = i18n.lang || 'pt-BR';
-    const base = blockTranslations[lang] || blockTranslations['pt-BR'];
-    JORNADA_BLOCKS = base.map(b => ({
-      id: b.id, title: b.title, data_i18n: b.data_i18n,
-      questions: b.questions, video_after: b.video_after, tipo: 'perguntas'
+  } else {
+    // fallback seguro (não trava o carregamento)
+    await new Promise((r) => setTimeout(r, 0));
+  }
+
+  const lang = i18n?.lang || 'pt-BR';
+
+  // ------------------------------
+  // 2) TEST MODE: trava em 14 perguntas
+  // ------------------------------
+  if (TEST_MODE) {
+    const baseTest = TEST_BLOCKS_PTBR;
+
+    JORNADA_BLOCKS = baseTest.map(b => ({
+      id: b.id,
+      title: b.title,
+      data_i18n: null,
+      questions: b.questions,
+      video_after: null,
+      tipo: 'perguntas'
     }));
+
     win.JORNADA_BLOCKS = JORNADA_BLOCKS;
-    log('Blocos carregados:', JORNADA_BLOCKS.length);
+    log('TEST_MODE ativo — blocos carregados:', JORNADA_BLOCKS.length, 'perguntas totais:',
+      JORNADA_BLOCKS.reduce((acc, bb) => acc + (bb.questions?.length || 0), 0)
+    );
     return true;
   }
+
+  // ------------------------------
+  // 3) NORMAL MODE: mantém seu comportamento atual
+  // ------------------------------
+  const base = blockTranslations[lang] || blockTranslations['pt-BR'];
+
+  JORNADA_BLOCKS = base.map(b => ({
+    id: b.id,
+    title: b.title,
+    data_i18n: b.data_i18n,
+    questions: b.questions,
+    video_after: b.video_after,
+    tipo: 'perguntas'
+  }));
+
+  win.JORNADA_BLOCKS = JORNADA_BLOCKS;
+  log('Blocos carregados:', JORNADA_BLOCKS.length);
+  return true;
+}
 
   async function initPaperQA() {
     await loadDynamicBlocks();
