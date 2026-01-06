@@ -776,3 +776,68 @@ textarea {
   0% { text-shadow: 0 0 10px var(--progress-main), 0 0 20px var(--progress-glow-1); }
   100% { text-shadow: 0 0 20px var(--progress-main), 0 0 40px var(--progress-glow-1); }
 }
+/* =========================================================
+   TEMA DO GUIA — Força auras a usar a cor do guia
+   (cole no FINAL do CSS global)
+   ========================================================= */
+
+:root{
+  --guide-color: #ffd700;
+  --guide-glow-1: rgba(255,230,180,0.85);
+  --guide-glow-2: rgba(255,210,120,0.75);
+}
+
+/* 1) Qualquer “bordo dourado” vira variável */
+.progress-top .progress-bar,
+.progress-middle .progress-bar,
+.progress-bottom .progress-bar,
+.progress-top .progress-fill,
+.progress-middle .progress-fill,
+.progress-bottom .progress-fill,
+#progress-block-fill,
+.progress-question-fill{
+  background: var(--guide-color) !important;
+  box-shadow:
+    0 0 18px var(--guide-color),
+    0 0 36px var(--guide-glow-1),
+    inset 0 0 24px var(--guide-glow-2) !important;
+  border-color: var(--guide-color) !important;
+}
+
+/* 2) Pílulas / contadores / badges */
+.progress-middle,
+.progress-question-value,
+.progress-label,
+.badge,
+.pill,
+.pill-bloco{
+  border-color: var(--guide-color) !important;
+  box-shadow:
+    0 0 14px var(--guide-color),
+    0 0 28px var(--guide-glow-1) !important;
+}
+
+/* 3) Aura em inputs/textarea (moldura) */
+#jp-answer-input,
+textarea,
+.input-box,
+.answer-box{
+  border-color: var(--guide-color) !important;
+  box-shadow:
+    0 0 16px var(--guide-color),
+    inset 0 0 20px rgba(0,0,0,0.6) !important;
+}
+
+/* 4) “Aro” dos botões (se já existe, reforça) */
+.btn, button{
+  box-shadow:
+    0 0 18px color-mix(in srgb, var(--guide-color) 60%, transparent) !important;
+}
+
+/* 5) Qualquer pseudo aura dourada (glows) */
+.j-panel-glow::before,
+.j-panel-glow::after{
+  box-shadow:
+    0 0 22px color-mix(in srgb, var(--guide-color) 45%, transparent),
+    inset 0 0 24px color-mix(in srgb, var(--guide-glow-1) 45%, transparent) !important;
+}
