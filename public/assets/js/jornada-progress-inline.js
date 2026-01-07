@@ -36,7 +36,7 @@
     // --------------------------------------------------
     const topBar = q('.progress-top');
     if (topBar) {
-      setImp(topBar, 'margin-bottom', '100px');
+      setImp(topBar, 'margin-bottom', '40px');
     }
 
     const content = q(
@@ -46,7 +46,7 @@
     );
 
     if (content) {
-      setImp(content, 'padding-top', '120px'); // mantém seu ajuste atual
+      setImp(content, 'padding-top', '140px'); // mantém seu ajuste atual
       setImp(content, 'margin-top', '0px');
     } else {
       const perguntasWrap = q('.perguntas-wrap, .section-perguntas');
