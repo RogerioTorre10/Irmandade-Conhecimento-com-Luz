@@ -306,8 +306,8 @@
 // === ATUALIZA TODAS AS BARRAS ===
 function updateProgress(block = 1, question = 1) {
   const totalBlocks = 5;
-  const questionsPerBlock = 10;
-  const totalQuestions = 50;
+  const questionsPerBlock = 3;
+  const totalQuestions = 14;
   const currentTotal = ((block - 1) * questionsPerBlock) + question;
 
   // Bloco
