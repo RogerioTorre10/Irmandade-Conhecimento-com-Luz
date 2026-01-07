@@ -36,7 +36,7 @@
     // --------------------------------------------------
     const topBar = q('.progress-top');
     if (topBar) {
-      setImp(topBar, 'margin-bottom', '80px');
+      setImp(topBar, 'margin-bottom', '100px');
     }
 
     const content = q(
