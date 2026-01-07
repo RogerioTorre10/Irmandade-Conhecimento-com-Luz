@@ -507,73 +507,111 @@ window.addEventListener('resize', () => setTimeout(applyGuiaTheme, 80));
   const btnConfirmar = $('#jp-btn-confirmar', root);
   const input       = $('#jp-answer-input', root);    
 
-   // ========= MICROFONE NATIVO COM TOGGLE CONTÍNUO (CORRIGIDO PARA MOBILE) =========
-  if (btnFalar && input) {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      btnFalar.disabled = true;
-      btnFalar.style.opacity = '0.5';
-      console.warn('SpeechRecognition não suportado');
-      return;
-    }
+  // ========= MICROFONE NATIVO COM TOGGLE CONTÍNUO (ANTI-DUPLICAÇÃO) =========
+if (btnFalar && input) {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    btnFalar.disabled = true;
+    btnFalar.style.opacity = '0.5';
+    console.warn('SpeechRecognition não suportado');
+    return;
+  }
 
-    let recognition = window.__GLOBAL_MIC__;
-    if (!recognition) {
-      recognition = new SpeechRecognition();
-      recognition.lang = 'pt-BR';
-      recognition.continuous = true;
-      recognition.interimResults = true;
+  let recognition = window.__GLOBAL_MIC__;
+  if (!recognition) {
+    recognition = new SpeechRecognition();
+    recognition.lang = 'pt-BR';
+    recognition.continuous = true;
+    recognition.interimResults = true;
 
-      recognition.onstart = () => {
-        btnFalar.classList.add('recording');
-        console.log('[MIC] Gravando continuamente');
-        // NÃO mexemos no foco aqui — deixamos o toggle funcionar naturalmente
-      };
+    // ===== CONTROLE DE TEXTO (FINAL vs INTERIM) =====
+    let finalText = '';     // texto confirmado
+    let lastInterim = '';   // texto provisório
 
-      recognition.onresult = (event) => {
-        let transcript = '';
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          transcript += event.results[i][0].transcript;
-          if (event.results[i].isFinal) transcript += ' ';
+    recognition.onstart = () => {
+      btnFalar.classList.add('recording');
+      console.log('[MIC] Gravando continuamente');
+    };
+
+    recognition.onresult = (event) => {
+      let interim = '';
+
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const res = event.results[i];
+        const txt = (res[0]?.transcript || '')
+          .replace(/\s+/g, ' ')
+          .trim();
+
+        if (!txt) continue;
+
+        if (res.isFinal) {
+          // adiciona somente o texto FINAL (uma vez)
+          finalText = (finalText + ' ' + txt)
+            .replace(/\s+/g, ' ')
+            .trim();
+        } else {
+          // interim é apenas visual (não acumula definitivo)
+          interim = (interim + ' ' + txt)
+            .replace(/\s+/g, ' ')
+            .trim();
         }
+      }
 
-        // Insere o texto de forma segura
-        const currentValue = input.value;
-        input.value = (currentValue + ' ' + transcript).trim() + ' ';
+      lastInterim = interim;
 
-        // Força atualização e mantém cursor no final (sem tirar foco)
+      // mostra no input: final confirmado + interim atual
+      const merged = (finalText + (interim ? ' ' + interim : ''))
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      // evita reaplicar o mesmo texto (duplication guard)
+      if (merged !== (input.value || '').trim()) {
+        input.value = merged + ' ';
+
         input.scrollTop = input.scrollHeight;
         if (input.selectionStart !== undefined) {
           input.selectionStart = input.selectionEnd = input.value.length;
         }
 
-        // Dispara eventos para o app reagir (resolve duplicidade no mobile)
         input.dispatchEvent(new Event('input', { bubbles: true }));
-        input.dispatchEvent(new Event('change', { bubbles: true }));
-      };
+      }
+    };
 
-      recognition.onerror = (event) => {
-        console.warn('[MIC] Erro:', event.error);
-        btnFalar.classList.remove('recording');
-        if (event.error === 'not-allowed') {
-          alert('Permissão de microfone negada. Ative nas configurações do navegador.');
-        }
-      };
+    recognition.onerror = (event) => {
+      console.warn('[MIC] Erro:', event.error);
+      btnFalar.classList.remove('recording');
+      if (event.error === 'not-allowed') {
+        alert('Permissão de microfone negada. Ative nas configurações do navegador.');
+      }
+    };
 
-      recognition.onend = () => {
-        btnFalar.classList.remove('recording');
-        console.log('[MIC] Parou');
-      };
+    recognition.onend = () => {
+      btnFalar.classList.remove('recording');
+      console.log('[MIC] Parou');
+    };
 
-      window.__GLOBAL_MIC__ = recognition;
-    }
+    window.__GLOBAL_MIC__ = recognition;
+  }
 
-    // Toggle corrigido: garante stop/start limpo
+  // ===== TOGGLE START / STOP (COM CONSOLIDAÇÃO DO INTERIM) =====
+  if (!btnFalar.__micBound) {
+    btnFalar.__micBound = true;
+
     btnFalar.addEventListener('click', (ev) => {
       ev.preventDefault();
       ev.stopPropagation();
 
       if (btnFalar.classList.contains('recording')) {
+        // consolida texto provisório antes de parar
+        if (typeof lastInterim !== 'undefined' && lastInterim.trim()) {
+          finalText = (finalText + ' ' + lastInterim)
+            .replace(/\s+/g, ' ')
+            .trim();
+          lastInterim = '';
+          input.value = finalText + ' ';
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+
         recognition.stop();
         console.log('[MIC] Parando manualmente');
       } else {
@@ -582,6 +620,7 @@ window.addEventListener('resize', () => setTimeout(applyGuiaTheme, 80));
       }
     });
   }
+}
 
   // ========= APAGAR =========
   if (btnApagar && input) {
