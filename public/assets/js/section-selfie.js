@@ -208,7 +208,7 @@
       if (texto && !texto.classList.contains('typed')) {
         const guiaNomeMap = { arian: 'Arian', lumen: 'Lumen', zion: 'Zion' };
         const guiaNome = guiaNomeMap[guia] || 'Guia';
-        const fullText = `${nome}, afaste um pouco o celular e posicione o rosto no centro. ${guiaNome} te guiará.`;
+        const fullText = `${nome}, afaste o celular e posicione o rosto. ${guiaNome} te guiará.`;
 
         texto.textContent = '';
         typeWriter(texto, fullText, 36);
