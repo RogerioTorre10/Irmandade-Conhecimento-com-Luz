@@ -756,7 +756,7 @@
   /* Cada linha de zoom */
   #section-selfie .zoom-row {
     display: grid !important;
-    grid-template-columns: 68px 1fr 24px !important;
+    grid-template-columns: 66x 1fr 24px !important;
     gap: 8px !important;
     align-items: center !important;
     padding: 8px 12px !important;
