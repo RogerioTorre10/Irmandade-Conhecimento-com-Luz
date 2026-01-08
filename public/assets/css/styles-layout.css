@@ -809,45 +809,6 @@
     text-overflow: ellipsis !important;
   }   
 }
-/* ============================
-   SELFIE — FIX BOTÕES SUMINDO (mobile pequeno)
-   ============================ */
-@media (max-width: 420px) {
-
-  /* 1) A seção precisa poder rolar */
-  #section-selfie {
-    min-height: 100dvh !important;      /* melhor que 100vh no mobile */
-    height: auto !important;
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  /* 2) O container interno NÃO pode cortar o rodapé */
-  #section-selfie .content,
-  #section-selfie .card,
-  #section-selfie .j-perg-v-inner,
-  #section-selfie .conteudo-pergaminho {
-    overflow: visible !important;
-  }
-
-  /* 3) Reserva “chão” para os botões (e safe-area) */
-  #section-selfie .content,
-  #section-selfie .j-perg-v-inner {
-    padding-bottom: calc(120px + env(safe-area-inset-bottom)) !important;
-  }
-
-  /* 4) Encolhe um pouco o painel dos ranges (opcional, ajuda a caber tudo) */
-  .ranges-panel {
-    max-width: 92vw !important;
-    padding: 10px 12px !important;
-    margin: 8px auto 10px !important;
-  }
-
-  .range-row {
-    grid-template-columns: 118px 1fr 46px !important;
-    gap: 8px !important;
-  }
-}
 
 
 /* =========================================
