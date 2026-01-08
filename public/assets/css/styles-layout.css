@@ -713,7 +713,7 @@
     transform: translateX(-50%) !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
-    width: min(94vw, 480px) !important;
+    width: min(90vw, 440px) !important;
     box-sizing: border-box !important;
     }
 
