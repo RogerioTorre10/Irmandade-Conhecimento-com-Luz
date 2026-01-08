@@ -656,7 +656,7 @@
     position: relative !important;
     left: 50% !important;
     right: 0 !important;
-    width: min(94vw, 520px) !important; /* um pouco menor p/ não “explodir” */
+    width: min(94vw, 480px) !important; /* um pouco menor p/ não “explodir” */
     max-width: 420px !important;           /* mesmo corpo da intro */
     margin: 0 auto !important;
     padding: 32px 24px 52px 24px !important;             /* borda fininha */
@@ -729,7 +729,7 @@
     transform: translateX(-50%) !important;
     margin-left: 0 !important;
     margin-right: 0 !important;  
-    width: min(92vw, 520px) !important;
+    width: min(89vw, 480px) !important;
     padding-bottom: 95% !important;
     margin: 14px auto 18px !important;
     border-radius: 18px !important;
