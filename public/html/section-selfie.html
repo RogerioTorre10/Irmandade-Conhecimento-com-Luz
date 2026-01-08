@@ -17,6 +17,13 @@
     <div id="selfieOrientWrap">
       <p id="selfieTexto" data-speed="36"></p>
     </div>
+      
+       <!-- BOTÕES COM MOLDURA -->
+    <div class="btn-row">
+      <button id="startCamBtn" class="btn-stone-espinhos">Previa</button>
+      <button id="btn-selfie-capture" class="btn-stone-espinhos" disabled>Capturar</button>
+      <button id="btn-selfie-confirm" class="btn-stone-espinhos" disabled>Iniciar</button>
+    </div> 
 
         <!-- PREVIEW -->
     <div class="selfie-preview-wrap">
@@ -44,14 +51,7 @@
         <input id="zoomY" type="range" min="0.8" max="1.4" step="0.01" value="1.0">
         <span class="range-val" id="zoomYVal">1.00×</span>
       </div>
-    </div>
-
-    <!-- BOTÕES COM MOLDURA -->
-    <div class="btn-row">
-      <button id="startCamBtn" class="btn-stone-espinhos">Previa</button>
-      <button id="btn-selfie-capture" class="btn-stone-espinhos" disabled>Capturar</button>
-      <button id="btn-selfie-confirm" class="btn-stone-espinhos" disabled>Iniciar</button>
-    </div> 
+    </div>  
 
     <div id="selfie-error" class="hidden">
       Não foi possível acessar a câmera. Verifique as permissões.
