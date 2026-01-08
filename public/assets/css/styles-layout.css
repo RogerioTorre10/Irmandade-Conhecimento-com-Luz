@@ -646,8 +646,9 @@
     justify-content: center !important;
     align-items: flex-start !important;  
     padding: 8px 0 140px !important;
-    min-height: 100vh !important;
-    overflow: hidden !important;
+    min-height: 100dvh !important;
+    overflow: auto !important;
+    height: auto !important; 
   }
 
   /* Painel de vidro (MESMA FAMÍLIA DO INTRO/TERMOS) */
@@ -655,15 +656,15 @@
     position: relative !important;
     left: 50% !important;
     right: 0 !important;
-    width: min(94vw, 520px) !important; /* um pouco menor p/ não “explodir” */
-    max-width: 460px !important;           /* mesmo corpo da intro */
+    width: min(90vw, 480px) !important; /* um pouco menor p/ não “explodir” */
+    max-width: 420px !important;           /* mesmo corpo da intro */
     margin: 0 auto !important;
     padding: 32px 24px 52px 24px !important;             /* borda fininha */
     border-radius: 26px !important;
     box-sizing: border-box !important;
      transform: translateX(-50%) !important;
     -webkit-transform: translateY(0) translateZ(0) !important;
-    overflow: hidden !important;
+    overflow: auto !important;
   } 
   
   #section-selfie .j-panel-glow {
