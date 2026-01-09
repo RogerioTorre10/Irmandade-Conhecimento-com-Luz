@@ -224,7 +224,7 @@
     transform: translate(-50%, -50%) !important;
     width: 60% !important;            /* tamanho relativo ao card */
     max-width: 180px !important;      /* teto pra não explodir */
-    aspect-ratio: 2.8 / 2.8 !important;   /* formato de carta vertical */
+    aspect-ratio: 2.8 / 3 !important;   /* formato de carta vertical */
     border-radius: 22px !important;
     overflow: hidden !important;
     display: flex !important;
@@ -240,7 +240,7 @@
    /* Ajusta o nome para ficar sempre colado na parte inferior da carta */
   #section-card .flame-layer .nome-guia {
     margin: 0 !important;               /* sem folga */
-    padding-bottom: 4px !important;     /* leve respiro */
+    padding-bottom: 3px !important;     /* leve respiro */
     pointer-events: auto !important;
     font-size: 0.9rem !important;      /* tamanho perfeito no mobile */
   }
