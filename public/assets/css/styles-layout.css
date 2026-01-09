@@ -810,42 +810,64 @@
   }   
 }
 /* ============================
-   SELFIE — FIX BOTÕES SUMINDO (mobile pequeno)
+   SECTION-SELFIE — glow não pode empurrar layout (mobile)
    ============================ */
-@media (max-width: 420px) {
+@media (max-width: 480px) {
 
-  /* 1) A seção precisa poder rolar */
-  #section-selfie {
-    min-height: 100dvh !important;      /* melhor que 100vh no mobile */
+  /* 1) O container principal NÃO pode ficar preso em altura fixa */
+  #section-selfie,
+  #section-selfie .content,
+  #section-selfie .j-perg-v-inner,
+  #section-selfie .card {
     height: auto !important;
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch;
+    min-height: 100dvh !important;
   }
 
-  /* 2) O container interno NÃO pode cortar o rodapé */
+  /* 2) Se algum wrapper estiver com overflow hidden e cortando a base */
   #section-selfie .content,
-  #section-selfie .card,
   #section-selfie .j-perg-v-inner,
-  #section-selfie .conteudo-pergaminho {
+  #section-selfie .card {
     overflow: visible !important;
   }
 
-  /* 3) Reserva “chão” para os botões (e safe-area) */
+  /* 3) Reserva chão para ranges + botões (safe-area) */
   #section-selfie .content,
   #section-selfie .j-perg-v-inner {
-    padding-bottom: calc(120px + env(safe-area-inset-bottom)) !important;
+    padding-bottom: calc(140px + env(safe-area-inset-bottom)) !important;
   }
 
-  /* 4) Encolhe um pouco o painel dos ranges (opcional, ajuda a caber tudo) */
+  /* 4) Glow deve ser só overlay (não aumentar caixa) */
+  #section-selfie .glow,
+  #section-selfie .panel-glow,
+  #section-selfie .j-panel-glow,
+  #section-selfie [class*="glow"] {
+    position: relative !important;
+  }
+
+  /* Se o glow usa pseudo-elementos, prende eles ao container sem “empurrar” */
+  #section-selfie .j-panel-glow::before,
+  #section-selfie .j-panel-glow::after,
+  #section-selfie [class*="glow"]::before,
+  #section-selfie [class*="glow"]::after {
+    content: "" !important;
+    position: absolute !important;
+    inset: 0 !important;
+    pointer-events: none !important;
+  }
+
+  /* 5) Sobe um pouco o bloco de baixo (ranges + botões) sem mexer no HTML */
   .ranges-panel {
-    max-width: 92vw !important;
-    padding: 10px 12px !important;
-    margin: 8px auto 10px !important;
+    margin-top: 8px !important;
+    margin-bottom: 10px !important;
   }
 
-  .range-row {
-    grid-template-columns: 98px 1fr 40px !important;
-    gap: 8px !important;
+  /* Se você tem um wrapper dos botões, isso ajuda muito */
+  .selfie-actions,
+  .selfie-buttons,
+  .btn-row,
+  .actions-row {
+    margin-top: 10px !important;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom)) !important;
   }
 }
 
