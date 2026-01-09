@@ -247,8 +247,8 @@
 
   /* Nome dentro do placeholder (badge GISELY) */
   #section-card .card-name-badge {
-    margin-bottom: 10px !important;   /* sobe um tiquinho do fundo */
-    font-size: 0.9rem !important;
+    margin-bottom: 5px !important;   /* sobe um tiquinho do fundo */
+    font-size: 0.7rem !important;
   }
 
   /* Área do botão CONTINUAR */
