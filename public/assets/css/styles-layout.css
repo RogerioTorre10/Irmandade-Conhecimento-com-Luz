@@ -833,7 +833,7 @@
   /* 3) Reserva chão para ranges + botões (safe-area) */
   #section-selfie .content,
   #section-selfie .j-perg-v-inner {
-    padding-bottom: calc(140px + env(safe-area-inset-bottom)) !important;
+    padding-bottom: calc(130px + env(safe-area-inset-bottom)) !important;
   }
 
   /* 4) Glow deve ser só overlay (não aumentar caixa) */
@@ -857,8 +857,8 @@
 
   /* 5) Sobe um pouco o bloco de baixo (ranges + botões) sem mexer no HTML */
   .ranges-panel {
-    margin-top: 8px !important;
-    margin-bottom: 10px !important;
+    margin-top: 18px !important;
+    margin-bottom: 30px !important;
   }
 
   /* Se você tem um wrapper dos botões, isso ajuda muito */
