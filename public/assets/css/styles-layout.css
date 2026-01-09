@@ -895,7 +895,7 @@
   .selfie-canvas,
   video,
   canvas {
-    max-height: 45vh !important;
+    max-height: 45dvh !important;
     width: 100% !important;
     object-fit: contain !important;
   }
