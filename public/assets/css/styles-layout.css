@@ -815,7 +815,7 @@
   .selfie-section,
   .jp-selfie-container {
     height: auto !important; /* permite scroll vertical */
-    min-height: 100vh !important; /* ocupa toda tela */
+    min-height: 100dvh !important; /* ocupa toda tela */
     overflow-y: auto !important; /* ativa scroll se precisar */
     padding: 20px 10px 120px 10px !important; /* espaço na base para botões não cortarem */
     box-sizing: border-box !important;
@@ -866,6 +866,38 @@
   /* Espaço extra na base para rodapé/copyright */
   body, html {
     padding-bottom: 80px !important; /* evita corte do copyright */
+  }
+}
+@media (max-width: 480px) {
+  /* Reforços extras (baseado na experiência real) */
+  .selfie-section,
+  .jp-selfie-container,
+  .selfie-preview-wrapper {
+    height: auto !important;
+    min-height: 100dvh !important;
+    overflow-y: auto !important;
+    padding-bottom: calc(160px + env(safe-area-inset-bottom, 20px)) !important;
+  }
+
+  /* Garante que os sliders de zoom e botões não cortem */
+  .zoom-controls,
+  .selfie-actions,
+  .selfie-buttons {
+    position: relative !important;
+    margin-top: 20px !important;
+    padding: 15px !important;
+    background: rgba(0,0,0,0.5) !important; /* opcional: fundo semi-transparente para melhor contraste */
+    border-radius: 12px !important;
+  }
+
+  /* Se a pré-visualização da câmera ainda estourar */
+  .preview-video,
+  .selfie-canvas,
+  video,
+  canvas {
+    max-height: 45vh !important;
+    width: 100% !important;
+    object-fit: contain !important;
   }
 }
 
