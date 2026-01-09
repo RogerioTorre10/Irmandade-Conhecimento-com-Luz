@@ -224,7 +224,7 @@
     transform: translate(-50%, -50%) !important;
     width: 60% !important;            /* tamanho relativo ao card */
     max-width: 180px !important;      /* teto pra não explodir */
-    aspect-ratio: 2.5 / 2.5 !important;   /* formato de carta vertical */
+    aspect-ratio: 3 / 4 !important;   /* formato de carta vertical */
     border-radius: 22px !important;
     overflow: hidden !important;
     display: flex !important;
