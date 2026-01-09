@@ -507,7 +507,7 @@ window.addEventListener('resize', () => setTimeout(applyGuiaTheme, 80));
   const btnConfirmar = $('#jp-btn-confirmar', root);
   const input       = $('#jp-answer-input', root);    
 
-  // ========= MICROFONE NATIVO COM TOGGLE CONTÍNUO (ANTI-DUPLICAÇÃO) =========
+  // ========= MICROFONE NATIVO COM TOGGLE CONTÍNUO + RESET POR PERGUNTA =========
 if (btnFalar && input) {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) {
@@ -524,9 +524,9 @@ if (btnFalar && input) {
     recognition.continuous = true;
     recognition.interimResults = true;
 
-    // ===== CONTROLE DE TEXTO (FINAL vs INTERIM) =====
-    let finalText = '';     // texto confirmado
-    let lastInterim = '';   // texto provisório
+    // Variáveis de controle (resetadas por pergunta)
+    let finalText = '';
+    let lastInterim = '';
 
     recognition.onstart = () => {
       btnFalar.classList.add('recording');
@@ -535,44 +535,31 @@ if (btnFalar && input) {
 
     recognition.onresult = (event) => {
       let interim = '';
-
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const res = event.results[i];
         const txt = (res[0]?.transcript || '')
           .replace(/\s+/g, ' ')
           .trim();
-
         if (!txt) continue;
-
         if (res.isFinal) {
-          // adiciona somente o texto FINAL (uma vez)
-          finalText = (finalText + ' ' + txt)
-            .replace(/\s+/g, ' ')
-            .trim();
+          finalText = (finalText + ' ' + txt).replace(/\s+/g, ' ').trim();
         } else {
-          // interim é apenas visual (não acumula definitivo)
-          interim = (interim + ' ' + txt)
-            .replace(/\s+/g, ' ')
-            .trim();
+          interim = (interim + ' ' + txt).replace(/\s+/g, ' ').trim();
         }
       }
-
       lastInterim = interim;
 
-      // mostra no input: final confirmado + interim atual
       const merged = (finalText + (interim ? ' ' + interim : ''))
         .replace(/\s+/g, ' ')
         .trim();
 
-      // evita reaplicar o mesmo texto (duplication guard)
+      // Evita duplicidade e atualiza
       if (merged !== (input.value || '').trim()) {
         input.value = merged + ' ';
-
         input.scrollTop = input.scrollHeight;
         if (input.selectionStart !== undefined) {
           input.selectionStart = input.selectionEnd = input.value.length;
         }
-
         input.dispatchEvent(new Event('input', { bubbles: true }));
       }
     };
@@ -593,33 +580,38 @@ if (btnFalar && input) {
     window.__GLOBAL_MIC__ = recognition;
   }
 
-  // ===== TOGGLE START / STOP (COM CONSOLIDAÇÃO DO INTERIM) =====
+  // Toggle start/stop
   if (!btnFalar.__micBound) {
     btnFalar.__micBound = true;
-
     btnFalar.addEventListener('click', (ev) => {
       ev.preventDefault();
       ev.stopPropagation();
 
       if (btnFalar.classList.contains('recording')) {
-        // consolida texto provisório antes de parar
-        if (typeof lastInterim !== 'undefined' && lastInterim.trim()) {
-          finalText = (finalText + ' ' + lastInterim)
-            .replace(/\s+/g, ' ')
-            .trim();
+        // Consolida texto provisório antes de parar
+        if (lastInterim.trim()) {
+          finalText = (finalText + ' ' + lastInterim).replace(/\s+/g, ' ').trim();
           lastInterim = '';
           input.value = finalText + ' ';
           input.dispatchEvent(new Event('input', { bubbles: true }));
         }
-
         recognition.stop();
-        console.log('[MIC] Parando manualmente');
       } else {
         recognition.start();
-        console.log('[MIC] Iniciando gravação');
       }
     });
   }
+
+  // 🔥 RESET AUTOMÁTICO DO MICROFONE AO MUDAR DE PERGUNTA (resolve o acúmulo!)
+  document.addEventListener('perguntas:state-changed', () => {
+    if (recognition && btnFalar.classList.contains('recording')) {
+      recognition.stop(); // para qualquer gravação em andamento
+      btnFalar.classList.remove('recording');
+    }
+    finalText = '';     // zera texto confirmado
+    lastInterim = '';   // zera texto provisório
+    console.log('[MIC] Resetado para nova pergunta');
+  });
 }
 
   // ========= APAGAR =========
