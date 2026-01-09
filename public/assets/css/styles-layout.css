@@ -809,65 +809,63 @@
     text-overflow: ellipsis !important;
   }   
 }
-/* ============================
-   SECTION-SELFIE — glow não pode empurrar layout (mobile)
-   ============================ */
-@media (max-width: 480px) {
-
-  /* 1) O container principal NÃO pode ficar preso em altura fixa */
+/* Responsivo mobile: tela de selfie cabe inteira + scroll suave */
+@media (max-width: 768px) {
   #section-selfie,
-  #section-selfie .content,
-  #section-selfie .j-perg-v-inner,
-  #section-selfie .card {
-    height: auto !important;
-    min-height: 100dvh !important;
+  .selfie-section,
+  .jp-selfie-container {
+    height: auto !important; /* permite scroll vertical */
+    min-height: 100vh !important; /* ocupa toda tela */
+    overflow-y: auto !important; /* ativa scroll se precisar */
+    padding: 20px 10px 120px 10px !important; /* espaço na base para botões não cortarem */
+    box-sizing: border-box !important;
   }
 
-  /* 2) Se algum wrapper estiver com overflow hidden e cortando a base */
-  #section-selfie .content,
-  #section-selfie .j-perg-v-inner,
-  #section-selfie .card {
-    overflow: visible !important;
+  /* Título e texto principal */
+  .selfie-title,
+  .selfie-instruction,
+  .selfie-text {
+    font-size: 1.1rem !important;
+    line-height: 1.4 !important;
+    margin-bottom: 15px !important;
   }
 
-  /* 3) Reserva chão para ranges + botões (safe-area) */
-  #section-selfie .content,
-  #section-selfie .j-perg-v-inner {
-    padding-bottom: calc(130px + env(safe-area-inset-bottom)) !important;
+  /* Área da câmera + pré-visualização */
+  .selfie-preview-container,
+  .preview-video,
+  .selfie-canvas {
+    width: 100% !important;
+    max-height: 50vh !important; /* limita altura para não estourar */
+    aspect-ratio: 4/3 !important;
+    object-fit: cover !important;
   }
 
-  /* 4) Glow deve ser só overlay (não aumentar caixa) */
-  #section-selfie .glow,
-  #section-selfie .panel-glow,
-  #section-selfie .j-panel-glow,
-  #section-selfie [class*="glow"] {
-    position: relative !important;
+  /* Botões (Preview, Capturar, Iniciar) */
+  .selfie-buttons {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    margin: 15px 0 !important;
   }
 
-  /* Se o glow usa pseudo-elementos, prende eles ao container sem “empurrar” */
-  #section-selfie .j-panel-glow::before,
-  #section-selfie .j-panel-glow::after,
-  #section-selfie [class*="glow"]::before,
-  #section-selfie [class*="glow"]::after {
-    content: "" !important;
-    position: absolute !important;
-    inset: 0 !important;
-    pointer-events: none !important;
+  .selfie-btn {
+    flex: 1 1 30% !important; /* 3 botões em linha se couber */
+    min-width: 120px !important;
+    padding: 12px !important;
+    font-size: 0.95rem !important;
   }
 
-  /* 5) Sobe um pouco o bloco de baixo (ranges + botões) sem mexer no HTML */
-  .ranges-panel {
-    margin-top: 18px !important;
-    margin-bottom: 30px !important;
+  /* Sliders de zoom */
+  .zoom-controls {
+    flex-direction: column !important;
+    gap: 10px !important;
+    padding: 10px !important;
   }
 
-  /* Se você tem um wrapper dos botões, isso ajuda muito */
-  .selfie-actions,
-  .selfie-buttons,
-  .btn-row,
-  .actions-row {
-    margin-top: 10px !important;
-    padding-bottom: calc(10px + env(safe-area-inset-bottom)) !important;
+  /* Espaço extra na base para rodapé/copyright */
+  body, html {
+    padding-bottom: 80px !important; /* evita corte do copyright */
   }
 }
 
