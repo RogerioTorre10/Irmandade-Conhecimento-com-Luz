@@ -542,7 +542,7 @@ function applyGuiaTheme(guiaIdOrNull) {
     : bind();
   
 /* =========================================================
-   GUIA – Nome primeiro + DEMO automática dos 3 guias (ANTI-TRAVA + RESET)
+   GUIA – Nome primeiro + DEMO automática (ANTI-TRAVA TOTAL + RETRY)
    ========================================================= */
 (function () {
   'use strict';
@@ -556,20 +556,14 @@ function applyGuiaTheme(guiaIdOrNull) {
   const input      = root.querySelector('#guiaNameInput');
   const btnConfirm = root.querySelector('#btn-confirmar-nome');
   const guiaNotice = root.querySelector('#guia-notice-text');
+  const guideButtons = Array.from(root.querySelectorAll('.guia-options button, .guia-buttons button, .btn-guia'));
 
-  const guideButtons = Array.from(
-    root.querySelectorAll('.guia-options button, .guia-buttons button, .btn-guia')
-  );
-
-  if (!input || !btnConfirm || guideButtons.length === 0) {
-    console.warn('[GUIA DEMO] elementos não encontrados');
-    return;
-  }
+  if (!input || !btnConfirm || guideButtons.length === 0) return;
 
   let demoDone = false;
-  let guiaEscolhido = false; // nova flag para rastrear se guia foi escolhido
+  let guiaEscolhido = false;
 
-  // Garante tema dourado no início da tela guia
+  // Tema dourado no início
   document.body.removeAttribute('data-guia');
   document.body.removeAttribute('data-guia-hover');
   document.documentElement.style.setProperty('--theme-main-color', '#d4af37');
@@ -581,9 +575,7 @@ function applyGuiaTheme(guiaIdOrNull) {
     guideButtons.forEach(btn => {
       btn.disabled = true;
       btn.style.pointerEvents = 'none';
-      btn.classList.remove('guia-demo-active');
     });
-    document.body.removeAttribute('data-guia-hover');
   }
 
   function unlockGuides() {
@@ -591,9 +583,7 @@ function applyGuiaTheme(guiaIdOrNull) {
       btn.disabled = false;
       btn.style.pointerEvents = 'auto';
     });
-    document.body.removeAttribute('data-guia-hover');
     demoDone = true;
-
     if (guiaNotice) {
       guiaNotice.setAttribute('data-text', 'Agora escolha, com calma, qual guia caminhará com você nesta jornada.');
     }
@@ -609,11 +599,12 @@ function applyGuiaTheme(guiaIdOrNull) {
   btnConfirm.addEventListener('click', () => {
     const nome = input.value.trim();
     if (!nome) {
-      alert('Digite seu nome primeiro para prosseguir!');
+      alert('Digite seu nome para prosseguir!');
       input.focus();
       return;
     }
 
+    // Se demo já rodou, só destrava
     if (demoDone) {
       unlockGuides();
       return;
@@ -623,17 +614,17 @@ function applyGuiaTheme(guiaIdOrNull) {
       guiaNotice.setAttribute('data-text', `Veja a apresentação dos guias, ${nome}, e depois escolha o que tocar seu coração.`);
     }
 
-    lockGuides();
+    lockGuides(); // trava guias durante demo
 
     const seq = ['lumen', 'zion', 'arian'];
     let step = 0;
 
-    const play = () => {
+    const playStep = () => {
       guideButtons.forEach(b => b.classList.remove('guia-demo-active'));
       document.body.removeAttribute('data-guia-hover');
 
       if (step >= seq.length) {
-        unlockGuides();
+        unlockGuides(); // destrava guias no final da demo
         return;
       }
 
@@ -644,31 +635,42 @@ function applyGuiaTheme(guiaIdOrNull) {
       if (btn) btn.classList.add('guia-demo-active');
 
       step++;
-      setTimeout(play, 1400);
+      setTimeout(playStep, 1400);
     };
 
-    play();
+    playStep();
   });
 
-  // ===== APLICAÇÃO DO TEMA DEFINITIVO AO ESCOLHER =====
+  // ===== ESCOLHA DO GUIA =====
   guideButtons.forEach(btn => {
-    btn.addEventListener('click', (ev) => {
-      // ... (mantenha a lógica de arm/confirm que já existe no arquivo)
-      // No final da confirmação (dentro de confirmGuide), chame isso:
-      applyGuiaTheme(guiaId); // aplica o tema definitivo
-      guiaEscolhido = true; // flag para destravar se necessário
+    btn.addEventListener('click', () => {
+      const guiaId = btn.dataset.guia || btn.textContent.toLowerCase().trim();
+      if (!guiaId) return;
+
+      // Salva nome e guia
+      sessionStorage.setItem('jornada.nome', input.value.trim());
+      sessionStorage.setItem('jornada.guia', guiaId);
+
+      // Aplica tema definitivo
+      aplicarGuiaTheme(guiaId);
+
+      guiaEscolhido = true;
+
+      // Avança para próxima seção
+      if (typeof JC !== 'undefined' && JC.next) JC.next();
     });
   });
 
-  // ANTI-TRAVA: se travar (ex: usuário não escolhe guia), permite reset do nome/Confirmar
+  // ANTI-TRAVA FINAL: se usuário não escolher guia após demo, permite retry
   setTimeout(() => {
-    if (!guiaEscolhido) {
+    if (!guiaEscolhido && demoDone) {
+      alert('Você ainda não escolheu um guia. Clique em um dos guias para prosseguir ou digite o nome novamente e confirme.');
       btnConfirm.disabled = false;
-      alert('Escolha um guia para prosseguir. Se quiser resetar, digite o nome novamente e confirme.');
+      input.focus();
     }
-  }, ARM_TIMEOUT_MS * 1.5); // após tempo de arm, destrava Confirmar para retry
+  }, 20000); // 20s após demo (tempo para usuário reagir)
 
-  console.log('[GUIA DEMO] Demo automática mantida + anti-trava + reset para não perder jornada');
+  console.log('[GUIA] Anti-trava total + retry ativado');
 })();
 
 })();
