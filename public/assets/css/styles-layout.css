@@ -840,50 +840,98 @@
 }
 /* Responsivo mobile: tela de selfie cabe inteira + scroll suave */
 @media (max-width: 768px) {
-   
-/* 1) Nunca travar o section em 100vh no mobile */
-#section-selfie {
+   /* =========================================================
+   SELFIE (MOBILE) — SCROLL + GLOW SEM QUEBRAR OS SLIDERS
+   Corrige: sliders inacessíveis / base cortada / glow bloqueando
+   ========================================================= */
+
+/* 1) Container externo: permite glow vazar, NÃO é ele que rola */
+#section-selfie,
+.selfie-section,
+.jp-selfie-container{
+  position: relative !important;
   height: auto !important;
-  min-height: 100svh !important; /* viewport "estável" no mobile */
-  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 18px) !important;
+  min-height: 100svh !important;
+  overflow: visible !important; /* glow pode vazar */
+  box-sizing: border-box !important;
 }
 
-/* 2) O container/painel precisa poder crescer e rolar */
+/* 2) Container interno: é ele que rola (SCROLL REAL) */
 #section-selfie .content,
-#section-selfie .j-perg-v-inner,
-#section-selfie .glass-panel,
-#section-selfie .glass-panel-glow,
-#section-selfie .j-panel,
-#section-selfie .panel {
-  height: auto !important;
-  min-height: 0 !important;
-  overflow: visible !important; /* evita corte */
-}
-
-/* 3) Se você tem um wrapper que deve rolar (recomendado) */
-#section-selfie .content {
+#section-selfie .selfie-wrap,
+#section-selfie .selfie-container,
+#section-selfie .jp-selfie-inner{
+  max-height: 100svh !important;
   overflow-y: auto !important;
   -webkit-overflow-scrolling: touch;
+  padding: 20px 10px calc(env(safe-area-inset-bottom, 0px) + 130px) 10px !important;
+  box-sizing: border-box !important;
 }
 
-/* 4) Evita “empurrar” ações para fora da tela */
-#section-selfie .selfie-root,
-#section-selfie .selfie-wrap,
-#section-selfie .selfie-container {
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: flex-start !important; /* NÃO space-between */
-  gap: 10px !important;
+/* 3) Não use padding-bottom em html/body (isso bagunça tudo no Android) */
+html, body{
+  padding-bottom: 0 !important;
 }
 
-/* 5) Garante área clicável dos botões no rodapé */
-#section-selfie .selfie-actions,
+/* 4) Preview: não prenda tudo em 50vh (isso joga os sliders pra fora)
+      Use clamp para caber em telas baixas sem “sumir” o painel */
+#section-selfie .selfie-preview-container,
+#section-selfie .preview-video,
+#section-selfie .selfie-canvas,
+#section-selfie .preview-frame{
+  width: 100% !important;
+  max-height: clamp(240px, 38svh, 360px) !important;
+  aspect-ratio: 4 / 3 !important;
+  object-fit: cover !important;
+}
+
+/* 5) Botões sempre acima */
 #section-selfie .selfie-buttons,
-#section-selfie .actions-row {
-  margin-top: 10px !important;
-  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 12px) !important;
-}  
+#section-selfie .selfie-actions{
+  position: relative !important;
+  z-index: 5 !important;
 }
+
+/* 6) Sliders: garante que estão clicáveis e acima de qualquer glow */
+#section-selfie .zoom-controls,
+#section-selfie .ranges-panel,
+#section-selfie input[type="range"]{
+  position: relative !important;
+  z-index: 10 !important;
+  pointer-events: auto !important;
+}
+
+/* 7) Glow inferior: fica atrás, não captura toque e não “mata” scroll */
+#section-selfie::before,
+.selfie-section::before,
+.jp-selfie-container::before{
+  content: "" !important;
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: -70px !important;
+  height: 160px !important;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--progress-glow-1, rgba(255,210,120,0.85)),
+    var(--progress-glow-2, rgba(255,210,120,0.40))
+  ) !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+  opacity: calc(0.6 * var(--luz-intensity, 1)) !important;
+  filter: blur(20px) !important;
+}
+
+/* 8) Garante que o conteúdo está acima do ::before */
+#section-selfie .content,
+#section-selfie .selfie-wrap,
+#section-selfie .selfie-container,
+#section-selfie .jp-selfie-inner{
+  position: relative !important;
+  z-index: 2 !important;
+}
+ }
 
 @media (max-width: 480px) {
   /* Reforços extras (baseado na experiência real) */
