@@ -808,7 +808,31 @@
     overflow: hidden !important;
     text-overflow: ellipsis !important;
   }
-   
+   /* Glow inferior consistente em TODAS as seções (inclui selfie e perguntas) */
+#section-selfie,
+.section-selfie,
+.jp-selfie-container {
+  position: relative !important; /* necessário para pseudo-elementos */
+  overflow: visible !important;  /* evita corte do glow */
+  padding-bottom: 80px !important; /* espaço extra para o glow vazar na base */
+}
+
+/* Glow inferior (a mesma luz que aparece em intro/termos/senha) */
+#section-selfie::before,
+.section-selfie::before,
+.jp-selfie-container::before {
+  content: "" !important;
+  position: absolute !important;
+  bottom: -60px !important; /* ajusta a posição da luz vazando */
+  left: 0 !important;
+  right: 0 !important;
+  height: 120px !important; /* altura do glow */
+  background: linear-gradient(to bottom, transparent, var(--progress-glow-1, rgba(255,210,120,0.85)), var(--progress-glow-2, rgba(255,210,120,0.4))) !important;
+  pointer-events: none !important;
+  z-index: -1 !important; /* fica atrás do conteúdo */
+  opacity: calc(0.6 * var(--luz-intensity, 1)) !important;
+  filter: blur(20px) !important; /* suaviza a luz */
+}
     #section-selfie::before {
     bottom: -80px !important;
     height: 160px !important;
@@ -873,6 +897,32 @@
     padding-bottom: 80px !important; /* evita corte do copyright */
   }
    
+/* Glow inferior consistente em TODAS as seções (inclui selfie e perguntas) */
+#section-selfie,
+.section-selfie,
+.jp-selfie-container {
+  position: relative !important; /* necessário para pseudo-elementos */
+  overflow: visible !important;  /* evita corte do glow */
+  padding-bottom: 80px !important; /* espaço extra para o glow vazar na base */
+}
+
+/* Glow inferior (a mesma luz que aparece em intro/termos/senha) */
+#section-selfie::before,
+.section-selfie::before,
+.jp-selfie-container::before {
+  content: "" !important;
+  position: absolute !important;
+  bottom: -60px !important; /* ajusta a posição da luz vazando */
+  left: 0 !important;
+  right: 0 !important;
+  height: 120px !important; /* altura do glow */
+  background: linear-gradient(to bottom, transparent, var(--progress-glow-1, rgba(255,210,120,0.85)), var(--progress-glow-2, rgba(255,210,120,0.4))) !important;
+  pointer-events: none !important;
+  z-index: -1 !important; /* fica atrás do conteúdo */
+  opacity: calc(0.6 * var(--luz-intensity, 1)) !important;
+  filter: blur(20px) !important; /* suaviza a luz */
+}
+   
    #section-selfie::before {
     bottom: -80px !important;
     height: 160px !important;
@@ -909,7 +959,32 @@
     width: 100% !important;
     object-fit: contain !important;
   }
+   
+/* Glow inferior consistente em TODAS as seções (inclui selfie e perguntas) */
+#section-selfie,
+.section-selfie,
+.jp-selfie-container {
+  position: relative !important; /* necessário para pseudo-elementos */
+  overflow: visible !important;  /* evita corte do glow */
+  padding-bottom: 80px !important; /* espaço extra para o glow vazar na base */
+}
 
+/* Glow inferior (a mesma luz que aparece em intro/termos/senha) */
+#section-selfie::before,
+.section-selfie::before,
+.jp-selfie-container::before {
+  content: "" !important;
+  position: absolute !important;
+  bottom: -60px !important; /* ajusta a posição da luz vazando */
+  left: 0 !important;
+  right: 0 !important;
+  height: 120px !important; /* altura do glow */
+  background: linear-gradient(to bottom, transparent, var(--progress-glow-1, rgba(255,210,120,0.85)), var(--progress-glow-2, rgba(255,210,120,0.4))) !important;
+  pointer-events: none !important;
+  z-index: -1 !important; /* fica atrás do conteúdo */
+  opacity: calc(0.6 * var(--luz-intensity, 1)) !important;
+  filter: blur(20px) !important; /* suaviza a luz */
+}
     #section-selfie::before {
     bottom: -80px !important;
     height: 160px !important;
@@ -1762,7 +1837,41 @@
   #section-perguntas .label-mic,
   #section-perguntas .mic-text {
     display: none !important;
-  }   
+  }
+ /* Glow inferior consistente em TODAS as seções (inclui selfie e perguntas) */
+#section-perguntas,
+.section-perguntas,
+.perguntas-wrap {
+  position: relative !important; /* necessário para pseudo-elementos */
+  overflow: visible !important;  /* evita corte do glow */
+  padding-bottom: 80px !important; /* espaço extra para o glow vazar na base */
+}
+
+/* Glow inferior (a mesma luz que aparece em intro/termos/senha) */
+#section-perguntas::before,
+.section-perguntas::before,
+.perguntas-wrap::before {
+  content: "" !important;
+  position: absolute !important;
+  bottom: -60px !important; /* ajusta a posição da luz vazando */
+  left: 0 !important;
+  right: 0 !important;
+  height: 120px !important; /* altura do glow */
+  background: linear-gradient(to bottom, transparent, var(--progress-glow-1, rgba(255,210,120,0.85)), var(--progress-glow-2, rgba(255,210,120,0.4))) !important;
+  pointer-events: none !important;
+  z-index: -1 !important; /* fica atrás do conteúdo */
+  opacity: calc(0.6 * var(--luz-intensity, 1)) !important;
+  filter: blur(20px) !important; /* suaviza a luz */
+}
+
+/* Reforço mobile (se precisar mais vazamento na base) */
+@media (max-width: 768px) {
+  #section-selfie::before,
+  #section-perguntas::before {
+    bottom: -80px !important;
+    height: 160px !important;
+  }
+}
 
   #section-perguntas::before {
     bottom: -80px !important;
@@ -1807,6 +1916,32 @@
   html, body {
     scroll-padding-bottom: 160px;
   }
+
+/* Glow inferior consistente em TODAS as seções (inclui selfie e perguntas) */
+#section-perguntas,
+.section-perguntas,
+.perguntas-wrap {
+  position: relative !important; /* necessário para pseudo-elementos */
+  overflow: visible !important;  /* evita corte do glow */
+  padding-bottom: 80px !important; /* espaço extra para o glow vazar na base */
+}
+
+/* Glow inferior (a mesma luz que aparece em intro/termos/senha) */
+#section-perguntas::before,
+.section-perguntas::before,
+.perguntas-wrap::before {
+  content: "" !important;
+  position: absolute !important;
+  bottom: -60px !important; /* ajusta a posição da luz vazando */
+  left: 0 !important;
+  right: 0 !important;
+  height: 120px !important; /* altura do glow */
+  background: linear-gradient(to bottom, transparent, var(--progress-glow-1, rgba(255,210,120,0.85)), var(--progress-glow-2, rgba(255,210,120,0.4))) !important;
+  pointer-events: none !important;
+  z-index: -1 !important; /* fica atrás do conteúdo */
+  opacity: calc(0.6 * var(--luz-intensity, 1)) !important;
+  filter: blur(20px) !important; /* suaviza a luz */
+}
     #section-perguntas::before {
     bottom: -80px !important;
     height: 160px !important;
