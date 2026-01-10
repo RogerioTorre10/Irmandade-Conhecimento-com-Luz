@@ -542,7 +542,7 @@ function applyGuiaTheme(guiaIdOrNull) {
     : bind();
   
 /* =========================================================
-   GUIA – Nome primeiro + DEMO automática dos 3 guias (INTEGRADA COM TEMA DOURADO INICIAL)
+   GUIA – Nome primeiro + DEMO automática dos 3 guias (ANTI-TRAVA + RESET)
    ========================================================= */
 (function () {
   'use strict';
@@ -550,7 +550,6 @@ function applyGuiaTheme(guiaIdOrNull) {
   const root = document.getElementById('section-guia');
   if (!root) return;
 
-  // evita rodar 2x
   if (root.dataset.guiaDemoBound === '1') return;
   root.dataset.guiaDemoBound = '1';
 
@@ -568,21 +567,16 @@ function applyGuiaTheme(guiaIdOrNull) {
   }
 
   let demoDone = false;
+  let guiaEscolhido = false; // nova flag para rastrear se guia foi escolhido
 
-  // Começa com tema dourado padrão (sem data-guia no body)
+  // Garante tema dourado no início da tela guia
   document.body.removeAttribute('data-guia');
-  document.body.classList.remove('guia-lumen', 'guia-zion', 'guia-arian');
-  
-  // Força variáveis douradas no início (garante que tudo brilhe em ouro antes da demo)
+  document.body.removeAttribute('data-guia-hover');
   document.documentElement.style.setProperty('--theme-main-color', '#d4af37');
   document.documentElement.style.setProperty('--progress-main', '#ffd700');
   document.documentElement.style.setProperty('--progress-glow-1', 'rgba(255,230,180,0.85)');
   document.documentElement.style.setProperty('--progress-glow-2', 'rgba(255,210,120,0.75)');
 
-  // 1) Começa com Confirmar desabilitado
-  btnConfirm.disabled = true;
-
-  // 2) Bots de guia começam travados até acabar a demo
   function lockGuides() {
     guideButtons.forEach(btn => {
       btn.disabled = true;
@@ -596,99 +590,85 @@ function applyGuiaTheme(guiaIdOrNull) {
     guideButtons.forEach(btn => {
       btn.disabled = false;
       btn.style.pointerEvents = 'auto';
-      btn.classList.remove('guia-demo-active');
     });
     document.body.removeAttribute('data-guia-hover');
     demoDone = true;
 
     if (guiaNotice) {
-      guiaNotice.setAttribute(
-        'data-text',
-        'Agora escolha, com calma, qual guia caminhará com você nesta jornada.'
-      );
+      guiaNotice.setAttribute('data-text', 'Agora escolha, com calma, qual guia caminhará com você nesta jornada.');
     }
   }
 
   lockGuides();
+  btnConfirm.disabled = true;
 
-  // 3) Habilita Confirmar quando tiver pelo menos 1 caractere (guardião anti-trava integrado)
   input.addEventListener('input', () => {
-    const hasName = input.value.trim().length > 0;
-    btnConfirm.disabled = !hasName;
+    btnConfirm.disabled = input.value.trim().length === 0;
   });
 
-  // 4) Clique no Confirmar → roda a demo (se ainda não rodou) + anti-trava se nome vazio
-  btnConfirm.addEventListener('click', (ev) => {
+  btnConfirm.addEventListener('click', () => {
     const nome = input.value.trim();
     if (!nome) {
-      ev.preventDefault();
-      ev.stopImmediatePropagation();
-      ev.stopPropagation();
+      alert('Digite seu nome primeiro para prosseguir!');
       input.focus();
       return;
     }
 
-    // Se a demo já foi rodada, só garante que tudo continue liberado
     if (demoDone) {
       unlockGuides();
       return;
     }
 
-    // Mensagem carinhosa
     if (guiaNotice) {
-      guiaNotice.setAttribute(
-        'data-text',
-        `Veja a apresentação dos guias, ${nome}, e depois escolha o que tocar seu coração.`
-      );
+      guiaNotice.setAttribute('data-text', `Veja a apresentação dos guias, ${nome}, e depois escolha o que tocar seu coração.`);
     }
 
-    lockGuides(); // garante que ninguém clique no meio da demo
+    lockGuides();
 
-    const seq = [
-      { key: 'lumen', match: /lumen/i },
-      { key: 'zion',  match: /zion/i },
-      { key: 'arian', match: /arian/i }
-    ];
-
+    const seq = ['lumen', 'zion', 'arian'];
     let step = 0;
 
-    const playStep = () => {
-      // limpa destaque anterior
-      guideButtons.forEach(btn => btn.classList.remove('guia-demo-active'));
+    const play = () => {
+      guideButtons.forEach(b => b.classList.remove('guia-demo-active'));
+      document.body.removeAttribute('data-guia-hover');
 
       if (step >= seq.length) {
         unlockGuides();
         return;
       }
 
-      const { key, match } = seq[step];
+      const guia = seq[step];
+      document.body.setAttribute('data-guia-hover', guia);
 
-      // acende a cor do guia (usa seus CSS body[data-guia-hover="..."])
-      document.body.setAttribute('data-guia-hover', key);
+      const btn = guideButtons.find(b => b.textContent.toLowerCase().includes(guia));
+      if (btn) btn.classList.add('guia-demo-active');
 
-      // destaca o botão correspondente
-      const btn = guideButtons.find(b => match.test(b.textContent || ''));
-      if (btn) {
-        btn.classList.add('guia-demo-active');
-      }
-
-      step += 1;
-      setTimeout(playStep, 1300); // tempo de cada guia na demo
+      step++;
+      setTimeout(play, 1400);
     };
 
-    playStep();
+    play();
   });
 
-  // ===== APLICAÇÃO DO TEMA DEFINITIVO AO ESCOLHER (integra com applyGuiaTheme do bloco principal) =====
+  // ===== APLICAÇÃO DO TEMA DEFINITIVO AO ESCOLHER =====
   guideButtons.forEach(btn => {
     btn.addEventListener('click', (ev) => {
       // ... (mantenha a lógica de arm/confirm que já existe no arquivo)
-      // Mas no final da confirmação (dentro de confirmGuide), chame isso:
+      // No final da confirmação (dentro de confirmGuide), chame isso:
       applyGuiaTheme(guiaId); // aplica o tema definitivo
+      guiaEscolhido = true; // flag para destravar se necessário
     });
   });
 
-  console.log('[GUIA DEMO] Demo automática mantida + tema dourado inicial + botões liberados no final');
-})();  
+  // ANTI-TRAVA: se travar (ex: usuário não escolhe guia), permite reset do nome/Confirmar
+  setTimeout(() => {
+    if (!guiaEscolhido) {
+      btnConfirm.disabled = false;
+      alert('Escolha um guia para prosseguir. Se quiser resetar, digite o nome novamente e confirme.');
+    }
+  }, ARM_TIMEOUT_MS * 1.5); // após tempo de arm, destrava Confirmar para retry
+
+  console.log('[GUIA DEMO] Demo automática mantida + anti-trava + reset para não perder jornada');
+})();
 
 })();
