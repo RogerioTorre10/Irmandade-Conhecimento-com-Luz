@@ -516,93 +516,112 @@ if (btnFalar && input) {
     console.warn('[MIC] SpeechRecognition não suportado');
   } else {
 
-    // ------------------------------------------------------------------
-    // Estado global do MIC (1 instância só) + buffers (anti-duplicação)
-    // ------------------------------------------------------------------
-    let recognition = window.__GLOBAL_MIC__;
-    if (!recognition) {
-      recognition = new SpeechRecognition();
-      recognition.lang = 'pt-BR';
-      recognition.continuous = true;
-      recognition.interimResults = true;
+// ------------------------------------------------------------------
+// Estado global do MIC (1 instância só) + buffers (anti-duplicação)
+// ------------------------------------------------------------------
+let recognition = window.__GLOBAL_MIC__;
+if (!recognition) {
+  recognition = new SpeechRecognition();
+  recognition.lang = 'pt-BR';
+  recognition.continuous = true;
+  recognition.interimResults = true;
 
-      // Buffers globais (para não duplicar) + controle de pergunta
-      window.__MIC_STATE__ = {
-        active: false,
-        // base = conteúdo existente quando o MIC iniciou nesta pergunta
-        baseText: '',
-        finalText: '',     // apenas finais acumulados desta pergunta
-        lastFinal: '',     // último final para dedupe
-        // para dedupe em eventos que repetem o mesmo resultIndex
-        seenFinalKeys: new Set(),
-        // id lógico da pergunta atual (qualquer token que você definir)
-        qKey: ''
-      };
+  // Buffers globais (ANTI-DUPLICAÇÃO) + controle de pergunta
+  window.__MIC_STATE__ = {
+    active: false,
 
-      recognition.onstart = () => {
-        window.__MIC_STATE__.active = true;
-        btnFalar.classList.add('recording');
-        console.log('[MIC] Gravando');
-      };
+    // base = conteúdo existente quando o MIC iniciou nesta pergunta
+    baseText: '',
 
-      recognition.onresult = (event) => {
-        const st = window.__MIC_STATE__;
-        if (!st) return;
+    // finais por índice (evita duplicação em Android/Chrome)
+    finalByIndex: Object.create(null),
 
-        let interim = '';
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const res = event.results[i];
-          const text = (res[0]?.transcript || '').trim();
-          if (!text) continue;
+    // último interim (preview)
+    lastInterim: '',
 
-          if (res.isFinal) {
-            // chave para evitar repetir o mesmo final (muito comum em mobile)
-            const key = `${i}:${text}`;
-            if (st.seenFinalKeys.has(key)) continue;
-            st.seenFinalKeys.add(key);
+    // id lógico da pergunta atual (se você quiser usar)
+    qKey: ''
+  };
 
-            // dedupe adicional (quando o browser repete exatamente o último final)
-            if (text === st.lastFinal) continue;
-            st.lastFinal = text;
+  recognition.onstart = () => {
+    const st = window.__MIC_STATE__;
+    st.active = true;
 
-            st.finalText = (st.finalText + ' ' + text).trim();
-          } else {
-            interim = (interim + ' ' + text).trim();
-          }
-        }
+    // fixa base desta pergunta e zera buffers
+    st.baseText = (input.value || '').trim();
+    st.finalByIndex = Object.create(null);
+    st.lastInterim = '';
 
-        // Atualiza o textarea SEM concatenar em cascata
-        const composed = [st.baseText, st.finalText, interim].filter(Boolean).join(' ').trim();
-        input.value = composed ? (composed + ' ') : '';
+    btnFalar.classList.add('recording');
+    console.log('[MIC] Gravando');
+  };
 
-        // mantém cursor no fim
-        input.scrollTop = input.scrollHeight;
-        if (input.selectionStart !== undefined) {
-          input.selectionStart = input.selectionEnd = input.value.length;
-        }
+  recognition.onresult = (event) => {
+    const st = window.__MIC_STATE__;
+    if (!st) return;
 
-        // Eventos para a app reagir
-        input.dispatchEvent(new Event('input', { bubbles: true }));
-      };
+    let interim = '';
 
-      recognition.onerror = (event) => {
-        console.warn('[MIC] Erro:', event.error);
-        btnFalar.classList.remove('recording');
-        window.__MIC_STATE__.active = false;
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const res = event.results[i];
+      const text = (res[0]?.transcript || '').trim();
+      if (!text) continue;
 
-        if (event.error === 'not-allowed') {
-          alert('Permissão de microfone negada. Ative nas configurações do navegador.');
-        }
-      };
-
-      recognition.onend = () => {
-        btnFalar.classList.remove('recording');
-        window.__MIC_STATE__.active = false;
-        console.log('[MIC] Parou');
-      };
-
-      window.__GLOBAL_MIC__ = recognition;
+      if (res.isFinal) {
+        // sobrescreve por índice -> não duplica
+        st.finalByIndex[i] = text;
+      } else {
+        // mantém o interim mais recente (preview)
+        interim = text;
+      }
     }
+
+    st.lastInterim = interim;
+
+    // reconstrói o final em ordem
+    const finalText = Object.keys(st.finalByIndex)
+      .map(Number)
+      .sort((a, b) => a - b)
+      .map(i => st.finalByIndex[i])
+      .join(' ')
+      .trim();
+
+    // compõe sem cascata
+    let composed = [st.baseText, finalText, interim].filter(Boolean).join(' ').trim();
+
+    // Anti-eco: remove duplicação imediata de palavras (paz paz -> paz)
+    composed = composed.replace(/(\b[\p{L}]+)(\s+\1\b)+/giu, '$1');
+
+    input.value = composed ? (composed + ' ') : '';
+
+    // mantém cursor no fim
+    input.scrollTop = input.scrollHeight;
+    if (input.selectionStart !== undefined) {
+      input.selectionStart = input.selectionEnd = input.value.length;
+    }
+
+    // Eventos para a app reagir
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+  };
+
+  recognition.onerror = (event) => {
+    console.warn('[MIC] Erro:', event.error);
+    btnFalar.classList.remove('recording');
+    if (window.__MIC_STATE__) window.__MIC_STATE__.active = false;
+
+    if (event.error === 'not-allowed') {
+      alert('Permissão de microfone negada. Ative nas configurações do navegador.');
+    }
+  };
+
+  recognition.onend = () => {
+    btnFalar.classList.remove('recording');
+    if (window.__MIC_STATE__) window.__MIC_STATE__.active = false;
+    console.log('[MIC] Parou');
+  };
+
+  window.__GLOBAL_MIC__ = recognition;
+}
 
     // ------------------------------------------------------------------
     // Funções utilitárias: reset por pergunta + stop seguro
