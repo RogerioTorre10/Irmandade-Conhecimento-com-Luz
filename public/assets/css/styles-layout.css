@@ -840,94 +840,51 @@
 }
 /* Responsivo mobile: tela de selfie cabe inteira + scroll suave */
 @media (max-width: 768px) {
-  #section-selfie,
-  .selfie-section,
-  .jp-selfie-container {
-    height: auto !important; /* permite scroll vertical */
-    min-height: 100dvh !important; /* ocupa toda tela */
-    overflow-y: auto !important; /* ativa scroll se precisar */
-    padding: 20px 10px 120px 10px !important; /* espaço na base para botões não cortarem */
-    box-sizing: border-box !important;
-  }
-
-  /* Título e texto principal */
-  .selfie-title,
-  .selfie-instruction,
-  .selfie-text {
-    font-size: 1.1rem !important;
-    line-height: 1.4 !important;
-    margin-bottom: 15px !important;
-  }
-
-  /* Área da câmera + pré-visualização */
-  .selfie-preview-container,
-  .preview-video,
-  .selfie-canvas {
-    width: 100% !important;
-    max-height: 50vh !important; /* limita altura para não estourar */
-    aspect-ratio: 4/3 !important;
-    object-fit: cover !important;
-  }
-
-  /* Botões (Preview, Capturar, Iniciar) */
-  .selfie-buttons {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    justify-content: center !important;
-    gap: 10px !important;
-    margin: 15px 0 !important;
-  }
-
-  .selfie-btn {
-    flex: 1 1 30% !important; /* 3 botões em linha se couber */
-    min-width: 120px !important;
-    padding: 12px !important;
-    font-size: 0.95rem !important;
-  }
-
-  /* Sliders de zoom */
-  .zoom-controls {
-    flex-direction: column !important;
-    gap: 10px !important;
-    padding: 10px !important;
-  }
-
-  /* Espaço extra na base para rodapé/copyright */
-  body, html {
-    padding-bottom: 80px !important; /* evita corte do copyright */
-  }
    
-/* Glow inferior consistente em TODAS as seções (inclui selfie e perguntas) */
-#section-selfie,
-.section-selfie,
-.jp-selfie-container {
-  position: relative !important; /* necessário para pseudo-elementos */
-  overflow: visible !important;  /* evita corte do glow */
-  padding-bottom: 80px !important; /* espaço extra para o glow vazar na base */
+/* 1) Nunca travar o section em 100vh no mobile */
+#section-selfie {
+  height: auto !important;
+  min-height: 100svh !important; /* viewport "estável" no mobile */
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 18px) !important;
 }
 
-/* Glow inferior (a mesma luz que aparece em intro/termos/senha) */
-#section-selfie::before,
-.section-selfie::before,
-.jp-selfie-container::before {
-  content: "" !important;
-  position: absolute !important;
-  bottom: -60px !important; /* ajusta a posição da luz vazando */
-  left: 0 !important;
-  right: 0 !important;
-  height: 120px !important; /* altura do glow */
-  background: linear-gradient(to bottom, transparent, var(--progress-glow-1, rgba(255,210,120,0.85)), var(--progress-glow-2, rgba(255,210,120,0.4))) !important;
-  pointer-events: none !important;
-  z-index: -1 !important; /* fica atrás do conteúdo */
-  opacity: calc(0.6 * var(--luz-intensity, 1)) !important;
-  filter: blur(20px) !important; /* suaviza a luz */
+/* 2) O container/painel precisa poder crescer e rolar */
+#section-selfie .content,
+#section-selfie .j-perg-v-inner,
+#section-selfie .glass-panel,
+#section-selfie .glass-panel-glow,
+#section-selfie .j-panel,
+#section-selfie .panel {
+  height: auto !important;
+  min-height: 0 !important;
+  overflow: visible !important; /* evita corte */
 }
-   
-   #section-selfie::before {
-    bottom: -80px !important;
-    height: 160px !important;
-  }
+
+/* 3) Se você tem um wrapper que deve rolar (recomendado) */
+#section-selfie .content {
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
 }
+
+/* 4) Evita “empurrar” ações para fora da tela */
+#section-selfie .selfie-root,
+#section-selfie .selfie-wrap,
+#section-selfie .selfie-container {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important; /* NÃO space-between */
+  gap: 10px !important;
+}
+
+/* 5) Garante área clicável dos botões no rodapé */
+#section-selfie .selfie-actions,
+#section-selfie .selfie-buttons,
+#section-selfie .actions-row {
+  margin-top: 10px !important;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 12px) !important;
+}  
+}
+
 @media (max-width: 480px) {
   /* Reforços extras (baseado na experiência real) */
   .selfie-section,
