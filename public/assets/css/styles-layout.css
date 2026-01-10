@@ -807,7 +807,12 @@
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
-  }   
+  }
+   
+    #section-selfie::before {
+    bottom: -80px !important;
+    height: 160px !important;
+  }
 }
 /* Responsivo mobile: tela de selfie cabe inteira + scroll suave */
 @media (max-width: 768px) {
@@ -867,6 +872,11 @@
   body, html {
     padding-bottom: 80px !important; /* evita corte do copyright */
   }
+   
+   #section-selfie::before {
+    bottom: -80px !important;
+    height: 160px !important;
+  }
 }
 @media (max-width: 480px) {
   /* Reforços extras (baseado na experiência real) */
@@ -898,6 +908,11 @@
     max-height: 45dvh !important;
     width: 100% !important;
     object-fit: contain !important;
+  }
+
+    #section-selfie::before {
+    bottom: -80px !important;
+    height: 160px !important;
   }
 }
 
@@ -1747,8 +1762,13 @@
   #section-perguntas .label-mic,
   #section-perguntas .mic-text {
     display: none !important;
+  }   
+
+  #section-perguntas::before {
+    bottom: -80px !important;
+    height: 160px !important;
   }
-}
+ }
    
 /* Responsivo mobile: garante espaço para os botões e evita corte */
 @media (max-width: 768px) {
@@ -1786,6 +1806,10 @@
   /* Se os botões ainda ficarem baixos, força um scroll suave */
   html, body {
     scroll-padding-bottom: 160px;
+  }
+    #section-perguntas::before {
+    bottom: -80px !important;
+    height: 160px !important;
   }
 }
 
