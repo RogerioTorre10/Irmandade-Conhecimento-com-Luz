@@ -197,6 +197,6 @@
     });
   }
 
-  window.JORNADA_MICRO = { attach, attachAll };
+ // window.JORNADA_MICRO = { attach, attachAll };
 
 })(window);
