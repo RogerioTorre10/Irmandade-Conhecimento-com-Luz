@@ -507,112 +507,185 @@ window.addEventListener('resize', () => setTimeout(applyGuiaTheme, 80));
   const btnConfirmar = $('#jp-btn-confirmar', root);
   const input       = $('#jp-answer-input', root);    
 
-  // ========= MICROFONE NATIVO COM TOGGLE CONTÍNUO + RESET POR PERGUNTA =========
+// ========= MICROFONE NATIVO COM TOGGLE (ANTI-DUPLICAÇÃO + RESET POR PERGUNTA) =========
 if (btnFalar && input) {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) {
     btnFalar.disabled = true;
     btnFalar.style.opacity = '0.5';
-    console.warn('SpeechRecognition não suportado');
-    return;
-  }
+    console.warn('[MIC] SpeechRecognition não suportado');
+  } else {
 
-  let recognition = window.__GLOBAL_MIC__;
-  if (!recognition) {
-    recognition = new SpeechRecognition();
-    recognition.lang = 'pt-BR';
-    recognition.continuous = true;
-    recognition.interimResults = true;
+    // ------------------------------------------------------------------
+    // Estado global do MIC (1 instância só) + buffers (anti-duplicação)
+    // ------------------------------------------------------------------
+    let recognition = window.__GLOBAL_MIC__;
+    if (!recognition) {
+      recognition = new SpeechRecognition();
+      recognition.lang = 'pt-BR';
+      recognition.continuous = true;
+      recognition.interimResults = true;
 
-    // Variáveis de controle (resetadas por pergunta)
-    let finalText = '';
-    let lastInterim = '';
+      // Buffers globais (para não duplicar) + controle de pergunta
+      window.__MIC_STATE__ = {
+        active: false,
+        // base = conteúdo existente quando o MIC iniciou nesta pergunta
+        baseText: '',
+        finalText: '',     // apenas finais acumulados desta pergunta
+        lastFinal: '',     // último final para dedupe
+        // para dedupe em eventos que repetem o mesmo resultIndex
+        seenFinalKeys: new Set(),
+        // id lógico da pergunta atual (qualquer token que você definir)
+        qKey: ''
+      };
 
-    recognition.onstart = () => {
-      btnFalar.classList.add('recording');
-      console.log('[MIC] Gravando continuamente');
-    };
+      recognition.onstart = () => {
+        window.__MIC_STATE__.active = true;
+        btnFalar.classList.add('recording');
+        console.log('[MIC] Gravando');
+      };
 
-    recognition.onresult = (event) => {
-      let interim = '';
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const res = event.results[i];
-        const txt = (res[0]?.transcript || '')
-          .replace(/\s+/g, ' ')
-          .trim();
-        if (!txt) continue;
-        if (res.isFinal) {
-          finalText = (finalText + ' ' + txt).replace(/\s+/g, ' ').trim();
-        } else {
-          interim = (interim + ' ' + txt).replace(/\s+/g, ' ').trim();
+      recognition.onresult = (event) => {
+        const st = window.__MIC_STATE__;
+        if (!st) return;
+
+        let interim = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const res = event.results[i];
+          const text = (res[0]?.transcript || '').trim();
+          if (!text) continue;
+
+          if (res.isFinal) {
+            // chave para evitar repetir o mesmo final (muito comum em mobile)
+            const key = `${i}:${text}`;
+            if (st.seenFinalKeys.has(key)) continue;
+            st.seenFinalKeys.add(key);
+
+            // dedupe adicional (quando o browser repete exatamente o último final)
+            if (text === st.lastFinal) continue;
+            st.lastFinal = text;
+
+            st.finalText = (st.finalText + ' ' + text).trim();
+          } else {
+            interim = (interim + ' ' + text).trim();
+          }
         }
-      }
-      lastInterim = interim;
 
-      const merged = (finalText + (interim ? ' ' + interim : ''))
-        .replace(/\s+/g, ' ')
-        .trim();
+        // Atualiza o textarea SEM concatenar em cascata
+        const composed = [st.baseText, st.finalText, interim].filter(Boolean).join(' ').trim();
+        input.value = composed ? (composed + ' ') : '';
 
-      // Evita duplicidade e atualiza
-      if (merged !== (input.value || '').trim()) {
-        input.value = merged + ' ';
+        // mantém cursor no fim
         input.scrollTop = input.scrollHeight;
         if (input.selectionStart !== undefined) {
           input.selectionStart = input.selectionEnd = input.value.length;
         }
+
+        // Eventos para a app reagir
         input.dispatchEvent(new Event('input', { bubbles: true }));
-      }
-    };
+      };
 
-    recognition.onerror = (event) => {
-      console.warn('[MIC] Erro:', event.error);
+      recognition.onerror = (event) => {
+        console.warn('[MIC] Erro:', event.error);
+        btnFalar.classList.remove('recording');
+        window.__MIC_STATE__.active = false;
+
+        if (event.error === 'not-allowed') {
+          alert('Permissão de microfone negada. Ative nas configurações do navegador.');
+        }
+      };
+
+      recognition.onend = () => {
+        btnFalar.classList.remove('recording');
+        window.__MIC_STATE__.active = false;
+        console.log('[MIC] Parou');
+      };
+
+      window.__GLOBAL_MIC__ = recognition;
+    }
+
+    // ------------------------------------------------------------------
+    // Funções utilitárias: reset por pergunta + stop seguro
+    // ------------------------------------------------------------------
+    const stopMicSafely = () => {
+      try { recognition.stop(); } catch (_) {}
       btnFalar.classList.remove('recording');
-      if (event.error === 'not-allowed') {
-        alert('Permissão de microfone negada. Ative nas configurações do navegador.');
-      }
+      if (window.__MIC_STATE__) window.__MIC_STATE__.active = false;
     };
 
-    recognition.onend = () => {
-      btnFalar.classList.remove('recording');
-      console.log('[MIC] Parou');
+    const resetMicForNewQuestion = () => {
+      const st = window.__MIC_STATE__;
+      if (!st) return;
+
+      // Para evitar “vazar” fala entre perguntas, a gente para o mic
+      stopMicSafely();
+
+      // Zera buffers e define nova base (o texto atual do input)
+      st.baseText = (input.value || '').trim();
+      st.finalText = '';
+      st.lastFinal = '';
+      st.seenFinalKeys = new Set();
+
+      console.log('[MIC] Reset para nova pergunta');
     };
 
-    window.__GLOBAL_MIC__ = recognition;
-  }
+    // ------------------------------------------------------------------
+    // Detecta mudança de pergunta para resetar buffers
+    // (use os eventos do seu app + fallback por mudança do texto da pergunta)
+    // ------------------------------------------------------------------
+    document.addEventListener('perguntas:state-changed', resetMicForNewQuestion);
+    document.addEventListener('sectionLoaded', resetMicForNewQuestion);
 
-  // Toggle start/stop
-  if (!btnFalar.__micBound) {
-    btnFalar.__micBound = true;
+    // Fallback: se o texto da pergunta mudar, reseta
+    const questionEl = document.querySelector('#jp-question-typed, .perguntas-titulo, #question-display');
+    if (questionEl && !window.__MIC_Q_OBS__) {
+      window.__MIC_Q_OBS__ = new MutationObserver(() => resetMicForNewQuestion());
+      window.__MIC_Q_OBS__.observe(questionEl, { childList: true, subtree: true, characterData: true });
+    }
+
+    // ------------------------------------------------------------------
+    // Toggle do botão (start/stop limpo)
+    // ------------------------------------------------------------------
     btnFalar.addEventListener('click', (ev) => {
       ev.preventDefault();
       ev.stopPropagation();
 
-      if (btnFalar.classList.contains('recording')) {
-        // Consolida texto provisório antes de parar
-        if (lastInterim.trim()) {
-          finalText = (finalText + ' ' + lastInterim).replace(/\s+/g, ' ').trim();
-          lastInterim = '';
-          input.value = finalText + ' ';
-          input.dispatchEvent(new Event('input', { bubbles: true }));
-        }
-        recognition.stop();
+      const st = window.__MIC_STATE__;
+      const isRecording = btnFalar.classList.contains('recording') || (st && st.active);
+
+      if (isRecording) {
+        stopMicSafely();
+        console.log('[MIC] Parando manualmente');
       } else {
-        recognition.start();
+        // Inicia sessão nesta pergunta: fixa a base do input (não acumula em cascata)
+        if (st) {
+          st.baseText = (input.value || '').trim();
+          st.finalText = '';
+          st.lastFinal = '';
+          st.seenFinalKeys = new Set();
+        }
+        try {
+          recognition.start();
+          console.log('[MIC] Iniciando gravação');
+        } catch (e) {
+          // Em alguns Androids dá InvalidStateError se start chamar rápido
+          console.warn('[MIC] start() falhou (provável estado inválido):', e?.message || e);
+        }
       }
     });
-  }
 
-  // 🔥 RESET AUTOMÁTICO DO MICROFONE AO MUDAR DE PERGUNTA (resolve o acúmulo!)
-  document.addEventListener('perguntas:state-changed', () => {
-    if (recognition && btnFalar.classList.contains('recording')) {
-      recognition.stop(); // para qualquer gravação em andamento
-      btnFalar.classList.remove('recording');
+    // ------------------------------------------------------------------
+    // OPCIONAL (RECOMENDADO): ao clicar em Avançar, pare o mic.
+    // Isso evita vazamento para a próxima pergunta.
+    // ------------------------------------------------------------------
+    const btnAvanca = document.querySelector('#jp-btn-confirmar, #btn-next, .btn-confirm, .btn-avanca');
+    if (btnAvanca && !btnAvanca.__micBound) {
+      btnAvanca.__micBound = true;
+      btnAvanca.addEventListener('click', () => stopMicSafely(), true);
     }
-    finalText = '';     // zera texto confirmado
-    lastInterim = '';   // zera texto provisório
-    console.log('[MIC] Resetado para nova pergunta');
-  });
+  }
 }
+
 
   // ========= APAGAR =========
   if (btnApagar && input) {
