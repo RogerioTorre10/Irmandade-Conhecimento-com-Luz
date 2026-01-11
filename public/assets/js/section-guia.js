@@ -385,47 +385,72 @@ try {
     guideButtons.forEach(b => { b.disabled = true; b.style.opacity = '0.6'; b.style.cursor = 'not-allowed'; });
 
     // ===== CONFIRMAR NOME (SALVA NOME AQUI) =====
-    els.confirmBtn?.addEventListener('click', async () => {
-      let name = (els.nameInput?.value || '').trim();
-      if (name.length < 2) {
-        window.toast?.('Por favor, insira um nome válido.', 'warning');
-        els.nameInput?.focus();
-        return;
-      }
+   // ===== CONFIRMAR NOME (SALVA NOME AQUI) =====
+let __NAME_CONFIRMED__ = false;
 
-      const upperName = name.toUpperCase();
-      els.nameInput.value = upperName;
+// confirma começa bloqueado; libera conforme input
+if (els.confirmBtn) els.confirmBtn.disabled = true;
 
-      // === SALVA NOME COM GARANTIA ===
-      try {
-        window.JC = window.JC || {};
-        window.JC.data = window.JC.data || {};
-        window.JC.data.nome = upperName;
+els.nameInput?.addEventListener('input', () => {
+  const v = (els.nameInput?.value || '').trim();
+  if (els.confirmBtn) els.confirmBtn.disabled = (v.length < 2);
+});
 
-        sessionStorage.setItem('jornada.nome', upperName);
-        localStorage.setItem('jc.nome', upperName);
-      } catch (e) {
-        console.warn('[JCGuia] Erro ao salvar nome:', e);
-      }
+els.confirmBtn?.addEventListener('click', async (ev) => {
+  ev.preventDefault();
+  ev.stopPropagation();
 
-      // === TEXTO PERSONALIZADO ===
-      if (els.guiaTexto) {
-        const base = (els.guiaTexto.dataset?.text || els.guiaTexto.textContent || 'Escolha seu guia para a Jornada.').trim();
-        const msg = base.replace(/\{\{\s*(nome|name)\s*\}\}/gi, upperName);
-        els.guiaTexto.textContent = '';
-        await typeOnce(els.guiaTexto, msg, { speed: 38, speak: true });
-        els.moldura?.classList.add('glow');
-        els.guiaTexto?.classList.add('glow');
-      }
+  let name = (els.nameInput?.value || '').trim();
+  if (name.length < 2) {
+    window.toast?.('Por favor, insira um nome válido (mín. 2 letras).', 'warning');
+    els.nameInput?.focus();
+    return; // <-- agora pode tentar de novo (SEM once:true)
+  }
 
-      // === HABILITA BOTÕES ===
-      guideButtons.forEach(b => {
-        b.disabled = false;
-        b.style.opacity = '1';
-        b.style.cursor = 'pointer';
-      });
-      hideNotice(root);
-    }, { once: true });
+  const upperName = name.toUpperCase();
+  els.nameInput.value = upperName;
+
+  // === SALVA NOME COM GARANTIA ===
+  try {
+    window.JC = window.JC || {};
+    window.JC.data = window.JC.data || {};
+    window.JC.data.nome = upperName;
+
+    sessionStorage.setItem('jornada.nome', upperName);
+    localStorage.setItem('jc.nome', upperName);
+  } catch (e) {
+    console.warn('[JCGuia] Erro ao salvar nome:', e);
+  }
+
+  // Se já confirmou antes, não precisa re-rodar TTS/datilo; só garante botões liberados
+  if (!__NAME_CONFIRMED__) {
+    __NAME_CONFIRMED__ = true;
+
+    // === TEXTO PERSONALIZADO ===
+    if (els.guiaTexto) {
+      const base = (els.guiaTexto.dataset?.text || els.guiaTexto.textContent || 'Escolha seu guia para a Jornada.').trim();
+      const msg = base.replace(/\{\{\s*(nome|name)\s*\}\}/gi, upperName);
+      els.guiaTexto.textContent = '';
+      await typeOnce(els.guiaTexto, msg, { speed: 38, speak: true });
+      els.moldura?.classList.add('glow');
+      els.guiaTexto?.classList.add('glow');
+    }
+  }
+
+  // === HABILITA BOTÕES (SEMPRE) ===
+  guideButtons.forEach(b => {
+    b.disabled = false;
+    b.style.opacity = '1';
+    b.style.cursor = 'pointer';
+    b.style.pointerEvents = 'auto';
+  });
+
+  hideNotice(root);
+
+  // opcional: desabilita confirmar depois de sucesso (evita “stress”)
+  // els.confirmBtn.disabled = true;
+});
+
 
     // ===== HOVER: PRÉVIA DA DESCRIÇÃO =====
     guideButtons.forEach(btn => {
