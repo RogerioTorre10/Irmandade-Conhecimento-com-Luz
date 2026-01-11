@@ -156,16 +156,7 @@
     }
   }
 
-  // ---- Listener do controller ----
-  document.addEventListener('section:shown', (e) => {
-    const id = e.detail && e.detail.sectionId;
-    if (!id || SECTION_IDS.indexOf(id) === -1) return;
-
-    const node = e.detail.node || qs('#' + id);
-    init(node);
-  });
-
-  /* =========================================================
+ /* =========================================================
    TEMA DO GUIA — reaplica em qualquer seção quando necessário
    ========================================================= */
 (function () {
@@ -196,6 +187,15 @@
   document.addEventListener('sectionLoaded', () => setTimeout(applyThemeFromSession, 50));
   document.addEventListener('guia:changed', applyThemeFromSession);
 })();
+  
+  // ---- Listener do controller ----
+  document.addEventListener('section:shown', (e) => {
+    const id = e.detail && e.detail.sectionId;
+    if (!id || SECTION_IDS.indexOf(id) === -1) return;
+
+    const node = e.detail.node || qs('#' + id);
+    init(node);
+  });
 
 
   console.log('[' + MOD + '] carregado');
