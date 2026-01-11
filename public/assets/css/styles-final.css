@@ -117,3 +117,87 @@ body.final-lock {
 #final-video {
   display: none !important;
 }
+
+/* =========================================================
+   GLOW DO GUIA — (Guia / Selfie / Card) igual Perguntas
+   Usa: --progress-main, --progress-glow-1, --progress-glow-2
+   ========================================================= */
+
+/* 1) Glow "ambiente" no fundo da seção (como Perguntas) */
+
+#section-final {
+  position: relative;
+  overflow: visible !important; /* não cortar o glow */
+}
+
+/* Glow inferior (vazando) */
+
+#section-final::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -70px;                 /* ajuste fino do vazamento */
+  height: 160px;                 /* altura do glow */
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.75;
+
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--progress-glow-1, rgba(255,210,120,0.85)),
+    var(--progress-glow-2, rgba(255,210,120,0.40))
+  );
+
+  filter: blur(22px);
+}
+
+/* 2) Glow forte no “quadro principal” (borda + aura) 
+   Aqui usamos seletores em camadas pra pegar o container real, independente do HTML exato.
+*/
+
+#section-final .card,
+#section-final .glass,
+#section-final .glass-panel,
+#section-final .card-stage,
+#section-final .j-card,
+#section-final .j-panel {
+  position: relative;
+  z-index: 1; /* acima do glow da seção */
+
+  border: 2px solid var(--progress-main, #ffd700) !important;
+
+  box-shadow:
+    0 0 18px var(--progress-main, #ffd700),
+    0 0 42px var(--progress-glow-1, rgba(255,210,120,0.85)),
+    inset 0 0 26px rgba(0,0,0,0.55) !important;
+
+  /* dá um “ar” de luz suave em volta */
+  filter: saturate(1.05);
+}
+
+/* 3) Borda iluminada em elementos-chave (inputs/caixas) — opcional, mas fica lindo */
+##section-final input,
+##section-final .input-espinhos,
+##section-final .preview-frame,
+##section-final .ranges-panel,
+##section-final .card,
+##section-final .card-inner,
+##section-final .card-frame {
+  border-color: var(--progress-main, #ffd700) !important;
+  box-shadow: 0 0 14px var(--progress-main, #ffd700) !important;
+}
+
+/* 4) Responsivo: reduz “vazamento” no mobile para não cortar clique nem estourar layout */
+@media (max-width: 600px) {
+  
+  #section-final::before {
+    bottom: -55px;
+    height: 130px;
+    filter: blur(18px);
+    opacity: 0.65;
+  }
+}
+
+
