@@ -329,6 +329,105 @@
       }
     });
 
+    /* =========================================================
+   TRANSIÇÃO LIMPA (ANTI-FLASH)
+   - Durante o vídeo: esconde todas as seções
+   - No fim: remove overlay e libera a próxima
+   ========================================================= */
+(function () {
+  'use strict';
+
+  // Cria overlay (1 vez)
+  function ensureOverlay() {
+    let ov = document.getElementById('transition-overlay');
+    if (ov) return ov;
+
+    ov = document.createElement('div');
+    ov.id = 'transition-overlay';
+
+    const vid = document.createElement('video');
+    vid.setAttribute('playsinline', '');
+    vid.setAttribute('webkit-playsinline', '');
+    vid.preload = 'auto';
+    vid.muted = true;  // transição deve ser muda (evita bloqueio autoplay)
+    vid.autoplay = true;
+
+    ov.appendChild(vid);
+    document.body.appendChild(ov);
+    return ov;
+  }
+
+  function enterTransitionMode() {
+    document.body.classList.add('is-transitioning');
+    // trava scroll (evita repintura esquisita)
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function exitTransitionMode() {
+    document.body.classList.remove('is-transitioning');
+    document.documentElement.style.overflow = '';
+    document.body.style.overflow = '';
+  }
+
+  async function playCleanTransition(videoSrc, done) {
+    const overlay = ensureOverlay();
+    const video = overlay.querySelector('video');
+
+    if (!videoSrc) {
+      // sem vídeo: apenas garante que não "pisca"
+      exitTransitionMode();
+      if (typeof done === 'function') done();
+      return;
+    }
+
+    enterTransitionMode();
+
+    overlay.classList.add('is-on');
+
+    // força repaint (isso remove o "flash" em vários Androids)
+    // eslint-disable-next-line no-unused-expressions
+    overlay.offsetHeight;
+
+    // prepara vídeo
+    video.pause();
+    video.currentTime = 0;
+    video.src = videoSrc;
+
+    const cleanup = () => {
+      video.onended = null;
+      video.onerror = null;
+
+      overlay.classList.remove('is-on');
+
+      // IMPORTANTÍSSIMO: só libera depois de desligar overlay (evita 1 frame do antigo)
+      // ainda força 1 frame de repaint
+      requestAnimationFrame(() => {
+        exitTransitionMode();
+        if (typeof done === 'function') done();
+      });
+    };
+
+    video.onerror = cleanup;
+    video.onended = cleanup;
+
+    try {
+      await video.play();
+    } catch (e) {
+      // se autoplay falhar, não trava o fluxo
+      cleanup();
+    }
+  }
+
+  // Se já existir uma função de transição, encapsula (sem quebrar seu fluxo)
+  const prev = window.playBlockTransition;
+  window.playBlockTransition = function (videoSrc, done) {
+    // Sempre usa a transição limpa.
+    // Se você quiser manter o comportamento antigo, dá para chamar prev dentro do done.
+    playCleanTransition(videoSrc, done);
+  };
+})();
+
     // ======== Boot ========
     (function init() {
       if (new URLSearchParams(location.search).get('logout') === '1') clearAuth();
