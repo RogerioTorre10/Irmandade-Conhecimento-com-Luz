@@ -1080,6 +1080,63 @@ html, body{
     margin-top: -18px !important;
     margin-bottom: 24px !important;
   }
+   /* 1) Glow "ambiente" no fundo da seção (como Perguntas) */
+#section-guia {
+  position: relative;
+  overflow: visible !important; /* não cortar o glow */
+}
+
+/* Glow inferior (vazando) */
+#section-guia::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -70px;                 /* ajuste fino do vazamento */
+  height: 160px;                 /* altura do glow */
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.75;
+
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--progress-glow-1, rgba(255,210,120,0.85)),
+    var(--progress-glow-2, rgba(255,210,120,0.40))
+  );
+
+  filter: blur(22px);
+}
+
+/* 2) Glow forte no “quadro principal” (borda + aura) 
+   Aqui usamos seletores em camadas pra pegar o container real, independente do HTML exato.
+*/
+#section-guia .card,
+#section-guia .glass,
+#section-guia .glass-panel,
+#section-guia .guia-card,
+#section-guia .j-card,
+#section-guia .j-panel {
+  position: relative;
+  z-index: 1; /* acima do glow da seção */
+
+  border: 2px solid var(--progress-main, #ffd700) !important;
+
+  box-shadow:
+    0 0 18px var(--progress-main, #ffd700),
+    0 0 42px var(--progress-glow-1, rgba(255,210,120,0.85)),
+    inset 0 0 26px rgba(0,0,0,0.55) !important;
+
+  /* dá um “ar” de luz suave em volta */
+  filter: saturate(1.05);
+}
+
+/* 3) Borda iluminada em elementos-chave (inputs/caixas) — opcional, mas fica lindo */
+#section-guia input,
+#section-guia .input-espinhos {
+  border-color: var(--progress-main, #ffd700) !important;
+  box-shadow: 0 0 14px var(--progress-main, #ffd700) !important;
+}
 }
 
 /* ---- GUIA: card com nome/inputs – segue padrão alto e central ---- */
@@ -1176,6 +1233,64 @@ html, body{
   transform: translateY(-2px);
   box-shadow: 0 0 16px rgba(255, 255, 210, 0.9);
 }
+/* 1) Glow "ambiente" no fundo da seção (como Perguntas) */
+#section-guia {
+  position: relative;
+  overflow: visible !important; /* não cortar o glow */
+}
+
+/* Glow inferior (vazando) */
+#section-guia::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -70px;                 /* ajuste fino do vazamento */
+  height: 160px;                 /* altura do glow */
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.75;
+
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--progress-glow-1, rgba(255,210,120,0.85)),
+    var(--progress-glow-2, rgba(255,210,120,0.40))
+  );
+
+  filter: blur(22px);
+}
+
+/* 2) Glow forte no “quadro principal” (borda + aura) 
+   Aqui usamos seletores em camadas pra pegar o container real, independente do HTML exato.
+*/
+#section-guia .card,
+#section-guia .glass,
+#section-guia .glass-panel,
+#section-guia .guia-card,
+#section-guia .j-card,
+#section-guia .j-panel {
+  position: relative;
+  z-index: 1; /* acima do glow da seção */
+
+  border: 2px solid var(--progress-main, #ffd700) !important;
+
+  box-shadow:
+    0 0 18px var(--progress-main, #ffd700),
+    0 0 42px var(--progress-glow-1, rgba(255,210,120,0.85)),
+    inset 0 0 26px rgba(0,0,0,0.55) !important;
+
+  /* dá um “ar” de luz suave em volta */
+  filter: saturate(1.05);
+}
+
+/* 3) Borda iluminada em elementos-chave (inputs/caixas) — opcional, mas fica lindo */
+#section-guia input,
+#section-guia .input-espinhos {
+  border-color: var(--progress-main, #ffd700) !important;
+  box-shadow: 0 0 14px var(--progress-main, #ffd700) !important;
+}
+   
 }
 
 /* =========================================
@@ -1206,7 +1321,7 @@ html, body{
     margin-right: auto !important;
     z-index: 6 !important;
   }
-}
+
 /* 1) Isola o fundo global dentro do card */
 #section-card,
 #section-card * {
@@ -1291,7 +1406,69 @@ html, body{
   display: flex;
   justify-content: center;
 }
+/* 1) Glow "ambiente" no fundo da seção (como Perguntas) */
 
+#section-card {
+  position: relative;
+  overflow: visible !important; /* não cortar o glow */
+}
+
+/* Glow inferior (vazando) */
+
+#section-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -70px;                 /* ajuste fino do vazamento */
+  height: 160px;                 /* altura do glow */
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.75;
+
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--progress-glow-1, rgba(255,210,120,0.85)),
+    var(--progress-glow-2, rgba(255,210,120,0.40))
+  );
+
+  filter: blur(22px);
+}
+
+/* 2) Glow forte no “quadro principal” (borda + aura) 
+   Aqui usamos seletores em camadas pra pegar o container real, independente do HTML exato.
+*/
+
+#section-card .card,
+#section-card .glass,
+#section-card .glass-panel,
+#section-card .card-stage,
+#section-card .j-card,
+#section-card .j-panel {
+  position: relative;
+  z-index: 1; /* acima do glow da seção */
+
+  border: 2px solid var(--progress-main, #ffd700) !important;
+
+  box-shadow:
+    0 0 18px var(--progress-main, #ffd700),
+    0 0 42px var(--progress-glow-1, rgba(255,210,120,0.85)),
+    inset 0 0 26px rgba(0,0,0,0.55) !important;
+
+  /* dá um “ar” de luz suave em volta */
+  filter: saturate(1.05);
+}
+
+/* 3) Borda iluminada em elementos-chave (inputs/caixas) — opcional, mas fica lindo */
+
+#section-card .card,
+#section-card .card-inner,
+#section-card .card-frame {
+  border-color: var(--progress-main, #ffd700) !important;
+  box-shadow: 0 0 14px var(--progress-main, #ffd700) !important;
+}
+}
 /* =========================================================
    SECTION-CARD MOBILE - BOTÃO CONTINUAR SEMPRE CLICÁVEL
    ========================================================= */
@@ -1395,7 +1572,68 @@ html, body{
   #section-card .j-panel-glow::after{
     pointer-events: none !important;
   }
-   
+   /* 1) Glow "ambiente" no fundo da seção (como Perguntas) */
+
+#section-card {
+  position: relative;
+  overflow: visible !important; /* não cortar o glow */
+}
+
+/* Glow inferior (vazando) */
+
+#section-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -70px;                 /* ajuste fino do vazamento */
+  height: 160px;                 /* altura do glow */
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.75;
+
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--progress-glow-1, rgba(255,210,120,0.85)),
+    var(--progress-glow-2, rgba(255,210,120,0.40))
+  );
+
+  filter: blur(22px);
+}
+
+/* 2) Glow forte no “quadro principal” (borda + aura) 
+   Aqui usamos seletores em camadas pra pegar o container real, independente do HTML exato.
+*/
+
+#section-card .card,
+#section-card .glass,
+#section-card .glass-panel,
+#section-card .card-stage,
+#section-card .j-card,
+#section-card .j-panel {
+  position: relative;
+  z-index: 1; /* acima do glow da seção */
+
+  border: 2px solid var(--progress-main, #ffd700) !important;
+
+  box-shadow:
+    0 0 18px var(--progress-main, #ffd700),
+    0 0 42px var(--progress-glow-1, rgba(255,210,120,0.85)),
+    inset 0 0 26px rgba(0,0,0,0.55) !important;
+
+  /* dá um “ar” de luz suave em volta */
+  filter: saturate(1.05);
+}
+
+/* 3) Borda iluminada em elementos-chave (inputs/caixas) — opcional, mas fica lindo */
+
+#section-card .card,
+#section-card .card-inner,
+#section-card .card-frame {
+  border-color: var(--progress-main, #ffd700) !important;
+  box-shadow: 0 0 14px var(--progress-main, #ffd700) !important;
+}
 }
 
 /* =========================================================
