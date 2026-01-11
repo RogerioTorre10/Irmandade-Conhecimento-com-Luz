@@ -565,6 +565,39 @@ function applyGuiaTheme(guiaIdOrNull) {
   document.readyState === 'loading'
     ? document.addEventListener('DOMContentLoaded', bind, { once: true })
     : bind();
+
+/* =========================================================
+   TEMA DO GUIA — reaplica em qualquer seção quando necessário
+   ========================================================= */
+(function () {
+  'use strict';
+
+  function applyThemeFromSession() {
+    const guiaRaw = sessionStorage.getItem('jornada.guia');
+    const guia = guiaRaw ? guiaRaw.toLowerCase().trim() : '';
+
+    // fallback dourado
+    let main = '#ffd700', g1 = 'rgba(255,230,180,0.85)', g2 = 'rgba(255,210,120,0.75)';
+
+    if (guia === 'lumen') { main = '#00ff9d'; g1 = 'rgba(0,255,157,0.90)'; g2 = 'rgba(120,255,200,0.70)'; }
+    if (guia === 'zion')  { main = '#00aaff'; g1 = 'rgba(0,170,255,0.90)'; g2 = 'rgba(255,214,91,0.70)'; }
+    if (guia === 'arian') { main = '#ff00ff'; g1 = 'rgba(255,120,255,0.95)'; g2 = 'rgba(255,180,255,0.80)'; }
+
+    document.documentElement.style.setProperty('--theme-main-color', main);
+    document.documentElement.style.setProperty('--progress-main', main);
+    document.documentElement.style.setProperty('--progress-glow-1', g1);
+    document.documentElement.style.setProperty('--progress-glow-2', g2);
+    document.documentElement.style.setProperty('--guide-color', main);
+
+    if (guia) document.body.setAttribute('data-guia', guia);
+  }
+
+  // roda no carregamento e também quando o app troca seção
+  document.addEventListener('DOMContentLoaded', applyThemeFromSession);
+  document.addEventListener('sectionLoaded', () => setTimeout(applyThemeFromSession, 50));
+  document.addEventListener('guia:changed', applyThemeFromSession);
+})();
+
   
 /* =========================================================
    GUIA – CONFIRMAR BLINDADO (anti-submit + stopImmediatePropagation + failsafe)
@@ -696,39 +729,5 @@ function applyGuiaTheme(guiaIdOrNull) {
 
   console.log('[GUIA] Confirmar blindado + anti-trava real ativado');
 })();
-
-/* =========================================================
-   TEMA DO GUIA — reaplica em qualquer seção quando necessário
-   ========================================================= */
-(function () {
-  'use strict';
-
-  function applyThemeFromSession() {
-    const guiaRaw = sessionStorage.getItem('jornada.guia');
-    const guia = guiaRaw ? guiaRaw.toLowerCase().trim() : '';
-
-    // fallback dourado
-    let main = '#ffd700', g1 = 'rgba(255,230,180,0.85)', g2 = 'rgba(255,210,120,0.75)';
-
-    if (guia === 'lumen') { main = '#00ff9d'; g1 = 'rgba(0,255,157,0.90)'; g2 = 'rgba(120,255,200,0.70)'; }
-    if (guia === 'zion')  { main = '#00aaff'; g1 = 'rgba(0,170,255,0.90)'; g2 = 'rgba(255,214,91,0.70)'; }
-    if (guia === 'arian') { main = '#ff00ff'; g1 = 'rgba(255,120,255,0.95)'; g2 = 'rgba(255,180,255,0.80)'; }
-
-    document.documentElement.style.setProperty('--theme-main-color', main);
-    document.documentElement.style.setProperty('--progress-main', main);
-    document.documentElement.style.setProperty('--progress-glow-1', g1);
-    document.documentElement.style.setProperty('--progress-glow-2', g2);
-    document.documentElement.style.setProperty('--guide-color', main);
-
-    if (guia) document.body.setAttribute('data-guia', guia);
-  }
-
-  // roda no carregamento e também quando o app troca seção
-  document.addEventListener('DOMContentLoaded', applyThemeFromSession);
-  document.addEventListener('sectionLoaded', () => setTimeout(applyThemeFromSession, 50));
-  document.addEventListener('guia:changed', applyThemeFromSession);
-})();
-
-
 
 })();
