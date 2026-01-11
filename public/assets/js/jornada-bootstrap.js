@@ -39,8 +39,8 @@
       'section-termos2',
       'section-senha',
       'section-guia',
-      'section-card',
       'section-selfie',
+      'section-card',
       'section-perguntas',
       'section-final'
     ]);
