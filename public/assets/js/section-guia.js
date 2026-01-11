@@ -542,7 +542,7 @@ function applyGuiaTheme(guiaIdOrNull) {
     : bind();
   
 /* =========================================================
-   GUIA – Confirmar SÓ COM NOME + Demo automática + ANTI-TRAVA TOTAL
+   GUIA – CONFIRMAR BLINDADO (anti-submit + stopImmediatePropagation + failsafe)
    ========================================================= */
 (function () {
   'use strict';
@@ -550,17 +550,20 @@ function applyGuiaTheme(guiaIdOrNull) {
   const root = document.getElementById('section-guia');
   if (!root) return;
 
+  // trava para não bindar 2x
   if (root.dataset.guiaBound === '1') return;
   root.dataset.guiaBound = '1';
 
-  const input      = root.querySelector('#guiaNameInput');
-  const btnConfirm = root.querySelector('#btn-confirmar-nome');
-  const guiaNotice = root.querySelector('#guia-notice-text');
+  const input        = root.querySelector('#guiaNameInput');
+  const btnConfirm   = root.querySelector('#btn-confirmar-nome');
+  const guiaNotice   = root.querySelector('#guia-notice-text');
   const guideButtons = Array.from(root.querySelectorAll('.guia-options button, .guia-buttons button, .btn-guia'));
 
   if (!input || !btnConfirm || guideButtons.length === 0) return;
 
-  let demoDone = false;
+  // === MUITO IMPORTANTE: impedir SUBMIT ===
+  btnConfirm.setAttribute('type', 'button');
+  guideButtons.forEach(b => b.setAttribute('type', 'button'));
 
   // Tema dourado inicial
   document.body.removeAttribute('data-guia');
@@ -570,98 +573,105 @@ function applyGuiaTheme(guiaIdOrNull) {
   document.documentElement.style.setProperty('--progress-glow-1', 'rgba(255,230,180,0.85)');
   document.documentElement.style.setProperty('--progress-glow-2', 'rgba(255,210,120,0.75)');
 
-  // Estado inicial: tudo travado
-  btnConfirm.disabled = true;
-  guideButtons.forEach(b => {
-    b.disabled = true;
-    b.style.pointerEvents = 'none';
-  });
+  // Estado inicial
+  let unlocked = false;
 
-  if (guiaNotice) {
-    guiaNotice.setAttribute('data-text', 'Digite seu nome para desbloquear a escolha do guia.');
+  function setNotice(msg) {
+    if (guiaNotice) guiaNotice.setAttribute('data-text', msg);
   }
 
-  // Habilita Confirmar com nome
+  function lockGuides() {
+    guideButtons.forEach(b => {
+      b.disabled = true;
+      b.style.pointerEvents = 'none';
+    });
+  }
+
+  function unlockGuides() {
+    guideButtons.forEach(b => {
+      b.disabled = false;
+      b.style.pointerEvents = 'auto';
+    });
+    unlocked = true;
+    setNotice(`${(input.value || '').trim()}, agora escolha o guia que caminhará com você.`);
+  }
+
+  // Inicial: guias travados, confirmar travado
+  lockGuides();
+  btnConfirm.disabled = true;
+  setNotice('Digite seu nome para desbloquear a escolha do guia.');
+
+  // Habilita Confirmar ao digitar nome
   input.addEventListener('input', () => {
     btnConfirm.disabled = input.value.trim().length === 0;
   });
 
-  // Clique no Confirmar: valida nome + roda demo
-  btnConfirm.addEventListener('click', () => {
+  // FAILSAFE: se algo travar, destrava em 2s
+  function armFailsafe() {
+    setTimeout(() => {
+      if (!unlocked && input.value.trim()) {
+        console.warn('[GUIA] FAILSAFE destravando guias.');
+        btnConfirm.disabled = false;
+        unlockGuides();
+      }
+    }, 2000);
+  }
+
+  // === CONFIRMAR: CAPTURE + stopImmediatePropagation para bloquear handlers antigos ===
+  btnConfirm.addEventListener('click', (ev) => {
+    ev.preventDefault();
+    ev.stopPropagation();
+    ev.stopImmediatePropagation(); // <- isto é o que normalmente resolve a “inoperância”
+
     const nome = input.value.trim();
     if (!nome) {
+      btnConfirm.disabled = true;
       alert('Digite seu nome para prosseguir!');
       input.focus();
       return;
     }
 
-    if (demoDone) return; // evita rodar demo 2x
-
     sessionStorage.setItem('jornada.nome', nome);
 
-    if (guiaNotice) {
-      guiaNotice.setAttribute('data-text', `Veja a apresentação dos guias, ${nome}, e depois escolha o que tocar seu coração.`);
-    }
+    // Destrava sem demo (zero risco)
+    unlockGuides();
 
-    guideButtons.forEach(b => b.disabled = true); // trava guias durante demo
+    // Failsafe extra (caso outro script trave depois)
+    armFailsafe();
+  }, true); // <- CAPTURE: pega antes de outros listeners
 
-    const seq = ['lumen', 'zion', 'arian'];
-    let step = 0;
-
-    const playStep = () => {
-      guideButtons.forEach(b => b.classList.remove('guia-demo-active'));
-      document.body.removeAttribute('data-guia-hover');
-
-      if (step >= seq.length) {
-        // Demo terminou: libera guias
-        guideButtons.forEach(b => {
-          b.disabled = false;
-          b.style.pointerEvents = 'auto';
-        });
-        demoDone = true;
-        if (guiaNotice) {
-          guiaNotice.setAttribute('data-text', `${nome}, agora escolha o guia que caminhará com você.`);
-        }
-        return;
-      }
-
-      const guia = seq[step];
-      document.body.setAttribute('data-guia-hover', guia);
-
-      const btn = guideButtons.find(b => b.textContent.toLowerCase().includes(guia));
-      if (btn) btn.classList.add('guia-demo-active');
-
-      step++;
-      setTimeout(playStep, 1400);
-    };
-
-    playStep();
-  });
-
-  // Escolha do guia: salva e avança
+  // Escolha do guia (também blindado)
   guideButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
+    if (btn.__guiaBound) return;
+    btn.__guiaBound = true;
+
+    btn.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      ev.stopImmediatePropagation();
+
       if (btn.disabled) return;
 
-      const guiaId = btn.dataset.guia || btn.textContent.toLowerCase().trim();
+      const guiaId = (btn.dataset.guia || btn.textContent || '').toLowerCase().trim();
       if (!guiaId) return;
 
       sessionStorage.setItem('jornada.guia', guiaId);
 
-      // Aplica tema definitivo
       if (typeof aplicarGuiaTheme === 'function') {
         aplicarGuiaTheme(guiaId);
       } else {
         document.body.setAttribute('data-guia', guiaId);
       }
 
-      // Avança para próxima seção
-      if (typeof JC !== 'undefined' && JC.next) JC.next();
-    });
+      if (typeof JC !== 'undefined' && JC && typeof JC.next === 'function') {
+        JC.next();
+      }
+    }, true);
   });
 
-  console.log('[GUIA] Fluxo seguro: Confirmar só com nome + demo + liberação automática');
+  console.log('[GUIA] Confirmar blindado + anti-trava real ativado');
 })();
+
 
 
 
