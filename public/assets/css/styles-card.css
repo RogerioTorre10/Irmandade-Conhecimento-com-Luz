@@ -268,6 +268,7 @@
     padding: 6px 18px !important;   /* altura reduzida */
     font-size: 0.70rem !important;   /* fonte levemente menor */
     border-radius: 12px !important;  /* deixa mais slim */
+    background: rgba(10, 10, 10, 0.35);   /* translúcido */
   }
    
  #section-card .card-actions {
