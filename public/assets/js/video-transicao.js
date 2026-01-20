@@ -113,112 +113,124 @@
   }
 
   // ------------------------- PLAYER PRINCIPAL ---------------------------
-  function playTransitionVideo(src, nextSectionId) {
-    log('Recebido src:', src, 'nextSectionId:', nextSectionId);
+window.playTransitionVideo = function playTransitionVideo(src, nextSectionId) {
+  log('Recebido src:', src, 'nextSectionId:', nextSectionId);
 
-    // 🔥 REFORÇO NO OVERLAY: cobre 100% com fundo preto para evitar vazamento
-    overlay.style.background = 'black';
-    overlay.style.opacity = '1';
-    overlay.style.transition = 'opacity 0.5s ease';
-
-    if (!src || !isMp4(src)) {
-      warn('Fonte não é MP4 (ou ausente). Pulando player e navegando direto…');
-      navigateTo(nextSectionId);
-      return;
-    }
-
-    if (isPlaying) {
-      log('Já reproduzindo vídeo, ignorando chamada duplicada…');
-      return;
-    }
-
-    isPlaying = true;
-    cleaned = false;
-
-    // Glamour: some a página antes do filme
-    document.body.classList.remove('vt-fade-in');
-    document.body.classList.add('vt-fade-out');
-
-    // 🔒 trava transições e cancela TTS
-    window.__TRANSITION_LOCK = true;
-    document.dispatchEvent(new CustomEvent('transition:started'));
-    try { window.speechSynthesis?.cancel(); } catch {}
-
-    const href = resolveHref(src);
-    log('Vídeo resolvido para:', href);
-
-    const { overlay, video, ambient, skip } = buildOverlay();
-
-    // Cache-buster (mesmo src pros dois)
-    const finalSrc = href + (href.includes('?') ? '&' : '?') + 't=' + Date.now();
-    video.src = finalSrc;
-    ambient.src = finalSrc;
-
-    // ---------------- EVENTOS (SÓ 1 onCanPlay!) ----------------
-    const onCanPlay = safeOnce(() => {
-      log('Vídeo carregado, iniciando reprodução:', finalSrc);
-
-      // limelight: cor do guia no overlay (se já escolhido)
-      try {
-        const g =
-          window.JC?.state?.guia ||
-          window.selectedGuide ||
-          localStorage.getItem('guiaEscolhido');
-        if (g) overlay.setAttribute('data-guia', g);
-      } catch {}
-
-      // luz viva enquanto toca
-      try { window.Luz?.startPulse({ min: 1, max: 1.5, speed: 120 }); } catch {}
-
-      // play core + reflexo
-      video.play().catch(err => {
-        warn('Falha ao dar play (autoplay?):', err);
-        video.muted = true;
-        video.play().catch(() => warn('Play ainda bloqueado.'));
-      });
-      ambient.play().catch(() => {});
-    });
-
-    const finishAndGo = safeOnce(() => {
-      overlay.classList.remove('show');
-      overlay.classList.add('hide');
-
-      setTimeout(() => {
-        try { window.Luz?.stopPulse(); } catch {}
-        cleanup(overlay);
-        navigateTo(nextSectionId);
-
-        // glamour fade-in na página nova
-        document.body.classList.remove('vt-fade-out');
-        document.body.classList.add('vt-fade-in');
-        setTimeout(() => document.body.classList.remove('vt-fade-in'), 650);
-      }, 360);
-    });
-
-    const onEnded = safeOnce(() => {
-      log('Vídeo finalizado:', finalSrc);
-      finishAndGo();
-    });
-
-    const onError = safeOnce((ev) => {
-      warn('Erro ao carregar vídeo:', finalSrc, ev);
-      finishAndGo();
-    });
-
-    skip.addEventListener('click', finishAndGo);
-    overlay.addEventListener('click', (e) => {
-      if (e.target === overlay) finishAndGo();
-    });
-    document.addEventListener('keydown', onKeydown, true);
-
-    video.addEventListener('canplaythrough', onCanPlay, { once: true });
-    video.addEventListener('loadeddata', onCanPlay, { once: true });
-    video.addEventListener('ended', onEnded, { once: true });
-    video.addEventListener('error', onError, { once: true });
-
-    video.load();
-    ambient.load();
+  if (!src || !isMp4(src)) {
+    warn('Fonte não é MP4 (ou ausente). Pulando player e navegando direto…');
+    navigateTo(nextSectionId);
+    return;
   }
+
+  if (isPlaying) {
+    log('Já reproduzindo vídeo, ignorando chamada duplicada…');
+    return;
+  }
+
+  isPlaying = true;
+  cleaned = false;
+
+  // 🔥 Cria o overlay ANTES de qualquer uso (resolve o ReferenceError)
+  let overlay = document.getElementById('transition-video-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'transition-video-overlay';
+    overlay.style.cssText = `
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: black;
+      opacity: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: auto;
+    `;
+    document.body.appendChild(overlay);
+  }
+
+  // Limpa conteúdo antigo do overlay
+  overlay.innerHTML = '';
+
+  // Cria frame dourado (mantido)
+  let frame = overlay.querySelector('.jp-video-frame');
+  if (!frame) {
+    frame = document.createElement('div');
+    frame.className = 'jp-video-frame';
+    overlay.appendChild(frame);
+  }
+
+  const video = document.createElement('video');
+  video.autoplay = true;
+  video.muted = true;
+  video.playsInline = true;
+  video.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+  frame.appendChild(video);
+
+  const skip = document.createElement('button');
+  skip.textContent = 'Pular';
+  skip.style.cssText = `
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    border: 1px solid white;
+    border-radius: 8px;
+    cursor: pointer;
+    z-index: 10000;
+  `;
+  overlay.appendChild(skip);
+
+  // Cache-buster
+  const finalSrc = src + (src.includes('?') ? '&' : '?') + 't=' + Date.now();
+  video.src = finalSrc;
+
+  // Função para finalizar transição
+  const finishAndGo = () => {
+    if (cleaned) return;
+    cleaned = true;
+
+    // 🔥 ANTI-VAZAMENTO: esconde seção atual ANTES de navegar
+    document.querySelectorAll('[id^="section-"], .current-section, [data-section-visible="true"]').forEach(sec => {
+      sec.style.display = 'none !important';
+      sec.style.opacity = '0 !important';
+      sec.classList.add('hidden');
+    });
+
+    document.body.style.overflow = 'hidden !important';
+
+    navigateTo(nextSectionId);
+
+    // Fade out suave do overlay
+    overlay.style.opacity = '0';
+    setTimeout(() => {
+      overlay.remove();
+      document.body.style.overflow = 'auto !important';
+      isPlaying = false;
+    }, 600);
+  };
+
+  // Eventos
+  video.onended = finishAndGo;
+  skip.addEventListener('click', finishAndGo);
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) finishAndGo();
+  });
+
+  video.addEventListener('canplaythrough', () => {
+    log('Vídeo carregado, iniciando reprodução');
+    video.play().catch(err => warn('Play bloqueado:', err));
+  }, { once: true });
+
+  video.addEventListener('error', (ev) => {
+    warn('Erro no vídeo:', ev);
+    finishAndGo();
+  }, { once: true });
+
+  video.load();
+};
 
   // ----------------- API PÚBLICA -----------------
   window.playTransitionVideo = playTransitionVideo;
