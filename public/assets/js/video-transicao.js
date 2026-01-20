@@ -16,37 +16,33 @@
     catch { return src; }
   };
 
-   function navigateTo(nextSectionId) {
-    if (!nextSectionId) return;
-    log('Transição concluída, navegando para:', nextSectionId);
+  function navigateTo(nextSectionId) {
+  if (!nextSectionId) return;
+  log('Transição concluída, navegando para:', nextSectionId);
 
-    // 🔥 ANTI-VAZAMENTO: esconde a seção atual IMEDIATAMENTE
-    const currentSection = document.querySelector('.current-section, [data-section-visible="true"], #section-' + currentSectionId); // ajuste o seletor para o seu
-    if (currentSection) {
-      currentSection.style.display = 'none !important';
-      currentSection.style.opacity = '0 !important';
-      currentSection.classList.add('hidden');
-    }
+  // 🔥 ANTI-VAZAMENTO: esconde TODAS as seções existentes ANTES de mostrar a nova
+  document.querySelectorAll('[id^="section-"], .current-section, [data-section-visible="true"], .section-visible').forEach(sec => {
+    sec.style.display = 'none !important';
+    sec.style.opacity = '0 !important';
+    sec.classList.add('hidden');
+    sec.dataset.sectionVisible = 'false'; // se usar esse atributo
+  });
 
-    // Esconde todo o conteúdo anterior (anti-flash)
-    document.body.style.overflow = 'hidden'; // evita scroll durante transição
-    const allSections = document.querySelectorAll('[id^="section-"]');
-    allSections.forEach(sec => {
-      if (sec.id !== 'section-' + nextSectionId) sec.style.display = 'none';
-    });
+  // Esconde qualquer conteúdo solto no body
+  document.body.style.overflow = 'hidden !important';
 
-    // Avança para a próxima
-    if (window.JC?.show) {
-      window.JC.show(nextSectionId);
-    } else if (typeof window.showSection === 'function') {
-      window.showSection(nextSectionId);
-    }
-
-    // Volta o body ao normal após 0.5s (tempo para a nova seção carregar)
-    setTimeout(() => {
-      document.body.style.overflow = 'auto';
-    }, 500);
+  // Avança para a próxima seção
+  if (window.JC?.show) {
+    window.JC.show(nextSectionId);
+  } else if (typeof window.showSection === 'function') {
+    window.showSection(nextSectionId);
   }
+
+  // Libera o body após 500ms (tempo para nova seção carregar)
+  setTimeout(() => {
+    document.body.style.overflow = 'auto !important';
+  }, 500);
+}
 
   // ---------------------------- LIMPEZA --------------------------------
   function cleanup(overlay) {
