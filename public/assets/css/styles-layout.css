@@ -1411,7 +1411,7 @@ html, body{
 /* =======================================================
    SECTION-CARD — MOBILE PERFECT (Lumen Mobile Fix v4)
    ======================================================= */
-@media (max-width: 900px) {
+@media (max-width: 600px) {
    
   /* Palco principal do card no mobile */
   #section-card .card-panel {
