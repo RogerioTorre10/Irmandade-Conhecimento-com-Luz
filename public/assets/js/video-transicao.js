@@ -16,34 +16,36 @@
     catch { return src; }
   };
 
-  function navigateTo(nextSectionId) {
+   function navigateTo(nextSectionId) {
     if (!nextSectionId) return;
     log('Transição concluída, navegando para:', nextSectionId);
 
+    // 🔥 ANTI-VAZAMENTO: esconde a seção atual IMEDIATAMENTE
+    const currentSection = document.querySelector('.current-section, [data-section-visible="true"], #section-' + currentSectionId); // ajuste o seletor para o seu
+    if (currentSection) {
+      currentSection.style.display = 'none !important';
+      currentSection.style.opacity = '0 !important';
+      currentSection.classList.add('hidden');
+    }
+
+    // Esconde todo o conteúdo anterior (anti-flash)
+    document.body.style.overflow = 'hidden'; // evita scroll durante transição
+    const allSections = document.querySelectorAll('[id^="section-"]');
+    allSections.forEach(sec => {
+      if (sec.id !== 'section-' + nextSectionId) sec.style.display = 'none';
+    });
+
+    // Avança para a próxima
     if (window.JC?.show) {
       window.JC.show(nextSectionId);
     } else if (typeof window.showSection === 'function') {
       window.showSection(nextSectionId);
-    } else {
-      window.location.hash = `#${nextSectionId}`;
     }
-  }
 
-  function safeOnce(fn) {
-    let done = false;
-    return (...args) => {
-      if (done) return;
-      done = true;
-      try { fn(...args); } catch (e) { warn('Erro no safeOnce:', e); }
-    };
-  }
-
-  function onKeydown(e) {
-    if (e.key === 'Escape') {
-      log('Vídeo pulado pelo usuário (Esc)');
-      const overlay = document.getElementById('vt-overlay');
-      cleanup(overlay);
-    }
+    // Volta o body ao normal após 0.5s (tempo para a nova seção carregar)
+    setTimeout(() => {
+      document.body.style.overflow = 'auto';
+    }, 500);
   }
 
   // ---------------------------- LIMPEZA --------------------------------
@@ -113,6 +115,11 @@
   // ------------------------- PLAYER PRINCIPAL ---------------------------
   function playTransitionVideo(src, nextSectionId) {
     log('Recebido src:', src, 'nextSectionId:', nextSectionId);
+
+    // 🔥 REFORÇO NO OVERLAY: cobre 100% com fundo preto para evitar vazamento
+    overlay.style.background = 'black';
+    overlay.style.opacity = '1';
+    overlay.style.transition = 'opacity 0.5s ease';
 
     if (!src || !isMp4(src)) {
       warn('Fonte não é MP4 (ou ausente). Pulando player e navegando direto…');
