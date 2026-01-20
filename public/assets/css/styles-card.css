@@ -196,7 +196,7 @@
 /* =======================================================
    SECTION-CARD — MOBILE PERFECT (Lumen Mobile Fix v4)
    ======================================================= */
-@media (max-width: 600px) {
+@media (max-width: 420px) {
    
   /* Palco principal do card no mobile */
   #section-card .card-panel {
