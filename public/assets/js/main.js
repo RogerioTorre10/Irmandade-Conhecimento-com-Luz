@@ -448,6 +448,20 @@
         } else {
           secIntro ? showOnly(secIntro) : toast('Bem-vindo à Jornada.', 'info');
         }
+          window.JC.show = function (sectionId) {
+        // 🔥 ANTI-VAZAMENTO: esconde todas antes
+        document.querySelectorAll('[id^="section-"]').forEach(sec => {
+        sec.style.display = 'none';
+        sec.classList.add('hidden');
+        });
+
+        const nextSec = document.getElementById(sectionId);
+        if (nextSec) {
+        nextSec.style.display = 'block';
+        nextSec.classList.remove('hidden');
+        nextSec.dataset.sectionVisible = 'true';
+        }
+       };
       }
     })();
   });
