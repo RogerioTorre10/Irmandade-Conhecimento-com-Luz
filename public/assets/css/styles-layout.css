@@ -1509,6 +1509,49 @@ html, body{
   }
  
 }
+/* =========================
+   CARD – CORREÇÕES MOBILE
+   ========================= */
+@media (max-width: 768px) {
+
+  /* Remove a mancha escura da base da selfie */
+  .card-selfie,
+  .selfie-container,
+  .selfie-frame,
+  .card-photo-area {
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  /* Fundo translúcido para o nome */
+  .card-name,
+  .participant-name,
+  .nome-participante {
+    background: rgba(255, 255, 255, 0.12) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.25);
+    box-shadow: 0 0 18px rgba(255,215,120,0.35);
+  }
+
+  /* Fundo translúcido para o botão CONTINUAR */
+  .btn-continuar,
+  .btn-continue,
+  .card-continue-btn {
+    background: rgba(255, 255, 255, 0.12) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.3);
+    box-shadow: 0 0 20px rgba(255,215,120,0.5);
+  }
+
+  /* Evita fundo escuro herdado */
+  .card-footer,
+  .card-bottom,
+  .card-actions {
+    background: transparent !important;
+  }
+}
 
 
 
