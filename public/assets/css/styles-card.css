@@ -429,7 +429,22 @@
 /* leve brilho no hover (continua translúcido) */
 #section-card #btnNext:hover {
   background: rgba(20, 20, 20, 0.55);
-}
+   
+#section-card #btnNext {
+    background: rgba(20, 20, 30, 0.28) !important;   /* um pouco mais escuro/transparente */
+    backdrop-filter: blur(6px) saturate(1.4);        /* aumenta um pouco o blur */
+    -webkit-backdrop-filter: blur(6px) saturate(1.4); /* prefixo essencial no iOS/Samsung */
+    border: 1px solid rgba(255, 215, 160, 0.50);     /* borda mais suave */
+  }
+
+  #section-card .card-name-badge {
+    background: rgba(0, 0, 0, 0.45) !important;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 215, 160, 0.60);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.6);
+  }
+
 }
 
 
