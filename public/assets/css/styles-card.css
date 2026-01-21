@@ -167,7 +167,104 @@
   background: rgba(20, 20, 20, 0.55);
 }
 
+/* =======================================================
+   SECTION-CARD — MOBILE PERFECT (Lumen Mobile Fix v4)
+   ======================================================= */
+@media (max-width: 600px) {
+   
+  /* Palco principal do card no mobile */
+  #section-card .card-panel {
+    width: 110% !important;
+    margin: 0 auto !important;
+    min-height: 720px !important;  
+    padding-top: 38px !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+    padding-bottom: 240px !important;  /* novo valor */
+    box-sizing: border-box;
+  }
 
+  /* Guia (cardão verde da pessoa) */
+  #section-card .guide-bg {
+    display: block;
+    max-width: 520px; 
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 auto !important;
+    border-radius: 28px !important;
+  }
+
+  /* PLACEHOLDER DOURADO (a cruz com o nome) */
+  #section-card .flame-layer {
+    position: absolute !important;
+    left: 50% !important;
+    top: 73% !important;              /* desce até o peito */
+    transform: translate(-50%, -50%) !important;
+    width: 60% !important;            /* tamanho relativo ao card */
+    max-width: 180px !important;      /* teto pra não explodir */
+    aspect-ratio: 2.8 / 3 !important;   /* formato de carta vertical */
+    border-radius: 22px !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    pointer-events: none !important;  /* não bloqueia toques */
+    box-shadow:
+      0 0 30px rgba(255, 215, 0, 0.45),
+      0 0 55px rgba(255, 180, 0, 0.35);
+  }
+   
+   /* Ajusta o nome para ficar sempre colado na parte inferior da carta */
+  #section-card .flame-layer .nome-guia {
+    margin: 0 !important;               /* sem folga */
+    padding-bottom: 2px !important;     /* leve respiro */
+    pointer-events: auto !important;
+    font-size: 0.6rem !important;      /* tamanho perfeito no mobile */
+  }
+
+  /* Nome dentro do placeholder (badge GISELY) */
+  #section-card .card-name-badge {
+    margin-bottom: 3px !important;   /* sobe um tiquinho do fundo */
+    font-size: 0.5rem !important;
+  }
+
+  /* Área do botão CONTINUAR */
+  #section-card .card-actions-below {
+    margin-top: 20px !important;
+    text-align: center !important;
+  }
+   
+ #section-card #btnNext {
+    width: auto;
+    max-width: 260px;
+    pointer-events: auto !important;  /* garante clique normal */
+    padding: 6px 18px !important;   /* altura reduzida */
+    font-size: 0.70rem !important;   /* fonte levemente menor */
+    border-radius: 12px !important;  /* deixa mais slim */
+    background: rgba(10, 10, 10, 0.35);   /* translúcido */
+  }
+   
+ #section-card .card-actions {
+    margin-top: 8px !important;   /* estava maior */
+    padding-bottom: 20px !important; /* menos espaço sobrando */
+  }
+   
+   #section-card .flame-layer .card-footer,
+  #section-card .flame-layer .card-name-badge {
+    margin-top: auto !important;      /* empurra o nome para a base */
+    margin-bottom: 2px !important;    /* encosta suavemente */
+    position: relative;
+    bottom: 0 !important;
+  }
+
+  #section-card #userNameSlot {
+    position: relative;
+    bottom: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+}
 
 
 
