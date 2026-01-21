@@ -264,8 +264,104 @@
     margin: 0 !important;
     padding: 0 !important;
   }
-}
 
+   /* Seção senha: ocupa a tela com respiro */
+ #section-card {
+    padding: 8px 0 140px !important;
+    min-height: 100vh !important;
+    overflow: hidden !important;
+  }
+
+  /* Painel de vidro (MESMA FAMÍLIA DO INTRO/TERMOS) */
+  #section-card .j-panel-glow {
+    position: relative !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: calc(100vw - 84px) !important;  /* um pouco menor p/ não “explodir” */
+    max-width: 460px !important;           /* mesmo corpo da intro */
+    margin: 0 auto !important;
+    padding: 32px 24px 52px 24px !important;             /* borda fininha */
+    border-radius: 26px !important;
+    box-sizing: border-box !important;
+     transform: none !important;
+    -webkit-transform: translateY(0) translateZ(0) !important;
+    overflow: hidden !important;
+  } 
+  
+
+  #section-card .j-panel-glow {
+    padding: 10px !important; /* igual Intro */
+  }  
+
+  #section-card .j-panel-glow::before {
+    content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid rgba(212,175,55,0.55);
+  box-shadow:
+    0 0 28px rgba(212,175,55,0.55),
+    inset 0 0 18px rgba(255,230,150,0.25);     
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.16),
+    transparent 45%,
+    transparent 100%
+  ) !important;
+  }   
+
+  /* Opcional: título e conteúdo respirando igual intro */
+  #section-card .senha-panel-inner {
+    padding: 0 10px !important;
+    box-sizing: border-box !important;
+  }
+  #section-card .pergaminho,
+  #section-card .pergaminho-v {
+  overflow-x: hidden !important;
+} 
+   
+  #section-card .card-stage {
+    max-width: 380px;
+    padding-bottom: 200px;
+  }
+
+  #section-card .placeholder-wrapper {
+    max-width: 240px;
+    margin-top: -20px;
+  }
+
+ /* 1) Reserva espaço REAL embaixo (inclusive safe-area) */
+  #section-card{
+    padding-bottom: calc(140px + env(safe-area-inset-bottom, 0px)) !important;
+    overflow: visible !important;
+  }
+
+  /* 2) Se o seu botão for .btn-continuar ou #btn-continuar */
+  #section-card .btn-continuar,
+  #section-card #btn-continuar,
+  #section-card .btn-primary{
+    position: sticky !important; /* fica “grudado” ao rolar sem quebrar layout */
+    bottom: calc(18px + env(safe-area-inset-bottom, 0px)) !important;
+    z-index: 50 !important;
+    margin-top: 14px !important;
+    touch-action: manipulation !important; /* melhora toque no Android */
+  }
+
+  /* 3) Garante que nenhum overlay esteja bloqueando o clique */
+  #section-card .card-stage,
+  #section-card .j-panel-glow,
+  #section-card .j-perg-v-inner{
+    overflow: visible !important;
+  }
+
+  /* Se você tiver pseudo-camadas por cima (fog/glow) */
+  #section-card .j-panel-glow::before,
+  #section-card .j-panel-glow::after{
+    pointer-events: none !important;
+  }
+}
 
 
 /* ----- TABLET (600–900px) ----- */
