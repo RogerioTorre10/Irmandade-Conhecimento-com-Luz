@@ -445,6 +445,14 @@
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
   }
+   #section-card .flame-layer,
+  #section-card .card-actions-below,
+  #section-card .card-stage,
+  #section-card .j-panel-glow {
+    background: transparent !important;
+    isolation: auto !important;               /* ← importante */
+    backdrop-filter: none !important;         /* evita herança indesejada */
+  }
 
 }
 
