@@ -361,6 +361,75 @@
   #section-card .j-panel-glow::after{
     pointer-events: none !important;
   }
+   /* ----- NOME DENTRO DO PLACEHOLDER (BASE INFERIOR) ----- */
+
+#section-card .flame-layer .card-footer {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  padding: 8px 10px 10px;
+  box-sizing: border-box;
+  text-align: center;
+
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.9),
+    rgba(0, 0, 0, 0.65),
+    transparent
+  );
+}
+
+#section-card .card-name-badge {
+  display: inline-block;
+  padding: 4px 16px 3px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 215, 160, 0.85);
+  background: rgba(0, 0, 0, 0.7);
+  box-shadow:
+    0 0 12px rgba(255, 215, 0, 0.55),
+    0 0 22px rgba(255, 215, 0, 0.35);
+  letter-spacing: 0.08em;
+}
+
+#section-card #userNameSlot {
+  font-family: "ManufacturingConsent-Regular", "Cardo", serif;
+  font-size: 1rem;
+  text-transform: uppercase;
+}
+
+/* ----- BOTÃO CONTINUAR (FORA DA SELFIE, TRANSLÚCIDO) ----- */
+
+#section-card .card-actions-below {
+  position: relative;
+  z-index: 5;
+  margin-top: 48px;              /* espaço depois do card */
+  width: 100%;
+  text-align: center;
+}
+
+#section-card #btnNext {
+  position: relative;
+  padding: 11px 40px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 215, 160, 0.9);
+  background: rgba(10, 10, 10, 0.35);   /* translúcido */
+  backdrop-filter: blur(3px);
+  color: #f6e7c6;
+  font-family: "ManufacturingConsent-Regular", "Cardo", serif;
+  font-size: 0.95rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+
+  box-shadow:
+    0 0 14px rgba(255, 215, 0, 0.45),
+    0 0 26px rgba(255, 160, 0, 0.35);
+}
+
+/* leve brilho no hover (continua translúcido) */
+#section-card #btnNext:hover {
+  background: rgba(20, 20, 20, 0.55);
+}
 }
 
 
