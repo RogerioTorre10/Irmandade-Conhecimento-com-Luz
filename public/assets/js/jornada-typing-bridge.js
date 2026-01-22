@@ -10,14 +10,14 @@
 
   const typingLog = (...args) => console.log('[TypingBridge]', ...args);
 
-  // i18n Fallback
-  const i18n = window.i18n || {
+  // i18n helper dinâmico (NÃO congela idioma)
+function getI18n() {
+  return window.i18n || {
     lang: 'pt-BR',
-    ready: false,
-    t: (_, fallback) => fallback || _,
-    apply: () => {},
-    waitForReady: async () => {}
+    t: (_, fallback) => fallback || _
   };
+}
+
 
   // ====== ESTILO DO CURSOR ======
   (function ensureStyle() {
@@ -126,7 +126,8 @@
     try { speechSynthesis.cancel(); } catch {}
 
     const utt = new SpeechSynthesisUtterance(String(text).trim());
-    utt.lang = i18n.lang || 'pt-BR';
+    const lang = getI18n().lang || 'pt-BR';
+    utt.lang = lang;
     utt.rate = options.rate || 1.03;
     utt.pitch = options.pitch || 1.0;
 
@@ -159,10 +160,16 @@
 
     if ('speechSynthesis' in window) {
       const utt = new SpeechSynthesisUtterance(String(text).trim());
-      utt.lang = i18n.lang || 'pt-BR';
+      const lang = getI18n().lang || 'pt-BR';
+      utt.lang = lang;      
       utt.rate = 0.95;
       utt.pitch = 1.0;
       utt.onend = () => { terminou = true; };
+
+      const voices = speechSynthesis.getVoices?.() || [];
+      const match = voices.find(v => v.lang && v.lang.startsWith(lang));
+      if (match) utt.voice = match;
+
 
       speechSynthesis.speak(utt);
     } else {
