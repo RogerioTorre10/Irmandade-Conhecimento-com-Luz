@@ -136,6 +136,20 @@
       const section = await window.carregarEtapa(cleanId);
       console.log('[JC.show] carregarEtapa completed, element #', sectionId, ':', !!section);
       if (section) {
+      if (window.i18n) {
+      try {
+      // garante que o dicionário já foi carregado
+      if (typeof window.i18n.waitForReady === 'function') {
+      await window.i18n.waitForReady(10000);
+      }
+      // traduz só o node da seção (mais rápido e correto)
+      if (typeof window.i18n.apply === 'function') {
+      window.i18n.apply(section);
+      }
+      } catch (e) {
+      console.warn('[i18n] Falha ao aplicar na seção:', sectionId, e);
+      }
+      }
         console.log('[JC.show] Content of #jornada-content-wrapper:', document.getElementById('jornada-content-wrapper')?.innerHTML.slice(0, 120) + '...');
         lastShownSection = sectionId;
         window.JC.currentSection = sectionId;
