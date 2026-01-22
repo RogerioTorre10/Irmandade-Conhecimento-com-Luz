@@ -129,6 +129,20 @@
 
   window.i18n = api;
 
+  // Helper global para trocar idioma de forma consistente no projeto inteiro
+   window.JORNADA_setLang = async function (lang) {
+  try {
+    if (!window.i18n) return;
+    await window.i18n.setLang(lang);
+
+    // reforça para TTS e outros módulos que leem <html lang="...">
+    document.documentElement.setAttribute('lang', window.i18n.lang);
+    document.documentElement.setAttribute('data-lang', window.i18n.lang);
+  } catch (e) {
+    console.warn('[i18n] JORNADA_setLang falhou:', e);
+  }
+};
+
   // Autoinit com respeito ao FORCE_LANG
   document.addEventListener('DOMContentLoaded', () => {
     (async () => {
