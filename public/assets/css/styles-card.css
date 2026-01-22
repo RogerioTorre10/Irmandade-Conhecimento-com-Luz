@@ -431,7 +431,7 @@
   background: rgba(20, 20, 20, 0.55);
 }
    
-  #section-card #btnNext {
+  /*#section-card #btnNext {
     background: transparent !important;
     border: 1px solid rgba(220, 190, 120, 0.7) !important;
     box-shadow: 
@@ -444,7 +444,8 @@
     ) !important;
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
-  }
+  }*/
+   
    #section-card .flame-layer,
   #section-card .card-actions-below,
   #section-card .card-stage,
@@ -479,5 +480,50 @@
   }
 }
  
+/* =======================================================
+   SECTION-CARD — GLASS MOBILE (FIX FINAL)
+   (colar no FINAL do styles-card.css)
+   ======================================================= */
+@media (max-width: 600px) {
+
+  /* Remove “mancha” escura da base do placeholder (footer) */
+  #section-card .flame-layer .card-footer{
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  /* Badge do nome: vidro translúcido */
+  #section-card .card-name-badge{
+    background: rgba(255,255,255,0.14) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+
+    border: 1px solid rgba(255,255,255,0.26) !important;
+    box-shadow:
+      0 0 14px rgba(255,215,120,0.35),
+      inset 0 0 14px rgba(255,255,255,0.10) !important;
+
+    color: #f6e7c6 !important;
+  }
+
+  /* Botão CONTINUAR: vidro translúcido (mata gradiente escuro) */
+  #section-card #btnNext{
+    background: rgba(255,255,255,0.12) !important;
+    background-image: none !important; /* remove o “chapado” */
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+
+    border: 1px solid rgba(255,255,255,0.28) !important;
+    box-shadow:
+      0 0 18px rgba(255,215,120,0.45),
+      inset 0 0 14px rgba(255,255,255,0.10) !important;
+
+    color: #f6e7c6 !important;
+  }
+
+  #section-card #btnNext:hover{
+    background: rgba(255,255,255,0.18) !important;
+  }
+}
 
 
