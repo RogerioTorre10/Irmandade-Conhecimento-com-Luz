@@ -156,4 +156,74 @@
     })();
   }, { once: true });
 
+  // =============================================
+// AUTO-BIND do seletor de idioma (global)
+// Faz a Jornada inteira seguir o idioma escolhido
+// =============================================
+(function () {
+  function looksLikeLangSelect(sel) {
+    if (!sel || sel.tagName !== 'SELECT') return false;
+
+    // Aceita ids/classes comuns (se existir)
+    const id = (sel.id || '').toLowerCase();
+    const cls = (sel.className || '').toLowerCase();
+    const name = (sel.name || '').toLowerCase();
+
+    if (id.includes('lang') || id.includes('idioma') || cls.includes('lang') || cls.includes('idioma') || name.includes('lang') || name.includes('idioma')) {
+      return true;
+    }
+
+    // Aceita por valores típicos de idioma
+    const values = Array.from(sel.options || []).map(o => (o.value || '').toLowerCase());
+    const hasPt = values.some(v => v.startsWith('pt'));
+    const hasEn = values.some(v => v.startsWith('en'));
+    if (hasPt || hasEn) return true;
+
+    // Aceita por textos típicos do seu dropdown
+    const texts = Array.from(sel.options || []).map(o => (o.textContent || '').toLowerCase());
+    const hasPortuguese = texts.some(t => t.includes('portugu'));
+    const hasEnglish = texts.some(t => t.includes('english'));
+    if (hasPortuguese || hasEnglish) return true;
+
+    return false;
+  }
+
+  // 1) Aplica o valor atual do i18n em selects já existentes
+  function syncExistingSelectors() {
+    const lang = (window.i18n && window.i18n.lang) || localStorage.getItem('i18n_lang') || 'pt-BR';
+    document.querySelectorAll('select').forEach(sel => {
+      if (!looksLikeLangSelect(sel)) return;
+      if (sel.value !== lang) sel.value = lang;
+    });
+  }
+
+  // 2) Captura troca de idioma em QUALQUER página/section
+  document.addEventListener('change', async (ev) => {
+    const target = ev.target;
+    if (!looksLikeLangSelect(target)) return;
+
+    const lang = target.value;
+    if (window.i18n && typeof window.i18n.setLang === 'function') {
+      await window.i18n.setLang(lang);
+
+      // reforço útil para TTS e acessibilidade
+      document.documentElement.setAttribute('lang', window.i18n.lang);
+      document.documentElement.setAttribute('data-lang', window.i18n.lang);
+
+      // garante que o DOM atual (seção inteira) reflita
+      if (typeof window.i18n.apply === 'function') {
+        window.i18n.apply(document.body);
+      }
+    }
+  }, true);
+
+  // 3) Se o header/seletor for inserido dinamicamente depois, sincroniza
+  const obs = new MutationObserver(() => syncExistingSelectors());
+  obs.observe(document.documentElement, { childList: true, subtree: true });
+
+  // primeira sincronização
+  syncExistingSelectors();
+})();
+
+
 })(window);
