@@ -10,14 +10,14 @@
 
   const typingLog = (...args) => console.log('[TypingBridge]', ...args);
 
-  // i18n helper dinâmico (NÃO congela idioma)
-function getI18n() {
-  return window.i18n || {
-    lang: 'pt-BR',
-    t: (_, fallback) => fallback || _
-  };
-}
-
+  // i18n helper dinâmico (SEM congelar idioma)
+  function getLangNow() {
+  return (
+    (window.i18n && window.i18n.lang) ||
+    localStorage.getItem('i18n_lang') ||
+    'pt-BR'
+  );
+ }
 
   // ====== ESTILO DO CURSOR ======
   (function ensureStyle() {
