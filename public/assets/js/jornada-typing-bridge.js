@@ -126,7 +126,7 @@ function getI18n() {
     try { speechSynthesis.cancel(); } catch {}
 
     const utt = new SpeechSynthesisUtterance(String(text).trim());
-    const lang = getI18n().lang || 'pt-BR';
+    utt.lang = getLangNow();
     utt.lang = lang;
     utt.rate = options.rate || 1.03;
     utt.pitch = options.pitch || 1.0;
@@ -160,7 +160,7 @@ function getI18n() {
 
     if ('speechSynthesis' in window) {
       const utt = new SpeechSynthesisUtterance(String(text).trim());
-      const lang = getI18n().lang || 'pt-BR';
+      utt.lang = getLangNow();
       utt.lang = lang;      
       utt.rate = 0.95;
       utt.pitch = 1.0;
