@@ -18,9 +18,10 @@
   let lastShownSection = null;
   let isTransitioning = false;
 
-  function getText(el) {
-    return (el?.dataset?.text ?? el?.textContent ?? '').trim();
-  }
+ function getText(el) {
+  return (el?.textContent ?? el?.dataset?.text ?? '').trim();
+}
+
   // ===== Sincroniza tema do guia com o BODY em qualquer página =====
 (function syncGuiaTema(){
   try {
