@@ -10,6 +10,7 @@
     'section-senha',
     'section-guia',
     'section-selfie',
+    'section-card',
     'section-perguntas',
     'section-final'
   ];
