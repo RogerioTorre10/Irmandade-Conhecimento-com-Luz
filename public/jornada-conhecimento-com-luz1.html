@@ -166,7 +166,8 @@
   // Função central que traduz TUDO que já existe no DOM
   const traduzirTudo = () => {
     if (!window.i18n?.ready) return;
-    i18n.apply(document.body);
+    const wrapper = document.getElementById('jornada-content-wrapper') || document.body;
+    i18n.apply(wrapper);
     // Traduz título da página
     const title = i18n.t('page.title') || 'Jornada Essencial';
     const site = i18n.t('site.title') || 'Irmandade Conhecimento com Luz';
