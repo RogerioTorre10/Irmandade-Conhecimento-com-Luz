@@ -173,6 +173,12 @@ function getText(el) {
       if (typeof window.i18n.apply === 'function') {
       window.i18n.apply(section);
       }
+       // após i18n.apply(section)
+      section.querySelectorAll?.('[data-typing="true"]').forEach(el => {
+      const tc = (el.textContent || '').trim();
+      if (tc) el.dataset.text = tc;
+      });
+ 
       } catch (e) {
       console.warn('[i18n] Falha ao aplicar na seção:', sectionId, e);
       }
