@@ -178,18 +178,63 @@
           detail: { sectionId, node: section }
         }));
 
-        document.dispatchEvent(new CustomEvent('section:shown', { detail: { sectionId, node: section } }));
-        console.log('[JC.show] Event section:shown fired for:', sectionId);
-        console.log('[JC.show] Displayed successfully:', sectionId);
-      } else {
-        console.error('[JC.show] Section element is null for:', sectionId);
-        window.toast?.(`Seção ${sectionId} não encontrada`, 'error');
-        const currentIndex = sectionOrder.indexOf(sectionId);
-        const nextSection = sectionOrder[currentIndex + 1];
-        if (nextSection) {
-          console.warn('[JC.show] Avançando para próxima seção:', nextSection);
-          show(nextSection);
+       if (section) {
+  // ✅ Seção existe: dispara evento e finaliza normalmente
+  document.dispatchEvent(new CustomEvent('section:shown', { detail: { sectionId, node: section } }));
+  console.log('[JC.show] Event section:shown fired for:', sectionId);
+  console.log('[JC.show] Displayed successfully:', sectionId);
+
+} else {
+  // 🚨 Seção veio null: NÃO avance imediatamente para a próxima.
+  // Primeiro, tenta carregar/injetar novamente (uma única vez por seção).
+  console.error('[JC.show] Section element is null for:', sectionId);
+  window.toast?.(`Seção ${sectionId} não encontrada`, 'error');
+
+  // evita loop infinito
+  window.__jc_retry = window.__jc_retry || {};
+  const retryCount = window.__jc_retry[sectionId] || 0;
+
+  if (retryCount < 1) {
+    window.__jc_retry[sectionId] = retryCount + 1;
+
+    console.warn('[JC.show] Tentando recarregar/injetar a seção novamente:', sectionId);
+
+    try {
+      // tenta novamente via loader (se existir)
+      const cleanId = sectionId.replace(/^section-/, '');
+      if (typeof window.carregarEtapa === 'function') {
+        const retrySection = await window.carregarEtapa(cleanId);
+
+        // garante id esperado
+        if (retrySection && retrySection.id !== sectionId) {
+          retrySection.id = sectionId;
         }
+
+        if (retrySection) {
+          // sucesso: dispara evento e encerra
+          document.dispatchEvent(new CustomEvent('section:shown', { detail: { sectionId, node: retrySection } }));
+          console.log('[JC.show] Event section:shown fired (after retry) for:', sectionId);
+          console.log('[JC.show] Displayed successfully (after retry):', sectionId);
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn('[JC.show] Retry falhou para:', sectionId, e);
+    }
+  }
+
+  // Se ainda falhou após retry, aí sim tenta próxima seção
+  const currentIndex = sectionOrder.indexOf(sectionId);
+  const nextSection = sectionOrder[currentIndex + 1];
+
+  if (nextSection) {
+    console.warn('[JC.show] Falha persistente. Avançando para próxima seção:', nextSection);
+    show(nextSection);
+  } else {
+    console.error('[JC.show] Nenhuma próxima seção disponível. Fluxo interrompido em:', sectionId);
+  }
+}
+
       }
     } catch (err) {
       console.error('[JC.show] Error showing section:', sectionId, err);
