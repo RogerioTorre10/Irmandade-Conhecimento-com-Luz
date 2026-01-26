@@ -258,16 +258,16 @@
     }
   }
 
-    // Iniciar jornada
-    const introElement = document.getElementById('section-intro');
-    if (!introElement) {
-      console.warn('[JC.init] section-intro não encontrado, avançando para section-termos1');
-      window.JC.currentSection = 'section-termos1';
-      window.JC.show('section-termos1');
-    } else {
-      window.JC.currentSection = 'section-intro';
-      window.JC.show('section-intro');
-    }
+   // Iniciar jornada (robusto)
+    window.JC.currentSection = 'section-intro';
+
+    window.JC.show('section-intro').catch((e) => {
+    console.warn('[JC.init] Falha ao iniciar section-intro, caindo para section-termos1', e);
+    window.JC.currentSection = 'section-termos1';
+    window.JC.show('section-termos1');
+  });
+
+
   }
 
   // Evento para lógica adicional após exibição de seção
