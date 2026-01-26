@@ -174,7 +174,7 @@ function getText(el) {
       window.i18n.apply(section);
       }
        // após i18n.apply(section)
-      section.querySelectorAll?.('[data-typing="true"]').forEach(el => {
+      (section.querySelectorAll && section.querySelectorAll('[data-typing="true"]') || []).forEach(el => {
       const tc = (el.textContent || '').trim();
       if (tc) el.dataset.text = tc;
       });
