@@ -122,13 +122,18 @@
       attachButtonEvents(sectionId, root);
       applyTypingAndTTS(sectionId, root);
     }
-  }
+   }
 
-  async function show(sectionId) {
+    async function show(sectionId) {
     console.log('[JC.show] Starting display for:', sectionId, { caller: new Error().stack });
     if (sectionId === window.JC.currentSection || sectionId === lastShownSection || isTransitioning) {
-      console.log('[JC.show] Seção já ativa, exibida recentemente ou em transição, ignorando:', sectionId);
-      return;
+      const existsInDom = !!document.getElementById(sectionId);
+    if (existsInDom) {
+    console.log('[JC.show] Seção já ativa... ignorando:', sectionId);
+    return;
+    }
+    console.warn('[JC.show] Guard acionado, mas seção não existe no DOM; seguindo para carregar:', sectionId);
+    // NÃO retorna aqui
     }
 
     isTransitioning = true;
