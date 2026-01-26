@@ -136,6 +136,10 @@
       const cleanId = sectionId.replace(/^section-/, '');
       console.log('[JC.show] Starting carregarEtapa for:', cleanId);
       const section = await window.carregarEtapa(cleanId);
+      // garante que a seção carregada tenha o ID que o controller espera
+      if (section && section.id !== sectionId) {
+      section.id = sectionId;
+      }
       if (window.i18n) {
       try {
       if (typeof window.i18n.waitForReady === 'function') {
@@ -144,7 +148,7 @@
       if (typeof window.i18n.apply === 'function' && section) {
       window.i18n.apply(section);
       }
-    } catch (e) {
+      } catch (e) {
       console.warn('[i18n] Falha ao aplicar i18n na seção:', sectionId, e);
       }
     }
