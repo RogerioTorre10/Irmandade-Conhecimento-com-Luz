@@ -19,9 +19,13 @@
   let lastShownSection = null;
   let isTransitioning = false;
 
- function getText(el) {
-  return (el?.textContent ?? el?.dataset?.text ?? '').trim();
+function getText(el) {
+  if (!el) return '';
+  const tc = (el.textContent || '').trim();
+  if (tc) return tc; // i18n aplica aqui (quando existir)
+  return (el.dataset?.text || '').trim(); // fallback para seu HTML atual
 }
+
 
   // ===== Sincroniza tema do guia com o BODY em qualquer página =====
 (function syncGuiaTema(){
