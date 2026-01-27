@@ -278,6 +278,11 @@
   }
   
   async function runTyping(root) {
+    
+    if (localStorage.getItem('i18n_locked') !== '1') {
+    console.warn('[Intro] Idioma não confirmado — bloqueando runTyping.');
+    return;
+    }
     const elements = Array.from(root.querySelectorAll('[data-typing="true"]'));
     const btn = findOrCreateAdvanceButton(root);
     btn.setAttribute('disabled', 'true'); btn.classList.add('is-hidden');
