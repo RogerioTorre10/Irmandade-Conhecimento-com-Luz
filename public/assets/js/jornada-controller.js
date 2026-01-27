@@ -46,9 +46,23 @@ function getText(el) {
   console.log('[JC.applyTypingAndTTS] Iniciando para:', sectionId);
 
   try {
+    // ============================================================
+    // A) TRAVA: não roda 2x na mesma seção (evita "começa e para")
+    // ============================================================
+    window.__JC_TYPED_ONCE = window.__JC_TYPED_ONCE || {};
+    if (window.__JC_TYPED_ONCE[sectionId]) {
+      console.log('[JC.applyTypingAndTTS] Já aplicado anteriormente, ignorando:', sectionId);
+      return;
+    }
+    window.__JC_TYPED_ONCE[sectionId] = true;
+
+    // ============================================================
+    // B) FLAG global: impede o i18n observer de re-aplicar durante typing
+    // ============================================================
+    window.__JC_IS_TYPING = true;
+
     // ------------------------------------------------------------
-    // 1) Garante que o "bridge" que você usa de fato está pronto
-    //    (no seu projeto: runTyping + EffectCoordinator/typeAndSpeak)
+    // 1) Garante que o "bridge" real está pronto
     // ------------------------------------------------------------
     let attempts = 0;
     const maxAttempts = 100;
@@ -68,6 +82,8 @@ function getText(el) {
         typeAndSpeak: !!window.typeAndSpeak,
         speak: !!window.EffectCoordinator?.speak
       });
+      // libera flag (senão trava tradução pra sempre)
+      window.__JC_IS_TYPING = false;
       return;
     }
 
@@ -79,6 +95,7 @@ function getText(el) {
 
     if (!typingElements.length) {
       console.warn('[JC.applyTypingAndTTS] Nenhum elemento com data-typing encontrado em:', sectionId);
+      window.__JC_IS_TYPING = false;
       return;
     }
 
@@ -94,7 +111,6 @@ function getText(el) {
       sectionNode.style.opacity = '1';
     }
 
-    // espera 2 frames para evitar “flash e some”
     await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 
     // ------------------------------------------------------------
@@ -109,16 +125,12 @@ function getText(el) {
       el.style.visibility = 'visible';
       el.style.opacity = '1';
 
-      // se estiver vazio visualmente, deixa o typing controlar
-      if (!el.textContent || !el.textContent.trim()) {
-        el.textContent = '';
-      }
+      // deixa o typing controlar a renderização
+      el.textContent = '';
 
-      // Se existir typeAndSpeak, usa ela (fala + digita sincronizado)
       if (typeof window.typeAndSpeak === 'function') {
         await window.typeAndSpeak(el, text, 36);
       } else {
-        // fallback: só digita
         await window.runTyping(el, text, () => {}, { speed: 36, cursor: true });
       }
     }
@@ -126,10 +138,15 @@ function getText(el) {
     console.log('[JC.applyTypingAndTTS] Efeitos de datilografia/TTS aplicados para:', sectionId);
   } catch (err) {
     console.error('[JC.applyTypingAndTTS] Erro ao aplicar efeitos:', sectionId, err);
+
+    // se deu erro, permite tentar de novo (senão fica travado pra sempre)
+    try { window.__JC_TYPED_ONCE[sectionId] = false; } catch {}
+  } finally {
+    // libera a tradução depois que terminar (ou erro)
+    window.__JC_IS_TYPING = false;
   }
 }
-
-
+  
   function attachButtonEvents(sectionId, root) {
     console.log('[JC.attachButtonEvents] Attaching buttons for:', sectionId);
     const buttons = root.querySelectorAll('[data-action]');
