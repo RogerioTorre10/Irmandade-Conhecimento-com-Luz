@@ -3,6 +3,9 @@
   window.JC = window.JC || {};
   const existingJC = { ...window.JC };
 
+  window.__JC_TYPED_ONCE = window.__JC_TYPED_ONCE || {};
+  window.__JC_IS_TYPING = window.__JC_IS_TYPING || false;
+
   const sectionOrder = [
     'section-intro',
     'section-termos1',
