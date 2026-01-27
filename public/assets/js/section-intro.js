@@ -43,22 +43,69 @@
     });
   }
 
-  async function typeOnce(el, { speed = TYPING_SPEED, speak = true } = {}) {
-    if (!el) return;
-    const text = (el.dataset?.text || el.textContent || '').trim();
-    if (!text) return;
-    el.classList.add('typing-active'); el.classList.remove('typing-done');
-    let usedFallback = false;
-    if (typeof window.runTyping === 'function') {
-      await new Promise(res => { try { window.runTyping(el, text, () => res(), { speed, cursor: true }); } catch { usedFallback = true; res(); } });
-    } else usedFallback = true;
-    if (usedFallback) await localType(el, text, speed);
-    el.classList.remove('typing-active'); el.classList.add('typing-done');
-    if (speak && text && !el.dataset.spoken) {
-      try { speechSynthesis.cancel(); if (window.EffectCoordinator?.speak) { await window.EffectCoordinator.speak(text, { lang: 'pt-BR', rate: 1.05, pitch: 1.0 }); await sleep(TTS_LATCH_MS); el.dataset.spoken = 'true'; } } catch {}
-    }
-    await sleep(60);
+ async function typeOnce(el, { speed = TYPING_SPEED, speak = true } = {}) {
+  if (!el) return;
+
+  const text = (el.dataset?.text || el.textContent || '').trim();
+  if (!text) return;
+
+  el.classList.add('typing-active');
+  el.classList.remove('typing-done');
+
+  let usedFallback = false;
+
+  // --- DATILOGRAFIA ---
+  if (typeof window.runTyping === 'function') {
+    await new Promise((res) => {
+      try {
+        window.runTyping(el, text, () => res(), { speed, cursor: true });
+      } catch {
+        usedFallback = true;
+        res();
+      }
+    });
+  } else {
+    usedFallback = true;
   }
+
+  if (usedFallback) {
+    await localType(el, text, speed);
+  }
+
+  el.classList.remove('typing-active');
+  el.classList.add('typing-done');
+
+  // --- TTS (voz) ---
+  if (speak && text && !el.dataset.spoken) {
+    try {
+      // idioma SEMPRE atual (travado na intro, se você aplicar o lock)
+      const langNow =
+        localStorage.getItem('i18n_lang') ||
+        window.i18n?.lang ||
+        'pt-BR';
+
+      // cancela fala anterior, se houver
+      try { window.speechSynthesis?.cancel?.(); } catch {}
+
+      if (window.EffectCoordinator?.speak) {
+        await window.EffectCoordinator.speak(text, {
+          lang: langNow,
+          rate: 1.05,
+          pitch: 1.0
+        });
+
+        // dá uma folga para evitar "cortar" o áudio no Android
+        await sleep(TTS_LATCH_MS);
+
+        // marca como já falado (pra não repetir)
+        el.dataset.spoken = 'true';
+      }
+    } catch {}
+  }
+
+  await sleep(60);
+}
+
 
   function findOrCreateAdvanceButton(root) {
     let btn = root.querySelector('[data-action="avancar"]') || root.querySelector('#btn-avancar');
