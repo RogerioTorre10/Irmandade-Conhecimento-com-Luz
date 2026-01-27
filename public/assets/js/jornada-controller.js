@@ -39,35 +39,93 @@ function getText(el) {
   }
 })();
 
-  async function applyTypingAndTTS(sectionId, root) {
-    console.log('[JC.applyTypingAndTTS] Iniciando para:', sectionId);
-    try {
-      let attempts = 0;
-      const maxAttempts = 100;
-      while (!window.TypingBridge && attempts < maxAttempts) {
-        console.log('[JC.applyTypingAndTTS] Aguardando TypingBridge...');
-        await new Promise(resolve => setTimeout(resolve, 100));
-        attempts++;
-      }
-      if (!window.TypingBridge) {
-        console.warn('[JC.applyTypingAndTTS] TypingBridge não disponível após tentativas:', sectionId);
-        return;
-      }
-      const typingElements = root.querySelectorAll('[data-typing="true"]');
-      console.log('[JC.applyTypingAndTTS] Elementos de datilografia encontrados:', typingElements.length);
-      if (typingElements.length === 0) {
-        console.warn('[JC.applyTypingAndTTS] Nenhum elemento com data-typing encontrado em:', sectionId);
-        return;
-      }
-      for (const element of typingElements) {
-        const text = getText(element);
-        await window.runTyping(element, text, () => {}, { speed: 36, cursor: true });
-      }
-      console.log('[JC.applyTypingAndTTS] Efeitos de datilografia aplicados para:', sectionId);
-    } catch (err) {
-      console.error('[JC.applyTypingAndTTS] Erro ao aplicar efeitos:', sectionId, err);
+ async function applyTypingAndTTS(sectionId, root) {
+  console.log('[JC.applyTypingAndTTS] Iniciando para:', sectionId);
+
+  try {
+    // ------------------------------------------------------------
+    // 1) Garante que o "bridge" que você usa de fato está pronto
+    //    (no seu projeto: runTyping + EffectCoordinator/typeAndSpeak)
+    // ------------------------------------------------------------
+    let attempts = 0;
+    const maxAttempts = 100;
+
+    while (
+      (!window.runTyping || (!window.typeAndSpeak && !window.EffectCoordinator?.speak)) &&
+      attempts < maxAttempts
+    ) {
+      await new Promise(r => setTimeout(r, 100));
+      attempts++;
     }
+
+    const bridgeReady = !!window.runTyping && (!!window.typeAndSpeak || !!window.EffectCoordinator?.speak);
+    if (!bridgeReady) {
+      console.warn('[JC.applyTypingAndTTS] Bridge de typing/TTS não disponível após tentativas:', sectionId, {
+        runTyping: !!window.runTyping,
+        typeAndSpeak: !!window.typeAndSpeak,
+        speak: !!window.EffectCoordinator?.speak
+      });
+      return;
+    }
+
+    // ------------------------------------------------------------
+    // 2) Busca elementos de datilografia
+    // ------------------------------------------------------------
+    const typingElements = root?.querySelectorAll?.('[data-typing="true"]') || [];
+    console.log('[JC.applyTypingAndTTS] Elementos de datilografia encontrados:', typingElements.length);
+
+    if (!typingElements.length) {
+      console.warn('[JC.applyTypingAndTTS] Nenhum elemento com data-typing encontrado em:', sectionId);
+      return;
+    }
+
+    // ------------------------------------------------------------
+    // 3) Garante que a seção está visível e o layout estabilizou
+    // ------------------------------------------------------------
+    const sectionNode = root?.closest?.('section') || root;
+    if (sectionNode) {
+      sectionNode.classList.remove('hidden', 'section-hidden');
+      sectionNode.setAttribute('aria-hidden', 'false');
+      sectionNode.style.display = 'block';
+      sectionNode.style.visibility = 'visible';
+      sectionNode.style.opacity = '1';
+    }
+
+    // espera 2 frames para evitar “flash e some”
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+    // ------------------------------------------------------------
+    // 4) Executa typing (e TTS se existir), preservando i18n
+    // ------------------------------------------------------------
+    for (const el of typingElements) {
+      const text = getText(el);
+      if (!text) continue;
+
+      // trava o texto (evita que outro script apague no meio)
+      el.dataset.text = text;
+      el.style.visibility = 'visible';
+      el.style.opacity = '1';
+
+      // se estiver vazio visualmente, deixa o typing controlar
+      if (!el.textContent || !el.textContent.trim()) {
+        el.textContent = '';
+      }
+
+      // Se existir typeAndSpeak, usa ela (fala + digita sincronizado)
+      if (typeof window.typeAndSpeak === 'function') {
+        await window.typeAndSpeak(el, text, 36);
+      } else {
+        // fallback: só digita
+        await window.runTyping(el, text, () => {}, { speed: 36, cursor: true });
+      }
+    }
+
+    console.log('[JC.applyTypingAndTTS] Efeitos de datilografia/TTS aplicados para:', sectionId);
+  } catch (err) {
+    console.error('[JC.applyTypingAndTTS] Erro ao aplicar efeitos:', sectionId, err);
   }
+}
+
 
   function attachButtonEvents(sectionId, root) {
     console.log('[JC.attachButtonEvents] Attaching buttons for:', sectionId);
