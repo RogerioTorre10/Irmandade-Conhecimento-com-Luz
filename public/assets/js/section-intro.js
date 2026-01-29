@@ -144,36 +144,128 @@
       console.warn('[SyncText] Erro:', e);
     }
   }
-  function buildLangModal(root) {
-    const modal = document.createElement('div');
-    modal.id = 'intro-lang-modal';
-    modal.innerHTML = `
-      <div class="intro-lang-backdrop"></div>
-      <div class="intro-lang-card" role="dialog" aria-modal="true" aria-labelledby="intro-lang-title">
-        <h3 id="intro-lang-title" class="intro-lang-title">Escolha seu idioma</h3>
-        <p class="intro-lang-sub">Selecione o idioma para navegar. Após confirmar, não será possível alterar.</p>
-        <div class="intro-lang-row">
-          <select id="intro-lang-select" class="intro-lang-select" aria-label="Selecione o idioma">
-            <option value="pt-BR">Português (BR)</option>
-            <option value="en-US">English (US)</option>
-            <option value="es-ES">Español (ES)</option>
-            <!-- Adicione mais opções aqui se precisar, e.g., <option value="fr-FR">Français (FR)</option> -->
-          </select>
-        </div>
-        <div class="intro-lang-actions">
-          <button id="intro-lang-confirm" type="button" class="btn btn-primary btn-stone">Confirmar</button>
-        </div>
+ function buildLangModal(root) {
+  const modal = document.createElement('div');
+  modal.id = 'intro-lang-modal';
+  modal.innerHTML = `
+    <div class="intro-lang-backdrop"></div>
+    <div class="intro-lang-card" role="dialog" aria-modal="true" aria-labelledby="intro-lang-title">
+      <h3 id="intro-lang-title" class="intro-lang-title">Escolha seu idioma</h3>
+      <p class="intro-lang-sub">Selecione o idioma para navegar. Após confirmar, não será possível alterar.</p>
+      <div class="intro-lang-row">
+        <select id="intro-lang-select" class="intro-lang-select" aria-label="Selecione o idioma">
+          <option value="pt-BR">Português (BR)</option>
+          <option value="en-US">English (US)</option>
+          <option value="es-ES">Español (ES)</option>
+          <!-- Adicione mais opções aqui se precisar -->
+        </select>
       </div>
-    `;
-    root.appendChild(modal);
-    // CSS (mesmo do original, sem mudanças)
-    const style = document.createElement('style');
-    style.textContent = `
-      /* Seu CSS original aqui, sem alterações */
-    `;
-    modal.appendChild(style);
-    return modal;
-  }
+      <div class="intro-lang-actions">
+        <button id="intro-lang-confirm" type="button" class="btn btn-primary btn-stone">Confirmar</button>
+      </div>
+    </div>
+  `;
+  root.appendChild(modal);
+
+  // CSS atualizado e otimizado para desktop + mobile
+  const style = document.createElement('style');
+  style.textContent = `
+    #intro-lang-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: auto;
+    }
+
+    #intro-lang-modal .intro-lang-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+
+    #intro-lang-modal .intro-lang-card {
+      position: relative;
+      width: min(92vw, 480px);
+      max-height: 90vh;
+      overflow-y: auto;
+      border-radius: 20px;
+      padding: 24px 20px 20px;
+      border: 1px solid rgba(212,175,55,0.6);
+      background: rgba(10,10,18,0.85);
+      box-shadow: 0 0 40px rgba(212,175,55,0.4), inset 0 0 20px rgba(255,230,150,0.15);
+      color: #f6e7c6;
+      text-align: center;
+      font-family: "Cardo", serif;
+      transform: scale(1);
+      transition: transform 0.3s ease;
+    }
+
+    @media (max-width: 480px) {
+      #intro-lang-modal .intro-lang-card {
+        width: 94vw;
+        padding: 20px 16px 16px;
+        border-radius: 16px;
+      }
+    }
+
+    #intro-lang-modal .intro-lang-title {
+      margin: 0 0 8px;
+      font-size: 1.3rem;
+      letter-spacing: 0.08em;
+      font-family: "ManufacturingConsent-Regular", "Cardo", serif;
+    }
+
+    #intro-lang-modal .intro-lang-sub {
+      margin: 0 0 16px;
+      font-size: 0.95rem;
+      opacity: 0.95;
+      line-height: 1.4;
+    }
+
+    #intro-lang-modal .intro-lang-row {
+      margin: 12px 0 16px;
+    }
+
+    #intro-lang-modal .intro-lang-select {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(212,175,55,0.6);
+      background: rgba(0,0,0,0.45);
+      color: #f6e7c6;
+      font-size: 1rem;
+      outline: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23d4af37' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 12px;
+    }
+
+    #intro-lang-modal .intro-lang-actions {
+      margin-top: 12px;
+    }
+
+    #intro-lang-modal .intro-lang-actions .btn {
+      width: 100%;
+      padding: 12px;
+      font-size: 1.1rem;
+    }
+
+    /* Trava scroll do fundo enquanto modal aberto */
+    body:has(#intro-lang-modal) {
+      overflow: hidden;
+    }
+  `;
+  modal.appendChild(style);
+
+  return modal;
+}
   async function requireLanguageChoice(root) {
     if (isLangLocked()) {
       console.log('[IntroLang] Idioma já travado, prosseguindo.');
