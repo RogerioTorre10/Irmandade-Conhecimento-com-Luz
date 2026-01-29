@@ -156,62 +156,108 @@
 
   
 <script>
-  // Função central que traduz TUDO que já existe no DOM
-  const traduzirTudo = () => {
-    if (!window.i18n?.ready) return;
-    const wrapper = document.getElementById('jornada-content-wrapper') || document.body;
-    i18n.apply(wrapper);
-    // Traduz título da página
-    const title = i18n.t('page.title') || 'Jornada Essencial';
-    const site = i18n.t('site.title') || 'Irmandade Conhecimento com Luz';
-    document.title = `${title} • ${site}`;
-  };
+     // Função central de tradução (igual à sua, mas protegida)
+    const traduzirTudo = () => {
+      if (!window.i18n?.ready) return;
+      const wrapper = document.getElementById('jornada-content-wrapper') || document.body;
+      window.i18n.apply(wrapper);
 
-  // 1. Quando mudar o idioma no select
-  document.getElementById('language-select').addEventListener('change', async (e) => {
-    const lang = e.target.value;
-    document.documentElement.lang = lang;
-    await i18n.setLang(lang);
-    traduzirTudo();
+      // Atualiza título da página
+      const title = window.i18n.t('page.title') || 'Jornada Essencial';
+      const site = window.i18n.t('site.title') || 'Irmandade Conhecimento com Luz';
+      document.title = `${title} • ${site}`;
+    };
 
-  });
+    // Verifica se idioma já está travado (não faz nada se estiver)
+    const isLocked = () => localStorage.getItem('i18n_locked') === '1';
 
-  // 2. Garantir que o select mostre o idioma atual ao carregar
-  document.addEventListener('DOMContentLoaded', async () => {
-    await i18n.waitForReady(10000);
-    document.getElementById('language-select').value = i18n.lang;
-    document.documentElement.lang = i18n.lang;
-    traduzirTudo();
-  });
+    // 1. Sincroniza idioma no <html> e título ao carregar (sempre, mas só se não travado)
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        await window.i18n?.waitForReady?.(8000).catch(() => {});
 
-  // 3. O GRANDE TRUNFO: observar TODAS as mudanças no conteúdo dinâmico
-  const observer = new MutationObserver((mutations) => {
-    let precisaTraduzir = false;
-    for (const m of mutations) {
-      if (m.type === 'childList' && m.addedNodes.length > 0) {
-        // Se algo foi adicionado dentro do wrapper da jornada → traduz
-        for (const node of m.addedNodes) {
-          if (node.nodeType === 1) { // é elemento
-            if (node.matches?.('#jornada-content-wrapper, #jornada-content-wrapper *')) {
-              precisaTraduzir = true;
-              break;
-            }
+        if (!isLocked()) {
+          // Só sincroniza seletor se não travado (e se ele existir)
+          const langSelect = document.getElementById('language-select');
+          if (langSelect) {
+            langSelect.value = window.i18n.lang;
+            langSelect.disabled = false;
+          }
+        } else {
+          // Se travado, desabilita ou remove o seletor global
+          const langSelect = document.getElementById('language-select');
+          if (langSelect) {
+            langSelect.disabled = true;
+            langSelect.style.pointerEvents = 'none';
+            langSelect.style.opacity = '0.6';
+            // langSelect.remove();  // descomente se quiser remover de vez
           }
         }
+
+        document.documentElement.lang = window.i18n.lang;
+        traduzirTudo();
+      } catch (err) {
+        console.warn('[Global i18n Sync] Erro no load:', err);
       }
-    }
-    if (precisaTraduzir) {
-      setTimeout(traduzirTudo, 50); // dá tempo do DOM assentar
-    }
-  });
+    });
 
-  observer.observe(document.getElementById('jornada-content-wrapper'), {
-    childList: true,
-    subtree: true
-  });
+    // 2. Listener de mudança NO SELECT (só se NÃO travado e elemento existir)
+    document.addEventListener('DOMContentLoaded', () => {
+      const langSelect = document.getElementById('language-select');
+      if (!langSelect || isLocked()) return;
 
-  // Bonus: caso algum script dispare section:shown (continua funcionando)
-  document.addEventListener('section:shown', () => setTimeout(traduzirTudo, 100));
+      langSelect.addEventListener('change', async (e) => {
+        const lang = e.target.value;
+        if (!lang) return;
+
+        try {
+          document.documentElement.lang = lang.split('-')[0];
+          await window.i18n.setLang(lang);
+          traduzirTudo();
+        } catch (err) {
+          console.error('[Global Lang Change] Erro:', err);
+        }
+      });
+    });
+
+    // 3. Observer de conteúdo dinâmico (com debounce e verificação de lock)
+    let debounceTimer = null;
+    const observer = new MutationObserver(() => {
+      if (debounceTimer) clearTimeout(debounceTimer);
+
+      debounceTimer = setTimeout(() => {
+        if (window.__JC_IS_TYPING) return; // evita traduzir durante typing
+        traduzirTudo();
+      }, 80);
+    });
+
+    // Observa só quando o wrapper existir
+    document.addEventListener('DOMContentLoaded', () => {
+      const wrapper = document.getElementById('jornada-content-wrapper');
+      if (wrapper) {
+        observer.observe(wrapper, {
+          childList: true,
+          subtree: true
+        });
+      }
+    });
+
+    // 4. Reforço no evento section:shown (já existe no controller)
+    document.addEventListener('section:shown', () => {
+      setTimeout(traduzirTudo, 100);
+    });
+
+    // 5. Quando travar idioma (opcional: reforço extra)
+    document.addEventListener('i18n:changed', (e) => {
+      if (e.detail?.locked) {
+        // Remove ou desabilita seletor global
+        const sel = document.getElementById('language-select');
+        if (sel) {
+          sel.remove(); // ou sel.disabled = true; sel.style.display = 'none';
+        }
+      }
+    });
+  })();
 </script>
 </body>
 </html>
