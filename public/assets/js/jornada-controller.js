@@ -211,21 +211,32 @@
         if (section) section.id = sectionId;
         section = await waitForNode('#' + sectionId, 8000); // timeout menor no retry
       }
+      
 
       if (!section) {
         throw new Error(`Seção ${sectionId} não encontrada no DOM após carregamento`);
       }
 
-      // Aplica i18n
-      if (window.i18n?.apply) {
-        await window.i18n.waitForReady?.(8000).catch(() => {});
-        window.i18n.apply(section);
-        // Sincroniza data-text para typing
-        section.querySelectorAll('[data-typing="true"]').forEach(el => {
-          const tc = el.textContent?.trim();
-          if (tc) el.dataset.text = tc;
-        });
-      }
+    // Aplica i18n na seção recém-carregada
+if (section && window.i18n?.apply) {
+  try {
+    // Espera i18n estar pronto (importante para dict carregar)
+    if (window.i18n.waitForReady) {
+      await window.i18n.waitForReady(8000);
+    }
+    
+    window.i18n.apply(section);
+    console.log('[i18n] Tradução aplicada na seção carregada:', sectionId);
+    
+    // Reforça data-text para typing se houver
+    section.querySelectorAll('[data-typing="true"]').forEach(el => {
+      const text = el.textContent?.trim();
+      if (text) el.dataset.text = text;
+    });
+  } catch (err) {
+    console.warn('[i18n] Falha ao aplicar em', sectionId, err);
+  }
+}
 
       window.JC.currentSection = sectionId;
       lastShownSection = sectionId;
