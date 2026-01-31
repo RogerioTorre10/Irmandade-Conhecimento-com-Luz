@@ -158,85 +158,54 @@
     hideNotice(root);
   }
 
-  function confirmGuide(root, guiaId, guiaName) {
-    // === SALVA O GUIA ===
-    try {
-      window.JC = window.JC || {};
-      window.JC.data = window.JC.data || {};
-      window.JC.data.guia = guiaId;
-
-      sessionStorage.setItem('jornada.guia', guiaId);
-      localStorage.setItem('jc.guia', guiaId);
-      document.body.dataset.guia = guiaId;
-    } catch (e) {
-      console.warn('[JCGuia] Erro ao salvar guia:', e);
-    }
-
-    // === SALVA O NOME (GARANTIDO AQUI TAMBÉM, POR SEGURANÇA) ===
-const nameInput = q('#guiaNameInput', root);
-const userName  = (nameInput?.value || '').trim().toUpperCase();
-const guiaAtual = (guiaId || '').trim().toLowerCase();
-
-if (!userName || !guiaAtual) {
+  // ===== CONFIRMAÇÃO FINAL (GUIA + NOME SALVO) =====
+async function confirmGuide(guiaId) {
   try {
-    const errBox = q('#guia-error', root);
-    if (errBox) {
-      errBox.classList.remove('hidden');
-
-      const msg = q('#guia-notice-text', errBox) || errBox;
-      msg.textContent = !userName
-        ? 'Para seguir, digite seu nome e escolha um guia.'
-        : 'Agora escolha o guia que caminhará com você.';
+    // Garantia de nome salvo
+    const nome = input?.value?.trim() || localStorage.getItem('JORNADA_NOME') || sessionStorage.getItem('jornada.nome') || '';
+    if (!nome) {
+      console.warn('[XGuia] Nome não encontrado - usando fallback vazio');
+      return; // ou mostre um alert se quiser forçar nome
     }
 
-    // só por segurança: reabilita todos os botões da tela guia
-    const buttons = root.querySelectorAll(
-      '.guia-options button, #btn-confirmar-nome'
-    );
-    buttons.forEach(btn => {
-      btn.disabled = false;
-      btn.classList.remove('is-disabled');
-    });
-  } catch (e) {
-    console.warn('[XGuia] Falha ao mostrar aviso na tela guia:', e);
-  }
+    // Salva nome (backup em localStorage)
+    sessionStorage.setItem('jornada.nome', nome);
+    localStorage.setItem('JORNADA_NOME', nome);
+    console.log('[XGuia] Nome salvo:', nome);
 
-  // ⚠️ ponto chave: NÃO avança, NÃO grava nome, NÃO seta dataset.guia
-  return;
-}
+    // Salva guia
+    const guiaAtual = guiaId?.toLowerCase() || 'zion'; // fallback se undefined
+    sessionStorage.setItem('jornada.guia', guiaAtual);
+    console.log('[XGuia] Guia salvo:', guiaAtual);
 
-// ======================================================
-// === SALVA O NOME (GARANTIDO AQUI TAMBÉM, POR SEGURANÇA)
-// (agora reaproveitando userName que já está lá em cima)
-// ======================================================
-try {
-  if (userName) {
-    window.xc.data.nome = userName;
-    sessionStorage.setItem('jornada.nome', userName);
-    localStorage.setItem('jc.nome', userName);
-  }
-} catch (e) {
-  console.warn('[XGuia] Erro ao salvar nome (backup):', e);
-}
+    // AURA: aplica cor do guia
+    try {
+      aplicarGuiaTheme(guiaAtual);
+    } catch (e) {
+      console.warn('[AURA] Falha ao aplicar tema:', e);
+      document.body.setAttribute('data-guia', guiaAtual); // fallback simples
+    }
 
-// ======================================================
-// === AURA DO CORPO (COR DO GUIA) ===
-// (reaproveita guiaAtual já em lowerCase)
-// ======================================================
-try {
-  if (guiaAtual) {
-    document.body.dataset.guia = guiaAtual;
-    console.log('[AURA] Guia ativo:', guiaAtual, '— cor aplicada');
-  }
-} catch (err) {
-  console.warn('[AURA] Falha ao definir cor:', err);
-}
+    // Desbloqueia botão "continuar"
+    const btnAvancar = q('#btn-avancar', root) || q('[data-action="avancar"]', root);
+    if (btnAvancar) {
+      btnAvancar.disabled = false;
+      btnAvancar.classList.remove('is-hidden');
+      btnAvancar.focus();
+    } else {
+      console.warn('[XGuia] Botão avançar não encontrado');
+    }
 
-
-    // === TRANSIÇÃO ===
-    const src = getTransitionSrc(root);
+    // Transição para próxima seção (selfie)
+    const src = getTransitionSrc(root, btnAvancar);
+    playTransitionSafe(src, NEXT_SECTION_ID);
+  } catch (err) {
+    console.error('[XGuia] Erro ao salvar nome/guia (backup):', err);
+    // Fallback: avança mesmo assim para não travar o usuário
+    const src = getTransitionSrc(root, null);
     playTransitionSafe(src, NEXT_SECTION_ID);
   }
+}
 
   function pick(root) {
     return {
