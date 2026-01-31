@@ -5,7 +5,7 @@
   const SECTION_ID      = 'section-guia';
   const NEXT_SECTION_ID = 'section-selfie';
   const HIDE_CLASS      = 'hidden';
-
+  
   const TYPING_SPEED = 42;
   const TTS_LATCH_MS = 600;
   const DATA_URL     = '/assets/data/guias.json';
@@ -21,6 +21,10 @@
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
   const q  = (sel, root = document) => root.querySelector(sel);
   const qa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+  // Declarações globais para o escopo do script
+  let hoverTimers = {};       // Objeto para armazenar timeouts de hover por botão
+  let armedId = null;         // ID do guia "armado" (pré-selecionado no 1º clique)
 
   // ===== Lock de transição (vídeo) =====
   async function waitForTransitionUnlock(timeoutMs = 20000) {
