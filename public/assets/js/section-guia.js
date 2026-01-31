@@ -142,43 +142,48 @@
     }
   }
 
-  // ===== CONFIRMAÇÃO FINAL (GUIA + NOME SALVO) =====
-  let armedId = null;
-  let armTimer = null;
-  const hoverTimers = new Map();
-
-  function cancelArm(root) {
-    if (armTimer) clearTimeout(armTimer);
-    armTimer = null;
-    armedId = null;
-    qa('.guia-option.armed', root).forEach(el => {
-      el.classList.remove('armed');
-      el.setAttribute('aria-pressed', 'false');
-    });
-    hideNotice(root);
+// ===== CONFIRMAÇÃO FINAL (GUIA + NOME SALVO) =====
+async function confirmGuide(guiaId) {
+  // Re-encontra os elementos no DOM (garante que estão disponíveis)
+  const root = document.getElementById('section-guia');
+  if (!root) {
+    console.error('[confirmGuide] section-guia não encontrada no DOM');
+    return;
   }
 
-  // ===== CONFIRMAÇÃO FINAL (GUIA + NOME SALVO) =====
-async function confirmGuide(guiaId) {
+  const input = root.querySelector('#guiaNameInput');
+  if (!input) {
+    console.error('[confirmGuide] #guiaNameInput não encontrado');
+    return;
+  }
+
   try {
-    // Garantia de nome salvo
-    const nome = input?.value?.trim() || localStorage.getItem('JORNADA_NOME') || sessionStorage.getItem('jornada.nome') || '';
+    // Nome do input (prioridade máxima)
+    const nome = input.value.trim();
+
+    // Se vazio, tenta fallback
     if (!nome) {
-      console.warn('[XGuia] Nome não encontrado - usando fallback vazio');
-      return; // ou mostre um alert se quiser forçar nome
+      const nomeFallback = localStorage.getItem('JORNADA_NOME') || sessionStorage.getItem('jornada.nome') || '';
+      if (!nomeFallback) {
+        console.warn('[XGuia] Nenhum nome encontrado');
+        // Pode mostrar toast ou alert aqui
+        return;
+      }
+      input.value = nomeFallback; // preenche de volta para UX
+      console.log('[XGuia] Nome recuperado do storage:', nomeFallback);
     }
 
-    // Salva nome (backup em localStorage)
+    // Salva nome (backup em múltiplos lugares)
     sessionStorage.setItem('jornada.nome', nome);
     localStorage.setItem('JORNADA_NOME', nome);
     console.log('[XGuia] Nome salvo:', nome);
 
     // Salva guia
-    const guiaAtual = guiaId?.toLowerCase() || 'zion'; // fallback se undefined
+    const guiaAtual = (guiaId || 'zion').toLowerCase().trim();
     sessionStorage.setItem('jornada.guia', guiaAtual);
     console.log('[XGuia] Guia salvo:', guiaAtual);
 
-    // AURA: aplica cor do guia
+    // Aplica aura / tema do guia
     try {
       aplicarGuiaTheme(guiaAtual);
     } catch (e) {
@@ -186,17 +191,17 @@ async function confirmGuide(guiaId) {
       document.body.setAttribute('data-guia', guiaAtual); // fallback simples
     }
 
-    // Desbloqueia botão "continuar"
-    const btnAvancar = q('#btn-avancar', root) || q('[data-action="avancar"]', root);
+    // Habilita botão de avançar
+    const btnAvancar = root.querySelector('#btn-avancar') || root.querySelector('[data-action="avancar"]');
     if (btnAvancar) {
       btnAvancar.disabled = false;
       btnAvancar.classList.remove('is-hidden');
-      btnAvancar.focus();
+      btnAvancar.focus?.();
     } else {
       console.warn('[XGuia] Botão avançar não encontrado');
     }
 
-    // Transição para próxima seção (selfie)
+    // Transição para próxima seção
     const src = getTransitionSrc(root, btnAvancar);
     playTransitionSafe(src, NEXT_SECTION_ID);
   } catch (err) {
