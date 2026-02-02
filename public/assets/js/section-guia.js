@@ -23,8 +23,10 @@
   const qa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
   // Declarações globais para o escopo do script
-  let hoverTimers = {};       // Objeto para armazenar timeouts de hover por botão
-  let armedId = null;         // ID do guia "armado" (pré-selecionado no 1º clique)
+  let hoverTimers = new Map();      // Map para armazenar timeouts de hover por guiaId
+  let armedId = null;               // ID do guia armado (aguardando confirmação)
+  let armTimer = null;              // Timer para desarmar após timeout
+  let cancelArm = null;             // Função para cancelar o arm (se existir)
 
   // ===== Lock de transição (vídeo) =====
   async function waitForTransitionUnlock(timeoutMs = 20000) {
@@ -148,10 +150,9 @@
 
 // ===== CONFIRMAÇÃO FINAL (GUIA + NOME SALVO) =====
 async function confirmGuide(guiaId) {
-  // Re-encontra os elementos no DOM (garante que estão disponíveis)
   const root = document.getElementById('section-guia');
   if (!root) {
-    console.error('[confirmGuide] section-guia não encontrada no DOM');
+    console.error('[confirmGuide] #section-guia não encontrado');
     return;
   }
 
@@ -162,57 +163,52 @@ async function confirmGuide(guiaId) {
   }
 
   try {
-    // Nome do input (prioridade máxima)
     const nome = input.value.trim();
-
-    // Se vazio, tenta fallback
     if (!nome) {
-      const nomeFallback = localStorage.getItem('JORNADA_NOME') || sessionStorage.getItem('jornada.nome') || '';
-      if (!nomeFallback) {
-        console.warn('[XGuia] Nenhum nome encontrado');
-        // Pode mostrar toast ou alert aqui
-        return;
-      }
-      input.value = nomeFallback; // preenche de volta para UX
-      console.log('[XGuia] Nome recuperado do storage:', nomeFallback);
+      console.warn('[XGuia] Nome vazio - usando fallback');
+      return;
     }
 
-    // Salva nome (backup em múltiplos lugares)
     sessionStorage.setItem('jornada.nome', nome);
     localStorage.setItem('JORNADA_NOME', nome);
     console.log('[XGuia] Nome salvo:', nome);
 
-    // Salva guia
-    const guiaAtual = (guiaId || 'zion').toLowerCase().trim();
+    // Proteção total para guiaId
+    const guiaAtual = guiaId 
+      ? String(guiaId).toLowerCase().trim() 
+      : 'zion';  // fallback se undefined ou nulo
+
     sessionStorage.setItem('jornada.guia', guiaAtual);
     console.log('[XGuia] Guia salvo:', guiaAtual);
 
-    // Aplica aura / tema do guia
+    // Aplica tema
     try {
       aplicarGuiaTheme(guiaAtual);
     } catch (e) {
-      console.warn('[AURA] Falha ao aplicar tema:', e);
-      document.body.setAttribute('data-guia', guiaAtual); // fallback simples
+      console.warn('[AURA] Falha:', e);
+      document.body.setAttribute('data-guia', guiaAtual);
     }
 
-    // Habilita botão de avançar
+    // Habilita botão avançar
     const btnAvancar = root.querySelector('#btn-avancar') || root.querySelector('[data-action="avancar"]');
     if (btnAvancar) {
       btnAvancar.disabled = false;
       btnAvancar.classList.remove('is-hidden');
       btnAvancar.focus?.();
-    } else {
-      console.warn('[XGuia] Botão avançar não encontrado');
     }
 
-    // Transição para próxima seção
+    // Limpa timer de arm se existir
+    if (armTimer) {
+      clearTimeout(armTimer);
+      armTimer = null;
+    }
+
+    // Transição
     const src = getTransitionSrc(root, btnAvancar);
     playTransitionSafe(src, NEXT_SECTION_ID);
   } catch (err) {
-    console.error('[XGuia] Erro ao salvar nome/guia (backup):', err);
-    // Fallback: avança mesmo assim para não travar o usuário
-    const src = getTransitionSrc(root, null);
-    playTransitionSafe(src, NEXT_SECTION_ID);
+    console.error('[XGuia] Erro ao salvar nome/guia:', err);
+    playTransitionSafe(getTransitionSrc(root, null), NEXT_SECTION_ID);
   }
 }
 
@@ -362,19 +358,18 @@ async function confirmGuide(guiaId) {
     guideButtons = qa('button[data-action="select-guia"]', els.optionsBox);
     guideButtons.forEach(b => { b.disabled = true; b.style.opacity = '0.6'; b.style.cursor = 'not-allowed'; });
 
-    // ===== CONFIRMAR NOME (SALVA NOME AQUI) =====
-   // ===== CONFIRMAR NOME (SALVA NOME AQUI) =====
-let __NAME_CONFIRMED__ = false;
+       // ===== CONFIRMAR NOME (SALVA NOME AQUI) =====
+    let __NAME_CONFIRMED__ = false;
 
-// confirma começa bloqueado; libera conforme input
-if (els.confirmBtn) els.confirmBtn.disabled = true;
+    // confirma começa bloqueado; libera conforme input
+    if (els.confirmBtn) els.confirmBtn.disabled = true;
 
-els.nameInput?.addEventListener('input', () => {
-  const v = (els.nameInput?.value || '').trim();
-  if (els.confirmBtn) els.confirmBtn.disabled = (v.length < 2);
-});
+    els.nameInput?.addEventListener('input', () => {
+    const v = (els.nameInput?.value || '').trim();
+   if (els.confirmBtn) els.confirmBtn.disabled = (v.length < 2);
+   });
 
-els.confirmBtn?.addEventListener('click', async (ev) => {
+  els.confirmBtn?.addEventListener('click', async (ev) => {
   ev.preventDefault();
   ev.stopPropagation();
 
@@ -430,49 +425,74 @@ els.confirmBtn?.addEventListener('click', async (ev) => {
 });
 
 
-    // ===== HOVER: PRÉVIA DA DESCRIÇÃO =====
-    guideButtons.forEach(btn => {
-      const preview = async () => {
-        if (btn.disabled) return;
-        const g = findGuia(guias, btn.dataset.guia);
-        if (!g || !els.guiaTexto) return;
+   // ===== EVENTOS DOS BOTÕES DE GUIA (hover, clique, double-click, teclado) =====
+guideButtons.forEach(btn => {
+  const guiaId = (btn.dataset.guia || btn.textContent || '').toLowerCase().trim();
+  const label = (btn.dataset.nome || btn.textContent || 'guia').toUpperCase();
+
+  // Hover: preview da descrição + tema
+  btn.addEventListener('mouseenter', () => {
+    if (btn.disabled || !guiaId) return;
+
+    // Limpa timer anterior se existir
+    if (hoverTimers.has(guiaId)) {
+      clearTimeout(hoverTimers.get(guiaId));
+    }
+
+    // Agenda preview da descrição + tema
+    const timer = setTimeout(async () => {
+      const g = findGuia(guias, guiaId);
+      if (g && els.guiaTexto) {
         els.guiaTexto.dataset.spoken = '';
         await typeOnce(els.guiaTexto, g.descricao, { speed: 34, speak: true });
-      };
+      }
+      applyGuiaTheme(guiaId); // preview de cor/tema
+    }, HOVER_DELAY_MS);
 
-      btn.addEventListener('mouseenter', () => {
-        if (btn.disabled) return;
-        const t = setTimeout(preview, HOVER_DELAY_MS);
-        hoverTimers.set(btn, t);
-      });
-      btn.addEventListener('mouseleave', () => {
-        const t = hoverTimers.get(btn);
-        if (t) clearTimeout(t);
-        hoverTimers.delete(btn);
-      });
-      btn.addEventListener('focus', () => {
-        if (!btn.disabled) preview();
-      });
-    });
+    hoverTimers.set(guiaId, timer);
+  });
 
-    // ===== CLIQUE: ARMAR / DUPLUCLIQUE: CONFIRMAR =====
-guideButtons.forEach(btn => {
-  const label = (btn.dataset.nome || btn.textContent || 'guia').toUpperCase();
-  const guiaId = (btn.dataset.guia || '').toLowerCase();
+  btn.addEventListener('mouseleave', () => {
+    if (!guiaId) return;
 
+    if (hoverTimers.has(guiaId)) {
+      clearTimeout(hoverTimers.get(guiaId));
+      hoverTimers.delete(guiaId);
+    }
+
+    // Reseta tema para padrão
+    applyGuiaTheme(null);
+  });
+
+  btn.addEventListener('focus', () => {
+    if (!btn.disabled) {
+      // Opcional: preview ao focar com teclado
+      const g = findGuia(guias, guiaId);
+      if (g && els.guiaTexto) {
+        els.guiaTexto.dataset.spoken = '';
+        typeOnce(els.guiaTexto, g.descricao, { speed: 34, speak: true });
+      }
+    }
+  });
+
+  // Clique simples: armar guia
   btn.addEventListener('click', (ev) => {
     ev.preventDefault();
+    ev.stopPropagation();
     if (btn.disabled) return;
     armGuide(root, btn, label);
   });
 
+  // Double-click: confirmar direto
   btn.addEventListener('dblclick', (ev) => {
     ev.preventDefault();
+    ev.stopPropagation();
     if (btn.disabled) return;
-    confirmGuide(root, guiaId, label);
-    cancelArm(root);
+    confirmGuide(guiaId);
+    cancelArm?.(root); // chama se existir
   });
 
+  // Enter / Espaço: armar (acessibilidade)
   btn.addEventListener('keydown', (ev) => {
     if (ev.key === 'Enter' || ev.key === ' ') {
       ev.preventDefault();
@@ -481,31 +501,22 @@ guideButtons.forEach(btn => {
     }
   });
 
-  // ===== PREVIEW DE TEMA AO PASSAR O MOUSE =====
-  btn.addEventListener('mouseenter', () => {
-    if (btn.disabled || !guiaId) return;
-    applyGuiaTheme(guiaId);    // aplica cor/tema temporário
-  });
-
-  btn.addEventListener('mouseleave', () => {
-    if (btn.disabled) return;
-    applyGuiaTheme(null);      // volta para o tema oficial (ou dourado)
-  });
-
+  // Acessibilidade básica
   btn.setAttribute('role', 'button');
   btn.setAttribute('tabindex', '0');
   btn.setAttribute('aria-pressed', 'false');
 });
 
-
-    // ===== CANCELA AO CLICAR FORA =====
-    document.addEventListener('click', (e) => {
-      const inside = e.target.closest?.('.guia-option');
-      if (!inside && armedId) cancelArm(root);
-    }, { passive: true });
-
-    console.log('[JCGuia] Inicializado com sucesso: nome + guia salvos + 2 cliques + TTS + aura');
+// ===== CANCELA AO CLICAR FORA =====
+document.addEventListener('click', (e) => {
+  const inside = e.target.closest?.('.guia-option') || e.target.closest?.('.guia-buttons');
+  if (!inside && armedId) {
+    cancelArm?.(root);
   }
+}, { passive: true });
+
+console.log('[JCGuia] Eventos de botões e hover configurados com sucesso');
+    
   // ===== TEMA DINÂMICO DOS GUIAS (preview ao passar o mouse) =====
 function applyGuiaTheme(guiaIdOrNull) {
   if (guiaIdOrNull) {
