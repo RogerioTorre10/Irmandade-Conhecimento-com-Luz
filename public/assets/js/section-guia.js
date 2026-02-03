@@ -517,7 +517,7 @@ document.addEventListener('click', (e) => {
 
 console.log('[JCGuia] Eventos de botões e hover configurados com sucesso');
 };    
-});
+
   // ===== TEMA DINÂMICO DOS GUIAS (preview ao passar o mouse) =====
 function applyGuiaTheme(guiaIdOrNull) {
   if (guiaIdOrNull) {
@@ -559,8 +559,6 @@ function applyGuiaTheme(guiaIdOrNull) {
 /* =========================================================
    TEMA DO GUIA — reaplica em qualquer seção quando necessário
    ========================================================= */
-(function () {
-  'use strict';
 
   function applyThemeFromSession() {
     const guiaRaw = sessionStorage.getItem('jornada.guia');
@@ -586,14 +584,10 @@ function applyGuiaTheme(guiaIdOrNull) {
   document.addEventListener('DOMContentLoaded', applyThemeFromSession);
   document.addEventListener('sectionLoaded', () => setTimeout(applyThemeFromSession, 50));
   document.addEventListener('guia:changed', applyThemeFromSession);
-})();
-
   
 /* =========================================================
    GUIA – CONFIRMAR BLINDADO (anti-submit + stopImmediatePropagation + failsafe)
    ========================================================= */
-(function () {
-  'use strict';
 
   const root = document.getElementById('section-guia');
   if (!root) return;
@@ -718,6 +712,7 @@ function applyGuiaTheme(guiaIdOrNull) {
   });
 
   console.log('[GUIA] Confirmar blindado + anti-trava real ativado');
+  
 });
 
 
