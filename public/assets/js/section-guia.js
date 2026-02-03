@@ -426,27 +426,28 @@ async function confirmGuide(guiaId) {
 
 
    // ===== EVENTOS DOS BOTÕES DE GUIA (hover, clique, double-click, teclado) =====
+// ===== EVENTOS DOS BOTÕES DE GUIA =====
 guideButtons.forEach(btn => {
   const guiaId = (btn.dataset.guia || btn.textContent || '').toLowerCase().trim();
   const label = (btn.dataset.nome || btn.textContent || 'guia').toUpperCase();
 
-  // Hover: preview da descrição + tema
+  // Hover: preview descrição + tema
   btn.addEventListener('mouseenter', () => {
     if (btn.disabled || !guiaId) return;
 
-    // Limpa timer anterior se existir
+    // Limpa timer anterior
     if (hoverTimers.has(guiaId)) {
       clearTimeout(hoverTimers.get(guiaId));
     }
 
-    // Agenda preview da descrição + tema
+    // Agenda preview
     const timer = setTimeout(async () => {
       const g = findGuia(guias, guiaId);
       if (g && els.guiaTexto) {
         els.guiaTexto.dataset.spoken = '';
         await typeOnce(els.guiaTexto, g.descricao, { speed: 34, speak: true });
       }
-      applyGuiaTheme(guiaId); // preview de cor/tema
+      applyGuiaTheme(guiaId);
     }, HOVER_DELAY_MS);
 
     hoverTimers.set(guiaId, timer);
@@ -454,19 +455,15 @@ guideButtons.forEach(btn => {
 
   btn.addEventListener('mouseleave', () => {
     if (!guiaId) return;
-
     if (hoverTimers.has(guiaId)) {
       clearTimeout(hoverTimers.get(guiaId));
       hoverTimers.delete(guiaId);
     }
-
-    // Reseta tema para padrão
     applyGuiaTheme(null);
   });
 
   btn.addEventListener('focus', () => {
     if (!btn.disabled) {
-      // Opcional: preview ao focar com teclado
       const g = findGuia(guias, guiaId);
       if (g && els.guiaTexto) {
         els.guiaTexto.dataset.spoken = '';
@@ -475,7 +472,7 @@ guideButtons.forEach(btn => {
     }
   });
 
-  // Clique simples: armar guia
+  // Clique simples: armar
   btn.addEventListener('click', (ev) => {
     ev.preventDefault();
     ev.stopPropagation();
@@ -489,10 +486,10 @@ guideButtons.forEach(btn => {
     ev.stopPropagation();
     if (btn.disabled) return;
     confirmGuide(guiaId);
-    cancelArm?.(root); // chama se existir
+    if (cancelArm) cancelArm(root);
   });
 
-  // Enter / Espaço: armar (acessibilidade)
+  // Teclado: Enter/Espaço = armar
   btn.addEventListener('keydown', (ev) => {
     if (ev.key === 'Enter' || ev.key === ' ') {
       ev.preventDefault();
@@ -501,7 +498,7 @@ guideButtons.forEach(btn => {
     }
   });
 
-  // Acessibilidade básica
+  // Acessibilidade
   btn.setAttribute('role', 'button');
   btn.setAttribute('tabindex', '0');
   btn.setAttribute('aria-pressed', 'false');
@@ -509,14 +506,13 @@ guideButtons.forEach(btn => {
 
 // ===== CANCELA AO CLICAR FORA =====
 document.addEventListener('click', (e) => {
-  const inside = e.target.closest?.('.guia-option') || e.target.closest?.('.guia-buttons');
-  if (!inside && armedId) {
-    cancelArm?.(root);
+  const inside = e.target.closest('.guia-option, .guia-buttons');
+  if (!inside && armedId && cancelArm) {
+    cancelArm(root);
   }
 }, { passive: true });
 
-console.log('[JCGuia] Eventos de botões e hover configurados com sucesso');
-};    
+console.log('[JCGuia] Eventos de botões e hover configurados');   
 
   // ===== TEMA DINÂMICO DOS GUIAS (preview ao passar o mouse) =====
 function applyGuiaTheme(guiaIdOrNull) {
