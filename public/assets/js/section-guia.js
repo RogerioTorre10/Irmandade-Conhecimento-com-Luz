@@ -292,32 +292,56 @@ async function confirmGuide(guiaId) {
   }
 
   // ===== ARMAR GUIA (2 CLICKS) =====
-  function armGuide(root, btn, label) {
-    const id = (btn.dataset.guia || '').toLowerCase();
+ // ===== ARMAR GUIA (2 CLICKS) =====
+function armGuide(root, btn, label) {
+  const guiaId = (btn.dataset.guia || '').toLowerCase().trim();
+  if (!guiaId) {
+    console.warn('[armGuide] guiaId não encontrado no botão');
+    return;
+  }
 
-    if (armedId === id) {
-      confirmGuide(root, id, label);
-      cancelArm(root);
-      return;
-    }
+  // Se já estiver armado e for o mesmo, confirma direto
+  if (armedId === guiaId) {
+    confirmGuide(guiaId);
+    if (cancelArm) cancelArm(root);
+    return;
+  }
 
-    armedId = id;
-    qa('.guia-option', root).forEach(el => {
+  // Limpa timer anterior se existir
+  if (armTimer) {
+    clearTimeout(armTimer);
+    armTimer = null;
+  }
+
+  // Remove 'armed' de todos os botões
+  root.querySelectorAll('.guia-option').forEach(el => {
+    el.classList.remove('armed');
+    el.setAttribute('aria-pressed', 'false');
+  });
+
+  // Marca o botão atual como armed
+  btn.classList.add('armed');
+  btn.setAttribute('aria-pressed', 'true');
+
+  // Atualiza armedId
+  armedId = guiaId;
+
+  // Mostra notificação
+  showNotice(root, `Você escolheu ${label}. Clique novamente para confirmar.`, { speak: true });
+
+  // Agenda desarme automático após timeout
+  armTimer = setTimeout(() => {
+    armedId = null;
+    armTimer = null;
+    // Remove destaque de todos
+    root.querySelectorAll('.guia-option').forEach(el => {
       el.classList.remove('armed');
       el.setAttribute('aria-pressed', 'false');
     });
-    btn.classList.add('armed');
-    btn.setAttribute('aria-pressed', 'true');
-
-    showNotice(root, `Você escolheu ${label}. Clique novamente para confirmar.`, { speak: true });
-
-    if (armTimer) clearTimeout(armTimer);
-    armTimer = setTimeout(() => {
-      cancelArm(root);
-      showNotice(root, 'Tempo esgotado. Selecione o guia e clique novamente para confirmar.', { speak: true });
-    }, ARM_TIMEOUT_MS);
-  }
-
+    showNotice(root, 'Tempo esgotado. Selecione o guia e clique novamente para confirmar.', { speak: true });
+  }, ARM_TIMEOUT_MS);
+}
+  
   async function initOnce(root) {
     if (!root || root.dataset.guiaInitialized === 'true') return;
     root.dataset.guiaInitialized = 'true';
