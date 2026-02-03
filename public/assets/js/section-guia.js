@@ -516,7 +516,8 @@ document.addEventListener('click', (e) => {
 }, { passive: true });
 
 console.log('[JCGuia] Eventos de botões e hover configurados com sucesso');
-    
+};    
+})(); 
   // ===== TEMA DINÂMICO DOS GUIAS (preview ao passar o mouse) =====
 function applyGuiaTheme(guiaIdOrNull) {
   if (guiaIdOrNull) {
