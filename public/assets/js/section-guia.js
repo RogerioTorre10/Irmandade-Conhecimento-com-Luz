@@ -517,7 +517,7 @@ document.addEventListener('click', (e) => {
 
 console.log('[JCGuia] Eventos de botões e hover configurados com sucesso');
 };    
-})(); 
+})();
   // ===== TEMA DINÂMICO DOS GUIAS (preview ao passar o mouse) =====
 function applyGuiaTheme(guiaIdOrNull) {
   if (guiaIdOrNull) {
@@ -720,4 +720,4 @@ function applyGuiaTheme(guiaIdOrNull) {
   console.log('[GUIA] Confirmar blindado + anti-trava real ativado');
 })();
 
-})();
+
