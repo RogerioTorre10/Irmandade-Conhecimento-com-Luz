@@ -307,17 +307,21 @@ function armGuide(root, btn, label) {
     return;
   }
 
-  // Limpa timer anterior se existir
+  cancelArm = function (root) {
+  armedId = null;
+
   if (armTimer) {
     clearTimeout(armTimer);
     armTimer = null;
   }
 
-  // Remove 'armed' de todos os botões
-  root.querySelectorAll('.guia-option').forEach(el => {
+  root?.querySelectorAll('.guia-option').forEach(el => {
     el.classList.remove('armed');
     el.setAttribute('aria-pressed', 'false');
   });
+
+  hideNotice(root);
+};
 
   // Marca o botão atual como armed
   btn.classList.add('armed');
