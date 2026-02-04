@@ -572,7 +572,7 @@ guideButtons.forEach(btn => {
 
 // ===== CANCELA AO CLICAR FORA =====
 document.addEventListener('click', (e) => {
-  const inside = e.target.closest('.guia-option, .guia-buttons');
+  const inside = e.target.closest('.guia-option, #btn-confirmar-nome, #guiaNameInput, .guia-options');
   if (!inside && armedId && cancelArm) {
     cancelArm(root);
   }
