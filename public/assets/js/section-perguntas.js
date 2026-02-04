@@ -1094,3 +1094,4 @@ waitForPerguntasSection((rootSection) => {
 
   log('Patch de mimos inicializado.');
 })();
+});
