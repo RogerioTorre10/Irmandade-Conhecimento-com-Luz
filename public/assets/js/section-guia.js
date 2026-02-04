@@ -291,7 +291,6 @@ async function confirmGuide(guiaId) {
     box.setAttribute('aria-hidden', 'true');
   }
 
-  // ===== ARMAR GUIA (2 CLICKS) =====
  // ===== ARMAR GUIA (2 CLICKS) =====
 function armGuide(root, btn, label) {
   const guiaId = (btn.dataset.guia || '').toLowerCase().trim();
