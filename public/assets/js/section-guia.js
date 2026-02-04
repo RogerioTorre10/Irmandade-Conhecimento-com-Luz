@@ -183,7 +183,7 @@ async function confirmGuide(guiaId) {
 
     // Aplica tema
     try {
-      aplicarGuiaTheme(guiaAtual);
+      applyGuiaTheme(guiaAtual);
     } catch (e) {
       console.warn('[AURA] Falha:', e);
       document.body.setAttribute('data-guia', guiaAtual);
