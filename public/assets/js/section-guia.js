@@ -646,6 +646,6 @@ function applyGuiaTheme(guiaIdOrNull) {
   document.addEventListener('DOMContentLoaded', applyThemeFromSession);
   document.addEventListener('sectionLoaded', () => setTimeout(applyThemeFromSession, 50));
   document.addEventListener('guia:changed', applyThemeFromSession);
-  
+  })();
 
 
