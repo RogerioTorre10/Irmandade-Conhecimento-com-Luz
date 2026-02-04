@@ -489,9 +489,9 @@ cancelArm = function (root) {
   // opcional: desabilita confirmar depois de sucesso (evita “stress”)
   // els.confirmBtn.disabled = true;
 });
+}
 
-
-   // ===== EVENTOS DOS BOTÕES DE GUIA (hover, clique, double-click, teclado) =====
+   
 // ===== EVENTOS DOS BOTÕES DE GUIA =====
 guideButtons.forEach(btn => {
   const guiaId = (btn.dataset.guia || btn.textContent || '').toLowerCase().trim();
