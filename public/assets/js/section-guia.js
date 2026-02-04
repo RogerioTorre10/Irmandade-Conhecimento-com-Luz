@@ -489,7 +489,7 @@ cancelArm = function (root) {
   // opcional: desabilita confirmar depois de sucesso (evita “stress”)
   // els.confirmBtn.disabled = true;
 });
-}
+};
 
    
 // ===== EVENTOS DOS BOTÕES DE GUIA =====
