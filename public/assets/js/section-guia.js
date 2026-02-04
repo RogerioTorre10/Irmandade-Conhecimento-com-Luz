@@ -1,11 +1,11 @@
-// /assets/js/section-guia.js — v3.2 (NOME + GUIA SALVOS COM GARANTIA + 2 PASSOS + TTS + AURA)
+// /assets/js/section-guia.js — v3.2 (NOME + GUIA SALVOS COM GARANTIA + 2 PASSOS + TTS + AURA) — CLEAN (Fluxo Moderno)
 (function () {
   'use strict';
 
   const SECTION_ID      = 'section-guia';
   const NEXT_SECTION_ID = 'section-selfie';
   const HIDE_CLASS      = 'hidden';
-  
+
   const TYPING_SPEED = 42;
   const TTS_LATCH_MS = 600;
   const DATA_URL     = '/assets/data/guias.json';
@@ -22,11 +22,11 @@
   const q  = (sel, root = document) => root.querySelector(sel);
   const qa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
-  // Declarações globais para o escopo do script
-  let hoverTimers = new Map();      // Map para armazenar timeouts de hover por guiaId
-  let armedId = null;               // ID do guia armado (aguardando confirmação)
-  let armTimer = null;              // Timer para desarmar após timeout
-  let cancelArm = null;             // Função para cancelar o arm (se existir)
+  // Estado do fluxo (escopo do IIFE)
+  let hoverTimers = new Map();  // Map<guiaId, timeoutId>
+  let armedId = null;           // guia armado (aguardando confirmação)
+  let armTimer = null;          // timer do arm
+  let cancelArm = null;         // função para cancelar arm (definida abaixo)
 
   // ===== Lock de transição (vídeo) =====
   async function waitForTransitionUnlock(timeoutMs = 20000) {
@@ -148,70 +148,67 @@
     }
   }
 
-// ===== CONFIRMAÇÃO FINAL (GUIA + NOME SALVO) =====
-async function confirmGuide(guiaId) {
-  const root = document.getElementById('section-guia');
-  if (!root) {
-    console.error('[confirmGuide] #section-guia não encontrado');
-    return;
-  }
+  // ===== CONFIRMAÇÃO FINAL (GUIA + NOME SALVO) =====
+  async function confirmGuide(guiaId) {
+    const root = document.getElementById(SECTION_ID);
+    if (!root) { console.error('[confirmGuide] #section-guia não encontrado'); return; }
 
-  const input = root.querySelector('#guiaNameInput');
-  if (!input) {
-    console.error('[confirmGuide] #guiaNameInput não encontrado');
-    return;
-  }
+    const input = root.querySelector('#guiaNameInput');
+    if (!input) { console.error('[confirmGuide] #guiaNameInput não encontrado'); return; }
 
-  try {
-    const nome = input.value.trim();
-    if (!nome) {
-      console.warn('[XGuia] Nome vazio - usando fallback');
-      return;
-    }
-
-    sessionStorage.setItem('jornada.nome', nome);
-    localStorage.setItem('JORNADA_NOME', nome);
-    console.log('[XGuia] Nome salvo:', nome);
-
-    // Proteção total para guiaId
-    const guiaAtual = guiaId 
-      ? String(guiaId).toLowerCase().trim() 
-      : 'zion';  // fallback se undefined ou nulo
-
-    sessionStorage.setItem('jornada.guia', guiaAtual);
-    console.log('[XGuia] Guia salvo:', guiaAtual);
-
-    // Aplica tema
     try {
-      applyGuiaTheme(guiaAtual);
-    } catch (e) {
-      console.warn('[AURA] Falha:', e);
-      document.body.setAttribute('data-guia', guiaAtual);
-    }
-    window.aplicarGuiaTheme = window.aplicarGuiaTheme || applyGuiaTheme;
+      const nome = (input.value || '').trim();
+      if (!nome) {
+        console.warn('[XGuia] Nome vazio - usando fallback');
+        return;
+      }
 
-    // Habilita botão avançar
-    const btnAvancar = root.querySelector('#btn-avancar') || root.querySelector('[data-action="avancar"]');
-    if (btnAvancar) {
-      btnAvancar.disabled = false;
-      btnAvancar.classList.remove('is-hidden');
-      btnAvancar.focus?.();
-    }
+      // salva nome (compat)
+      sessionStorage.setItem('jornada.nome', nome);
+      localStorage.setItem('JORNADA_NOME', nome);
+      console.log('[XGuia] Nome salvo:', nome);
 
-    // Limpa timer de arm se existir
-    if (armTimer) {
-      clearTimeout(armTimer);
-      armTimer = null;
-    }
+      // Proteção total para guiaId
+      const guiaAtual = guiaId ? String(guiaId).toLowerCase().trim() : 'zion';
 
-    // Transição
-    const src = getTransitionSrc(root, btnAvancar);
-    playTransitionSafe(src, NEXT_SECTION_ID);
-  } catch (err) {
-    console.error('[XGuia] Erro ao salvar nome/guia:', err);
-    playTransitionSafe(getTransitionSrc(root, null), NEXT_SECTION_ID);
+      // salva guia
+      sessionStorage.setItem('jornada.guia', guiaAtual);
+      try {
+        window.JC = window.JC || {};
+        window.JC.data = window.JC.data || {};
+        window.JC.data.guia = guiaAtual;
+      } catch {}
+      console.log('[XGuia] Guia salvo:', guiaAtual);
+
+      // Aplica tema
+      try {
+        applyGuiaTheme(guiaAtual);
+      } catch (e) {
+        console.warn('[AURA] Falha:', e);
+        document.body.setAttribute('data-guia', guiaAtual);
+      }
+      window.aplicarGuiaTheme = window.aplicarGuiaTheme || applyGuiaTheme;
+
+      // Habilita botão avançar
+      const btnAvancar = root.querySelector('#btn-avancar') || root.querySelector('[data-action="avancar"]');
+      if (btnAvancar) {
+        btnAvancar.disabled = false;
+        btnAvancar.classList.remove('is-hidden');
+        btnAvancar.focus?.();
+      }
+
+      // Limpa arm
+      if (armTimer) { clearTimeout(armTimer); armTimer = null; }
+      armedId = null;
+
+      // Transição
+      const src = getTransitionSrc(root, btnAvancar);
+      playTransitionSafe(src, NEXT_SECTION_ID);
+    } catch (err) {
+      console.error('[XGuia] Erro ao salvar nome/guia:', err);
+      playTransitionSafe(getTransitionSrc(root, null), NEXT_SECTION_ID);
+    }
   }
-}
 
   function pick(root) {
     return {
@@ -254,7 +251,7 @@ async function confirmGuide(guiaId) {
       optionsBox.appendChild(btn);
     });
   }
-    
+
   function findGuia(guias, id) {
     id = (id || '').toLowerCase();
     return guias.find(g => (g.id || '').toLowerCase() === id);
@@ -292,98 +289,87 @@ async function confirmGuide(guiaId) {
     box.setAttribute('aria-hidden', 'true');
   }
 
-// ===== ARMAR GUIA (2 CLICKS) =====
-function armGuide(root, btn, label) {
-  const guiaId = (btn?.dataset?.guia || '').toLowerCase().trim();
-  if (!guiaId) {
-    console.warn('[armGuide] guiaId não encontrado no botão');
-    return;
-  }
+  // ===== ARMAR GUIA (2 CLICKS) =====
+  function armGuide(root, btn, label) {
+    const guiaId = (btn?.dataset?.guia || '').toLowerCase().trim();
+    if (!guiaId) {
+      console.warn('[armGuide] guiaId não encontrado no botão');
+      return;
+    }
 
-  // Se já estiver armado e for o mesmo, confirma direto
-  if (armedId === guiaId) {
-    confirmGuide(guiaId);
-    if (cancelArm) cancelArm(root);
-    return;
-  }
+    // Se já estiver armado e for o mesmo, confirma direto
+    if (armedId === guiaId) {
+      confirmGuide(guiaId);
+      if (cancelArm) cancelArm(root);
+      return;
+    }
 
-  // Limpa timer anterior se existir
-  if (armTimer) {
-    clearTimeout(armTimer);
-    armTimer = null;
-  }
+    // Limpa timer anterior se existir
+    if (armTimer) { clearTimeout(armTimer); armTimer = null; }
 
-  // Remove 'armed' de todos os botões
-  root.querySelectorAll('.guia-option').forEach(el => {
-    el.classList.remove('armed');
-    el.setAttribute('aria-pressed', 'false');
-  });
-
-  // Marca o botão atual como armed
-  btn.classList.add('armed');
-  btn.setAttribute('aria-pressed', 'true');
-
-  // Atualiza armedId
-  armedId = guiaId;
-
-  // Mostra notificação
-  showNotice(root, `Você escolheu ${label}. Clique novamente para confirmar.`, { speak: true });
-
-  // Agenda desarme automático após timeout
-  armTimer = setTimeout(() => {
-    armedId = null;
-    armTimer = null;
-
+    // Remove 'armed' de todos os botões
     root.querySelectorAll('.guia-option').forEach(el => {
       el.classList.remove('armed');
       el.setAttribute('aria-pressed', 'false');
     });
 
-    showNotice(root, 'Tempo esgotado. Selecione o guia e clique novamente para confirmar.', { speak: true });
-  }, ARM_TIMEOUT_MS);
-}
+    // Marca o botão atual como armed
+    btn.classList.add('armed');
+    btn.setAttribute('aria-pressed', 'true');
 
-// ===== CANCELAR ARM (fora do armGuide) =====
-cancelArm = function (root) {
-  armedId = null;
+    // Atualiza armedId
+    armedId = guiaId;
 
-  if (armTimer) {
-    clearTimeout(armTimer);
-    armTimer = null;
+    // Mostra notificação
+    showNotice(root, `Você escolheu ${label}. Clique novamente para confirmar.`, { speak: true });
+
+    // Agenda desarme automático após timeout
+    armTimer = setTimeout(() => {
+      armedId = null;
+      armTimer = null;
+
+      root.querySelectorAll('.guia-option').forEach(el => {
+        el.classList.remove('armed');
+        el.setAttribute('aria-pressed', 'false');
+      });
+
+      showNotice(root, 'Tempo esgotado. Selecione o guia e clique novamente para confirmar.', { speak: true });
+    }, ARM_TIMEOUT_MS);
   }
 
-  root?.querySelectorAll('.guia-option').forEach(el => {
-    el.classList.remove('armed');
-    el.setAttribute('aria-pressed', 'false');
-  });
-
-  hideNotice(root);
-};
-
-
-  // Marca o botão atual como armed
-  btn.classList.add('armed');
-  btn.setAttribute('aria-pressed', 'true');
-
-  // Atualiza armedId
-  armedId = guiaId;
-
-  // Mostra notificação
-  showNotice(root, `Você escolheu ${label}. Clique novamente para confirmar.`, { speak: true });
-
-  // Agenda desarme automático após timeout
-  armTimer = setTimeout(() => {
+  // ===== CANCELAR ARM (fora do armGuide) =====
+  cancelArm = function (root) {
     armedId = null;
-    armTimer = null;
-    // Remove destaque de todos
-    root.querySelectorAll('.guia-option').forEach(el => {
+    if (armTimer) { clearTimeout(armTimer); armTimer = null; }
+
+    root?.querySelectorAll('.guia-option').forEach(el => {
       el.classList.remove('armed');
       el.setAttribute('aria-pressed', 'false');
     });
-    showNotice(root, 'Tempo esgotado. Selecione o guia e clique novamente para confirmar.', { speak: true });
-  }, ARM_TIMEOUT_MS);
-}
-  
+
+    hideNotice(root);
+  };
+
+  // ===== TEMA DINÂMICO DOS GUIAS (preview ao passar o mouse) =====
+  function applyGuiaTheme(guiaIdOrNull) {
+    if (guiaIdOrNull) {
+      document.body.dataset.guia = guiaIdOrNull.toLowerCase();
+      return;
+    }
+
+    // sem parâmetro: restaura o tema "oficial" (já escolhido ou nenhum)
+    const saved =
+      (window.JC && window.JC.data && window.JC.data.guia) ||
+      sessionStorage.getItem('jornada.guia') ||
+      '';
+
+    if (saved) {
+      document.body.dataset.guia = saved.toLowerCase();
+    } else {
+      delete document.body.dataset.guia;
+    }
+  }
+
   async function initOnce(root) {
     if (!root || root.dataset.guiaInitialized === 'true') return;
     root.dataset.guiaInitialized = 'true';
@@ -396,11 +382,12 @@ cancelArm = function (root) {
     let guideButtons = [];
 
     // ===== NOME EM MAIÚSCULO =====
-    if (els.nameInput) {
+    if (els.nameInput && !els.nameInput.dataset.upperBound) {
+      els.nameInput.dataset.upperBound = '1';
       els.nameInput.addEventListener('input', () => {
         const start = els.nameInput.selectionStart;
         const end = els.nameInput.selectionEnd;
-        els.nameInput.value = els.nameInput.value.toUpperCase();
+        els.nameInput.value = (els.nameInput.value || '').toUpperCase();
         els.nameInput.setSelectionRange(start, end);
       });
     }
@@ -424,184 +411,168 @@ cancelArm = function (root) {
     guideButtons = qa('button[data-action="select-guia"]', els.optionsBox);
     guideButtons.forEach(b => { b.disabled = true; b.style.opacity = '0.6'; b.style.cursor = 'not-allowed'; });
 
-       // ===== CONFIRMAR NOME (SALVA NOME AQUI) =====
+    // ===== CONFIRMAR NOME (SALVA NOME AQUI) =====
     let __NAME_CONFIRMED__ = false;
 
     // confirma começa bloqueado; libera conforme input
     if (els.confirmBtn) els.confirmBtn.disabled = true;
 
-    els.nameInput?.addEventListener('input', () => {
-    const v = (els.nameInput?.value || '').trim();
-   if (els.confirmBtn) els.confirmBtn.disabled = (v.length < 2);
-   });
-
-  els.confirmBtn?.addEventListener('click', async (ev) => {
-  ev.preventDefault();
-  ev.stopPropagation();
-
-  let name = (els.nameInput?.value || '').trim();
-  if (name.length < 2) {
-    window.toast?.('Por favor, insira um nome válido (mín. 2 letras).', 'warning');
-    els.nameInput?.focus();
-    return; // <-- agora pode tentar de novo (SEM once:true)
-  }
-
-  const upperName = name.toUpperCase();
-  els.nameInput.value = upperName;
-
-  // === SALVA NOME COM GARANTIA ===
-  try {
-    window.JC = window.JC || {};
-    window.JC.data = window.JC.data || {};
-    window.JC.data.nome = upperName;
-
-    sessionStorage.setItem('jornada.nome', upperName);
-    localStorage.setItem('jc.nome', upperName);
-  } catch (e) {
-    console.warn('[JCGuia] Erro ao salvar nome:', e);
-  }
-
-  // Se já confirmou antes, não precisa re-rodar TTS/datilo; só garante botões liberados
-  if (!__NAME_CONFIRMED__) {
-    __NAME_CONFIRMED__ = true;
-
-    // === TEXTO PERSONALIZADO ===
-    if (els.guiaTexto) {
-      const base = (els.guiaTexto.dataset?.text || els.guiaTexto.textContent || 'Escolha seu guia para a Jornada.').trim();
-      const msg = base.replace(/\{\{\s*(nome|name)\s*\}\}/gi, upperName);
-      els.guiaTexto.textContent = '';
-      await typeOnce(els.guiaTexto, msg, { speed: 38, speak: true });
-      els.moldura?.classList.add('glow');
-      els.guiaTexto?.classList.add('glow');
-    }
-  }
-
-  // === HABILITA BOTÕES (SEMPRE) ===
-  guideButtons.forEach(b => {
-    b.disabled = false;
-    b.style.opacity = '1';
-    b.style.cursor = 'pointer';
-    b.style.pointerEvents = 'auto';
-  });
-
-  hideNotice(root);
-
-  // opcional: desabilita confirmar depois de sucesso (evita “stress”)
-  // els.confirmBtn.disabled = true;
-});
-
-
-   
-// ===== EVENTOS DOS BOTÕES DE GUIA =====
-guideButtons.forEach(btn => {
-  const guiaId = (btn.dataset.guia || btn.textContent || '').toLowerCase().trim();
-  const label = (btn.dataset.nome || btn.textContent || 'guia').toUpperCase();
-
-  // Hover: preview descrição + tema
-  btn.addEventListener('mouseenter', () => {
-    if (btn.disabled || !guiaId) return;
-
-    // Limpa timer anterior
-    if (hoverTimers.has(guiaId)) {
-      clearTimeout(hoverTimers.get(guiaId));
+    if (els.nameInput && !els.nameInput.dataset.confirmGateBound) {
+      els.nameInput.dataset.confirmGateBound = '1';
+      els.nameInput.addEventListener('input', () => {
+        const v = (els.nameInput?.value || '').trim();
+        if (els.confirmBtn) els.confirmBtn.disabled = (v.length < 2);
+      });
     }
 
-    // Agenda preview
-    const timer = setTimeout(async () => {
-      const g = findGuia(guias, guiaId);
-      if (g && els.guiaTexto) {
-        els.guiaTexto.dataset.spoken = '';
-        await typeOnce(els.guiaTexto, g.descricao, { speed: 34, speak: true });
+    if (els.confirmBtn && !els.confirmBtn.dataset.confirmBound) {
+      els.confirmBtn.dataset.confirmBound = '1';
+      els.confirmBtn.addEventListener('click', async (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+
+        const name = (els.nameInput?.value || '').trim();
+        if (name.length < 2) {
+          window.toast?.('Por favor, insira um nome válido (mín. 2 letras).', 'warning');
+          els.nameInput?.focus();
+          return;
+        }
+
+        const upperName = name.toUpperCase();
+        els.nameInput.value = upperName;
+
+        // === SALVA NOME COM GARANTIA ===
+        try {
+          window.JC = window.JC || {};
+          window.JC.data = window.JC.data || {};
+          window.JC.data.nome = upperName;
+
+          sessionStorage.setItem('jornada.nome', upperName);
+          localStorage.setItem('jc.nome', upperName);
+        } catch (e) {
+          console.warn('[JCGuia] Erro ao salvar nome:', e);
+        }
+
+        // Se já confirmou antes, não precisa re-rodar TTS/datilo; só garante botões liberados
+        if (!__NAME_CONFIRMED__) {
+          __NAME_CONFIRMED__ = true;
+
+          // === TEXTO PERSONALIZADO ===
+          if (els.guiaTexto) {
+            const base = (els.guiaTexto.dataset?.text || els.guiaTexto.textContent || 'Escolha seu guia para a Jornada.').trim();
+            const msg = base.replace(/\{\{\s*(nome|name)\s*\}\}/gi, upperName);
+            els.guiaTexto.textContent = '';
+            await typeOnce(els.guiaTexto, msg, { speed: 38, speak: true });
+            els.moldura?.classList.add('glow');
+            els.guiaTexto?.classList.add('glow');
+          }
+        }
+
+        // === HABILITA BOTÕES (SEMPRE) ===
+        guideButtons.forEach(b => {
+          b.disabled = false;
+          b.style.opacity = '1';
+          b.style.cursor = 'pointer';
+          b.style.pointerEvents = 'auto';
+        });
+
+        hideNotice(root);
+      });
+    }
+
+    // ===== EVENTOS DOS BOTÕES DE GUIA (bind 1x) =====
+    if (root.dataset.guiaButtonsBound !== '1') {
+      root.dataset.guiaButtonsBound = '1';
+
+      guideButtons.forEach(btn => {
+        const guiaId = (btn.dataset.guia || btn.textContent || '').toLowerCase().trim();
+        const label = (btn.dataset.nome || btn.textContent || 'guia').toUpperCase();
+
+        // Hover: preview descrição + tema
+        btn.addEventListener('mouseenter', () => {
+          if (btn.disabled || !guiaId) return;
+
+          if (hoverTimers.has(guiaId)) clearTimeout(hoverTimers.get(guiaId));
+
+          const timer = setTimeout(async () => {
+            const g = findGuia(guias, guiaId);
+            if (g && els.guiaTexto) {
+              els.guiaTexto.dataset.spoken = '';
+              await typeOnce(els.guiaTexto, g.descricao, { speed: 34, speak: true });
+            }
+            applyGuiaTheme(guiaId);
+          }, HOVER_DELAY_MS);
+
+          hoverTimers.set(guiaId, timer);
+        });
+
+        btn.addEventListener('mouseleave', () => {
+          if (!guiaId) return;
+          if (hoverTimers.has(guiaId)) {
+            clearTimeout(hoverTimers.get(guiaId));
+            hoverTimers.delete(guiaId);
+          }
+          applyGuiaTheme(null);
+        });
+
+        btn.addEventListener('focus', () => {
+          if (!btn.disabled) {
+            const g = findGuia(guias, guiaId);
+            if (g && els.guiaTexto) {
+              els.guiaTexto.dataset.spoken = '';
+              typeOnce(els.guiaTexto, g.descricao, { speed: 34, speak: true });
+            }
+          }
+        });
+
+        // Clique simples: armar
+        btn.addEventListener('click', (ev) => {
+          ev.preventDefault();
+          ev.stopPropagation();
+          if (btn.disabled) return;
+          armGuide(root, btn, label);
+        });
+
+        // Double-click: confirmar direto
+        btn.addEventListener('dblclick', (ev) => {
+          ev.preventDefault();
+          ev.stopPropagation();
+          if (btn.disabled) return;
+          confirmGuide(guiaId);
+          if (cancelArm) cancelArm(root);
+        });
+
+        // Teclado: Enter/Espaço = armar
+        btn.addEventListener('keydown', (ev) => {
+          if (ev.key === 'Enter' || ev.key === ' ') {
+            ev.preventDefault();
+            if (btn.disabled) return;
+            armGuide(root, btn, label);
+          }
+        });
+
+        // Acessibilidade
+        btn.setAttribute('role', 'button');
+        btn.setAttribute('tabindex', '0');
+        btn.setAttribute('aria-pressed', 'false');
+      });
+
+      // CANCELA AO CLICAR FORA (1x global)
+      if (!document.documentElement.dataset.guiaOutsideCancelBound) {
+        document.documentElement.dataset.guiaOutsideCancelBound = '1';
+        document.addEventListener('click', (e) => {
+          const inside = e.target.closest('.guia-option, .guia-options, #btn-confirmar-nome, #guiaNameInput');
+          if (!inside && armedId && cancelArm) {
+            const r = document.getElementById(SECTION_ID);
+            if (r) cancelArm(r);
+          }
+        }, { passive: true });
       }
-      applyGuiaTheme(guiaId);
-    }, HOVER_DELAY_MS);
 
-    hoverTimers.set(guiaId, timer);
-  });
-
-  btn.addEventListener('mouseleave', () => {
-    if (!guiaId) return;
-    if (hoverTimers.has(guiaId)) {
-      clearTimeout(hoverTimers.get(guiaId));
-      hoverTimers.delete(guiaId);
+      console.log('[JCGuia] Eventos de botões e hover configurados');
     }
-    applyGuiaTheme(null);
-  });
-
-  btn.addEventListener('focus', () => {
-    if (!btn.disabled) {
-      const g = findGuia(guias, guiaId);
-      if (g && els.guiaTexto) {
-        els.guiaTexto.dataset.spoken = '';
-        typeOnce(els.guiaTexto, g.descricao, { speed: 34, speak: true });
-      }
-    }
-  });
-
-  // Clique simples: armar
-  btn.addEventListener('click', (ev) => {
-    ev.preventDefault();
-    ev.stopPropagation();
-    if (btn.disabled) return;
-    armGuide(root, btn, label);
-  });
-
-  // Double-click: confirmar direto
-  btn.addEventListener('dblclick', (ev) => {
-    ev.preventDefault();
-    ev.stopPropagation();
-    if (btn.disabled) return;
-    confirmGuide(guiaId);
-    if (cancelArm) cancelArm(root);
-  });
-
-  // Teclado: Enter/Espaço = armar
-  btn.addEventListener('keydown', (ev) => {
-    if (ev.key === 'Enter' || ev.key === ' ') {
-      ev.preventDefault();
-      if (btn.disabled) return;
-      armGuide(root, btn, label);
-    }
-  });
-
-  // Acessibilidade
-  btn.setAttribute('role', 'button');
-  btn.setAttribute('tabindex', '0');
-  btn.setAttribute('aria-pressed', 'false');
-});
-
-// ===== CANCELA AO CLICAR FORA =====
-document.addEventListener('click', (e) => {
-  const inside = e.target.closest('.guia-option, #btn-confirmar-nome, #guiaNameInput, .guia-options');
-  if (!inside && armedId && cancelArm) {
-    cancelArm(root);
-  }
-}, { passive: true });
-
-console.log('[JCGuia] Eventos de botões e hover configurados');   
-
-  // ===== TEMA DINÂMICO DOS GUIAS (preview ao passar o mouse) =====
-function applyGuiaTheme(guiaIdOrNull) {
-  if (guiaIdOrNull) {
-    // aplica tema do guia passado
-    document.body.dataset.guia = guiaIdOrNull.toLowerCase();
-    return;
   }
 
-  // sem parâmetro: restaura o tema "oficial" (já escolhido ou nenhum)
-  const saved =
-    (window.JC && window.JC.data && window.JC.data.guia) ||
-    sessionStorage.getItem('jornada.guia') ||
-    '';
-
-  if (saved) {
-    document.body.dataset.guia = saved.toLowerCase();
-  } else {
-    // remove o data-guia → volta pro padrão dourado
-    delete document.body.dataset.guia;
-  }
-}
-  
   function onSectionShown(evt) {
     const { sectionId, node } = evt?.detail || {};
     if (sectionId !== SECTION_ID) return;
@@ -618,9 +589,9 @@ function applyGuiaTheme(guiaIdOrNull) {
     ? document.addEventListener('DOMContentLoaded', bind, { once: true })
     : bind();
 
-/* =========================================================
-   TEMA DO GUIA — reaplica em qualquer seção quando necessário
-   ========================================================= */
+  /* =========================================================
+     TEMA DO GUIA — reaplica em qualquer seção quando necessário
+     ========================================================= */
 
   function applyThemeFromSession() {
     const guiaRaw = sessionStorage.getItem('jornada.guia');
@@ -642,10 +613,8 @@ function applyGuiaTheme(guiaIdOrNull) {
     if (guia) document.body.setAttribute('data-guia', guia);
   }
 
-  // roda no carregamento e também quando o app troca seção
   document.addEventListener('DOMContentLoaded', applyThemeFromSession);
   document.addEventListener('sectionLoaded', () => setTimeout(applyThemeFromSession, 50));
   document.addEventListener('guia:changed', applyThemeFromSession);
-  })();
 
-
+})();
