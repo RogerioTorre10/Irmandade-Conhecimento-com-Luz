@@ -188,6 +188,7 @@ async function confirmGuide(guiaId) {
       console.warn('[AURA] Falha:', e);
       document.body.setAttribute('data-guia', guiaAtual);
     }
+    window.aplicarGuiaTheme = window.aplicarGuiaTheme || applyGuiaTheme;
 
     // Habilita botão avançar
     const btnAvancar = root.querySelector('#btn-avancar') || root.querySelector('[data-action="avancar"]');
@@ -608,17 +609,17 @@ function applyGuiaTheme(guiaIdOrNull) {
    GUIA – CONFIRMAR BLINDADO (anti-submit + stopImmediatePropagation + failsafe)
    ========================================================= */
 
-  const root = document.getElementById('section-guia');
-  if (!root) return;
+  const rootEl = document.getElementById('section-guia');
+  if (!rootEl) return;
 
   // trava para não bindar 2x
-  if (root.dataset.guiaBound === '1') return;
+  if (rootEl.dataset.guiaBound === '1') return;
   root.dataset.guiaBound = '1';
 
-  const input        = root.querySelector('#guiaNameInput');
-  const btnConfirm   = root.querySelector('#btn-confirmar-nome');
-  const guiaNotice   = root.querySelector('#guia-notice-text');
-  const guideButtons = Array.from(root.querySelectorAll('.guia-options button, .guia-buttons button, .btn-guia'));
+  const input        = rootEl.querySelector('#guiaNameInput');
+  const btnConfirm   = rootEl.querySelector('#btn-confirmar-nome');
+  const guiaNotice   = rootEl.querySelector('#guia-notice-text');
+  const guideButtons = Array.from(rootEl.querySelectorAll('.guia-options button, .guia-buttons button, .btn-guia'));
 
   if (!input || !btnConfirm || guideButtons.length === 0) return;
 
