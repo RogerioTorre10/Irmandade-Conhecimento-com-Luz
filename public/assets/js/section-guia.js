@@ -731,8 +731,7 @@ guideButtons.forEach(btn => {
     }
   }, true); // capture phase
 });    
-};
-})();
+
 console.log('[GUIA] Confirmar blindado + anti-trava real ativado');
 
 
