@@ -823,13 +823,20 @@ if (!recognition) {
   const log = (...a) => console.log('[PERGUNTAS:MIMOS]', ...a);
   const $   = (sel, root = document) => (root || document).querySelector(sel);
 
-  // ---- 1. Pegar elementos básicos uma vez ----
-  const rootSection    = $('#section-perguntas');
-  if (!rootSection) {
-    log('Seção #section-perguntas não encontrada – abortando patch.');
-    return;
-  }
+  // ----- 1. Pegar elementos básicos quando a seção existir -----
+function waitForPerguntasSection(cb) {
+  const el = $('#section-perguntas');
+  if (el) return cb(el);
 
+  // ainda não carregou (normal no boot) — tenta de novo sem gritar
+  setTimeout(() => waitForPerguntasSection(cb), 60);
+}
+
+waitForPerguntasSection((rootSection) => {
+  // Evita rodar duas vezes (agora por seção, não global)
+  if (rootSection.dataset.mimosPatched === '1') return;
+  rootSection.dataset.mimosPatched = '1';
+ 
   // topo: "1 de 5"
   const elBlocoIndicador = rootSection.querySelector('[data-perguntas-bloco-indicador], .perg-bloco-indicador');
 
