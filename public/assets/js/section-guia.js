@@ -609,134 +609,129 @@ function applyGuiaTheme(guiaIdOrNull) {
   document.addEventListener('sectionLoaded', () => setTimeout(applyThemeFromSession, 50));
   document.addEventListener('guia:changed', applyThemeFromSession);
   
-/* =========================================================
-   GUIA – CONFIRMAR BLINDADO (anti-submit + stopImmediatePropagation + failsafe)
-   ========================================================= */
+// ===== CONFIRMAR BLINDADO (anti-submit + stopImmediatePropagation + failsafe) =====
+const rootEl = document.getElementById('section-guia');
+if (!rootEl) return;
 
-  const rootEl = document.getElementById('section-guia');
-  if (!rootEl) return;
+// trava para não bindar 2x
+if (rootEl.dataset.guiaBound === '1') return;
+rootEl.dataset.guiaBound = '1';
 
-  // trava para não bindar 2x
-  if (rootEl.dataset.guiaBound === '1') return;
-  root.dataset.guiaBound = '1';
+const input = rootEl.querySelector('#guiaNameInput');
+const btnConfirm = rootEl.querySelector('#btn-confirmar-nome');
+const guiaNotice = rootEl.querySelector('#guia-notice-text');
+const guideButtons = Array.from(rootEl.querySelectorAll('.guia-options button, .guia-buttons button, .btn-guia'));
 
-  const input        = rootEl.querySelector('#guiaNameInput');
-  const btnConfirm   = rootEl.querySelector('#btn-confirmar-nome');
-  const guiaNotice   = rootEl.querySelector('#guia-notice-text');
-  const guideButtons = Array.from(rootEl.querySelectorAll('.guia-options button, .guia-buttons button, .btn-guia'));
+if (!input || !btnConfirm || guideButtons.length === 0) return;
 
-  if (!input || !btnConfirm || guideButtons.length === 0) return;
+// === MUITO IMPORTANTE: impedir SUBMIT ===
+btnConfirm.setAttribute('type', 'button');
+guideButtons.forEach(b => b.setAttribute('type', 'button'));
 
-  // === MUITO IMPORTANTE: impedir SUBMIT ===
-  btnConfirm.setAttribute('type', 'button');
-  guideButtons.forEach(b => b.setAttribute('type', 'button'));
+// Tema dourado inicial
+document.body.removeAttribute('data-guia');
+document.body.removeAttribute('data-guia-hover');
+document.documentElement.style.setProperty('--theme-main-color', '#d4af37');
+document.documentElement.style.setProperty('--progress-main', '#ffd700');
+document.documentElement.style.setProperty('--progress-glow-1', 'rgba(255,230,180,0.85)');
+document.documentElement.style.setProperty('--progress-glow-2', 'rgba(255,210,120,0.75)');
 
-  // Tema dourado inicial
-  document.body.removeAttribute('data-guia');
-  document.body.removeAttribute('data-guia-hover');
-  document.documentElement.style.setProperty('--theme-main-color', '#d4af37');
-  document.documentElement.style.setProperty('--progress-main', '#ffd700');
-  document.documentElement.style.setProperty('--progress-glow-1', 'rgba(255,230,180,0.85)');
-  document.documentElement.style.setProperty('--progress-glow-2', 'rgba(255,210,120,0.75)');
+// Estado inicial
+let unlocked = false;
 
-  // Estado inicial
-  let unlocked = false;
+function setNotice(msg) {
+  if (guiaNotice) guiaNotice.setAttribute('data-text', msg);
+}
 
-  function setNotice(msg) {
-    if (guiaNotice) guiaNotice.setAttribute('data-text', msg);
-  }
-
-  function lockGuides() {
-    guideButtons.forEach(b => {
-      b.disabled = true;
-      b.style.pointerEvents = 'none';
-    });
-  }
-
-  function unlockGuides() {
-    guideButtons.forEach(b => {
-      b.disabled = false;
-      b.style.pointerEvents = 'auto';
-    });
-    unlocked = true;
-    setNotice(`${(input.value || '').trim()}, agora escolha o guia que caminhará com você.`);
-  }
-
-  // Inicial: guias travados, confirmar travado
-  lockGuides();
-  btnConfirm.disabled = true;
-  setNotice('Digite seu nome para desbloquear a escolha do guia.');
-
-  // Habilita Confirmar ao digitar nome
-  input.addEventListener('input', () => {
-    btnConfirm.disabled = input.value.trim().length === 0;
+function lockGuides() {
+  guideButtons.forEach(b => {
+    b.disabled = true;
+    b.style.pointerEvents = 'none';
   });
+}
 
-  // FAILSAFE: se algo travar, destrava em 2s
-  function armFailsafe() {
-    setTimeout(() => {
-      if (!unlocked && input.value.trim()) {
-        console.warn('[GUIA] FAILSAFE destravando guias.');
-        btnConfirm.disabled = false;
-        unlockGuides();
-      }
-    }, 2000);
+function unlockGuides() {
+  guideButtons.forEach(b => {
+    b.disabled = false;
+    b.style.pointerEvents = 'auto';
+  });
+  unlocked = true;
+  setNotice(`${(input.value || '').trim()}, agora escolha o guia que caminhará com você.`);
+}
+
+// Inicial: guias travados, confirmar travado
+lockGuides();
+btnConfirm.disabled = true;
+setNotice('Digite seu nome para desbloquear a escolha do guia.');
+
+// Habilita Confirmar ao digitar nome
+input.addEventListener('input', () => {
+  btnConfirm.disabled = input.value.trim().length === 0;
+});
+
+// FAILSAFE: se algo travar, destrava em 2s
+function armFailsafe() {
+  setTimeout(() => {
+    if (!unlocked && input.value.trim()) {
+      console.warn('[GUIA] FAILSAFE destravando guias.');
+      btnConfirm.disabled = false;
+      unlockGuides();
+    }
+  }, 2000);
+}
+
+// === CONFIRMAR: CAPTURE + stopImmediatePropagation para bloquear handlers antigos ===
+btnConfirm.addEventListener('click', (ev) => {
+  ev.preventDefault();
+  ev.stopPropagation();
+  ev.stopImmediatePropagation(); // bloqueia handlers antigos
+
+  const nome = input.value.trim();
+  if (!nome) {
+    btnConfirm.disabled = true;
+    alert('Digite seu nome para prosseguir!');
+    input.focus();
+    return;
   }
 
-  // === CONFIRMAR: CAPTURE + stopImmediatePropagation para bloquear handlers antigos ===
-  btnConfirm.addEventListener('click', (ev) => {
+  sessionStorage.setItem('jornada.nome', nome);
+
+  // Destrava sem demo (zero risco)
+  unlockGuides();
+
+  // Failsafe extra
+  armFailsafe();
+}, true); // capture phase
+
+// Escolha do guia (blindado)
+guideButtons.forEach(btn => {
+  if (btn.__guiaBound) return;
+  btn.__guiaBound = true;
+
+  btn.addEventListener('click', (ev) => {
     ev.preventDefault();
     ev.stopPropagation();
-    ev.stopImmediatePropagation(); // <- isto é o que normalmente resolve a “inoperância”
+    ev.stopImmediatePropagation();
 
-    const nome = input.value.trim();
-    if (!nome) {
-      btnConfirm.disabled = true;
-      alert('Digite seu nome para prosseguir!');
-      input.focus();
-      return;
+    if (btn.disabled) return;
+
+    const guiaId = (btn.dataset.guia || btn.textContent || '').toLowerCase().trim();
+    if (!guiaId) return;
+
+    sessionStorage.setItem('jornada.guia', guiaId);
+
+    if (typeof aplicarGuiaTheme === 'function') {
+      aplicarGuiaTheme(guiaId);
+    } else {
+      document.body.setAttribute('data-guia', guiaId);
     }
 
-    sessionStorage.setItem('jornada.nome', nome);
-
-    // Destrava sem demo (zero risco)
-    unlockGuides();
-
-    // Failsafe extra (caso outro script trave depois)
-    armFailsafe();
-  }, true); // <- CAPTURE: pega antes de outros listeners
-
-  // Escolha do guia (também blindado)
-  guideButtons.forEach(btn => {
-    if (btn.__guiaBound) return;
-    btn.__guiaBound = true;
-
-    btn.addEventListener('click', (ev) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-      ev.stopImmediatePropagation();
-
-      if (btn.disabled) return;
-
-      const guiaId = (btn.dataset.guia || btn.textContent || '').toLowerCase().trim();
-      if (!guiaId) return;
-
-      sessionStorage.setItem('jornada.guia', guiaId);
-
-      if (typeof aplicarGuiaTheme === 'function') {
-        aplicarGuiaTheme(guiaId);
-      } else {
-        document.body.setAttribute('data-guia', guiaId);
-      }
-
-      if (typeof JC !== 'undefined' && JC && typeof JC.next === 'function') {
-        JC.next();
-      }
-    }, true);
-  });
-
-  console.log('[GUIA] Confirmar blindado + anti-trava real ativado');
-  
+    if (typeof JC !== 'undefined' && JC && typeof JC.next === 'function') {
+      JC.next();
+    }
+  }, true); // capture phase
 });
+
+console.log('[GUIA] Confirmar blindado + anti-trava real ativado');
 
 
