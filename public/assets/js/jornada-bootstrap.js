@@ -31,19 +31,33 @@
       console.error('[BOOT] Aborting: JC not available');
       return;
     }
-    console.log('[BOOT] JC disponível, iniciando...');
+   console.log('[BOOT] JC disponível, iniciando...');
 
-    window.JC.setOrder([
-      'section-intro',
-      'section-termos1',
-      'section-termos2',
-      'section-senha',
-      'section-guia',
-      'section-selfie',
-      'section-card',
-      'section-perguntas',
-      'section-final'
-    ]);
+// BOOT = iniciador oficial
+if (window.__JC_INITED__) {
+  console.log('[BOOT] __JC_INITED__ já true, não chamando JC.init novamente');
+} else {
+  window.__JC_INITED__ = true;
+  window.__JC_INIT_SOURCE__ = 'BOOT';
+
+  if (typeof window.JC.init === 'function') {
+    window.JC.init();
+    console.log('[BOOT] JC.init executado pelo BOOT');
+  }
+}
+
+window.JC.setOrder([
+  'section-intro',
+  'section-termos1',
+  'section-termos2',
+  'section-senha',
+  'section-guia',
+  'section-selfie',
+  'section-card',
+  'section-perguntas',
+  'section-final'
+]);
+
 
     console.log('[BOOT] Iniciando jornada com section-intro...');
     if (lastSection !== 'section-intro') {
