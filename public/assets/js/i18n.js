@@ -93,22 +93,29 @@ window.__I18N_DICT_CACHE__ = window.__I18N_DICT_CACHE__ || {};
 
 
 
-  async function init(lang) {
-    state.lang = lang || detectLang();
-    try {
-      state.dict = await loadDict(state.lang);
-      state.ready = true;
-      window.__I18N_READY_LOGGED__ = window.__I18N_READY_LOGGED__ || {};
-      const _readyKey = state.lang || lang || DEFAULT;
-   if (!window.__I18N_READY_LOGGED__[_readyKey]) {
+async function init(lang) {
+  state.lang = lang || detectLang();
+
+  try {
+    state.dict = await loadDict(state.lang);
+    state.ready = true;
+
+    // 🔒 Latch para log "Pronto para" (1x por idioma)
+    window.__I18N_READY_LOGGED__ = window.__I18N_READY_LOGGED__ || {};
+    const _readyKey = state.lang || lang || DEFAULT;
+
+    if (!window.__I18N_READY_LOGGED__[_readyKey]) {
       window.__I18N_READY_LOGGED__[_readyKey] = true;
       console.log('[i18n] Pronto para:', _readyKey);
-    } catch (e) {
-      console.error('[i18n] Erro no init:', e);
-      state.dict = {};
-      state.ready = true; // continua rodando mesmo sem dict
     }
+
+  } catch (e) {
+    console.error('[i18n] Erro no init:', e);
+    state.dict = {};
+    state.ready = true; // continua rodando mesmo sem dict
   }
+}
+
 
   function t(key, fallbackOrOpts) {
     if (!key) return '';
@@ -261,5 +268,5 @@ window.__I18N_DICT_CACHE__ = window.__I18N_DICT_CACHE__ || {};
       console.error('[i18n] Erro no autoinit/apply:', e);
     }
   }, { once: true });
-
+  
 })(window);
