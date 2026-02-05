@@ -25,12 +25,12 @@
     dict: {}
   };
 
-  // Singleton: evita i18n.js inicializar duas vezes
-if (window.__I18N_SINGLETON__) {
-  console.log('[i18n] Já carregado (singleton), ignorando segunda carga');
-  return;
-}
-window.__I18N_SINGLETON__ = true;
+   // Singleton: evita i18n.js inicializar duas vezes
+   // if (window.__I18N_SINGLETON__) {
+  //  console.log('[i18n] Já carregado (singleton), ignorando segunda carga');
+  // return;
+ //}
+ // window.__I18N_SINGLETON__ = true;
 
 // Cache GLOBAL (compartilhado mesmo se o script for carregado 2x por engano)
 window.__I18N_DICT_CACHE__ = window.__I18N_DICT_CACHE__ || {};
