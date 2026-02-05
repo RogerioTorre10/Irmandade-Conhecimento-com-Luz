@@ -139,20 +139,27 @@
         typeof window.JC?.init === 'function' &&
         typeof window.carregarEtapa === 'function';
 
-      if (ready) {
-        try {
-          // marca como iniciado ANTES de chamar (evita corrida)
-          window.__JC_INITED__ = true;
+     if (ready) {
 
-          window.JC.init();
-          console.log('[Init] JC.init executado (fallback HTML)');
-        } catch (e) {
-          // se falhou, libera a trava para permitir nova tentativa manual
-          window.__JC_INITED__ = false;
-          console.error('[Init] Erro no JC.init:', e);
-        }
-        return;
-      }
+  // Se o BOOT já iniciou oficialmente, não roda fallback
+  if (window.__JC_INITED__ && window.__JC_INIT_SOURCE__ === 'BOOT') {
+    console.log('[Init] BOOT já iniciou, cancelando fallback HTML');
+    return;
+  }
+
+  try {
+    // marca como iniciado ANTES de chamar (evita corrida)
+    window.__JC_INITED__ = true;
+    window.__JC_INIT_SOURCE__ = 'HTML';
+
+    window.JC.init();
+    console.log('[Init] JC.init executado (fallback HTML)');
+  } catch (e) {
+    window.__JC_INITED__ = false;
+    console.error('[Init] Erro no JC.init:', e);
+  }
+  return;
+}
 
       attempts++;
       if (attempts >= maxAttempts) {
