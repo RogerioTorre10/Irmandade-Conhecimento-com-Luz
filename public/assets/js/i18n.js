@@ -20,10 +20,12 @@
     null;
 
   const state = {
-    lang: DEFAULT,
-    ready: false,
-    dict: {}
+   lang: DEFAULT,
+   ready: false,
+   dict: {},
+   _langPromise: null
   };
+
 
    // Singleton: evita i18n.js inicializar duas vezes
    // if (window.__I18N_SINGLETON__) {
@@ -59,10 +61,9 @@ window.__I18N_DICT_CACHE__ = window.__I18N_DICT_CACHE__ || {};
   }
 
  async function loadDict(lang) {
-
-  // 🔒 Se já carregamos esse idioma nesta sessão, reutiliza
+  // ✅ Cache global pode guardar Promise (in-flight) ou objeto final
   if (DICT_CACHE[lang]) {
-    return DICT_CACHE[lang];
+    return await DICT_CACHE[lang];
   }
 
   const candidates = [
@@ -71,25 +72,25 @@ window.__I18N_DICT_CACHE__ = window.__I18N_DICT_CACHE__ || {};
     `/i18n/${lang}.json`
   ];
 
-  for (const url of candidates) {
-    try {
-      const res = await fetch(url, { cache: 'no-cache' });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-      const json = await res.json();
-      console.log('[i18n] Carregado:', url);
-
-      // guarda no cache
-      DICT_CACHE[lang] = json;
-      return json;
-
-    } catch (e) {
-      console.warn('[i18n] Falha ao carregar', url, e);
+  // ✅ guarda a promise já no começo (anti-concorrência)
+  DICT_CACHE[lang] = (async () => {
+    for (const url of candidates) {
+      try {
+        const res = await fetch(url, { cache: 'no-cache' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+        console.log('[i18n] Carregado:', url);
+        return json;
+      } catch (e) {
+        console.warn('[i18n] Falha ao carregar', url, e);
+      }
     }
-  }
+    throw new Error('Nenhum dicionário encontrado para ' + lang);
+  })();
 
-  throw new Error('Nenhum dicionário encontrado para ' + lang);
+  return await DICT_CACHE[lang];
 }
+
 
 
   async function init(lang) {
