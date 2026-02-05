@@ -114,23 +114,41 @@
   <script src="/assets/js/main.js" defer></script>
 
   
-  <!-- Inicialização -->
- <script>
+ <!-- Inicialização (fallback seguro; evita JC.init duplicado) -->
+<script>
+(function () {
+  // Se o BOOT já iniciou, não inicia de novo pelo HTML
+  if (window.__JC_INITED__) {
+    console.log('[Init] JC já iniciado (via BOOT), ignorando init do HTML');
+    return;
+  }
+
   window.addEventListener('load', () => {
     let attempts = 0;
     const maxAttempts = 80;
     const interval = 250;
 
     const check = () => {
+      // Se em algum momento o BOOT iniciar, respeita e para
+      if (window.__JC_INITED__) {
+        console.log('[Init] Detectado JC iniciado durante espera, abortando fallback HTML');
+        return;
+      }
+
       const ready =
         typeof window.JC?.init === 'function' &&
         typeof window.carregarEtapa === 'function';
 
       if (ready) {
         try {
+          // marca como iniciado ANTES de chamar (evita corrida)
+          window.__JC_INITED__ = true;
+
           window.JC.init();
-          console.log('[Init] JC.init executado');
+          console.log('[Init] JC.init executado (fallback HTML)');
         } catch (e) {
+          // se falhou, libera a trava para permitir nova tentativa manual
+          window.__JC_INITED__ = false;
           console.error('[Init] Erro no JC.init:', e);
         }
         return;
@@ -147,8 +165,8 @@
 
     check();
   });
+})();
 </script>
-
 
   <noscript>
     <p style="text-align:center; padding:12px">Ative o JavaScript para usar esta página.</p>
