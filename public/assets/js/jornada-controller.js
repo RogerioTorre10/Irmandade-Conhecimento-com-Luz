@@ -42,61 +42,74 @@
   })();
 
   async function applyTypingAndTTS(sectionId, root) {
-    console.log('[JC.applyTypingAndTTS] Iniciando para:', sectionId);
-    if (window.__JC_TYPED_ONCE[sectionId]) {
-      console.log('[JC.applyTypingAndTTS] Já aplicado, ignorando:', sectionId);
-      return;
-    }
-    window.__JC_TYPED_ONCE[sectionId] = true;
-    window.__JC_IS_TYPING = true;
+  console.log('[JC.applyTypingAndTTS] Iniciando para:', sectionId);
 
-    try {
-      // Espera bridge de typing/TTS
-      let attempts = 0;
-      while (
-        (!window.runTyping || (!window.typeAndSpeak && !window.EffectCoordinator?.speak)) &&
-        attempts < 80
-      ) {
-        await new Promise(r => setTimeout(r, 80));
-        attempts++;
-      }
+  // ✅ garante estrutura
+  window.__JC_TYPED_ONCE = window.__JC_TYPED_ONCE || {};
 
-      const typingElements = root?.querySelectorAll?.('[data-typing="true"]') || [];
-      if (!typingElements.length) {
-        console.warn('[JC.applyTypingAndTTS] Nenhum [data-typing] em:', sectionId);
-        return;
-      }
-
-      // Garante visibilidade
-      const sectionNode = root?.closest?.('section') || root;
-      if (sectionNode) {
-        sectionNode.classList.remove('hidden', 'section-hidden');
-        sectionNode.setAttribute('aria-hidden', 'false');
-        sectionNode.style.display = 'block';
-        sectionNode.style.visibility = 'visible';
-        sectionNode.style.opacity = '1';
-      }
-      await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-
-      for (const el of typingElements) {
-        const text = getText(el);
-        if (!text) continue;
-        el.dataset.text = text;
-        el.textContent = '';
-        if (typeof window.typeAndSpeak === 'function') {
-          await window.typeAndSpeak(el, text, 36);
-        } else if (typeof window.runTyping === 'function') {
-          await window.runTyping(el, text, () => {}, { speed: 36, cursor: true });
-        }
-      }
-      console.log('[JC.applyTypingAndTTS] Concluído para:', sectionId);
-    } catch (err) {
-      console.error('[JC.applyTypingAndTTS] Erro:', sectionId, err);
-      window.__JC_TYPED_ONCE[sectionId] = false; // permite retry futuro
-    } finally {
-      window.__JC_IS_TYPING = false;
-    }
+  // ✅ latch por seção
+  if (window.__JC_TYPED_ONCE[sectionId]) {
+    console.log('[JC.applyTypingAndTTS] Já aplicado, ignorando:', sectionId);
+    return;
   }
+
+  // só marca "em andamento" aqui (não como done)
+  window.__JC_IS_TYPING = true;
+
+  try {
+    // Espera bridge de typing/TTS
+    let attempts = 0;
+    while (
+      (!window.runTyping || (!window.typeAndSpeak && !window.EffectCoordinator?.speak)) &&
+      attempts < 80
+    ) {
+      await new Promise(r => setTimeout(r, 80));
+      attempts++;
+    }
+
+    const typingElements = root?.querySelectorAll?.('[data-typing="true"]') || [];
+    if (!typingElements.length) {
+      console.warn('[JC.applyTypingAndTTS] Nenhum [data-typing] em:', sectionId);
+      return; // ✅ não marca como done
+    }
+
+    // ✅ agora sim: marca como aplicado (porque tem o que processar)
+    window.__JC_TYPED_ONCE[sectionId] = true;
+
+    // Garante visibilidade
+    const sectionNode = root?.closest?.('section') || root;
+    if (sectionNode) {
+      sectionNode.classList.remove('hidden', 'section-hidden');
+      sectionNode.setAttribute('aria-hidden', 'false');
+      sectionNode.style.display = 'block';
+      sectionNode.style.visibility = 'visible';
+      sectionNode.style.opacity = '1';
+    }
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+    for (const el of typingElements) {
+      const text = getText(el);
+      if (!text) continue;
+      el.dataset.text = text;
+      el.textContent = '';
+
+      if (typeof window.typeAndSpeak === 'function') {
+        await window.typeAndSpeak(el, text, 36);
+      } else if (typeof window.runTyping === 'function') {
+        await window.runTyping(el, text, () => {}, { speed: 36, cursor: true });
+      }
+    }
+
+    console.log('[JC.applyTypingAndTTS] Concluído para:', sectionId);
+
+  } catch (err) {
+    console.error('[JC.applyTypingAndTTS] Erro:', sectionId, err);
+    // ✅ libera retry futuro em caso de falha real
+    window.__JC_TYPED_ONCE[sectionId] = false;
+  } finally {
+    window.__JC_IS_TYPING = false;
+  }
+}
 
   function attachButtonEvents(sectionId, root) {
     const buttons = root.querySelectorAll('[data-action]');
