@@ -24,7 +24,10 @@
     ready: false,
     dict: {}
   };
-
+  
+  // Cache em memória para evitar recarregar o mesmo JSON várias vezes
+  const DICT_CACHE = {};
+  
   function detectLang() {
     // Se já está travado, ignora tudo e usa o armazenado
     const locked = localStorage.getItem(LOCK_KEY) === '1';
@@ -45,24 +48,39 @@
     return DEFAULT;
   }
 
-  async function loadDict(lang) {
-    const candidates = [
-      `/assets/js/i18n/${lang}.json`,
-      `/assets/i18n/${lang}.json`,
-      `/i18n/${lang}.json`
-    ];
-    for (const url of candidates) {
-      try {
-        const res = await fetch(url, { cache: 'no-cache' });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        console.log('[i18n] Carregado:', url);
-        return await res.json();
-      } catch (e) {
-        console.warn('[i18n] Falha ao carregar', url, e);
-      }
-    }
-    throw new Error('Nenhum dicionário encontrado para ' + lang);
+ async function loadDict(lang) {
+
+  // 🔒 Se já carregamos esse idioma nesta sessão, reutiliza
+  if (DICT_CACHE[lang]) {
+    return DICT_CACHE[lang];
   }
+
+  const candidates = [
+    `/assets/js/i18n/${lang}.json`,
+    `/assets/i18n/${lang}.json`,
+    `/i18n/${lang}.json`
+  ];
+
+  for (const url of candidates) {
+    try {
+      const res = await fetch(url, { cache: 'no-cache' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      const json = await res.json();
+      console.log('[i18n] Carregado:', url);
+
+      // guarda no cache
+      DICT_CACHE[lang] = json;
+      return json;
+
+    } catch (e) {
+      console.warn('[i18n] Falha ao carregar', url, e);
+    }
+  }
+
+  throw new Error('Nenhum dicionário encontrado para ' + lang);
+}
+
 
   async function init(lang) {
     state.lang = lang || detectLang();
