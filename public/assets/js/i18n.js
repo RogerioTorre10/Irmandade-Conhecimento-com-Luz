@@ -24,9 +24,19 @@
     ready: false,
     dict: {}
   };
+
+  // Singleton: evita i18n.js inicializar duas vezes
+if (window.__I18N_SINGLETON__) {
+  console.log('[i18n] Já carregado (singleton), ignorando segunda carga');
+  return;
+}
+window.__I18N_SINGLETON__ = true;
+
+// Cache GLOBAL (compartilhado mesmo se o script for carregado 2x por engano)
+window.__I18N_DICT_CACHE__ = window.__I18N_DICT_CACHE__ || {};
   
   // Cache em memória para evitar recarregar o mesmo JSON várias vezes
-  const DICT_CACHE = {};
+  const DICT_CACHE = window.__I18N_DICT_CACHE__;
   
   function detectLang() {
     // Se já está travado, ignora tudo e usa o armazenado
@@ -120,7 +130,14 @@
 
   async function setLang(lang, lock = false) {
     if (!SUPPORTED.includes(lang)) lang = DEFAULT;
-
+    
+    lang = (lang || '').trim();
+    if (!lang) return;
+    if (state.ready && state.lang === lang) {
+   // já está nesse idioma e pronto
+   return;
+ }
+ 
     localStorage.setItem(STORAGE_KEY, lang);
     if (lock) {
       localStorage.setItem(LOCK_KEY, '1');
