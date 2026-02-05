@@ -330,13 +330,19 @@ async function applyGlobalI18n(node) {
       if (lang) await window.i18n.forceLang(lang, true);
       window.i18n.apply(node || document);
 
-      const targetName =
-        (node && node.nodeType === 9) ? 'document' : (node?.id || node?.tagName || 'unknown');
+     const targetName =
+  (node && node.nodeType === 9) ? 'document' : (node?.id || node?.tagName || 'unknown');
 
-      if (targetName !== 'unknown') {
-        console.log('[GlobalI18n] Aplicado em', targetName);
-      }
-    } catch (e) {
+if (targetName !== 'unknown') {
+  // ✅ latch do LOG por alvo + idioma (não mexe na lógica do apply)
+  window.__GLOBAL_I18N_LOG_ONCE__ = window.__GLOBAL_I18N_LOG_ONCE__ || {};
+  const logKey = `${lang || 'na'}::${targetName}`;
+
+  if (!window.__GLOBAL_I18N_LOG_ONCE__[logKey]) {
+    window.__GLOBAL_I18N_LOG_ONCE__[logKey] = true;
+    console.log('[GlobalI18n] Aplicado em', targetName);
+  }
+} catch (e) {
       console.warn('[GlobalI18n] Erro:', e);
     }
   }
