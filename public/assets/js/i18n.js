@@ -129,16 +129,21 @@ window.__I18N_DICT_CACHE__ = window.__I18N_DICT_CACHE__ || {};
     });
   }
 
-  async function setLang(lang, lock = false) {
-    if (!SUPPORTED.includes(lang)) lang = DEFAULT;
-    
-    lang = (lang || '').trim();
-    if (!lang) return;
-    if (state.ready && state.lang === lang) {
-   // já está nesse idioma e pronto
-   return;
- }
- 
+ async function setLang(lang, lock = false) {
+
+  // ✅ normaliza ANTES de qualquer coisa
+  lang = (lang || '').trim();
+  if (!lang) lang = DEFAULT;
+  if (!SUPPORTED.includes(lang)) lang = DEFAULT;
+
+  // ✅ se já existe uma troca de idioma em andamento, reaproveita a mesma Promise
+  if (state._langPromise) return state._langPromise;
+
+  state._langPromise = (async () => {
+
+    // ✅ se já está pronto e já é esse idioma, sai
+    if (state.ready && state.lang === lang) return;
+
     localStorage.setItem(STORAGE_KEY, lang);
     if (lock) {
       localStorage.setItem(LOCK_KEY, '1');
@@ -149,10 +154,18 @@ window.__I18N_DICT_CACHE__ = window.__I18N_DICT_CACHE__ || {};
     await init(lang);
     apply(document.body);
 
-    // Reforça atributos no html (útil para TTS, direction, etc.)
+    // reforça atributos no html (seo/direção/etc.)
     document.documentElement.setAttribute('lang', state.lang);
     document.documentElement.setAttribute('data-lang', state.lang);
+
+  })();
+
+  try {
+    return await state._langPromise;
+  } finally {
+    state._langPromise = null;
   }
+}
 
   async function forceLang(lang, persist = true) {
     return setLang(lang, persist);
