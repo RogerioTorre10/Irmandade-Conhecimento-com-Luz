@@ -347,9 +347,8 @@ async function applyGlobalI18n(node) {
     window.JCIntro.state.initialized = true;
     ensureVisible(root);
     await requireLanguageChoice(root);
-    await runTyping(root);
-    console.log('[JCIntro] pronto');
-  }
+    await runTyping(root);   
+  }  
   function onSectionShown(evt) {
     const { sectionId, node } = evt?.detail || {};
     applyGlobalI18n(node); // Aplica i18n em TODAS as seções
