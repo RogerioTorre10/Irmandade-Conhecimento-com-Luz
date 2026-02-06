@@ -341,8 +341,7 @@ if (targetName !== 'unknown') {
   if (!window.__GLOBAL_I18N_LOG_ONCE__[logKey]) {
     window.__GLOBAL_I18N_LOG_ONCE__[logKey] = true;
     console.log('[GlobalI18n] Aplicado em', targetName);
-  }
-} catch (e) {
+  } catch (e) {
       console.warn('[GlobalI18n] Erro:', e);
     }
   }
