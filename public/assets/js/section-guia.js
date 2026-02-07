@@ -236,7 +236,7 @@
       btn.type = 'button';
       btn.className = 'btn btn-stone-espinhos no-anim guia-option';
       btn.dataset.action = 'select-guia';
-      btn.dataset.guia = g.id;
+      btn.dataset.guia = String(g.id || '').trim().toLowerCase();
       btn.dataset.nome = g.nome;
       btn.setAttribute('aria-label', `Escolher o guia ${g.nome}`);
       btn.disabled = true;
