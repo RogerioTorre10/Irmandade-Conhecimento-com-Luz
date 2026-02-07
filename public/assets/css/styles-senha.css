@@ -203,66 +203,76 @@
 }
 
 /* =========================================================
-   SENHA — OLHO COLADO NA BORDA / ZERO BORDA VISÍVEL
+   SENHA — OLHO COLADO NA BORDA / ZERO BORDA VISÍVEL / INVISÍVEL TOTALMENTE
    ========================================================= */
 
-/* garante contexto */
+/* Container relativo obrigatório */
 .senha-input {
   position: relative !important;
+  display: block !important; /* garante que o input ocupe todo o espaço */
 }
 
-/* espaço mínimo interno só pro olho */
+/* Input: espaço EXATAMENTE para o olho (sem sobrepor texto) */
 #senha-input {
-  padding-right: 10px !important;
+  padding-right: 40px !important;   /* ← Aumentei para 40px → dá espaço pro olho sem encostar no texto */
+  box-sizing: border-box !important;
 }
 
-/* botão invisível total */
+/* Botão do olho: INVISÍVEL + COLADO NA DIREITA */
 .senha-input .btn.btn-toggle-senha {
   position: absolute !important;
-
-  /* 🔥 quase encostado na borda interna direita */
-  right: 2px !important;
   top: 50% !important;
+  right: 8px !important;            /* ← Ajuste fino: 8px ou 6px para colar mais (teste valores 4-10px) */
   transform: translateY(-50%) !important;
-
-  width: 8px !important;
-  height: 8px !important;
-
+  
+  /* Dimensões reais do ícone (não precisa ser quadrado pequeno) */
+  width: 28px !important;           /* ← Maior = mais fácil de clicar e visual melhor */
+  height: 28px !important;
   padding: 0 !important;
   margin: 0 !important;
-
-  /* mata QUALQUER borda/sombra/resíduo */
+  
+  /* Zera QUALQUER coisa que o navegador possa adicionar */
   background: transparent !important;
   background-image: none !important;
-  border: 0 !important;
+  border: none !important;          /* ← none em vez de 0 */
+  border-radius: 0 !important;
   box-shadow: none !important;
   outline: none !important;
-
   -webkit-appearance: none !important;
   appearance: none !important;
-
+  
+  /* Centraliza o ícone perfeitamente */
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-
+  
   cursor: pointer !important;
+  user-select: none !important;
+  pointer-events: auto !important;
+  
+  /* Remove qualquer transição/efeito que possa criar sombra */
+  transition: none !important;
 }
 
-/* remove estados visuais escondidos (mobile é o vilão aqui) */
+/* Estados: NADA visível! */
 .senha-input .btn.btn-toggle-senha:hover,
 .senha-input .btn.btn-toggle-senha:active,
 .senha-input .btn.btn-toggle-senha:focus,
-.senha-input .btn.btn-toggle-senha:focus-visible {
+.senha-input .btn.btn-toggle-senha:focus-visible,
+.senha-input .btn.btn-toggle-senha:focus-within {
   background: transparent !important;
-  border: 0 !important;
+  border: none !important;
   box-shadow: none !important;
   outline: none !important;
+  outline-offset: 0 !important;
 }
 
-/* ícone puro */
+/* Ícone puro (ajuste o tamanho e cor) */
 .senha-input .btn.btn-toggle-senha {
-  font-size: 17px !important;
+  font-size: 22px !important;       /* ← Tamanho bom: visível mas discreto */
+  color: #aaa !important;           /* Cor sutil, ajuste se quiser mais claro/escuro */
   line-height: 1 !important;
 }
+
 
 
