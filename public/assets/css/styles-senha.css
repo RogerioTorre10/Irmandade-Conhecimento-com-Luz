@@ -203,41 +203,39 @@
 }
 
 /* =========================================================
-   FIX: OLHO DA SENHA como ícone dentro do input (sem botão)
-   Cole no FINAL do CSS da página senha
+   SENHA — OLHO INVISÍVEL (somente ícone visível)
    ========================================================= */
 
-/* o wrapper do input precisa ser "relative" */
+/* wrapper garante posicionamento */
 .senha-input {
   position: relative !important;
 }
 
-/* abre espaço pro olho dentro do input */
+/* espaço interno pro olho */
 #senha-input {
-  padding-right: 56px !important;
+  padding-right: 52px !important;
 }
 
-/* reset total do botão do olho (mata aparência de botão no mobile) */
+/* botão totalmente invisível */
 .senha-input .btn.btn-toggle-senha {
   position: absolute !important;
-  right: 10px !important;
+  right: 12px !important;
   top: 50% !important;
   transform: translateY(-50%) !important;
 
-  width: 36px !important;
-  height: 36px !important;
+  width: 32px !important;
+  height: 32px !important;
 
   padding: 0 !important;
   margin: 0 !important;
 
-  /* remove “botão aparente” */
+  /* INVISÍVEL */
   background: transparent !important;
   background-image: none !important;
-  border: 0 !important;
-  border-radius: 999px !important;
+  border: none !important;
   box-shadow: none !important;
+  outline: none !important;
 
-  /* remove estilo nativo mobile */
   -webkit-appearance: none !important;
   appearance: none !important;
 
@@ -245,20 +243,22 @@
   align-items: center !important;
   justify-content: center !important;
 
-  color: var(--fg, #fff) !important;
-  font-size: 18px !important;
-  line-height: 1 !important;
-
   cursor: pointer !important;
 }
 
-/* sem “fundo” ao clicar */
-.senha-input .btn.btn-toggle-senha:active {
+/* remove qualquer efeito no toque */
+.senha-input .btn.btn-toggle-senha:hover,
+.senha-input .btn.btn-toggle-senha:active,
+.senha-input .btn.btn-toggle-senha:focus,
+.senha-input .btn.btn-toggle-senha:focus-visible {
   background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
 }
 
-/* foco acessível sem estragar layout */
-.senha-input .btn.btn-toggle-senha:focus-visible {
-  outline: 2px solid rgba(255, 215, 0, 0.55) !important;
-  outline-offset: 2px !important;
+/* o ícone (emoji 👁) */
+.senha-input .btn.btn-toggle-senha {
+  font-size: 18px !important;
+  line-height: 1 !important;
 }
+
