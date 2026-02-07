@@ -407,6 +407,9 @@ body[data-guia-hover="arian"] {
   border-color: var(--progress-main, #ffd700) !important;
   box-shadow: 0 0 14px var(--progress-main, #ffd700) !important;
 }
+
+
+
 /* ===========================
    GUIA — Preview cinematográfico (hover)
    =========================== */
@@ -442,6 +445,11 @@ body[data-guia-hover="arian"] {
   transform: translateZ(0);
   opacity: 0.98;
 }
+
+/* ===========================
+   
+   =========================== */
+
 
 /* em desktop pode ser um pouco maior */
 @media (min-width: 900px){
