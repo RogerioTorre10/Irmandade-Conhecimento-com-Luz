@@ -203,36 +203,38 @@
 }
 
 /* =========================================================
-   SENHA — OLHO INVISÍVEL (somente ícone visível)
+   SENHA — OLHO COLADO NA BORDA / ZERO BORDA VISÍVEL
    ========================================================= */
 
-/* wrapper garante posicionamento */
+/* garante contexto */
 .senha-input {
   position: relative !important;
 }
 
-/* espaço interno pro olho */
+/* espaço mínimo interno só pro olho */
 #senha-input {
-  padding-right: 52px !important;
+  padding-right: 44px !important;
 }
 
-/* botão totalmente invisível */
+/* botão invisível total */
 .senha-input .btn.btn-toggle-senha {
   position: absolute !important;
-  right: 12px !important;
+
+  /* 🔥 quase encostado na borda interna direita */
+  right: 6px !important;
   top: 50% !important;
   transform: translateY(-50%) !important;
 
-  width: 32px !important;
-  height: 32px !important;
+  width: 28px !important;
+  height: 28px !important;
 
   padding: 0 !important;
   margin: 0 !important;
 
-  /* INVISÍVEL */
+  /* mata QUALQUER borda/sombra/resíduo */
   background: transparent !important;
   background-image: none !important;
-  border: none !important;
+  border: 0 !important;
   box-shadow: none !important;
   outline: none !important;
 
@@ -246,19 +248,21 @@
   cursor: pointer !important;
 }
 
-/* remove qualquer efeito no toque */
+/* remove estados visuais escondidos (mobile é o vilão aqui) */
 .senha-input .btn.btn-toggle-senha:hover,
 .senha-input .btn.btn-toggle-senha:active,
 .senha-input .btn.btn-toggle-senha:focus,
 .senha-input .btn.btn-toggle-senha:focus-visible {
   background: transparent !important;
+  border: 0 !important;
   box-shadow: none !important;
   outline: none !important;
 }
 
-/* o ícone (emoji 👁) */
+/* ícone puro */
 .senha-input .btn.btn-toggle-senha {
-  font-size: 18px !important;
+  font-size: 17px !important;
   line-height: 1 !important;
 }
+
 
