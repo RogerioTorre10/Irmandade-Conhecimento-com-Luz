@@ -407,6 +407,48 @@ body[data-guia-hover="arian"] {
   border-color: var(--progress-main, #ffd700) !important;
   box-shadow: 0 0 14px var(--progress-main, #ffd700) !important;
 }
+/* ===========================
+   GUIA — Preview cinematográfico (hover)
+   =========================== */
+
+.guia-preview-overlay{
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+
+  /* fundo escuro com leve aura */
+  background: radial-gradient(ellipse at center,
+    rgba(0,0,0,0.35) 0%,
+    rgba(0,0,0,0.75) 55%,
+    rgba(0,0,0,0.92) 100%);
+
+  pointer-events: none; /* não atrapalha clique no guia */
+}
+
+.guia-preview-overlay.is-on{
+  display: flex;
+}
+
+.guia-preview-video{
+  width: min(420px, 86vw);
+  height: auto;
+  border-radius: 18px;
+
+  /* “cinema” leve, sem borda */
+  box-shadow: 0 10px 30px rgba(0,0,0,0.55);
+  transform: translateZ(0);
+  opacity: 0.98;
+}
+
+/* em desktop pode ser um pouco maior */
+@media (min-width: 900px){
+  .guia-preview-video{
+    width: min(520px, 32vw);
+  }
+}
 
 /* 4) Responsivo: reduz “vazamento” no mobile para não cortar clique nem estourar layout */
 @media (max-width: 600px) {
