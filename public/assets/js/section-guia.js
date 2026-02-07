@@ -617,4 +617,162 @@
   document.addEventListener('sectionLoaded', () => setTimeout(applyThemeFromSession, 50));
   document.addEventListener('guia:changed', applyThemeFromSession);
 
+  /* =========================================================
+   GUIA — Preview (10s) ao hover antes da transição p/ selfie
+   ========================================================= */
+(function GuiaPreview10s(){
+  const overlay = document.getElementById('guiaPreviewOverlay');
+  const video   = document.getElementById('guiaPreviewVideo');
+  if (!overlay || !video) return;
+
+  // >>> AJUSTE OS CAMINHOS DOS VÍDEOS AQUI <<<
+  const PREVIEW_SRC = {
+    zion:  '/assets/video/preview-zion-10s.mp4',
+    lumen: '/assets/video/preview-lumen-10s.mp4',
+    arian: '/assets/video/preview-arian-10s.mp4',
+  };
+
+  // Seletores dos botões do guia
+  const buttons = Array.from(document.querySelectorAll(
+    'button[data-guia], .btn-guia[data-guia], button[data-guide], .btn-guia[data-guide]'
+  ));
+
+  if (!buttons.length) return;
+
+  let playing = false;
+  let currentGuide = null;
+  let stopTimer = null;
+  let lastPlayedAt = { zion: 0, lumen: 0, arian: 0 };
+
+  function getGuideFromBtn(btn){
+    return (btn.getAttribute('data-guia') || btn.getAttribute('data-guide') || '').trim().toLowerCase();
+  }
+
+  function show(){
+    overlay.classList.add('is-on');
+  }
+  function hide(){
+    overlay.classList.remove('is-on');
+  }
+
+  async function playPreview(guide, {force=false} = {}){
+    if (!PREVIEW_SRC[guide]) return false;
+
+    // evita “spam”: se já tocou nos últimos 8s, não repete
+    const now = Date.now();
+    if (!force && (now - (lastPlayedAt[guide] || 0) < 8000)) return false;
+
+    // se já está tocando outro, para
+    stopPreview();
+
+    playing = true;
+    currentGuide = guide;
+    lastPlayedAt[guide] = now;
+
+    // configura vídeo
+    video.muted = true;
+    video.playsInline = true;
+    video.src = PREVIEW_SRC[guide];
+
+    show();
+
+    // fallback hard-stop em 10.2s (mesmo se o ended não disparar)
+    stopTimer = setTimeout(() => stopPreview(), 10200);
+
+    try {
+      // tenta tocar
+      await video.play();
+    } catch (e) {
+      // se o browser bloquear autoplay (raro em hover desktop), só não mostra
+      stopPreview();
+      return false;
+    }
+
+    // espera terminar (ou stopPreview ser chamado)
+    await new Promise((resolve) => {
+      const onEnd = () => { cleanup(); resolve(true); };
+      const onErr = () => { cleanup(); resolve(false); };
+
+      function cleanup(){
+        video.removeEventListener('ended', onEnd);
+        video.removeEventListener('error', onErr);
+      }
+
+      video.addEventListener('ended', onEnd, { once:true });
+      video.addEventListener('error', onErr, { once:true });
+    });
+
+    return true;
+  }
+
+  function stopPreview(){
+    if (stopTimer) { clearTimeout(stopTimer); stopTimer = null; }
+    if (!playing) { hide(); return; }
+
+    playing = false;
+    currentGuide = null;
+
+    try { video.pause(); } catch(e){}
+    try { video.currentTime = 0; } catch(e){}
+    hide();
+  }
+
+  // HOVER: toca preview e para ao sair
+  buttons.forEach(btn => {
+    const g = getGuideFromBtn(btn);
+    if (!g) return;
+
+    btn.addEventListener('mouseenter', () => playPreview(g));
+    btn.addEventListener('mouseleave', () => stopPreview());
+
+    // acessibilidade: teclado
+    btn.addEventListener('focusin', () => playPreview(g));
+    btn.addEventListener('focusout', () => stopPreview());
+
+    // Mobile: touchstart tenta dar um preview rápido (não atrapalha clique)
+    btn.addEventListener('touchstart', () => playPreview(g, {force:true}), { passive:true });
+
+    // CLICK: garante preview antes do vídeo de transição
+    btn.addEventListener('click', async (ev) => {
+      const guide = getGuideFromBtn(btn);
+      if (!guide) return;
+
+      // Se o preview está tocando, espera acabar (ou no máximo 10s)
+      if (playing && currentGuide === guide) {
+        ev.preventDefault();
+        ev.stopPropagation();
+
+        // espera o preview terminar “naturalmente”
+        // (stopTimer já garante limite)
+        await new Promise(r => setTimeout(r, 250)); // micro delay pra estabilizar
+        // aguarda até o overlay sumir
+        await new Promise((resolve) => {
+          const t0 = Date.now();
+          const iv = setInterval(() => {
+            if (!overlay.classList.contains('is-on') || (Date.now()-t0)>11000) {
+              clearInterval(iv);
+              resolve();
+            }
+          }, 60);
+        });
+
+        // agora deixa o fluxo normal de clique acontecer:
+        // simula o clique original sem cair em loop
+        stopPreview();
+        btn.click();
+      } else {
+        // se não tocou preview, toca agora rapidinho ANTES da transição (forçado)
+        // opcional: se você quiser que SEMPRE toque antes, descomente abaixo:
+        // ev.preventDefault(); ev.stopPropagation();
+        // await playPreview(guide, {force:true});
+        // stopPreview();
+        // btn.click();
+      }
+    }, true); // captura para interceptar antes do handler que inicia a transição
+  });
+
+  // segurança: se trocar de seção, fecha
+  window.addEventListener('jc:section:leave', stopPreview);
+})();
+  
 })();
