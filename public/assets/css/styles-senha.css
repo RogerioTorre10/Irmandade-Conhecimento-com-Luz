@@ -202,68 +202,68 @@
   max-width: 100%;
 }
 
-/* =========================================================
-   SENHA — OLHO COLADO NA BORDA / ZERO BORDA VISÍVEL / INVISÍVEL TOTALMENTE
-   ========================================================= */
-
-/* Container */
-.senha-input {
-  position: relative !important;
-  display: inline-block !important; /* ou block, dependendo do layout */
-  width: 100% !important;
+/* Container relativo */
+.senha-wrapper {
+  position: relative;
+  display: block;
+  width: 100%;
 }
 
-/* Input: espaço PRECISO pro olho (ajuste fino) */
+/* O input */
 #senha-input {
-  padding-right: 48px !important;   /* ← Aumente se o texto encostar no olho; teste 44px–52px */
-  box-sizing: border-box !important;
-  border-radius: 8px !important;    /* ajuste conforme seu tema */
+  width: 100%;
+  padding: 12px 48px 12px 16px !important;   /* espaço à direita para o olho */
+  box-sizing: border-box;
+  border: 2px solid #d4a017;                 /* ajuste conforme seu tema */
+  border-radius: 8px;
+  background: #111;
+  color: #eee;
+  font-size: 18px;
 }
 
-/* Botão do olho: colado na direita, sem largura extra */
-.senha-input .btn.btn-toggle-senha {
-  position: absolute !important;
-  top: 50% !important;
-  right: 0px !important;            /* ← ZERO ou 1-2px para colar TOTALMENTE */
-  transform: translateY(-50%) !important;
+/* O ícone – agora é um span simples */
+.toggle-senha {
+  position: absolute;
+  top: 50%;
+  right: 12px;                          /* ajuste fino: 8px–14px até colar na borda interna */
+  transform: translateY(-50%);
   
-  width: 32px !important;           /* ← Largura menor que antes, mas confortável para clique */
-  height: 100% !important;          /* ← Altura total do input = centraliza perfeitamente */
-  min-height: 40px !important;      /* garante visibilidade em inputs pequenos */
+  font-size: 22px;                      /* tamanho confortável */
+  color: #aaa;                          /* cor sutil – ajuste se quiser mais visível */
+  cursor: pointer;
+  user-select: none;
   
+  /* Remove QUALQUER coisa que pareça botão ou tenha borda */
+  background: none !important;
+  border: none !important;
   padding: 0 !important;
   margin: 0 !important;
-  
-  background: transparent !important;
-  border: none !important;
-  border-radius: 0 !important;      /* sem bordas arredondadas no botão */
   box-shadow: none !important;
   outline: none !important;
   -webkit-appearance: none !important;
   appearance: none !important;
-  
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  
-  cursor: pointer !important;
 }
 
-/* Estados: absolutamente nada visível */
-.senha-input .btn.btn-toggle-senha:hover,
-.senha-input .btn.btn-toggle-senha:active,
-.senha-input .btn.btn-toggle-senha:focus,
-.senha-input .btn.btn-toggle-senha:focus-visible {
-  background: transparent !important;
+/* Garante que não apareça nada em hover/focus */
+.toggle-senha:hover,
+.toggle-senha:active,
+.toggle-senha:focus,
+.toggle-senha:focus-visible {
+  background: none !important;
   box-shadow: none !important;
   outline: none !important;
 }
 
-/* Ícone: tamanho bom e cor sutil */
-.senha-input .btn.btn-toggle-senha {
-  font-size: 24px !important;       /* ← Ajuste se o olho parecer pequeno/grande demais */
-  color: transparent !important;        /* tom dourado/âmbar para combinar com o tema */
-  line-height: 1 !important;
+/* Remove o botão de revelar senha nativo do navegador (principal culpado em muitos casos) */
+#senha-input::-ms-reveal,
+#senha-input::-ms-clear,
+#senha-input::-webkit-textfield-decoration-container,
+#senha-input::-webkit-inner-spin-button,
+#senha-input::-webkit-outer-spin-button,
+#senha-input::-webkit-contacts-auto-fill-button {
+  display: none !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
 }
-
 
