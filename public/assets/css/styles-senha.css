@@ -201,3 +201,64 @@
   width: 100%;
   max-width: 100%;
 }
+
+/* =========================================================
+   FIX: OLHO DA SENHA como ícone dentro do input (sem botão)
+   Cole no FINAL do CSS da página senha
+   ========================================================= */
+
+/* o wrapper do input precisa ser "relative" */
+.senha-input {
+  position: relative !important;
+}
+
+/* abre espaço pro olho dentro do input */
+#senha-input {
+  padding-right: 56px !important;
+}
+
+/* reset total do botão do olho (mata aparência de botão no mobile) */
+.senha-input .btn.btn-toggle-senha {
+  position: absolute !important;
+  right: 10px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+
+  width: 36px !important;
+  height: 36px !important;
+
+  padding: 0 !important;
+  margin: 0 !important;
+
+  /* remove “botão aparente” */
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  box-shadow: none !important;
+
+  /* remove estilo nativo mobile */
+  -webkit-appearance: none !important;
+  appearance: none !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  color: var(--fg, #fff) !important;
+  font-size: 18px !important;
+  line-height: 1 !important;
+
+  cursor: pointer !important;
+}
+
+/* sem “fundo” ao clicar */
+.senha-input .btn.btn-toggle-senha:active {
+  background: transparent !important;
+}
+
+/* foco acessível sem estragar layout */
+.senha-input .btn.btn-toggle-senha:focus-visible {
+  outline: 2px solid rgba(255, 215, 0, 0.55) !important;
+  outline-offset: 2px !important;
+}
