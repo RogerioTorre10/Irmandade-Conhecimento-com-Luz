@@ -206,73 +206,64 @@
    SENHA — OLHO COLADO NA BORDA / ZERO BORDA VISÍVEL / INVISÍVEL TOTALMENTE
    ========================================================= */
 
-/* Container relativo obrigatório */
+/* Container */
 .senha-input {
   position: relative !important;
-  display: block !important; /* garante que o input ocupe todo o espaço */
+  display: inline-block !important; /* ou block, dependendo do layout */
+  width: 100% !important;
 }
 
-/* Input: espaço EXATAMENTE para o olho (sem sobrepor texto) */
+/* Input: espaço PRECISO pro olho (ajuste fino) */
 #senha-input {
-  padding-right: 40px !important;   /* ← Aumentei para 40px → dá espaço pro olho sem encostar no texto */
+  padding-right: 48px !important;   /* ← Aumente se o texto encostar no olho; teste 44px–52px */
   box-sizing: border-box !important;
+  border-radius: 8px !important;    /* ajuste conforme seu tema */
 }
 
-/* Botão do olho: INVISÍVEL + COLADO NA DIREITA */
+/* Botão do olho: colado na direita, sem largura extra */
 .senha-input .btn.btn-toggle-senha {
   position: absolute !important;
   top: 50% !important;
-  right: 8px !important;            /* ← Ajuste fino: 8px ou 6px para colar mais (teste valores 4-10px) */
+  right: 0px !important;            /* ← ZERO ou 1-2px para colar TOTALMENTE */
   transform: translateY(-50%) !important;
   
-  /* Dimensões reais do ícone (não precisa ser quadrado pequeno) */
-  width: 28px !important;           /* ← Maior = mais fácil de clicar e visual melhor */
-  height: 28px !important;
+  width: 32px !important;           /* ← Largura menor que antes, mas confortável para clique */
+  height: 100% !important;          /* ← Altura total do input = centraliza perfeitamente */
+  min-height: 40px !important;      /* garante visibilidade em inputs pequenos */
+  
   padding: 0 !important;
   margin: 0 !important;
   
-  /* Zera QUALQUER coisa que o navegador possa adicionar */
   background: transparent !important;
-  background-image: none !important;
-  border: none !important;          /* ← none em vez de 0 */
-  border-radius: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;      /* sem bordas arredondadas no botão */
   box-shadow: none !important;
   outline: none !important;
   -webkit-appearance: none !important;
   appearance: none !important;
   
-  /* Centraliza o ícone perfeitamente */
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   
   cursor: pointer !important;
-  user-select: none !important;
-  pointer-events: auto !important;
-  
-  /* Remove qualquer transição/efeito que possa criar sombra */
-  transition: none !important;
 }
 
-/* Estados: NADA visível! */
+/* Estados: absolutamente nada visível */
 .senha-input .btn.btn-toggle-senha:hover,
 .senha-input .btn.btn-toggle-senha:active,
 .senha-input .btn.btn-toggle-senha:focus,
-.senha-input .btn.btn-toggle-senha:focus-visible,
-.senha-input .btn.btn-toggle-senha:focus-within {
+.senha-input .btn.btn-toggle-senha:focus-visible {
   background: transparent !important;
-  border: none !important;
   box-shadow: none !important;
   outline: none !important;
-  outline-offset: 0 !important;
 }
 
-/* Ícone puro (ajuste o tamanho e cor) */
+/* Ícone: tamanho bom e cor sutil */
 .senha-input .btn.btn-toggle-senha {
-  font-size: 22px !important;       /* ← Tamanho bom: visível mas discreto */
-  color: #aaa !important;           /* Cor sutil, ajuste se quiser mais claro/escuro */
+  font-size: 24px !important;       /* ← Ajuste se o olho parecer pequeno/grande demais */
+  color: #d4a017 !important;        /* tom dourado/âmbar para combinar com o tema */
   line-height: 1 !important;
 }
-
 
 
