@@ -446,6 +446,20 @@ body[data-guia-hover="arian"] {
   opacity: 0.98;
 }
 
+/* Botão travado: ainda responde hover, mas parece bloqueado */
+.guia-option.is-locked,
+button.guia-option.is-locked,
+.btn.guia-option.is-locked,
+.btn.btn-stone-espinhos.guia-option.is-locked {
+  opacity: 0.85;
+}
+
+/* cursor e feedback */
+button[data-guia].is-locked {
+  cursor: pointer; /* mantém hover funcionando */
+}
+
+
 /* ===========================
    
    =========================== */
