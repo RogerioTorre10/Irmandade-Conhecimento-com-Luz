@@ -542,7 +542,7 @@
         btn.addEventListener('click', (ev) => {
           ev.preventDefault();
           ev.stopPropagation();
-          if (btn.disabled) return;
+          if (btn.dataset.locked === '1') return;
           armGuide(root, btn, label);
         });
 
@@ -550,7 +550,7 @@
         btn.addEventListener('dblclick', (ev) => {
           ev.preventDefault();
           ev.stopPropagation();
-          if (btn.disabled) return;
+         if (btn.dataset.locked === '1') return;
           confirmGuide(guiaId);
           if (cancelArm) cancelArm(root);
         });
@@ -559,7 +559,7 @@
         btn.addEventListener('keydown', (ev) => {
           if (ev.key === 'Enter' || ev.key === ' ') {
             ev.preventDefault();
-            if (btn.disabled) return;
+            if (btn.dataset.locked === '1') return;
             armGuide(root, btn, label);
           }
         });
