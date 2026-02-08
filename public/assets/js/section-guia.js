@@ -502,7 +502,8 @@
 
         // Hover: preview descrição + tema
         btn.addEventListener('mouseenter', () => {
-          if (btn.disabled || !guiaId) return;
+        if (!guiaId) return; // hover pode rodar mesmo locked
+
 
           if (hoverTimers.has(guiaId)) clearTimeout(hoverTimers.get(guiaId));
 
