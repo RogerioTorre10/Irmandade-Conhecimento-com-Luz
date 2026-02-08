@@ -409,7 +409,17 @@
     }
 
     guideButtons = qa('button[data-action="select-guia"]', els.optionsBox);
-    guideButtons.forEach(b => { b.disabled = true; b.style.opacity = '0.6'; b.style.cursor = 'not-allowed'; });
+    guideButtons.forEach(b => {
+    b.dataset.locked = '1';
+    b.setAttribute('aria-disabled', 'true');
+    b.classList.add('is-locked');
+
+    // visual de bloqueado (mas mantendo hover)
+    b.style.opacity = '0.6';
+    b.style.cursor = 'pointer';
+    b.style.pointerEvents = 'auto';
+    });
+
 
     // ===== CONFIRMAR NOME (SALVA NOME AQUI) =====
     let __NAME_CONFIRMED__ = false;
