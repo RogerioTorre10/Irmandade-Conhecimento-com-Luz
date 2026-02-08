@@ -478,13 +478,15 @@
           }
         }
 
-        // === HABILITA BOTÕES (SEMPRE) ===
         guideButtons.forEach(b => {
-          b.disabled = false;
-          b.style.opacity = '1';
-          b.style.cursor = 'pointer';
-          b.style.pointerEvents = 'auto';
-        });
+        b.dataset.locked = '0';
+        b.removeAttribute('aria-disabled');
+        b.classList.remove('is-locked');
+
+        b.style.opacity = '1';
+        b.style.cursor = 'pointer';
+        b.style.pointerEvents = 'auto';
+       });
 
         hideNotice(root);
       });
