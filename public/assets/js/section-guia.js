@@ -529,14 +529,13 @@
         });
 
         btn.addEventListener('focus', () => {
-          if (!btn.disabled) {
-            const g = findGuia(guias, guiaId);
-            if (g && els.guiaTexto) {
-              els.guiaTexto.dataset.spoken = '';
-              typeOnce(els.guiaTexto, g.descricao, { speed: 34, speak: true });
-            }
-          }
-        });
+        const g = findGuia(guias, guiaId);
+        if (g && els.guiaTexto) {
+        els.guiaTexto.dataset.spoken = '';
+        typeOnce(els.guiaTexto, g.descricao, { speed: 34, speak: true });
+        }
+      });
+
 
         // Clique simples: armar
         btn.addEventListener('click', (ev) => {
