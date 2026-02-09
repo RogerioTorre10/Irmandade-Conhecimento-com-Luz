@@ -658,9 +658,9 @@
   if (!section || !options || !overlay || !video) return;
 
   const PREVIEW_SRC = {
-    zion:  encodeURI('/assets/videos/Zion escolhido.mp4'),
-    lumen: encodeURI('/assets/videos/Lumen escolhida.mp4'),
-    arian: encodeURI('/assets/videos/Arian escolhida.mp4'),
+    zion:  encodeURI('/assets/videos/Zion-escolhido.mp4'),
+    lumen: encodeURI('/assets/videos/Lumen-escolhida.mp4'),
+    arian: encodeURI('/assets/videos/Arian-escolhida.mp4'),
   };
 
   const DEBUG = !!window.JC_DEBUG;
@@ -709,14 +709,14 @@
   show();
   stopTimer = setTimeout(() => stopPreview(), 10200);
 
-  try {
-    await video.play();
-    log('preview play:', src);
-  } catch (e) {
-    stopPreview();
-    return false;
-  }
-
+ try {
+  await video.play();
+  log('preview play OK:', src);
+} catch (e) {
+  console.warn('[PREVIEW] play() falhou:', e?.name, e?.message, 'src=', src);
+  stopPreview();
+  return false;
+}
   return true;
 }
 
