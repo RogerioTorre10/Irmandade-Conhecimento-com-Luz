@@ -321,31 +321,17 @@ input[type=range]::-webkit-slider-thumb {
   }
 }
 
-/* =========================================
-   DIAMANTE: para de piscar a scrollbar (desktop zoom)
-   ========================================= */
-
-html {
-  overflow-x: clip;   /* mantém teu eixo X blindado */
-  overflow-y: auto;
+/* =========================================================
+   DIAMANTE: esconder scrollbar SÓ na selfie (sem matar o scroll)
+   ========================================================= */
+body.no-selfie-scrollbar {
+  scrollbar-width: none;            /* Firefox */
+  -ms-overflow-style: none;         /* IE/Edge antigo */
 }
 
-body {
-  overflow-x: clip;
-  overflow-y: auto;
-
-  /* Reserva o espaço da scrollbar SEM ficar ligando/desligando */
-  scrollbar-gutter: stable both-edges;
-}
-
-/* Fallback: browsers sem scrollbar-gutter → barra sempre presente */
-@supports not (scrollbar-gutter: stable) {
-  html, body { overflow-y: scroll; }
-}
-
-/* Fallback do clip */
-@supports not (overflow-x: clip) {
-  html, body { overflow-x: hidden; }
+body.no-selfie-scrollbar::-webkit-scrollbar {
+  width: 0 !important;              /* Chrome/Safari */
+  height: 0 !important;
 }
 
 
