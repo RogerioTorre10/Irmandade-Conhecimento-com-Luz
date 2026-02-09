@@ -195,7 +195,7 @@
   #section-termos1 {
     padding: 8px 0 140px !important;  /* distância do topo + espaço pro botão */
     overflow: hidden !important;
-    min-height: 100vh !important;
+    min-height: 100dvh !important;
   }
 
   /* Painel de vidro dentro do pergaminho */
@@ -335,7 +335,7 @@
     #section-termos2 {
     padding: 8px 0 140px !important;  /* distância do topo + espaço pro botão */
     overflow: hidden !important;
-    min-height: 100vh !important;
+    min-height: 100dvh !important;
   }
 
   /* Painel de vidro dentro do pergaminho */
@@ -514,7 +514,7 @@
  /* Seção senha: ocupa a tela com respiro */
   #section-senha {
     padding: 8px 0 140px !important;
-    min-height: 100vh !important;
+    min-height: 100dvh !important;
     overflow: hidden !important;
   }
 
@@ -646,7 +646,7 @@
     justify-content: center !important;
     align-items: flex-start !important;  
     padding: 8px 0 140px !important;
-    min-height: 100vh !important;
+    min-height: 100dvh !important;
     overflow: hidden !important;
     height: auto !important; 
   }
@@ -851,7 +851,7 @@
 .jp-selfie-container{
   position: relative !important;
   height: auto !important;
-  min-height: 100svh !important;
+  min-height: 100dvh !important;
   overflow: visible !important; /* glow pode vazar */
   box-sizing: border-box !important;
 }
@@ -1149,7 +1149,7 @@ html, body{
   /* Seção: centraliza o painel */
   #section-guia {
     padding: 24px 0 120px !important;
-    min-height: 100vh !important;
+    min-height: 100dvh !important;
     display: flex !important;
     justify-content: center !important;
     align-items: flex-start !important;
@@ -1420,7 +1420,7 @@ html, body{
   /* 1) Seção: sem cortar conteúdo (progresso/rodapé) */
   #section-perguntas{
     padding: 10px 0 110px !important;
-    min-height: 100vh !important;
+    min-height: 100dvh !important;
     height: auto !important;
     overflow: visible !important;            /* CHAVE: não corta barra */
   }
@@ -1590,7 +1590,7 @@ html, body{
   /* 1) Seção: sem cortar conteúdo (progresso/rodapé) */
   #section-perguntas{
     padding: 10px 0 110px !important;
-    min-height: 100vh !important;
+    min-height: 100dvh !important;
     height: auto !important;
     overflow: visible !important;            /* CHAVE: não corta barra */
   }
@@ -1878,7 +1878,7 @@ html, body{
     justify-content: center !important;
     align-items: flex-start !important;
     padding: 32px 20px 72px !important;
-    min-height: 100vh !important;
+    min-height: 100dvh !important;
     box-sizing: border-box !important;
   }
 
