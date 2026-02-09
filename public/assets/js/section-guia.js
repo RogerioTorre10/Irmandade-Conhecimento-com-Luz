@@ -721,36 +721,47 @@
 }
 
   // ================================
-  // HOVER / FOCUS (DESKTOP)
-  // ================================
-  options.addEventListener('mouseover', (ev) => {
-    const guide = getGuideFromEl(ev.target);
-    if (!guide) return;
-    playPreview(guide);
-  });
+// HOVER / FOCUS (DESKTOP)
+// ================================
+options.addEventListener('mouseover', (ev) => {
+  const btn = ev.target.closest('button[data-guia]');
+  if (!btn) return;
 
-  options.addEventListener('mouseout', (ev) => {
-    // sai do container dos botões: para
-    const related = ev.relatedTarget;
-    if (!related || !options.contains(related)) stopPreview();
-  });
+  const src = btn.dataset.previewSrc;
+  if (!src) return;
 
-  options.addEventListener('focusin', (ev) => {
-    const guide = getGuideFromEl(ev.target);
-    if (!guide) return;
-    playPreview(guide);
-  });
+  playPreviewSrc(src);
+});
 
-  options.addEventListener('focusout', () => stopPreview());
+options.addEventListener('mouseout', (ev) => {
+  const related = ev.relatedTarget;
+  if (!related || !options.contains(related)) stopPreview();
+});
 
-  // ================================
-  // MOBILE (TOUCH)
-  // ================================
-  options.addEventListener('touchstart', (ev) => {
-    const guide = getGuideFromEl(ev.target);
-    if (!guide) return;
-    playPreview(guide);
-  }, { passive:true });
+options.addEventListener('focusin', (ev) => {
+  const btn = ev.target.closest('button[data-guia]');
+  if (!btn) return;
+
+  const src = btn.dataset.previewSrc;
+  if (!src) return;
+
+  playPreviewSrc(src);
+});
+
+options.addEventListener('focusout', () => stopPreview());
+
+// ================================
+// MOBILE (TOUCH)
+// ================================
+options.addEventListener('touchstart', (ev) => {
+  const btn = ev.target.closest('button[data-guia]');
+  if (!btn) return;
+
+  const src = btn.dataset.previewSrc;
+  if (!src) return;
+
+  playPreviewSrc(src);
+}, { passive:true });
 
   // ================================
   // CLICK: garante preview antes da transição para selfie
