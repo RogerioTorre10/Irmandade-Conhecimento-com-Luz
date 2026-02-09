@@ -2078,5 +2078,31 @@ html, body{
   }
 }
    
+/* ============================
+   DIAMANTE: elimina scroll fantasma no desktop (zoom)
+   ============================ */
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden !important;
+}
+
+/* evita que containers empurrem a viewport */
+body {
+  position: relative;
+}
+
+/* mídia/overlay nunca pode vazar */
+img, video, canvas, svg {
+  max-width: 100%;
+}
+
+/* se você usa panels/frames com glow */
+.j-panel-glow,
+.j-arcane-card,
+.j-perg-v-inner {
+  max-width: 100%;
+  overflow-x: clip;
+}
 
 
