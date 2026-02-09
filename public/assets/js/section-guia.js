@@ -1,4 +1,4 @@
-// /assets/js/section-guia.js — v3.2 (NOME + GUIA SALVOS COM GARANTIA + 2 PASSOS + TTS + AURA) — CLEAN (Fluxo Moderno)
+// /assets/js/section-guia.js — v3.3 (NOME + GUIA SALVOS + 2 PASSOS + TTS + AURA + PREVIEW 10s LIMPO)
 (function () {
   'use strict';
 
@@ -11,10 +11,13 @@
   const DATA_URL     = '/assets/data/guias.json';
 
   // UX: confirmação em 2 passos
-  const ARM_TIMEOUT_MS = 10000;   // tempo para confirmar após 1º clique
-  const HOVER_DELAY_MS = 150;     // atraso para preview no hover
+  const ARM_TIMEOUT_MS = 10000;
+  const HOVER_DELAY_MS = 150;
 
-  if (window.JCGuia?.__bound) { console.log('[JCGuia] já carregado'); return; }
+  // Preview (10s)
+  const PREVIEW_TIMEOUT_MS = 10200;
+
+  if (window.JCGuia?.__bound) { return; }
   window.JCGuia = window.JCGuia || {};
   window.JCGuia.__bound = true;
 
@@ -22,11 +25,129 @@
   const q  = (sel, root = document) => root.querySelector(sel);
   const qa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
-  // Estado do fluxo (escopo do IIFE)
-  let hoverTimers = new Map();  // Map<guiaId, timeoutId>
-  let armedId = null;           // guia armado (aguardando confirmação)
-  let armTimer = null;          // timer do arm
-  let cancelArm = null;         // função para cancelar arm (definida abaixo)
+  // Estado do fluxo
+  let hoverTimers = new Map();   // Map<guiaId, timeoutId>
+  let armedId = null;            // guia armado
+  let armTimer = null;           // timer do arm
+  let cancelArm = null;          // função de cancelamento (definida abaixo)
+
+  // =========================
+  // PREVIEW 10s (escopo único)
+  // =========================
+  let previewOverlay = null;
+  let previewVideo   = null;
+  let previewStopTimer = null;
+  let previewPlaying = false;
+  let previewCurrentSrc = null;
+
+  function ensurePreviewRefs(root) {
+    if (previewOverlay && previewVideo) return true;
+    // overlay/video são globais no HTML do guia
+    previewOverlay = document.getElementById('guiaPreviewOverlay');
+    previewVideo   = document.getElementById('guiaPreviewVideo');
+    if (!previewOverlay || !previewVideo) return false;
+
+    // configurações seguras
+    previewVideo.muted = true;
+    previewVideo.playsInline = true;
+    previewVideo.preload = 'auto';
+
+    // se der erro no vídeo, para preview sem barulho
+    previewVideo.addEventListener('error', () => {
+      stopPreview();
+    });
+
+    return true;
+  }
+
+  function showPreview() {
+    if (!previewOverlay) return;
+    previewOverlay.classList.add('is-on');
+    previewOverlay.setAttribute('aria-hidden', 'false');
+  }
+
+  function hidePreview() {
+    if (!previewOverlay) return;
+    previewOverlay.classList.remove('is-on');
+    previewOverlay.setAttribute('aria-hidden', 'true');
+  }
+
+  function stopPreview() {
+    if (previewStopTimer) { clearTimeout(previewStopTimer); previewStopTimer = null; }
+    previewPlaying = false;
+    previewCurrentSrc = null;
+
+    if (previewVideo) {
+      try { previewVideo.pause(); } catch {}
+      try { previewVideo.currentTime = 0; } catch {}
+    }
+    hidePreview();
+  }
+
+  async function playPreviewSrc(src, root) {
+    if (!src) return false;
+    if (!ensurePreviewRefs(root)) return false;
+
+    // se já está tocando o mesmo src, não reinicia
+    if (previewPlaying && previewCurrentSrc === src) return true;
+
+    stopPreview();
+    previewPlaying = true;
+    previewCurrentSrc = src;
+
+    previewVideo.src = src;
+    try { previewVideo.load(); } catch {}
+
+    showPreview();
+    previewStopTimer = setTimeout(() => stopPreview(), PREVIEW_TIMEOUT_MS);
+
+    try {
+      await previewVideo.play();
+      return true;
+    } catch {
+      stopPreview();
+      return false;
+    }
+  }
+
+  function bindPreviewToButtons(root, buttons) {
+    if (!root || !buttons || !buttons.length) return;
+    if (root.dataset.previewBound === '1') return;
+    root.dataset.previewBound = '1';
+
+    // preview por botão (SEM delegação em container)
+    buttons.forEach((btn) => {
+      // evita duplicar se re-renderizar
+      if (btn.dataset.previewBtnBound === '1') return;
+      btn.dataset.previewBtnBound = '1';
+
+      const getSrc = () => (btn.dataset.previewSrc || '').trim();
+
+      btn.addEventListener('mouseenter', () => {
+        const src = getSrc();
+        if (src) playPreviewSrc(src, root);
+      });
+
+      btn.addEventListener('mouseleave', () => {
+        stopPreview();
+      });
+
+      btn.addEventListener('focusin', () => {
+        const src = getSrc();
+        if (src) playPreviewSrc(src, root);
+      });
+
+      btn.addEventListener('focusout', () => stopPreview());
+
+      btn.addEventListener('touchstart', () => {
+        const src = getSrc();
+        if (src) playPreviewSrc(src, root);
+      }, { passive: true });
+    });
+
+    // segurança: ao sair da seção, encerra preview
+    window.addEventListener('jc:section:leave', stopPreview, { passive: true });
+  }
 
   // ===== Lock de transição (vídeo) =====
   async function waitForTransitionUnlock(timeoutMs = 20000) {
@@ -95,7 +216,7 @@
       || '/assets/videos/filme-conhecimento-com-luz-jardim.mp4';
   }
 
-  // ===== Fallback de vídeo de transição (100% seguro) =====
+  // ===== Fallback de vídeo de transição =====
   function playTransitionSafe(src, nextId) {
     if (typeof window.playTransitionVideo === 'function') {
       window.playTransitionVideo(src, nextId);
@@ -128,68 +249,55 @@
 
       v.addEventListener('ended', endTransition, { once: true });
       v.addEventListener('error', () => {
-        console.warn('[guia] erro no vídeo de transição, seguindo...');
         endTransition();
       }, { once: true });
 
       document.body.appendChild(v);
       const p = v.play();
       if (p && typeof p.catch === 'function') {
-        p.catch(() => {
-          console.warn('[guia] autoplay bloqueado, indo direto...');
-          endTransition();
-        });
+        p.catch(() => endTransition());
       }
-    } catch (e) {
-      console.error('[guia] fallback transição falhou', e);
+    } catch {
       window.__TRANSITION_LOCK = false;
       (window.JC && JC.show) ? JC.show(nextId, { force: true }) : (location.hash = '#' + nextId);
       document.dispatchEvent(new CustomEvent('transition:ended'));
     }
   }
 
-  // ===== CONFIRMAÇÃO FINAL (GUIA + NOME SALVO) =====
+  // ===== CONFIRMAÇÃO FINAL =====
   async function confirmGuide(guiaId) {
     const root = document.getElementById(SECTION_ID);
-    if (!root) { console.error('[confirmGuide] #section-guia não encontrado'); return; }
+    if (!root) return;
 
     const input = root.querySelector('#guiaNameInput');
-    if (!input) { console.error('[confirmGuide] #guiaNameInput não encontrado'); return; }
+    if (!input) return;
 
     try {
-      const nome = (input.value || '').trim();
-      if (!nome) {
-        console.warn('[XGuia] Nome vazio - usando fallback');
-        return;
-      }
+      // encerra preview antes de transicionar
+      stopPreview();
 
-      // salva nome (compat)
+      const nome = (input.value || '').trim();
+      if (!nome) return;
+
       sessionStorage.setItem('jornada.nome', nome);
       localStorage.setItem('JORNADA_NOME', nome);
-      console.log('[XGuia] Nome salvo:', nome);
 
-      // Proteção total para guiaId
       const guiaAtual = guiaId ? String(guiaId).toLowerCase().trim() : 'zion';
 
-      // salva guia
       sessionStorage.setItem('jornada.guia', guiaAtual);
       try {
         window.JC = window.JC || {};
         window.JC.data = window.JC.data || {};
         window.JC.data.guia = guiaAtual;
       } catch {}
-      console.log('[XGuia] Guia salvo:', guiaAtual);
 
-      // Aplica tema
       try {
         applyGuiaTheme(guiaAtual);
-      } catch (e) {
-        console.warn('[AURA] Falha:', e);
+      } catch {
         document.body.setAttribute('data-guia', guiaAtual);
       }
       window.aplicarGuiaTheme = window.aplicarGuiaTheme || applyGuiaTheme;
 
-      // Habilita botão avançar
       const btnAvancar = root.querySelector('#btn-avancar') || root.querySelector('[data-action="avancar"]');
       if (btnAvancar) {
         btnAvancar.disabled = false;
@@ -197,15 +305,12 @@
         btnAvancar.focus?.();
       }
 
-      // Limpa arm
       if (armTimer) { clearTimeout(armTimer); armTimer = null; }
       armedId = null;
 
-      // Transição
       const src = getTransitionSrc(root, btnAvancar);
       playTransitionSafe(src, NEXT_SECTION_ID);
-    } catch (err) {
-      console.error('[XGuia] Erro ao salvar nome/guia:', err);
+    } catch {
       playTransitionSafe(getTransitionSrc(root, null), NEXT_SECTION_ID);
     }
   }
@@ -229,69 +334,49 @@
     return r.json();
   }
 
- function renderButtons(optionsBox, guias) {
-  optionsBox.innerHTML = '';
-  guias.forEach(g => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'btn btn-stone-espinhos no-anim guia-option';
-    btn.dataset.action = 'select-guia';
-    btn.dataset.guia = String(g.id || '').trim().toLowerCase();
+  function renderButtons(optionsBox, guias) {
+    optionsBox.innerHTML = '';
+    guias.forEach(g => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn btn-stone-espinhos no-anim guia-option';
+      btn.dataset.action = 'select-guia';
+      btn.dataset.guia = String(g.id || '').trim().toLowerCase();
 
-    // trava por lógica (não usar disabled)
-    btn.dataset.locked = '1';
-    btn.setAttribute('aria-disabled', 'true');
-    btn.classList.add('is-locked');
+      // trava por lógica (não usar disabled)
+      btn.dataset.locked = '1';
+      btn.setAttribute('aria-disabled', 'true');
+      btn.classList.add('is-locked');
 
-    // ✅ PREVIEW do guia (10s) — caminho seguro (espaços/acentos)
-    const gid = btn.dataset.guia;
-    const PREVIEW_BY_ID = {
-      zion:  '/assets/videos/Zion-escolhido.mp4',
-      lumen: '/assets/videos/Lumen-escolhida.mp4',
-      arian: '/assets/videos/Arian-escolhida.mp4',
-    };
-    btn.dataset.previewSrc = encodeURI(PREVIEW_BY_ID[gid] || '');    
+      // Preview do guia (10s) — nomes reais do repo
+      const gid = btn.dataset.guia;
+      const PREVIEW_BY_ID = {
+        zion:  '/assets/videos/Zion-escolhido.mp4',
+        lumen: '/assets/videos/Lumen-escolhida.mp4',
+        arian: '/assets/videos/Arian-escolhida.mp4',
+      };
+      btn.dataset.previewSrc = encodeURI(PREVIEW_BY_ID[gid] || '');
 
-    btn.addEventListener('mouseenter', () => {
-    const src = btn.dataset.previewSrc;
-    console.log('[PREVIEW] enter', btn.dataset.guia, src);
-    if (src) playPreviewSrc(src);
-   });
+      btn.dataset.nome = g.nome;
+      btn.setAttribute('aria-label', `Escolher o guia ${g.nome}`);
+      btn.innerHTML = `<span class="label">${g.nome}</span>`;
 
-   btn.addEventListener('mouseleave', () => {
-   console.log('[PREVIEW] leave', btn.dataset.guia);
-   stopPreview();
-   });
+      if (g.bgImage) {
+        btn.style.backgroundImage = `url('${g.bgImage}')`;
+        btn.style.backgroundSize = 'cover';
+        btn.style.backgroundPosition = 'center';
+      }
 
-   btn.addEventListener('focusin', () => {
-   const src = btn.dataset.previewSrc;
-   if (src) playPreviewSrc(src);
-   });
-
-   btn.addEventListener('focusout', () => stopPreview());
-   btn.addEventListener('touchstart', () => {
-   const src = btn.dataset.previewSrc;
-   if (src) playPreviewSrc(src);
-    }, { passive:true });
-    btn.dataset.nome = g.nome;
-    btn.setAttribute('aria-label', `Escolher o guia ${g.nome}`);
-    btn.innerHTML = `<span class="label">${g.nome}</span>`;
-    if (g.bgImage) {
-    btn.style.backgroundImage = `url('${g.bgImage}')`;
-    btn.style.backgroundSize = 'cover';
-    btn.style.backgroundPosition = 'center';
-    }
-
-    optionsBox.appendChild(btn);
-  });
-}
+      optionsBox.appendChild(btn);
+    });
+  }
 
   function findGuia(guias, id) {
     id = (id || '').toLowerCase();
     return guias.find(g => (g.id || '').toLowerCase() === id);
   }
 
-  // ===== AVISO (usando #guia-error) =====
+  // ===== AVISO (#guia-error) =====
   function getNoticeRefs(root) {
     const box = q('#guia-error', root);
     if (!box) return { box: null, span: null };
@@ -326,38 +411,28 @@
   // ===== ARMAR GUIA (2 CLICKS) =====
   function armGuide(root, btn, label) {
     const guiaId = (btn?.dataset?.guia || '').toLowerCase().trim();
-    if (!guiaId) {
-      console.warn('[armGuide] guiaId não encontrado no botão');
-      return;
-    }
+    if (!guiaId) return;
 
-    // Se já estiver armado e for o mesmo, confirma direto
     if (armedId === guiaId) {
       confirmGuide(guiaId);
       if (cancelArm) cancelArm(root);
       return;
     }
 
-    // Limpa timer anterior se existir
     if (armTimer) { clearTimeout(armTimer); armTimer = null; }
 
-    // Remove 'armed' de todos os botões
     root.querySelectorAll('.guia-option').forEach(el => {
       el.classList.remove('armed');
       el.setAttribute('aria-pressed', 'false');
     });
 
-    // Marca o botão atual como armed
     btn.classList.add('armed');
     btn.setAttribute('aria-pressed', 'true');
 
-    // Atualiza armedId
     armedId = guiaId;
 
-    // Mostra notificação
     showNotice(root, `Você escolheu ${label}. Clique novamente para confirmar.`, { speak: true });
 
-    // Agenda desarme automático após timeout
     armTimer = setTimeout(() => {
       armedId = null;
       armTimer = null;
@@ -371,7 +446,6 @@
     }, ARM_TIMEOUT_MS);
   }
 
-  // ===== CANCELAR ARM (fora do armGuide) =====
   cancelArm = function (root) {
     armedId = null;
     if (armTimer) { clearTimeout(armTimer); armTimer = null; }
@@ -384,24 +458,20 @@
     hideNotice(root);
   };
 
-  // ===== TEMA DINÂMICO DOS GUIAS (preview ao passar o mouse) =====
+  // ===== TEMA DINÂMICO =====
   function applyGuiaTheme(guiaIdOrNull) {
     if (guiaIdOrNull) {
       document.body.dataset.guia = guiaIdOrNull.toLowerCase();
       return;
     }
 
-    // sem parâmetro: restaura o tema "oficial" (já escolhido ou nenhum)
     const saved =
       (window.JC && window.JC.data && window.JC.data.guia) ||
       sessionStorage.getItem('jornada.guia') ||
       '';
 
-    if (saved) {
-      document.body.dataset.guia = saved.toLowerCase();
-    } else {
-      delete document.body.dataset.guia;
-    }
+    if (saved) document.body.dataset.guia = saved.toLowerCase();
+    else delete document.body.dataset.guia;
   }
 
   async function initOnce(root) {
@@ -415,7 +485,7 @@
     let guias = [];
     let guideButtons = [];
 
-    // ===== NOME EM MAIÚSCULO =====
+    // nome em maiúsculo
     if (els.nameInput && !els.nameInput.dataset.upperBound) {
       els.nameInput.dataset.upperBound = '1';
       els.nameInput.addEventListener('input', () => {
@@ -426,39 +496,38 @@
       });
     }
 
-    // ===== TÍTULO COM TTS =====
+    // título
     if (els.title && !els.title.classList.contains('typing-done')) {
       await typeOnce(els.title, null, { speed: 34, speak: true });
     }
 
-    // ===== CARREGA GUIAS =====
+    // carrega guias
     try {
       guias = await loadGuias();
       renderButtons(els.optionsBox, guias);
       hideNotice(root);
-    } catch (e) {
-      console.error('[JCGuia] Erro ao carregar guias:', e);
+    } catch {
       showNotice(root, 'Não foi possível carregar os guias. Tente novamente mais tarde.', { speak: false });
       return;
     }
 
     guideButtons = qa('button[data-action="select-guia"]', els.optionsBox);
-    guideButtons.forEach(b => {
-    b.dataset.locked = '1';
-    b.setAttribute('aria-disabled', 'true');
-    b.classList.add('is-locked');
 
-    // visual de bloqueado (mas mantendo hover)
-    b.style.opacity = '0.6';
-    b.style.cursor = 'pointer';
-    b.style.pointerEvents = 'auto';
+    // mantém hover/preview funcionando, mas bloqueia seleção até confirmar nome
+    guideButtons.forEach(b => {
+      b.dataset.locked = '1';
+      b.setAttribute('aria-disabled', 'true');
+      b.classList.add('is-locked');
+      b.style.opacity = '0.6';
+      b.style.cursor = 'pointer';
+      b.style.pointerEvents = 'auto';
     });
 
+    // BIND preview (único e limpo)
+    bindPreviewToButtons(root, guideButtons);
 
-    // ===== CONFIRMAR NOME (SALVA NOME AQUI) =====
+    // confirmar começa bloqueado; libera conforme input
     let __NAME_CONFIRMED__ = false;
-
-    // confirma começa bloqueado; libera conforme input
     if (els.confirmBtn) els.confirmBtn.disabled = true;
 
     if (els.nameInput && !els.nameInput.dataset.confirmGateBound) {
@@ -477,7 +546,6 @@
 
         const name = (els.nameInput?.value || '').trim();
         if (name.length < 2) {
-          window.toast?.('Por favor, insira um nome válido (mín. 2 letras).', 'warning');
           els.nameInput?.focus();
           return;
         }
@@ -485,7 +553,6 @@
         const upperName = name.toUpperCase();
         els.nameInput.value = upperName;
 
-        // === SALVA NOME COM GARANTIA ===
         try {
           window.JC = window.JC || {};
           window.JC.data = window.JC.data || {};
@@ -493,15 +560,11 @@
 
           sessionStorage.setItem('jornada.nome', upperName);
           localStorage.setItem('jc.nome', upperName);
-        } catch (e) {
-          console.warn('[JCGuia] Erro ao salvar nome:', e);
-        }
+        } catch {}
 
-        // Se já confirmou antes, não precisa re-rodar TTS/datilo; só garante botões liberados
         if (!__NAME_CONFIRMED__) {
           __NAME_CONFIRMED__ = true;
 
-          // === TEXTO PERSONALIZADO ===
           if (els.guiaTexto) {
             const base = (els.guiaTexto.dataset?.text || els.guiaTexto.textContent || 'Escolha seu guia para a Jornada.').trim();
             const msg = base.replace(/\{\{\s*(nome|name)\s*\}\}/gi, upperName);
@@ -512,21 +575,21 @@
           }
         }
 
+        // destrava seleção (preview já funciona antes)
         guideButtons.forEach(b => {
-        b.dataset.locked = '0';
-        b.removeAttribute('aria-disabled');
-        b.classList.remove('is-locked');
-
-        b.style.opacity = '1';
-        b.style.cursor = 'pointer';
-        b.style.pointerEvents = 'auto';
-       });
+          b.dataset.locked = '0';
+          b.removeAttribute('aria-disabled');
+          b.classList.remove('is-locked');
+          b.style.opacity = '1';
+          b.style.cursor = 'pointer';
+          b.style.pointerEvents = 'auto';
+        });
 
         hideNotice(root);
       });
     }
 
-    // ===== EVENTOS DOS BOTÕES DE GUIA (bind 1x) =====
+    // eventos dos botões de guia (bind 1x)
     if (root.dataset.guiaButtonsBound !== '1') {
       root.dataset.guiaButtonsBound = '1';
 
@@ -534,10 +597,9 @@
         const guiaId = (btn.dataset.guia || btn.textContent || '').toLowerCase().trim();
         const label = (btn.dataset.nome || btn.textContent || 'guia').toUpperCase();
 
-        // Hover: preview descrição + tema
+        // Hover: descrição + tema (seu comportamento original)
         btn.addEventListener('mouseenter', () => {
-        if (!guiaId) return; // hover pode rodar mesmo locked
-
+          if (!guiaId) return;
 
           if (hoverTimers.has(guiaId)) clearTimeout(hoverTimers.get(guiaId));
 
@@ -563,13 +625,12 @@
         });
 
         btn.addEventListener('focus', () => {
-        const g = findGuia(guias, guiaId);
-        if (g && els.guiaTexto) {
-        els.guiaTexto.dataset.spoken = '';
-        typeOnce(els.guiaTexto, g.descricao, { speed: 34, speak: true });
-        }
-      });
-
+          const g = findGuia(guias, guiaId);
+          if (g && els.guiaTexto) {
+            els.guiaTexto.dataset.spoken = '';
+            typeOnce(els.guiaTexto, g.descricao, { speed: 34, speak: true });
+          }
+        });
 
         // Clique simples: armar
         btn.addEventListener('click', (ev) => {
@@ -583,12 +644,12 @@
         btn.addEventListener('dblclick', (ev) => {
           ev.preventDefault();
           ev.stopPropagation();
-         if (btn.dataset.locked === '1') return;
+          if (btn.dataset.locked === '1') return;
           confirmGuide(guiaId);
           if (cancelArm) cancelArm(root);
         });
 
-        // Teclado: Enter/Espaço = armar
+        // Teclado: Enter/Espaço
         btn.addEventListener('keydown', (ev) => {
           if (ev.key === 'Enter' || ev.key === ' ') {
             ev.preventDefault();
@@ -597,13 +658,12 @@
           }
         });
 
-        // Acessibilidade
         btn.setAttribute('role', 'button');
         btn.setAttribute('tabindex', '0');
         btn.setAttribute('aria-pressed', 'false');
       });
 
-      // CANCELA AO CLICAR FORA (1x global)
+      // cancelar arm ao clicar fora (1x global)
       if (!document.documentElement.dataset.guiaOutsideCancelBound) {
         document.documentElement.dataset.guiaOutsideCancelBound = '1';
         document.addEventListener('click', (e) => {
@@ -614,8 +674,6 @@
           }
         }, { passive: true });
       }
-
-      console.log('[JCGuia] Eventos de botões e hover configurados');
     }
   }
 
@@ -635,17 +693,14 @@
     ? document.addEventListener('DOMContentLoaded', bind, { once: true })
     : bind();
 
-  /* =========================================================
-     TEMA DO GUIA — reaplica em qualquer seção quando necessário
-     ========================================================= */
-
+  // =========================================================
+  // TEMA DO GUIA — reaplica em qualquer seção quando necessário
+  // =========================================================
   function applyThemeFromSession() {
     const guiaRaw = sessionStorage.getItem('jornada.guia');
     const guia = guiaRaw ? guiaRaw.toLowerCase().trim() : '';
 
-    // fallback dourado
     let main = '#ffd700', g1 = 'rgba(255,230,180,0.85)', g2 = 'rgba(255,210,120,0.75)';
-
     if (guia === 'lumen') { main = '#00ff9d'; g1 = 'rgba(0,255,157,0.90)'; g2 = 'rgba(120,255,200,0.70)'; }
     if (guia === 'zion')  { main = '#00aaff'; g1 = 'rgba(0,170,255,0.90)'; g2 = 'rgba(255,214,91,0.70)'; }
     if (guia === 'arian') { main = '#ff00ff'; g1 = 'rgba(255,120,255,0.95)'; g2 = 'rgba(255,180,255,0.80)'; }
@@ -663,177 +718,4 @@
   document.addEventListener('sectionLoaded', () => setTimeout(applyThemeFromSession, 50));
   document.addEventListener('guia:changed', applyThemeFromSession);
 
-  
-
-/* =========================================================
-   GUIA — Preview 10s (hover) antes do vídeo de transição p/ selfie
-   - funciona com botões gerados via JSON dentro de .guia-options
-   ========================================================= */
-(function GuiaPreview10s(){
-  const section = document.getElementById('section-guia');
-  const options = section && section.querySelector('.guia-options');
-  const overlay = document.getElementById('guiaPreviewOverlay');
-  const video   = document.getElementById('guiaPreviewVideo');
-  if (!section || !options || !overlay || !video) return;
-
-  const PREVIEW_SRC = {
-    zion:  encodeURI('/assets/videos/Zion-escolhido.mp4'),
-    lumen: encodeURI('/assets/videos/Lumen-escolhida.mp4'),
-    arian: encodeURI('/assets/videos/Arian-escolhida.mp4'),
-  };
-
-  const DEBUG = !!window.JC_DEBUG;
-
-  let playing = false;
-  let currentGuide = null;
-  let stopTimer = null;
-  let armedClick = false; // evita loop quando re-disparamos clique
-
-  function log(...a){ if (DEBUG) console.log('[GUIA_PREVIEW]', ...a); }
-
-  function show(){ overlay.classList.add('is-on'); overlay.setAttribute('aria-hidden','false'); }
-  function hide(){ overlay.classList.remove('is-on'); overlay.setAttribute('aria-hidden','true'); }
-
-  function getGuideFromEl(el){
-    // tenta achar atributo no próprio botão ou no card pai
-    const btn = el.closest('[data-guia],[data-guide],button,a,div');
-    if (!btn) return '';
-    return (btn.getAttribute('data-guia') || btn.getAttribute('data-guide') || '').trim().toLowerCase();
-  }
-
-  function stopPreview(){
-    if (stopTimer) { clearTimeout(stopTimer); stopTimer = null; }
-    playing = false;
-    currentGuide = null;
-    try { video.pause(); } catch(e){}
-    try { video.currentTime = 0; } catch(e){}
-    hide();
-  }
-
-  async function playPreviewSrc(src) {
-  if (!src) return false;
-
-  // se já está tocando o mesmo, não reinicia
-  if (playing && currentGuide === src) return true;
-
-  stopPreview();
-  playing = true;
-  currentGuide = src;
-
-  video.muted = true;
-  video.playsInline = true;
-  video.src = src;
-  video.load();
-
-  show();
-  stopTimer = setTimeout(() => stopPreview(), 10200);
-
- try {
-  await video.play();
-  log('preview play OK:', src);
-} catch (e) {
-  console.warn('[PREVIEW] play() falhou:', e?.name, e?.message, 'src=', src);
-  stopPreview();
-  return false;
-}
-  return true;
-}
-
-  // ================================
-// HOVER / FOCUS (DESKTOP)
-// ================================
-options.addEventListener('mouseenter', (ev) => {
-  const btn = ev.target.closest('button[data-guia]');
-  if (!btn) return;
-
-  const src = btn.dataset.previewSrc;
-  if (!src) return;
-
-  playPreviewSrc(src);
-}, true);
-
-options.addEventListener('mouseout', (ev) => {
-  const related = ev.relatedTarget;
-  if (!related || !options.contains(related)) stopPreview();
-});
-
-options.addEventListener('focusin', (ev) => {
-  const btn = ev.target.closest('button[data-guia]');
-  if (!btn) return;
-
-  const src = btn.dataset.previewSrc;
-  if (!src) return;
-
-  playPreviewSrc(src);
-});
-
-options.addEventListener('focusout', () => stopPreview());
-
-// ================================
-// MOBILE (TOUCH)
-// ================================
-options.addEventListener('touchstart', (ev) => {
-  const btn = ev.target.closest('button[data-guia]');
-  if (!btn) return;
-
-  const src = btn.dataset.previewSrc;
-  if (!src) return;
-
-  playPreviewSrc(src);
-}, { passive:true });
-
-  // ================================
-  // CLICK: garante preview antes da transição para selfie
-  // ================================
-  options.addEventListener('click', async (ev) => {
-    if (armedClick) { armedClick = false; return; }
-
-    const guide = getGuideFromEl(ev.target);
-    if (!guide) return;
-
-    // se preview está tocando, segura o clique até acabar
-    if (playing && currentGuide === guide) {
-      ev.preventDefault();
-      ev.stopPropagation();
-
-      // espera o overlay fechar (fim natural ou timeout)
-      await new Promise((resolve) => {
-        const t0 = Date.now();
-        const iv = setInterval(() => {
-          const done = !overlay.classList.contains('is-on');
-          if (done || (Date.now() - t0) > 11000) {
-            clearInterval(iv);
-            resolve();
-          }
-        }, 60);
-      });
-
-      stopPreview();
-
-      // re-dispara clique sem entrar em loop
-      armedClick = true;
-      const targetBtn = ev.target.closest('button,a,[role="button"],div');
-      if (targetBtn) targetBtn.click();
-      return;
-    }
-
-    // Se você quiser que SEMPRE rode preview antes (mesmo sem hover),
-    // descomente o bloco abaixo:
-    /*
-    ev.preventDefault();
-    ev.stopPropagation();
-    await playPreview(guide);
-    // espera ~10s ou fim
-    await new Promise(r => setTimeout(r, 10200));
-    stopPreview();
-    armedClick = true;
-    const targetBtn = ev.target.closest('button,a,[role="button"],div');
-    if (targetBtn) targetBtn.click();
-    */
-  }, true);
-
-  // segurança: ao sair da seção, encerra preview
-  window.addEventListener('jc:section:leave', stopPreview);
-})();
-  
 })();
