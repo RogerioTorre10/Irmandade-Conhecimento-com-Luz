@@ -246,9 +246,9 @@
     // ✅ PREVIEW do guia (10s) — caminho seguro (espaços/acentos)
     const gid = btn.dataset.guia;
     const PREVIEW_BY_ID = {
-      zion:  '/assets/videos/Zion escolhido.mp4',
-      lumen: '/assets/videos/Lumen escolhida.mp4',
-      arian: '/assets/videos/Arian escolhida.mp4',
+      zion:  '/assets/videos/Zion-escolhido.mp4',
+      lumen: '/assets/videos/Lumen-escolhida.mp4',
+      arian: '/assets/videos/Arian-escolhida.mp4',
     };
     btn.dataset.previewSrc = encodeURI(PREVIEW_BY_ID[gid] || '');
 
