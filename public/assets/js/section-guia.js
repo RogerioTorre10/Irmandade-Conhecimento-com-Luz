@@ -723,7 +723,7 @@
   // ================================
 // HOVER / FOCUS (DESKTOP)
 // ================================
-options.addEventListener('mouseover', (ev) => {
+options.addEventListener('mouseenter', (ev) => {
   const btn = ev.target.closest('button[data-guia]');
   if (!btn) return;
 
@@ -731,7 +731,7 @@ options.addEventListener('mouseover', (ev) => {
   if (!src) return;
 
   playPreviewSrc(src);
-});
+}, true);
 
 options.addEventListener('mouseout', (ev) => {
   const related = ev.relatedTarget;
