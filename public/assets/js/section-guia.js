@@ -229,28 +229,43 @@
     return r.json();
   }
 
-  function renderButtons(optionsBox, guias) {
-    optionsBox.innerHTML = '';
-    guias.forEach(g => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'btn btn-stone-espinhos no-anim guia-option';
-      btn.dataset.action = 'select-guia';
-      btn.dataset.guia = String(g.id || '').trim().toLowerCase();
-      btn.dataset.locked = '1';
-      btn.setAttribute('aria-disabled', 'true');
-      btn.classList.add('is-locked');
+ function renderButtons(optionsBox, guias) {
+  optionsBox.innerHTML = '';
+  guias.forEach(g => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn btn-stone-espinhos no-anim guia-option';
+    btn.dataset.action = 'select-guia';
+    btn.dataset.guia = String(g.id || '').trim().toLowerCase();
 
-      btn.innerHTML = `<span class="label">${g.nome}</span>`;
+    // trava por lógica (não usar disabled)
+    btn.dataset.locked = '1';
+    btn.setAttribute('aria-disabled', 'true');
+    btn.classList.add('is-locked');
 
-      if (g.bgImage) {
-        btn.style.backgroundImage = `url('${g.bgImage}')`;
-        btn.style.backgroundSize = 'cover';
-        btn.style.backgroundPosition = 'center';
-      }
-      optionsBox.appendChild(btn);
-    });
-  }
+    // ✅ PREVIEW do guia (10s) — caminho seguro (espaços/acentos)
+    const gid = btn.dataset.guia;
+    const PREVIEW_BY_ID = {
+      zion:  '/assets/videos/Zion escolhido.mp4',
+      lumen: '/assets/videos/Lumen escolhida.mp4',
+      arian: '/assets/videos/Arian escolhida.mp4',
+    };
+    btn.dataset.previewSrc = encodeURI(PREVIEW_BY_ID[gid] || '');
+
+    btn.dataset.nome = g.nome;
+    btn.setAttribute('aria-label', `Escolher o guia ${g.nome}`);
+    btn.innerHTML = `<span class="label">${g.nome}</span>`;
+
+    if (g.bgImage) {
+      btn.style.backgroundImage = `url('${g.bgImage}')`;
+      btn.style.backgroundSize = 'cover';
+      btn.style.backgroundPosition = 'center';
+    }
+
+    optionsBox.appendChild(btn);
+  });
+}
+
 
   function findGuia(guias, id) {
     id = (id || '').toLowerCase();
