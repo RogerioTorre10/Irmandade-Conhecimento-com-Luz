@@ -250,22 +250,41 @@
       lumen: '/assets/videos/Lumen-escolhida.mp4',
       arian: '/assets/videos/Arian-escolhida.mp4',
     };
-    btn.dataset.previewSrc = encodeURI(PREVIEW_BY_ID[gid] || '');
+    btn.dataset.previewSrc = encodeURI(PREVIEW_BY_ID[gid] || '');    
 
+    btn.addEventListener('mouseenter', () => {
+    const src = btn.dataset.previewSrc;
+    console.log('[PREVIEW] enter', btn.dataset.guia, src);
+    if (src) playPreviewSrc(src);
+   });
+
+   btn.addEventListener('mouseleave', () => {
+   console.log('[PREVIEW] leave', btn.dataset.guia);
+   stopPreview();
+   });
+
+   btn.addEventListener('focusin', () => {
+   const src = btn.dataset.previewSrc;
+   if (src) playPreviewSrc(src);
+   });
+
+   btn.addEventListener('focusout', () => stopPreview());
+   btn.addEventListener('touchstart', () => {
+   const src = btn.dataset.previewSrc;
+   if (src) playPreviewSrc(src);
+    }, { passive:true });
     btn.dataset.nome = g.nome;
     btn.setAttribute('aria-label', `Escolher o guia ${g.nome}`);
     btn.innerHTML = `<span class="label">${g.nome}</span>`;
-
     if (g.bgImage) {
-      btn.style.backgroundImage = `url('${g.bgImage}')`;
-      btn.style.backgroundSize = 'cover';
-      btn.style.backgroundPosition = 'center';
+    btn.style.backgroundImage = `url('${g.bgImage}')`;
+    btn.style.backgroundSize = 'cover';
+    btn.style.backgroundPosition = 'center';
     }
 
     optionsBox.appendChild(btn);
   });
 }
-
 
   function findGuia(guias, id) {
     id = (id || '').toLowerCase();
