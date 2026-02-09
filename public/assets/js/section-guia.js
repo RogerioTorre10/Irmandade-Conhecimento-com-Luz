@@ -691,34 +691,34 @@
     hide();
   }
 
-  async function playPreview(guide){
-    if (!PREVIEW_SRC[guide]) return false;
+  async function playPreviewSrc(src) {
+  if (!src) return false;
 
-    // se já está tocando o mesmo, não reinicia
-    if (playing && currentGuide === guide) return true;
+  // se já está tocando o mesmo, não reinicia
+  if (playing && currentGuide === src) return true;
 
+  stopPreview();
+  playing = true;
+  currentGuide = src;
+
+  video.muted = true;
+  video.playsInline = true;
+  video.src = src;
+  video.load();
+
+  show();
+  stopTimer = setTimeout(() => stopPreview(), 10200);
+
+  try {
+    await video.play();
+    log('preview play:', src);
+  } catch (e) {
     stopPreview();
-    playing = true;
-    currentGuide = guide;
-
-    video.muted = true;
-    video.playsInline = true;
-    video.src = PREVIEW_SRC[guide];
-    video.load();
-
-    show();
-    stopTimer = setTimeout(() => stopPreview(), 10200);
-
-    try {
-      await video.play();
-      log('preview play:', guide);
-    } catch (e) {
-      stopPreview();
-      return false;
-    }
-
-    return true;
+    return false;
   }
+
+  return true;
+}
 
   // ================================
   // HOVER / FOCUS (DESKTOP)
