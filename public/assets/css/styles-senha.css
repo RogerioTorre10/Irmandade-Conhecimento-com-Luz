@@ -274,3 +274,6 @@
   outline: none !important;
   box-shadow: none !important;
 }
+.senha-input .btn-toggle-senha {
+  -webkit-tap-highlight-color: transparent;
+}
