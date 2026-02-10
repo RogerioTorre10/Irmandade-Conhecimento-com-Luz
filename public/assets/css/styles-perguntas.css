@@ -675,21 +675,21 @@ body[data-guia="arian"] .progress-inline .progress-question-fill {
 /* container do bloco */
 .perguntas-no-bloco{
   position: relative !important;
-  margin-top: 50px !important;
+  margin-top: 15px !important;
   margin-bottom: 10px !important;
 }
 
 /* título */
 .perguntas-no-bloco .titulo-bloco,
 .perguntas-no-bloco h3{
-  margin-bottom: 6px !important;
+  margin-bottom: 4px !important;
   text-align: center;
 }
 
 /* barra logo abaixo do título */
 .perguntas-no-bloco .barra-progresso,
 .perguntas-no-bloco .progress-bar{
-  margin-top: 4px !important;
+  margin-top: 2px !important;
 }
    /* ======================================================
    BOTÕES — magia consistente em todos os estados
