@@ -65,34 +65,46 @@
   opacity: 0.8;
 }
 
-/* Botão olho (mostrar/esconder senha) */
+/* =========================================
+   DIAMANTE: botão do olho (senha) — ícone puro
+   ========================================= */
 .senha-input .btn-toggle-senha {
+  all: unset;                      /* remove TUDO do botão */
   position: absolute;
-  right: 8px;
+  right: 10px;                     /* bem no cantinho */
   top: 50%;
   transform: translateY(-50%);
-  padding: 2px;
-  min-width: 24px;
-  min-height: 24px;
-  font-size: 12px;
-  border: none;
-  border-radius: var(--radius);
-  background-image: url('/assets/img/textura-de-pedra.jpg') !important;
-  background-size: cover !important;
-  background-position: center !important;
-  background-color: var(--card-2) !important;
-  background-blend-mode: overlay !important;
-  color: var(--fg);
-  font-family: 'ManufacturingConsent', sans-serif;
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 1 !important;
-  z-index: 10;
-  pointer-events: auto !important;
+
+  font-size: 16px;                 /* tamanho do olho */
+  line-height: 1;
+
+  color: #ffd966;                  /* dourado do ícone */
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+
+  padding: 0;
+  margin: 0;
 }
+
+/* remove qualquer foco visual indesejado */
+.senha-input .btn-toggle-senha:focus,
+.senha-input .btn-toggle-senha:active {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* hover sutil (opcional, elegante) */
+.senha-input .btn-toggle-senha:hover {
+  filter: brightness(1.15);
+}
+
 
 /* Linha de botões (prev / avançar) */
 .senha-actions {
