@@ -59,7 +59,7 @@
 .progress-top{
   position: absolute;
   top: 14px;
-  margin-bottom: 15px;        /* descola a pergunta da régua de cima */
+  margin-bottom: 25px;        /* descola a pergunta da régua de cima */
   left: 14px;
   right: 88px;     /* mais folga pra ampulheta */
   padding-top: 14px; /* espaço pro número ficar em cima */
