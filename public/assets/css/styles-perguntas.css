@@ -675,7 +675,7 @@ body[data-guia="arian"] .progress-inline .progress-question-fill {
 /* container do bloco */
 .perguntas-no-bloco{
   position: relative !important;
-  margin-top: 30px !important;
+  margin-top: 50px !important;
   margin-bottom: 10px !important;
 }
 
