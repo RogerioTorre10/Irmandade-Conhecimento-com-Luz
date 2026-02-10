@@ -841,3 +841,14 @@ textarea,
     0 0 22px color-mix(in srgb, var(--guide-color) 45%, transparent),
     inset 0 0 24px color-mix(in srgb, var(--guide-glow-1) 45%, transparent) !important;
 }
+
+/* DIAMANTE: pergunta sempre branca (não sofre com aura do guia) */
+.section-perguntas .jp-question-typed,
+#jp-question-typed {
+  color: #fff !important;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.95) !important;
+  animation: none !important; /* opcional: remove pulsação do texto */
+}
+
+
+
