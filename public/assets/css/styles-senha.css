@@ -277,3 +277,28 @@
 .senha-input .btn-toggle-senha {
   -webkit-tap-highlight-color: transparent;
 }
+/* REFINO FINAL: olho menor, colado à direita e bem centralizado */
+.senha-input .btn-toggle-senha {
+  /* posição */
+  right: 4px !important;            /* cola no canto direito */
+  top: 50%;
+  transform: translateY(-50%);
+
+  /* tamanho real do botão (área clicável mínima) */
+  width: 16px !important;
+  height: 16px !important;
+  min-width: 16px !important;
+  min-height: 16px !important;
+
+  /* ícone */
+  font-size: 14px !important;       /* olho proporcional */
+  line-height: 1 !important;
+
+  /* remove qualquer sobra invisível */
+  padding: 0 !important;
+  margin: 0 !important;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
