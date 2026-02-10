@@ -245,37 +245,32 @@
   cursor: pointer;
   user-select: none;
   
-  /* Remove QUALQUER coisa que pareça botão ou tenha borda */
-  background: none !important;
+  /* DIAMANTE: botão do olho sem caixa (apenas ícone) */
+.senha-input .btn-toggle-senha {
+  background: transparent !important;
+  background-image: none !important;
+  background-color: transparent !important;
+  background-blend-mode: normal !important;
+
   border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+
   padding: 0 !important;
-  margin: 0 !important;
-  box-shadow: none !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  /* ícone bem no cantinho direito */
+  right: 6px !important;
+  font-size: 16px !important;
+  line-height: 1 !important;
+
+  color: #ffd966 !important; /* dourado do olho */
+}
+
+/* remove qualquer destaque de foco/active que pareça borda */
+.senha-input .btn-toggle-senha:focus,
+.senha-input .btn-toggle-senha:active {
   outline: none !important;
-  -webkit-appearance: none !important;
-  appearance: none !important;
-}
-
-/* Garante que não apareça nada em hover/focus */
-.toggle-senha:hover,
-.toggle-senha:active,
-.toggle-senha:focus,
-.toggle-senha:focus-visible {
-  background: none !important;
   box-shadow: none !important;
-  outline: none !important;
 }
-
-/* Remove o botão de revelar senha nativo do navegador (principal culpado em muitos casos) */
-#senha-input::-ms-reveal,
-#senha-input::-ms-clear,
-#senha-input::-webkit-textfield-decoration-container,
-#senha-input::-webkit-inner-spin-button,
-#senha-input::-webkit-outer-spin-button,
-#senha-input::-webkit-contacts-auto-fill-button {
-  display: none !important;
-  visibility: hidden !important;
-  width: 0 !important;
-  height: 0 !important;
-}
-
