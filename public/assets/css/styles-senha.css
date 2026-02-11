@@ -237,10 +237,10 @@
 .toggle-senha {
   position: absolute;
   top: 50%;
-  right: 12px;                          /* ajuste fino: 8px–14px até colar na borda interna */
+  right: 6px;                          /* ajuste fino: 8px–14px até colar na borda interna */
   transform: translateY(-50%);
   
-  font-size: 22px;                      /* tamanho confortável */
+  font-size: 18px;                      /* tamanho confortável */
   color: #aaa;                          /* cor sutil – ajuste se quiser mais visível */
   cursor: pointer;
   user-select: none;
@@ -261,7 +261,7 @@
   min-height: 0 !important;
 
   /* ícone bem no cantinho direito */
-  right: 6px !important;
+  right: 2px !important;
   font-size: 16px !important;
   line-height: 1 !important;
 
@@ -280,15 +280,15 @@
 /* REFINO FINAL: olho menor, colado à direita e bem centralizado */
 .senha-input .btn-toggle-senha {
   /* posição */
-  right: 4px !important;            /* cola no canto direito */
+  right: 2px !important;            /* cola no canto direito */
   top: 50%;
   transform: translateY(-50%);
 
   /* tamanho real do botão (área clicável mínima) */
-  width: 8px !important;
-  height: 8px !important;
-  min-width: 8px !important;
-  min-height: 8px !important;
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  min-height: 28px !important;
 
   /* ícone */
   font-size: 14px !important;       /* olho proporcional */
