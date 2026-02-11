@@ -70,7 +70,7 @@
    ========================================= */
 .senha-input .btn-toggle-senha {
   all: unset;                      /* remove TUDO do botão */
-  position: absolute;
+  position: relative;
   right: 4px;                     /* bem no cantinho */
   top: 50%;
   transform: translateY(-50%);
