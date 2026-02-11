@@ -18,6 +18,14 @@
         
           <!-- Botões de escolha (preenchidos via JSON) -->
         <div class="guia-options" role="group" aria-label="Opções de Guias"></div>
+        <!-- PREVIEW OVERLAY (10s) -->
+        <div id="guiaPreviewOverlay" class="guia-preview-overlay" aria-hidden="true">
+        <video id="guiaPreviewVideo"
+         class="guia-preview-video"
+         preload="auto"
+         playsinline
+         muted></video>
+        </div>
 
       <!-- Nome primeiro -->
       <div class="guia-name-input on-pergaminho">
@@ -43,20 +51,10 @@
               data-cursor="true"
               data-text="AO PASSAR SUAVEMENTE POR CIMA DO BOTÃO SERÁ EXIBIDO O PERFIL DO GUIA. PARA CONFIRMAR, CLIQUE NOVAMENTE OU USE DUPLO CLIQUE.">
         </span>
-      </div>
-        
-<!-- Botões de escolha (preenchidos via JSON) -->
-        <div class="guia-options" role="group" aria-label="Opções de Guias"></div>
-    
-<!-- PREVIEW OVERLAY (10s) -->
-<div id="guiaPreviewOverlay" class="guia-preview-overlay" aria-hidden="true">
-  <video id="guiaPreviewVideo"
-         class="guia-preview-video"
-         preload="auto"
-         playsinline
-         muted></video>
-</div>
-                                               
+      </div>            
+
+      <!-- Botões de escolha (preenchidos via JSON) -->
+        <div class="guia-options" role="group" aria-label="Opções de Guias"></div>                                         
 
     </div>
   </div>
