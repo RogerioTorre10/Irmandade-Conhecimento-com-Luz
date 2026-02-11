@@ -73,7 +73,7 @@
   position: relative;
   right: 4px;                     /* bem no cantinho */
   top: 50%;
-  transform: translateY(-50%) translateY(8px) !important;
+  transform: translateY(-50%) translateY(12px) !important;
   cursor: pointer;
 
   display: flex;
@@ -282,7 +282,7 @@
   position: relative !important;
   right: 4px !important;
   top: 50% !important;
-  transform: translateY(-50%) translateY(8px) !important;
+  transform: translateY(-50%) translateY(12px) !important;
 
   width: 8px !important;
   height: 8px !important;
