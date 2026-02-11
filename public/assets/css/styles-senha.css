@@ -73,7 +73,7 @@
   position: relative;
   right: 4px;                     /* bem no cantinho */
   top: 50%;
-  transform: translateY(-50%);
+  transform: translateY(-50%) translateY(8px) !important;
   cursor: pointer;
 
   display: flex;
@@ -280,9 +280,9 @@
 /* Olho: preso no canto direito do input */
 .senha-input .btn-toggle-senha{
   position: relative !important;
-  right: 2px !important;
+  right: 4px !important;
   top: 50% !important;
-  transform: translateY(-50%) !important;
+  transform: translateY(-50%) translateY(8px) !important;
 
   width: 8px !important;
   height: 8px !important;
