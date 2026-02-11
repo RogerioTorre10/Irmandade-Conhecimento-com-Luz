@@ -70,8 +70,8 @@
    ========================================= */
 .senha-input .btn-toggle-senha {
   all: unset;                      /* remove TUDO do botão */
-  position: absolute;
-  right: 10px;                     /* bem no cantinho */
+  position: relative;
+  right: 2px;                     /* bem no cantinho */
   top: 50%;
   transform: translateY(-50%);
   cursor: pointer;
@@ -80,7 +80,7 @@
   align-items: center;
   justify-content: center;
 
-  font-size: 16px;                 /* tamanho do olho */
+  font-size: 14px;                 /* tamanho do olho */
   line-height: 1;
 
   color: #ffd966;                  /* dourado do ícone */
@@ -285,10 +285,10 @@
   transform: translateY(-50%);
 
   /* tamanho real do botão (área clicável mínima) */
-  width: 28px !important;
-  height: 28px !important;
-  min-width: 28px !important;
-  min-height: 28px !important;
+  width: 6px !important;
+  height: 6px !important;
+  min-width: 6px !important;
+  min-height: 6px !important;
 
   /* ícone */
   font-size: 14px !important;       /* olho proporcional */
