@@ -526,24 +526,45 @@
     // carrega guias
     try {
       guias = await loadGuias();
-      renderButtons(els.optionsBox, guias);
+      const topBox    = root.querySelector('.guia-options-top');
+      const bottomBox = root.querySelector('.guia-options-bottom');
+
+      if (topBox)    renderButtons(topBox, guias);
+      if (bottomBox) renderButtons(bottomBox, guias);
+
+     // estado inicial:
+     // botões de cima ATIVOS (preview apenas)
+     // botões de baixo DESABILITADOS
+     if (topBox) {
+     topBox.classList.remove('disabled');
+     topBox.classList.add('enabled');
+     }
+
+    if (bottomBox) {
+    bottomBox.classList.remove('enabled');
+    bottomBox.classList.add('disabled');
+    }
       hideNotice(root);
     } catch {
       showNotice(root, 'Não foi possível carregar os guias. Tente novamente mais tarde.', { speak: false });
       return;
     }
 
-    guideButtons = qa('button[data-action="select-guia"]', els.optionsBox);
+    guideButtons = [
+  ...qa('button[data-action="select-guia"]', topBox || root),
+  ...qa('button[data-action="select-guia"]', bottomBox || root),
+];
 
-    // mantém hover/preview funcionando, mas bloqueia seleção até confirmar nome
-    guideButtons.forEach(b => {
-      b.dataset.locked = '1';
-      b.setAttribute('aria-disabled', 'true');
-      b.classList.add('is-locked');
-      b.style.opacity = '0.6';
-      b.style.cursor = 'pointer';
-      b.style.pointerEvents = 'auto';
-    });
+    // trava selecao nos dois grupos no início (mantém preview ok)
+guideButtons.forEach(b => {
+  b.dataset.locked = '1';
+  b.setAttribute('aria-disabled', 'true');
+  b.classList.add('is-locked');
+  b.style.opacity = '0.6';
+  b.style.cursor = 'pointer';
+  b.style.pointerEvents = 'auto';
+});
+
 
     // BIND preview (único e limpo)
     bindPreviewToButtons(root, guideButtons);
@@ -604,15 +625,19 @@
           }
         }
 
-        // destrava seleção (preview já funciona antes)
-        guideButtons.forEach(b => {
-          b.dataset.locked = '0';
-          b.removeAttribute('aria-disabled');
-          b.classList.remove('is-locked');
-          b.style.opacity = '1';
-          b.style.cursor = 'pointer';
-          b.style.pointerEvents = 'auto';
-        });
+        // destrava seleção APENAS nos botões de baixo
+const bottomBox = root.querySelector('.guia-options-bottom');
+const bottomButtons = qa('button[data-action="select-guia"]', bottomBox || root);
+
+bottomButtons.forEach(b => {
+  b.dataset.locked = '0';
+  b.removeAttribute('aria-disabled');
+  b.classList.remove('is-locked');
+  b.style.opacity = '1';
+  b.style.cursor = 'pointer';
+  b.style.pointerEvents = 'auto';
+});
+
 
         hideNotice(root);
       });
