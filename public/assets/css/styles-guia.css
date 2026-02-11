@@ -458,6 +458,18 @@ button.guia-option.is-locked,
 button[data-guia].is-locked {
   cursor: pointer; /* mantém hover funcionando */
 }
+.guia-options.disabled {
+  pointer-events: none;
+  opacity: 0.35;
+  filter: grayscale(0.4);
+}
+
+.guia-options.enabled {
+  pointer-events: auto;
+  opacity: 1;
+  filter: none;
+}
+
 
 
 /* ===========================
