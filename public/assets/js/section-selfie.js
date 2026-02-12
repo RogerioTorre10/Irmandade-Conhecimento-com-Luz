@@ -267,7 +267,7 @@ function tSelfie(key, vars = {}) {
     setTimeout(() => {
       // TÍTULO: só uma vez
       if (title && !title.classList.contains('typed')) {
-        const titleText = (title.dataset.text || 'Prepare sua selfie').trim();
+        const titleText = (title?.dataset?.text || tSelfie('selfie.title')).trim();
         title.textContent = '';
         typeWriter(title, titleText, 40);
         title.classList.add('typed');
@@ -277,7 +277,7 @@ function tSelfie(key, vars = {}) {
       if (texto && !texto.classList.contains('typed')) {
         const guiaNomeMap = { arian: 'Arian', lumen: 'Lumen', zion: 'Zion' };
         const guiaNome = guiaNomeMap[guia] || 'Guia';
-        const fullText = `${nome}, afaste o celular e posicione o rosto. ${guiaNome} te guiará.`;
+        const fullText = tSelfie('selfie.text', { nome, guia: guiaNome });
 
         texto.textContent = '';
         typeWriter(texto, fullText, 36);
