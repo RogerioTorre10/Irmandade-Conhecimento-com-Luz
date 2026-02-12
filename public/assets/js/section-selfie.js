@@ -267,7 +267,7 @@ function tSelfie(key, vars = {}) {
     setTimeout(() => {
       // TÍTULO: só uma vez
       if (title && !title.classList.contains('typed')) {
-        const titleText = (title?.dataset?.text || tSelfie('selfie.title')).trim();
+        const titleText = (title.dataset.text || 'Prepare sua selfie').trim();
         title.textContent = '';
         typeWriter(title, titleText, 40);
         title.classList.add('typed');
