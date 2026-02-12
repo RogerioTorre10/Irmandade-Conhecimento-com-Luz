@@ -204,7 +204,7 @@
         body: JSON.stringify({
           answers: window.JornadaAnswers || window.__QA_ANSWERS__ || { teste: 'finalizado' },
           meta: window.__QA_META__ || { finishedAt: new Date().toISOString() },
-          lang: getActiveLang()
+          lang: langNow.
         })
       });
 
