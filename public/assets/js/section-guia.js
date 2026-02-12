@@ -523,39 +523,45 @@
       await typeOnce(els.title, null, { speed: 34, speak: true });
     }
 
-    // carrega guias
-    try {
-      guias = await loadGuias();
-      const topBox    = root.querySelector('.guia-options-top');
-      const bottomBox = root.querySelector('.guia-options-bottom');
+   // carrega guias
+let topBox = null;
+let bottomBox = null;
 
-      if (topBox)    renderButtons(topBox, guias);
-      if (bottomBox) renderButtons(bottomBox, guias);
+try {
+  guias = await loadGuias();
 
-     // estado inicial:
-     // botões de cima ATIVOS (preview apenas)
-     // botões de baixo DESABILITADOS
-     if (topBox) {
-     topBox.classList.remove('disabled');
-     topBox.classList.add('enabled');
-     }
+  topBox = root.querySelector('.guia-options-top');
+  bottomBox = root.querySelector('.guia-options-bottom');
 
-    if (bottomBox) {
+  if (topBox) renderButtons(topBox, guias);
+  if (bottomBox) renderButtons(bottomBox, guias);
+
+  // estado inicial:
+  // botões de cima ATIVOS (preview apenas)
+  // botões de baixo DESABILITADOS
+  if (topBox) {
+    topBox.classList.remove('disabled');
+    topBox.classList.add('enabled');
+  }
+
+  if (bottomBox) {
     bottomBox.classList.remove('enabled');
     bottomBox.classList.add('disabled');
-    }
-      hideNotice(root);
-    } catch {
-      showNotice(root, 'Não foi possível carregar os guias. Tente novamente mais tarde.', { speak: false });
-      return;
-    }
+  }
 
-    guideButtons = [
+  hideNotice(root);
+} catch {
+  showNotice(root, 'Não foi possível carregar os guias. Tente novamente mais tarde.', { speak: false });
+  return;
+}
+
+// pega botões dos DOIS containers (topo + baixo)
+guideButtons = [
   ...qa('button[data-action="select-guia"]', topBox || root),
   ...qa('button[data-action="select-guia"]', bottomBox || root),
 ];
 
-    // trava selecao nos dois grupos no início (mantém preview ok)
+// trava seleção nos dois grupos no início (mantém preview ok)
 guideButtons.forEach(b => {
   b.dataset.locked = '1';
   b.setAttribute('aria-disabled', 'true');
@@ -564,7 +570,6 @@ guideButtons.forEach(b => {
   b.style.cursor = 'pointer';
   b.style.pointerEvents = 'auto';
 });
-
 
     // BIND preview (único e limpo)
     bindPreviewToButtons(root, guideButtons);
