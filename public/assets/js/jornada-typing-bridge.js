@@ -1,11 +1,12 @@
-// /assets/js/jornada-typing-bridge.js — FINAL (LATCH + anti-eco GLOBAL + logs controláveis + VOICE MANAGER)
+// /assets/js/jornada-typing-bridge.js — FINAL (Voice Manager + anti-eco seguro + latch)
+// - Voz correta por idioma (aguarda voices carregarem)
+// - Anti-eco NÃO deixa texto sumir (forceShow)
+// - getLangNow alinhado: i18n.currentLang + sessionStorage jornada.lang + etc.
+
 (function (window) {
   'use strict';
 
-  if (window.__TypingBridgeReady) {
-    // não loga aqui pra não poluir
-    return;
-  }
+  if (window.__TypingBridgeReady) return;
   window.__TypingBridgeReady = true;
 
   // =========================
@@ -31,12 +32,12 @@
 
   // =========================
   // VOICE MANAGER (global)
-  // - garante voz correta por idioma
-  // - espera carregamento das voices (voiceschanged)
+  // - aguarda voices carregarem (voiceschanged / timeout)
+  // - cache por idioma
   // =========================
   let __voices = [];
   let __voicesPromise = null;
-  const __voiceCache = new Map(); // lang -> voice
+  const __voiceCache = new Map(); // lang -> SpeechSynthesisVoice|null
 
   function __loadVoicesNow() {
     try { __voices = speechSynthesis.getVoices?.() || []; } catch { __voices = []; }
@@ -74,7 +75,6 @@
         tick();
       });
     }
-
     return __voicesPromise;
   }
 
@@ -88,10 +88,10 @@
     // 1) match exato
     let v = __voices.find(x => (x.lang || '').toLowerCase() === L) || null;
 
-    // 2) match por prefixo (pt, en, es...)
+    // 2) match por prefixo (pt/en/es)
     if (!v) v = __voices.find(x => (x.lang || '').toLowerCase().startsWith(prefix)) || null;
 
-    // 3) preferência por localService quando possível
+    // 3) prefere localService (quando existir)
     if (v && typeof v.localService === 'boolean') {
       const same = __voices.filter(x => (x.lang || '').toLowerCase() === (v.lang || '').toLowerCase());
       const local = same.find(x => x.localService);
@@ -108,6 +108,23 @@
     const v = __pickBestVoice(lang);
     if (v) utt.voice = v;
   }
+
+  // Teste rápido (console):
+  // window.TYPING_DEBUG_VOICES()
+  window.TYPING_DEBUG_VOICES = async function () {
+    if (!('speechSynthesis' in window)) {
+      console.log('speechSynthesis não disponível.');
+      return;
+    }
+    await __ensureVoicesReady();
+    const list = (__voices || []).map(v => ({
+      name: v.name,
+      lang: v.lang,
+      local: v.localService
+    }));
+    console.table(list);
+    console.log('Idiomas detectados:', [...new Set(list.map(x => x.lang))]);
+  };
 
   // ====== ESTILO DO CURSOR ======
   (function ensureStyle() {
@@ -132,35 +149,40 @@
   let abortCurrent = null;
 
   // ====== FUNÇÕES DE LOCK ======
-  function lock() {
-    window.__typingLock = true;
-  }
-  function unlock() {
-    window.__typingLock = false;
-  }
+  function lock() { window.__typingLock = true; }
+  function unlock() { window.__typingLock = false; }
 
-  // ====== HELPERS DE "LATCH" POR ELEMENTO ======
+  // ====== HELPERS ======
   function makeTypingSig(text) {
     const lang = getLangNow();
     const t = String(text || '').trim();
     return `${lang}::${t}`;
   }
 
-  // ====== ANTI-ECO GLOBAL DO TYPING ======
-  // Segura cascatas (i18n.apply + section:shown + controller) mesmo se o elemento for recriado.
+  // Anti-eco GLOBAL (segura cascatas mesmo se DOM recriou)
   let __lastTypingSig = '';
   let __lastTypingAt = 0;
 
   function shouldSkipTyping(sig) {
     const now = Date.now();
-    // janela maior para cascatas reais do seu app
     if (sig === __lastTypingSig && (now - __lastTypingAt) < 1400) return true;
     __lastTypingSig = sig;
     __lastTypingAt = now;
     return false;
   }
 
-  // ====== FUNÇÃO PRINCIPAL DE DATILOGRAFIA ======
+  // ✅ IMPORTANTÍSSIMO: quando pular, NÃO pode deixar vazio.
+  function forceShow(element, text) {
+    if (!element) return;
+    element.textContent = String(text || '');
+    element.style.opacity = '1';
+    element.classList.add('typing-done');
+    element.dataset.typingDone = '1';
+    // marca para latch por elemento
+    try { element.dataset.typingSig = makeTypingSig(text); } catch {}
+  }
+
+  // ====== DATILOGRAFIA ======
   async function typeText(element, text, speed = 40, showCursor = true) {
     return new Promise(resolve => {
       if (!element || !text) return resolve();
@@ -181,7 +203,6 @@
 
       element.textContent = '';
       if (showCursor) element.appendChild(caret);
-
       element.style.opacity = '1';
 
       let i = 0;
@@ -214,12 +235,12 @@
     const speed = options.speed || 36;
     const showCursor = options.cursor ?? true;
 
-    // ===== LATCH + ANTI-ECO =====
     try {
       const sig = makeTypingSig(text);
 
-      // 1) anti-eco GLOBAL (segura cascatas mesmo se DOM recriou)
+      // 1) anti-eco GLOBAL (NUNCA deixa vazio)
       if (shouldSkipTyping(sig)) {
+        forceShow(element, text);
         if (typeof callback === 'function') setTimeout(callback, 0);
         return;
       }
@@ -227,6 +248,7 @@
       // 2) latch por elemento (mesmo texto/idioma, mesmo elemento)
       const prev = element?.dataset?.typingSig;
       if (element && prev === sig && element.classList.contains('typing-done')) {
+        forceShow(element, text);
         if (typeof callback === 'function') setTimeout(callback, 0);
         return;
       }
@@ -247,11 +269,10 @@
   };
 
   // ===========================================================
-  //  EFEITOS DE VOZ + DATILOGRAFIA
+  //  EFEITOS DE VOZ
   // ===========================================================
   window.EffectCoordinator = window.EffectCoordinator || {};
 
-  // Anti-eco (mesmo texto/idioma em sequência)
   let __lastSpeakSig = '';
   let __lastSpeakAt = 0;
 
@@ -263,7 +284,6 @@
     const sig = `${lang}::${clean}`;
     const now = Date.now();
 
-    // janela maior para cascatas reais do app
     if (sig === __lastSpeakSig && (now - __lastSpeakAt) < 1600) return;
     __lastSpeakSig = sig;
     __lastSpeakAt = now;
@@ -272,53 +292,54 @@
 
     const utt = new SpeechSynthesisUtterance(clean);
     utt.lang  = lang;
-    utt.rate  = options.rate  || 1.03;
-    utt.pitch = options.pitch || 1.0;
+    utt.rate  = options.rate  ?? 1.03;
+    utt.pitch = options.pitch ?? 1.0;
+    utt.volume = options.volume ?? 1.0;
 
-    utt.onboundary = () => {
-      try { window.Luz?.startPulse({ min: 1, max: 1.45, speed: 120 }); } catch {}
-    };
-    utt.onend = () => {
-      try { window.Luz?.stopPulse(); } catch {}
-    };
+    utt.onboundary = () => { try { window.Luz?.startPulse({ min: 1, max: 1.45, speed: 120 }); } catch {} };
+    utt.onend = () => { try { window.Luz?.stopPulse(); } catch {} };
+    utt.onerror = () => { try { window.Luz?.stopPulse(); } catch {} };
 
-    // fala com a melhor voice possível pro idioma (espera voices carregarem)
-    const _speakNow = () => {
+    const speakNow = () => {
       speechSynthesis.speak(utt);
       typingLog('TTS falando…', lang);
     };
 
     Promise.resolve(__applyVoice(utt, lang))
       .catch(() => {})
-      .finally(_speakNow);
-
-    return;
+      .finally(speakNow);
   };
 
   // ===========================================================
-  //  typeAndSpeak — avança só quando a voz terminar
+  //  typeAndSpeak — datilografa e fala (voz correta)
   // ===========================================================
   window.typeAndSpeak = async function (element, text, speed = 36) {
     if (!text || !element) return;
 
-    // latch por elemento/texto/idioma
     try {
       const sig = makeTypingSig(text);
+
+      // latch por elemento
       if (element.dataset.typingSig === sig && element.classList.contains('typing-done')) return;
 
-      // anti-eco global também aqui (caso chamem typeAndSpeak em cascata)
-      if (shouldSkipTyping(sig)) return;
+      // anti-eco global (NUNCA deixa vazio)
+      if (shouldSkipTyping(sig)) {
+        forceShow(element, text);
+        return;
+      }
+
       element.dataset.typingSig = sig;
     } catch {}
 
     let terminou = false;
 
     if ('speechSynthesis' in window) {
-      const utt = new SpeechSynthesisUtterance(String(text).trim());
       const lang = getLangNow();
+      const utt = new SpeechSynthesisUtterance(String(text).trim());
       utt.lang  = lang;
       utt.rate  = 0.95;
       utt.pitch = 1.0;
+      utt.volume = 1.0;
       utt.onend = () => { terminou = true; };
       utt.onerror = () => { terminou = true; };
 
@@ -333,6 +354,7 @@
     await window.runTyping(element, text, null, { speed });
 
     while (!terminou) {
+      // eslint-disable-next-line no-await-in-loop
       await new Promise(r => setTimeout(r, 80));
     }
   };
