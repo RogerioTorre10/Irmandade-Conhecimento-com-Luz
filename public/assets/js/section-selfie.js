@@ -277,8 +277,7 @@ function tSelfie(key, vars = {}) {
       if (texto && !texto.classList.contains('typed')) {
         const guiaNomeMap = { arian: 'Arian', lumen: 'Lumen', zion: 'Zion' };
         const guiaNome = guiaNomeMap[guia] || 'Guia';
-        const fullText = tSelfie('selfie.text', { nome, guia: guiaNome });
-
+        const fullText = `${nome}, afaste o celular e posicione o rosto. ${guiaNome} te guiará.`;
         texto.textContent = '';
         typeWriter(texto, fullText, 36);
         speak(fullText);
