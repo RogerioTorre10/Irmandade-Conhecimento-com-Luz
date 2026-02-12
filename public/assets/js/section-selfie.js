@@ -65,14 +65,83 @@
     }, speed);
   }
 
-  function speak(text) {
-    if (window.speak) window.speak(text);
-    else if ('speechSynthesis' in window) {
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = 'pt-BR'; u.rate = 0.9;
-      speechSynthesis.speak(u);
+// ================================
+// LANG/I18N helpers (fallback safe)
+// ================================
+function getActiveLang() {
+  // 1) i18n global (se existir)
+  const l1 = window.i18n?.currentLang;
+
+  // 2) chaves comuns em storage (caso você salve em algum lugar)
+  const l2 = sessionStorage.getItem('jornada.lang') || sessionStorage.getItem('i18n.lang');
+  const l3 = localStorage.getItem('jc.lang') || localStorage.getItem('i18n.lang');
+
+  // 3) html lang
+  const l4 = document.documentElement?.lang;
+
+  const lang = (l1 || l2 || l3 || l4 || 'pt-BR').toString().trim();
+  return lang;
+}
+
+function tSelfie(key, vars = {}) {
+  // Se você tiver i18n.t / i18n.get / i18n.translate, usa
+  const it = window.i18n;
+  const lang = getActiveLang();
+
+  // tenta funções comuns
+  const candidates = [
+    typeof it?.t === 'function' ? it.t(key, vars) : null,
+    typeof it?.get === 'function' ? it.get(key, vars) : null,
+    typeof it?.translate === 'function' ? it.translate(key, vars) : null,
+  ].filter(Boolean);
+
+  if (candidates.length) return String(candidates[0]);
+
+  // fallback: dicionário mínimo
+  const dict = {
+    'pt-BR': {
+      'selfie.title': 'Prepare sua selfie',
+      'selfie.text': '{nome}, afaste o celular e posicione o rosto. {guia} te guiará.'
+    },
+    'en-US': {
+      'selfie.title': 'Prepare your selfie',
+      'selfie.text': '{nome}, hold your phone a bit farther and frame your face. {guia} will guide you.'
+    },
+    'es-ES': {
+      'selfie.title': 'Prepara tu selfie',
+      'selfie.text': '{nome}, aleja el teléfono y encuadra tu rostro. {guia} te guiará.'
     }
+  };
+
+  const base = dict[lang] || dict['pt-BR'];
+  let str = base[key] || dict['pt-BR'][key] || key;
+
+  // interpolação simples {nome} {guia}
+  Object.keys(vars).forEach(k => {
+    str = str.replaceAll(`{${k}}`, String(vars[k] ?? ''));
+  });
+  return str;
+}
+
+  
+ function speak(text) {
+  const lang = getActiveLang();
+
+  if (window.speak) {
+    // Se existir um speak global seu, tente passar lang se ele aceitar
+    try { window.speak(text, { lang }); return; } catch (e) {}
+    window.speak(text); // fallback
+    return;
   }
+
+  if ('speechSynthesis' in window) {
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = lang;   // ✅ usa idioma ativo
+    u.rate = 0.9;
+    speechSynthesis.speak(u);
+  }
+}
+
 
   function updateZoom() {
     const all = +document.getElementById('zoomAll').value;
