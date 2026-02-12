@@ -1,4 +1,4 @@
-// /assets/js/jornada-typing-bridge.js — FINAL (LATCH + anti-eco GLOBAL + logs controláveis)
+// /assets/js/jornada-typing-bridge.js — FINAL (LATCH + anti-eco GLOBAL + logs controláveis + VOICE MANAGER)
 (function (window) {
   'use strict';
 
@@ -18,10 +18,95 @@
 
   function getLangNow() {
     return (
-      (window.i18n && window.i18n.lang) ||
+      window.i18n?.currentLang ||
+      window.i18n?.lang ||
+      sessionStorage.getItem('jornada.lang') ||
+      sessionStorage.getItem('i18n.lang') ||
+      localStorage.getItem('jc.lang') ||
       localStorage.getItem('i18n_lang') ||
+      document.documentElement?.lang ||
       'pt-BR'
     );
+  }
+
+  // =========================
+  // VOICE MANAGER (global)
+  // - garante voz correta por idioma
+  // - espera carregamento das voices (voiceschanged)
+  // =========================
+  let __voices = [];
+  let __voicesPromise = null;
+  const __voiceCache = new Map(); // lang -> voice
+
+  function __loadVoicesNow() {
+    try { __voices = speechSynthesis.getVoices?.() || []; } catch { __voices = []; }
+    return __voices;
+  }
+
+  function __normalizeLang(lang) {
+    return String(lang || 'pt-BR').trim();
+  }
+
+  function __ensureVoicesReady(timeoutMs = 1400) {
+    if (!('speechSynthesis' in window)) return Promise.resolve();
+
+    __loadVoicesNow();
+    if (__voices.length) return Promise.resolve();
+
+    if (!__voicesPromise) {
+      __voicesPromise = new Promise((resolve) => {
+        const t0 = Date.now();
+
+        const tick = () => {
+          __loadVoicesNow();
+          if (__voices.length) return resolve();
+          if (Date.now() - t0 > timeoutMs) return resolve();
+          setTimeout(tick, 80);
+        };
+
+        try {
+          speechSynthesis.onvoiceschanged = () => {
+            __loadVoicesNow();
+            resolve();
+          };
+        } catch {}
+
+        tick();
+      });
+    }
+
+    return __voicesPromise;
+  }
+
+  function __pickBestVoice(lang) {
+    lang = __normalizeLang(lang);
+    if (__voiceCache.has(lang)) return __voiceCache.get(lang);
+
+    const L = lang.toLowerCase();
+    const prefix = L.split('-')[0];
+
+    // 1) match exato
+    let v = __voices.find(x => (x.lang || '').toLowerCase() === L) || null;
+
+    // 2) match por prefixo (pt, en, es...)
+    if (!v) v = __voices.find(x => (x.lang || '').toLowerCase().startsWith(prefix)) || null;
+
+    // 3) preferência por localService quando possível
+    if (v && typeof v.localService === 'boolean') {
+      const same = __voices.filter(x => (x.lang || '').toLowerCase() === (v.lang || '').toLowerCase());
+      const local = same.find(x => x.localService);
+      if (local) v = local;
+    }
+
+    __voiceCache.set(lang, v);
+    return v;
+  }
+
+  async function __applyVoice(utt, lang) {
+    if (!utt || !('speechSynthesis' in window)) return;
+    await __ensureVoicesReady();
+    const v = __pickBestVoice(lang);
+    if (v) utt.voice = v;
   }
 
   // ====== ESTILO DO CURSOR ======
@@ -190,15 +275,6 @@
     utt.rate  = options.rate  || 1.03;
     utt.pitch = options.pitch || 1.0;
 
-    // tenta escolher uma voz compatível com o idioma
-    try {
-      const voices = speechSynthesis.getVoices?.() || [];
-      const match =
-        voices.find(v => (v.lang || '').toLowerCase() === lang.toLowerCase()) ||
-        voices.find(v => (v.lang || '').toLowerCase().startsWith(lang.toLowerCase().slice(0, 2)));
-      if (match) utt.voice = match;
-    } catch {}
-
     utt.onboundary = () => {
       try { window.Luz?.startPulse({ min: 1, max: 1.45, speed: 120 }); } catch {}
     };
@@ -206,8 +282,17 @@
       try { window.Luz?.stopPulse(); } catch {}
     };
 
-    speechSynthesis.speak(utt);
-    typingLog('TTS falando…', lang);
+    // fala com a melhor voice possível pro idioma (espera voices carregarem)
+    const _speakNow = () => {
+      speechSynthesis.speak(utt);
+      typingLog('TTS falando…', lang);
+    };
+
+    Promise.resolve(__applyVoice(utt, lang))
+      .catch(() => {})
+      .finally(_speakNow);
+
+    return;
   };
 
   // ===========================================================
@@ -235,14 +320,9 @@
       utt.rate  = 0.95;
       utt.pitch = 1.0;
       utt.onend = () => { terminou = true; };
+      utt.onerror = () => { terminou = true; };
 
-      try {
-        const voices = speechSynthesis.getVoices?.() || [];
-        const match =
-          voices.find(v => (v.lang || '').toLowerCase() === lang.toLowerCase()) ||
-          voices.find(v => (v.lang || '').toLowerCase().startsWith(lang.toLowerCase().slice(0, 2)));
-        if (match) utt.voice = match;
-      } catch {}
+      try { await __applyVoice(utt, lang); } catch {}
 
       try { speechSynthesis.cancel(); } catch {}
       speechSynthesis.speak(utt);
