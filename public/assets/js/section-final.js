@@ -1,4 +1,4 @@
-/* /assets/js/section-final.js — v5
+/* /assets/js/section-final.js — v5 (corrigido i18n/lang)
  * Página final da Jornada Essencial
  * - Datilografia + voz
  * - Botões de PDF/HQ
@@ -13,9 +13,9 @@
   const FINAL_MOVIE  = '/assets/videos/filme-5-fim-da-jornada.mp4';
 
   let started = false;
-  
+
   // ================================
-  // LANG/I18N helpers (fallback safe)
+  // LANG helper (fallback safe)
   // ================================
   function getActiveLang() {
     const l1 = window.i18n?.currentLang;
@@ -24,14 +24,6 @@
     const l4 = document.documentElement?.lang;
     return (l1 || l2 || l3 || l4 || 'pt-BR').toString().trim();
   }
-
-  function applyI18nIfAvailable(root) {
-    // aplica textos traduzidos no DOM antes de capturar "original"
-    if (window.i18n && typeof window.i18n.apply === 'function' && root) {
-      try { window.i18n.apply(root); } catch (e) {}
-    }
-  }
-
 
   // Utilitário de pausa
   const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -44,7 +36,7 @@
 
     speechChain = speechChain.then(() => new Promise((resolve) => {
       const utter = new SpeechSynthesisUtterance(text);
-      utter.lang   = getActiveLang();
+      utter.lang   = getActiveLang(); // ✅ idioma ativo
       utter.rate   = 0.9;
       utter.pitch  = 1;
       utter.volume = 0.9;
@@ -68,7 +60,6 @@
     for (let i = 0; i < text.length; i++) {
       el.textContent += text[i];
       if (i % 2 === 0) {
-        // pequena pausa para não pesar
         // eslint-disable-next-line no-await-in-loop
         await sleep(delay);
       }
@@ -101,41 +92,30 @@
     speechChain = Promise.resolve();
 
     const { section, titleEl, msgEl, botoes } = ensureFinalDOM();
-    
-    // Reaplica idioma ativo ANTES de capturar textos originais
-    applyI18nIfAvailable(section);
-    const langNow = getActiveLang();
-
     if (!section || !titleEl || !msgEl) return;
 
-    // Garante que a seção esteja visível (mesmo que tenha vindo com style="display:none")
+    // Garante que a seção esteja visível
     section.style.display = 'block';
 
     const tituloOriginal =
-    (titleEl.dataset.original && titleEl.dataset.originalLang === langNow)
-    ? titleEl.dataset.original
-    : (titleEl.textContent.trim() || 'Gratidão por Caminhar com Luz');
+      titleEl.dataset.original ||
+      titleEl.textContent.trim() ||
+      'Gratidão por Caminhar com Luz';
 
     titleEl.dataset.original = tituloOriginal;
-    titleEl.dataset.originalLang = langNow;
+    titleEl.textContent = '';
+    titleEl.style.opacity = 0;
+    titleEl.style.transform = 'translateY(-16px)';
 
     const ps = msgEl.querySelectorAll('p');
     ps.forEach(p => {
-    const currentTxt = p.textContent.trim();
-    const txt =
-    (p.dataset.original && p.dataset.originalLang === langNow)
-     ? p.dataset.original
-     : currentTxt;
-
+      const txt = p.dataset.original || p.textContent.trim();
       p.dataset.original = txt;
-      p.dataset.originalLang = langNow;
-
       p.textContent = '';
       p.style.opacity = 0;
       p.style.transform = 'translateY(10px)';
       p.classList.remove('revealed');
     });
-
 
     section.classList.add('show');
     await sleep(200);
@@ -152,6 +132,7 @@
       const p = ps[i];
       const txt = p.dataset.original || '';
       if (!txt) continue;
+
       p.style.transition = 'all 0.8s ease';
       p.style.opacity = 1;
       p.style.transform = 'translateY(0)';
@@ -188,7 +169,8 @@
 
   // ------------------------ PDF / HQ ------------------------
   async function generateArtifacts() {
-    const langNow = getActiveLang();
+    const langNow = getActiveLang(); // ✅ pega idioma 1x
+
     const btn = document.getElementById('btnBaixarPDFHQ');
     if (!btn || btn.dataset.loading === '1') return;
 
@@ -204,7 +186,7 @@
         body: JSON.stringify({
           answers: window.JornadaAnswers || window.__QA_ANSWERS__ || { teste: 'finalizado' },
           meta: window.__QA_META__ || { finishedAt: new Date().toISOString() },
-          lang: langNow.
+          lang: langNow // ✅ idioma ativo
         })
       });
 
@@ -256,7 +238,7 @@
       window.playTransitionVideo(src, null);
       setTimeout(() => {
         window.location.href = HOME_URL;
-      }, 16000); // tempo aproximado de segurança
+      }, 16000);
       return;
     }
 
@@ -274,9 +256,7 @@
     console.log('[FINAL] section:shown recebido para section-final, iniciando sequência...');
 
     const sec = document.getElementById(SECTION_ID);
-    if (sec) {
-      sec.style.display = 'block';
-    }
+    if (sec) sec.style.display = 'block';
 
     startFinalSequence();
   });
@@ -305,41 +285,38 @@
     const visible = sec.classList.contains('show') ||
                     getComputedStyle(sec).display !== 'none';
 
-    if (visible) {
-      startFinalSequence();
-    }
+    if (visible) startFinalSequence();
   });
+
   /* =========================================================
    TEMA DO GUIA — reaplica em qualquer seção quando necessário
    ========================================================= */
-(function () {
-  'use strict';
+  (function () {
+    'use strict';
 
-  function applyThemeFromSession() {
-    const guiaRaw = sessionStorage.getItem('jornada.guia');
-    const guia = guiaRaw ? guiaRaw.toLowerCase().trim() : '';
+    function applyThemeFromSession() {
+      const guiaRaw = sessionStorage.getItem('jornada.guia');
+      const guia = guiaRaw ? guiaRaw.toLowerCase().trim() : '';
 
-    // fallback dourado
-    let main = '#ffd700', g1 = 'rgba(255,230,180,0.85)', g2 = 'rgba(255,210,120,0.75)';
+      // fallback dourado
+      let main = '#ffd700', g1 = 'rgba(255,230,180,0.85)', g2 = 'rgba(255,210,120,0.75)';
 
-    if (guia === 'lumen') { main = '#00ff9d'; g1 = 'rgba(0,255,157,0.90)'; g2 = 'rgba(120,255,200,0.70)'; }
-    if (guia === 'zion')  { main = '#00aaff'; g1 = 'rgba(0,170,255,0.90)'; g2 = 'rgba(255,214,91,0.70)'; }
-    if (guia === 'arian') { main = '#ff00ff'; g1 = 'rgba(255,120,255,0.95)'; g2 = 'rgba(255,180,255,0.80)'; }
+      if (guia === 'lumen') { main = '#00ff9d'; g1 = 'rgba(0,255,157,0.90)'; g2 = 'rgba(120,255,200,0.70)'; }
+      if (guia === 'zion')  { main = '#00aaff'; g1 = 'rgba(0,170,255,0.90)'; g2 = 'rgba(255,214,91,0.70)'; }
+      if (guia === 'arian') { main = '#ff00ff'; g1 = 'rgba(255,120,255,0.95)'; g2 = 'rgba(255,180,255,0.80)'; }
 
-    document.documentElement.style.setProperty('--theme-main-color', main);
-    document.documentElement.style.setProperty('--progress-main', main);
-    document.documentElement.style.setProperty('--progress-glow-1', g1);
-    document.documentElement.style.setProperty('--progress-glow-2', g2);
-    document.documentElement.style.setProperty('--guide-color', main);
+      document.documentElement.style.setProperty('--theme-main-color', main);
+      document.documentElement.style.setProperty('--progress-main', main);
+      document.documentElement.style.setProperty('--progress-glow-1', g1);
+      document.documentElement.style.setProperty('--progress-glow-2', g2);
+      document.documentElement.style.setProperty('--guide-color', main);
 
-    if (guia) document.body.setAttribute('data-guia', guia);
-  }
+      if (guia) document.body.setAttribute('data-guia', guia);
+    }
 
-  // roda no carregamento e também quando o app troca seção
-  document.addEventListener('DOMContentLoaded', applyThemeFromSession);
-  document.addEventListener('sectionLoaded', () => setTimeout(applyThemeFromSession, 50));
-  document.addEventListener('guia:changed', applyThemeFromSession);
-})();
-
+    document.addEventListener('DOMContentLoaded', applyThemeFromSession);
+    document.addEventListener('sectionLoaded', () => setTimeout(applyThemeFromSession, 50));
+    document.addEventListener('guia:changed', applyThemeFromSession);
+  })();
 
 })();
