@@ -13,6 +13,25 @@
   const FINAL_MOVIE  = '/assets/videos/filme-5-fim-da-jornada.mp4';
 
   let started = false;
+  
+  // ================================
+  // LANG/I18N helpers (fallback safe)
+  // ================================
+  function getActiveLang() {
+    const l1 = window.i18n?.currentLang;
+    const l2 = sessionStorage.getItem('jornada.lang') || sessionStorage.getItem('i18n.lang');
+    const l3 = localStorage.getItem('jc.lang') || localStorage.getItem('i18n.lang');
+    const l4 = document.documentElement?.lang;
+    return (l1 || l2 || l3 || l4 || 'pt-BR').toString().trim();
+  }
+
+  function applyI18nIfAvailable(root) {
+    // aplica textos traduzidos no DOM antes de capturar "original"
+    if (window.i18n && typeof window.i18n.apply === 'function' && root) {
+      try { window.i18n.apply(root); } catch (e) {}
+    }
+  }
+
 
   // Utilitário de pausa
   const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -25,7 +44,7 @@
 
     speechChain = speechChain.then(() => new Promise((resolve) => {
       const utter = new SpeechSynthesisUtterance(text);
-      utter.lang   = 'pt-BR';
+      utter.lang   = getActiveLang();
       utter.rate   = 0.9;
       utter.pitch  = 1;
       utter.volume = 0.9;
@@ -82,30 +101,41 @@
     speechChain = Promise.resolve();
 
     const { section, titleEl, msgEl, botoes } = ensureFinalDOM();
+    
+    // Reaplica idioma ativo ANTES de capturar textos originais
+    applyI18nIfAvailable(section);
+    const langNow = getActiveLang();
+
     if (!section || !titleEl || !msgEl) return;
 
     // Garante que a seção esteja visível (mesmo que tenha vindo com style="display:none")
     section.style.display = 'block';
 
     const tituloOriginal =
-      titleEl.dataset.original ||
-      titleEl.textContent.trim() ||
-      'Gratidão por Caminhar com Luz';
+    (titleEl.dataset.original && titleEl.dataset.originalLang === langNow)
+    ? titleEl.dataset.original
+    : (titleEl.textContent.trim() || 'Gratidão por Caminhar com Luz');
 
     titleEl.dataset.original = tituloOriginal;
-    titleEl.textContent = '';
-    titleEl.style.opacity = 0;
-    titleEl.style.transform = 'translateY(-16px)';
+    titleEl.dataset.originalLang = langNow;
 
     const ps = msgEl.querySelectorAll('p');
     ps.forEach(p => {
-      const txt = p.dataset.original || p.textContent.trim();
+    const currentTxt = p.textContent.trim();
+    const txt =
+    (p.dataset.original && p.dataset.originalLang === langNow)
+     ? p.dataset.original
+     : currentTxt;
+
       p.dataset.original = txt;
+      p.dataset.originalLang = langNow;
+
       p.textContent = '';
       p.style.opacity = 0;
       p.style.transform = 'translateY(10px)';
       p.classList.remove('revealed');
     });
+
 
     section.classList.add('show');
     await sleep(200);
@@ -158,6 +188,7 @@
 
   // ------------------------ PDF / HQ ------------------------
   async function generateArtifacts() {
+    const langNow = getActiveLang();
     const btn = document.getElementById('btnBaixarPDFHQ');
     if (!btn || btn.dataset.loading === '1') return;
 
@@ -173,7 +204,7 @@
         body: JSON.stringify({
           answers: window.JornadaAnswers || window.__QA_ANSWERS__ || { teste: 'finalizado' },
           meta: window.__QA_META__ || { finishedAt: new Date().toISOString() },
-          lang: 'pt-BR'
+          lang: getActiveLang()
         })
       });
 
