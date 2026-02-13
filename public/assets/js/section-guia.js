@@ -651,24 +651,25 @@ root.__BOTTOM_BOX__ = bottomBox;
           }
         }
 
-   // DESATIVA TOP DEFINITIVAMENTE
+ // TOP: mata tudo
 topButtons.forEach(b => {
   b.dataset.locked = '1';
   b.setAttribute('aria-disabled', 'true');
   b.classList.add('is-locked');
-  b.style.pointerEvents = 'none';
-  b.style.opacity = '0.4';
+  b.style.opacity = '0.35';
+  b.style.cursor = 'default';
+  b.style.pointerEvents = 'none';     // ✅ mata hover/preview/clique
 });
 
-// ATIVA BOTTOM PARA ESCOLHA REAL
+// BOTTOM: libera seleção oficial
 bottomButtons.forEach(b => {
   b.dataset.locked = '0';
   b.removeAttribute('aria-disabled');
   b.classList.remove('is-locked');
-  b.style.pointerEvents = 'auto';
   b.style.opacity = '1';
+  b.style.cursor = 'pointer';
+  b.style.pointerEvents = 'auto';     // ✅ libera tudo
 });
-
 
 // Preview agora só no BOTTOM (opcional, se você quiser preview também na fase 2)
 bindPreviewToButtons(root, bottomButtons);
@@ -682,7 +683,6 @@ if (bottomBox) {
   bottomBox.classList.remove('disabled');
   bottomBox.classList.add('enabled');
 }
-
 
         hideNotice(root);
       });
