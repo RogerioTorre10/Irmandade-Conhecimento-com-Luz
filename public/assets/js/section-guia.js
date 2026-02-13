@@ -556,20 +556,34 @@ try {
 }
 
 // pega botões dos DOIS containers (topo + baixo)
-guideButtons = [
-  ...qa('button[data-action="select-guia"]', topBox || root),
-  ...qa('button[data-action="select-guia"]', bottomBox || root),
-];
+// ===============================
+// BOTÕES TOP e BOTTOM SEPARADOS
+// ===============================
+const topButtons = qa('button[data-action="select-guia"]', topBox || root);
+const bottomButtons = qa('button[data-action="select-guia"]', bottomBox || root);
 
-// trava seleção nos dois grupos no início (mantém preview ok)
-guideButtons.forEach(b => {
+// ---------- ESTADO INICIAL ----------
+// TOP → preview apenas (hover + vídeo + voz)
+// BOTTOM → completamente morto (sem preview / sem clique)
+
+// TOP
+topButtons.forEach(b => {
+  b.dataset.locked = '1'; // impede confirmar
+  b.setAttribute('aria-disabled', 'true');
+  b.classList.add('is-locked');
+  b.style.opacity = '1';
+  b.style.pointerEvents = 'auto'; // preview OK
+});
+
+// BOTTOM
+bottomButtons.forEach(b => {
   b.dataset.locked = '1';
   b.setAttribute('aria-disabled', 'true');
   b.classList.add('is-locked');
-  b.style.opacity = '0.6';
-  b.style.cursor = 'pointer';
-  b.style.pointerEvents = 'auto';
+  b.style.opacity = '0';
+  b.style.pointerEvents = 'none'; // completamente inativo
 });
+
 
     // BIND preview (único e limpo)
     bindPreviewToButtons(root, guideButtons);
@@ -634,15 +648,23 @@ guideButtons.forEach(b => {
 const bottomBox = root.querySelector('.guia-options-bottom');
 const bottomButtons = qa('button[data-action="select-guia"]', bottomBox || root);
 
+// DESATIVA TOP DEFINITIVAMENTE
+topButtons.forEach(b => {
+  b.dataset.locked = '1';
+  b.setAttribute('aria-disabled', 'true');
+  b.classList.add('is-locked');
+  b.style.pointerEvents = 'none';
+  b.style.opacity = '0.4';
+});
+
+// ATIVA BOTTOM PARA ESCOLHA REAL
 bottomButtons.forEach(b => {
   b.dataset.locked = '0';
   b.removeAttribute('aria-disabled');
   b.classList.remove('is-locked');
-  b.style.opacity = '1';
-  b.style.cursor = 'pointer';
   b.style.pointerEvents = 'auto';
+  b.style.opacity = '1';
 });
-
 
         hideNotice(root);
       });
