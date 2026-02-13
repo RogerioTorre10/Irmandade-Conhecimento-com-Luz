@@ -1,4 +1,4 @@
-// /assets/js/section-guia.js — v3.4 (Fase 1: preview com áudio; Fase 2: TTS da descrição)
+// /assets/js/section-guia.js — v3.3 (NOME + GUIA SALVOS + 2 PASSOS + TTS + AURA + PREVIEW 10s LIMPO)
 (function () {
   'use strict';
 
@@ -25,13 +25,6 @@
   const q  = (sel, root = document) => root.querySelector(sel);
   const qa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
-  // ============================
-  // ✅ FASES DE ÁUDIO/TTS (NOVO)
-  // ============================
-  // Fase 1 (antes de confirmar nome): preview com áudio, sem TTS de descrição
-  // Fase 2 (depois de confirmar nome): preview mudo, TTS da descrição ligado
-  let nomeConfirmado = false;
-
   // Estado do fluxo
   let hoverTimers = new Map();   // Map<guiaId, timeoutId>
   let armedId = null;            // guia armado
@@ -54,7 +47,8 @@
     previewVideo   = document.getElementById('guiaPreviewVideo');
     if (!previewOverlay || !previewVideo) return false;
 
-    // configurações seguras (não forçar muted aqui; quem decide é a fase)
+    // configurações seguras
+    previewVideo.muted = true;
     previewVideo.playsInline = true;
     previewVideo.preload = 'auto';
 
@@ -90,28 +84,16 @@
     hidePreview();
   }
 
-  // ✅ NOVO: withAudio controla se o preview toca com som
-  async function playPreviewSrc(src, root, withAudio = false) {
+  async function playPreviewSrc(src, root) {
     if (!src) return false;
     if (!ensurePreviewRefs(root)) return false;
 
     // se já está tocando o mesmo src, não reinicia
     if (previewPlaying && previewCurrentSrc === src) return true;
 
-    // Se vamos tocar com áudio (fase 1), cancela TTS para não “abafar”
-    if (withAudio) {
-      try { window.speechSynthesis?.cancel?.(); } catch {}
-    }
-
     stopPreview();
     previewPlaying = true;
     previewCurrentSrc = src;
-
-    // áudio conforme fase
-    try {
-      previewVideo.muted = !withAudio;
-      previewVideo.volume = withAudio ? 1 : 0;
-    } catch {}
 
     previewVideo.src = src;
     try { previewVideo.load(); } catch {}
@@ -143,9 +125,7 @@
 
       btn.addEventListener('mouseenter', () => {
         const src = getSrc();
-        if (!src) return;
-        // Fase 1: com áudio / Fase 2: mudo
-        playPreviewSrc(src, root, !nomeConfirmado);
+        if (src) playPreviewSrc(src, root);
       });
 
       btn.addEventListener('mouseleave', () => {
@@ -154,16 +134,14 @@
 
       btn.addEventListener('focusin', () => {
         const src = getSrc();
-        if (!src) return;
-        playPreviewSrc(src, root, !nomeConfirmado);
+        if (src) playPreviewSrc(src, root);
       });
 
       btn.addEventListener('focusout', () => stopPreview());
 
       btn.addEventListener('touchstart', () => {
         const src = getSrc();
-        if (!src) return;
-        playPreviewSrc(src, root, !nomeConfirmado);
+        if (src) playPreviewSrc(src, root);
       }, { passive: true });
     });
 
@@ -521,104 +499,34 @@
     // título
     if (els.title && !els.title.classList.contains('typing-done')) {
       await typeOnce(els.title, null, { speed: 34, speak: true });
-    }  
+    }
 
-    // ===== CARREGA GUIAS =====
+    // carrega guias
     try {
       guias = await loadGuias();
-
-      // detecta containers TOP e BOTTOM (novo), ou cai no antigo .guia-options
-      topBox    = root.querySelector('.guia-options-top')    || null;
-      bottomBox = root.querySelector('.guia-options-bottom') || null;
-
-      const legacyBox = els.optionsBox || root.querySelector('.guia-options');
-
-      if (topBox) {
-        renderButtons(topBox, guias, previewCtrl);
-      } else if (legacyBox) {
-        renderButtons(legacyBox, guias, previewCtrl);
-      }
-
-      if (bottomBox) {
-        renderButtons(bottomBox, guias, previewCtrl);
-      }
-
+      renderButtons(els.optionsBox, guias);
       hideNotice(root);
-    } catch (e) {
+    } catch {
       showNotice(root, 'Não foi possível carregar os guias. Tente novamente mais tarde.', { speak: false });
       return;
     }
 
-    // pega botões dos containers (TOP + BOTTOM ou legacy)
-    const legacyBox = els.optionsBox || root.querySelector('.guia-options') || root;
+    guideButtons = qa('button[data-action="select-guia"]', els.optionsBox);
 
-    topButtons = qa('button[data-action="select-guia"]', (topBox || legacyBox));
-    bottomButtons = bottomBox ? qa('button[data-action="select-guia"]', bottomBox) : [];
-
-    guideButtons = [...topButtons, ...bottomButtons];
-
-    // ------------------------------
-    // Estado inicial (2 estágios):
-    // TOP: preview ON, mas SEM confirmar (locked=1, pointerEvents=auto)
-    // BOTTOM: totalmente "morto" até confirmar (sem hover/preview/click)
-    // ------------------------------
-    topButtons.forEach(b => {
+    // mantém hover/preview funcionando, mas bloqueia seleção até confirmar nome
+    guideButtons.forEach(b => {
       b.dataset.locked = '1';
       b.setAttribute('aria-disabled', 'true');
       b.classList.add('is-locked');
-      b.style.opacity = '0.85';
+      b.style.opacity = '0.6';
       b.style.cursor = 'pointer';
-      b.style.pointerEvents = 'auto'; // permite preview
+      b.style.pointerEvents = 'auto';
     });
 
-    bottomButtons.forEach(b => {
-      b.dataset.locked = '1';
-      b.setAttribute('aria-disabled', 'true');
-      b.classList.add('is-locked');
-      b.style.opacity = '0.25';
-      b.style.cursor = 'default';
-      b.style.pointerEvents = 'none'; // NÃO permite preview/click antes do nome
-    });
+    // BIND preview (único e limpo)
+    bindPreviewToButtons(root, guideButtons);
 
-    // clique simples / dblclick / teclado (delegado no root)
-    // (aplica para TOP e BOTTOM, mas o locked/pointer-events controla o stage)
-    root.addEventListener('click', (ev) => {
-      const btn = ev.target.closest('button[data-action="select-guia"]');
-      if (!btn) return;
-
-      ev.preventDefault();
-      ev.stopPropagation();
-
-      if (btn.dataset.locked === '1') return; // não confirma
-
-      armGuide(root, btn);
-    }, true);
-
-    root.addEventListener('dblclick', (ev) => {
-      const btn = ev.target.closest('button[data-action="select-guia"]');
-      if (!btn) return;
-
-      ev.preventDefault();
-      ev.stopPropagation();
-
-      if (btn.dataset.locked === '1') return;
-
-      armGuide(root, btn);
-    }, true);
-
-    root.addEventListener('keydown', (ev) => {
-      if (ev.key !== 'Enter' && ev.key !== ' ') return;
-
-      const btn = ev.target.closest && ev.target.closest('button[data-action="select-guia"]');
-      if (!btn) return;
-
-      ev.preventDefault();
-      if (btn.dataset.locked === '1') return;
-
-      armGuide(root, btn);
-    }, true);
-
-    // confirmar nome começa bloqueado; libera conforme input
+    // confirmar começa bloqueado; libera conforme input
     let __NAME_CONFIRMED__ = false;
     if (els.confirmBtn) els.confirmBtn.disabled = true;
 
@@ -630,45 +538,45 @@
       });
     }
 
-    if (els.confirmBtn && !els.confirmBtn.dataset.bound) {
-      els.confirmBtn.dataset.bound = '1';
-
+    if (els.confirmBtn && !els.confirmBtn.dataset.confirmBound) {
+      els.confirmBtn.dataset.confirmBound = '1';
       els.confirmBtn.addEventListener('click', async (ev) => {
         ev.preventDefault();
         ev.stopPropagation();
 
-        const nome = (els.nameInput?.value || '').trim();
-        if (nome.length < 2) return;
-
-        if (__NAME_CONFIRMED__) return;
-        __NAME_CONFIRMED__ = true;
-
-        // salva nome
-        try { localStorage.setItem('jc.nome', nome.toUpperCase()); } catch (_) {}
-
-        // texto de boas vindas (mantém seu template {{nome}})
-        if (els.guiaTexto) {
-          const base = (els.guiaTexto.dataset?.text || els.guiaTexto.textContent || 'Olá, {{nome}}! Escolha seu guia para a Jornada.');
-          const msg = base.replace(/\{\{\s*(nome|name)\s*\}\}/gi, nome.toUpperCase());
-          els.guiaTexto.textContent = '';
-          await typeOnce(els.guiaTexto, msg, { speed: 38, speak: true });
+        const name = (els.nameInput?.value || '').trim();
+        if (name.length < 2) {
+          els.nameInput?.focus();
+          return;
         }
 
-        // ------------------------------
-        // STAGE 2: após confirmar o nome
-        // - TOP fica desabilitado (sem hover/preview/click)
-        // - BOTTOM fica habilitado (preview + seleção)
-        // ------------------------------
-        topButtons.forEach(b => {
-          b.dataset.locked = '1';
-          b.setAttribute('aria-disabled', 'true');
-          b.classList.add('is-locked');
-          b.style.opacity = '0.35';
-          b.style.cursor = 'default';
-          b.style.pointerEvents = 'none';
-        });
+        const upperName = name.toUpperCase();
+        els.nameInput.value = upperName;
 
-        bottomButtons.forEach(b => {
+        try {
+          window.JC = window.JC || {};
+          window.JC.data = window.JC.data || {};
+          window.JC.data.nome = upperName;
+
+          sessionStorage.setItem('jornada.nome', upperName);
+          localStorage.setItem('jc.nome', upperName);
+        } catch {}
+
+        if (!__NAME_CONFIRMED__) {
+          __NAME_CONFIRMED__ = true;
+
+          if (els.guiaTexto) {
+            const base = (els.guiaTexto.dataset?.text || els.guiaTexto.textContent || 'Escolha seu guia para a Jornada.').trim();
+            const msg = base.replace(/\{\{\s*(nome|name)\s*\}\}/gi, upperName);
+            els.guiaTexto.textContent = '';
+            await typeOnce(els.guiaTexto, msg, { speed: 38, speak: true });
+            els.moldura?.classList.add('glow');
+            els.guiaTexto?.classList.add('glow');
+          }
+        }
+
+        // destrava seleção (preview já funciona antes)
+        guideButtons.forEach(b => {
           b.dataset.locked = '0';
           b.removeAttribute('aria-disabled');
           b.classList.remove('is-locked');
@@ -677,44 +585,9 @@
           b.style.pointerEvents = 'auto';
         });
 
-        if (topBox) {
-          topBox.classList.remove('enabled');
-          topBox.classList.add('disabled');
-        }
-        if (bottomBox) {
-          bottomBox.classList.remove('disabled');
-          bottomBox.classList.add('enabled');
-        }
-
         hideNotice(root);
       });
     }
-
-    // segurança: ao sair da seção, para preview
-    window.addEventListener('jc:section:leave', () => {
-      try { if (previewCtrl) previewCtrl.stopPreview(); } catch (_) {}
-    });
-
-    log('Eventos configurados (TOP preview / BOTTOM seleção)');
-  }
-
-  // ---------------------------------------
-  // Bootstrap: roda quando seção aparece
-  // ---------------------------------------
-  function boot() {
-    const root = document.getElementById(SECTION_ID);
-    if (!root) return;
-
-    initOnce(root).catch(e => console.warn('[JCGuia] initOnce erro:', e));
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot);
-  } else {
-    boot();
-  }
-})();
-
 
     // eventos dos botões de guia (bind 1x)
     if (root.dataset.guiaButtonsBound !== '1') {
@@ -724,7 +597,7 @@
         const guiaId = (btn.dataset.guia || btn.textContent || '').toLowerCase().trim();
         const label = (btn.dataset.nome || btn.textContent || 'guia').toUpperCase();
 
-        // Hover: descrição + tema (com speak condicionado pela fase)
+        // Hover: descrição + tema (seu comportamento original)
         btn.addEventListener('mouseenter', () => {
           if (!guiaId) return;
 
@@ -734,9 +607,7 @@
             const g = findGuia(guias, guiaId);
             if (g && els.guiaTexto) {
               els.guiaTexto.dataset.spoken = '';
-              // ✅ Fase 1: NÃO fala descrição (para não abafar o vídeo)
-              // ✅ Fase 2: fala descrição normalmente
-              await typeOnce(els.guiaTexto, g.descricao, { speed: 34, speak: !!nomeConfirmado });
+              await typeOnce(els.guiaTexto, g.descricao, { speed: 34, speak: true });
             }
             applyGuiaTheme(guiaId);
           }, HOVER_DELAY_MS);
@@ -757,7 +628,7 @@
           const g = findGuia(guias, guiaId);
           if (g && els.guiaTexto) {
             els.guiaTexto.dataset.spoken = '';
-            typeOnce(els.guiaTexto, g.descricao, { speed: 34, speak: !!nomeConfirmado });
+            typeOnce(els.guiaTexto, g.descricao, { speed: 34, speak: true });
           }
         });
 
