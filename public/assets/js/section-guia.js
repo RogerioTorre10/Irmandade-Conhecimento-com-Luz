@@ -1,4 +1,4 @@
-// /assets/js/section-guia.js — v3.3 (NOME + GUIA SALVOS + 2 PASSOS + TTS + AURA + PREVIEW 10s LIMPO)
+// /assets/js/section-guia.js — v3.4 (Fase 1: preview com áudio; Fase 2: TTS da descrição)
 (function () {
   'use strict';
 
@@ -25,6 +25,13 @@
   const q  = (sel, root = document) => root.querySelector(sel);
   const qa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
+  // ============================
+  // ✅ FASES DE ÁUDIO/TTS (NOVO)
+  // ============================
+  // Fase 1 (antes de confirmar nome): preview com áudio, sem TTS de descrição
+  // Fase 2 (depois de confirmar nome): preview mudo, TTS da descrição ligado
+  let nomeConfirmado = false;
+
   // Estado do fluxo
   let hoverTimers = new Map();   // Map<guiaId, timeoutId>
   let armedId = null;            // guia armado
@@ -47,8 +54,7 @@
     previewVideo   = document.getElementById('guiaPreviewVideo');
     if (!previewOverlay || !previewVideo) return false;
 
-    // configurações seguras
-    previewVideo.muted = true;
+    // configurações seguras (não forçar muted aqui; quem decide é a fase)
     previewVideo.playsInline = true;
     previewVideo.preload = 'auto';
 
@@ -84,16 +90,28 @@
     hidePreview();
   }
 
-  async function playPreviewSrc(src, root) {
+  // ✅ NOVO: withAudio controla se o preview toca com som
+  async function playPreviewSrc(src, root, withAudio = false) {
     if (!src) return false;
     if (!ensurePreviewRefs(root)) return false;
 
     // se já está tocando o mesmo src, não reinicia
     if (previewPlaying && previewCurrentSrc === src) return true;
 
+    // Se vamos tocar com áudio (fase 1), cancela TTS para não “abafar”
+    if (withAudio) {
+      try { window.speechSynthesis?.cancel?.(); } catch {}
+    }
+
     stopPreview();
     previewPlaying = true;
     previewCurrentSrc = src;
+
+    // áudio conforme fase
+    try {
+      previewVideo.muted = !withAudio;
+      previewVideo.volume = withAudio ? 1 : 0;
+    } catch {}
 
     previewVideo.src = src;
     try { previewVideo.load(); } catch {}
@@ -125,7 +143,9 @@
 
       btn.addEventListener('mouseenter', () => {
         const src = getSrc();
-        if (src) playPreviewSrc(src, root);
+        if (!src) return;
+        // Fase 1: com áudio / Fase 2: mudo
+        playPreviewSrc(src, root, !nomeConfirmado);
       });
 
       btn.addEventListener('mouseleave', () => {
@@ -134,14 +154,16 @@
 
       btn.addEventListener('focusin', () => {
         const src = getSrc();
-        if (src) playPreviewSrc(src, root);
+        if (!src) return;
+        playPreviewSrc(src, root, !nomeConfirmado);
       });
 
       btn.addEventListener('focusout', () => stopPreview());
 
       btn.addEventListener('touchstart', () => {
         const src = getSrc();
-        if (src) playPreviewSrc(src, root);
+        if (!src) return;
+        playPreviewSrc(src, root, !nomeConfirmado);
       }, { passive: true });
     });
 
@@ -550,6 +572,13 @@
           return;
         }
 
+        // ✅ ao confirmar o nome, entramos na FASE 2
+        nomeConfirmado = true;
+
+        // ✅ evita mix de áudio: para preview e cancela TTS antes de falar descrição
+        stopPreview();
+        try { window.speechSynthesis?.cancel?.(); } catch {}
+
         const upperName = name.toUpperCase();
         els.nameInput.value = upperName;
 
@@ -597,7 +626,7 @@
         const guiaId = (btn.dataset.guia || btn.textContent || '').toLowerCase().trim();
         const label = (btn.dataset.nome || btn.textContent || 'guia').toUpperCase();
 
-        // Hover: descrição + tema (seu comportamento original)
+        // Hover: descrição + tema (com speak condicionado pela fase)
         btn.addEventListener('mouseenter', () => {
           if (!guiaId) return;
 
@@ -607,7 +636,9 @@
             const g = findGuia(guias, guiaId);
             if (g && els.guiaTexto) {
               els.guiaTexto.dataset.spoken = '';
-              await typeOnce(els.guiaTexto, g.descricao, { speed: 34, speak: true });
+              // ✅ Fase 1: NÃO fala descrição (para não abafar o vídeo)
+              // ✅ Fase 2: fala descrição normalmente
+              await typeOnce(els.guiaTexto, g.descricao, { speed: 34, speak: !!nomeConfirmado });
             }
             applyGuiaTheme(guiaId);
           }, HOVER_DELAY_MS);
@@ -628,7 +659,7 @@
           const g = findGuia(guias, guiaId);
           if (g && els.guiaTexto) {
             els.guiaTexto.dataset.spoken = '';
-            typeOnce(els.guiaTexto, g.descricao, { speed: 34, speak: true });
+            typeOnce(els.guiaTexto, g.descricao, { speed: 34, speak: !!nomeConfirmado });
           }
         });
 
