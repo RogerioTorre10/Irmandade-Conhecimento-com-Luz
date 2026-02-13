@@ -651,36 +651,24 @@ root.__BOTTOM_BOX__ = bottomBox;
           }
         }
 
-     // ================================
-// FASE 2: após confirmar nome
-// - TOP vira vitrine (sem hover/preview/clique)
-// - BOTTOM vira seleção oficial
-// ================================
-const topBox = root.__TOP_BOX__ || root.querySelector('.guia-options-top');
-const bottomBox = root.__BOTTOM_BOX__ || root.querySelector('.guia-options-bottom');
-
-const topButtons = root.__TOP_BTNS__ || qa('button[data-action="select-guia"]', topBox || root);
-const bottomButtons = root.__BOTTOM_BTNS__ || qa('button[data-action="select-guia"]', bottomBox || root);
-
-// TOP: mata tudo
+   // DESATIVA TOP DEFINITIVAMENTE
 topButtons.forEach(b => {
   b.dataset.locked = '1';
   b.setAttribute('aria-disabled', 'true');
   b.classList.add('is-locked');
-  b.style.opacity = '0.35';
-  b.style.cursor = 'default';
-  b.style.pointerEvents = 'none';     // ✅ mata hover/preview/clique
+  b.style.pointerEvents = 'none';
+  b.style.opacity = '0.4';
 });
 
-// BOTTOM: libera seleção oficial
+// ATIVA BOTTOM PARA ESCOLHA REAL
 bottomButtons.forEach(b => {
   b.dataset.locked = '0';
   b.removeAttribute('aria-disabled');
   b.classList.remove('is-locked');
+  b.style.pointerEvents = 'auto';
   b.style.opacity = '1';
-  b.style.cursor = 'pointer';
-  b.style.pointerEvents = 'auto';     // ✅ libera tudo
 });
+
 
 // Preview agora só no BOTTOM (opcional, se você quiser preview também na fase 2)
 bindPreviewToButtons(root, bottomButtons);
