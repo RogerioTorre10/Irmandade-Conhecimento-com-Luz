@@ -527,75 +527,428 @@
 let topBox = null;
 let bottomBox = null;
 
-try {
-  guias = await loadGuias();
+/* =========================================
+   SECTION-GUIA.JS — v(dual boxes stage fix)
+   TOP: preview antes do nome
+   BOTTOM: seleção após confirmar o nome
+========================================= */
 
-  topBox = root.querySelector('.guia-options-top');
-  bottomBox = root.querySelector('.guia-options-bottom');
+(function () {
+  'use strict';
 
-  if (topBox) renderButtons(topBox, guias);
-  if (bottomBox) renderButtons(bottomBox, guias);
+  const SECTION_ID = 'section-guia';
 
-  // estado inicial:
-  // botões de cima ATIVOS (preview apenas)
-  // botões de baixo DESABILITADOS
-  if (topBox) {
-    topBox.classList.remove('disabled');
-    topBox.classList.add('enabled');
+  // ---------------------------------------
+  // Helpers
+  // ---------------------------------------
+  const $  = (sel, root) => (root || document).querySelector(sel);
+  const qa = (sel, root) => Array.from((root || document).querySelectorAll(sel));
+
+  function log(...args) {
+    console.log('[JCGuia]', ...args);
   }
 
-  if (bottomBox) {
-    bottomBox.classList.remove('enabled');
-    bottomBox.classList.add('disabled');
+  function waitForTransitionUnlock() {
+    // compat com seu fluxo (se existir)
+    if (window.JC && typeof window.JC.waitForTransitionUnlock === 'function') {
+      return window.JC.waitForTransitionUnlock();
+    }
+    return Promise.resolve();
   }
 
-  hideNotice(root);
-} catch {
-  showNotice(root, 'Não foi possível carregar os guias. Tente novamente mais tarde.', { speak: false });
-  return;
-}
+  function ensureVisible(root) {
+    try {
+      root.style.display = '';
+      root.hidden = false;
+    } catch (_) {}
+  }
 
-// -------------------------------
-// Botões TOP e BOTTOM separados
-// -------------------------------
-const topButtons = qa('button[data-action="select-guia"]', topBox || root);
-const bottomButtons = qa('button[data-action="select-guia"]', bottomBox || root);
+  function pick(root) {
+    root = root || document;
 
-// Estado inicial:
-// TOP: interativo para preview (hover vídeo + voz) mas sem confirmar (locked)
-// BOTTOM: visível porém "morto" (sem hover/preview/clique) até confirmar nome
-topButtons.forEach(b => {
-  b.dataset.locked = '1'; // impede confirmar
-  b.setAttribute('aria-disabled', 'true');
-  b.classList.add('is-locked');
-  b.style.opacity = '1';
-  b.style.cursor = 'pointer';
-  b.style.pointerEvents = 'auto'; // preview permitido
-});
+    return {
+      root,
+      title: $('#section-guia .titulo-pergaminho', root) || $('#section-guia [data-typing="true"]', root),
 
-bottomButtons.forEach(b => {
-  b.dataset.locked = '1';
-  b.setAttribute('aria-disabled', 'true');
-  b.classList.add('is-locked');
-  b.style.opacity = '0.35';
-  b.style.cursor = 'default';
-  b.style.pointerEvents = 'none'; // ✅ mata hover/preview antes do nome
-});
+      nameInput: $('#guiaNameInput', root),
+      confirmBtn: $('#btn-confirmar-nome', root),
 
-// ✅ Preview só no topo na fase 1
-bindPreviewToButtons(root, topButtons);
+      guiaTexto: $('#guiaTexto', root),
+      noticeBox: $('#guia-error', root),
 
-// Guarda no root para usar no Confirmar
-root.__TOP_BTNS__ = topButtons;
-root.__BOTTOM_BTNS__ = bottomButtons;
-root.__TOP_BOX__ = topBox;
-root.__BOTTOM_BOX__ = bottomBox;
+      // legacy (um só container)
+      optionsBox: $('.guia-options', root),
 
+      // novo (2 containers)
+      topBox: $('.guia-options-top', root),
+      bottomBox: $('.guia-options-bottom', root),
 
-    // BIND preview (único e limpo)
-    bindPreviewToButtons(root, guideButtons);
+      // preview overlay (vídeo)
+      previewOverlay: $('#guiaPreviewOverlay', root),
+      previewVideo: $('#guiaPreviewVideo', root),
+    };
+  }
 
-    // confirmar começa bloqueado; libera conforme input
+  function showNotice(root, msg, opts) {
+    const els = pick(root);
+    if (!els.noticeBox) return;
+
+    els.noticeBox.classList.remove('hidden');
+
+    const span = $('#guia-notice-text', els.noticeBox) || els.noticeBox;
+    if (span && span.dataset) {
+      // mantém data-text se existir (typing/tts global pode usar)
+      if (msg) span.dataset.text = msg;
+    }
+    if (span) span.textContent = msg || span.textContent || '';
+
+    // se você usa TTS via typeOnce, respeita opts.speak quando disponível
+    if (opts && opts.speak === false) {
+      // nada
+    }
+  }
+
+  function hideNotice(root) {
+    const els = pick(root);
+    if (els.noticeBox) els.noticeBox.classList.add('hidden');
+  }
+
+  // ---------------------------------------
+  // Typing/TTS bridge (usa seu typeOnce se existir)
+  // ---------------------------------------
+  async function typeOnce(el, text, opts) {
+    if (!el) return;
+    if (typeof window.typeOnce === 'function') {
+      return window.typeOnce(el, text, opts);
+    }
+    // fallback simples
+    if (text != null) el.textContent = text;
+  }
+
+  // ---------------------------------------
+  // Load guias JSON (usa seu loader se existir)
+  // ---------------------------------------
+  async function loadGuias() {
+    if (typeof window.loadGuias === 'function') return window.loadGuias();
+
+    // fallback: tenta arquivo padrão (ajuste se necessário)
+    const res = await fetch('/assets/data/guias.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error('guias.json not ok');
+    return res.json();
+  }
+
+  function findGuia(guias, id) {
+    id = (id || '').toLowerCase().trim();
+    return (guias || []).find(g => String(g.id || '').toLowerCase().trim() === id);
+  }
+
+  // ---------------------------------------
+  // Preview video (10s)
+  // ---------------------------------------
+  function createPreviewController(root) {
+    const els = pick(root);
+    const overlay = els.previewOverlay;
+    const video = els.previewVideo;
+
+    if (!overlay || !video) return null;
+
+    let playing = false;
+    let currentSrc = '';
+    let stopTimer = null;
+
+    function show() {
+      overlay.setAttribute('aria-hidden', 'false');
+      overlay.classList.add('on');
+    }
+
+    function hide() {
+      overlay.setAttribute('aria-hidden', 'true');
+      overlay.classList.remove('on');
+    }
+
+    function stopPreview() {
+      try {
+        if (stopTimer) {
+          clearTimeout(stopTimer);
+          stopTimer = null;
+        }
+        playing = false;
+        currentSrc = '';
+        video.pause();
+        video.removeAttribute('src');
+        video.load();
+      } catch (_) {}
+      hide();
+    }
+
+    async function playPreviewSrc(src) {
+      if (!src) return false;
+
+      // se já está tocando o mesmo src, não reinicia
+      if (playing && currentSrc === src) return true;
+
+      stopPreview();
+      playing = true;
+      currentSrc = src;
+
+      video.muted = true;
+      video.playsInline = true;
+      video.src = src;
+      video.load();
+
+      show();
+      stopTimer = setTimeout(() => stopPreview(), 10200);
+
+      try {
+        await video.play();
+        return true;
+      } catch (e) {
+        stopPreview();
+        return false;
+      }
+    }
+
+    return { playPreviewSrc, stopPreview };
+  }
+
+  // ---------------------------------------
+  // Render buttons (em qualquer container)
+  // - cria botões com dataset.guia e dataset.previewSrc
+  // - já aplica handlers de preview "por botão"
+  // ---------------------------------------
+  function renderButtons(optionsBox, guias, previewCtrl) {
+    if (!optionsBox) return;
+
+    optionsBox.innerHTML = '';
+
+    guias.forEach(g => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn btn-stone-espinhos no-anim guia-option';
+      btn.dataset.action = 'select-guia';
+      btn.dataset.guia = String(g.id || '').trim().toLowerCase();
+
+      // Preview do guia (10s) — nomes reais do repo
+      const gid = btn.dataset.guia;
+      const PREVIEW_BY_ID = {
+        zion:  '/assets/videos/Zion-escolhido.mp4',
+        lumen: '/assets/videos/Lumen-escolhida.mp4',
+        arian: '/assets/videos/Arian-escolhida.mp4',
+      };
+      btn.dataset.previewSrc = encodeURI(PREVIEW_BY_ID[gid] || '');
+
+      btn.dataset.nome = g.nome || g.name || gid;
+      btn.setAttribute('aria-label', `Escolher o guia ${btn.dataset.nome}`);
+
+      btn.innerHTML = `<span class="label">${btn.dataset.nome}</span>`;
+
+      if (g.bgImage) {
+        btn.style.backgroundImage = `url("${g.bgImage}")`;
+        btn.style.backgroundSize = 'cover';
+        btn.style.backgroundPosition = 'center center';
+      }
+
+      // Preview por hover/focus/touch (controlado por pointer-events do stage)
+      btn.addEventListener('mouseenter', () => {
+        const src = btn.dataset.previewSrc;
+        if (src && previewCtrl) previewCtrl.playPreviewSrc(src);
+      });
+
+      btn.addEventListener('mouseleave', () => {
+        if (previewCtrl) previewCtrl.stopPreview();
+      });
+
+      btn.addEventListener('focusin', () => {
+        const src = btn.dataset.previewSrc;
+        if (src && previewCtrl) previewCtrl.playPreviewSrc(src);
+      });
+
+      btn.addEventListener('focusout', () => {
+        if (previewCtrl) previewCtrl.stopPreview();
+      });
+
+      btn.addEventListener('touchstart', () => {
+        const src = btn.dataset.previewSrc;
+        if (src && previewCtrl) previewCtrl.playPreviewSrc(src);
+      }, { passive: true });
+
+      optionsBox.appendChild(btn);
+    });
+  }
+
+  // ---------------------------------------
+  // Seleção do guia (clique)
+  // - respeita dataset.locked === '1'
+  // ---------------------------------------
+  function armGuide(root, btn, label) {
+    if (!btn) return;
+
+    // se estiver locked, não confirma (mas preview pode existir)
+    if (btn.dataset.locked === '1') return;
+
+    // marca visual
+    qa('button[data-action="select-guia"]', root).forEach(b => b.setAttribute('aria-pressed', 'false'));
+    btn.setAttribute('aria-pressed', 'true');
+
+    // dispara confirmação (se você já tem evento global)
+    const guiaID = btn.dataset.guia;
+    confirmGuide(guiaID);
+  }
+
+  function confirmGuide(guiaID) {
+    // mantém compat com seu fluxo existente:
+    // - salva em storage
+    // - dispara evento
+    try {
+      const id = String(guiaID || '').toLowerCase().trim();
+      localStorage.setItem('jc.guia', id);
+      window.dispatchEvent(new CustomEvent('guia:changed', { detail: { guia: id } }));
+      log('Guia confirmado:', id);
+
+      // se existir um controller que avança a seção, ele cuida.
+      if (window.JC && typeof window.JC.next === 'function') {
+        window.JC.next();
+      }
+    } catch (e) {
+      console.warn('[JCGuia] confirmGuide erro:', e);
+    }
+  }
+
+  // ---------------------------------------
+  // INIT ONCE
+  // ---------------------------------------
+  async function initOnce(root) {
+    if (!root || root.dataset.guiaInitialized === 'true') return;
+    root.dataset.guiaInitialized = 'true';
+
+    await waitForTransitionUnlock();
+    ensureVisible(root);
+
+    const els = pick(root);
+    let guias = [];
+    let guideButtons = [];
+
+    // containers (top + bottom). se não existir, cai no container padrão .guia-options
+    let topBox = null;
+    let bottomBox = null;
+    let topButtons = [];
+    let bottomButtons = [];
+
+    // preview controller
+    const previewCtrl = createPreviewController(root);
+
+    // nome em maiúsculo
+    if (els.nameInput && !els.nameInput.dataset.upperBound) {
+      els.nameInput.dataset.upperBound = '1';
+      els.nameInput.addEventListener('input', () => {
+        const start = els.nameInput.selectionStart;
+        const end = els.nameInput.selectionEnd;
+        els.nameInput.value = (els.nameInput.value || '').toUpperCase();
+        try { els.nameInput.setSelectionRange(start, end); } catch (_) {}
+      });
+    }
+
+    // título (typing)
+    if (els.title && !els.title.classList.contains('typing-done')) {
+      await typeOnce(els.title, null, { speed: 34, speak: true });
+    }
+
+    // ===== CARREGA GUIAS =====
+    try {
+      guias = await loadGuias();
+
+      // detecta containers TOP e BOTTOM (novo), ou cai no antigo .guia-options
+      topBox    = root.querySelector('.guia-options-top')    || null;
+      bottomBox = root.querySelector('.guia-options-bottom') || null;
+
+      const legacyBox = els.optionsBox || root.querySelector('.guia-options');
+
+      if (topBox) {
+        renderButtons(topBox, guias, previewCtrl);
+      } else if (legacyBox) {
+        renderButtons(legacyBox, guias, previewCtrl);
+      }
+
+      if (bottomBox) {
+        renderButtons(bottomBox, guias, previewCtrl);
+      }
+
+      hideNotice(root);
+    } catch (e) {
+      showNotice(root, 'Não foi possível carregar os guias. Tente novamente mais tarde.', { speak: false });
+      return;
+    }
+
+    // pega botões dos containers (TOP + BOTTOM ou legacy)
+    const legacyBox = els.optionsBox || root.querySelector('.guia-options') || root;
+
+    topButtons = qa('button[data-action="select-guia"]', (topBox || legacyBox));
+    bottomButtons = bottomBox ? qa('button[data-action="select-guia"]', bottomBox) : [];
+
+    guideButtons = [...topButtons, ...bottomButtons];
+
+    // ------------------------------
+    // Estado inicial (2 estágios):
+    // TOP: preview ON, mas SEM confirmar (locked=1, pointerEvents=auto)
+    // BOTTOM: totalmente "morto" até confirmar (sem hover/preview/click)
+    // ------------------------------
+    topButtons.forEach(b => {
+      b.dataset.locked = '1';
+      b.setAttribute('aria-disabled', 'true');
+      b.classList.add('is-locked');
+      b.style.opacity = '0.85';
+      b.style.cursor = 'pointer';
+      b.style.pointerEvents = 'auto'; // permite preview
+    });
+
+    bottomButtons.forEach(b => {
+      b.dataset.locked = '1';
+      b.setAttribute('aria-disabled', 'true');
+      b.classList.add('is-locked');
+      b.style.opacity = '0.25';
+      b.style.cursor = 'default';
+      b.style.pointerEvents = 'none'; // NÃO permite preview/click antes do nome
+    });
+
+    // clique simples / dblclick / teclado (delegado no root)
+    // (aplica para TOP e BOTTOM, mas o locked/pointer-events controla o stage)
+    root.addEventListener('click', (ev) => {
+      const btn = ev.target.closest('button[data-action="select-guia"]');
+      if (!btn) return;
+
+      ev.preventDefault();
+      ev.stopPropagation();
+
+      if (btn.dataset.locked === '1') return; // não confirma
+
+      armGuide(root, btn);
+    }, true);
+
+    root.addEventListener('dblclick', (ev) => {
+      const btn = ev.target.closest('button[data-action="select-guia"]');
+      if (!btn) return;
+
+      ev.preventDefault();
+      ev.stopPropagation();
+
+      if (btn.dataset.locked === '1') return;
+
+      armGuide(root, btn);
+    }, true);
+
+    root.addEventListener('keydown', (ev) => {
+      if (ev.key !== 'Enter' && ev.key !== ' ') return;
+
+      const btn = ev.target.closest && ev.target.closest('button[data-action="select-guia"]');
+      if (!btn) return;
+
+      ev.preventDefault();
+      if (btn.dataset.locked === '1') return;
+
+      armGuide(root, btn);
+    }, true);
+
+    // confirmar nome começa bloqueado; libera conforme input
     let __NAME_CONFIRMED__ = false;
     if (els.confirmBtn) els.confirmBtn.disabled = true;
 
@@ -607,86 +960,91 @@ root.__BOTTOM_BOX__ = bottomBox;
       });
     }
 
-    if (els.confirmBtn && !els.confirmBtn.dataset.confirmBound) {
-      els.confirmBtn.dataset.confirmBound = '1';
+    if (els.confirmBtn && !els.confirmBtn.dataset.bound) {
+      els.confirmBtn.dataset.bound = '1';
+
       els.confirmBtn.addEventListener('click', async (ev) => {
         ev.preventDefault();
         ev.stopPropagation();
 
-        const name = (els.nameInput?.value || '').trim();
-        if (name.length < 2) {
-          els.nameInput?.focus();
-          return;
+        const nome = (els.nameInput?.value || '').trim();
+        if (nome.length < 2) return;
+
+        if (__NAME_CONFIRMED__) return;
+        __NAME_CONFIRMED__ = true;
+
+        // salva nome
+        try { localStorage.setItem('jc.nome', nome.toUpperCase()); } catch (_) {}
+
+        // texto de boas vindas (mantém seu template {{nome}})
+        if (els.guiaTexto) {
+          const base = (els.guiaTexto.dataset?.text || els.guiaTexto.textContent || 'Olá, {{nome}}! Escolha seu guia para a Jornada.');
+          const msg = base.replace(/\{\{\s*(nome|name)\s*\}\}/gi, nome.toUpperCase());
+          els.guiaTexto.textContent = '';
+          await typeOnce(els.guiaTexto, msg, { speed: 38, speak: true });
         }
 
-        // ✅ ao confirmar o nome, entramos na FASE 2
-        nomeConfirmado = true;
+        // ------------------------------
+        // STAGE 2: após confirmar o nome
+        // - TOP fica desabilitado (sem hover/preview/click)
+        // - BOTTOM fica habilitado (preview + seleção)
+        // ------------------------------
+        topButtons.forEach(b => {
+          b.dataset.locked = '1';
+          b.setAttribute('aria-disabled', 'true');
+          b.classList.add('is-locked');
+          b.style.opacity = '0.35';
+          b.style.cursor = 'default';
+          b.style.pointerEvents = 'none';
+        });
 
-        // ✅ evita mix de áudio: para preview e cancela TTS antes de falar descrição
-        stopPreview();
-        try { window.speechSynthesis?.cancel?.(); } catch {}
+        bottomButtons.forEach(b => {
+          b.dataset.locked = '0';
+          b.removeAttribute('aria-disabled');
+          b.classList.remove('is-locked');
+          b.style.opacity = '1';
+          b.style.cursor = 'pointer';
+          b.style.pointerEvents = 'auto';
+        });
 
-        const upperName = name.toUpperCase();
-        els.nameInput.value = upperName;
-
-        try {
-          window.JC = window.JC || {};
-          window.JC.data = window.JC.data || {};
-          window.JC.data.nome = upperName;
-
-          sessionStorage.setItem('jornada.nome', upperName);
-          localStorage.setItem('jc.nome', upperName);
-        } catch {}
-
-        if (!__NAME_CONFIRMED__) {
-          __NAME_CONFIRMED__ = true;
-
-          if (els.guiaTexto) {
-            const base = (els.guiaTexto.dataset?.text || els.guiaTexto.textContent || 'Escolha seu guia para a Jornada.').trim();
-            const msg = base.replace(/\{\{\s*(nome|name)\s*\}\}/gi, upperName);
-            els.guiaTexto.textContent = '';
-            await typeOnce(els.guiaTexto, msg, { speed: 38, speak: true });
-            els.moldura?.classList.add('glow');
-            els.guiaTexto?.classList.add('glow');
-          }
+        if (topBox) {
+          topBox.classList.remove('enabled');
+          topBox.classList.add('disabled');
         }
-
- // TOP: mata tudo
-topButtons.forEach(b => {
-  b.dataset.locked = '1';
-  b.setAttribute('aria-disabled', 'true');
-  b.classList.add('is-locked');
-  b.style.opacity = '0.35';
-  b.style.cursor = 'default';
-  b.style.pointerEvents = 'none';     // ✅ mata hover/preview/clique
-});
-
-// BOTTOM: libera seleção oficial
-bottomButtons.forEach(b => {
-  b.dataset.locked = '0';
-  b.removeAttribute('aria-disabled');
-  b.classList.remove('is-locked');
-  b.style.opacity = '1';
-  b.style.cursor = 'pointer';
-  b.style.pointerEvents = 'auto';     // ✅ libera tudo
-});
-
-// Preview agora só no BOTTOM (opcional, se você quiser preview também na fase 2)
-bindPreviewToButtons(root, bottomButtons);
-
-// classes visuais (se você estiver usando enabled/disabled)
-if (topBox) {
-  topBox.classList.remove('enabled');
-  topBox.classList.add('disabled');
-}
-if (bottomBox) {
-  bottomBox.classList.remove('disabled');
-  bottomBox.classList.add('enabled');
-}
+        if (bottomBox) {
+          bottomBox.classList.remove('disabled');
+          bottomBox.classList.add('enabled');
+        }
 
         hideNotice(root);
       });
     }
+
+    // segurança: ao sair da seção, para preview
+    window.addEventListener('jc:section:leave', () => {
+      try { if (previewCtrl) previewCtrl.stopPreview(); } catch (_) {}
+    });
+
+    log('Eventos configurados (TOP preview / BOTTOM seleção)');
+  }
+
+  // ---------------------------------------
+  // Bootstrap: roda quando seção aparece
+  // ---------------------------------------
+  function boot() {
+    const root = document.getElementById(SECTION_ID);
+    if (!root) return;
+
+    initOnce(root).catch(e => console.warn('[JCGuia] initOnce erro:', e));
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+})();
+
 
     // eventos dos botões de guia (bind 1x)
     if (root.dataset.guiaButtonsBound !== '1') {
