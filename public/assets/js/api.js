@@ -13,8 +13,9 @@
   // Candidatos conhecidos para health (ordem de tentativa)
   const HEALTH_PATHS = ['/health', '/healthz', '/status', '/.well-known/health', '/api/health'];
 
-  // Candidatos comuns para geração de PDF/HQ
-  const PDF_PATHS = ['/generate-pdf-hq', '/generate-pdf', '/pdf/generate', '/generate'];
+  // Novo padrão: PDF apenas com respostas + selfieCard
+  const PDF_PATHS = ['/generate-pdf-respostas'];
+
 
   // ---------- Utils ----------
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
