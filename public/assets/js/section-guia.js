@@ -523,27 +523,54 @@
       await typeOnce(els.title, null, { speed: 34, speak: true });
     }
 
-    // carrega guias
-    try {
-      guias = await loadGuias();
-      renderButtons(els.optionsBox, guias);
-      hideNotice(root);
-    } catch {
-      showNotice(root, 'Não foi possível carregar os guias. Tente novamente mais tarde.', { speak: false });
-      return;
-    }
+   // carrega guias
+let topBox = null;
+let bottomBox = null;
 
-    guideButtons = qa('button[data-action="select-guia"]', els.optionsBox);
+try {
+  guias = await loadGuias();
 
-    // mantém hover/preview funcionando, mas bloqueia seleção até confirmar nome
-    guideButtons.forEach(b => {
-      b.dataset.locked = '1';
-      b.setAttribute('aria-disabled', 'true');
-      b.classList.add('is-locked');
-      b.style.opacity = '0.6';
-      b.style.cursor = 'pointer';
-      b.style.pointerEvents = 'auto';
-    });
+  topBox = root.querySelector('.guia-options-top');
+  bottomBox = root.querySelector('.guia-options-bottom');
+
+  if (topBox) renderButtons(topBox, guias);
+  if (bottomBox) renderButtons(bottomBox, guias);
+
+  // estado inicial:
+  // botões de cima ATIVOS (preview apenas)
+  // botões de baixo DESABILITADOS
+  if (topBox) {
+    topBox.classList.remove('disabled');
+    topBox.classList.add('enabled');
+  }
+
+  if (bottomBox) {
+    bottomBox.classList.remove('enabled');
+    bottomBox.classList.add('disabled');
+  }
+
+  hideNotice(root);
+} catch {
+  showNotice(root, 'Não foi possível carregar os guias. Tente novamente mais tarde.', { speak: false });
+  return;
+}
+
+// pega botões dos DOIS containers (topo + baixo)
+guideButtons = [
+  ...qa('button[data-action="select-guia"]', topBox || root),
+  ...qa('button[data-action="select-guia"]', bottomBox || root),
+];
+
+// trava seleção nos dois grupos no início (mantém preview ok)
+guideButtons.forEach(b => {
+  b.dataset.locked = '1';
+  b.setAttribute('aria-disabled', 'true');
+  b.classList.add('is-locked');
+  b.style.opacity = '0.6';
+  b.style.cursor = 'pointer';
+  b.style.pointerEvents = 'auto';
+});
+
 
     // BIND preview (único e limpo)
     bindPreviewToButtons(root, guideButtons);
