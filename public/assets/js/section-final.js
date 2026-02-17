@@ -248,59 +248,61 @@ function mountFinalPdfUI(root) {
       }
     }
 
-    // --------------------------------------------------
-    // CLICK: PDF (gera + baixa)
-    // --------------------------------------------------
-    if (btnPdf) {
-      btnPdf.addEventListener('click', async (ev) => {
-        ev.preventDefault();
-        ev.stopPropagation();
+   // ----------------------------------------------------
+// CLICK: PDF (gera + baixa)  ✅ com guard-rail + finally
+// ----------------------------------------------------
+if (btnPdf) {
+  btnPdf.addEventListener('click', async (ev) => {
+    ev.preventDefault();
+    ev.stopPropagation();
 
-        if (!window.API || typeof window.API.gerarPDFEHQ !== 'function') {
-          setStatus('❌ API não está pronta. Verifique se /assets/js/api.js carregou.', 'err');
-          return;
-        }
-
-        const payload = buildFinalPayloadDiamante();
-        console.log('[FINAL][PAYLOAD]', payload);
-
-        // Guard-rail: nome e respostas
-        if (!payload.nome || payload.nome.length < 2) {
-          setStatus('⚠️ Nome inválido. Volte e confirme o nome antes de gerar o PDF.', 'err');
-          return;
-        }
-        if (!payload.respostas || payload.respostas.length === 0) {
-          setStatus('⚠️ Ainda não há respostas registradas para gerar o PDF.', 'err');
-          return;
-        }
-
-        // trava botões durante geração
-        if (btnPdf) btnPdf.disabled = true;
-        if (btnSelfie) btnSelfie.disabled = true;
-
-        const timer = startMagicDots(root, 'Forjando seu pergaminho…');
-
-        try {
-          const result = await window.API.gerarPDFEHQ(payload);
-          clearInterval(timer);
-
-          if (result && result.ok) {
-            setStatus('✅ Pergaminho gerado e baixado com sucesso!', 'ok');
-          } else {
-            setStatus('❌ Não consegui gerar o PDF. Veja o console para detalhes.', 'err');
-            console.warn('[FINAL][PDF] result:', result);
-            if (btnPdf) btnPdf.disabled = false;
-            if (btnSelfie) btnSelfie.disabled = false;
-          }
-        } catch (e) {
-          clearInterval(timer);
-          console.error('[FINAL][PDF] erro:', e);
-          setStatus('❌ Erro ao gerar o PDF. Confira o console (Network/Console).', 'err');
-          if (btnPdf) btnPdf.disabled = false;
-          if (btnSelfie) btnSelfie.disabled = false;
-        }
-      });
+    // API pronta?
+    if (!window.API || typeof window.API.gerarPDFEHQ !== 'function') {
+      setStatus('✖ API não está pronta. Verifique se /assets/js/api.js carregou.', 'err');
+      return;
     }
+
+    // trava botões imediatamente
+    btnPdf.disabled = true;
+    if (btnSelfie) btnSelfie.disabled = true;
+
+    let timer = null;
+
+    try {
+      const payload = buildFinalPayloadDiamante();
+      console.log('[FINAL][PAYLOAD]', payload);
+
+      // Guard-rail: nome e respostas
+      if (!payload.nome || payload.nome.length < 2) {
+        setStatus('⚠ Nome inválido. Volte e confirme o nome antes de gerar o PDF.', 'err');
+        return;
+      }
+      if (!Array.isArray(payload.respostas) || payload.respostas.length === 0) {
+        setStatus('⚠ Sem respostas. Finalize as perguntas antes de gerar o PDF.', 'err');
+        return;
+      }
+
+      timer = startMagicDots(root, 'Forjando seu pergaminho…');
+
+      const result = await window.API.gerarPDFEHQ(payload);
+
+      if (result && result.ok) {
+        setStatus('✅ Pergaminho gerado e baixado com sucesso!', 'ok');
+      } else {
+        setStatus('✖ Não consegui gerar o PDF. Veja o console para detalhes.', 'err');
+        console.warn('[FINAL][PDF] result:', result);
+      }
+    } catch (e) {
+      console.error('[FINAL][PDF] erro:', e);
+      setStatus('✖ Erro ao gerar o PDF. Confira o console (Network/Console).', 'err');
+    } finally {
+      if (timer) clearInterval(timer);
+      btnPdf.disabled = false;            // ✅ sempre volta
+      if (btnSelfie) btnSelfie.disabled = false;
+    }
+  });
+}
+
 
     // --------------------------------------------------
     // CLICK: SelfieCard (download local)
