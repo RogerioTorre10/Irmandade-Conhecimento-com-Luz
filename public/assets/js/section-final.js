@@ -140,25 +140,43 @@ function getJornadaState() {
 }
 
 function buildFinalPayloadDiamante() {
-  const s = getJornadaState();
-
+  const s = getJornadaState ? getJornadaState() : (window.JORNADA_STATE || window.state || {});
   console.log('[FINAL][STATE RAW]', s);
 
   const nome = String(s.nome || s.name || s.participantName || '').trim();
   const guia = String(s.guiaSelecionado || s.guia || s.guide || '').trim().toLowerCase();
 
-  let respostas = s.respostas || s.answers || s.perguntas || s.responses || [];
+  // tenta achar respostas em vários formatos
+  let respostas =
+    s.respostas ||
+    s.answers ||
+    s.perguntas ||
+    s.responses ||
+    s.respostasLista ||
+    [];
+
+  // ✅ aqui é o ponto crítico: só zera se NÃO for array
   if (!Array.isArray(respostas)) respostas = [];
 
-  respostas = respostas.map(r => String(r ?? '').trim()).filter(Boolean);
+  // normaliza strings
+  respostas = respostas
+    .map(r => String(r ?? '').trim())
+    .filter(Boolean);
 
-  const selfieCard = String(s.selfieBase64 || s.selfieCard || s.cardImage || '');
+  const selfieCard = String(
+    s.selfieBase64 ||
+    s.selfieCard ||
+    s.cardImage ||
+    s.selfiecard ||
+    ''
+  ).trim();
 
   const payload = { nome, guia, respostas, selfieCard };
   console.log('[FINAL][PAYLOAD NORMALIZED]', payload);
 
   return payload;
 }
+
 
 
 function setPdfStatus(root, msg, kind) {
