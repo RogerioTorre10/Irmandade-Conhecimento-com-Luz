@@ -110,62 +110,56 @@ function ensureFinalPdfStyles() {
   document.head.appendChild(style);
 }
 
-function buildFinalPayloadDiamante() {
-
-  // 🧠 resolver universal do estado da jornada
+function getJornadaState() {
+  // 1) memória em runtime
   const s =
-      window.JORNADA_STATE ||
-      window.APP_STATE ||
-      window.state ||
-      window.JC_STATE ||
-      {};
+    window.JORNADA_STATE ||
+    window.APP_STATE ||
+    window.state ||
+    window.JC_STATE ||
+    (window.JC && window.JC.state) ||
+    (window.JORNADA && window.JORNADA.state) ||
+    null;
+
+  if (s && typeof s === 'object') return s;
+
+  // 2) LocalStorage (fallback real do projeto)
+  try {
+    const key = (window.APP_CONFIG && window.APP_CONFIG.STORAGE_KEY) || 'jornada_essencial_v1';
+    const raw = localStorage.getItem(key);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object') return parsed;
+    }
+  } catch (e) {
+    console.warn('[FINAL][STATE] LocalStorage parse fail', e);
+  }
+
+  // 3) fallback
+  return {};
+}
+
+function buildFinalPayloadDiamante() {
+  const s = getJornadaState();
 
   console.log('[FINAL][STATE RAW]', s);
 
-  // nome
-  const nome =
-      String(
-        s.nome ||
-        s.name ||
-        s.participantName ||
-        ''
-      ).trim();
+  const nome = String(s.nome || s.name || s.participantName || '').trim();
+  const guia = String(s.guiaSelecionado || s.guia || s.guide || '').trim().toLowerCase();
 
-  // guia
-  const guia =
-      String(
-        s.guiaSelecionado ||
-        s.guia ||
-        s.guide ||
-        ''
-      ).trim().toLowerCase();
-
-  // respostas (garante array de strings)
-  let respostas =
-      s.respostas ||
-      s.answers ||
-      s.perguntas ||
-      [];
-
+  let respostas = s.respostas || s.answers || s.perguntas || s.responses || [];
   if (!Array.isArray(respostas)) respostas = [];
 
-  respostas = respostas
-      .map(r => String(r || '').trim())
-      .filter(Boolean);
+  respostas = respostas.map(r => String(r ?? '').trim()).filter(Boolean);
 
-  // selfie card (vários nomes possíveis)
-  const selfieCard =
-      s.selfieBase64 ||
-      s.selfieCard ||
-      s.cardImage ||
-      '';
+  const selfieCard = String(s.selfieBase64 || s.selfieCard || s.cardImage || '');
 
   const payload = { nome, guia, respostas, selfieCard };
-
   console.log('[FINAL][PAYLOAD NORMALIZED]', payload);
 
   return payload;
 }
+
 
 function setPdfStatus(root, msg, kind) {
   const el = root.querySelector('#finalPdfStatus');
