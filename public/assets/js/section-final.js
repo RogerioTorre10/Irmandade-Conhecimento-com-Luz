@@ -539,10 +539,12 @@ function mountFinalPdfUI(root) {
     if (id !== SECTION_ID) return;
 
     console.log('[FINAL] section:shown recebido para section-final, iniciando sequência...');
-    mountFinalPdfUI(root);
 
     const sec = document.getElementById(SECTION_ID);
-    if (sec) sec.style.display = 'block';
+    if (sec) {
+      sec.style.display = 'block';
+      mountFinalPdfUI(sec);
+    }
 
     startFinalSequence();
   });
