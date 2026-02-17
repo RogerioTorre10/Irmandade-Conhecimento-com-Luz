@@ -24,6 +24,28 @@
     const l4 = document.documentElement?.lang;
     return (l1 || l2 || l3 || l4 || 'pt-BR').toString().trim();
   }
+// ============================================
+// PREPARA PAYLOAD FINAL (guard-rail diamante)
+// ============================================
+function buildFinalPayload() {
+  const state = window.JORNADA_STATE || window.state || {};
+
+  const nome = (state.nome || '').trim();
+  const guia = (state.guiaSelecionado || state.guia || '').toLowerCase();
+
+  // GARANTE ARRAY DE STRINGS
+  let respostas = state.respostas || [];
+  if (!Array.isArray(respostas)) respostas = [];
+
+  respostas = respostas
+    .map(r => String(r || '').trim())
+    .filter(Boolean);
+
+  // selfie card opcional
+  const selfieCard = state.selfieBase64 || state.selfieCard || '';
+
+  return { nome, guia, respostas, selfieCard };
+}
 
   // Utilitário de pausa
   const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
