@@ -173,86 +173,163 @@ function startMagicDots(root, baseMsg) {
 
 function mountFinalPdfUI(root) {
   ensureFinalPdfStyles();
-  if (!root || root.querySelector('#finalPdfWrap')) return;
+  if (!root) return;
 
-  // tenta colocar dentro de um container “natural” da final, mas sem depender de selector perfeito
-  const host =
-    root.querySelector('.j-perg-v-inner') ||
-    root.querySelector('.j-panel') ||
-    root.querySelector('.glass') ||
-    root.querySelector('.content') ||
-    root;
+  // se já existe UI injetada antiga, remove (elimina "Gerar meu Pergaminho" + "Agora não")
+  const oldWrap = root.querySelector('#finalPdfWrap');
+  if (oldWrap) oldWrap.remove();
 
-  const wrap = document.createElement('div');
-  wrap.id = 'finalPdfWrap';
-  wrap.className = 'final-pdf-wrap';
+  // --------------------------------------------------
+  // Helpers
+  // --------------------------------------------------
+  const findBtnByText = (rx) => {
+    const all = [...root.querySelectorAll('button, a')];
+    return all.find(el => rx.test((el.textContent || '').trim()));
+  };
 
-  wrap.innerHTML = `
-    <div class="final-pdf-row">
-      <button id="finalBtnPdf" type="button" class="final-pdf-btn">📜 Gerar meu Pergaminho (PDF)</button>
-      <button id="finalBtnSkipPdf" type="button" class="final-pdf-skip">Agora não</button>
-    </div>
-    <div id="finalPdfStatus" class="final-pdf-status">
-      Você escolhe: gerar e baixar o PDF agora, ou deixar para depois.
-    </div>
-  `;
+  // tenta achar um lugar para mostrar status (se não existir, cria discreto)
+  const getOrCreateStatus = () => {
+    let box =
+      root.querySelector('#finalPdfStatus') ||
+      root.querySelector('.final-pdf-status') ||
+      root.querySelector('[data-final-status]');
 
-  host.appendChild(wrap);
-
-  const btnPdf = wrap.querySelector('#finalBtnPdf');
-  const btnSkip = wrap.querySelector('#finalBtnSkipPdf');
-
-  btnSkip.addEventListener('click', () => {
-    // não faz nada além de “encerrar” o convite
-    setPdfStatus(root, 'Tudo certo ✅ Você pode baixar depois quando quiser.', 'ok');
-    btnSkip.disabled = true;
-  });
-
-  btnPdf.addEventListener('click', async () => {
-    if (!window.API || typeof window.API.gerarPDFEHQ !== 'function') {
-      setPdfStatus(root, '❌ API não está pronta ainda. Verifique se /assets/js/api.js carregou.', 'err');
-      return;
+    if (!box) {
+      box = document.createElement('div');
+      box.id = 'finalPdfStatus';
+      box.className = 'final-pdf-status';
+      box.setAttribute('data-final-status', '1');
+      // coloca perto dos botões internos (tenta achar a área do rodapé)
+      const host =
+        root.querySelector('.j-panel .j-actions') ||
+        root.querySelector('.j-actions') ||
+        root.querySelector('.j-panel') ||
+        root;
+      host.appendChild(box);
     }
+    return box;
+  };
 
-    const payload = buildFinalPayloadDiamante();
+  const setStatus = (msg, kind) => {
+    const box = getOrCreateStatus();
+    box.textContent = msg || '';
+    box.classList.remove('ok', 'err', 'info', 'warn');
+    box.classList.add(kind || 'info');
+  };
 
-    if (!payload.nome || payload.nome.length < 2) {
-      setPdfStatus(root, '⚠️ Nome inválido. Volte e confirme o nome antes de gerar o PDF.', 'err');
-      return;
-    }
+  // --------------------------------------------------
+  // 1) Encontrar seus DOIS botões internos (PDF e SelfieCard)
+  // --------------------------------------------------
+  // Ajuste aqui se você souber IDs/classes exatos (deixa ainda mais firme):
+  const btnPdf =
+    root.querySelector('[data-action="final-pdf"]') ||
+    root.querySelector('#btnFinalPdf') ||
+    root.querySelector('#btnPdf') ||
+    root.querySelector('.btn-final-pdf') ||
+    findBtnByText(/pdf|pergaminho/i);
 
-    if (!payload.respostas || payload.respostas.length === 0) {
-      setPdfStatus(root, '⚠️ Ainda não há respostas registradas para gerar o PDF.', 'err');
-      return;
-    }
+  const btnSelfie =
+    root.querySelector('[data-action="final-selfie"]') ||
+    root.querySelector('#btnFinalSelfie') ||
+    root.querySelector('#btnSelfie') ||
+    root.querySelector('.btn-final-selfie') ||
+    findBtnByText(/selfie|card|foto/i);
 
-    btnPdf.disabled = true;
-    btnSkip.disabled = true;
+  // Se você ainda quiser manter um "Agora não", a gente NÃO cria mais nada.
+  // Só feedback caso não encontre botões.
+  if (!btnPdf && !btnSelfie) {
+    console.warn('[FINAL] Não encontrei botões internos (PDF/Selfie).');
+    return;
+  }
 
-    const timer = startMagicDots(root, 'Forjando seu pergaminho');
+  // --------------------------------------------------
+  // 2) Ligar lógica DIAMANTE no botão PDF
+  // --------------------------------------------------
+  if (btnPdf && !btnPdf.dataset.pdfBound) {
+    btnPdf.dataset.pdfBound = '1';
 
-    try {
-      const result = await window.API.gerarPDFEHQ(payload);
-      clearInterval(timer);
+    btnPdf.addEventListener('click', async (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
 
-      if (result && result.ok) {
-        setPdfStatus(root, '✅ Pergaminho gerado e baixado com sucesso!', 'ok');
-      } else {
-        setPdfStatus(root, '❌ Não consegui gerar o PDF. Veja o console para detalhes.', 'err');
-        console.warn('[FINAL][PDF] result:', result);
-        btnPdf.disabled = false;
-        btnSkip.disabled = false;
+      if (!window.API || typeof window.API.gerarPDFEHQ !== 'function') {
+        setStatus('⚠️ API não está pronta. Verifique se /assets/js/api.js carregou.', 'err');
+        return;
       }
-    } catch (e) {
-      clearInterval(timer);
-      console.error('[FINAL][PDF] erro:', e);
-      setPdfStatus(root, '❌ Erro ao gerar o PDF. Confira o console (Network/Console).', 'err');
-      btnPdf.disabled = false;
-      btnSkip.disabled = false;
-    }
-  });
-}
 
+      // ✅ Guard-rail diamante (nome/guia/respostas/selfieCard sempre saneados)
+      const payload = buildFinalPayloadDiamante();
+
+      if (!payload.nome || payload.nome.length < 2) {
+        setStatus('⚠️ Nome inválido. Volte e confirme o nome antes de gerar o PDF.', 'err');
+        return;
+      }
+
+      if (!payload.respostas || payload.respostas.length === 0) {
+        setStatus('⚠️ Ainda não há respostas registradas para gerar o PDF.', 'err');
+        return;
+      }
+
+      btnPdf.disabled = true;
+      if (btnSelfie) btnSelfie.disabled = true;
+
+      const timer = startMagicDots(getOrCreateStatus(), 'Forjando seu pergaminho');
+
+      try {
+        const result = await window.API.gerarPDFEHQ(payload);
+        clearInterval(timer);
+
+        if (result && result.ok) {
+          setStatus('✅ Pergaminho gerado e baixado com sucesso!', 'ok');
+        } else {
+          setStatus('❌ Não consegui gerar o PDF. Veja o console para detalhes.', 'err');
+          console.warn('[FINAL][PDF] result:', result);
+          btnPdf.disabled = false;
+          if (btnSelfie) btnSelfie.disabled = false;
+        }
+      } catch (e) {
+        clearInterval(timer);
+        console.error('[FINAL][PDF] erro:', e);
+        setStatus('❌ Erro ao gerar o PDF. Confira o console (Network/Console).', 'err');
+        btnPdf.disabled = false;
+        if (btnSelfie) btnSelfie.disabled = false;
+      }
+    });
+  }
+
+  // --------------------------------------------------
+  // 3) Ligar lógica do botão SelfieCard (download opcional)
+  // --------------------------------------------------
+  if (btnSelfie && !btnSelfie.dataset.selfieBound) {
+    btnSelfie.dataset.selfieBound = '1';
+
+    btnSelfie.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+
+      const payload = buildFinalPayloadDiamante();
+      const dataUrl = payload.selfieCard;
+
+      if (!dataUrl || typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image/')) {
+        setStatus('⚠️ SelfieCard ainda não está disponível neste momento.', 'warn');
+        return;
+      }
+
+      try {
+        const a = document.createElement('a');
+        a.href = dataUrl;
+        a.download = `${(payload.nome || 'selfiecard').trim()}-selfiecard.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setStatus('✅ SelfieCard baixado!', 'ok');
+      } catch (e) {
+        console.error('[FINAL][SELFIE] erro:', e);
+        setStatus('❌ Não consegui baixar o SelfieCard.', 'err');
+      }
+    });
+  }
+}
 
   // Utilitário de pausa
   const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
