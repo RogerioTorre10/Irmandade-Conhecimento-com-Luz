@@ -549,3 +549,5 @@ function mountFinalPdfUI(root) {
   // ============================================
 // PDF: geração é acionada APENAS via botões da UI (mountFinalPdfUI)
 // ============================================
+
+})();
