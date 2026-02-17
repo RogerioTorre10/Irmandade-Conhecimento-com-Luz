@@ -32,7 +32,7 @@
   // Rotas tentadas (base já inclui /api)
   // --------------------------------------------------
   const PDF_PATHS = [
-    '/jornada/essencial/pdf',
+    '/jornada/essencial/pdf', // ✅ rota confirmada
     '/jornada-essencial/pdf',
     '/pdf',
     '/gerar-pdf'
@@ -54,6 +54,27 @@
     a.click();
     document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(url), 2000);
+  }
+
+  function triggerDownloadUrl(url, filename) {
+    // tenta baixar via <a>, e se o browser abrir em aba, ainda assim funciona pra PDF
+    const a = document.createElement('a');
+    a.href = url;
+    if (filename) a.download = filename;
+    a.rel = 'noopener';
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  function guessPdfFromHeaders(res) {
+    const ct = (res.headers.get('content-type') || '').toLowerCase();
+    const cd = (res.headers.get('content-disposition') || '').toLowerCase();
+    if (ct.includes('application/pdf')) return true;
+    if (cd.includes('.pdf')) return true; // ex.: attachment; filename="xxx.pdf"
+    if (ct.includes('application/octet-stream') && cd.includes('attachment')) return true;
+    return false;
   }
 
   async function postJSON(base, path, body, opts = {}) {
@@ -86,16 +107,16 @@
 
       const contentType = (res.headers.get('content-type') || '').toLowerCase();
 
-      // PDF
-      if (contentType.includes('application/pdf')) {
-        const blob = await res.blob();
-        return { data: blob, filename: opts.filename };
-      }
-
       // JSON
       if (contentType.includes('application/json')) {
         const json = await res.json();
         return { data: json };
+      }
+
+      // PDF (ou octet-stream que pareça PDF)
+      if (guessPdfFromHeaders(res)) {
+        const blob = await res.blob();
+        return { data: blob, filename: opts.filename };
       }
 
       // texto/outros
@@ -117,21 +138,34 @@
     // payload esperado:
     // { nome, guia, respostas, selfieCard }
     const safePayload = payload || {};
-    const fileNameBase = (safePayload.nome ? String(safePayload.nome).trim() : 'jornada');
+
+    const fileNameBase =
+      (safePayload.nome ? String(safePayload.nome).trim() : 'jornada')
+        .replace(/[^\p{L}\p{N}_-]+/gu, '_')
+        .slice(0, 40) || 'jornada';
+
     const fname = `${fileNameBase}-${new Date().toISOString().slice(0,10)}.pdf`;
 
     for (const path of PDF_PATHS) {
       try {
-        const { data } = await postJSON(base, path, safePayload, { timeout: 30000, filename: fname });
+        const { data } = await postJSON(base, path, safePayload, {
+          timeout: 60000,     // 💎 mais seguro no Render
+          filename: fname
+        });
 
         // backend devolveu { url: "..." }
         if (data && typeof data === 'object' && typeof data.url === 'string') {
-          // baixa via url
-          const r = await fetch(data.url);
-          if (!r.ok) throw new Error(`Download URL falhou: HTTP ${r.status}`);
-          const blob = await r.blob();
-          triggerDownload(blob, fname);
-          return { ok: true, downloaded: true, via: 'url', path, base };
+          // tenta baixar via fetch->blob (mais garantido), senão abre link
+          try {
+            const r = await fetch(data.url, { cache: 'no-store' });
+            if (!r.ok) throw new Error(`Download URL falhou: HTTP ${r.status}`);
+            const blob = await r.blob();
+            triggerDownload(blob, fname);
+            return { ok: true, downloaded: true, via: 'url+blob', path, base };
+          } catch (e) {
+            triggerDownloadUrl(data.url, fname);
+            return { ok: true, downloaded: true, via: 'url', path, base, warn: String(e?.message || e) };
+          }
         }
 
         // backend devolveu PDF (Blob)
@@ -140,20 +174,21 @@
           return { ok: true, downloaded: true, via: 'blob', path, base, filename: fname };
         }
 
-        // devolveu JSON/texto (debug)
-        return { ok: true, downloaded: false, via: 'json/text', path, base, data };
+        // devolveu texto/qualquer coisa (debug)
+        return { ok: true, downloaded: false, via: 'text', path, base, data };
       } catch (e) {
         lastErr = e;
-        // backoff curto
-        await sleep(120);
+        await sleep(150);
       }
     }
 
     return {
       ok: false,
       base,
-      error: String(lastErr && lastErr.message || lastErr),
-      details: lastErr && (lastErr.url || lastErr.body) ? { url: lastErr.url, body: lastErr.body } : undefined
+      error: String((lastErr && lastErr.message) || lastErr || 'unknown'),
+      details: (lastErr && (lastErr.url || lastErr.body))
+        ? { url: lastErr.url, body: lastErr.body }
+        : undefined
     };
   }
 
@@ -161,7 +196,7 @@
   window.API = window.API || {};
   window.API.gerarPDFEHQ = gerarPDFEHQ;
 
-  // Log de sanidade (ajuda no diagnóstico)
+  // Log de sanidade
   try {
     console.log('[API] pronto · PRIMARY=', API_PRIMARY, '· PDF_PATHS=', PDF_PATHS);
   } catch {}
