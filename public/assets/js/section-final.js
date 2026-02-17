@@ -133,19 +133,7 @@ function ensureFinalPdfStyles() {
   style.id = 'final-pdf-magic-style';
   style.textContent = css;
   document.head.appendChild(style);
-}
-   
- const respostasSafe = Array.isArray(state.respostas)
-  ? state.respostas.map(v => String(v ?? '').trim()).filter(Boolean)
-  : [];
-
-const payload = {
-  nome: String(state.nome ?? '').trim(),
-  guia: String(state.guiaSelecionado ?? '').trim(),
-  respostas: respostasSafe,
-  selfieCard: String(state.selfieBase64 ?? '')
-};
-  
+}  
 
 function buildFinalPayloadDiamante() {
   const state = window.JORNADA_STATE || window.state || {};
