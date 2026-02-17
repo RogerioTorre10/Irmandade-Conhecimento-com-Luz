@@ -24,6 +24,31 @@
     const l4 = document.documentElement?.lang;
     return (l1 || l2 || l3 || l4 || 'pt-BR').toString().trim();
   }
+  
+// ================================
+// STATE (compat) — evita "state is not defined"
+// ================================
+function getJornadaState() {
+  // 1) se você já tem um state global com outro nome
+  if (window.JORNADA_STATE) return window.JORNADA_STATE;
+  if (window.STATE) return window.STATE;
+
+  // 2) se existe um controller/namespace
+  if (window.JC && window.JC.state) return window.JC.state;
+  if (window.JORNADA && window.JORNADA.state) return window.JORNADA.state;
+
+  // 3) fallback: tenta localStorage (padrão do seu config.js)
+  try {
+    const key = (window.APP_CONFIG && window.APP_CONFIG.STORAGE_KEY) || 'jornada_essencial_v1';
+    const raw = localStorage.getItem(key);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+
+  // 4) fallback final
+  return {};
+}
+
+  
 // ============================================
 // FINAL — PDF MÁGICO (COM BOTÃO OPCIONAL)
 // ============================================
