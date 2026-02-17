@@ -24,31 +24,6 @@
     const l4 = document.documentElement?.lang;
     return (l1 || l2 || l3 || l4 || 'pt-BR').toString().trim();
   }
-  
-// ================================
-// STATE (compat) — evita "state is not defined"
-// ================================
-function getJornadaState() {
-  // 1) se você já tem um state global com outro nome
-  if (window.JORNADA_STATE) return window.JORNADA_STATE;
-  if (window.STATE) return window.STATE;
-
-  // 2) se existe um controller/namespace
-  if (window.JC && window.JC.state) return window.JC.state;
-  if (window.JORNADA && window.JORNADA.state) return window.JORNADA.state;
-
-  // 3) fallback: tenta localStorage (padrão do seu config.js)
-  try {
-    const key = (window.APP_CONFIG && window.APP_CONFIG.STORAGE_KEY) || 'jornada_essencial_v1';
-    const raw = localStorage.getItem(key);
-    if (raw) return JSON.parse(raw);
-  } catch {}
-
-  // 4) fallback final
-  return {};
-}
-
-  
 // ============================================
 // FINAL — PDF MÁGICO (COM BOTÃO OPCIONAL)
 // ============================================
@@ -133,7 +108,7 @@ function ensureFinalPdfStyles() {
   style.id = 'final-pdf-magic-style';
   style.textContent = css;
   document.head.appendChild(style);
-}  
+}
 
 function buildFinalPayloadDiamante() {
   const state = window.JORNADA_STATE || window.state || {};
@@ -172,164 +147,168 @@ function startMagicDots(root, baseMsg) {
 }
 
 function mountFinalPdfUI(root) {
-  ensureFinalPdfStyles();
-  if (!root) return;
+    ensureFinalPdfStyles();
+    // remove UI antiga (botão grande + 'agora não') se existir
+    const legacy = root && root.querySelector ? root.querySelector('#finalPdfWrap') : null;
+    if (legacy && legacy.parentNode) legacy.parentNode.removeChild(legacy);
+    if (!root) return;
 
-  // se já existe UI injetada antiga, remove (elimina "Gerar meu Pergaminho" + "Agora não")
-  const oldWrap = root.querySelector('#finalPdfWrap');
-  if (oldWrap) oldWrap.remove();
+    // evita duplicar
+    if (root.querySelector('#finalPdfStatus')) return;
 
-  // --------------------------------------------------
-  // Helpers
-  // --------------------------------------------------
-  const findBtnByText = (rx) => {
-    const all = [...root.querySelectorAll('button, a')];
-    return all.find(el => rx.test((el.textContent || '').trim()));
-  };
+    // tenta achar o "host" dentro do container final (onde ficam os botões)
+    const host =
+      root.querySelector('.final-acoes') ||
+      root.querySelector('.j-perg-v-inner') ||
+      root.querySelector('.j-panel') ||
+      root.querySelector('.glass') ||
+      root.querySelector('.content') ||
+      root;
 
-  // tenta achar um lugar para mostrar status (se não existir, cria discreto)
-  const getOrCreateStatus = () => {
-    let box =
-      root.querySelector('#finalPdfStatus') ||
-      root.querySelector('.final-pdf-status') ||
-      root.querySelector('[data-final-status]');
+    // cria status logo ABAIXO dos botões (dentro do container)
+    const status = document.createElement('div');
+    status.id = 'finalPdfStatus';
+    status.className = 'final-pdf-status';
+    status.textContent = '✅ Você pode gerar o PDF agora, ou baixar depois.';
 
-    if (!box) {
-      box = document.createElement('div');
-      box.id = 'finalPdfStatus';
-      box.className = 'final-pdf-status';
-      box.setAttribute('data-final-status', '1');
-      // coloca perto dos botões internos (tenta achar a área do rodapé)
-      const host =
-        root.querySelector('.j-panel .j-actions') ||
-        root.querySelector('.j-actions') ||
-        root.querySelector('.j-panel') ||
-        root;
-      host.appendChild(box);
+    // insere no lugar certo: após o bloco de botões, se existir
+    if (host.classList && host.classList.contains('final-acoes') && host.parentNode) {
+      host.parentNode.insertBefore(status, host.nextSibling);
+    } else {
+      host.appendChild(status);
     }
-    return box;
-  };
 
-  const setStatus = (msg, kind) => {
-    const box = getOrCreateStatus();
-    box.textContent = msg || '';
-    box.classList.remove('ok', 'err', 'info', 'warn');
-    box.classList.add(kind || 'info');
-  };
+    // --------------------------------------------------
+    // Descobre os dois botões já existentes no container
+    // (PDF + SelfieCard)
+    // --------------------------------------------------
+    const actionsRoot = root.querySelector('.final-acoes') || host;
 
-  // --------------------------------------------------
-  // 1) Encontrar seus DOIS botões internos (PDF e SelfieCard)
-  // --------------------------------------------------
-  // Ajuste aqui se você souber IDs/classes exatos (deixa ainda mais firme):
-  const btnPdf =
-    root.querySelector('[data-action="final-pdf"]') ||
-    root.querySelector('#btnFinalPdf') ||
-    root.querySelector('#btnPdf') ||
-    root.querySelector('.btn-final-pdf') ||
-    findBtnByText(/pdf|pergaminho/i);
+    const btns = Array.from(actionsRoot.querySelectorAll('button'));
+    // tenta por data-action/id primeiro
+    const btnPdf =
+      actionsRoot.querySelector('[data-action="pdf"]') ||
+      actionsRoot.querySelector('#btnPdf') ||
+      actionsRoot.querySelector('#btnFinalPdf') ||
+      btns[0] || null;
 
-  const btnSelfie =
-    root.querySelector('[data-action="final-selfie"]') ||
-    root.querySelector('#btnFinalSelfie') ||
-    root.querySelector('#btnSelfie') ||
-    root.querySelector('.btn-final-selfie') ||
-    findBtnByText(/selfie|card|foto/i);
+    const btnSelfie =
+      actionsRoot.querySelector('[data-action="selfie"]') ||
+      actionsRoot.querySelector('#btnSelfie') ||
+      actionsRoot.querySelector('#btnFinalSelfie') ||
+      btns[1] || null;
 
-  // Se você ainda quiser manter um "Agora não", a gente NÃO cria mais nada.
-  // Só feedback caso não encontre botões.
-  if (!btnPdf && !btnSelfie) {
-    console.warn('[FINAL] Não encontrei botões internos (PDF/Selfie).');
-    return;
-  }
+    // evita múltiplos binds
+    if (btnPdf && btnPdf.dataset.pdfBound === '1') return;
+    if (btnPdf) btnPdf.dataset.pdfBound = '1';
+    if (btnSelfie) btnSelfie.dataset.selfieBound = '1';
 
-  // --------------------------------------------------
-  // 2) Ligar lógica DIAMANTE no botão PDF
-  // --------------------------------------------------
-  if (btnPdf && !btnPdf.dataset.pdfBound) {
-    btnPdf.dataset.pdfBound = '1';
-
-    btnPdf.addEventListener('click', async (ev) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-
-      if (!window.API || typeof window.API.gerarPDFEHQ !== 'function') {
-        setStatus('⚠️ API não está pronta. Verifique se /assets/js/api.js carregou.', 'err');
-        return;
+    // helpers
+    function setStatus(msg, kind) {
+      // reaproveita função existente se houver
+      if (typeof setPdfStatus === 'function') {
+        setPdfStatus(root, msg, kind);
+      } else {
+        status.textContent = msg || '';
+        status.classList.toggle('is-err', kind === 'err');
+        status.classList.toggle('is-ok', kind === 'ok');
       }
+    }
 
-      // ✅ Guard-rail diamante (nome/guia/respostas/selfieCard sempre saneados)
-      const payload = buildFinalPayloadDiamante();
+    // --------------------------------------------------
+    // CLICK: PDF (gera + baixa)
+    // --------------------------------------------------
+    if (btnPdf) {
+      btnPdf.addEventListener('click', async (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
 
-      if (!payload.nome || payload.nome.length < 2) {
-        setStatus('⚠️ Nome inválido. Volte e confirme o nome antes de gerar o PDF.', 'err');
-        return;
-      }
+        if (!window.API || typeof window.API.gerarPDFEHQ !== 'function') {
+          setStatus('❌ API não está pronta. Verifique se /assets/js/api.js carregou.', 'err');
+          return;
+        }
 
-      if (!payload.respostas || payload.respostas.length === 0) {
-        setStatus('⚠️ Ainda não há respostas registradas para gerar o PDF.', 'err');
-        return;
-      }
+        const payload = buildFinalPayloadDiamante();
+        console.log('[FINAL][PAYLOAD]', payload);
 
-      btnPdf.disabled = true;
-      if (btnSelfie) btnSelfie.disabled = true;
+        // Guard-rail: nome e respostas
+        if (!payload.nome || payload.nome.length < 2) {
+          setStatus('⚠️ Nome inválido. Volte e confirme o nome antes de gerar o PDF.', 'err');
+          return;
+        }
+        if (!payload.respostas || payload.respostas.length === 0) {
+          setStatus('⚠️ Ainda não há respostas registradas para gerar o PDF.', 'err');
+          return;
+        }
 
-      const timer = startMagicDots(getOrCreateStatus(), 'Forjando seu pergaminho');
+        // trava botões durante geração
+        if (btnPdf) btnPdf.disabled = true;
+        if (btnSelfie) btnSelfie.disabled = true;
 
-      try {
-        const result = await window.API.gerarPDFEHQ(payload);
-        clearInterval(timer);
+        const timer = startMagicDots(root, 'Forjando seu pergaminho…');
 
-        if (result && result.ok) {
-          setStatus('✅ Pergaminho gerado e baixado com sucesso!', 'ok');
-        } else {
-          setStatus('❌ Não consegui gerar o PDF. Veja o console para detalhes.', 'err');
-          console.warn('[FINAL][PDF] result:', result);
-          btnPdf.disabled = false;
+        try {
+          const result = await window.API.gerarPDFEHQ(payload);
+          clearInterval(timer);
+
+          if (result && result.ok) {
+            setStatus('✅ Pergaminho gerado e baixado com sucesso!', 'ok');
+          } else {
+            setStatus('❌ Não consegui gerar o PDF. Veja o console para detalhes.', 'err');
+            console.warn('[FINAL][PDF] result:', result);
+            if (btnPdf) btnPdf.disabled = false;
+            if (btnSelfie) btnSelfie.disabled = false;
+          }
+        } catch (e) {
+          clearInterval(timer);
+          console.error('[FINAL][PDF] erro:', e);
+          setStatus('❌ Erro ao gerar o PDF. Confira o console (Network/Console).', 'err');
+          if (btnPdf) btnPdf.disabled = false;
           if (btnSelfie) btnSelfie.disabled = false;
         }
-      } catch (e) {
-        clearInterval(timer);
-        console.error('[FINAL][PDF] erro:', e);
-        setStatus('❌ Erro ao gerar o PDF. Confira o console (Network/Console).', 'err');
-        btnPdf.disabled = false;
-        if (btnSelfie) btnSelfie.disabled = false;
-      }
-    });
+      });
+    }
+
+    // --------------------------------------------------
+    // CLICK: SelfieCard (download local)
+    // --------------------------------------------------
+    if (btnSelfie) {
+      btnSelfie.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+
+        const payload = buildFinalPayloadDiamante();
+        console.log('[FINAL][PAYLOAD]', payload);
+        const img = payload.selfieCard;
+
+        if (!img || String(img).trim().length < 50) {
+          setStatus('⚠️ SelfieCard ainda não está disponível neste momento.', 'err');
+          return;
+        }
+
+        try {
+          // aceita dataURL ou base64 puro
+          let dataUrl = String(img).trim();
+          if (!dataUrl.startsWith('data:image')) {
+            dataUrl = 'data:image/png;base64,' + dataUrl.replace(/^base64,/, '');
+          }
+
+          const a = document.createElement('a');
+          a.href = dataUrl;
+          a.download = (payload.nome ? payload.nome : 'selfiecard') + '-selfiecard.png';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+
+          setStatus('✅ SelfieCard baixado com sucesso!', 'ok');
+        } catch (e) {
+          console.error('[FINAL][SELFIE] erro:', e);
+          setStatus('❌ Não consegui baixar a SelfieCard. Veja o console.', 'err');
+        }
+      });
+    }
   }
 
-  // --------------------------------------------------
-  // 3) Ligar lógica do botão SelfieCard (download opcional)
-  // --------------------------------------------------
-  if (btnSelfie && !btnSelfie.dataset.selfieBound) {
-    btnSelfie.dataset.selfieBound = '1';
-
-    btnSelfie.addEventListener('click', (ev) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-
-      const payload = buildFinalPayloadDiamante();
-      const dataUrl = payload.selfieCard;
-
-      if (!dataUrl || typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image/')) {
-        setStatus('⚠️ SelfieCard ainda não está disponível neste momento.', 'warn');
-        return;
-      }
-
-      try {
-        const a = document.createElement('a');
-        a.href = dataUrl;
-        a.download = `${(payload.nome || 'selfiecard').trim()}-selfiecard.png`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        setStatus('✅ SelfieCard baixado!', 'ok');
-      } catch (e) {
-        console.error('[FINAL][SELFIE] erro:', e);
-        setStatus('❌ Não consegui baixar o SelfieCard.', 'err');
-      }
-    });
-  }
-}
 
   // Utilitário de pausa
   const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -469,9 +448,6 @@ function mountFinalPdfUI(root) {
         el.style.pointerEvents = 'auto';
       });
     }
-    // após revelar botões padrão, injeta UI do PDF mágico
-    const root = document.getElementById(SECTION_ID);
-    if (root) mountFinalPdfUI(root);
 
     console.log('[FINAL] Sequência concluída com sucesso!');
   }
@@ -558,22 +534,41 @@ function mountFinalPdfUI(root) {
   // ------------------------ EVENTOS ------------------------
 
   // Quando o JC disser que a section-final foi mostrada
- document.addEventListener('section:shown', e => {
-  const id = e.detail?.sectionId || e.detail;
-  if (id !== SECTION_ID) return;
+  document.addEventListener('section:shown', e => {
+    const id = e.detail?.sectionId || e.detail;
+    if (id !== SECTION_ID) return;
 
-  const root = document.getElementById(SECTION_ID);
-  if (!root) return;
-
-  mountFinalPdfUI(root);
+    console.log('[FINAL] section:shown recebido para section-final, iniciando sequência...');
+    mountFinalPdfUI(root);
 
     const sec = document.getElementById(SECTION_ID);
     if (sec) sec.style.display = 'block';
 
     startFinalSequence();
-   // garante que typing + TTS iniciem sempre
-    setTimeout(startFinalSequence, 150);
-  }); 
+  });
+  // ============================================
+// GERA PDF FINAL DA JORNADA
+// ============================================
+
+try {
+  console.log('[FINAL] Preparando payload para PDF...');
+
+  const payload = buildFinalPayload();
+
+  console.log('[FINAL] Payload:', payload);
+
+  const result = await API.gerarPDFEHQ(payload);
+
+  console.log('[FINAL] Resultado PDF:', result);
+
+  if (!result.ok) {
+    console.warn('[FINAL] Falha ao gerar PDF:', result.error);
+  }
+
+} catch (err) {
+  console.error('[FINAL] Erro ao gerar PDF:', err);
+}
+
 
   // Clicks nos botões
   document.addEventListener('click', e => {
