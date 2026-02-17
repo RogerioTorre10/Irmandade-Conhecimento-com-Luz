@@ -25,15 +25,97 @@
     return (l1 || l2 || l3 || l4 || 'pt-BR').toString().trim();
   }
 // ============================================
-// PREPARA PAYLOAD FINAL (guard-rail diamante)
+// FINAL — PDF MÁGICO (COM BOTÃO OPCIONAL)
 // ============================================
-function buildFinalPayload() {
+
+function ensureFinalPdfStyles() {
+  if (document.getElementById('final-pdf-magic-style')) return;
+
+  const css = `
+  @keyframes finalPdfPulse {
+    0%   { box-shadow: 0 0 0 rgba(255,215,80,.0), 0 0 14px rgba(255,215,80,.25); }
+    50%  { box-shadow: 0 0 0 rgba(255,215,80,.0), 0 0 26px rgba(255,215,80,.55); }
+    100% { box-shadow: 0 0 0 rgba(255,215,80,.0), 0 0 14px rgba(255,215,80,.25); }
+  }
+
+  .final-pdf-wrap {
+    margin-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .final-pdf-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .final-pdf-btn {
+    border: 1px solid rgba(255, 215, 80, .55);
+    border-radius: 16px;
+    padding: 10px 14px;
+    min-width: 200px;
+    cursor: pointer;
+    animation: finalPdfPulse 1.6s ease-in-out infinite;
+    letter-spacing: .5px;
+  }
+
+  .final-pdf-btn[disabled] {
+    opacity: .6 !important;
+    cursor: not-allowed !important;
+    animation: none !important;
+  }
+
+  .final-pdf-skip {
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: 16px;
+    padding: 10px 14px;
+    min-width: 200px;
+    cursor: pointer;
+    opacity: .9;
+  }
+
+  .final-pdf-status {
+    width: min(520px, 92%);
+    text-align: center;
+    font-size: 14px;
+    line-height: 1.25;
+    opacity: .95;
+    padding: 8px 10px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(0,0,0,.18);
+    backdrop-filter: blur(4px);
+  }
+
+  .final-pdf-status.ok {
+    border-color: rgba(120,255,170,.35);
+    box-shadow: 0 0 18px rgba(120,255,170,.18);
+  }
+
+  .final-pdf-status.err {
+    border-color: rgba(255,120,120,.35);
+    box-shadow: 0 0 18px rgba(255,120,120,.18);
+  }
+  `;
+
+  const style = document.createElement('style');
+  style.id = 'final-pdf-magic-style';
+  style.textContent = css;
+  document.head.appendChild(style);
+}
+
+function buildFinalPayloadDiamante() {
   const state = window.JORNADA_STATE || window.state || {};
 
-  const nome = (state.nome || '').trim();
-  const guia = (state.guiaSelecionado || state.guia || '').toLowerCase();
+  const nome = String(state.nome || '').trim();
+  const guia = String(state.guiaSelecionado || state.guia || '').trim().toLowerCase();
 
-  // GARANTE ARRAY DE STRINGS
   let respostas = state.respostas || [];
   if (!Array.isArray(respostas)) respostas = [];
 
@@ -41,11 +123,111 @@ function buildFinalPayload() {
     .map(r => String(r || '').trim())
     .filter(Boolean);
 
-  // selfie card opcional
   const selfieCard = state.selfieBase64 || state.selfieCard || '';
 
   return { nome, guia, respostas, selfieCard };
 }
+
+function setPdfStatus(root, msg, kind) {
+  const el = root.querySelector('#finalPdfStatus');
+  if (!el) return;
+  el.classList.remove('ok', 'err');
+  if (kind) el.classList.add(kind);
+  el.textContent = msg;
+}
+
+function startMagicDots(root, baseMsg) {
+  let n = 0;
+  const tick = () => {
+    n = (n + 1) % 4;
+    setPdfStatus(root, baseMsg + '.'.repeat(n), null);
+  };
+  tick();
+  return setInterval(tick, 420);
+}
+
+function mountFinalPdfUI(root) {
+  ensureFinalPdfStyles();
+  if (!root || root.querySelector('#finalPdfWrap')) return;
+
+  // tenta colocar dentro de um container “natural” da final, mas sem depender de selector perfeito
+  const host =
+    root.querySelector('.j-perg-v-inner') ||
+    root.querySelector('.j-panel') ||
+    root.querySelector('.glass') ||
+    root.querySelector('.content') ||
+    root;
+
+  const wrap = document.createElement('div');
+  wrap.id = 'finalPdfWrap';
+  wrap.className = 'final-pdf-wrap';
+
+  wrap.innerHTML = `
+    <div class="final-pdf-row">
+      <button id="finalBtnPdf" type="button" class="final-pdf-btn">📜 Gerar meu Pergaminho (PDF)</button>
+      <button id="finalBtnSkipPdf" type="button" class="final-pdf-skip">Agora não</button>
+    </div>
+    <div id="finalPdfStatus" class="final-pdf-status">
+      Você escolhe: gerar e baixar o PDF agora, ou deixar para depois.
+    </div>
+  `;
+
+  host.appendChild(wrap);
+
+  const btnPdf = wrap.querySelector('#finalBtnPdf');
+  const btnSkip = wrap.querySelector('#finalBtnSkipPdf');
+
+  btnSkip.addEventListener('click', () => {
+    // não faz nada além de “encerrar” o convite
+    setPdfStatus(root, 'Tudo certo ✅ Você pode baixar depois quando quiser.', 'ok');
+    btnSkip.disabled = true;
+  });
+
+  btnPdf.addEventListener('click', async () => {
+    if (!window.API || typeof window.API.gerarPDFEHQ !== 'function') {
+      setPdfStatus(root, '❌ API não está pronta ainda. Verifique se /assets/js/api.js carregou.', 'err');
+      return;
+    }
+
+    const payload = buildFinalPayloadDiamante();
+
+    if (!payload.nome || payload.nome.length < 2) {
+      setPdfStatus(root, '⚠️ Nome inválido. Volte e confirme o nome antes de gerar o PDF.', 'err');
+      return;
+    }
+
+    if (!payload.respostas || payload.respostas.length === 0) {
+      setPdfStatus(root, '⚠️ Ainda não há respostas registradas para gerar o PDF.', 'err');
+      return;
+    }
+
+    btnPdf.disabled = true;
+    btnSkip.disabled = true;
+
+    const timer = startMagicDots(root, 'Forjando seu pergaminho');
+
+    try {
+      const result = await window.API.gerarPDFEHQ(payload);
+      clearInterval(timer);
+
+      if (result && result.ok) {
+        setPdfStatus(root, '✅ Pergaminho gerado e baixado com sucesso!', 'ok');
+      } else {
+        setPdfStatus(root, '❌ Não consegui gerar o PDF. Veja o console para detalhes.', 'err');
+        console.warn('[FINAL][PDF] result:', result);
+        btnPdf.disabled = false;
+        btnSkip.disabled = false;
+      }
+    } catch (e) {
+      clearInterval(timer);
+      console.error('[FINAL][PDF] erro:', e);
+      setPdfStatus(root, '❌ Erro ao gerar o PDF. Confira o console (Network/Console).', 'err');
+      btnPdf.disabled = false;
+      btnSkip.disabled = false;
+    }
+  });
+}
+
 
   // Utilitário de pausa
   const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -282,6 +464,29 @@ function buildFinalPayload() {
 
     startFinalSequence();
   });
+  // ============================================
+// GERA PDF FINAL DA JORNADA
+// ============================================
+
+try {
+  console.log('[FINAL] Preparando payload para PDF...');
+
+  const payload = buildFinalPayload();
+
+  console.log('[FINAL] Payload:', payload);
+
+  const result = await API.gerarPDFEHQ(payload);
+
+  console.log('[FINAL] Resultado PDF:', result);
+
+  if (!result.ok) {
+    console.warn('[FINAL] Falha ao gerar PDF:', result.error);
+  }
+
+} catch (err) {
+  console.error('[FINAL] Erro ao gerar PDF:', err);
+}
+
 
   // Clicks nos botões
   document.addEventListener('click', e => {
