@@ -111,21 +111,60 @@ function ensureFinalPdfStyles() {
 }
 
 function buildFinalPayloadDiamante() {
-  const state = window.JORNADA_STATE || window.state || {};
 
-  const nome = String(state.nome || '').trim();
-  const guia = String(state.guiaSelecionado || state.guia || '').trim().toLowerCase();
+  // 🧠 resolver universal do estado da jornada
+  const s =
+      window.JORNADA_STATE ||
+      window.APP_STATE ||
+      window.state ||
+      window.JC_STATE ||
+      {};
 
-  let respostas = state.respostas || [];
+  console.log('[FINAL][STATE RAW]', s);
+
+  // nome
+  const nome =
+      String(
+        s.nome ||
+        s.name ||
+        s.participantName ||
+        ''
+      ).trim();
+
+  // guia
+  const guia =
+      String(
+        s.guiaSelecionado ||
+        s.guia ||
+        s.guide ||
+        ''
+      ).trim().toLowerCase();
+
+  // respostas (garante array de strings)
+  let respostas =
+      s.respostas ||
+      s.answers ||
+      s.perguntas ||
+      [];
+
   if (!Array.isArray(respostas)) respostas = [];
 
   respostas = respostas
-    .map(r => String(r || '').trim())
-    .filter(Boolean);
+      .map(r => String(r || '').trim())
+      .filter(Boolean);
 
-  const selfieCard = state.selfieBase64 || state.selfieCard || '';
+  // selfie card (vários nomes possíveis)
+  const selfieCard =
+      s.selfieBase64 ||
+      s.selfieCard ||
+      s.cardImage ||
+      '';
 
-  return { nome, guia, respostas, selfieCard };
+  const payload = { nome, guia, respostas, selfieCard };
+
+  console.log('[FINAL][PAYLOAD NORMALIZED]', payload);
+
+  return payload;
 }
 
 function setPdfStatus(root, msg, kind) {
