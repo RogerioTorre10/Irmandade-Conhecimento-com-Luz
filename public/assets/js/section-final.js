@@ -392,6 +392,9 @@ function mountFinalPdfUI(root) {
         el.style.pointerEvents = 'auto';
       });
     }
+    // após revelar botões padrão, injeta UI do PDF mágico
+    const root = document.getElementById(SECTION_ID);
+    if (root) mountFinalPdfUI(root);
 
     console.log('[FINAL] Sequência concluída com sucesso!');
   }
@@ -478,47 +481,22 @@ function mountFinalPdfUI(root) {
   // ------------------------ EVENTOS ------------------------
 
   // Quando o JC disser que a section-final foi mostrada
-  document.addEventListener('section:shown', e => {
-    const id = e.detail?.sectionId || e.detail;
-    if (id !== SECTION_ID) return;
+ document.addEventListener('section:shown', e => {
+  const id = e.detail?.sectionId || e.detail;
+  if (id !== SECTION_ID) return;
 
-    console.log('[FINAL] section:shown recebido para section-final, iniciando sequência...');
-    mountFinalPdfUI(root);
+  const root = document.getElementById(SECTION_ID);
+  if (!root) return;
+
+  mountFinalPdfUI(root);
 
     const sec = document.getElementById(SECTION_ID);
     if (sec) sec.style.display = 'block';
 
     startFinalSequence();
-  });
-  // ============================================
-// GERA PDF FINAL DA JORNADA
-// ============================================
-
-try {
-  console.log('[FINAL] Preparando payload para PDF...');
-
-  const payload = buildFinalPayload();
-
-  console.log('[FINAL] Payload:', payload);
-
-  API.gerarPDFEHQ(payload)
-  .then((res) => {
-    console.log('[FINAL][PDF] ok', res);
-  })
-  .catch((err) => {
-    console.error('[FINAL][PDF] erro', err);
-  });
-
-  console.log('[FINAL] Resultado PDF:', result);
-
-  if (!result.ok) {
-    console.warn('[FINAL] Falha ao gerar PDF:', result.error);
-  }
-
-} catch (err) {
-  console.error('[FINAL] Erro ao gerar PDF:', err);
-}
-
+   // garante que typing + TTS iniciem sempre
+    setTimeout(startFinalSequence, 150);
+  }); 
 
   // Clicks nos botões
   document.addEventListener('click', e => {
