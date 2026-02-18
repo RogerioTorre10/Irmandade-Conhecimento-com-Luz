@@ -177,7 +177,62 @@ function buildFinalPayloadDiamante() {
   return payload;
 }
 
+// ==================================================
+// STATE — Diamante (pega do lugar certo)
+// ==================================================
+function safeParseJSON(raw) {
+  try { return JSON.parse(raw); } catch { return null; }
+}
 
+function getStorageKey() {
+  return (
+    window.APP_CONFIG?.STORAGE_KEY ||
+    window.JORNADA_CFG?.STORAGE_KEY ||
+    window.CONFIG?.STORAGE_KEY ||
+    'jornada_essencial_v1'
+  );
+}
+
+/**
+ * Tenta recuperar o estado:
+ * 1) window.JORNADA_STATE / window.state (se existir)
+ * 2) localStorage[STORAGE_KEY] (principal)
+ * 3) localStorage em chaves "backup" comuns
+ */
+function getJornadaState() {
+  const fromWindow =
+    (window.JORNADA_STATE && typeof window.JORNADA_STATE === 'object') ? window.JORNADA_STATE :
+    (window.state && typeof window.state === 'object') ? window.state :
+    {};
+
+  const key = getStorageKey();
+
+  const candidates = [
+    key,
+    'JORNADA_STATE',
+    'jornada_state',
+    'jornada_essencial',
+    'jornada_essencial_v1',
+  ];
+
+  let fromLS = {};
+  for (const k of candidates) {
+    const raw = localStorage.getItem(k);
+    const parsed = raw ? safeParseJSON(raw) : null;
+    if (parsed && typeof parsed === 'object') {
+      fromLS = parsed;
+      break;
+    }
+  }
+
+  // merge: prioriza o que veio do localStorage, mas mantém campos que só existam em window
+  const merged = Object.assign({}, fromWindow, fromLS);
+
+  // (opcional) mantém um “espelho” para outras seções acharem
+  window.JORNADA_STATE = merged;
+
+  return merged;
+}
 
 function setPdfStatus(root, msg, kind) {
   const el = root.querySelector('#finalPdfStatus');
