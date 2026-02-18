@@ -551,8 +551,10 @@ function mountFinalPdfUI(root) {
 
     startFinalSequence();
   });
+  
   // ============================================
-// GERA PDF FINAL DA JORNADA
+  // (REMOVIDO) Bloco de teste com await em topo
+  // ============================================
 
 
   // Clicks nos botões
