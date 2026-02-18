@@ -111,67 +111,92 @@ function ensureFinalPdfStyles() {
 }
 
 function getJornadaState() {
-  // 1) memória em runtime
-  const s =
+  // 1) tentativas globais (se existirem)
+  const g =
     window.JORNADA_STATE ||
-    window.APP_STATE ||
     window.state ||
     window.JC_STATE ||
-    (window.JC && window.JC.state) ||
-    (window.JORNADA && window.JORNADA.state) ||
+    window.__JORNADA_STATE__ ||
     null;
 
-  if (s && typeof s === 'object') return s;
+  if (g && typeof g === 'object' && Object.keys(g).length) return g;
 
-  // 2) LocalStorage (fallback real do projeto)
+  // 2) localStorage pelo STORAGE_KEY oficial
+  const key =
+    (window.APP_CONFIG && window.APP_CONFIG.STORAGE_KEY) ||
+    'jornada_essencial_v1';
+
+  // tenta 3 lugares comuns
+  const raw =
+    localStorage.getItem(key) ||
+    localStorage.getItem('jornada_essencial_v1') ||
+    localStorage.getItem('jornada_essencial') ||
+    sessionStorage.getItem(key);
+
+  if (!raw) return {};
+
   try {
-    const key = (window.APP_CONFIG && window.APP_CONFIG.STORAGE_KEY) || 'jornada_essencial_v1';
-    const raw = localStorage.getItem(key);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (parsed && typeof parsed === 'object') return parsed;
-    }
+    const parsed = JSON.parse(raw);
+    return (parsed && typeof parsed === 'object') ? parsed : {};
   } catch (e) {
-    console.warn('[FINAL][STATE] LocalStorage parse fail', e);
+    console.warn('[FINAL] Falha ao parsear storage state:', e);
+    return {};
   }
-
-  // 3) fallback
-  return {};
 }
 
 function buildFinalPayloadDiamante() {
   const s = getJornadaState();
-
   console.log('[FINAL][STATE RAW]', s);
 
-  const nome = String(s.nome || s.name || s.participantName || '').trim();
-  const guia = String(s.guiaSelecionado || s.guia || s.guide || '').trim().toLowerCase();
+  // nome (cobre vários formatos)
+  const nome = String(
+    s.nome ??
+    s.name ??
+    s.participantName ??
+    s.participante ??
+    ''
+  ).trim();
 
+  // guia (cobre vários formatos)
+  const guia = String(
+    s.guiaSelecionado ??
+    s.guia ??
+    s.guide ??
+    s.selectedGuide ??
+    ''
+  ).trim().toLowerCase();
+
+  // respostas (cobre vários formatos)
   let respostas =
-    s.respostas ||
-    s.answers ||
-    s.perguntas ||
-    s.responses ||
+    s.respostas ??
+    s.answers ??
+    s.perguntas ??
+    s.responses ??
+    s.respostasArray ??
     [];
 
   if (!Array.isArray(respostas)) respostas = [];
 
+  // normaliza: sempre array<string> limpo
   respostas = respostas
-    .map(r => String(r ?? '').trim())
+    .map(v => String(v ?? '').trim())
     .filter(Boolean);
 
+  // selfie/card (cobre vários formatos)
   const selfieCard = String(
-    s.selfieBase64 ||
-    s.selfieCard ||
-    s.cardImage ||
+    s.selfieBase64 ??
+    s.selfieCard ??
+    s.cardImage ??
+    s.cardBase64 ??
     ''
-  );
+  ).trim();
 
   const payload = { nome, guia, respostas, selfieCard };
 
   console.log('[FINAL][PAYLOAD NORMALIZED]', payload);
   return payload;
 }
+
 
 
 // ==================================================
