@@ -150,6 +150,65 @@
     });
   }
 
+    // ================================
+    // SELFIECARD — salvar no storage (para section-final)
+    // Cole logo após: console.log('[CARD] Render ok!', ...);
+    // ================================
+    (function salvarSelfieCardParaFinal(){
+     try {
+     // 1) tenta pegar canvas (mais comum)
+     const canvas =
+      document.querySelector('#cardCanvas') ||
+      document.querySelector('#selfieCardCanvas') ||
+      document.querySelector('canvas[data-selfiecard="1"]') ||
+      document.querySelector('.selfiecard-canvas') ||
+      null;
+
+    let dataUrl = '';
+
+    if (canvas && typeof canvas.toDataURL === 'function') {
+      dataUrl = canvas.toDataURL('image/png');
+    }
+
+    // 2) fallback: tenta pegar IMG já renderizada
+    if (!dataUrl) {
+      const img =
+        document.querySelector('#selfieCardImg') ||
+        document.querySelector('#cardPreviewImg') ||
+        document.querySelector('img[data-selfiecard="1"]') ||
+        document.querySelector('.selfiecard-img') ||
+        null;
+
+      if (img && img.src && img.src.startsWith('data:image')) {
+        dataUrl = img.src;
+      }
+    }
+
+    if (!dataUrl || dataUrl.length < 80) {
+      console.warn('[CARD][SELFIECARD] não encontrei canvas/img com dataURL válido.');
+      return;
+    }
+
+    // 3) grava em várias chaves (compatível com section-final)
+    localStorage.setItem('JORNADA_SELFIECARD', dataUrl);
+    sessionStorage.setItem('JORNADA_SELFIECARD', dataUrl);
+
+    // também guarda em chaves alternativas (pra garantir)
+    localStorage.setItem('SELFIE_CARD', dataUrl);
+    sessionStorage.setItem('SELFIE_CARD', dataUrl);
+
+    // espelha no estado global, se existir
+    window.JORNADA_STATE = window.JORNADA_STATE || {};
+    window.JORNADA_STATE.selfieCard = dataUrl;
+
+    console.log('[CARD][SELFIECARD] salva com sucesso:', dataUrl.slice(0, 40) + '...');
+  } catch (e) {
+    console.error('[CARD][SELFIECARD] erro ao salvar:', e);
+  }
+})();
+
+
+  
   // ---- Navegação para perguntas ----
   function goNext() {
     try { speechSynthesis.cancel(); } catch {}
