@@ -150,60 +150,127 @@
     });
   }
 
-    // ================================
-    // SELFIECARD — salvar no storage (para section-final)
-    // Cole logo após: console.log('[CARD] Render ok!', ...);
-    // ================================
-    (function salvarSelfieCardParaFinal(){
-     try {
-     // 1) tenta pegar canvas (mais comum)
-     const canvas =
-      document.querySelector('#cardCanvas') ||
-      document.querySelector('#selfieCardCanvas') ||
-      document.querySelector('canvas[data-selfiecard="1"]') ||
-      document.querySelector('.selfiecard-canvas') ||
-      null;
+  // ================================
+// SELFIECARD — GERAR IMAGEM (OFFSCREEN) + SALVAR NO STORAGE
+// Cole logo após: console.log('[CARD] Render ok!', ...)
+// ================================
+(async function gerarESalvarSelfieCard(){
+  try {
+    const sec = document.getElementById('section-card') || document;
 
-    let dataUrl = '';
+    const selfieImg = sec.querySelector('#selfieImage');
+    const bgImg     = sec.querySelector('#guideBg');
 
-    if (canvas && typeof canvas.toDataURL === 'function') {
-      dataUrl = canvas.toDataURL('image/png');
-    }
-
-    // 2) fallback: tenta pegar IMG já renderizada
-    if (!dataUrl) {
-      const img =
-        document.querySelector('#selfieCardImg') ||
-        document.querySelector('#cardPreviewImg') ||
-        document.querySelector('img[data-selfiecard="1"]') ||
-        document.querySelector('.selfiecard-img') ||
-        null;
-
-      if (img && img.src && img.src.startsWith('data:image')) {
-        dataUrl = img.src;
-      }
-    }
-
-    if (!dataUrl || dataUrl.length < 80) {
-      console.warn('[CARD][SELFIECARD] não encontrei canvas/img com dataURL válido.');
+    if (!selfieImg || !selfieImg.src) {
+      console.warn('[CARD][SELFIECARD] selfieImage não encontrado/sem src.');
       return;
     }
 
-    // 3) grava em várias chaves (compatível com section-final)
+    // helper: garante que imagem carregou (mesmo se já veio do cache)
+    function waitImg(img) {
+      return new Promise((resolve) => {
+        if (!img) return resolve(false);
+        if (img.complete && img.naturalWidth > 0) return resolve(true);
+        const done = () => resolve(true);
+        const fail = () => resolve(false);
+        img.addEventListener('load', done, { once: true });
+        img.addEventListener('error', fail, { once: true });
+        // fallback
+        setTimeout(() => resolve(img.complete && img.naturalWidth > 0), 1200);
+      });
+    }
+
+    // garante carregamento da selfie e do bg (se existir)
+    await waitImg(selfieImg);
+    if (bgImg) await waitImg(bgImg);
+
+    // tamanho padrão do card (ajuste se quiser)
+    const W = 768;
+    const H = 1024;
+
+    // canvas offscreen
+    const c = document.createElement('canvas');
+    c.width = W;
+    c.height = H;
+    const ctx = c.getContext('2d', { alpha: true });
+
+    // 1) fundo (se existir)
+    if (bgImg && bgImg.naturalWidth > 0) {
+      // cobre o canvas mantendo proporção
+      const r = Math.max(W / bgImg.naturalWidth, H / bgImg.naturalHeight);
+      const dw = bgImg.naturalWidth * r;
+      const dh = bgImg.naturalHeight * r;
+      ctx.drawImage(bgImg, (W - dw) / 2, (H - dh) / 2, dw, dh);
+    } else {
+      // fallback: fundo escuro leve
+      ctx.fillStyle = 'rgba(0,0,0,0.55)';
+      ctx.fillRect(0, 0, W, H);
+    }
+
+    // 2) moldura simples (pra já ficar “card”)
+    ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+    ctx.lineWidth = 6;
+    ctx.strokeRect(18, 18, W - 36, H - 36);
+
+    // 3) recorte da selfie em círculo (estilo “flame-selfie”)
+    const cx = W / 2;
+    const cy = 360;
+    const radius = 180;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    ctx.closePath();
+    ctx.clip();
+
+    // desenha selfie “cover” dentro do círculo
+    const sw = selfieImg.naturalWidth || 1;
+    const sh = selfieImg.naturalHeight || 1;
+    const scale = Math.max((radius * 2) / sw, (radius * 2) / sh);
+    const dw = sw * scale;
+    const dh = sh * scale;
+    ctx.drawImage(selfieImg, cx - dw / 2, cy - dh / 2, dw, dh);
+
+    ctx.restore();
+
+    // 4) brilho/halo em volta do círculo
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius + 6, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(140,220,255,0.55)';
+    ctx.lineWidth = 10;
+    ctx.shadowColor = 'rgba(140,220,255,0.55)';
+    ctx.shadowBlur = 18;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // 5) nome e guia (puxa do estado se existir)
+    const nome = (window.JORNADA_STATE?.nome || localStorage.getItem('JORNADA_NOME') || '').trim();
+    const guia = (window.JORNADA_STATE?.guiaSelecionado || window.JORNADA_STATE?.guia || localStorage.getItem('JORNADA_GUIA') || '').trim();
+
+    ctx.fillStyle = 'rgba(255,255,255,0.92)';
+    ctx.textAlign = 'center';
+
+    ctx.font = 'bold 44px Cardo, serif';
+    ctx.fillText(nome || 'PARTICIPANTE', cx, 660);
+
+    ctx.font = '28px Cardo, serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.78)';
+    ctx.fillText((guia ? `Guia: ${guia}` : 'Guia: —'), cx, 710);
+
+    // 6) exporta e salva
+    const dataUrl = c.toDataURL('image/png');
+
     localStorage.setItem('JORNADA_SELFIECARD', dataUrl);
     sessionStorage.setItem('JORNADA_SELFIECARD', dataUrl);
-
-    // também guarda em chaves alternativas (pra garantir)
     localStorage.setItem('SELFIE_CARD', dataUrl);
     sessionStorage.setItem('SELFIE_CARD', dataUrl);
 
-    // espelha no estado global, se existir
     window.JORNADA_STATE = window.JORNADA_STATE || {};
     window.JORNADA_STATE.selfieCard = dataUrl;
 
-    console.log('[CARD][SELFIECARD] salva com sucesso:', dataUrl.slice(0, 40) + '...');
+    console.log('[CARD][SELFIECARD] ✅ gerada e salva:', dataUrl.slice(0,40) + '...');
   } catch (e) {
-    console.error('[CARD][SELFIECARD] erro ao salvar:', e);
+    console.error('[CARD][SELFIECARD] erro ao gerar:', e);
   }
 })();
 
