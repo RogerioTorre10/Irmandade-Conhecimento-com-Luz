@@ -1083,25 +1083,6 @@ function mountFinalPdfUI(root) {
 // GERA PDF FINAL DA JORNADA
 // ============================================
 
-try {
-  console.log('[FINAL] Preparando payload para PDF...');
-
-  const payload = buildFinalPayload();
-
-  console.log('[FINAL] Payload:', payload);
-
-  const result = await API.gerarPDFEHQ(payload);
-
-  console.log('[FINAL] Resultado PDF:', result);
-
-  if (!result.ok) {
-    console.warn('[FINAL] Falha ao gerar PDF:', result.error);
-  }
-
-} catch (err) {
-  console.error('[FINAL] Erro ao gerar PDF:', err);
-}
-
 
   // Clicks nos botões
   document.addEventListener('click', e => {
