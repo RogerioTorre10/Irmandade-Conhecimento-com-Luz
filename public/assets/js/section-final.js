@@ -1,77 +1,56 @@
 /* =====================================================================================
-   section-final.js (clean / robust)
-   - Reata botões mesmo quando JC.attachButtonEvents = 0
-   - PDF/HQ via API.gerarPDFEHQ(payload) com guard-rail "diamante"
-   - SelfieCard download local (dataURL ou base64)
-   - Datilografia + TTS (runTyping/speakText se existirem; fallback)
+   section-final.js (ultra-robusto)
+   - Garante bind mesmo se:
+     • IDs mudarem / não existirem
+     • section-final vier com id diferente (prefixo)
+     • botões forem <button> ou <div role="button">
    ===================================================================================== */
 (() => {
   'use strict';
 
-  // ---------------------------------------------
-  // CONFIG
-  // ---------------------------------------------
-  const SECTION_ID = 'section-final';
-
-  // Keys mais comuns no seu projeto
-  const LS_KEYS = {
-    nome: ['JORNADA_NOME', 'JORNADA_NAME', 'NOME', 'USER_NAME'],
-    guia: ['JORNADA_GUIA', 'JORNADA_GUIDE', 'GUIA', 'GUIDE'],
-    respostas: [
-      'JORNADA_RESPOSTAS',
-      'JORNADA_ANSWERS',
-      'JOURNEY_ANSWERS',
-      'RESPOSTAS',
-      'ANSWERS'
-    ],
-    selfie: [
-      'JORNADA_SELFIE',
-      'JORNADA_SELFIE_DATAURL',
-      'SELFIE_DATAURL',
-      'SELFIE',
-      'SELFIE_BASE64'
-    ]
-  };
-
-  // IDs esperados (mantém compatibilidade com sua UI)
-  const UI_IDS = {
-    btnPdf: '#btnBaixarPDFHQ',
-    btnSelfie: '#btnSelfieCard',
-    status: '#finalStatus',
-    // área onde o texto final aparece (tentamos várias)
-    textTargets: ['#finalTexto', '#final-texto', '.final-texto', '.jp-typing', '[data-final-text]']
-  };
+  const TAG = '[section-final]';
 
   // ---------------------------------------------
-  // HELPERS (DOM)
+  // HELPERS
   // ---------------------------------------------
   const $ = (sel, root) => (root || document).querySelector(sel);
   const $$ = (sel, root) => Array.from((root || document).querySelectorAll(sel));
 
-  function getSectionRoot() {
-    return document.getElementById(SECTION_ID) || document.querySelector(`#${SECTION_ID}`) || null;
-  }
+  function log(...args) { console.log(TAG, ...args); }
+  function warn(...args) { console.warn(TAG, ...args); }
+  function err(...args) { console.error(TAG, ...args); }
 
-  function setStatus(msg) {
-    const root = getSectionRoot();
-    const el = root && $(UI_IDS.status, root);
-    if (el) el.textContent = String(msg || '');
-  }
+  // ---------------------------------------------
+  // ACHAR ROOT (muito tolerante)
+  // ---------------------------------------------
+  function getFinalRoot() {
+    // 1) id exato
+    let el = document.getElementById('section-final');
+    if (el) return el;
 
-  function disableButton(btn, disabled, labelWhenDisabled) {
-    if (!btn) return;
-    btn.disabled = !!disabled;
-    btn.classList.toggle('is-loading', !!disabled);
+    // 2) qualquer id que começa com section-final
+    el = document.querySelector('[id^="section-final"]');
+    if (el) return el;
 
-    // preserva rótulo original
-    if (!btn.__origText) btn.__origText = btn.textContent;
-    if (disabled && labelWhenDisabled) btn.textContent = labelWhenDisabled;
-    if (!disabled) btn.textContent = btn.__origText || btn.textContent;
+    // 3) data-section / data-step
+    el = document.querySelector('[data-section="final"], [data-step="final"]');
+    if (el) return el;
+
+    // 4) fallback: seção visível com "final" no id/class
+    el = document.querySelector('.section-final, .final, [class*="final"]');
+    return el || null;
   }
 
   // ---------------------------------------------
-  // HELPERS (storage / parsing)
+  // STORAGE helpers (mesmo padrão)
   // ---------------------------------------------
+  const LS_KEYS = {
+    nome: ['JORNADA_NOME', 'JORNADA_NAME', 'NOME', 'USER_NAME'],
+    guia: ['JORNADA_GUIA', 'JORNADA_GUIDE', 'GUIA', 'GUIDE'],
+    respostas: ['JORNADA_RESPOSTAS', 'JORNADA_ANSWERS', 'RESPOSTAS', 'ANSWERS'],
+    selfie: ['JORNADA_SELFIE', 'JORNADA_SELFIE_DATAURL', 'SELFIE_DATAURL', 'SELFIE', 'SELFIE_BASE64']
+  };
+
   function lsGetFirst(keys) {
     for (const k of keys) {
       try {
@@ -87,36 +66,25 @@
     if (typeof value === 'object') return value;
     const s = String(value).trim();
     if (!s) return null;
-    try {
-      return JSON.parse(s);
-    } catch (_) {
-      return null;
-    }
+    try { return JSON.parse(s); } catch (_) { return null; }
   }
 
   function toArrayOfStrings(x) {
-    // guard-rail "diamante": sempre array<string>
     if (x == null) return [];
     if (Array.isArray(x)) return x.map(v => String(v ?? '')).filter(s => s.trim() !== '');
     if (typeof x === 'object') {
-      // caso venha como map {q1: "...", q2:"..."} -> pega values
       const vals = Object.values(x).map(v => String(v ?? '')).filter(s => s.trim() !== '');
       if (vals.length) return vals;
     }
     const s = String(x).trim();
-    if (!s) return [];
-    return [s];
+    return s ? [s] : [];
   }
 
   function normalizeSelfie(selfie) {
-    // aceita:
-    // - data:image/...;base64,...
-    // - base64 puro
-    // - objeto { dataUrl, base64, mime }
     if (!selfie) return null;
 
     if (typeof selfie === 'object') {
-      const dataUrl = selfie.dataUrl || selfie.dataURL || selfie.data_uri || selfie.uri;
+      const dataUrl = selfie.dataUrl || selfie.dataURL || selfie.uri;
       if (dataUrl && String(dataUrl).startsWith('data:image/')) return String(dataUrl);
 
       const b64 = selfie.base64 || selfie.b64;
@@ -132,7 +100,6 @@
     if (!s) return null;
     if (s.startsWith('data:image/')) return s;
 
-    // base64 puro
     if (/^[A-Za-z0-9+/=\s]+$/.test(s) && s.replace(/\s/g, '').length > 200) {
       const clean = s.replace(/\s/g, '').replace(/^data:image\/[a-zA-Z0-9+.-]+;base64,/, '');
       return `data:image/jpeg;base64,${clean}`;
@@ -141,73 +108,49 @@
     return null;
   }
 
-  // ---------------------------------------------
-  // COLETA (múltiplas fontes)
-  // ---------------------------------------------
   function collectNomeGuia() {
-    const nome = (lsGetFirst(LS_KEYS.nome) || '').trim();
-    const guia = (lsGetFirst(LS_KEYS.guia) || '').trim();
+    const nomeLS = (lsGetFirst(LS_KEYS.nome) || '').trim();
+    const guiaLS = (lsGetFirst(LS_KEYS.guia) || '').trim();
 
-    // tenta também globais, se existirem
-    const gNome =
+    const nomeG =
       (window.JORNADA_NOME && String(window.JORNADA_NOME).trim()) ||
       (window.JORNADA?.nome && String(window.JORNADA.nome).trim()) ||
-      (window.state?.nome && String(window.state.nome).trim());
+      (window.state?.nome && String(window.state.nome).trim()) || '';
 
-    const gGuia =
+    const guiaG =
       (window.JORNADA_GUIA && String(window.JORNADA_GUIA).trim()) ||
       (window.JORNADA?.guia && String(window.JORNADA.guia).trim()) ||
-      (window.state?.guia && String(window.state.guia).trim());
+      (window.state?.guia && String(window.state.guia).trim()) || '';
 
-    return {
-      nome: (gNome || nome || '').trim(),
-      guia: (gGuia || guia || '').trim()
-    };
+    return { nome: (nomeG || nomeLS || ''), guia: (guiaG || guiaLS || '') };
   }
 
   function collectRespostas() {
-    // 1) globais prováveis
     const candidates = [
       window.JORNADA_RESPOSTAS,
       window.JORNADA_ANSWERS,
       window.JORNADA?.respostas,
       window.JORNADA?.answers,
       window.state?.respostas,
-      window.state?.answers,
-      window.JORNADA_STATE?.answers,
-      window.JORNADA_STATE?.respostas
+      window.state?.answers
     ];
-
     for (const c of candidates) {
       const arr = toArrayOfStrings(c);
       if (arr.length) return arr;
     }
 
-    // 2) localStorage (JSON ou texto)
     const raw = lsGetFirst(LS_KEYS.respostas);
     const parsed = tryJSONParse(raw);
     const arr2 = toArrayOfStrings(parsed ?? raw);
-    if (arr2.length) return arr2;
-
-    // 3) fallback: tenta pegar de campos DOM (se existir histórico renderizado)
-    const root = getSectionRoot();
-    if (root) {
-      const fromDom = $$('[data-answer]', root).map(el => el.getAttribute('data-answer'));
-      const arr3 = toArrayOfStrings(fromDom);
-      if (arr3.length) return arr3;
-    }
-
-    return [];
+    return arr2;
   }
 
   function collectSelfie() {
     const candidates = [
       window.JORNADA_SELFIE,
       window.JORNADA?.selfie,
-      window.state?.selfie,
-      window.JORNADA_STATE?.selfie
+      window.state?.selfie
     ];
-
     for (const c of candidates) {
       const s = normalizeSelfie(c);
       if (s) return s;
@@ -215,38 +158,23 @@
 
     const raw = lsGetFirst(LS_KEYS.selfie);
     const parsed = tryJSONParse(raw);
-    const s2 = normalizeSelfie(parsed ?? raw);
-    if (s2) return s2;
-
-    return null;
+    return normalizeSelfie(parsed ?? raw);
   }
 
   function buildDiamantePayload() {
     const { nome, guia } = collectNomeGuia();
     const respostas = collectRespostas();
-    const selfieDataUrl = collectSelfie();
+    const selfie = collectSelfie();
 
-    // Guard-rail “diamante”
-    const payload = {
-      meta: {
-        nome: String(nome || ''),
-        guia: String(guia || ''),
-        // timestamp local (UTC-3 no seu padrão, mas aqui deixamos ISO local do browser)
-        ts: new Date().toISOString()
-      },
+    return {
+      meta: { nome: String(nome || ''), guia: String(guia || ''), ts: new Date().toISOString() },
       respostas: toArrayOfStrings(respostas),
-      selfie: selfieDataUrl ? String(selfieDataUrl) : null
+      selfie: selfie ? String(selfie) : null
     };
-
-    // garante tipos
-    if (!Array.isArray(payload.respostas)) payload.respostas = [];
-    payload.respostas = payload.respostas.map(s => String(s ?? ''));
-
-    return payload;
   }
 
   // ---------------------------------------------
-  // DOWNLOAD helpers
+  // DOWNLOAD
   // ---------------------------------------------
   function downloadDataUrl(dataUrl, filename) {
     const a = document.createElement('a');
@@ -258,78 +186,108 @@
   }
 
   // ---------------------------------------------
-  // DATILOGRAFIA + TTS (fallback)
+  // DATILOGRAFIA + TTS (tentativa)
   // ---------------------------------------------
   async function runFinalTyping(root) {
-    root = root || getSectionRoot();
-    if (!root) return;
+    const target =
+      $('[data-final-text]', root) ||
+      $('#finalTexto', root) ||
+      $('#final-texto', root) ||
+      $('.final-texto', root) ||
+      $('.jp-typing', root);
 
-    // acha um alvo de texto razoável
-    let target = null;
-    for (const sel of UI_IDS.textTargets) {
-      target = $(sel, root);
-      if (target) break;
+    if (!target) {
+      warn('Alvo de mensagem final não encontrado (ok se sua UI não usa typing aqui).');
+      return;
     }
-    if (!target) return;
 
-    const text =
-      (target.getAttribute('data-text') || target.textContent || '').trim();
-
+    const text = (target.getAttribute('data-text') || target.textContent || '').trim();
     if (!text) return;
 
-    // Se existir runTyping, usa; senão apenas garante texto
     const runTyping = window.runTyping || window.JORNADA_TYPING?.runTyping;
     const speakText = window.speakText || window.JORNADA_TTS?.speakText;
 
     try {
       if (typeof runTyping === 'function') {
-        // assinatura tolerante: (el, text, opts)
         await runTyping(target, text, { speak: true });
-        return;
+      } else {
+        target.textContent = text;
+        if (typeof speakText === 'function') {
+          try { await speakText(text); } catch (_) {}
+        }
       }
-
-      target.textContent = text;
-
-      if (typeof speakText === 'function') {
-        try { await speakText(text); } catch (_) {}
-      }
-    } catch (_) {
-      // fallback silencioso
+    } catch (e) {
+      err('Falha no typing/TTS:', e);
       target.textContent = text;
     }
   }
 
   // ---------------------------------------------
+  // BUTTON FINDER (resolve seu "0 botões")
+  // ---------------------------------------------
+  function findActionButtons(root) {
+    // 1) IDs oficiais
+    let btnPdf = $('#btnBaixarPDFHQ', root);
+    let btnSelfie = $('#btnSelfieCard', root);
+
+    // 2) data-action
+    if (!btnPdf) btnPdf = $('[data-action="pdf"]', root);
+    if (!btnSelfie) btnSelfie = $('[data-action="selfie"]', root);
+
+    // 3) fallback por “botões visíveis”
+    // aceita <button> e também <div role="button">
+    const candidates = $$('.j-btn, button, [role="button"]', root)
+      .filter(el => {
+        const r = el.getBoundingClientRect();
+        return r.width > 10 && r.height > 10; // visível o bastante
+      });
+
+    // Se ainda não achou, tenta pegar os 2 primeiros dentro do “card” central
+    if ((!btnPdf || !btnSelfie) && candidates.length >= 2) {
+      // Heurística: no seu print tem 2 botões lado a lado. Primeiro = pdf, segundo = selfie.
+      btnPdf = btnPdf || candidates[0];
+      btnSelfie = btnSelfie || candidates[1];
+    }
+
+    return { btnPdf, btnSelfie };
+  }
+
+  function disable(btn, on, label) {
+    if (!btn) return;
+    btn.disabled = !!on;
+    btn.classList.toggle('is-loading', !!on);
+    if (!btn.__origText) btn.__origText = btn.textContent;
+    if (on && label) btn.textContent = label;
+    if (!on) btn.textContent = btn.__origText || btn.textContent;
+  }
+
+  // ---------------------------------------------
   // ACTIONS
   // ---------------------------------------------
-  async function onClickPDF(ev) {
+  async function onPDFClick(ev) {
     ev?.preventDefault?.();
     ev?.stopPropagation?.();
 
-    const root = getSectionRoot();
-    const btn = root && $(UI_IDS.btnPdf, root);
+    const root = getFinalRoot();
+    const { btnPdf } = findActionButtons(root);
 
-    disableButton(btn, true, 'GERANDO PDF…');
-    setStatus('Gerando PDF/HQ…');
-
-    const payload = buildDiamantePayload();
+    disable(btnPdf, true, 'GERANDO…');
 
     try {
       if (!window.API || typeof window.API.gerarPDFEHQ !== 'function') {
-        throw new Error('API.gerarPDFEHQ não está disponível (window.API)');
+        throw new Error('API.gerarPDFEHQ não disponível em window.API');
       }
 
-      // Chamando API (ela pode:
-      // - disparar download automaticamente; ou
-      // - retornar { url } / { dataUrl } / Blob; então tentamos lidar)
+      const payload = buildDiamantePayload();
+      log('Chamando API.gerarPDFEHQ(payload):', payload);
+
       const res = await window.API.gerarPDFEHQ(payload);
 
-      // Tentativas de compatibilidade: url / dataUrl / blob
+      // compat: url / dataUrl / blob
       if (res && typeof res === 'object') {
         if (res.dataUrl && String(res.dataUrl).startsWith('data:application/pdf')) {
           downloadDataUrl(String(res.dataUrl), `Jornada-${payload.meta.nome || 'Participante'}.pdf`);
         } else if (res.url && typeof res.url === 'string') {
-          // abre em nova aba (se for download direto, melhor ainda)
           window.open(res.url, '_blank', 'noopener,noreferrer');
         } else if (res.blob instanceof Blob) {
           const url = URL.createObjectURL(res.blob);
@@ -337,125 +295,102 @@
           setTimeout(() => URL.revokeObjectURL(url), 60_000);
         }
       }
-
-      setStatus('PDF/HQ gerado. Se não baixou automaticamente, verifique a nova aba/pop-up.');
-    } catch (err) {
-      console.error('[section-final] Erro ao gerar PDF/HQ:', err);
-      setStatus(`Falha ao gerar PDF/HQ: ${err?.message || err}`);
-      alert(`Falha ao gerar PDF/HQ.\n\n${err?.message || err}`);
+    } catch (e) {
+      err('Erro PDF/HQ:', e);
+      alert(`Falha ao gerar PDF/HQ.\n\n${e?.message || e}`);
     } finally {
-      disableButton(btn, false);
-      // limpa status depois de um tempo (não obrigatório)
-      setTimeout(() => setStatus(''), 2500);
+      disable(btnPdf, false);
     }
   }
 
-  function onClickSelfie(ev) {
+  function onSelfieClick(ev) {
     ev?.preventDefault?.();
     ev?.stopPropagation?.();
 
-    const root = getSectionRoot();
-    const btn = root && $(UI_IDS.btnSelfie, root);
+    const root = getFinalRoot();
+    const { btnSelfie } = findActionButtons(root);
 
-    disableButton(btn, true, 'BAIXANDO…');
-    setStatus('Preparando SelfieCard…');
+    disable(btnSelfie, true, 'BAIXANDO…');
 
     try {
-      const { nome } = collectNomeGuia();
       const selfie = collectSelfie();
-      if (!selfie) {
-        throw new Error('Selfie não encontrada (nem global nem localStorage).');
-      }
+      const { nome } = collectNomeGuia();
+      if (!selfie) throw new Error('Selfie não encontrada.');
 
       const safeName = (nome || 'Participante').replace(/[^\w\-]+/g, '_');
       downloadDataUrl(selfie, `SelfieCard-${safeName}.png`);
-
-      setStatus('SelfieCard baixado.');
-    } catch (err) {
-      console.error('[section-final] Erro ao baixar SelfieCard:', err);
-      setStatus(`Falha ao baixar SelfieCard: ${err?.message || err}`);
-      alert(`Falha ao baixar SelfieCard.\n\n${err?.message || err}`);
+    } catch (e) {
+      err('Erro SelfieCard:', e);
+      alert(`Falha ao baixar SelfieCard.\n\n${e?.message || e}`);
     } finally {
-      disableButton(btn, false);
-      setTimeout(() => setStatus(''), 2500);
+      disable(btnSelfie, false);
     }
   }
 
   // ---------------------------------------------
-  // BIND (robusto: reata sempre que a seção aparecer)
+  // BIND (com “rebinding”)
   // ---------------------------------------------
-  function bindUIOnce(root) {
-    if (!root) return;
-    if (root.__finalBound) return;
-    root.__finalBound = true;
-
-    const btnPdf = $(UI_IDS.btnPdf, root);
-    const btnSelfie = $(UI_IDS.btnSelfie, root);
-
-    if (btnPdf) btnPdf.addEventListener('click', onClickPDF);
-    if (btnSelfie) btnSelfie.addEventListener('click', onClickSelfie);
-
-    // tenta typing/TTS ao entrar
-    runFinalTyping(root).catch(() => {});
-  }
-
-  function tryBindNow() {
-    const root = getSectionRoot();
+  function bind(root) {
     if (!root) return false;
-    bindUIOnce(root);
+
+    // evita duplicar listeners, mas permite “reatar” se o DOM foi recriado
+    if (root.__finalBindStamp && root.__finalBindStamp === root.innerHTML.length) {
+      return true;
+    }
+    root.__finalBindStamp = root.innerHTML.length;
+
+    const { btnPdf, btnSelfie } = findActionButtons(root);
+    log('Root encontrado:', root.id || '(sem id)', '| btnPdf:', !!btnPdf, '| btnSelfie:', !!btnSelfie);
+
+    if (btnPdf) {
+      btnPdf.onclick = null;
+      btnPdf.addEventListener('click', onPDFClick, { passive: false });
+    }
+    if (btnSelfie) {
+      btnSelfie.onclick = null;
+      btnSelfie.addEventListener('click', onSelfieClick, { passive: false });
+    }
+
+    // typing / TTS
+    runFinalTyping(root).catch(() => {});
+
+    // Se ainda não encontrou botões, avisa forte (pra você bater o olho no DOM)
+    if (!btnPdf && !btnSelfie) {
+      warn('Nenhum botão detectado dentro da section-final. Provável: botões estão fora do root OU não são button/role=button.');
+    }
+
     return true;
   }
 
-  // Observa DOM (caso a seção seja injetada depois pelo controller)
-  function observeSection() {
-    if (tryBindNow()) return;
+  function bindWhenReady() {
+    const root = getFinalRoot();
+    if (root) return bind(root);
+
+    return false;
+  }
+
+  function observe() {
+    // tenta já
+    if (bindWhenReady()) return;
 
     const mo = new MutationObserver(() => {
-      const ok = tryBindNow();
-      if (ok) mo.disconnect();
+      if (bindWhenReady()) mo.disconnect();
     });
-
     mo.observe(document.documentElement, { childList: true, subtree: true });
   }
-
-  // Também escuta um evento padrão, caso exista no seu controller
-  function hookControllerEvents() {
-    const handler = (e) => {
-      // se o controller emitir algo como { detail: { id: 'section-final' } }
-      const id = e?.detail?.id || e?.detail?.section || e?.detail;
-      if (String(id || '').includes('final')) {
-        tryBindNow();
-      }
-    };
-
-    // nomes comuns
-    window.addEventListener('jornada:section:shown', handler);
-    window.addEventListener('JC:shown', handler);
-    window.addEventListener('section:shown', handler);
-  }
-
-  // ---------------------------------------------
-  // EXPORT opcional (se o controller quiser chamar)
-  // ---------------------------------------------
-  window.JORNADA_SECTION_FINAL = {
-    mount() {
-      // chamado quando a seção final for exibida
-      tryBindNow();
-    }
-  };
 
   // ---------------------------------------------
   // BOOT
   // ---------------------------------------------
+  log('LOADED ✅ (se você não ver isso, o arquivo NÃO está carregando!)');
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      observeSection();
-      hookControllerEvents();
-      tryBindNow();
-    });
+    document.addEventListener('DOMContentLoaded', observe);
   } else {
-    observeSection();
-    hookControllerEvents();
-    tryBindNow();
+    observe();
   }
+
+  // expõe um mount manual (se quiser chamar do controller)
+  window.JORNADA_SECTION_FINAL = window.JORNADA_SECTION_FINAL || {};
+  window.JORNADA_SECTION_FINAL.mount = () => bindWhenReady();
 })();
