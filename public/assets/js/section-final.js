@@ -1,75 +1,83 @@
-/* =====================================================================================
-   section-final.js (ultra-robusto)
-   - Garante bind mesmo se:
-     • IDs mudarem / não existirem
-     • section-final vier com id diferente (prefixo)
-     • botões forem <button> ou <div role="button">
-   ===================================================================================== */
 (() => {
   'use strict';
 
   const TAG = '[section-final]';
-
-  // ---------------------------------------------
-  // HELPERS
-  // ---------------------------------------------
   const $ = (sel, root) => (root || document).querySelector(sel);
   const $$ = (sel, root) => Array.from((root || document).querySelectorAll(sel));
 
-  function log(...args) { console.log(TAG, ...args); }
-  function warn(...args) { console.warn(TAG, ...args); }
-  function err(...args) { console.error(TAG, ...args); }
+  function log(...a){ console.log(TAG, ...a); }
+  function warn(...a){ console.warn(TAG, ...a); }
+  function err(...a){ console.error(TAG, ...a); }
 
-  // ---------------------------------------------
-  // ACHAR ROOT (muito tolerante)
-  // ---------------------------------------------
-  function getFinalRoot() {
-    // 1) id exato
-    let el = document.getElementById('section-final');
-    if (el) return el;
-
-    // 2) qualquer id que começa com section-final
-    el = document.querySelector('[id^="section-final"]');
-    if (el) return el;
-
-    // 3) data-section / data-step
-    el = document.querySelector('[data-section="final"], [data-step="final"]');
-    if (el) return el;
-
-    // 4) fallback: seção visível com "final" no id/class
-    el = document.querySelector('.section-final, .final, [class*="final"]');
-    return el || null;
+  function getRoot(){
+    return document.getElementById('section-final') || document.querySelector('[id^="section-final"]');
   }
 
-  // ---------------------------------------------
-  // STORAGE helpers (mesmo padrão)
-  // ---------------------------------------------
+  function hydrateFinalMessage(root){
+    const box = $('#final-message', root);
+    if (!box) return;
+
+    const ps = $$('p[data-original]', box);
+    ps.forEach(p => {
+      if (!p.textContent || !p.textContent.trim()) {
+        p.textContent = p.getAttribute('data-original') || '';
+      }
+    });
+  }
+
+  async function runTitleTyping(root){
+    const titleEl = $('#final-title', root);
+    if (!titleEl) return;
+
+    // Se você usa i18n, pode pôr data-original aqui também; se não tiver, define um fallback
+    const text = (titleEl.getAttribute('data-original') || titleEl.textContent || 'Jornada concluída.').trim();
+    if (!text) return;
+
+    const runTyping = window.runTyping || window.JORNADA_TYPING?.runTyping;
+    const speakText = window.speakText || window.JORNADA_TTS?.speakText;
+
+    try{
+      if (typeof runTyping === 'function') {
+        await runTyping(titleEl, text, { speak: true });
+      } else {
+        titleEl.textContent = text;
+        if (typeof speakText === 'function') {
+          try { await speakText(text); } catch(_){}
+        }
+      }
+    } catch(e){
+      err('typing/TTS falhou:', e);
+      titleEl.textContent = text;
+    }
+  }
+
+  // ---------- payload “diamante” ----------
   const LS_KEYS = {
-    nome: ['JORNADA_NOME', 'JORNADA_NAME', 'NOME', 'USER_NAME'],
-    guia: ['JORNADA_GUIA', 'JORNADA_GUIDE', 'GUIA', 'GUIDE'],
-    respostas: ['JORNADA_RESPOSTAS', 'JORNADA_ANSWERS', 'RESPOSTAS', 'ANSWERS'],
-    selfie: ['JORNADA_SELFIE', 'JORNADA_SELFIE_DATAURL', 'SELFIE_DATAURL', 'SELFIE', 'SELFIE_BASE64']
+    nome: ['JORNADA_NOME','JORNADA_NAME','NOME','USER_NAME'],
+    guia: ['JORNADA_GUIA','JORNADA_GUIDE','GUIA','GUIDE'],
+    respostas: ['JORNADA_RESPOSTAS','JORNADA_ANSWERS','RESPOSTAS','ANSWERS'],
+    selfie: ['JORNADA_SELFIE','JORNADA_SELFIE_DATAURL','SELFIE_DATAURL','SELFIE','SELFIE_BASE64']
   };
 
-  function lsGetFirst(keys) {
-    for (const k of keys) {
-      try {
+  function lsGetFirst(keys){
+    for (const k of keys){
+      try{
         const v = localStorage.getItem(k);
-        if (v !== null && v !== undefined && String(v).trim() !== '') return v;
-      } catch (_) {}
+        if (v != null && String(v).trim() !== '') return v;
+      } catch(_){}
     }
     return null;
   }
 
-  function tryJSONParse(value) {
-    if (value == null) return null;
-    if (typeof value === 'object') return value;
-    const s = String(value).trim();
+  function tryJSONParse(v){
+    if (v == null) return null;
+    if (typeof v === 'object') return v;
+    const s = String(v).trim();
     if (!s) return null;
-    try { return JSON.parse(s); } catch (_) { return null; }
+    try { return JSON.parse(s); } catch(_) { return null; }
   }
 
-  function toArrayOfStrings(x) {
+  function toArrayOfStrings(x){
     if (x == null) return [];
     if (Array.isArray(x)) return x.map(v => String(v ?? '')).filter(s => s.trim() !== '');
     if (typeof x === 'object') {
@@ -80,7 +88,7 @@
     return s ? [s] : [];
   }
 
-  function normalizeSelfie(selfie) {
+  function normalizeSelfie(selfie){
     if (!selfie) return null;
 
     if (typeof selfie === 'object') {
@@ -100,15 +108,14 @@
     if (!s) return null;
     if (s.startsWith('data:image/')) return s;
 
-    if (/^[A-Za-z0-9+/=\s]+$/.test(s) && s.replace(/\s/g, '').length > 200) {
-      const clean = s.replace(/\s/g, '').replace(/^data:image\/[a-zA-Z0-9+.-]+;base64,/, '');
+    if (/^[A-Za-z0-9+/=\s]+$/.test(s) && s.replace(/\s/g,'').length > 200){
+      const clean = s.replace(/\s/g,'').replace(/^data:image\/[a-zA-Z0-9+.-]+;base64,/, '');
       return `data:image/jpeg;base64,${clean}`;
     }
-
     return null;
   }
 
-  function collectNomeGuia() {
+  function collectNomeGuia(){
     const nomeLS = (lsGetFirst(LS_KEYS.nome) || '').trim();
     const guiaLS = (lsGetFirst(LS_KEYS.guia) || '').trim();
 
@@ -125,7 +132,7 @@
     return { nome: (nomeG || nomeLS || ''), guia: (guiaG || guiaLS || '') };
   }
 
-  function collectRespostas() {
+  function collectRespostas(){
     const candidates = [
       window.JORNADA_RESPOSTAS,
       window.JORNADA_ANSWERS,
@@ -134,38 +141,30 @@
       window.state?.respostas,
       window.state?.answers
     ];
-    for (const c of candidates) {
+    for (const c of candidates){
       const arr = toArrayOfStrings(c);
       if (arr.length) return arr;
     }
-
     const raw = lsGetFirst(LS_KEYS.respostas);
     const parsed = tryJSONParse(raw);
-    const arr2 = toArrayOfStrings(parsed ?? raw);
-    return arr2;
+    return toArrayOfStrings(parsed ?? raw);
   }
 
-  function collectSelfie() {
-    const candidates = [
-      window.JORNADA_SELFIE,
-      window.JORNADA?.selfie,
-      window.state?.selfie
-    ];
-    for (const c of candidates) {
+  function collectSelfie(){
+    const candidates = [window.JORNADA_SELFIE, window.JORNADA?.selfie, window.state?.selfie];
+    for (const c of candidates){
       const s = normalizeSelfie(c);
       if (s) return s;
     }
-
     const raw = lsGetFirst(LS_KEYS.selfie);
     const parsed = tryJSONParse(raw);
     return normalizeSelfie(parsed ?? raw);
   }
 
-  function buildDiamantePayload() {
+  function buildPayload(){
     const { nome, guia } = collectNomeGuia();
     const respostas = collectRespostas();
     const selfie = collectSelfie();
-
     return {
       meta: { nome: String(nome || ''), guia: String(guia || ''), ts: new Date().toISOString() },
       respostas: toArrayOfStrings(respostas),
@@ -173,10 +172,7 @@
     };
   }
 
-  // ---------------------------------------------
-  // DOWNLOAD
-  // ---------------------------------------------
-  function downloadDataUrl(dataUrl, filename) {
+  function downloadDataUrl(dataUrl, filename){
     const a = document.createElement('a');
     a.href = dataUrl;
     a.download = filename || 'arquivo';
@@ -185,74 +181,7 @@
     a.remove();
   }
 
-  // ---------------------------------------------
-  // DATILOGRAFIA + TTS (tentativa)
-  // ---------------------------------------------
-  async function runFinalTyping(root) {
-    const target =
-      $('[data-final-text]', root) ||
-      $('#finalTexto', root) ||
-      $('#final-texto', root) ||
-      $('.final-texto', root) ||
-      $('.jp-typing', root);
-
-    if (!target) {
-      warn('Alvo de mensagem final não encontrado (ok se sua UI não usa typing aqui).');
-      return;
-    }
-
-    const text = (target.getAttribute('data-text') || target.textContent || '').trim();
-    if (!text) return;
-
-    const runTyping = window.runTyping || window.JORNADA_TYPING?.runTyping;
-    const speakText = window.speakText || window.JORNADA_TTS?.speakText;
-
-    try {
-      if (typeof runTyping === 'function') {
-        await runTyping(target, text, { speak: true });
-      } else {
-        target.textContent = text;
-        if (typeof speakText === 'function') {
-          try { await speakText(text); } catch (_) {}
-        }
-      }
-    } catch (e) {
-      err('Falha no typing/TTS:', e);
-      target.textContent = text;
-    }
-  }
-
-  // ---------------------------------------------
-  // BUTTON FINDER (resolve seu "0 botões")
-  // ---------------------------------------------
-  function findActionButtons(root) {
-    // 1) IDs oficiais
-    let btnPdf = $('#btnBaixarPDFHQ', root);
-    let btnSelfie = $('#btnSelfieCard', root);
-
-    // 2) data-action
-    if (!btnPdf) btnPdf = $('[data-action="pdf"]', root);
-    if (!btnSelfie) btnSelfie = $('[data-action="selfie"]', root);
-
-    // 3) fallback por “botões visíveis”
-    // aceita <button> e também <div role="button">
-    const candidates = $$('.j-btn, button, [role="button"]', root)
-      .filter(el => {
-        const r = el.getBoundingClientRect();
-        return r.width > 10 && r.height > 10; // visível o bastante
-      });
-
-    // Se ainda não achou, tenta pegar os 2 primeiros dentro do “card” central
-    if ((!btnPdf || !btnSelfie) && candidates.length >= 2) {
-      // Heurística: no seu print tem 2 botões lado a lado. Primeiro = pdf, segundo = selfie.
-      btnPdf = btnPdf || candidates[0];
-      btnSelfie = btnSelfie || candidates[1];
-    }
-
-    return { btnPdf, btnSelfie };
-  }
-
-  function disable(btn, on, label) {
+  function disable(btn, on, label){
     if (!btn) return;
     btn.disabled = !!on;
     btn.classList.toggle('is-loading', !!on);
@@ -261,29 +190,25 @@
     if (!on) btn.textContent = btn.__origText || btn.textContent;
   }
 
-  // ---------------------------------------------
-  // ACTIONS
-  // ---------------------------------------------
-  async function onPDFClick(ev) {
+  async function onClickPdfSelfie(ev){
     ev?.preventDefault?.();
     ev?.stopPropagation?.();
 
-    const root = getFinalRoot();
-    const { btnPdf } = findActionButtons(root);
+    const root = getRoot();
+    const btn = root && $('#btnBaixarPDFHQ', root);
+    disable(btn, true, 'GERANDO…');
 
-    disable(btnPdf, true, 'GERANDO…');
+    try{
+      const payload = buildPayload();
+      log('payload:', payload);
 
-    try {
       if (!window.API || typeof window.API.gerarPDFEHQ !== 'function') {
         throw new Error('API.gerarPDFEHQ não disponível em window.API');
       }
 
-      const payload = buildDiamantePayload();
-      log('Chamando API.gerarPDFEHQ(payload):', payload);
-
       const res = await window.API.gerarPDFEHQ(payload);
 
-      // compat: url / dataUrl / blob
+      // se o backend devolver dataUrl do PDF
       if (res && typeof res === 'object') {
         if (res.dataUrl && String(res.dataUrl).startsWith('data:application/pdf')) {
           downloadDataUrl(String(res.dataUrl), `Jornada-${payload.meta.nome || 'Participante'}.pdf`);
@@ -292,105 +217,77 @@
         } else if (res.blob instanceof Blob) {
           const url = URL.createObjectURL(res.blob);
           window.open(url, '_blank', 'noopener,noreferrer');
-          setTimeout(() => URL.revokeObjectURL(url), 60_000);
+          setTimeout(() => URL.revokeObjectURL(url), 60000);
         }
       }
-    } catch (e) {
-      err('Erro PDF/HQ:', e);
-      alert(`Falha ao gerar PDF/HQ.\n\n${e?.message || e}`);
+
+      // selfie também (se existir)
+      if (payload.selfie && payload.selfie.startsWith('data:image/')) {
+        const safeName = (payload.meta.nome || 'Participante').replace(/[^\w\-]+/g, '_');
+        downloadDataUrl(payload.selfie, `SelfieCard-${safeName}.png`);
+      } else {
+        warn('Selfie não encontrada para download (ok se não capturou).');
+      }
+
+    } catch(e){
+      err('PDF/SELFIE falhou:', e);
+      alert(`Falha ao gerar PDF/SELFIE.\n\n${e?.message || e}`);
     } finally {
-      disable(btnPdf, false);
+      disable(btn, false);
     }
   }
 
-  function onSelfieClick(ev) {
+  function onClickVoltar(ev){
     ev?.preventDefault?.();
     ev?.stopPropagation?.();
-
-    const root = getFinalRoot();
-    const { btnSelfie } = findActionButtons(root);
-
-    disable(btnSelfie, true, 'BAIXANDO…');
-
-    try {
-      const selfie = collectSelfie();
-      const { nome } = collectNomeGuia();
-      if (!selfie) throw new Error('Selfie não encontrada.');
-
-      const safeName = (nome || 'Participante').replace(/[^\w\-]+/g, '_');
-      downloadDataUrl(selfie, `SelfieCard-${safeName}.png`);
-    } catch (e) {
-      err('Erro SelfieCard:', e);
-      alert(`Falha ao baixar SelfieCard.\n\n${e?.message || e}`);
-    } finally {
-      disable(btnSelfie, false);
+    // se você tem controller:
+    if (window.JC && typeof window.JC.show === 'function') {
+      window.JC.show('section-intro');
+      return;
     }
+    // fallback: volta para index/jornadas
+    window.location.href = '/';
   }
 
-  // ---------------------------------------------
-  // BIND (com “rebinding”)
-  // ---------------------------------------------
-  function bind(root) {
+  function bind(root){
     if (!root) return false;
+    if (root.__finalBound) return true;
+    root.__finalBound = true;
 
-    // evita duplicar listeners, mas permite “reatar” se o DOM foi recriado
-    if (root.__finalBindStamp && root.__finalBindStamp === root.innerHTML.length) {
-      return true;
-    }
-    root.__finalBindStamp = root.innerHTML.length;
+    hydrateFinalMessage(root);
 
-    const { btnPdf, btnSelfie } = findActionButtons(root);
-    log('Root encontrado:', root.id || '(sem id)', '| btnPdf:', !!btnPdf, '| btnSelfie:', !!btnSelfie);
+    const btnPdf = $('#btnBaixarPDFHQ', root);
+    const btnVoltar = $('#btnVoltarInicio', root);
 
     if (btnPdf) {
-      btnPdf.onclick = null;
-      btnPdf.addEventListener('click', onPDFClick, { passive: false });
-    }
-    if (btnSelfie) {
-      btnSelfie.onclick = null;
-      btnSelfie.addEventListener('click', onSelfieClick, { passive: false });
+      btnPdf.disabled = false; // 🔥 garante que não fica morto
+      btnPdf.addEventListener('click', onClickPdfSelfie, { passive: false });
+    } else {
+      warn('btnBaixarPDFHQ não encontrado dentro do section-final');
     }
 
-    // typing / TTS
-    runFinalTyping(root).catch(() => {});
-
-    // Se ainda não encontrou botões, avisa forte (pra você bater o olho no DOM)
-    if (!btnPdf && !btnSelfie) {
-      warn('Nenhum botão detectado dentro da section-final. Provável: botões estão fora do root OU não são button/role=button.');
+    if (btnVoltar) {
+      btnVoltar.addEventListener('click', onClickVoltar, { passive: false });
     }
+
+    runTitleTyping(root).catch(() => {});
+    log('BIND OK:', { btnPdf: !!btnPdf, btnVoltar: !!btnVoltar });
 
     return true;
   }
 
-  function bindWhenReady() {
-    const root = getFinalRoot();
+  function boot(){
+    const root = getRoot();
     if (root) return bind(root);
 
-    return false;
-  }
-
-  function observe() {
-    // tenta já
-    if (bindWhenReady()) return;
-
     const mo = new MutationObserver(() => {
-      if (bindWhenReady()) mo.disconnect();
+      const r = getRoot();
+      if (r) { bind(r); mo.disconnect(); }
     });
     mo.observe(document.documentElement, { childList: true, subtree: true });
   }
 
-  // ---------------------------------------------
-  // BOOT
-  // ---------------------------------------------
-  log('LOADED ✅ (se você não ver isso, o arquivo NÃO está carregando!)');
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', observe);
-  } else {
-    observe();
-  }
-
-  // expõe um mount manual (se quiser chamar do controller)
-  window.JORNADA_SECTION_FINAL = window.JORNADA_SECTION_FINAL || {};
-  window.JORNADA_SECTION_FINAL.mount = () => bindWhenReady();
+  log('LOADED ✅');
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
 })();
