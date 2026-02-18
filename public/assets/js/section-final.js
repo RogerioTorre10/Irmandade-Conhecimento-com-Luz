@@ -140,25 +140,22 @@ function getJornadaState() {
 }
 
 function buildFinalPayloadDiamante() {
-  const s = getJornadaState ? getJornadaState() : (window.JORNADA_STATE || window.state || {});
+  const s = getJornadaState();
+
   console.log('[FINAL][STATE RAW]', s);
 
   const nome = String(s.nome || s.name || s.participantName || '').trim();
   const guia = String(s.guiaSelecionado || s.guia || s.guide || '').trim().toLowerCase();
 
-  // tenta achar respostas em vários formatos
   let respostas =
     s.respostas ||
     s.answers ||
     s.perguntas ||
     s.responses ||
-    s.respostasLista ||
     [];
 
-  // ✅ aqui é o ponto crítico: só zera se NÃO for array
   if (!Array.isArray(respostas)) respostas = [];
 
-  // normaliza strings
   respostas = respostas
     .map(r => String(r ?? '').trim())
     .filter(Boolean);
@@ -167,15 +164,15 @@ function buildFinalPayloadDiamante() {
     s.selfieBase64 ||
     s.selfieCard ||
     s.cardImage ||
-    s.selfiecard ||
     ''
-  ).trim();
+  );
 
   const payload = { nome, guia, respostas, selfieCard };
-  console.log('[FINAL][PAYLOAD NORMALIZED]', payload);
 
+  console.log('[FINAL][PAYLOAD NORMALIZED]', payload);
   return payload;
 }
+
 
 // ==================================================
 // STATE — Diamante (pega do lugar certo)
