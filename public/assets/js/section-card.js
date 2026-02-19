@@ -182,16 +182,34 @@
       ctx.restore();
 
       // texto
-      const nomeX = (window.JORNADA_STATE?.nome || localStorage.getItem('JORNADA_NOME') || 'PARTICIPANTE').trim();
-      const guiaX = (window.JORNADA_STATE?.guiaSelecionado || window.JORNADA_STATE?.guia || localStorage.getItem('JORNADA_GUIA') || '').trim();
+     // texto
+const nomeX = (window.JORNADA_STATE?.nome || localStorage.getItem('JORNADA_NOME') || 'PARTICIPANTE').trim();
 
-      ctx.textAlign = 'center';
-      ctx.fillStyle = 'rgba(255,255,255,0.92)';
-      ctx.font = 'bold 30px Cardo, serif';
-      ctx.fillText(nomeX || 'PARTICIPANTE', cx, 500);
-      ctx.fillStyle = 'rgba(255,255,255,0.75)';
-      ctx.font = '22px Cardo, serif';
-      ctx.fillText(guiaX ? `Guia: ${guiaX}` : 'Guia: —', cx, 540);
+// guia normalizado (nunca mais imprime "guia")
+const guiaRaw = (
+  window.JORNADA_STATE?.guiaSelecionado ||
+  window.JORNADA_STATE?.guia ||
+  localStorage.getItem('JORNADA_GUIA') ||
+  sessionStorage.getItem('JORNADA_GUIA') ||
+  ''
+).trim();
+
+const g = guiaRaw.toLowerCase();
+const guiaNome =
+  (!g || g === 'guia' || g === 'guide' || g === 'selecionado') ? '' :
+  (g.includes('lumen')) ? 'Lumen' :
+  (g.includes('zion'))  ? 'Zion'  :
+  (g.includes('arion') || g.includes('arian')) ? 'Arion' :
+  guiaRaw;
+
+ctx.textAlign = 'center';
+ctx.fillStyle = 'rgba(255,255,255,0.92)';
+ctx.font = 'bold 30px Cardo, serif';
+ctx.fillText(nomeX || 'PARTICIPANTE', cx, 500);
+
+ctx.fillStyle = 'rgba(255,255,255,0.75)';
+ctx.font = '22px Cardo, serif';
+ctx.fillText(guiaNome ? `Guia: ${guiaNome}` : 'Guia: —', cx, 540);
 
       // export
       let dataUrl = '';
