@@ -114,6 +114,21 @@
     }
 
     console.log('%c[CARD] Render ok!', 'color: gold', { nome, guia });
+
+    // ✅ FIX: crava guia correto para toda a jornada (state + storages)
+   try {
+  const guiaCanon = String(guia || '').trim().toLowerCase(); // usa o guia que já está correto no render
+  if (guiaCanon) {
+    window.JORNADA_STATE = window.JORNADA_STATE || {};
+    window.JORNADA_STATE.guia = guiaCanon;
+    window.JORNADA_STATE.guiaSelecionado = guiaCanon;
+
+    localStorage.setItem('JORNADA_GUIA', guiaCanon);
+    sessionStorage.setItem('JORNADA_GUIA', guiaCanon);
+  }
+} catch (e) {
+  console.warn('[CARD] não consegui cravar guiaCanon', e);
+}
  
 // ================================
 // SELFIECARD — gerar e salvar (chamado direto do render)
