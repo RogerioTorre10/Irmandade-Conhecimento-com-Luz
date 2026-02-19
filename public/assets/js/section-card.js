@@ -115,16 +115,27 @@
 
     console.log('%c[CARD] Render ok!', 'color: gold', { nome, guia });
 
-    // ✅ FIX: crava guia correto para toda a jornada (state + storages)
-   try {
-  const guiaCanon = String(guia || '').trim().toLowerCase(); // usa o guia que já está correto no render
-  if (guiaCanon) {
+   // ✅ FIX: crava guia correto para toda a jornada (state + storages)
+try {
+  const guiaRaw =
+    String(guia || '').trim() ||
+    String(localStorage.getItem('JORNADA_GUIA') || '').trim() ||
+    String(sessionStorage.getItem('JORNADA_GUIA') || '').trim() ||
+    '';
+
+  const guiaCanon = guiaRaw.toLowerCase();
+
+  if (guiaCanon && guiaCanon !== 'guia') {
     window.JORNADA_STATE = window.JORNADA_STATE || {};
     window.JORNADA_STATE.guia = guiaCanon;
     window.JORNADA_STATE.guiaSelecionado = guiaCanon;
 
     localStorage.setItem('JORNADA_GUIA', guiaCanon);
     sessionStorage.setItem('JORNADA_GUIA', guiaCanon);
+
+    console.log('[CARD] guiaCanon gravado:', guiaCanon);
+  } else {
+    console.warn('[CARD] guiaCanon inválido, não gravei:', guiaRaw);
   }
 } catch (e) {
   console.warn('[CARD] não consegui cravar guiaCanon', e);
@@ -143,15 +154,28 @@
 
   const run = async () => {
     try {
-      const sec = document.getElementById('section-card') || document;
+      // pega só as URLs do DOM (não desenha direto do DOM)
+const sec = document.getElementById('section-card') || document;
+const selfieSrc = sec.querySelector('#selfieImage')?.src || '';
+const bgSrc     = sec.querySelector('#guideBg')?.src || '';
 
-      const selfieImg = sec.querySelector('#selfieImage');
-      const bgImg     = sec.querySelector('#guideBg');
+const loadImg = (src) => new Promise((resolve) => {
+  if (!src) return resolve(null);
+  const im = new Image();
+  im.crossOrigin = 'anonymous';
+  im.onload = () => resolve(im);
+  im.onerror = () => resolve(null);
+  im.src = src;
+});
 
-      if (!selfieImg || !selfieImg.src) {
-        console.warn('[CARD][SELFIECARD] selfieImage não encontrado/sem src.');
-        return;
-      }
+// carrega “de verdade”
+const selfieImg = await loadImg(selfieSrc);
+const bgImg     = await loadImg(bgSrc);
+
+if (!selfieImg) {
+  console.warn('[CARD][SELFIECARD] selfieImg não carregou.');
+  return;
+}
 
       const waitImg = (img) => new Promise((resolve) => {
         if (!img) return resolve(false);
@@ -176,7 +200,7 @@
         const dh = bgImg.naturalHeight * r;
         ctx.drawImage(bgImg, (W - dw) / 2, (H - dh) / 2, dw, dh);
       } else {
-        ctx.fillStyle = 'rgba(0,0,0,0.55)';
+        ctx.fillStyle = 'rgba(0,0,0,0.75)';
         ctx.fillRect(0, 0, W, H);
       }
 
