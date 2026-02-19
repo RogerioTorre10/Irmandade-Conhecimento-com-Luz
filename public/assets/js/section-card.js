@@ -114,7 +114,7 @@
     }
 
     console.log('%c[CARD] Render ok!', 'color: gold', { nome, guia });
-  }
+ 
 // ================================
 // SELFIECARD — gerar e salvar (chamado direto do render)
 // ================================
@@ -225,7 +225,7 @@
     else run();
   }, 80);
 })();
-
+ }
 
   // ---- Navegação para perguntas ----
   function goNext() {
