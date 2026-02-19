@@ -115,11 +115,11 @@
 
     console.log('%c[CARD] Render ok!', 'color: gold', { nome, guia });
   }
-// =====================================================
-// SELFIECARD — SAFE MODE (gera 1x por sessão sem travar UI)
-// =====================================================
-(function selfieCardSafeMode(){
-
+// ================================
+// SELFIECARD — gerar e salvar (chamado direto do render)
+// ================================
+(function () {
+  // evita repetir
   if (sessionStorage.getItem('__SELFIECARD_DONE__') === '1') {
     console.log('[CARD][SELFIECARD] já gerada nesta sessão.');
     return;
@@ -134,81 +134,98 @@
       const bgImg     = sec.querySelector('#guideBg');
 
       if (!selfieImg || !selfieImg.src) {
-        console.warn('[CARD][SELFIECARD] selfieImage não encontrado.');
+        console.warn('[CARD][SELFIECARD] selfieImage não encontrado/sem src.');
         return;
       }
 
-      const waitImg = (img) => new Promise((resolve)=>{
+      const waitImg = (img) => new Promise((resolve) => {
         if (!img) return resolve(false);
         if (img.complete && img.naturalWidth > 0) return resolve(true);
-        img.onload = () => resolve(true);
-        img.onerror = () => resolve(false);
-        setTimeout(()=>resolve(true),800);
+        img.addEventListener('load', () => resolve(true), { once: true });
+        img.addEventListener('error', () => resolve(false), { once: true });
+        setTimeout(() => resolve(img.complete && img.naturalWidth > 0), 1200);
       });
 
       await waitImg(selfieImg);
       if (bgImg) await waitImg(bgImg);
 
-      const W = 512;
-      const H = 720;
-
+      const W = 512, H = 720;
       const canvas = document.createElement('canvas');
-      canvas.width = W;
-      canvas.height = H;
-      const ctx = canvas.getContext('2d');
+      canvas.width = W; canvas.height = H;
+      const ctx = canvas.getContext('2d', { alpha: true });
 
       // fundo
       if (bgImg && bgImg.naturalWidth > 0) {
-        const r = Math.max(W/bgImg.naturalWidth, H/bgImg.naturalHeight);
-        const dw = bgImg.naturalWidth*r;
-        const dh = bgImg.naturalHeight*r;
-        ctx.drawImage(bgImg,(W-dw)/2,(H-dh)/2,dw,dh);
+        const r = Math.max(W / bgImg.naturalWidth, H / bgImg.naturalHeight);
+        const dw = bgImg.naturalWidth * r;
+        const dh = bgImg.naturalHeight * r;
+        ctx.drawImage(bgImg, (W - dw) / 2, (H - dh) / 2, dw, dh);
       } else {
-        ctx.fillStyle = '#0b0b0b';
-        ctx.fillRect(0,0,W,H);
+        ctx.fillStyle = 'rgba(0,0,0,0.55)';
+        ctx.fillRect(0, 0, W, H);
       }
 
       // selfie circular
-      const cx=W/2, cy=240, radius=120;
+      const cx = W / 2, cy = 240, radius = 120;
       ctx.save();
       ctx.beginPath();
-      ctx.arc(cx,cy,radius,0,Math.PI*2);
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.closePath();
       ctx.clip();
 
-      const sw=selfieImg.naturalWidth||1;
-      const sh=selfieImg.naturalHeight||1;
-      const scale=Math.max((radius*2)/sw,(radius*2)/sh);
-      ctx.drawImage(selfieImg,cx-(sw*scale)/2,cy-(sh*scale)/2,sw*scale,sh*scale);
+      const sw = selfieImg.naturalWidth || 1;
+      const sh = selfieImg.naturalHeight || 1;
+      const scale = Math.max((radius * 2) / sw, (radius * 2) / sh);
+      const dw = sw * scale;
+      const dh = sh * scale;
+      ctx.drawImage(selfieImg, cx - dw / 2, cy - dh / 2, dw, dh);
       ctx.restore();
 
-      // textos
-      const nome = (window.JORNADA_STATE?.nome || localStorage.getItem('JORNADA_NOME') || '').trim();
-      const guia = (window.JORNADA_STATE?.guiaSelecionado || window.JORNADA_STATE?.guia || localStorage.getItem('JORNADA_GUIA') || '').trim();
+      // texto
+      const nomeX = (window.JORNADA_STATE?.nome || localStorage.getItem('JORNADA_NOME') || 'PARTICIPANTE').trim();
+      const guiaX = (window.JORNADA_STATE?.guiaSelecionado || window.JORNADA_STATE?.guia || localStorage.getItem('JORNADA_GUIA') || '').trim();
 
-      ctx.textAlign='center';
-      ctx.fillStyle='#ffffff';
-      ctx.font='bold 30px Cardo';
-      ctx.fillText(nome || 'PARTICIPANTE',cx,480);
+      ctx.textAlign = 'center';
+      ctx.fillStyle = 'rgba(255,255,255,0.92)';
+      ctx.font = 'bold 30px Cardo, serif';
+      ctx.fillText(nomeX || 'PARTICIPANTE', cx, 500);
+      ctx.fillStyle = 'rgba(255,255,255,0.75)';
+      ctx.font = '22px Cardo, serif';
+      ctx.fillText(guiaX ? `Guia: ${guiaX}` : 'Guia: —', cx, 540);
 
-      ctx.font='22px Cardo';
-      ctx.fillText(guia ? `Guia: ${guia}` : 'Guia: —',cx,520);
+      // export
+      let dataUrl = '';
+      try {
+        dataUrl = canvas.toDataURL('image/jpeg', 0.88);
+      } catch (err) {
+        console.error('[CARD][SELFIECARD] toDataURL falhou (CORS/tainted?)', err);
+        return;
+      }
 
-      const dataUrl = canvas.toDataURL('image/jpeg',0.9);
-
-      sessionStorage.setItem('JORNADA_SELFIECARD',dataUrl);
-      localStorage.setItem('JORNADA_SELFIECARD',dataUrl);
+      // salva
+      sessionStorage.setItem('JORNADA_SELFIECARD', dataUrl);
+      sessionStorage.setItem('SELFIE_CARD', dataUrl);
+      try {
+        localStorage.setItem('JORNADA_SELFIECARD', dataUrl);
+        localStorage.setItem('SELFIE_CARD', dataUrl);
+      } catch (_) {}
 
       window.JORNADA_STATE = window.JORNADA_STATE || {};
       window.JORNADA_STATE.selfieCard = dataUrl;
 
-      console.log('[CARD][SELFIECARD] ✔ gerada e salva!');
-    } catch(e){
-      console.error('[CARD][SELFIECARD]',e);
+      console.log('[CARD][SELFIECARD] ✅ salva!', dataUrl.slice(0, 40) + '...');
+    } catch (e) {
+      console.error('[CARD][SELFIECARD] erro:', e);
     }
   };
 
-  setTimeout(run,200); // roda fora da renderização
-})(); 
+  // roda fora do paint
+  setTimeout(() => {
+    if ('requestIdleCallback' in window) requestIdleCallback(run, { timeout: 1200 });
+    else run();
+  }, 80);
+})();
+
 
   // ---- Navegação para perguntas ----
   function goNext() {
