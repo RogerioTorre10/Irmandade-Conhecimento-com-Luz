@@ -433,6 +433,138 @@
       });
     }
 
+    // ================================
+// SELFIECARD — SAFE MODE (não trava UI)
+// gera 1x por sessão, em idle, e salva no storage
+// ================================
+(function selfieCardSafeMode(){
+  // evita rodar várias vezes
+  if (sessionStorage.getItem('__SELFIECARD_DONE__') === '1') {
+    console.log('[CARD][SELFIECARD] já gerada nesta sessão.');
+    return;
+  }
+  sessionStorage.setItem('__SELFIECARD_DONE__', '1');
+
+  const run = async () => {
+    try {
+      const sec = document.getElementById('section-card') || document;
+
+      const selfieImg = sec.querySelector('#selfieImage');
+      const bgImg     = sec.querySelector('#guideBg');
+
+      if (!selfieImg || !selfieImg.src) {
+        console.warn('[CARD][SELFIECARD] selfieImage não encontrado/sem src.');
+        return;
+      }
+
+      const waitImg = (img) => new Promise((resolve) => {
+        if (!img) return resolve(false);
+        if (img.complete && img.naturalWidth > 0) return resolve(true);
+        const done = () => resolve(true);
+        const fail = () => resolve(false);
+        img.addEventListener('load', done, { once: true });
+        img.addEventListener('error', fail, { once: true });
+        setTimeout(() => resolve(img.complete && img.naturalWidth > 0), 1000);
+      });
+
+      await waitImg(selfieImg);
+      if (bgImg) await waitImg(bgImg);
+
+      // ⬇️ menor = mais rápido e menos chance de travar
+      const W = 512;
+      const H = 720;
+
+      const c = document.createElement('canvas');
+      c.width = W; c.height = H;
+      const ctx = c.getContext('2d', { alpha: true });
+
+      // fundo
+      if (bgImg && bgImg.naturalWidth > 0) {
+        const r = Math.max(W / bgImg.naturalWidth, H / bgImg.naturalHeight);
+        const dw = bgImg.naturalWidth * r;
+        const dh = bgImg.naturalHeight * r;
+        ctx.drawImage(bgImg, (W - dw) / 2, (H - dh) / 2, dw, dh);
+      } else {
+        ctx.fillStyle = 'rgba(0,0,0,0.55)';
+        ctx.fillRect(0, 0, W, H);
+      }
+
+      // moldura
+      ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(12, 12, W - 24, H - 24);
+
+      // selfie circular
+      const cx = W / 2;
+      const cy = 240;
+      const radius = 120;
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.closePath();
+      ctx.clip();
+
+      const sw = selfieImg.naturalWidth || 1;
+      const sh = selfieImg.naturalHeight || 1;
+      const scale = Math.max((radius * 2) / sw, (radius * 2) / sh);
+      const dw = sw * scale;
+      const dh = sh * scale;
+      ctx.drawImage(selfieImg, cx - dw / 2, cy - dh / 2, dw, dh);
+      ctx.restore();
+
+      // textos
+      const nome = (window.JORNADA_STATE?.nome || localStorage.getItem('JORNADA_NOME') || '').trim();
+      const guia = (window.JORNADA_STATE?.guiaSelecionado || window.JORNADA_STATE?.guia || localStorage.getItem('JORNADA_GUIA') || '').trim();
+
+      ctx.textAlign = 'center';
+      ctx.fillStyle = 'rgba(255,255,255,0.92)';
+      ctx.font = 'bold 30px Cardo, serif';
+      ctx.fillText(nome || 'PARTICIPANTE', cx, 480);
+
+      ctx.fillStyle = 'rgba(255,255,255,0.75)';
+      ctx.font = '22px Cardo, serif';
+      ctx.fillText(guia ? `Guia: ${guia}` : 'Guia: —', cx, 520);
+
+      // export: JPEG é bem mais leve (menos travamento / quota)
+      let dataUrl = '';
+      try {
+        dataUrl = c.toDataURL('image/jpeg', 0.88);
+      } catch (err) {
+        console.error('[CARD][SELFIECARD] toDataURL falhou (possível CORS/tainted).', err);
+        return;
+      }
+
+      // salva (preferência: sessionStorage, e tenta localStorage também)
+      sessionStorage.setItem('JORNADA_SELFIECARD', dataUrl);
+      sessionStorage.setItem('SELFIE_CARD', dataUrl);
+
+      try {
+        localStorage.setItem('JORNADA_SELFIECARD', dataUrl);
+        localStorage.setItem('SELFIE_CARD', dataUrl);
+      } catch (e) {
+        console.warn('[CARD][SELFIECARD] localStorage sem espaço (quota). Mantido em sessionStorage.');
+      }
+
+      window.JORNADA_STATE = window.JORNADA_STATE || {};
+      window.JORNADA_STATE.selfieCard = dataUrl;
+
+      console.log('[CARD][SELFIECARD] ✅ gerada e salva (JPEG).', dataUrl.slice(0, 40) + '...');
+    } catch (e) {
+      console.error('[CARD][SELFIECARD] erro:', e);
+    }
+  };
+
+  // roda “fora do caminho” (não trava a pintura)
+  setTimeout(() => {
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(run, { timeout: 1200 });
+    } else {
+      setTimeout(run, 120);
+    }
+  }, 50);
+})();
+
     // --------------------------------------------------
     // CLICK: SelfieCard (download local)
     // --------------------------------------------------
