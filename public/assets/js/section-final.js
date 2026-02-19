@@ -375,6 +375,62 @@
     if (btnPdf) btnPdf.dataset.pdfBound = '1';
     if (btnSelfie) btnSelfie.dataset.selfieBound = '1';
 
+    // ✅ garante botões extra na final
+let btnPortal = actionsRoot.querySelector('#btnVoltarPortal');
+if (!btnPortal) {
+  btnPortal = document.createElement('button');
+  btnPortal.id = 'btnVoltarPortal';
+  btnPortal.type = 'button';
+  btnPortal.className = 'btn btn-portal';
+  btnPortal.textContent = '🏰 VOLTAR AO PORTAL';
+  actionsRoot.appendChild(btnPortal);
+}
+
+let btnBaixarImg = actionsRoot.querySelector('#btnBaixarSelfie');
+if (!btnBaixarImg) {
+  btnBaixarImg = document.createElement('button');
+  btnBaixarImg.id = 'btnBaixarSelfie';
+  btnBaixarImg.type = 'button';
+  btnBaixarImg.className = 'btn btn-selfie';
+  btnBaixarImg.textContent = '🖼️ BAIXAR SELFIECARD';
+  actionsRoot.appendChild(btnBaixarImg);
+}
+
+// bind portal
+btnPortal.addEventListener('click', (ev) => {
+  ev.preventDefault();
+  ev.stopPropagation();
+  handleVoltarInicio();
+});
+
+// bind download selfie (usa o mesmo fluxo do btnSelfie)
+btnBaixarImg.addEventListener('click', (ev) => {
+  ev.preventDefault();
+  ev.stopPropagation();
+
+  const payload = buildFinalPayloadDiamante();
+  const img = payload.selfieCard;
+
+  if (!img || String(img).trim().length < 80) {
+    setPdfStatus(root, '⚠️ SelfieCard ainda não está disponível.', 'err');
+    return;
+  }
+
+  let dataUrl = String(img).trim();
+  if (!dataUrl.startsWith('data:image')) {
+    dataUrl = 'data:image/png;base64,' + dataUrl.replace(/^base64,/, '');
+  }
+
+  const a = document.createElement('a');
+  a.href = dataUrl;
+  a.download = (payload.nome ? payload.nome : 'selfiecard') + '-selfiecard.jpg';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+  setPdfStatus(root, '✅ SelfieCard baixado!', 'ok');
+});
+
     // ------------------------------------------------------
     // CLICK: PDF (gera + baixa)
     // ------------------------------------------------------
