@@ -327,6 +327,44 @@ if (section && window.i18n?.apply) {
     }
 
     isInitializing = false;
+
+    // ✅ RESET CONTROLADO da jornada (evita guia/cor/carda antigos)
+(function resetJornadaIfNewRun(){
+  // gera um id por “run”
+  const runId = String(Date.now());
+  const lastRun = sessionStorage.getItem('JORNADA_RUN_ID');
+
+  // se não tem run ativo, inicia limpando
+  if (!lastRun) {
+    sessionStorage.setItem('JORNADA_RUN_ID', runId);
+
+    // limpa só o que é da jornada
+    const keys = [
+      'JORNADA_GUIA',
+      'JORNADA_SELFIECARD',
+      'SELFIE_CARD',
+      '__SELFIECARD_DONE__',
+      'JORNADA_PROGRESS',
+      'JORNADA_RESPOSTAS',
+      'JORNADA_STATE_CACHE'
+    ];
+
+    keys.forEach(k => {
+      try { sessionStorage.removeItem(k); } catch(e){}
+      // localStorage: remove só o que pode “vazar” entre runs
+      try { localStorage.removeItem(k); } catch(e){}
+    });
+
+    // reseta state em memória
+    if (window.JORNADA_STATE) {
+      delete window.JORNADA_STATE.guia;
+      delete window.JORNADA_STATE.guiaSelecionado;
+      delete window.JORNADA_STATE.selfieCard;
+    }
+
+    console.log('[RESET] Jornada resetada para novo run:', runId);
+  }
+})();
   }
 
   // Listener de section:shown (apenas para reforço)
