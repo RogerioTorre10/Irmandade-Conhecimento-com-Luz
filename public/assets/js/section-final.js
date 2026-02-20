@@ -539,6 +539,66 @@ btnBaixarImg.addEventListener('click', (ev) => {
         }
       });
     }
+
+    function bindFinalButtons(root) {
+  root = root || document.getElementById('section-final') || document;
+
+  const btnPdf   = root.querySelector('#btnPdf');
+  const btnSelf  = root.querySelector('#btnBaixarSelfie');
+  const btnVoltar= root.querySelector('#btnVoltarPortal');
+
+  // PDF
+  if (btnPdf) {
+    btnPdf.onclick = async (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      try {
+        const payload = buildFinalPayloadDiamante(); // a mesma função que você já usa
+        await gerarPDFEHQ(payload);                  // sua função do api.js
+      } catch (e) {
+        console.error('[FINAL] erro ao gerar PDF:', e);
+      }
+    };
+  }
+
+  // SelfieCard
+  if (btnSelf) {
+    btnSelf.onclick = (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+
+      const payload = buildFinalPayloadDiamante();
+      const img = payload.selfieCard;
+
+      if (!img || String(img).trim().length < 80) {
+        setPdfStatus(root, '⚠️ SelfieCard ainda não está disponível.', 'err');
+        return;
+      }
+
+      const dataUrl = String(img).trim().startsWith('data:image')
+        ? String(img).trim()
+        : ('data:image/jpeg;base64,' + String(img).trim().replace(/^base64,/, ''));
+
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = (payload.nome ? payload.nome : 'selfiecard') + '-selfiecard.jpg';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      setPdfStatus(root, '✅ SelfieCard baixado!', 'ok');
+    };
+  }
+
+  // Voltar Portal
+  if (btnVoltar) {
+    btnVoltar.onclick = (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      handleVoltarInicio(); // sua função que volta ao portal
+    };
+  }
+}
   }
 
   // ================================
