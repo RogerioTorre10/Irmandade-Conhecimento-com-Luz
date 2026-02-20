@@ -205,7 +205,9 @@ if (!selfieImg) {
       }
 
       // selfie circular
-      const cx = W / 2, cy = 240, radius = 120;
+      const cx = W / 2;
+      const cy = Math.round(H * 0.62);   // ~ 62% da altura (peito)
+      const radius = Math.round(W * 0.18); // mantém proporcional
       ctx.save();
       ctx.beginPath();
       ctx.arc(cx, cy, radius, 0, Math.PI * 2);
