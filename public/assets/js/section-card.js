@@ -203,6 +203,9 @@ if (!selfieImg) {
         ctx.fillStyle = 'rgba(0,0,0,0.75)';
         ctx.fillRect(0, 0, W, H);
       }
+      
+      const frameSrc = '/assets/img/moldura-medieval-espinhos.png';
+      const frameImg = await loadImg(frameSrc);
 
       // selfie circular
       const cx = W / 2;
@@ -222,12 +225,15 @@ if (!selfieImg) {
       ctx.drawImage(selfieImg, cx - dw / 2, cy - dh / 2, dw, dh);
       ctx.restore();
 
-      // texto
+      // moldura medieval por cima (full bleed)
+      if (frameImg) {
+      ctx.drawImage(frameImg, 0, 0, W, H);
+      }
      // texto
-const nomeX = (window.JORNADA_STATE?.nome || localStorage.getItem('JORNADA_NOME') || 'PARTICIPANTE').trim();
+     const nomeX = (window.JORNADA_STATE?.nome || localStorage.getItem('JORNADA_NOME') || 'PARTICIPANTE').trim();
 
-// guia normalizado (nunca mais imprime "guia")
-const guiaRaw = (
+    // guia normalizado (nunca mais imprime "guia")
+   const guiaRaw = (
   window.JORNADA_STATE?.guiaSelecionado ||
   window.JORNADA_STATE?.guia ||
   localStorage.getItem('JORNADA_GUIA') ||
