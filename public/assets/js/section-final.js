@@ -430,7 +430,21 @@ btnBaixarImg.addEventListener('click', (ev) => {
 
   setPdfStatus(root, '✅ SelfieCard baixado!', 'ok');
 });
+    
+// ✅ manter apenas 3 botões (pdf, selfie, voltar)
+(function enforce3Buttons(){
+  const actions = root.querySelector('.final-acoes') || root;
 
+  // defina os 3 IDs oficiais
+  const keep = new Set(['btnPdf', 'btnBaixarSelfie', 'btnVoltarPortal']);
+
+  // remove botões sobrando (qualquer <button> que não esteja na lista)
+  [...actions.querySelectorAll('button')].forEach(btn => {
+    const id = btn.id || '';
+    if (!keep.has(id)) btn.remove();
+  });
+  })();
+    
     // ------------------------------------------------------
     // CLICK: PDF (gera + baixa)
     // ------------------------------------------------------
