@@ -206,7 +206,7 @@ if (!selfieImg) {
 
       // selfie circular
       const cx = W / 2;
-      const cy = Math.round(H * 0.62);   // ~ 62% da altura (peito)
+      const cy = Math.round(H * 0.68);   // ~ 62% da altura (peito)
       const radius = Math.round(W * 0.18); // mantém proporcional
       ctx.save();
       ctx.beginPath();
@@ -243,15 +243,17 @@ const guiaNome =
   (g.includes('arion') || g.includes('arian')) ? 'Arion' :
   guiaRaw;
 
+const nomeY = Math.round(H * 0.86);     // antes estava ~500
+const guiaY = Math.round(H * 0.91);     // antes estava ~540
+
 ctx.textAlign = 'center';
 ctx.fillStyle = 'rgba(255,255,255,0.92)';
 ctx.font = 'bold 30px Cardo, serif';
-ctx.fillText(nomeX || 'PARTICIPANTE', cx, 500);
+ctx.fillText(nomeX || 'PARTICIPANTE', cx, nomeY);
 
 ctx.fillStyle = 'rgba(255,255,255,0.75)';
 ctx.font = '22px Cardo, serif';
-ctx.fillText(guiaNome ? `Guia: ${guiaNome}` : 'Guia: —', cx, 540);
-
+ctx.fillText(guiaNome ? `Guia: ${guiaNome}` : 'Guia: —', cx, guiaY);
       // export
       let dataUrl = '';
       try {
