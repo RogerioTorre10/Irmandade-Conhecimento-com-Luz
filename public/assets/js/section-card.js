@@ -238,13 +238,19 @@ function makeWhiteTransparent(img, threshold = 245) {
         ctx.fillRect(0, 0, W, H);
       }
       
-     // moldura (não deixa quebrar se não carregar)
-     try {
-     const frameImg = await loadImg('/assets/img/borda-medieval-espinhos.png');
-     if (frameImg) ctx.drawImage(frameImg, 0, 0, W, H);
-     } catch(e) {
-     console.warn('[CARD][SELFIECARD] moldura falhou', e);
-    }
+     // ------------------------------
+     // Moldura (overlay) — SEM erro de escopo
+     // ------------------------------
+    try {
+    const frameImg = await loadImg('/assets/img/borda-medieval-espinhos.png');
+    if (frameImg) {
+    ctx.drawImage(frameImg, 0, 0, W, H);
+   } else {
+    console.warn('[CARD][SELFIECARD] moldura não carregou.');
+   }
+   } catch (e) {
+   console.warn('[CARD][SELFIECARD] erro ao carregar moldura:', e);
+   }
       
       // selfie circular
       const cx = W / 2;
