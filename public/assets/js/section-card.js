@@ -228,7 +228,7 @@ function makeWhiteTransparent(img, threshold = 245) {
         ctx.fillRect(0, 0, W, H);
       }
       
-      const frameSrc = '/assets/img/moldura-medieval-espinhos.png';
+      const frameSrc = '/assets/img/borda-medieval-espinhos.png';
       if (frameImg) {
       const frameAlpha = makeWhiteTransparent(frameImg, 245);
       ctx.drawImage(frameAlpha, 0, 0, W, H);
