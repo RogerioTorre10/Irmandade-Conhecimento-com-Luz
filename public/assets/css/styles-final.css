@@ -200,4 +200,33 @@ body.final-lock {
   }
 }
 
+.final-acoes{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  align-items: center;
+  justify-items: stretch;
+  margin-top: 16px;
+}
 
+/* 3 botões com a mesma altura/visual */
+#btnPdf, #btnBaixarSelfie, #btnVoltarPortal{
+  height: 48px;
+  border-radius: 12px;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  width: 100%;
+}
+
+/* mobile: vira 2 linhas (2 em cima, 1 embaixo centralizado) */
+@media (max-width: 520px){
+  .final-acoes{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  #btnVoltarPortal{
+    grid-column: 1 / -1;   /* ocupa a linha toda */
+  }
+}
