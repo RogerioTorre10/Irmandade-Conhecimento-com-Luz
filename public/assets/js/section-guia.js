@@ -466,6 +466,13 @@
 
       showNotice(root, 'Tempo esgotado. Selecione o guia e clique novamente para confirmar.', { speak: true });
     }, ARM_TIMEOUT_MS);
+
+    const guiaCanon = 'arion' // ou lumen/zion conforme escolhido
+    localStorage.setItem('JORNADA_GUIA', guiaCanon);
+    sessionStorage.setItem('JORNADA_GUIA', guiaCanon);
+    window.JORNADA_STATE = window.JORNADA_STATE || {};
+    window.JORNADA_STATE.guia = guiaCanon;
+    window.JORNADA_STATE.guiaSelecionado = guiaCanon;
   }
 
   cancelArm = function (root) {
