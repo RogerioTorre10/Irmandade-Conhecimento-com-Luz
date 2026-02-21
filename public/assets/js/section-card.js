@@ -177,6 +177,30 @@ if (!selfieImg) {
   return;
 }
 
+     // Remove branco (ou quase branco) de uma imagem e devolve um canvas com alpha
+function makeWhiteTransparent(img, threshold = 245) {
+  const c = document.createElement('canvas');
+  c.width = img.naturalWidth || img.width;
+  c.height = img.naturalHeight || img.height;
+  const x = c.getContext('2d', { willReadFrequently: true });
+  x.drawImage(img, 0, 0);
+
+  const im = x.getImageData(0, 0, c.width, c.height);
+  const d = im.data;
+
+  for (let i = 0; i < d.length; i += 4) {
+    const r = d[i], g = d[i + 1], b = d[i + 2];
+
+    // se for "quase branco", zera o alpha
+    if (r >= threshold && g >= threshold && b >= threshold) {
+      d[i + 3] = 0;
+    }
+  }
+
+  x.putImageData(im, 0, 0);
+  return c;
+} 
+
       const waitImg = (img) => new Promise((resolve) => {
         if (!img) return resolve(false);
         if (img.complete && img.naturalWidth > 0) return resolve(true);
@@ -205,8 +229,11 @@ if (!selfieImg) {
       }
       
       const frameSrc = '/assets/img/moldura-medieval-espinhos.png';
-      const frameImg = await loadImg(frameSrc);
-
+      if (frameImg) {
+      const frameAlpha = makeWhiteTransparent(frameImg, 245);
+      ctx.drawImage(frameAlpha, 0, 0, W, H);
+      }
+      
       // selfie circular
       const cx = W / 2;
       const cy = Math.round(H * 0.68);   // ~ 62% da altura (peito)
