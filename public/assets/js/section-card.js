@@ -13,7 +13,7 @@
     zion:  '/assets/img/irmandade-quarteto-bg-zion.png'
   };
 
-  const PLACEHOLDER_SELFIE = '/assets/img/irmandade-card-placeholder.jpg';
+  const PLACEHOLDER_SELFIE = '/assets/img/irmandade-card-placeholder.png';
 
   const qs  = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
