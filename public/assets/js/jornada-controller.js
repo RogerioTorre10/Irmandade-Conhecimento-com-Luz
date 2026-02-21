@@ -365,6 +365,23 @@ if (section && window.i18n?.apply) {
     console.log('[RESET] Jornada resetada para novo run:', runId);
   }
 })();
+    
+(function resetRun(){
+  if (sessionStorage.getItem('JORNADA_RUN_RESET') === '1') return;
+  sessionStorage.setItem('JORNADA_RUN_RESET', '1');
+
+  // limpa apenas o que vaza entre testes
+  ['JORNADA_GUIA','JORNADA_SELFIECARD','SELFIE_CARD','__SELFIECARD_DONE__']
+    .forEach(k => { try { sessionStorage.removeItem(k); } catch(e){} });
+
+  // NÃO limpe localStorage inteiro, só chaves da jornada
+  ['JORNADA_GUIA','JORNADA_SELFIECARD','SELFIE_CARD','__SELFIECARD_DONE__']
+    .forEach(k => { try { localStorage.removeItem(k); } catch(e){} });
+
+  window.JORNADA_STATE = {};
+  console.log('[RESET] run limpo');
+})();
+    
   }
 
   // Listener de section:shown (apenas para reforço)
