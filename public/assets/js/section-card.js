@@ -115,6 +115,16 @@
 
     console.log('%c[CARD] Render ok!', 'color: gold', { nome, guia });
 
+    const guiaCanon =
+    (sessionStorage.getItem('JORNADA_GUIA') ||
+    localStorage.getItem('JORNADA_GUIA') ||
+    window.JORNADA_STATE?.guia ||
+   '').toLowerCase();
+
+    guideBg.src = guiaCanon === 'lumen' ? CARD_BG.lumen
+          : guiaCanon === 'arion' ? CARD_BG.arion
+          : CARD_BG.zion;
+
    // ✅ FIX: crava guia correto para toda a jornada (state + storages)
 try {
   const guiaRaw =
