@@ -297,6 +297,19 @@ function tSelfie(key, vars = {}) {
       stopCamera();
       playTransitionThenGo();
     };
+
+   // ==============================
+   // Helper local: canonGuia (SELFIE)
+   // ==============================
+  function canonGuia(v) {
+  const s = String(v || '').trim().toLowerCase();
+  if (!s) return '';
+  if (s.includes('lumen')) return 'lumen';
+  if (s.includes('zion')) return 'zion';
+  if (s.includes('arion') || s.includes('arian')) return 'arion';
+  if (s === 'guia') return '';
+  return s;
+}
     
     const guiaCanon =
   canonGuia(window.JORNADA_STATE?.guiaSelecionado) ||
