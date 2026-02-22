@@ -382,7 +382,17 @@ if (section && window.i18n?.apply) {
   console.log('[RESET] run limpo');
 })();
     
-  }
+if (sessionStorage.getItem('JORNADA_NEW_RUN') !== '1') {
+  sessionStorage.setItem('JORNADA_NEW_RUN', '1');
+
+  // limpa só o que causa vazamento de guia/card
+  ['JORNADA_GUIA', 'JORNADA_SELFIECARD', 'SELFIE_CARD', '__SELFIECARD_DONE__']
+    .forEach(k => { try { sessionStorage.removeItem(k); } catch(e){} });
+
+  window.JORNADA_STATE = {};
+  console.log('[RESET] nova jornada limpa');
+}
+}
 
   // Listener de section:shown (apenas para reforço)
   document.addEventListener('section:shown', (e) => {
