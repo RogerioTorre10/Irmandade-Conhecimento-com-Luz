@@ -75,18 +75,19 @@ function canonGuia(v) {
     return g;
   }
 
-  function persistGuiaCanon(g) {
-    const guiaCanon = canonGuia(guia);
-    if (!guiaCanon || !CARD_BG[guiaCanon]) return;
-    try {
-      window.JORNADA_STATE = window.JORNADA_STATE || {};
-      window.JORNADA_STATE.guia = guiaCanon;
-      window.JORNADA_STATE.guiaSelecionado = guiaCanon;
+ function persistGuiaCanon(g) {
+  const guiaCanon = canonGuia(g);
+  if (!guiaCanon || !CARD_BG[guiaCanon]) return;
 
-      sessionStorage.setItem('JORNADA_GUIA', guiaCanon);
-      localStorage.setItem('JORNADA_GUIA', guiaCanon);
-    } catch {}
-  }
+  try {
+    window.JORNADA_STATE = window.JORNADA_STATE || {};
+    window.JORNADA_STATE.guia = guiaCanon;
+    window.JORNADA_STATE.guiaSelecionado = guiaCanon;
+
+    sessionStorage.setItem('JORNADA_GUIA', guiaCanon);
+    localStorage.setItem('JORNADA_GUIA', guiaCanon);
+  } catch {}
+}
 
   // -----------------------------
   // Monta HTML interno 1x
