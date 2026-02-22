@@ -298,14 +298,19 @@ function tSelfie(key, vars = {}) {
       playTransitionThenGo();
     };
     
-    const guiaCanon = 'lumen'; // ou zion/arion conforme escolhido
-    sessionStorage.setItem('JORNADA_GUIA', guiaCanon);
-    localStorage.setItem('JORNADA_GUIA', guiaCanon);
+    const guiaCanon =
+  canonGuia(window.JORNADA_STATE?.guiaSelecionado) ||
+  canonGuia(window.JORNADA_STATE?.guia) ||
+  canonGuia(sessionStorage.getItem('JORNADA_GUIA')) ||
+  canonGuia(localStorage.getItem('JORNADA_GUIA')) ||
+  canonGuia(guiaSelecionadoAgora) ||
+  'zion'; // fallback neutro (NUNCA lumen)
 
-    window.JORNADA_STATE = window.JORNADA_STATE || {};
-    window.JORNADA_STATE.guia = guiaCanon;
-    window.JORNADA_STATE.guiaSelecionado = guiaCanon;
-
+  sessionStorage.setItem('JORNADA_GUIA', guiaCanon);
+  localStorage.setItem('JORNADA_GUIA', guiaCanon);
+  window.JORNADA_STATE = window.JORNADA_STATE || {};
+  window.JORNADA_STATE.guia = guiaCanon;
+  window.JORNADA_STATE.guiaSelecionado = guiaCanon;
   console.log('[SELFIE] guiaCanon gravado:', guiaCanon);    
   });
 
