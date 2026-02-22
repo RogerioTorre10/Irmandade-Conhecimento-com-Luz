@@ -304,14 +304,30 @@
       sessionStorage.setItem('jornada.nome', nome);
       localStorage.setItem('JORNADA_NOME', nome);
 
-      const guiaAtual = guiaId ? String(guiaId).toLowerCase().trim() : 'zion';
+      // guia canon
+const guiaAtual = guiaId ? String(guiaId).toLowerCase().trim() : 'zion';
 
-      sessionStorage.setItem('jornada.guia', guiaAtual);
-      try {
-        window.JC = window.JC || {};
-        window.JC.data = window.JC.data || {};
-        window.JC.data.guia = guiaAtual;
-      } catch {}
+// grava SEMPRE nas chaves oficiais
+sessionStorage.setItem('JORNADA_GUIA', guiaAtual);
+localStorage.setItem('JORNADA_GUIA', guiaAtual);
+
+// mantém compatibilidade (se você ainda usa)
+sessionStorage.setItem('jornada.guia', guiaAtual);
+
+// atualiza estados globais
+window.JORNADA_STATE = window.JORNADA_STATE || {};
+window.JORNADA_STATE.guia = guiaAtual;
+window.JORNADA_STATE.guiaSelecionado = guiaAtual;
+
+window.JC = window.JC || {};
+window.JC.data = window.JC.data || {};
+window.JC.data.guia = guiaAtual;
+window.JC.data.guiaSelecionado = guiaAtual;
+
+// reset de artefatos do guia anterior (evita “card do Zion com cor do Lumen”)
+sessionStorage.removeItem('JORNADA_SELFIECARD');
+sessionStorage.removeItem('SELFIE_CARD');
+sessionStorage.removeItem('__SELFIECARD_SIG__');
 
       try {
         applyGuiaTheme(guiaAtual);
