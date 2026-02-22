@@ -24,7 +24,7 @@
   };
 
   const PLACEHOLDER_SELFIE = '/assets/img/irmandade-card-placeholder.png';
-  const FRAME_SRC = '/assets/img/borda-medieval-espinhos.png';
+  const FRAME_SRC = '/assets/img/borda-medieval-espinhos1.png';
 
   const qs  = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
