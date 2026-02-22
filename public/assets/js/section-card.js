@@ -17,7 +17,7 @@
     arion: '/assets/img/irmandade-quarteto-bg-arian.png' // arquivo existente (arian), id canônico = arion
   };
 
-  const FRAME_SRC = '/assets/img/borda-medieval-espinhos.png';
+  const FRAME_SRC = '/assets/img/borda-medieval-espinhos1.png';
   const PLACEHOLDER_SELFIE = '/assets/img/irmandade-card-placeholder.png';
 
   const qs  = (s, r = document) => r.querySelector(s);
