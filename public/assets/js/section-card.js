@@ -29,17 +29,17 @@
   const qs  = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
 
-  function getGuiaCanon() {
-    const g =
-      sessionStorage.getItem('JORNADA_GUIA') ||
-      localStorage.getItem('JORNADA_GUIA') ||
-      window.JORNADA_STATE?.guiaSelecionado ||
-      window.JORNADA_STATE?.guia ||
-      window.JC?.data?.guia ||
-      localStorage.getItem('jc.guia') ||
-      '';
-    return normalizeGuia(g) || 'zion';
-  }
+ function getGuiaCanon() {
+  const g =
+    sessionStorage.getItem('JORNADA_GUIA') ||     // ✅ verdade da sessão
+    localStorage.getItem('JORNADA_GUIA') ||       // backup
+    window.JORNADA_STATE?.guiaSelecionado ||      // fallback
+    window.JORNADA_STATE?.guia ||                 // fallback
+    '';                                           // sem JC, sem jc.guia
+
+  const canon = normalizeGuia(g) || 'zion';
+  return canon;
+}
 
   function setGuiaCanonEverywhere(guiaCanon) {
     const canon = normalizeGuia(guiaCanon) || 'zion';
