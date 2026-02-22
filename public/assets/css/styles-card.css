@@ -526,4 +526,22 @@
   }
 }
 
+#section-card { position: relative; }
 
+#guideBg{
+  position:absolute;
+  inset:0;
+  z-index:1;
+}
+
+.flame-layer{
+  position:relative;
+  z-index:2;
+}
+
+.card-frame{
+  position:absolute;
+  inset:0;
+  z-index:3;           /* acima de tudo */
+  pointer-events:none; /* não bloqueia cliques */
+}
