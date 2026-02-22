@@ -297,6 +297,16 @@ function tSelfie(key, vars = {}) {
       stopCamera();
       playTransitionThenGo();
     };
+    
+    const guiaCanon = 'lumen'; // ou zion/arion conforme escolhido
+    sessionStorage.setItem('JORNADA_GUIA', guiaCanon);
+    localStorage.setItem('JORNADA_GUIA', guiaCanon);
+
+    window.JORNADA_STATE = window.JORNADA_STATE || {};
+    window.JORNADA_STATE.guia = guiaCanon;
+    window.JORNADA_STATE.guiaSelecionado = guiaCanon;
+
+  console.log('[SELFIE] guiaCanon gravado:', guiaCanon);    
   });
 
   document.addEventListener('sectionWillHide', e => {
