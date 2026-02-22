@@ -25,15 +25,14 @@
   // -----------------------------
   // Normalização de guia
   // -----------------------------
-  function canonGuia(v) {
-    const raw = String(v || '').trim().toLowerCase();
-    if (!raw) return '';
-    if (raw === 'guia' || raw === 'guide' || raw === 'selecionado') return '';
-    if (raw.includes('lumen')) return 'lumen';
-    if (raw.includes('zion')) return 'zion';
-    if (raw.includes('arion') || raw.includes('arian')) return 'arion';
-    return raw; // último recurso
-  }
+function canonGuia(v) {
+  const s = String(v || '').trim().toLowerCase();
+  if (!s) return '';
+  if (s.includes('lumen')) return 'lumen';
+  if (s.includes('zion')) return 'zion';
+  if (s.includes('arion') || s.includes('arian')) return 'arion';
+  return s;
+}
 
   function prettyGuia(id) {
     const g = canonGuia(id);
@@ -77,7 +76,7 @@
   }
 
   function persistGuiaCanon(g) {
-    const guiaCanon = canonGuia(g);
+    const guiaCanon = canonGuia(guia);
     if (!guiaCanon || !CARD_BG[guiaCanon]) return;
     try {
       window.JORNADA_STATE = window.JORNADA_STATE || {};
