@@ -327,8 +327,8 @@ function selfieCardSafeMode(section, ctxData) {
 
       // 2) Placeholder 2x2 (quadrado arredondado) no peito
       const cx = W / 2;
-      const cy = Math.round(H * 0.66);     // peito (ajuste fino: 0.64~0.68)
-      const box = Math.round(W * 0.34);    // tamanho do “2x2”
+      const cy = Math.round(H * 0.70);     // peito (ajuste fino: 0.64~0.68)
+      const box = Math.round(W * 0.36);    // tamanho do “2x2”
       const rBox = Math.round(box * 0.18); // arredondado
       const x0 = Math.round(cx - box / 2);
       const y0 = Math.round(cy - box / 2);
@@ -346,9 +346,9 @@ function selfieCardSafeMode(section, ctxData) {
       c.restore();
 
       // 3) Moldura por cima (FULL BLEED pra encostar na borda)
-      const BLEED = 14; // ajuste fino: 10~18 (14 costuma ficar perfeito)
-      if (frameCanvas) c.drawImage(frameCanvas, -BLEED, -BLEED, W + BLEED * 2, H + BLEED * 2);
-      else if (frameImg) c.drawImage(frameImg, -BLEED, -BLEED, W + BLEED * 2, H + BLEED * 2);
+      const BLEED = 0; // borda exatamente na borda do canvas
+      if (frameCanvas) c.drawImage(frameCanvas, 0, 0, W, H);
+      else if (frameImg) c.drawImage(frameImg, 0, 0, W, H);
 
       // 4) Texto (nome + guia) no rodapé
       const nomeX = (nome || 'PARTICIPANTE').trim();
