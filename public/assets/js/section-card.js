@@ -57,24 +57,24 @@ function canonGuia(v) {
   }
 
   function getGuiaCanon() {
-    // prioridade: JORNADA_GUIA (session -> local), depois state, depois JC/jc.*
-    let g = '';
-    try {
-      g = canonGuia(sessionStorage.getItem('JORNADA_GUIA')) ||
-          canonGuia(localStorage.getItem('JORNADA_GUIA')) ||
-          canonGuia(window.JORNADA_STATE?.guiaSelecionado) ||
-          canonGuia(window.JORNADA_STATE?.guia) ||
-          canonGuia(window.JC?.data?.guiaSelecionado) ||
-          canonGuia(window.JC?.data?.guia) ||
-          canonGuia(localStorage.getItem('jc.guia')) ||
-          canonGuia(localStorage.getItem('jc.guiaSelecionado')) ||
-          '';
-    } catch {}
-    // fallback seguro
-    if (!g || !CARD_BG[g]) g = 'zion';
-    return g;
-  }
+  // prioridade correta: STATE/SELFIE atual -> storage -> JC/jc.*
+  let g = '';
+  try {
+    g =
+      canonGuia(window.JORNADA_STATE?.guiaSelecionado) ||
+      canonGuia(window.JORNADA_STATE?.guia) ||
+      canonGuia(window.JC?.data?.guiaSelecionado) ||
+      canonGuia(window.JC?.data?.guia) ||
+      canonGuia(sessionStorage.getItem('JORNADA_GUIA')) ||
+      canonGuia(localStorage.getItem('JORNADA_GUIA')) ||
+      canonGuia(localStorage.getItem('jc.guiaSelecionado')) ||
+      canonGuia(localStorage.getItem('jc.guia')) ||
+      '';
+  } catch {}
 
+  if (!g || !CARD_BG[g]) g = 'zion';
+  return g;
+}
  function persistGuiaCanon(g) {
   const guiaCanon = canonGuia(g);
   if (!guiaCanon || !CARD_BG[guiaCanon]) return;
