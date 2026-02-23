@@ -262,46 +262,59 @@ function selfieCardSafeMode(section, ctxData) {
   if (last === signature && sessionStorage.getItem('JORNADA_SELFIECARD')) return;
   sessionStorage.setItem('__SELFIECARD_SIG__', signature);
 
-  // --- recorta transparência ao redor (remove “margem invisível” da moldura)
-  function trimAlphaCanvas(srcCanvas, alphaThreshold = 1, padding = 2) {
-    if (!srcCanvas) return null;
-    const w = srcCanvas.width, h = srcCanvas.height;
-    const ctx = srcCanvas.getContext('2d', { willReadFrequently: true });
-    const img = ctx.getImageData(0, 0, w, h);
-    const d = img.data;
+  // =========================
+// 5) Moldura REAL externa
+// =========================
 
-    let minX = w, minY = h, maxX = -1, maxY = -1;
+function trimAlphaStrict(srcCanvas) {
+  const w = srcCanvas.width;
+  const h = srcCanvas.height;
+  const ctx = srcCanvas.getContext('2d', { willReadFrequently: true });
+  const img = ctx.getImageData(0, 0, w, h);
+  const d = img.data;
 
-    for (let y = 0; y < h; y++) {
-      for (let x = 0; x < w; x++) {
-        const i = (y * w + x) * 4;
-        const a = d[i + 3];
-        if (a > alphaThreshold) {
-          if (x < minX) minX = x;
-          if (y < minY) minY = y;
-          if (x > maxX) maxX = x;
-          if (y > maxY) maxY = y;
-        }
+  let minX = w, minY = h, maxX = 0, maxY = 0;
+
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const i = (y * w + x) * 4;
+      if (d[i + 3] > 5) { // alpha > 5 (ignora transparência)
+        if (x < minX) minX = x;
+        if (y < minY) minY = y;
+        if (x > maxX) maxX = x;
+        if (y > maxY) maxY = y;
       }
     }
-
-    // se tudo transparente, não recorta
-    if (maxX < 0 || maxY < 0) return srcCanvas;
-
-    minX = Math.max(0, minX - padding);
-    minY = Math.max(0, minY - padding);
-    maxX = Math.min(w - 1, maxX + padding);
-    maxY = Math.min(h - 1, maxY + padding);
-
-    const tw = maxX - minX + 1;
-    const th = maxY - minY + 1;
-
-    const out = document.createElement('canvas');
-    out.width = tw;
-    out.height = th;
-    out.getContext('2d').drawImage(srcCanvas, minX, minY, tw, th, 0, 0, tw, th);
-    return out;
   }
+
+  const tw = maxX - minX;
+  const th = maxY - minY;
+
+  const out = document.createElement('canvas');
+  out.width = tw;
+  out.height = th;
+
+  out.getContext('2d').drawImage(
+    srcCanvas,
+    minX, minY, tw, th,
+    0, 0, tw, th
+  );
+
+  return out;
+}
+
+if (frameCanvas) {
+  const trimmed = trimAlphaStrict(frameCanvas);
+  c.drawImage(trimmed, 0, 0, W, H);
+}
+else if (frameImg) {
+  const tmp = document.createElement('canvas');
+  tmp.width = frameImg.naturalWidth;
+  tmp.height = frameImg.naturalHeight;
+  tmp.getContext('2d').drawImage(frameImg, 0, 0);
+  const trimmed = trimAlphaStrict(tmp);
+  c.drawImage(trimmed, 0, 0, W, H);
+}
 
   const run = async () => {
   try {
