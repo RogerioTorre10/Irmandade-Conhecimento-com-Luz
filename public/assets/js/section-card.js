@@ -433,9 +433,25 @@ if (frameImg) {
     // 5) Moldura OUTER (BLEED maior que o canvas)
     //    -> “encosta fora” e elimina aparência “pra dentro”
     // =========================
-    const BLEED = 18; // ajuste fino: 10~26 (maior = moldura mais “pra fora”)
-    if (frameCanvas) c.drawImage(frameCanvas, -BLEED, -BLEED, W + BLEED * 2, H + BLEED * 2);
-    else if (frameImg) c.drawImage(frameImg, -BLEED, -BLEED, W + BLEED * 2, H + BLEED * 2);
+  const FRAME_BLEED = 38;
+
+if (frameCanvas) {
+  c.drawImage(
+    frameCanvas,
+    -FRAME_BLEED,
+    -FRAME_BLEED,
+    W + FRAME_BLEED * 2,
+    H + FRAME_BLEED * 2
+  );
+} else if (frameImg) {
+  c.drawImage(
+    frameImg,
+    -FRAME_BLEED,
+    -FRAME_BLEED,
+    W + FRAME_BLEED * 2,
+    H + FRAME_BLEED * 2
+  );
+}
 
     // =========================
     // 6) Export + persist
