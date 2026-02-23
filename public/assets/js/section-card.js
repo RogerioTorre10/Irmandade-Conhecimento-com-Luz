@@ -304,149 +304,160 @@ function selfieCardSafeMode(section, ctxData) {
   }
 
   const run = async () => {
-    try {
-      const sec = section || document.getElementById('section-card') || document;
+  try {
+    const sec = section || document.getElementById('section-card') || document;
 
-      const selfieSrc = sec.querySelector('#selfieImage')?.src || '';
-      const bgSrc =
-        sec.querySelector('#guideBg')?.src ||
-        (CARD_BG?.[guia] || CARD_BG?.zion || '');
+    const selfieSrc = sec.querySelector('#selfieImage')?.src || '';
+    const bgSrc =
+      sec.querySelector('#guideBg')?.src ||
+      (CARD_BG?.[guia] || CARD_BG?.zion || '');
 
-      const selfieImg = await loadImg(selfieSrc);
-      const bgImg = await loadImg(bgSrc);
-      const frameImg = await loadImg(FRAME_SRC);
+    const selfieImg = await loadImg(selfieSrc);
+    const bgImg = await loadImg(bgSrc);
+    const frameImg = await loadImg(FRAME_SRC);
 
-      if (!selfieImg) {
-        console.warn('[CARD][SELFIECARD] selfieImg não carregou.');
-        return;
-      }
-
-      // 1) Prepara moldura: remove branco -> alpha (se vier), depois TRIM alpha pra tirar margens transparentes
-      let frameCanvas = null;
-      if (frameImg) {
-        try {
-          // remove branco para alpha (se necessário)
-          const noWhite = makeWhiteTransparent(frameImg, 245);
-
-          // TRIM alpha (remove padding invisível da PNG)
-          frameCanvas = trimAlphaCanvas(noWhite, 1, 2) || noWhite;
-        } catch (e) {
-          // fallback: desenha a imagem num canvas e tenta trim
-          try {
-            const tmp = document.createElement('canvas');
-            tmp.width = frameImg.naturalWidth || frameImg.width;
-            tmp.height = frameImg.naturalHeight || frameImg.height;
-            tmp.getContext('2d').drawImage(frameImg, 0, 0);
-            frameCanvas = trimAlphaCanvas(tmp, 1, 2) || tmp;
-          } catch {
-            frameCanvas = null;
-          }
-        }
-      }
-
-      const W = 512, H = 720;
-      const canvas = document.createElement('canvas');
-      canvas.width = W; canvas.height = H;
-      const c = canvas.getContext('2d', { alpha: true });
-
-      // 0) Fundo sólido (evita “xadrez” em viewers)
-      c.fillStyle = '#0b0f16';
-      c.fillRect(0, 0, W, H);
-
-      // 1) BG do guia em cover
-      if (bgImg && bgImg.naturalWidth > 0) {
-        const r = Math.max(W / bgImg.naturalWidth, H / bgImg.naturalHeight);
-        const dw = bgImg.naturalWidth * r;
-        const dh = bgImg.naturalHeight * r;
-        c.drawImage(bgImg, (W - dw) / 2, (H - dh) / 2, dw, dh);
-      } else {
-        c.fillStyle = 'rgba(0,0,0,0.35)';
-        c.fillRect(0, 0, W, H);
-      }
-
-      // helper: rounded-rect
-      function roundRectPath(ctx, x, y, w, h, r) {
-        const rr = Math.max(0, Math.min(r, Math.min(w, h) / 2));
-        ctx.beginPath();
-        ctx.moveTo(x + rr, y);
-        ctx.arcTo(x + w, y, x + w, y + h, rr);
-        ctx.arcTo(x + w, y + h, x, y + h, rr);
-        ctx.arcTo(x, y + h, x, y, rr);
-        ctx.arcTo(x, y, x + w, y, rr);
-        ctx.closePath();
-      }
-
-      // 2) Placeholder 2x2 (quadrado arredondado) no peito
-      const cx = W / 2;
-
-      // (ajuste fino de “altura do peito”)
-      const cy = Math.round(H * 0.66);
-
-      const box = Math.round(W * 0.34);
-      const rBox = Math.round(box * 0.18);
-      const x0 = Math.round(cx - box / 2);
-      const y0 = Math.round(cy - box / 2);
-
-      c.save();
-      roundRectPath(c, x0, y0, box, box, rBox);
-      c.clip();
-
-      const sw = selfieImg.naturalWidth || 1;
-      const sh = selfieImg.naturalHeight || 1;
-      const scale = Math.max(box / sw, box / sh);
-      const dw = sw * scale;
-      const dh = sh * scale;
-      c.drawImage(selfieImg, cx - dw / 2, cy - dh / 2, dw, dh);
-      c.restore();
-
-      // 3) Moldura por cima — AGORA full-bleed REAL (encosta na borda externa)
-      // Como trim removeu o “padding invisível”, basta esticar pro canvas todo.
-      if (frameCanvas) {
-        c.drawImage(frameCanvas, 0, 0, W, H);
-      } else if (frameImg) {
-        c.drawImage(frameImg, 0, 0, W, H);
-      }
-
-      // 4) Texto (nome + guia) no rodapé
-      const guiaNome = (typeof prettyGuia === 'function') ? prettyGuia(guia) : guia;
-
-      const nomeY = Math.round(H * 0.86);
-      const guiaY = Math.round(H * 0.91);
-
-      c.textAlign = 'center';
-      c.fillStyle = 'rgba(255,255,255,0.92)';
-      c.font = 'bold 30px Cardo, serif';
-      c.fillText((nome || 'PARTICIPANTE').toUpperCase(), cx, nomeY);
-
-      c.fillStyle = 'rgba(255,255,255,0.75)';
-      c.font = '22px Cardo, serif';
-      c.fillText(guiaNome ? `Guia: ${guiaNome}` : 'Guia: —', cx, guiaY);
-
-      // 5) Export PNG
-      let dataUrl = '';
-      try {
-        dataUrl = canvas.toDataURL('image/png');
-      } catch (err) {
-        console.error('[CARD][SELFIECARD] toDataURL falhou (CORS/tainted?)', err);
-        return;
-      }
-
-      // 6) Salva
-      sessionStorage.setItem('JORNADA_SELFIECARD', dataUrl);
-      sessionStorage.setItem('SELFIE_CARD', dataUrl);
-      try {
-        localStorage.setItem('JORNADA_SELFIECARD', dataUrl);
-        localStorage.setItem('SELFIE_CARD', dataUrl);
-      } catch (_) {}
-
-      window.JORNADA_STATE = window.JORNADA_STATE || {};
-      window.JORNADA_STATE.selfieCard = dataUrl;
-
-      console.log('[CARD][SELFIECARD] ✅ salva!', dataUrl.slice(0, 40) + '...');
-    } catch (e) {
-      console.error('[CARD][SELFIECARD] erro:', e);
+    if (!selfieImg) {
+      console.warn('[CARD][SELFIECARD] selfieImg não carregou.');
+      return;
     }
-  };
+
+    // opcional: se moldura vier com branco "sujo", tenta limpar
+    let frameCanvas = null;
+    if (frameImg) {
+      try {
+        frameCanvas = makeWhiteTransparent(frameImg, 245);
+      } catch {
+        frameCanvas = null;
+      }
+    }
+
+    const W = 512, H = 720;
+    const canvas = document.createElement('canvas');
+    canvas.width = W;
+    canvas.height = H;
+    const c = canvas.getContext('2d', { alpha: true });
+
+    // =========================
+    // 1) “Miolo” (inner) — onde o conteúdo vive
+    // =========================
+    const PAD = 26; // ajuste fino: 22~34 (define a “borda externa” real)
+    const ix = PAD;
+    const iy = PAD;
+    const iW = W - PAD * 2;
+    const iH = H - PAD * 2;
+
+    // fundo sólido fora do miolo (evita “xadrez”)
+    c.fillStyle = '#0b0f16';
+    c.fillRect(0, 0, W, H);
+
+    // BG do guia: cover dentro do MIolo (não no canvas todo)
+    if (bgImg && bgImg.naturalWidth > 0) {
+      const r = Math.max(iW / bgImg.naturalWidth, iH / bgImg.naturalHeight);
+      const dw = bgImg.naturalWidth * r;
+      const dh = bgImg.naturalHeight * r;
+      c.drawImage(bgImg, ix + (iW - dw) / 2, iy + (iH - dh) / 2, dw, dh);
+    } else {
+      c.fillStyle = 'rgba(0,0,0,0.35)';
+      c.fillRect(ix, iy, iW, iH);
+    }
+
+    // leve vinheta no miolo (deixa mais épico e ajuda contraste)
+    c.save();
+    c.globalAlpha = 0.22;
+    c.fillStyle = '#000';
+    c.fillRect(ix, iy, iW, iH);
+    c.globalAlpha = 1;
+    c.restore();
+
+    // helper: rounded rect
+    function roundRectPath(ctx, x, y, w, h, r) {
+      const rr = Math.max(0, Math.min(r, Math.min(w, h) / 2));
+      ctx.beginPath();
+      ctx.moveTo(x + rr, y);
+      ctx.arcTo(x + w, y, x + w, y + h, rr);
+      ctx.arcTo(x + w, y + h, x, y + h, rr);
+      ctx.arcTo(x, y + h, x, y, rr);
+      ctx.arcTo(x, y, x + w, y, rr);
+      ctx.closePath();
+    }
+
+    // =========================
+    // 2) Placeholder “2x2” (quadrado arredondado) no PEITO
+    //    (agora relativo ao miolo)
+    // =========================
+    const cx = ix + iW / 2;
+
+    // peito: ~64% do miolo (ajuste fino)
+    const cy = iy + Math.round(iH * 0.66);
+
+    const box = Math.round(iW * 0.34);   // tamanho 2x2 baseado no miolo
+    const rBox = Math.round(box * 0.18);
+    const x0 = Math.round(cx - box / 2);
+    const y0 = Math.round(cy - box / 2);
+
+    c.save();
+    roundRectPath(c, x0, y0, box, box, rBox);
+    c.clip();
+
+    const sw = selfieImg.naturalWidth || 1;
+    const sh = selfieImg.naturalHeight || 1;
+    const scale = Math.max(box / sw, box / sh);
+    const dw = sw * scale;
+    const dh = sh * scale;
+
+    c.drawImage(selfieImg, cx - dw / 2, cy - dh / 2, dw, dh);
+    c.restore();
+
+    // =========================
+    // 3) Texto (dentro do miolo, mais perto do rodapé)
+    // =========================
+    const nomeX = (nome || 'PARTICIPANTE').trim();
+    const guiaNome = (typeof prettyGuia === 'function') ? prettyGuia(guia) : guia;
+
+    const nomeY = iy + Math.round(iH * 0.88);
+    const guiaY = iy + Math.round(iH * 0.93);
+
+    c.textAlign = 'center';
+    c.fillStyle = 'rgba(255,255,255,0.92)';
+    c.font = 'bold 30px Cardo, serif';
+    c.fillText(nomeX, cx, nomeY);
+
+    c.fillStyle = 'rgba(255,255,255,0.75)';
+    c.font = '22px Cardo, serif';
+    c.fillText(guiaNome ? `Guia: ${guiaNome}` : 'Guia: —', cx, guiaY);
+
+    // =========================
+    // 4) Moldura — no CANVAS TODO (borda externa real)
+    // =========================
+    if (frameCanvas) c.drawImage(frameCanvas, 0, 0, W, H);
+    else if (frameImg) c.drawImage(frameImg, 0, 0, W, H);
+
+    // =========================
+    // 5) Export + persist
+    // =========================
+    let dataUrl = '';
+    try {
+      dataUrl = canvas.toDataURL('image/png');
+    } catch (err) {
+      console.error('[CARD][SELFIECARD] toDataURL falhou (CORS/tainted?)', err);
+      return;
+    }
+
+    sessionStorage.setItem('JORNADA_SELFIECARD', dataUrl);
+    sessionStorage.setItem('SELFIE_CARD', dataUrl);
+    try {
+      localStorage.setItem('JORNADA_SELFIECARD', dataUrl);
+      localStorage.setItem('SELFIE_CARD', dataUrl);
+    } catch (_) {}
+
+    window.JORNADA_STATE = window.JORNADA_STATE || {};
+    window.JORNADA_STATE.selfieCard = dataUrl;
+
+    console.log('[CARD][SELFIECARD] ✅ salva!', dataUrl.slice(0, 40) + '...');
+  } catch (e) {
+    console.error('[CARD][SELFIECARD] erro:', e);
+  }
+};
 
   // roda fora do paint, sem travar
   setTimeout(() => {
