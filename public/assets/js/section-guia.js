@@ -304,30 +304,41 @@
       sessionStorage.setItem('jornada.nome', nome);
       localStorage.setItem('JORNADA_NOME', nome);
 
-      // guia canon
-const guiaAtual = guiaId ? String(guiaId).toLowerCase().trim() : 'zion';
+      // =====================================================
+      // CANONIZA E GRAVA DEFINITIVAMENTE O GUIA ESCOLHIDO
+      // =====================================================
 
-// grava SEMPRE nas chaves oficiais
-sessionStorage.setItem('JORNADA_GUIA', guiaAtual);
-localStorage.setItem('JORNADA_GUIA', guiaAtual);
+      function canonGuia(v) {
+       const s = String(v || '').trim().toLowerCase();
+       if (!s) return 'zion';
+       if (s.includes('lumen')) return 'lumen';
+       if (s.includes('zion')) return 'zion';
+       if (s.includes('arion') || s.includes('arian')) return 'arion';
+       return 'zion';
+      }
 
-// mantém compatibilidade (se você ainda usa)
-sessionStorage.setItem('jornada.guia', guiaAtual);
+     // usa o guia que acabou de ser escolhido
+     const guiaCanon = canonGuia(guiaId || selectedGuide);
 
-// atualiza estados globais
-window.JORNADA_STATE = window.JORNADA_STATE || {};
-window.JORNADA_STATE.guia = guiaAtual;
-window.JORNADA_STATE.guiaSelecionado = guiaAtual;
+     // grava nas chaves oficiais (fonte única da verdade)
+     sessionStorage.setItem('JORNADA_GUIA', guiaCanon);
+     localStorage.setItem('JORNADA_GUIA', guiaCanon);
 
-window.JC = window.JC || {};
-window.JC.data = window.JC.data || {};
-window.JC.data.guia = guiaAtual;
-window.JC.data.guiaSelecionado = guiaAtual;
+     // grava também no state global (usado pelo card/selfie/pdf)
+     window.JORNADA_STATE = window.JORNADA_STATE || {};
+     window.JORNADA_STATE.guia = guiaCanon;
+     window.JORNADA_STATE.guiaSelecionado = guiaCanon;
 
-// reset de artefatos do guia anterior (evita “card do Zion com cor do Lumen”)
-sessionStorage.removeItem('JORNADA_SELFIECARD');
-sessionStorage.removeItem('SELFIE_CARD');
-sessionStorage.removeItem('__SELFIECARD_SIG__');
+     console.log('[GUIA] guiaCanon gravado:', guiaCanon);
+     window.JC = window.JC || {};
+     window.JC.data = window.JC.data || {};
+     window.JC.data.guia = guiaAtual;
+     window.JC.data.guiaSelecionado = guiaAtual;
+
+    // reset de artefatos do guia anterior (evita “card do Zion com cor do Lumen”)
+    sessionStorage.removeItem('JORNADA_SELFIECARD');
+    sessionStorage.removeItem('SELFIE_CARD');
+    sessionStorage.removeItem('__SELFIECARD_SIG__');
 
       try {
         applyGuiaTheme(guiaAtual);
