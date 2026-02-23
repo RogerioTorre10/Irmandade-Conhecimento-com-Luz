@@ -135,13 +135,16 @@
 
 /* ----- BOTÃO CONTINUAR (FORA DA SELFIE, TRANSLÚCIDO) ----- */
 
-#section-card .card-actions-below {
+#section-card .card-actions-below{
+  margin-top: auto;          /* empurra para o fim */
+  padding-bottom: 18px;      /* “borda inferior” */
+  display: flex;
+  justify-content: center;
   position: relative;
   z-index: 5;
-  margin-top: 48px;              /* espaço depois do card */
   width: 100%;
-  text-align: center;
-}
+  text-align: center !important;
+  }
 
 #section-card #btnNext {
   position: relative;
@@ -227,13 +230,7 @@
   #section-card .card-name-badge {
     margin-bottom: 3px !important;   /* sobe um tiquinho do fundo */
     font-size: 0.5rem !important;
-  }
-
-  /* Área do botão CONTINUAR */
-  #section-card .card-actions-below {
-    margin-top: 20px !important;
-    text-align: center !important;
-  }
+  } 
    
  #section-card #btnNext {
     width: auto;
@@ -286,8 +283,7 @@
      transform: none !important;
     -webkit-transform: translateY(0) translateZ(0) !important;
     overflow: hidden !important;
-  } 
-  
+  }   
 
   #section-card .j-panel-glow {
     padding: 10px !important; /* igual Intro */
@@ -398,14 +394,17 @@
 }
 
 /* ----- BOTÃO CONTINUAR (FORA DA SELFIE, TRANSLÚCIDO) ----- */
-
-#section-card .card-actions-below {
+#section-card .card-actions-below{
+  margin-top: auto;          /* empurra para o fim */
+  padding-bottom: 18px;      /* “borda inferior” */
+  display: flex;
+  justify-content: center;
   position: relative;
   z-index: 5;
-  margin-top: 48px;              /* espaço depois do card */
   width: 100%;
-  text-align: center;
-}
+  text-align: center !important;
+  z-index: 5;
+  }
 
 #section-card #btnNext {
   position: relative;
@@ -475,8 +474,16 @@
     width: 65%;
   }
 
-  #section-card .card-actions-below {
-    margin-top: 40px;
+  #section-card .card-actions-below{
+  margin-top: auto;          /* empurra para o fim */
+  padding-bottom: 18px;      /* “borda inferior” */
+  display: flex;
+  justify-content: center;
+  position: relative;
+  z-index: 5;
+  width: 100%;
+  text-align: center !important;
+  z-index: 5;  
   }
 }
  
