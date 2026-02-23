@@ -67,6 +67,7 @@
 
 #section-card .flame-layer {
   position: absolute;
+  margin-top: 10px; 
   left: 50%;
   top: 68%;                        /* posição vertical sobre o peito */
   transform: translate(-50%, -50%);
@@ -200,6 +201,7 @@
   /* PLACEHOLDER DOURADO (a cruz com o nome) */
   #section-card .flame-layer {
     position: absolute !important;
+    margin-top: 10px !important; 
     left: 50% !important;
     top: 73% !important;              /* desce até o peito */
     transform: translate(-50%, -50%) !important;
