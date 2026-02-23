@@ -321,55 +321,40 @@ function selfieCardSafeMode(section, ctxData) {
       return;
     }
 
-    // opcional: se moldura vier com branco "sujo", tenta limpar
+    // Se a moldura vier com branco “sujo”, tenta limpar
     let frameCanvas = null;
     if (frameImg) {
-      try {
-        frameCanvas = makeWhiteTransparent(frameImg, 245);
-      } catch {
-        frameCanvas = null;
-      }
+      try { frameCanvas = makeWhiteTransparent(frameImg, 245); } catch { frameCanvas = null; }
     }
 
     const W = 512, H = 720;
     const canvas = document.createElement('canvas');
-    canvas.width = W;
-    canvas.height = H;
+    canvas.width = W; canvas.height = H;
     const c = canvas.getContext('2d', { alpha: true });
 
     // =========================
-    // 1) “Miolo” (inner) — onde o conteúdo vive
+    // 1) BG FULL-BLEED (sem fundo preto, sem vinheta)
     // =========================
-    const PAD = 26; // ajuste fino: 22~34 (define a “borda externa” real)
-    const ix = PAD;
-    const iy = PAD;
-    const iW = W - PAD * 2;
-    const iH = H - PAD * 2;
-
-    // fundo sólido fora do miolo (evita “xadrez”)
-    c.fillStyle = '#0b0f16';
-    c.fillRect(0, 0, W, H);
-
-    // BG do guia: cover dentro do MIolo (não no canvas todo)
     if (bgImg && bgImg.naturalWidth > 0) {
-      const r = Math.max(iW / bgImg.naturalWidth, iH / bgImg.naturalHeight);
+      const r = Math.max(W / bgImg.naturalWidth, H / bgImg.naturalHeight);
       const dw = bgImg.naturalWidth * r;
       const dh = bgImg.naturalHeight * r;
-      c.drawImage(bgImg, ix + (iW - dw) / 2, iy + (iH - dh) / 2, dw, dh);
+      c.drawImage(bgImg, (W - dw) / 2, (H - dh) / 2, dw, dh);
     } else {
-      c.fillStyle = 'rgba(0,0,0,0.35)';
-      c.fillRect(ix, iy, iW, iH);
+      // fallback neutro (se não vier bg)
+      c.fillStyle = '#111';
+      c.fillRect(0, 0, W, H);
     }
 
-    // leve vinheta no miolo (deixa mais épico e ajuda contraste)
-    c.save();
-    c.globalAlpha = 0.22;
-    c.fillStyle = '#000';
-    c.fillRect(ix, iy, iW, iH);
-    c.globalAlpha = 1;
-    c.restore();
+    // =========================
+    // 2) SAFE AREA (só pra posicionar elementos)
+    // =========================
+    const SAFE = 34;          // ajuste fino: 28~44
+    const ix = SAFE, iy = SAFE;
+    const iW = W - SAFE * 2;
+    const iH = H - SAFE * 2;
 
-    // helper: rounded rect
+    // helper: rounded-rect
     function roundRectPath(ctx, x, y, w, h, r) {
       const rr = Math.max(0, Math.min(r, Math.min(w, h) / 2));
       ctx.beginPath();
@@ -382,16 +367,15 @@ function selfieCardSafeMode(section, ctxData) {
     }
 
     // =========================
-    // 2) Placeholder “2x2” (quadrado arredondado) no PEITO
-    //    (agora relativo ao miolo)
+    // 3) Placeholder 2x2 (quadrado arredondado) no PEITO
     // =========================
     const cx = ix + iW / 2;
 
-    // peito: ~64% do miolo (ajuste fino)
-    const cy = iy + Math.round(iH * 0.66);
+    // peito (mais baixo que rosto)
+    const cy = iy + Math.round(iH * 0.63);   // ajuste fino: 0.61~0.66
 
-    const box = Math.round(iW * 0.34);   // tamanho 2x2 baseado no miolo
-    const rBox = Math.round(box * 0.18);
+    const box = Math.round(iW * 0.34);       // 2x2
+    const rBox = Math.round(box * 0.20);     // arredondamento
     const x0 = Math.round(cx - box / 2);
     const y0 = Math.round(cy - box / 2);
 
@@ -402,38 +386,39 @@ function selfieCardSafeMode(section, ctxData) {
     const sw = selfieImg.naturalWidth || 1;
     const sh = selfieImg.naturalHeight || 1;
     const scale = Math.max(box / sw, box / sh);
-    const dw = sw * scale;
-    const dh = sh * scale;
-
-    c.drawImage(selfieImg, cx - dw / 2, cy - dh / 2, dw, dh);
+    const dw2 = sw * scale;
+    const dh2 = sh * scale;
+    c.drawImage(selfieImg, cx - dw2 / 2, cy - dh2 / 2, dw2, dh2);
     c.restore();
 
     // =========================
-    // 3) Texto (dentro do miolo, mais perto do rodapé)
+    // 4) Texto (ainda dentro do SAFE)
     // =========================
     const nomeX = (nome || 'PARTICIPANTE').trim();
     const guiaNome = (typeof prettyGuia === 'function') ? prettyGuia(guia) : guia;
 
-    const nomeY = iy + Math.round(iH * 0.88);
-    const guiaY = iy + Math.round(iH * 0.93);
+    const nomeY = iy + Math.round(iH * 0.90);
+    const guiaY = iy + Math.round(iH * 0.95);
 
     c.textAlign = 'center';
     c.fillStyle = 'rgba(255,255,255,0.92)';
     c.font = 'bold 30px Cardo, serif';
     c.fillText(nomeX, cx, nomeY);
 
-    c.fillStyle = 'rgba(255,255,255,0.75)';
+    c.fillStyle = 'rgba(255,255,255,0.78)';
     c.font = '22px Cardo, serif';
     c.fillText(guiaNome ? `Guia: ${guiaNome}` : 'Guia: —', cx, guiaY);
 
     // =========================
-    // 4) Moldura — no CANVAS TODO (borda externa real)
+    // 5) Moldura OUTER (BLEED maior que o canvas)
+    //    -> “encosta fora” e elimina aparência “pra dentro”
     // =========================
-    if (frameCanvas) c.drawImage(frameCanvas, 0, 0, W, H);
-    else if (frameImg) c.drawImage(frameImg, 0, 0, W, H);
+    const BLEED = 18; // ajuste fino: 10~26 (maior = moldura mais “pra fora”)
+    if (frameCanvas) c.drawImage(frameCanvas, -BLEED, -BLEED, W + BLEED * 2, H + BLEED * 2);
+    else if (frameImg) c.drawImage(frameImg, -BLEED, -BLEED, W + BLEED * 2, H + BLEED * 2);
 
     // =========================
-    // 5) Export + persist
+    // 6) Export + persist
     // =========================
     let dataUrl = '';
     try {
