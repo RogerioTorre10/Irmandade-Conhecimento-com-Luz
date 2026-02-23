@@ -262,10 +262,9 @@ function selfieCardSafeMode(section, ctxData) {
   if (last === signature && sessionStorage.getItem('JORNADA_SELFIECARD')) return;
   sessionStorage.setItem('__SELFIECARD_SIG__', signature);
 
-  // =========================
-// 5) Moldura REAL externa
 // =========================
-
+// Moldura REAL externa (trim alpha)
+// =========================
 function trimAlphaStrict(srcCanvas) {
   const w = srcCanvas.width;
   const h = srcCanvas.height;
@@ -274,11 +273,13 @@ function trimAlphaStrict(srcCanvas) {
   const d = img.data;
 
   let minX = w, minY = h, maxX = 0, maxY = 0;
+  let found = false;
 
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
       const i = (y * w + x) * 4;
-      if (d[i + 3] > 5) { // alpha > 5 (ignora transparência)
+      if (d[i + 3] > 5) { // alpha > 5
+        found = true;
         if (x < minX) minX = x;
         if (y < minY) minY = y;
         if (x > maxX) maxX = x;
@@ -287,8 +288,11 @@ function trimAlphaStrict(srcCanvas) {
     }
   }
 
-  const tw = maxX - minX;
-  const th = maxY - minY;
+  // fallback: se não achou nada, devolve original
+  if (!found) return srcCanvas;
+
+  const tw = Math.max(1, maxX - minX + 1);
+  const th = Math.max(1, maxY - minY + 1);
 
   const out = document.createElement('canvas');
   out.width = tw;
@@ -306,11 +310,10 @@ function trimAlphaStrict(srcCanvas) {
 if (frameCanvas) {
   const trimmed = trimAlphaStrict(frameCanvas);
   c.drawImage(trimmed, 0, 0, W, H);
-}
-else if (frameImg) {
+} else if (frameImg) {
   const tmp = document.createElement('canvas');
-  tmp.width = frameImg.naturalWidth;
-  tmp.height = frameImg.naturalHeight;
+  tmp.width = frameImg.naturalWidth || frameImg.width;
+  tmp.height = frameImg.naturalHeight || frameImg.height;
   tmp.getContext('2d').drawImage(frameImg, 0, 0);
   const trimmed = trimAlphaStrict(tmp);
   c.drawImage(trimmed, 0, 0, W, H);
@@ -325,20 +328,24 @@ else if (frameImg) {
       sec.querySelector('#guideBg')?.src ||
       (CARD_BG?.[guia] || CARD_BG?.zion || '');
 
-    const selfieImg = await loadImg(selfieSrc);
-    const bgImg = await loadImg(bgSrc);
-    const frameImg = await loadImg(FRAME_SRC);
+   const selfieImg = await loadImg(selfieSrc);
+const bgImg     = await loadImg(bgSrc);
+let   frameImg  = await loadImg(FRAME_SRC);
 
-    if (!selfieImg) {
-      console.warn('[CARD][SELFIECARD] selfieImg não carregou.');
-      return;
-    }
+if (!selfieImg) {
+  console.warn('[CARD][SELFIECARD] selfieImg não carregou.');
+  return;
+}
 
-    // Se a moldura vier com branco “sujo”, tenta limpar
-    let frameCanvas = null;
-    if (frameImg) {
-      try { frameCanvas = makeWhiteTransparent(frameImg, 245); } catch { frameCanvas = null; }
-    }
+// cria a versão transparente da moldura (remove fundo branco)
+let frameCanvas = null;
+if (frameImg) {
+  try {
+    frameCanvas = makeWhiteTransparent(frameImg, 245);
+  } catch {
+    frameCanvas = null;
+  }
+}
 
     const W = 512, H = 720;
     const canvas = document.createElement('canvas');
