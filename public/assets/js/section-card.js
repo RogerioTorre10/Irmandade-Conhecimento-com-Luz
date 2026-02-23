@@ -220,33 +220,33 @@ function canonGuia(v) {
     return c;
   }
 
-  // -----------------------------
+// -----------------------------
 // SELFIECARD — SAFE MODE
 // - 1x por sessão OU quando (nome+guia) mudar
 // -----------------------------
 function selfieCardSafeMode(section, ctxData) {
   // canon único (arion) + robustez
-  const canonGuia = (v) => {
+  const canonGuiaLocal = (v) => {
     const s = String(v || '').trim().toLowerCase();
     if (!s) return '';
     if (s.includes('lumen')) return 'lumen';
     if (s.includes('zion')) return 'zion';
     if (s.includes('arion') || s.includes('arian')) return 'arion';
-    // caso venha "guia" / lixo, retorna vazio pra cair no fallback
     if (s === 'guia') return '';
     return s;
   };
 
-  const nome = ctxData?.nome || getNome();
+  const nome = (ctxData?.nome || getNome() || 'PARTICIPANTE').trim();
 
   // prioridade: ctxData.guia -> storages/state -> fallback
-  const guia = canonGuia(ctxData?.guia)
-    || canonGuia(getGuiaCanon?.())
-    || canonGuia(window.JORNADA_STATE?.guiaSelecionado)
-    || canonGuia(window.JORNADA_STATE?.guia)
-    || canonGuia(sessionStorage.getItem('JORNADA_GUIA'))
-    || canonGuia(localStorage.getItem('JORNADA_GUIA'))
-    || 'zion';
+  const guia =
+    canonGuiaLocal(ctxData?.guia) ||
+    canonGuiaLocal(typeof getGuiaCanon === 'function' ? getGuiaCanon() : '') ||
+    canonGuiaLocal(window.JORNADA_STATE?.guiaSelecionado) ||
+    canonGuiaLocal(window.JORNADA_STATE?.guia) ||
+    canonGuiaLocal(sessionStorage.getItem('JORNADA_GUIA')) ||
+    canonGuiaLocal(localStorage.getItem('JORNADA_GUIA')) ||
+    'zion';
 
   // grava o guia canon aqui também (pra não voltar “fantasma” depois)
   try {
@@ -257,13 +257,51 @@ function selfieCardSafeMode(section, ctxData) {
     window.JORNADA_STATE.guiaSelecionado = guia;
   } catch (_) {}
 
-  const signature = `${String(nome || '').trim()}__${guia}`;
+  const signature = `${String(nome).trim()}__${guia}`;
   const last = sessionStorage.getItem('__SELFIECARD_SIG__') || '';
-  if (last === signature && sessionStorage.getItem('JORNADA_SELFIECARD')) {
-    // já tem a mesma selfiecard pra esse nome/guia nesta sessão
-    return;
-  }
+  if (last === signature && sessionStorage.getItem('JORNADA_SELFIECARD')) return;
   sessionStorage.setItem('__SELFIECARD_SIG__', signature);
+
+  // --- recorta transparência ao redor (remove “margem invisível” da moldura)
+  function trimAlphaCanvas(srcCanvas, alphaThreshold = 1, padding = 2) {
+    if (!srcCanvas) return null;
+    const w = srcCanvas.width, h = srcCanvas.height;
+    const ctx = srcCanvas.getContext('2d', { willReadFrequently: true });
+    const img = ctx.getImageData(0, 0, w, h);
+    const d = img.data;
+
+    let minX = w, minY = h, maxX = -1, maxY = -1;
+
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const i = (y * w + x) * 4;
+        const a = d[i + 3];
+        if (a > alphaThreshold) {
+          if (x < minX) minX = x;
+          if (y < minY) minY = y;
+          if (x > maxX) maxX = x;
+          if (y > maxY) maxY = y;
+        }
+      }
+    }
+
+    // se tudo transparente, não recorta
+    if (maxX < 0 || maxY < 0) return srcCanvas;
+
+    minX = Math.max(0, minX - padding);
+    minY = Math.max(0, minY - padding);
+    maxX = Math.min(w - 1, maxX + padding);
+    maxY = Math.min(h - 1, maxY + padding);
+
+    const tw = maxX - minX + 1;
+    const th = maxY - minY + 1;
+
+    const out = document.createElement('canvas');
+    out.width = tw;
+    out.height = th;
+    out.getContext('2d').drawImage(srcCanvas, minX, minY, tw, th, 0, 0, tw, th);
+    return out;
+  }
 
   const run = async () => {
     try {
@@ -276,20 +314,33 @@ function selfieCardSafeMode(section, ctxData) {
 
       const selfieImg = await loadImg(selfieSrc);
       const bgImg = await loadImg(bgSrc);
-      let frameImg = await loadImg(FRAME_SRC);
+      const frameImg = await loadImg(FRAME_SRC);
 
       if (!selfieImg) {
         console.warn('[CARD][SELFIECARD] selfieImg não carregou.');
         return;
       }
 
-      // Se a moldura vier com fundo branco, remove para alpha
+      // 1) Prepara moldura: remove branco -> alpha (se vier), depois TRIM alpha pra tirar margens transparentes
       let frameCanvas = null;
       if (frameImg) {
         try {
-          frameCanvas = makeWhiteTransparent(frameImg, 245);
-        } catch {
-          frameCanvas = null;
+          // remove branco para alpha (se necessário)
+          const noWhite = makeWhiteTransparent(frameImg, 245);
+
+          // TRIM alpha (remove padding invisível da PNG)
+          frameCanvas = trimAlphaCanvas(noWhite, 1, 2) || noWhite;
+        } catch (e) {
+          // fallback: desenha a imagem num canvas e tenta trim
+          try {
+            const tmp = document.createElement('canvas');
+            tmp.width = frameImg.naturalWidth || frameImg.width;
+            tmp.height = frameImg.naturalHeight || frameImg.height;
+            tmp.getContext('2d').drawImage(frameImg, 0, 0);
+            frameCanvas = trimAlphaCanvas(tmp, 1, 2) || tmp;
+          } catch {
+            frameCanvas = null;
+          }
         }
       }
 
@@ -302,7 +353,7 @@ function selfieCardSafeMode(section, ctxData) {
       c.fillStyle = '#0b0f16';
       c.fillRect(0, 0, W, H);
 
-      // 1) Fundo (BG do guia) em cover
+      // 1) BG do guia em cover
       if (bgImg && bgImg.naturalWidth > 0) {
         const r = Math.max(W / bgImg.naturalWidth, H / bgImg.naturalHeight);
         const dw = bgImg.naturalWidth * r;
@@ -327,9 +378,12 @@ function selfieCardSafeMode(section, ctxData) {
 
       // 2) Placeholder 2x2 (quadrado arredondado) no peito
       const cx = W / 2;
-      const cy = Math.round(H * 0.70);     // peito (ajuste fino: 0.64~0.68)
-      const box = Math.round(W * 0.36);    // tamanho do “2x2”
-      const rBox = Math.round(box * 0.18); // arredondado
+
+      // (ajuste fino de “altura do peito”)
+      const cy = Math.round(H * 0.66);
+
+      const box = Math.round(W * 0.34);
+      const rBox = Math.round(box * 0.18);
       const x0 = Math.round(cx - box / 2);
       const y0 = Math.round(cy - box / 2);
 
@@ -345,13 +399,15 @@ function selfieCardSafeMode(section, ctxData) {
       c.drawImage(selfieImg, cx - dw / 2, cy - dh / 2, dw, dh);
       c.restore();
 
-      // 3) Moldura por cima (FULL BLEED pra encostar na borda)
-      const BLEED = 0; // borda exatamente na borda do canvas
-      if (frameCanvas) c.drawImage(frameCanvas, 0, 0, W, H);
-      else if (frameImg) c.drawImage(frameImg, 0, 0, W, H);
+      // 3) Moldura por cima — AGORA full-bleed REAL (encosta na borda externa)
+      // Como trim removeu o “padding invisível”, basta esticar pro canvas todo.
+      if (frameCanvas) {
+        c.drawImage(frameCanvas, 0, 0, W, H);
+      } else if (frameImg) {
+        c.drawImage(frameImg, 0, 0, W, H);
+      }
 
       // 4) Texto (nome + guia) no rodapé
-      const nomeX = (nome || 'PARTICIPANTE').trim();
       const guiaNome = (typeof prettyGuia === 'function') ? prettyGuia(guia) : guia;
 
       const nomeY = Math.round(H * 0.86);
@@ -360,13 +416,13 @@ function selfieCardSafeMode(section, ctxData) {
       c.textAlign = 'center';
       c.fillStyle = 'rgba(255,255,255,0.92)';
       c.font = 'bold 30px Cardo, serif';
-      c.fillText(nomeX, cx, nomeY);
+      c.fillText((nome || 'PARTICIPANTE').toUpperCase(), cx, nomeY);
 
       c.fillStyle = 'rgba(255,255,255,0.75)';
       c.font = '22px Cardo, serif';
       c.fillText(guiaNome ? `Guia: ${guiaNome}` : 'Guia: —', cx, guiaY);
 
-      // 5) Export
+      // 5) Export PNG
       let dataUrl = '';
       try {
         dataUrl = canvas.toDataURL('image/png');
@@ -375,7 +431,7 @@ function selfieCardSafeMode(section, ctxData) {
         return;
       }
 
-      // 6) Salva em chaves padrão
+      // 6) Salva
       sessionStorage.setItem('JORNADA_SELFIECARD', dataUrl);
       sessionStorage.setItem('SELFIE_CARD', dataUrl);
       try {
