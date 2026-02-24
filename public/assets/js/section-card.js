@@ -374,26 +374,35 @@ function selfieCardSafeMode(section, ctxData) {
     }
   };
 
-  // roda fora do paint
-  setTimeout(() => {
-    if ('requestIdleCallback' in window) requestIdleCallback(run, { timeout: 1200 });
-    else run();
-  }, 60);
+  // roda AGORA e guarda uma promise global (pra final/PDF poder aguardar)
+try {
+  window.__SELFIECARD_PROMISE__ = run();
+} catch (_) {
+  run();
 }
 
   // -----------------------------
   // Navegação
   // -----------------------------
-  function goNext() {
-    try { speechSynthesis.cancel(); } catch {}
-    if (typeof window.playTransitionVideo === 'function') {
-      window.playTransitionVideo(VIDEO_SRC, NEXT_SECTION_ID);
-      return;
-    }
-    if (window.JC && typeof window.JC.show === 'function') {
-      window.JC.show(NEXT_SECTION_ID, { force: true });
-    }
+ async function goNext() {
+  try { speechSynthesis.cancel(); } catch {}
+
+  // espera a selfiecard terminar (máx ~900ms)
+  try {
+    await Promise.race([
+      window.__SELFIECARD_PROMISE__ || Promise.resolve(),
+      new Promise(r => setTimeout(r, 900))
+    ]);
+  } catch {}
+
+  if (typeof window.playTransitionVideo === 'function') {
+    window.playTransitionVideo(VIDEO_SRC, NEXT_SECTION_ID);
+    return;
   }
+  if (window.JC && typeof window.JC.show === 'function') {
+    window.JC.show(NEXT_SECTION_ID, { force: true });
+  }
+}
 
   // -----------------------------
   // Init (section:shown friendly)
