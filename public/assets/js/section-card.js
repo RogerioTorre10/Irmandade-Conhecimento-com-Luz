@@ -6,7 +6,7 @@
 (function () {
   'use strict';
 
-  const const MOD = 'section-card.js';
+  const MOD = 'section-card.js';
   const SECTION_IDS = ['section-card', 'section-eu-na-irmandade'];
   const NEXT_SECTION_ID = 'section-perguntas';
   const VIDEO_SRC = '/assets/videos/filme-0-ao-encontro-da-jornada.mp4';
