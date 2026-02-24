@@ -90,31 +90,26 @@ function canonGuia(v) {
 }
 
   // -----------------------------
-  // Monta HTML interno 1x
-  // -----------------------------
-  function buildMarkup(section) {
-    if (!section || section.__CARD_BUILT__) return;
+// Build Markup (AJUSTE MOLDURA EXTERNA — sem quebrar IDs/fluxo)
+// -----------------------------
+function buildMarkup(section) {
+  if (!section || section.__CARD_BUILT__) return;
 
-    section.innerHTML = `
-      <div class="j-panel-glow card-panel">
-        <div class="conteudo-pergaminho">
-          <h2
-            data-typing="true"
-            data-text="Eu na Irmandade"
-            data-speed="40"
-            data-cursor="true"
-            class="titulo-selfie"
-          >Eu na Irmandade</h2>
+  // Wrapper externo do card (permite a moldura “sair” pra fora)
+  section.innerHTML = `
+    <div class="j-panel-glow card-panel">
+      <div class="conteudo-pergaminho">
 
-          <img id="guideBg" class="guide-bg" alt="Fundo do Guia" />
+        <div class="card-wrap" style="position:relative; overflow:visible;">
+          <!-- BG do guia -->
+          <img id="guideBg" class="guide-bg" alt="Fundo do Guia"
+               style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:1;" />
 
-          <div class="flame-layer show placeholder-only" aria-hidden="true">
-            <img
-              id="selfieImage"
-              class="flame-selfie"
-              src="${PLACEHOLDER_SELFIE}"
-              alt="Sua foto na Irmandade"
-            />
+          <!-- camada do conteúdo do card -->
+          <div class="flame-layer show placeholder-only"
+               style="position:relative; z-index:5;">
+            <img id="selfieImage" class="flame-selfie"
+                 src="${PLACEHOLDER_SELFIE}" alt="Sua foto na Irmandade" />
             <div class="card-footer">
               <span class="card-name-badge">
                 <span id="userNameSlot">Carregando...</span>
@@ -122,16 +117,29 @@ function canonGuia(v) {
             </div>
           </div>
 
-          <div class="card-actions-below">
-            <button id="btnNext" class="btn btn-stone">✅ Continuar</button>
-          </div>
+          <!-- ✅ Moldura externa (fica fora do card sem clipping) -->
+          <img id="cardFrame" src="${FRAME_SRC}" alt=""
+               style="
+                 position:absolute;
+                 top:-22px; left:-22px;
+                 width:calc(100% + 44px);
+                 height:calc(100% + 44px);
+                 object-fit:contain;
+                 pointer-events:none;
+                 z-index:20;
+               " />
         </div>
+
+        <div class="card-actions-below">
+          <button id="btnNext" class="btn btn-stone">✅ Continuar</button>
+        </div>
+
       </div>
-    `.trim();
+    </div>
+  `.trim();
 
-    section.__CARD_BUILT__ = true;
-  }
-
+  section.__CARD_BUILT__ = true;
+}
   // -----------------------------
   // Render UI do Card
   // -----------------------------
