@@ -121,12 +121,12 @@ function buildMarkup(section) {
           <img id="cardFrame" src="${FRAME_SRC}" alt=""
                style="
                  position:absolute;
-                 top:-22px; left:-22px;
-                 width:calc(100% + 44px);
-                 height:calc(100% + 44px);
+                 top:-12px; left:-12px;
+                 width:calc(100% + 24px);
+                 height:calc(100% + 24px);
                  object-fit:contain;
                  pointer-events:none;
-                 z-index:20;
+                 z-index:8;
                " />
         </div>
 
@@ -278,16 +278,7 @@ function selfieCardSafeMode(section, ctxData) {
         return;
       }
 
-      // ✅ frameCanvas EXISTE e FICA DENTRO do run()
-      let frameCanvas = null;
-      if (frameImg) {
-        try {
-          // remove branco “sujo” se existir (se sua moldura já é transparente, isso não atrapalha)
-          frameCanvas = makeWhiteTransparent(frameImg, 245);
-        } catch {
-          frameCanvas = null;
-        }
-      }
+      const frameCanvas = frameImg || null;
 
       const W = 512, H = 720;
       const canvas = document.createElement('canvas');
