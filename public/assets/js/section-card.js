@@ -463,6 +463,8 @@ try {
 } catch {
   window.__SELFIECARD_PROMISE__ = Promise.resolve(true);
 }
+}
+   
   // -----------------------------
   // Navegação
   // -----------------------------
