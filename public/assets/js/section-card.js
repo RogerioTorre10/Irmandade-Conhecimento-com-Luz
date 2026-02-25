@@ -188,6 +188,76 @@ function buildMarkup(section) {
     }
   }
 
+   function drawGoldFrame(ctx, W, H, opts = {}) {
+  const pad = Math.max(10, opts.pad ?? 26);     // “largura” útil da moldura
+  const rad = Math.max(6, opts.radius ?? 26);  // raio dos cantos
+  const glow = opts.glow ?? true;
+
+  function rrPath(x, y, w, h, r) {
+    const rr = Math.min(r, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + rr, y);
+    ctx.arcTo(x + w, y, x + w, y + h, rr);
+    ctx.arcTo(x + w, y + h, x, y + h, rr);
+    ctx.arcTo(x, y + h, x, y, rr);
+    ctx.arcTo(x, y, x + w, y, rr);
+    ctx.closePath();
+  }
+
+  // 1) “faixa” da moldura = retângulo externo - retângulo interno
+  ctx.save();
+
+  // Glow externo sutil
+  if (glow) {
+    ctx.shadowBlur = 18;
+    ctx.shadowColor = "rgba(255, 210, 120, 0.55)";
+  }
+
+  rrPath(2, 2, W - 4, H - 4, rad + 6);
+  ctx.fillStyle = "rgba(255, 220, 160, 0.08)";
+  ctx.fill();
+
+  ctx.shadowBlur = 0;
+
+  // Cria faixa (stroke largo com gradiente)
+  const grad = ctx.createLinearGradient(0, 0, W, H);
+  grad.addColorStop(0.00, "rgba(255, 242, 210, 0.95)");
+  grad.addColorStop(0.25, "rgba(255, 205, 120, 0.95)");
+  grad.addColorStop(0.50, "rgba(210, 150, 70, 0.95)");
+  grad.addColorStop(0.75, "rgba(255, 205, 120, 0.95)");
+  grad.addColorStop(1.00, "rgba(255, 242, 210, 0.95)");
+
+  ctx.lineWidth = pad;                 // <<< aqui “vira” moldura
+  ctx.strokeStyle = grad;
+  rrPath(pad / 2, pad / 2, W - pad, H - pad, rad);
+  ctx.stroke();
+
+  // Filete interno pra acabamento (não cobre conteúdo)
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = "rgba(60, 30, 10, 0.35)";
+  rrPath(pad + 2, pad + 2, W - (pad + 4) * 2, H - (pad + 4) * 2, Math.max(8, rad - 10));
+  ctx.stroke();
+
+  // “Brilhinhos” discretos nos cantos
+  if (glow) {
+    const spark = (x, y, a = 0.85) => {
+      ctx.save();
+      ctx.globalAlpha = a;
+      ctx.beginPath();
+      ctx.arc(x, y, 4, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(255,255,255,0.9)";
+      ctx.fill();
+      ctx.restore();
+    };
+    spark(pad * 0.55, pad * 0.55, 0.55);
+    spark(W - pad * 0.55, pad * 0.55, 0.45);
+    spark(pad * 0.55, H - pad * 0.55, 0.45);
+    spark(W - pad * 0.55, H - pad * 0.55, 0.55);
+  }
+
+  ctx.restore();
+}
+
   function loadImg(src) {
     return new Promise((resolve) => {
       if (!src) return resolve(null);
@@ -206,59 +276,6 @@ function buildMarkup(section) {
       im.src = s;
     });
   }
-
-   function drawGoldFrame(ctx, W, H, opts = {}) {
-  const pad  = Math.max(10, opts.pad ?? 34);     // “moldura externa” (espessura)
-  const rad  = Math.max(6,  opts.radius ?? 22);  // raio cantos
-  const glow = opts.glow ?? true;
-
-  function rrPath(x, y, w, h, r) {
-    const rr = Math.min(r, w / 2, h / 2);
-    ctx.beginPath();
-    ctx.moveTo(x + rr, y);
-    ctx.arcTo(x + w, y, x + w, y + h, rr);
-    ctx.arcTo(x + w, y + h, x, y + h, rr);
-    ctx.arcTo(x, y + h, x, y, rr);
-    ctx.arcTo(x, y, x + w, y, rr);
-    ctx.closePath();
-  }
-
-  const x = pad / 2;
-  const y = pad / 2;
-  const w = W - pad;
-  const h = H - pad;
-
-  ctx.save();
-
-  // Glow suave externo
-  if (glow) {
-    ctx.shadowBlur = Math.max(8, pad * 0.75);
-    ctx.shadowColor = 'rgba(255, 215, 90, 0.55)';
-  }
-
-  // Aro dourado (várias passadas pra dar “profundidade”)
-  const strokes = [
-    { lw: Math.max(8, pad * 0.36), col: 'rgba(255, 220, 120, 0.95)' },
-    { lw: Math.max(5, pad * 0.22), col: 'rgba(210, 150, 40, 0.95)' },
-    { lw: Math.max(3, pad * 0.14), col: 'rgba(255, 245, 200, 0.85)' },
-  ];
-
-  strokes.forEach(s => {
-    ctx.lineWidth = s.lw;
-    ctx.strokeStyle = s.col;
-    rrPath(x, y, w, h, rad);
-    ctx.stroke();
-  });
-
-  // Linha interna pra “separar” a arte do frame
-  ctx.shadowBlur = 0;
-  ctx.lineWidth = 2;
-  ctx.strokeStyle = 'rgba(0,0,0,0.25)';
-  rrPath(x + pad * 0.18, y + pad * 0.18, w - pad * 0.36, h - pad * 0.36, rad * 0.85);
-  ctx.stroke();
-
-  ctx.restore();
-}
 
   function makeWhiteTransparent(img, threshold = 245) {
     const c = document.createElement('canvas');
