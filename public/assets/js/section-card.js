@@ -208,7 +208,7 @@ function buildMarkup(section) {
   }
 
    function drawGoldFrame(ctx, W, H, opts = {}) {
-  const pad  = Math.max(10, opts.pad ?? 28);     // “moldura externa” (espessura)
+  const pad  = Math.max(10, opts.pad ?? 34);     // “moldura externa” (espessura)
   const rad  = Math.max(6,  opts.radius ?? 22);  // raio cantos
   const glow = opts.glow ?? true;
 
