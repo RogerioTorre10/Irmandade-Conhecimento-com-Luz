@@ -423,37 +423,53 @@ function selfieCardSafeMode(section, ctxData) {
     console.log('[CARD][SELFIECARD] ✅ salva!', signature);
   };
 
-  // expõe promise para o PDF aguardar
+  // expõe promise para o PDF aguardar (SEM async)
+try {
   window.__SELFIECARD_PROMISE__ = new Promise((resolve) => {
     setTimeout(() => {
+      const done = () => resolve(true);
+
       if ('requestIdleCallback' in window) {
-        requestIdleCallback(async () => { await run(); resolve(true); }, { timeout: 1200 });
+        requestIdleCallback(() => {
+          Promise.resolve()
+            .then(() => run())
+            .then(done)
+            .catch(done);
+        }, { timeout: 1200 });
       } else {
-        Promise.resolve(run()).then(() => resolve(true));
+        Promise.resolve()
+          .then(() => run())
+          .then(done)
+          .catch(done);
       }
     }, 60);
   });
+} catch {
+  window.__SELFIECARD_PROMISE__ = Promise.resolve(true);
 }
   // -----------------------------
   // Navegação
   // -----------------------------
- async function goNext() {
+function goNext() {
   try { speechSynthesis.cancel(); } catch {}
 
-  // espera a selfiecard terminar (máx ~900ms)
-  try {
-    await Promise.race([
-      window.__SELFIECARD_PROMISE__ || Promise.resolve(),
-      new Promise(r => setTimeout(r, 900))
-    ]);
-  } catch {}
+  const proceed = () => {
+    if (typeof window.playTransitionVideo === 'function') {
+      window.playTransitionVideo(VIDEO_SRC, NEXT_SECTION_ID);
+      return;
+    }
+    if (window.JC && typeof window.JC.show === 'function') {
+      window.JC.show(NEXT_SECTION_ID, { force: true });
+    }
+  };
 
-  if (typeof window.playTransitionVideo === 'function') {
-    window.playTransitionVideo(VIDEO_SRC, NEXT_SECTION_ID);
-    return;
-  }
-  if (window.JC && typeof window.JC.show === 'function') {
-    window.JC.show(NEXT_SECTION_ID, { force: true });
+  try {
+    Promise.race([
+      window.__SELFIECARD_PROMISE__ || Promise.resolve(),
+      new Promise((r) => setTimeout(r, 900)),
+    ]).then(proceed).catch(proceed);
+  } catch {
+    proceed();
   }
 }
 
