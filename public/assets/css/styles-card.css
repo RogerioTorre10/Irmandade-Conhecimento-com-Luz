@@ -171,6 +171,58 @@
 #section-card #btnNext:hover {
   background: rgba(20, 20, 20, 0.55);
 }
+/* =========================================================
+   FIX — section-card: footer (nome + botão) no rodapé
+   ========================================================= */
+
+#section-card .conteudo-pergaminho{
+  position: relative !important;
+  min-height: 100% !important;
+}
+
+/* o BG não pode empurrar layout */
+#section-card #guideBg{
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  z-index: 1 !important;
+  pointer-events: none !important;
+}
+
+/* placeholder/selfie “flutuando” mais pra baixo */
+#section-card .flame-layer{
+  position: absolute !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  bottom: 130px !important;         /* ajuste fino */
+  z-index: 3 !important;
+}
+
+/* nome sempre abaixo do placeholder */
+#section-card .card-footer{
+  margin-top: 14px !important;
+}
+
+/* botão continuar sempre no rodapé */
+#section-card .card-actions-below{
+  position: absolute !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  bottom: 44px !important;          /* ajuste fino */
+  z-index: 4 !important;
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+}
+
+/* garante que nada “suba” por margem errada */
+#section-card .titulo-selfie{
+  position: relative !important;
+  z-index: 5 !important;
+  margin-bottom: 10px !important;
+}
 
 /* =======================================================
    SECTION-CARD — MOBILE PERFECT (Lumen Mobile Fix v4)
