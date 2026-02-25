@@ -207,6 +207,59 @@ function buildMarkup(section) {
     });
   }
 
+   function drawGoldFrame(ctx, W, H, opts = {}) {
+  const pad  = Math.max(10, opts.pad ?? 28);     // “moldura externa” (espessura)
+  const rad  = Math.max(6,  opts.radius ?? 22);  // raio cantos
+  const glow = opts.glow ?? true;
+
+  function rrPath(x, y, w, h, r) {
+    const rr = Math.min(r, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + rr, y);
+    ctx.arcTo(x + w, y, x + w, y + h, rr);
+    ctx.arcTo(x + w, y + h, x, y + h, rr);
+    ctx.arcTo(x, y + h, x, y, rr);
+    ctx.arcTo(x, y, x + w, y, rr);
+    ctx.closePath();
+  }
+
+  const x = pad / 2;
+  const y = pad / 2;
+  const w = W - pad;
+  const h = H - pad;
+
+  ctx.save();
+
+  // Glow suave externo
+  if (glow) {
+    ctx.shadowBlur = Math.max(8, pad * 0.75);
+    ctx.shadowColor = 'rgba(255, 215, 90, 0.55)';
+  }
+
+  // Aro dourado (várias passadas pra dar “profundidade”)
+  const strokes = [
+    { lw: Math.max(8, pad * 0.36), col: 'rgba(255, 220, 120, 0.95)' },
+    { lw: Math.max(5, pad * 0.22), col: 'rgba(210, 150, 40, 0.95)' },
+    { lw: Math.max(3, pad * 0.14), col: 'rgba(255, 245, 200, 0.85)' },
+  ];
+
+  strokes.forEach(s => {
+    ctx.lineWidth = s.lw;
+    ctx.strokeStyle = s.col;
+    rrPath(x, y, w, h, rad);
+    ctx.stroke();
+  });
+
+  // Linha interna pra “separar” a arte do frame
+  ctx.shadowBlur = 0;
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+  rrPath(x + pad * 0.18, y + pad * 0.18, w - pad * 0.36, h - pad * 0.36, rad * 0.85);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
   function makeWhiteTransparent(img, threshold = 245) {
     const c = document.createElement('canvas');
     c.width = img.naturalWidth || img.width;
