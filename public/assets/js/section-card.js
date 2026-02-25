@@ -78,7 +78,6 @@ function canonGuia(v) {
  function persistGuiaCanon(g) {
   const guiaCanon = canonGuia(g);
   if (!guiaCanon || !CARD_BG[guiaCanon]) return;
-
   try {
     window.JORNADA_STATE = window.JORNADA_STATE || {};
     window.JORNADA_STATE.guia = guiaCanon;
@@ -228,16 +227,10 @@ function buildMarkup(section) {
     return c;
   }
 
-// -----------------------------
-// SELFIECARD — SAFE MODE (FIX)
-// - 1x por sessão OU quando (nome+guia) mudar
-// - placeholder 2x2 (rounded square) no peito
-// - moldura FULL-BLEED (fora do card) sem “borda escura”
-// -----------------------------
 function selfieCardSafeMode(section, ctxData) {
   const nome = (ctxData?.nome || getNome() || 'PARTICIPANTE').trim();
 
-  // guia canon vem do ctxData primeiro, depois storages/state
+  // fonte única do guia (canon)
   const guia =
     canonGuia(ctxData?.guia) ||
     canonGuia(sessionStorage.getItem('JORNADA_GUIA')) ||
@@ -246,14 +239,14 @@ function selfieCardSafeMode(section, ctxData) {
     canonGuia(window.JORNADA_STATE?.guia) ||
     'zion';
 
-  // garante persistência pra não “voltar guia fantasma”
+  // grava também aqui (segurança)
   try {
     sessionStorage.setItem('JORNADA_GUIA', guia);
     localStorage.setItem('JORNADA_GUIA', guia);
     window.JORNADA_STATE = window.JORNADA_STATE || {};
     window.JORNADA_STATE.guia = guia;
     window.JORNADA_STATE.guiaSelecionado = guia;
-  } catch (_) {}
+  } catch {}
 
   const signature = `${nome}__${guia}`;
   const last = sessionStorage.getItem('__SELFIECARD_SIG__') || '';
@@ -261,126 +254,133 @@ function selfieCardSafeMode(section, ctxData) {
   sessionStorage.setItem('__SELFIECARD_SIG__', signature);
 
   const run = async () => {
-    try {
-      const sec = section || document.getElementById('section-card') || document;
+    const sec = section || document.getElementById('section-card') || document;
 
-      const selfieSrc = sec.querySelector('#selfieImage')?.src || '';
-      const bgSrc =
-        sec.querySelector('#guideBg')?.src ||
-        (CARD_BG?.[guia] || CARD_BG?.zion || '');
+    const selfieSrc = sec.querySelector('#selfieImage')?.src || '';
+    const bgSrc =
+      sec.querySelector('#guideBg')?.src ||
+      (CARD_BG?.[guia] || CARD_BG?.zion || '');
 
-      const selfieImg = await loadImg(selfieSrc);
-      const bgImg = await loadImg(bgSrc);
-      const frameImg = await loadImg(FRAME_SRC);
+    const selfieImg = await loadImg(selfieSrc);
+    const bgImg = await loadImg(bgSrc);
+    const frameImg = await loadImg(FRAME_SRC);
 
-      if (!selfieImg) {
-        console.warn('[CARD][SELFIECARD] selfieImg não carregou.');
-        return;
-      }
-
-      const frameCanvas = frameImg || null;
-
-      const W = 512, H = 720;
-      const canvas = document.createElement('canvas');
-      canvas.width = W; canvas.height = H;
-      const c = canvas.getContext('2d', { alpha: true });
-
-      // 0) fundo sólido (evita “xadrez” em alguns viewers)
-      c.fillStyle = '#0b0f16';
-      c.fillRect(0, 0, W, H);
-
-      // 1) BG do guia (cover)
-      if (bgImg && bgImg.naturalWidth > 0) {
-        const r = Math.max(W / bgImg.naturalWidth, H / bgImg.naturalHeight);
-        const dw = bgImg.naturalWidth * r;
-        const dh = bgImg.naturalHeight * r;
-        c.drawImage(bgImg, (W - dw) / 2, (H - dh) / 2, dw, dh);
-      }
-
-      // helper: rounded rect
-      function roundRectPath(ctx, x, y, w, h, r) {
-        const rr = Math.max(0, Math.min(r, Math.min(w, h) / 2));
-        ctx.beginPath();
-        ctx.moveTo(x + rr, y);
-        ctx.arcTo(x + w, y, x + w, y + h, rr);
-        ctx.arcTo(x + w, y + h, x, y + h, rr);
-        ctx.arcTo(x, y + h, x, y, rr);
-        ctx.arcTo(x, y, x + w, y, rr);
-        ctx.closePath();
-      }
-
-      // 2) “2x2” no peito
-      const cx = W / 2;
-      const cy = Math.round(H * 0.66);        // ajuste fino (0.64~0.68)
-      const box = Math.round(W * 0.34);       // tamanho do quadrado
-      const rBox = Math.round(box * 0.18);    // arredondamento
-      const x0 = Math.round(cx - box / 2);
-      const y0 = Math.round(cy - box / 2);
-
-      c.save();
-      roundRectPath(c, x0, y0, box, box, rBox);
-      c.clip();
-
-      const sw = selfieImg.naturalWidth || 1;
-      const sh = selfieImg.naturalHeight || 1;
-      const scale = Math.max(box / sw, box / sh);
-      const dw = sw * scale;
-      const dh = sh * scale;
-      c.drawImage(selfieImg, cx - dw / 2, cy - dh / 2, dw, dh);
-      c.restore();
-
-      // 3) Moldura “por fora” (FULL BLEED)
-      //    Aumente/diminua o BLEED até ficar idêntico ao seu print 2.
-      const BLEED = 22; // 18~28 (quanto maior, mais “pra fora”)
-      if (frameCanvas) c.drawImage(frameCanvas, -BLEED, -BLEED, W + BLEED * 2, H + BLEED * 2);
-      else if (frameImg) c.drawImage(frameImg, -BLEED, -BLEED, W + BLEED * 2, H + BLEED * 2);
-
-      // 4) textos
-      const nomeY = Math.round(H * 0.86);
-      const guiaY = Math.round(H * 0.91);
-      const guiaNome = prettyGuia(guia);
-
-      c.textAlign = 'center';
-      c.fillStyle = 'rgba(255,255,255,0.92)';
-      c.font = 'bold 30px Cardo, serif';
-      c.fillText(nome.toUpperCase(), cx, nomeY);
-
-      c.fillStyle = 'rgba(255,255,255,0.75)';
-      c.font = '22px Cardo, serif';
-      c.fillText(guiaNome ? `Guia: ${guiaNome}` : 'Guia: —', cx, guiaY);
-
-      // 5) export
-      let dataUrl = '';
-      try {
-        dataUrl = canvas.toDataURL('image/png');
-      } catch (err) {
-        console.error('[CARD][SELFIECARD] toDataURL falhou (CORS/tainted?)', err);
-        return;
-      }
-
-      sessionStorage.setItem('JORNADA_SELFIECARD', dataUrl);
-      sessionStorage.setItem('SELFIE_CARD', dataUrl);
-      try {
-        localStorage.setItem('JORNADA_SELFIECARD', dataUrl);
-        localStorage.setItem('SELFIE_CARD', dataUrl);
-      } catch (_) {}
-
-      window.JORNADA_STATE = window.JORNADA_STATE || {};
-      window.JORNADA_STATE.selfieCard = dataUrl;
-
-      console.log('[CARD][SELFIECARD] ✅ salva!', signature);
-    } catch (e) {
-      console.error('[CARD][SELFIECARD] erro:', e);
+    if (!selfieImg) {
+      console.warn('[CARD][SELFIECARD] selfieImg não carregou.');
+      return;
     }
+
+    // moldura pode ser PNG já transparente; se vier “branco sujo”, tenta limpar
+    let frameCanvas = null;
+    if (frameImg) {
+      try { frameCanvas = makeWhiteTransparent(frameImg, 245); }
+      catch { frameCanvas = null; }
+    }
+
+    const W = 512, H = 720;
+    const canvas = document.createElement('canvas');
+    canvas.width = W; canvas.height = H;
+    const c = canvas.getContext('2d', { alpha: true });
+
+    // FUNDO sólido (evita “efeito xadrez” em alguns viewers)
+    c.fillStyle = '#0b0f16';
+    c.fillRect(0, 0, W, H);
+
+    // ==============================
+    // CONTEÚDO DENTRO DA MOLDURA
+    // padding garante moldura externa sem cobrir texto/bg
+    // ==============================
+    const P = 34; // ajuste fino (28~40). 34 costuma ficar perfeito p/ molduras grossas
+    const ix = P, iy = P, iw = W - 2 * P, ih = H - 2 * P;
+
+    // BG do guia (cover) DENTRO do retângulo interno
+    if (bgImg && bgImg.naturalWidth > 0) {
+      const r = Math.max(iw / bgImg.naturalWidth, ih / bgImg.naturalHeight);
+      const dw = bgImg.naturalWidth * r;
+      const dh = bgImg.naturalHeight * r;
+      c.drawImage(bgImg, ix + (iw - dw) / 2, iy + (ih - dh) / 2, dw, dh);
+    } else {
+      c.fillStyle = 'rgba(0,0,0,0.35)';
+      c.fillRect(ix, iy, iw, ih);
+    }
+
+    // helper: rounded rect
+    function roundRectPath(ctx, x, y, w, h, r) {
+      const rr = Math.max(0, Math.min(r, Math.min(w, h) / 2));
+      ctx.beginPath();
+      ctx.moveTo(x + rr, y);
+      ctx.arcTo(x + w, y, x + w, y + h, rr);
+      ctx.arcTo(x + w, y + h, x, y + h, rr);
+      ctx.arcTo(x, y + h, x, y, rr);
+      ctx.arcTo(x, y, x + w, y, rr);
+      ctx.closePath();
+    }
+
+    // Placeholder 2x2 (quadrado arredondado) no peito
+    const cx = ix + iw / 2;
+    const cy = iy + ih * 0.62;        // ajuste fino peito: 0.60~0.66
+    const box = iw * 0.34;            // “2x2”
+    const rBox = box * 0.18;
+    const x0 = Math.round(cx - box / 2);
+    const y0 = Math.round(cy - box / 2);
+
+    c.save();
+    roundRectPath(c, x0, y0, box, box, rBox);
+    c.clip();
+
+    const sw = selfieImg.naturalWidth || 1;
+    const sh = selfieImg.naturalHeight || 1;
+    const scale = Math.max(box / sw, box / sh);
+    const dw = sw * scale;
+    const dh = sh * scale;
+    c.drawImage(selfieImg, cx - dw / 2, cy - dh / 2, dw, dh);
+    c.restore();
+
+    // Textos dentro do retângulo interno (não ficam sob a moldura)
+    const guiaNome = (typeof prettyGuia === 'function') ? prettyGuia(guia) : guia;
+
+    c.textAlign = 'center';
+    c.fillStyle = 'rgba(255,255,255,0.92)';
+    c.font = 'bold 30px Cardo, serif';
+    c.fillText(nome.toUpperCase(), cx, iy + ih * 0.90);
+
+    c.fillStyle = 'rgba(255,255,255,0.78)';
+    c.font = '22px Cardo, serif';
+    c.fillText(`Guia: ${guiaNome || '—'}`, cx, iy + ih * 0.95);
+
+    // ==============================
+    // MOLDURA EXTERNA (full canvas)
+    // ==============================
+    if (frameCanvas) c.drawImage(frameCanvas, 0, 0, W, H);
+    else if (frameImg) c.drawImage(frameImg, 0, 0, W, H);
+
+    // Export
+    const dataUrl = canvas.toDataURL('image/png');
+
+    sessionStorage.setItem('JORNADA_SELFIECARD', dataUrl);
+    sessionStorage.setItem('SELFIE_CARD', dataUrl);
+    try {
+      localStorage.setItem('JORNADA_SELFIECARD', dataUrl);
+      localStorage.setItem('SELFIE_CARD', dataUrl);
+    } catch {}
+
+    window.JORNADA_STATE = window.JORNADA_STATE || {};
+    window.JORNADA_STATE.selfieCard = dataUrl;
+
+    console.log('[CARD][SELFIECARD] ✅ salva!', signature);
   };
 
-  // roda AGORA e guarda uma promise global (pra final/PDF poder aguardar)
-try {
-  window.__SELFIECARD_PROMISE__ = run();
-} catch (_) {
-  run();
+  // expõe promise para o PDF aguardar
+  window.__SELFIECARD_PROMISE__ = new Promise((resolve) => {
+    setTimeout(() => {
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(async () => { await run(); resolve(true); }, { timeout: 1200 });
+      } else {
+        Promise.resolve(run()).then(() => resolve(true));
+      }
+    }, 60);
+  });
 }
-
   // -----------------------------
   // Navegação
   // -----------------------------
