@@ -398,6 +398,13 @@ function selfieCardSafeMode(section, ctxData) {
     c.drawImage(selfieImg, cx - dw / 2, cy - dh / 2, dw, dh);
     c.restore();
 
+     // ===== NOVA MOLDURA GERADA POR CÓDIGO =====
+    drawGoldFrame(c, W, H, {
+    pad: 28,      // espessura da moldura
+    radius: 28,   // cantos arredondados
+    glow: true
+   });
+
     // Textos dentro do retângulo interno (não ficam sob a moldura)
     const guiaNome = (typeof prettyGuia === 'function') ? prettyGuia(guia) : guia;
 
