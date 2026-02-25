@@ -404,8 +404,8 @@ function selfieCardSafeMode(section, ctxData) {
     // ==============================
     // MOLDURA EXTERNA (full canvas)
     // ==============================
-    if (frameCanvas) c.drawImage(frameCanvas, 0, 0, W, H);
-    else if (frameImg) c.drawImage(frameImg, 0, 0, W, H);
+    //if (frameCanvas) c.drawImage(frameCanvas, 0, 0, W, H);
+    //else if (frameImg) c.drawImage(frameImg, 0, 0, W, H);
 
     // Export
     const dataUrl = canvas.toDataURL('image/png');
