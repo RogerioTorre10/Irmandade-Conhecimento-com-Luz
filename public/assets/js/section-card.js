@@ -154,16 +154,23 @@ function buildMarkup(section) {
 
     const selfieImg = qs('#selfieImage', section);
     if (selfieImg) {
-      let src = '';
-      try {
-        src =
-          window.JORNADA_STATE?.selfieDataUrl ||
-          window.JC?.data?.selfieDataUrl ||
-          localStorage.getItem('jc.selfieDataUrl') ||
-          localStorage.getItem('JORNADA_SELFIE') ||
-          '';
-      } catch {}
-      selfieImg.src = src || PLACEHOLDER_SELFIE;
+      let src = null;
+try {
+  src =
+    (window.JC && window.JC.data && window.JC.data.selfieDataUrl) ||
+    localStorage.getItem('jc.selfieDataUrl') ||
+    sessionStorage.getItem('JORNADA_SELFIE') ||
+    localStorage.getItem('JORNADA_SELFIE') ||
+    '';
+} catch {}
+
+try {
+  const sc1 = sessionStorage.getItem('JORNADA_SELFIECARD') || '';
+  const sc2 = sessionStorage.getItem('SELFIE_CARD') || '';
+  if (src && (src === sc1 || src === sc2)) src = '';
+} catch {}
+
+selfieImg.src = src || PLACEHOLDER_SELFIE;
     }
 
     const nameSlot = qs('#userNameSlot', section);
