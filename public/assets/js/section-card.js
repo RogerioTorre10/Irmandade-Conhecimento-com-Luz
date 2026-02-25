@@ -387,7 +387,7 @@ function selfieCardSafeMode(section, ctxData) {
 
     // Placeholder 2x2 (quadrado arredondado) no peito
     const cx = ix + iw / 2;
-    const cy = iy + ih * 0.71;        // ajuste fino peito: 0.60~0.66
+    const cy = iy + ih * 0.72;        // ajuste fino peito: 0.60~0.66
     const box = iw * 0.34;            // “2x2”
     const rBox = box * 0.18;
     const x0 = Math.round(cx - box / 2);
