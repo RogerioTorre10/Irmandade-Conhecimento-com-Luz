@@ -189,8 +189,8 @@ function buildMarkup(section) {
   }
 
    function drawGoldFrame(ctx, W, H, opts = {}) {
-  const pad = Math.max(10, opts.pad ?? 26);     // “largura” útil da moldura
-  const rad = Math.max(6, opts.radius ?? 26);  // raio dos cantos
+  const pad = Math.max(10, opts.pad ?? 28);     // “largura” útil da moldura
+  const rad = Math.max(6, opts.radius ?? 28);  // raio dos cantos
   const glow = opts.glow ?? true;
 
   function rrPath(x, y, w, h, r) {
