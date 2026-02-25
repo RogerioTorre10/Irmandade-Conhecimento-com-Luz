@@ -549,17 +549,38 @@ btnBaixarImg.addEventListener('click', (ev) => {
 
   // PDF
   if (btnPdf) {
-    btnPdf.onclick = async (ev) => {
-      ev.preventDefault();
-      ev.stopPropagation();
+  btnPdf.onclick = async (ev) => {
+    ev.preventDefault();
+    ev.stopPropagation();
+
+    try {
+      // ⏳ AGUARDA a selfiecard terminar de renderizar (máx 900ms)
       try {
-        const payload = buildFinalPayloadDiamante(); // a mesma função que você já usa
-        await gerarPDFEHQ(payload);                  // sua função do api.js
-      } catch (e) {
-        console.error('[FINAL] erro ao gerar PDF:', e);
-      }
-    };
-  }
+        await Promise.race([
+          window.__SELFIECARD_PROMISE__ || Promise.resolve(),
+          new Promise(r => setTimeout(r, 900))
+        ]);
+      } catch {}
+
+      // 🔑 pega a selfieCard da fonte correta
+      const selfieCard =
+        sessionStorage.getItem('JORNADA_SELFIECARD') ||
+        localStorage.getItem('JORNADA_SELFIECARD') ||
+        window.JORNADA_STATE?.selfieCard ||
+        '';
+
+      const payload = buildFinalPayloadDiamante();
+
+      // garante que vai pro backend a imagem CERTA
+      payload.selfieCard = selfieCard;
+
+      await gerarPDFEHQ(payload);
+
+    } catch (e) {
+      console.error('[FINAL] erro ao gerar PDF:', e);
+    }
+  };
+}
 
   // SelfieCard
   if (btnSelf) {
