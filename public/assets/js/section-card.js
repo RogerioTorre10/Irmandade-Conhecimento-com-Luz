@@ -333,19 +333,11 @@ function selfieCardSafeMode(section, ctxData) {
 
     const selfieImg = await loadImg(selfieSrc);
     const bgImg = await loadImg(bgSrc);
-    const frameImg = await loadImg(FRAME_SRC);
-
+   
     if (!selfieImg) {
       console.warn('[CARD][SELFIECARD] selfieImg não carregou.');
       return;
-    }
-
-    // moldura pode ser PNG já transparente; se vier “branco sujo”, tenta limpar
-    //let frameCanvas = null;
-   // if (frameImg) {
-   // try { frameCanvas = makeWhiteTransparent(frameImg, 245); }
-   //  catch { frameCanvas = null; }
-    }
+    }   
 
     const W = 512, H = 720;
     const canvas = document.createElement('canvas');
