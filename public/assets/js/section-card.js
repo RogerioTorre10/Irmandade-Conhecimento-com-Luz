@@ -324,10 +324,10 @@ function selfieCardSafeMode(section, ctxData) {
     }
 
     // moldura pode ser PNG já transparente; se vier “branco sujo”, tenta limpar
-    let frameCanvas = null;
-    if (frameImg) {
-      try { frameCanvas = makeWhiteTransparent(frameImg, 245); }
-      catch { frameCanvas = null; }
+    //let frameCanvas = null;
+   // if (frameImg) {
+   // try { frameCanvas = makeWhiteTransparent(frameImg, 245); }
+   //  catch { frameCanvas = null; }
     }
 
     const W = 512, H = 720;
