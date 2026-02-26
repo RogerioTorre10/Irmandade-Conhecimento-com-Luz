@@ -206,27 +206,24 @@ lastCapture = canvas.toDataURL('image/jpeg', 0.92);
 
 // ✅ SALVA SELFIE (fonte única para Card + SelfieCard + PDF)
 try {
-  sessionStorage.setItem('JORNADA_SELFIE', lastCapture);
-  localStorage.setItem('JORNADA_SELFIE', lastCapture);
+  const dataUrl = lastCapture;
 
-  // compat com versões antigas do projeto
-  localStorage.setItem('jc.selfieDataUrl', lastCapture);
-  sessionStorage.setItem('jc.selfieDataUrl', lastCapture);
+  sessionStorage.setItem('JORNADA_SELFIE', dataUrl);
+  localStorage.setItem('JORNADA_SELFIE', dataUrl);
+
+  // compat com versões antigas do projeto (card tenta ler isso)
+  sessionStorage.setItem('jc.selfieDataUrl', dataUrl);
+  localStorage.setItem('jc.selfieDataUrl', dataUrl);
 
   window.JORNADA_STATE = window.JORNADA_STATE || {};
-  window.JORNADA_STATE.selfieDataUrl = lastCapture;
+  window.JORNADA_STATE.selfieDataUrl = dataUrl;
   window.JORNADA_STATE.selfieDataUrlTs = Date.now();
 
-  console.log('[SELFIE] ✅ dataUrl salvo com sucesso');
+  console.log('[SELFIE] ✅ dataUrl salvo (JORNADA_SELFIE / jc.selfieDataUrl)');
 } catch (e) {
   console.warn('[SELFIE] erro ao salvar dataUrl:', e);
 }
-
-    videoEl.style.display = 'none';
-    canvasEl.style.display = 'block';
-    document.getElementById('btn-selfie-confirm').disabled = false;
-  }
-
+    
   function playTransitionThenGo() {
     console.log(`[SELFIE] Transição → ${NEXT_SECTION_ID}`);
     if (window.playTransitionVideo) {
