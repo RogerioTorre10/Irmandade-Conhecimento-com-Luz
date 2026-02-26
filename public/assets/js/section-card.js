@@ -104,12 +104,13 @@ function canonGuia(v) {
     if (selfieImg) {
       let src = null;
 try {
-  src =
+ src =
   window.JORNADA_STATE?.selfieDataUrl ||
-  sessionStorage.getItem('JORNADA_SELFIE') ||
-  localStorage.getItem('JORNADA_SELFIE') ||
+  window.JC?.data?.selfieDataUrl ||
+  sessionStorage.getItem('JORNADA_SELFIE') ||   // ✅ add
+  localStorage.getItem('JORNADA_SELFIE') ||     // ✅ add
   localStorage.getItem('jc.selfieDataUrl') ||
-  localStorage.getItem('JORNADA_SELFIECARD') ||  // só se quiser fallback extremo
+  localStorage.getItem('JORNADA_SELFIE') ||
   '';
 } catch {}
 
@@ -282,11 +283,19 @@ function selfieCardSafeMode(section, ctxData) {
   const run = async () => {
     const sec = section || document.getElementById('section-card') || document;
 
-    const selfieSrc = sec.querySelector('#selfieImage')?.src || '';
-    const bgSrc =
-      sec.querySelector('#guideBg')?.src ||
-      (CARD_BG?.[guia] || CARD_BG?.zion || '');
+   // pega a selfie SEM depender do DOM (fonte única)
+const selfieSrc =
+  (window.JORNADA_STATE?.selfieDataUrl || '') ||
+  (sessionStorage.getItem('JORNADA_SELFIE') || '') ||
+  (localStorage.getItem('JORNADA_SELFIE') || '') ||
+  (localStorage.getItem('jc.selfieDataUrl') || '') ||
+  (sec.querySelector('#selfieImage')?.src || '');
 
+// BG do guia (pode vir do DOM ou do mapa)
+const bgSrc =
+  (sec.querySelector('#guideBg')?.src || '') ||
+  (CARD_BG?.[guia] || CARD_BG?.zion || '');
+     
     const selfieImg = await loadImg(selfieSrc);
     const bgImg = await loadImg(bgSrc);
    
