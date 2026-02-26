@@ -383,5 +383,5 @@ try {
   document.addEventListener('sectionLoaded', () => setTimeout(applyThemeFromSession, 50));
   document.addEventListener('guia:changed', applyThemeFromSession);
 })();
-  
+  } 
 })(window);
