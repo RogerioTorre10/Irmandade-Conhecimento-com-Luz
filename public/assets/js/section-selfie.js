@@ -202,7 +202,25 @@ function tSelfie(key, vars = {}) {
     const sy = (video.videoHeight - sh) / 2;
 
     ctx.drawImage(video, sx, sy, sw, sh, 0, 0, w, h);
-    lastCapture = canvas.toDataURL('image/jpeg', 0.92);
+lastCapture = canvas.toDataURL('image/jpeg', 0.92);
+
+// ✅ SALVA SELFIE (fonte única para Card + SelfieCard + PDF)
+try {
+  sessionStorage.setItem('JORNADA_SELFIE', lastCapture);
+  localStorage.setItem('JORNADA_SELFIE', lastCapture);
+
+  // compat com versões antigas do projeto
+  localStorage.setItem('jc.selfieDataUrl', lastCapture);
+  sessionStorage.setItem('jc.selfieDataUrl', lastCapture);
+
+  window.JORNADA_STATE = window.JORNADA_STATE || {};
+  window.JORNADA_STATE.selfieDataUrl = lastCapture;
+  window.JORNADA_STATE.selfieDataUrlTs = Date.now();
+
+  console.log('[SELFIE] ✅ dataUrl salvo com sucesso');
+} catch (e) {
+  console.warn('[SELFIE] erro ao salvar dataUrl:', e);
+}
 
     videoEl.style.display = 'none';
     canvasEl.style.display = 'block';
