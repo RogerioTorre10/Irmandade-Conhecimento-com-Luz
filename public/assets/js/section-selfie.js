@@ -378,4 +378,46 @@ try {
   document.addEventListener('sectionLoaded', () => setTimeout(applyThemeFromSession, 50));
   document.addEventListener('guia:changed', applyThemeFromSession);
 }
+
+  // ===================================================
+// GARANTE INIT SEM DEPENDER DO CONTROLLER
+// ===================================================
+function initSelfieSection() {
+  const section = document.getElementById('section-selfie');
+  if (!section) return;
+
+  // tenta achar botões por IDs comuns (ajuste se seus IDs forem diferentes)
+  const btnPreview  = section.querySelector('#btn-preview, #btn-selfie-preview, [data-action="preview"]');
+  const btnCapture  = section.querySelector('#btn-capture, #btn-selfie-capture, [data-action="capture"]');
+  const btnStart    = section.querySelector('#btn-start, #btn-selfie-start, [data-action="start"]');
+  const btnSemFoto  = section.querySelector('#btn-sem-foto, #btn-selfie-semfoto, [data-action="nofoto"]');
+
+  // Se nenhum botão for encontrado, pelo menos loga pra diagnosticar
+  if (!btnPreview && !btnCapture && !btnStart && !btnSemFoto) {
+    console.warn('[SELFIE] Nenhum botão encontrado — confira IDs/data-action no HTML.');
+    return;
+  }
+
+  // Se você já tem bindUI(root) no seu arquivo, chama ele
+  if (typeof window.JCSelfie?.bindUI === 'function') {
+    window.JCSelfie.bindUI(section);
+  } else if (typeof bindUI === 'function') {
+    bindUI(section);
+  } else {
+    console.warn('[SELFIE] bindUI() não existe no escopo — botão não será ligado.');
+  }
+}
+
+// roda quando a seção entra
+document.addEventListener('sectionLoaded', (e) => {
+  if (e?.detail?.sectionId === 'section-selfie') {
+    initSelfieSection();
+  }
+});
+
+// fallback (se sectionLoaded falhar)
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(initSelfieSection, 200);
+});
+  
 })(window);
