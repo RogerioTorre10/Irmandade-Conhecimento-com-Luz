@@ -89,57 +89,6 @@ function canonGuia(v) {
 }
 
   // -----------------------------
-// Build Markup (AJUSTE MOLDURA EXTERNA — sem quebrar IDs/fluxo)
-// -----------------------------
-function buildMarkup(section) {
-  if (!section || section.__CARD_BUILT__) return;
-
-  // Wrapper externo do card (permite a moldura “sair” pra fora)
-  section.innerHTML = `
-    <div class="j-panel-glow card-panel">
-      <div class="conteudo-pergaminho">
-
-        <div class="card-wrap" style="position:relative; overflow:visible;">
-          <!-- BG do guia -->
-          <img id="guideBg" class="guide-bg" alt="Fundo do Guia"
-               style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:1;" />
-
-          <!-- camada do conteúdo do card -->
-          <div class="flame-layer show placeholder-only"
-               style="position:relative; z-index:5;">
-            <img id="selfieImage" class="flame-selfie"
-                 src="${PLACEHOLDER_SELFIE}" alt="Sua foto na Irmandade" />
-            <div class="card-footer">
-              <span class="card-name-badge">
-                <span id="userNameSlot">Carregando...</span>
-              </span>
-            </div>
-          </div>
-
-          <!-- ✅ Moldura externa (fica fora do card sem clipping) -->
-          <img id="cardFrame" src="${FRAME_SRC}" alt=""
-               style="
-                 position:absolute;
-                 top:-12px; left:-12px;
-                 width:calc(100% + 24px);
-                 height:calc(100% + 24px);
-                 object-fit:contain;
-                 pointer-events:none;
-                 z-index:8;
-               " />
-        </div>
-
-        <div class="card-actions-below">
-          <button id="btnNext" class="btn btn-stone">✅ Continuar</button>
-        </div>
-
-      </div>
-    </div>
-  `.trim();
-
-  section.__CARD_BUILT__ = true;
-}
-  // -----------------------------
   // Render UI do Card
   // -----------------------------
   function renderCard(section) {
@@ -522,14 +471,13 @@ function goNext() {
     }
   }
 
-  function init(root) {
-    const section = findSection(root || null);
-    if (!section) return;
+  function init(root){
+  const section = findSection(root || null);
+  if (!section) return;
 
-    buildMarkup(section);
-    renderCard(section);
-    bind(section);
-  }
+  renderCard(section);   // agora o CSS volta a mandar
+  bind(section);
+}
 
   // boot
   document.addEventListener('DOMContentLoaded', () => init());
