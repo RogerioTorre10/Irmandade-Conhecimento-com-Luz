@@ -106,11 +106,12 @@ function canonGuia(v) {
       let src = null;
 try {
   src =
-    (window.JC && window.JC.data && window.JC.data.selfieDataUrl) ||
-    localStorage.getItem('jc.selfieDataUrl') ||
-    sessionStorage.getItem('JORNADA_SELFIE') ||
-    localStorage.getItem('JORNADA_SELFIE') ||
-    '';
+  window.JORNADA_STATE?.selfieDataUrl ||
+  sessionStorage.getItem('JORNADA_SELFIE') ||
+  localStorage.getItem('JORNADA_SELFIE') ||
+  localStorage.getItem('jc.selfieDataUrl') ||
+  localStorage.getItem('JORNADA_SELFIECARD') ||  // só se quiser fallback extremo
+  '';
 } catch {}
 
 try {
