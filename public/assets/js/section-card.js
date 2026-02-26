@@ -16,8 +16,7 @@
   lumen: '/assets/img/irmandade-quarteto-bg-lumen.png',
   zion:  '/assets/img/irmandade-quarteto-bg-zion.png',
 };
-
-  const FRAME_SRC = '/assets/img/borda-medieval-luminosa.png';
+  
   const PLACEHOLDER_SELFIE = '/assets/img/irmandade-card-placeholder.png';
 
   const qs  = (s, r = document) => r.querySelector(s);
