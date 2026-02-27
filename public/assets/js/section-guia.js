@@ -785,17 +785,43 @@ guideButtons.forEach(b => {
     ? document.addEventListener('DOMContentLoaded', bind, { once: true })
     : bind();
 
-  // =========================================================
-  // TEMA DO GUIA — reaplica em qualquer seção quando necessário
-  // =========================================================
-  function applyThemeFromSession() {
-    const guiaRaw = sessionStorage.getItem('jornada.guia');
-    const guia = guiaRaw ? guiaRaw.toLowerCase().trim() : '';
+  document.addEventListener('DOMContentLoaded', applyThemeFromSession);
+  document.addEventListener('sectionLoaded', () => setTimeout(applyThemeFromSession, 50));
+  document.addEventListener('guia:changed', applyThemeFromSession);
 
-    let main = '#ffd700', g1 = 'rgba(255,230,180,0.85)', g2 = 'rgba(255,210,120,0.75)';
-    if (guia === 'lumen') { main = '#00ff9d'; g1 = 'rgba(0,255,157,0.90)'; g2 = 'rgba(120,255,200,0.70)'; }
-    if (guia === 'zion')  { main = '#00aaff'; g1 = 'rgba(0,170,255,0.90)'; g2 = 'rgba(255,214,91,0.70)'; }
-    if (guia === 'arian') { main = '#ff00ff'; g1 = 'rgba(255,120,255,0.95)'; g2 = 'rgba(255,180,255,0.80)'; }
+})();
+  // ===============================
+// TEMA DO GUIA (só após escolher)
+// ===============================
+(function(){
+  function canon(v){
+    const s = String(v||'').toLowerCase();
+    if (s.includes('lumen')) return 'lumen';
+    if (s.includes('zion')) return 'zion';
+    if (s.includes('arion') || s.includes('arian')) return 'arion';
+    return '';
+  }
+
+  function readGuide(){
+    return canon(
+      window.JORNADA_STATE?.guiaSelecionado ||
+      window.JORNADA_STATE?.guia ||
+      sessionStorage.getItem('JORNADA_GUIA') ||
+      localStorage.getItem('JORNADA_GUIA') ||
+      localStorage.getItem('jc.guiaSelecionado') ||
+      localStorage.getItem('jc.guia') ||
+      localStorage.getItem('guiaEscolhido')
+    );
+  }
+
+  window.applyGuideTheme = function(){
+    const guia = readGuide();
+    if (!guia) return false; // <- não mexe no dourado se ainda não escolheu
+
+    let main='#ffd700', g1='rgba(255,230,180,0.85)', g2='rgba(255,210,120,0.75)';
+    if (guia==='lumen'){ main='#00ff9d'; g1='rgba(0,255,157,0.90)'; g2='rgba(120,255,200,0.70)'; }
+    if (guia==='zion'){  main='#00aaff'; g1='rgba(0,170,255,0.90)'; g2='rgba(255,214,91,0.70)'; }
+    if (guia==='arion'){ main='#ff00ff'; g1='rgba(255,120,255,0.95)'; g2='rgba(255,180,255,0.80)'; }
 
     document.documentElement.style.setProperty('--theme-main-color', main);
     document.documentElement.style.setProperty('--progress-main', main);
@@ -803,11 +829,9 @@ guideButtons.forEach(b => {
     document.documentElement.style.setProperty('--progress-glow-2', g2);
     document.documentElement.style.setProperty('--guide-color', main);
 
-    if (guia) document.body.setAttribute('data-guia', guia);
-  }
-
-  document.addEventListener('DOMContentLoaded', applyThemeFromSession);
-  document.addEventListener('sectionLoaded', () => setTimeout(applyThemeFromSession, 50));
-  document.addEventListener('guia:changed', applyThemeFromSession);
-
+    document.body.setAttribute('data-guia', guia);
+    console.log('[THEME] aplicado:', guia);
+    return true;
+  };
 })();
+
