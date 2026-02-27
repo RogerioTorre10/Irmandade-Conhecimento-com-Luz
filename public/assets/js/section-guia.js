@@ -475,6 +475,7 @@ if (btnAvancar) {
   function armGuide(root, btn, label) {
     const guiaId = (btn?.dataset?.guia || '').toLowerCase().trim();
     if (!guiaId) return;
+    const guiaCanon = canonGuia(guiaId);
 
     if (armedId === guiaId) {
       confirmGuide(guiaId);
