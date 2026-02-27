@@ -2202,4 +2202,10 @@ body {
     bottom: 84px !important;
   }
 }
+body.vt-playing .section {
+  visibility: hidden !important;
+}
 
+body.vt-playing #vt-overlay {
+  visibility: visible !important;
+}
