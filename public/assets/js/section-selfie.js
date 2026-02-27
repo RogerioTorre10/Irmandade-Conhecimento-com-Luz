@@ -135,26 +135,6 @@
     ctx.drawImage(video, sx, sy, sw, sh, 0, 0, w, h);
     lastCapture = canvas.toDataURL('image/jpeg', 0.92);
 
-    // ✅ SALVA SELFIE (fonte única p/ Card + SelfieCard + PDF)
-try {
-  // chaves oficiais
-  sessionStorage.setItem('JORNADA_SELFIE', lastCapture);
-  localStorage.setItem('JORNADA_SELFIE', lastCapture);
-
-  // compat com versões antigas / outras leituras
-  localStorage.setItem('jc.selfieDataUrl', lastCapture);
-  sessionStorage.setItem('jc.selfieDataUrl', lastCapture);
-
-  // estado global
-  window.JORNADA_STATE = window.JORNADA_STATE || {};
-  window.JORNADA_STATE.selfieDataUrl = lastCapture;
-  window.JORNADA_STATE.selfieDataUrlTs = Date.now();
-
-  console.log('[SELFIE] ✅ selfie salva (JORNADA_SELFIE / jc.selfieDataUrl)');
-} catch (e) {
-  console.warn('[SELFIE] falha ao salvar selfie:', e);
-}
-
     videoEl.style.display = 'none';
     canvasEl.style.display = 'block';
     document.getElementById('btn-selfie-confirm').disabled = false;
