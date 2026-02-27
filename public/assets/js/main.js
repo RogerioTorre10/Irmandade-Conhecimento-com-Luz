@@ -495,4 +495,5 @@
   document.addEventListener('DOMContentLoaded', applyGold);
 })();
   });
+  };
 })();
