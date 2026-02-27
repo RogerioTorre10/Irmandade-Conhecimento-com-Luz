@@ -104,11 +104,11 @@
     frame.appendChild(ambient);
     frame.appendChild(video);
     frame.appendChild(skip);
-    overlay.appendChild(frame);
-    document.body.appendChild(overlay);
+   overlay.appendChild(frame);
+document.body.appendChild(overlay);
 
 // ===============================
-// DIAMANTE: overlay sempre acima de tudo
+// DIAMANTE: overlay acima de tudo
 // ===============================
 overlay.style.position = 'fixed';
 overlay.style.inset = '0';
@@ -116,15 +116,15 @@ overlay.style.width = '100vw';
 overlay.style.height = '100vh';
 overlay.style.zIndex = '2147483647';
 overlay.style.pointerEvents = 'auto';
+overlay.style.display = 'block';
+overlay.style.opacity = '1';
+overlay.style.visibility = 'visible';
+overlay.style.background = '#000';
 
-// trava “vazamento” de outras sections durante o filme
-document.documentElement.style.overflow = '';
-document.body.classList.remove('vt-playing');
-if (overlay?.parentNode) overlay.parentNode.removeChild(overlay);
-    
+document.body.classList.add('vt-playing');
 
-    // glamour fade-in do portal
-    requestAnimationFrame(() => overlay.classList.add('show'));
+// glamour fade-in do portal
+requestAnimationFrame(() => overlay.classList.add('show'));
 
     return { overlay, frame, video, ambient, skip };
   }
