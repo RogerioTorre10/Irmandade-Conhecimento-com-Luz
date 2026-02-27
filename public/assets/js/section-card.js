@@ -296,14 +296,19 @@ const bgSrc =
   (sec.querySelector('#guideBg')?.src || '') ||
   (CARD_BG?.[guia] || CARD_BG?.zion || '');
      
-    const selfieImg = await loadImg(selfieSrc);
-    const bgImg = await loadImg(bgSrc);
-   
-    if (!selfieImg) {
-      console.warn('[CARD][SELFIECARD] selfieImg não carregou.');
-      return;
-    }   
+    let selfieImg = await loadImg(selfieSrc);
 
+// fallback duro: nunca trava
+if (!selfieImg) {
+  console.warn('[CARD][SELFIECARD] selfieImg não carregou. Usando PLACEHOLDER_SELFIE.');
+  selfieImg = await loadImg(PLACEHOLDER_SELFIE);
+}
+
+// se até placeholder falhar, aí sim aborta
+if (!selfieImg) {
+  console.warn('[CARD][SELFIECARD] PLACEHOLDER_SELFIE também falhou.');
+  return;
+}
     const W = 512, H = 720;
     const canvas = document.createElement('canvas');
     canvas.width = W; canvas.height = H;
