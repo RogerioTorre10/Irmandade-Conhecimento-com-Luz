@@ -480,8 +480,11 @@
       'zion'
     );
   }
-
- // DEFAULT DOURADO (início da jornada) — não força guia
+  })();
+/* =====================================================
+   DEFAULT DOURADO (início da jornada) — não força guia
+   (main.js deve ter SOMENTE isso de tema)
+   ===================================================== */
 (function(){
   function applyGold(){
     const main = '#ffd700';
@@ -495,5 +498,5 @@
   document.addEventListener('DOMContentLoaded', applyGold);
 })();
   });
-  }();
+ 
 })();
