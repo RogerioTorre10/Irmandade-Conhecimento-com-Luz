@@ -2104,5 +2104,102 @@ body {
   html, body { overflow-x: hidden; }
 }
 
+/* =========================
+   DIAMANTE: CONTROLES NO PÉ DO CARD
+   (placeholder / input nome / continuar)
+   ========================= */
 
+/* 1) Containers das seções viram "palco" */
+#section-guia,
+#section-selfie,
+#section-card {
+  position: relative !important;
+}
+
+/* 2) A “área útil” dentro do card ocupa a altura e empurra controles pra baixo */
+#section-guia .conteudo-pergaminho,
+#section-selfie .conteudo-pergaminho,
+#section-card .conteudo-pergaminho,
+#section-guia .j-perg-v-inner,
+#section-selfie .j-perg-v-inner,
+#section-card .j-perg-v-inner {
+  position: relative !important;
+  min-height: 72vh !important;     /* ajuste base (mobile) */
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* 3) Wrapper de ações (botões) SEMPRE no final */
+#section-guia .card-actions,
+#section-selfie .card-actions,
+#section-card .card-actions,
+#section-guia .card-actions-below,
+#section-selfie .card-actions-below,
+#section-card .card-actions-below,
+#section-guia .actions,
+#section-selfie .actions,
+#section-card .actions {
+  margin-top: auto !important;
+  padding-bottom: 18px !important;
+}
+
+/* 4) Input de nome + botão continuar ancorados no fundo (CSS vence inline JS) */
+#section-guia .guia-name-input,
+#section-guia .name-input,
+#section-guia .name-wrap,
+#section-guia #guiaNameInput,
+#section-guia #btnContinuar,
+#section-guia #btnNext,
+#section-guia #btnContinue {
+  position: relative !important;
+  top: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+}
+
+/* 5) Caso o teu layout use “overlay” no meio (como no print),
+      força o overlay a ir para baixo */
+#section-selfie .overlay,
+#section-card .overlay,
+#section-selfie .card-overlay,
+#section-card .card-overlay,
+#section-selfie .center-overlay,
+#section-card .center-overlay {
+  position: absolute !important;
+  left: 50% !important;
+  top: auto !important;
+  bottom: 20px !important;         /* << aqui desce pro pé */
+  transform: translateX(-50%) !important;
+  margin: 0 !important;
+}
+
+/* 6) Badge do nome (GISELY) sempre no rodapé do card */
+#section-selfie .card-name-badge,
+#section-card .card-name-badge,
+#section-selfie .name-badge,
+#section-card .name-badge {
+  position: absolute !important;
+  left: 50% !important;
+  bottom: 92px !important;         /* acima do botão */
+  transform: translateX(-50%) !important;
+}
+
+/* 7) Ajuste fino p/ mobile pequeno */
+@media (max-width: 420px) {
+  #section-guia .conteudo-pergaminho,
+  #section-selfie .conteudo-pergaminho,
+  #section-card .conteudo-pergaminho {
+    min-height: 76vh !important;
+  }
+  #section-selfie .overlay,
+  #section-card .overlay,
+  #section-selfie .card-overlay,
+  #section-card .card-overlay {
+    bottom: 16px !important;
+  }
+  #section-selfie .card-name-badge,
+  #section-card .card-name-badge {
+    bottom: 84px !important;
+  }
+}
 
