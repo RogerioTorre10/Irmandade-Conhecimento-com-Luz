@@ -1,4 +1,4 @@
-/* /assets/js/section-card.js — REBUILD LIMPO DO CARD (versão estável + FIX GUIA) */
+/* /assets/js/section-card.js — REBUILD LIMPO DO CARD (versão estável) */
 (function () {
   'use strict';
 
@@ -18,46 +18,20 @@
   const qs  = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
 
-  function normStr(v) {
-    return String(v || '').trim();
-  }
-
-  function normalizeGuide(raw) {
-    const g = normStr(raw).toLowerCase();
-
-    // aliases defensivos
-    if (g === 'arion') return 'arian';
-    if (g === 'aryan') return 'arian';
-
-    if (g === 'arian' || g === 'lumen' || g === 'zion') return g;
-    return ''; // desconhecido
-  }
-
   // ---- Dados do usuário (nome + guia + selfie) ----
   function getUserData() {
     let nome = 'AMOR';
     let guia = 'zion';
 
     try {
-      // 1) sessionStorage (mais fiel ao "agora" do fluxo)
-      const ssNome = sessionStorage.getItem('jornada.nome') || sessionStorage.getItem('jc.nome');
-      const ssGuia = sessionStorage.getItem('jornada.guia') || sessionStorage.getItem('jc.guia');
-
-      // 2) window.JC.data (quando o controller mantém estado em memória)
-      const jcNome = (window.JC && window.JC.data && window.JC.data.nome) ? window.JC.data.nome : '';
-      const jcGuia = (window.JC && window.JC.data && window.JC.data.guia) ? window.JC.data.guia : '';
-
-      // 3) localStorage (fallback)
+      if (window.JC && window.JC.data) {
+        if (window.JC.data.nome) nome = window.JC.data.nome;
+        if (window.JC.data.guia) guia = window.JC.data.guia;
+      }
       const lsNome = localStorage.getItem('jc.nome');
       const lsGuia = localStorage.getItem('jc.guia');
-
-      const resolvedNome = ssNome || jcNome || lsNome || nome;
-      const resolvedGuia = ssGuia || jcGuia || lsGuia || guia;
-
-      nome = normStr(resolvedNome) || 'AMOR';
-
-      const normGuia = normalizeGuide(resolvedGuia);
-      guia = normGuia || 'zion';
+      if (lsNome) nome = lsNome;
+      if (lsGuia) guia = lsGuia;
     } catch (e) {
       console.warn('[CARD] Erro ao ler dados:', e);
     }
@@ -128,10 +102,8 @@
     if (selfieImg) {
       let src = null;
       try {
-        src =
-          (window.JC && window.JC.data && window.JC.data.selfieDataUrl) ||
-          sessionStorage.getItem('jc.selfieDataUrl') ||
-          localStorage.getItem('jc.selfieDataUrl');
+        src = (window.JC && window.JC.data && window.JC.data.selfieDataUrl) ||
+              localStorage.getItem('jc.selfieDataUrl');
       } catch {}
       selfieImg.src = src || PLACEHOLDER_SELFIE;
     }
@@ -141,13 +113,7 @@
       nameSlot.textContent = nome;
     }
 
-    console.log('%c[CARD] Render ok!', 'color: gold', {
-      nome,
-      guia,
-      ssGuia: (typeof sessionStorage !== 'undefined') ? sessionStorage.getItem('jornada.guia') : null,
-      jcGuia: (window.JC && window.JC.data) ? window.JC.data.guia : null,
-      lsGuia: (typeof localStorage !== 'undefined') ? localStorage.getItem('jc.guia') : null
-    });
+    console.log('%c[CARD] Render ok!', 'color: gold', { nome, guia });
   }
 
   // ---- Navegação para perguntas ----
@@ -190,44 +156,38 @@
     }
   }
 
-  /* =========================================================
-     TEMA DO GUIA — reaplica em qualquer seção quando necessário
-     ========================================================= */
-  (function () {
-    'use strict';
+ /* =========================================================
+   TEMA DO GUIA — reaplica em qualquer seção quando necessário
+   ========================================================= */
+(function () {
+  'use strict';
 
-    function normalizeGuideForTheme(raw) {
-      const g = String(raw || '').toLowerCase().trim();
-      if (g === 'arion') return 'arian';
-      if (g === 'aryan') return 'arian';
-      return g;
-    }
+  function applyThemeFromSession() {
+    const guiaRaw = sessionStorage.getItem('jornada.guia');
+    const guia = guiaRaw ? guiaRaw.toLowerCase().trim() : '';
 
-    function applyThemeFromSession() {
-      const guiaRaw = sessionStorage.getItem('jornada.guia');
-      const guia = normalizeGuideForTheme(guiaRaw);
+    // fallback dourado
+    let main = '#ffd700', g1 = 'rgba(255,230,180,0.85)', g2 = 'rgba(255,210,120,0.75)';
 
-      // fallback dourado
-      let main = '#ffd700', g1 = 'rgba(255,230,180,0.85)', g2 = 'rgba(255,210,120,0.75)';
+    if (guia === 'lumen') { main = '#00ff9d'; g1 = 'rgba(0,255,157,0.90)'; g2 = 'rgba(120,255,200,0.70)'; }
+    if (guia === 'zion')  { main = '#00aaff'; g1 = 'rgba(0,170,255,0.90)'; g2 = 'rgba(255,214,91,0.70)'; }
+    if (guia === 'arian') { main = '#ff00ff'; g1 = 'rgba(255,120,255,0.95)'; g2 = 'rgba(255,180,255,0.80)'; }
 
-      if (guia === 'lumen') { main = '#00ff9d'; g1 = 'rgba(0,255,157,0.90)'; g2 = 'rgba(120,255,200,0.70)'; }
-      if (guia === 'zion')  { main = '#00aaff'; g1 = 'rgba(0,170,255,0.90)'; g2 = 'rgba(255,214,91,0.70)'; }
-      if (guia === 'arian') { main = '#ff00ff'; g1 = 'rgba(255,120,255,0.95)'; g2 = 'rgba(255,180,255,0.80)'; }
+    document.documentElement.style.setProperty('--theme-main-color', main);
+    document.documentElement.style.setProperty('--progress-main', main);
+    document.documentElement.style.setProperty('--progress-glow-1', g1);
+    document.documentElement.style.setProperty('--progress-glow-2', g2);
+    document.documentElement.style.setProperty('--guide-color', main);
 
-      document.documentElement.style.setProperty('--theme-main-color', main);
-      document.documentElement.style.setProperty('--progress-main', main);
-      document.documentElement.style.setProperty('--progress-glow-1', g1);
-      document.documentElement.style.setProperty('--progress-glow-2', g2);
-      document.documentElement.style.setProperty('--guide-color', main);
+    if (guia) document.body.setAttribute('data-guia', guia);
+  }
 
-      if (guia) document.body.setAttribute('data-guia', guia);
-    }
-
-    document.addEventListener('DOMContentLoaded', applyThemeFromSession);
-    document.addEventListener('sectionLoaded', () => setTimeout(applyThemeFromSession, 50));
-    document.addEventListener('guia:changed', applyThemeFromSession);
-  })();
-
+  // roda no carregamento e também quando o app troca seção
+  document.addEventListener('DOMContentLoaded', applyThemeFromSession);
+  document.addEventListener('sectionLoaded', () => setTimeout(applyThemeFromSession, 50));
+  document.addEventListener('guia:changed', applyThemeFromSession);
+})();
+  
   // ---- Listener do controller ----
   document.addEventListener('section:shown', (e) => {
     const id = e.detail && e.detail.sectionId;
@@ -236,6 +196,7 @@
     const node = e.detail.node || qs('#' + id);
     init(node);
   });
+
 
   console.log('[' + MOD + '] carregado');
 })();
