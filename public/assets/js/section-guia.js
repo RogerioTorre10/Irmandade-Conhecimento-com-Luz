@@ -798,11 +798,15 @@ guideButtons.forEach(b => {
     ? document.addEventListener('DOMContentLoaded', bind, { once: true })
     : bind();
 
-  document.addEventListener('DOMContentLoaded', applyThemeFromSession);
-  document.addEventListener('sectionLoaded', () => setTimeout(applyThemeFromSession, 50));
-  document.addEventListener('guia:changed', applyThemeFromSession);
+   const applyThemeSafe = () => {
+    try { window.applyGuideTheme?.(); } catch {}
+    };
 
-})();
+    document.addEventListener('DOMContentLoaded', applyThemeSafe);
+    document.addEventListener('sectionLoaded', () => setTimeout(applyThemeSafe, 50));
+    document.addEventListener('guia:changed', applyThemeSafe);
+
+   })();
   // ===============================
 // TEMA DO GUIA (só após escolher)
 // ===============================
