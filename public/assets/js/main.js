@@ -481,31 +481,18 @@
     );
   }
 
-  function applyGuideTheme(){
-    const guia = readGuide();
-
-    let main='#ffd700', g1='rgba(255,230,180,0.85)', g2='rgba(255,210,120,0.75)';
-    if (guia==='lumen'){ main='#00ff9d'; g1='rgba(0,255,157,0.90)'; g2='rgba(120,255,200,0.70)'; }
-    if (guia==='zion'){  main='#00aaff'; g1='rgba(0,170,255,0.90)'; g2='rgba(255,214,91,0.70)'; }
-    if (guia==='arion'){ main='#ff00ff'; g1='rgba(255,120,255,0.95)'; g2='rgba(255,180,255,0.80)'; }
-
+ // DEFAULT DOURADO (início da jornada) — não força guia
+(function(){
+  function applyGold(){
+    const main = '#ffd700';
     document.documentElement.style.setProperty('--theme-main-color', main);
     document.documentElement.style.setProperty('--progress-main', main);
-    document.documentElement.style.setProperty('--progress-glow-1', g1);
-    document.documentElement.style.setProperty('--progress-glow-2', g2);
+    document.documentElement.style.setProperty('--progress-glow-1', 'rgba(255,230,180,0.85)');
+    document.documentElement.style.setProperty('--progress-glow-2', 'rgba(255,210,120,0.75)');
     document.documentElement.style.setProperty('--guide-color', main);
-
-    document.body.setAttribute('data-guia', guia);
-
-    console.log('[THEME] aplicado:', guia);
+    document.body.setAttribute('data-guia', 'gold');
   }
-
-  // aplica ao carregar
-  document.addEventListener('DOMContentLoaded', applyGuideTheme);
-
-  // reaplica a cada troca de seção (ESSENCIAL)
-  document.addEventListener('section:shown', applyGuideTheme);
-
-})();    
+  document.addEventListener('DOMContentLoaded', applyGold);
+})();
   });
 })();
