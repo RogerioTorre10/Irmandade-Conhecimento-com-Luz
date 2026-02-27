@@ -229,3 +229,40 @@ body.final-lock {
     grid-column: 1 / -1;   /* ocupa a linha toda */
   }
 }
+
+/* =========================
+   DIAMANTE: VÍDEO DE TRANSIÇÃO ACIMA DE TUDO
+   ========================= */
+
+#video-transition-overlay,
+.video-transition-overlay,
+#videoOverlay,
+#video-transicao-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: #000 !important;
+  z-index: 2147483647 !important; /* topo absoluto */
+  pointer-events: auto !important;
+}
+
+#video-transition-overlay video,
+.video-transition-overlay video,
+#videoOverlay video,
+#video-transicao-overlay video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+/* enquanto o vídeo toca, impede “vazamento” visual */
+body.vt-playing .section {
+  visibility: hidden !important;
+}
+body.vt-playing #video-transition-overlay,
+body.vt-playing .video-transition-overlay,
+body.vt-playing #videoOverlay,
+body.vt-playing #video-transicao-overlay {
+  visibility: visible !important;
+}
