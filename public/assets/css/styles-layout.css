@@ -2202,16 +2202,29 @@ body {
     bottom: 84px !important;
   }
 }
-/* DIAMANTE: durante vídeo, esconde as sections */
-body.vt-playing .section { visibility: hidden !important; }
-body.vt-playing #vt-overlay { visibility: visible !important; }
+/* =========================
+   VT OVERLAY — SEM SUMIR
+   (último bloco do styles-layout.css)
+   ========================= */
 
-/* segurança extra: overlay sempre full */
-#vt-overlay {
+#vt-overlay{
   position: fixed !important;
   inset: 0 !important;
   width: 100vw !important;
   height: 100vh !important;
   z-index: 2147483647 !important;
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  background: #000 !important;
 }
-#vt-overlay video { width:100% !important; height:100% !important; object-fit:cover !important; }
+
+#vt-overlay video{
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+/* opcional: esconde sections DURANTE o vídeo (não mexe no overlay) */
+body.vt-playing .section{ visibility: hidden !important; }
+body.vt-playing #vt-overlay{ visibility: visible !important; }
