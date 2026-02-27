@@ -782,7 +782,7 @@ guideButtons.forEach(b => {
     }
   }
 
-  function onSectionShown(evt) {
+   function onSectionShown(evt) {
     const { sectionId, node } = evt?.detail || {};
     if (sectionId !== SECTION_ID) return;
     initOnce(node || document.getElementById(SECTION_ID));
@@ -798,31 +798,23 @@ guideButtons.forEach(b => {
     ? document.addEventListener('DOMContentLoaded', bind, { once: true })
     : bind();
 
-   const applyThemeSafe = () => {
-    try { window.applyGuideTheme?.(); } catch {}
-    };
-
-    document.addEventListener('DOMContentLoaded', applyThemeSafe);
-    document.addEventListener('sectionLoaded', () => setTimeout(applyThemeSafe, 50));
-    document.addEventListener('guia:changed', applyThemeSafe);
-
-   })();
-  // ===============================
-// TEMA DO GUIA (só após escolher)
-// ===============================
-(function(){
-  function canon(v){
-    const s = String(v||'').toLowerCase();
+  // =====================================================
+  // TEMA: aplica quando o guia já foi escolhido (senão mantém dourado)
+  // =====================================================
+  function canonTheme(v) {
+    const s = String(v || '').toLowerCase();
     if (s.includes('lumen')) return 'lumen';
     if (s.includes('zion')) return 'zion';
     if (s.includes('arion') || s.includes('arian')) return 'arion';
     return '';
   }
 
-  function readGuide(){
-    return canon(
+  function readGuideTheme() {
+    return canonTheme(
       window.JORNADA_STATE?.guiaSelecionado ||
       window.JORNADA_STATE?.guia ||
+      window.JC?.data?.guiaSelecionado ||
+      window.JC?.data?.guia ||
       sessionStorage.getItem('JORNADA_GUIA') ||
       localStorage.getItem('JORNADA_GUIA') ||
       localStorage.getItem('jc.guiaSelecionado') ||
@@ -831,14 +823,14 @@ guideButtons.forEach(b => {
     );
   }
 
-  window.applyGuideTheme = function(){
-    const guia = readGuide();
-    if (!guia) return false; // <- não mexe no dourado se ainda não escolheu
+  window.applyGuideTheme = function applyGuideTheme() {
+    const guia = readGuideTheme();
+    if (!guia) return false; // não mexe no dourado se ainda não escolheu
 
-    let main='#ffd700', g1='rgba(255,230,180,0.85)', g2='rgba(255,210,120,0.75)';
-    if (guia==='lumen'){ main='#00ff9d'; g1='rgba(0,255,157,0.90)'; g2='rgba(120,255,200,0.70)'; }
-    if (guia==='zion'){  main='#00aaff'; g1='rgba(0,170,255,0.90)'; g2='rgba(255,214,91,0.70)'; }
-    if (guia==='arion'){ main='#ff00ff'; g1='rgba(255,120,255,0.95)'; g2='rgba(255,180,255,0.80)'; }
+    let main = '#ffd700', g1 = 'rgba(255,230,180,0.85)', g2 = 'rgba(255,210,120,0.75)';
+    if (guia === 'lumen') { main = '#00ff9d'; g1 = 'rgba(0,255,157,0.90)'; g2 = 'rgba(120,255,200,0.70)'; }
+    if (guia === 'zion')  { main = '#00aaff'; g1 = 'rgba(0,170,255,0.90)'; g2 = 'rgba(255,214,91,0.70)'; }
+    if (guia === 'arion') { main = '#ff00ff'; g1 = 'rgba(255,120,255,0.95)'; g2 = 'rgba(255,180,255,0.80)'; }
 
     document.documentElement.style.setProperty('--theme-main-color', main);
     document.documentElement.style.setProperty('--progress-main', main);
@@ -850,5 +842,10 @@ guideButtons.forEach(b => {
     console.log('[THEME] aplicado:', guia);
     return true;
   };
-})();
 
+  // reaplica em momentos seguros (não quebra o dourado inicial)
+  const applyThemeSafe = () => { try { window.applyGuideTheme?.(); } catch {} };
+  document.addEventListener('sectionLoaded', () => setTimeout(applyThemeSafe, 50));
+  document.addEventListener('guia:changed', applyThemeSafe);
+
+})(); // <-- FECHAMENTO ÚNICO do IIFE principal (não coloque outro IIFE depois)
