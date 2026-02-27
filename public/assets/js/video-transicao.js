@@ -118,7 +118,9 @@ overlay.style.zIndex = '2147483647';
 overlay.style.pointerEvents = 'auto';
 
 // trava “vazamento” de outras sections durante o filme
-document.body.classList.add('vt-playing');
+document.documentElement.style.overflow = '';
+document.body.classList.remove('vt-playing');
+if (overlay?.parentNode) overlay.parentNode.removeChild(overlay);
     
 
     // glamour fade-in do portal
