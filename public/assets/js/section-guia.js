@@ -258,16 +258,29 @@
       v.autoplay = true;
       v.preload = 'auto';
       v.style.cssText = `
-        position:fixed;inset:0;z-index:9999;background:#000;
-        width:100%;height:100%;object-fit:cover
+      position:fixed;
+      inset:0;
+      z-index:2147483647;
+      background:#000;
+      width:100vw;
+      height:100vh;
+      object-fit:cover;
+      display:block;
       `;
+     document.body.classList.add('vt-playing');
 
-      const endTransition = () => {
-        v.remove();
-        window.__TRANSITION_LOCK = false;
-        (window.JC && JC.show) ? JC.show(nextId, { force: true }) : (location.hash = '#' + nextId);
-        document.dispatchEvent(new CustomEvent('transition:ended'));
-      };
+     const endTransition = () => {
+
+  document.body.classList.remove('vt-playing');
+
+  v.remove();
+  window.__TRANSITION_LOCK = false;
+  (window.JC && JC.show)
+    ? JC.show(nextId, { force: true })
+    : (location.hash = '#' + nextId);
+
+  document.dispatchEvent(new CustomEvent('transition:ended'));
+};
 
       v.addEventListener('ended', endTransition, { once: true });
       v.addEventListener('error', () => {
