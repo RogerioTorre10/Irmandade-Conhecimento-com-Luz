@@ -88,6 +88,49 @@ function canonGuia(v) {
 }
 
   // -----------------------------
+  // Monta HTML interno 1x
+  // -----------------------------
+  function buildMarkup(section) {
+    if (!section || section.__CARD_BUILT__) return;
+
+    section.innerHTML = `
+      <div class="j-panel-glow card-panel">
+        <div class="conteudo-pergaminho">
+          <h2
+            data-typing="true"
+            data-text="Eu na Irmandade"
+            data-speed="40"
+            data-cursor="true"
+            class="titulo-selfie"
+          >Eu na Irmandade</h2>
+
+          <img id="guideBg" class="guide-bg" alt="Fundo do Guia" />
+
+          <div class="flame-layer show placeholder-only" aria-hidden="true">
+            <img
+              id="selfieImage"
+              class="flame-selfie"
+              src="${PLACEHOLDER_SELFIE}"
+              alt="Sua foto na Irmandade"
+            />
+            <div class="card-footer">
+              <span class="card-name-badge">
+                <span id="userNameSlot">Carregando...</span>
+              </span>
+            </div>
+          </div>
+
+          <div class="card-actions-below">
+            <button id="btnNext" class="btn btn-stone">✅ Continuar</button>
+          </div>
+        </div>
+      </div>
+    `.trim();
+
+    section.__CARD_BUILT__ = true;
+  }
+   
+  // -----------------------------
   // Render UI do Card
   // -----------------------------
   function renderCard(section) {
