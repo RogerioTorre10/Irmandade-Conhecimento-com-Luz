@@ -173,11 +173,19 @@ if (overlay?.parentNode) overlay.parentNode.removeChild(overlay);
       // limelight: cor do guia no overlay (se já escolhido)
       try {
         const g =
-          window.JC?.state?.guia ||
-          window.selectedGuide ||
-          localStorage.getItem('guiaEscolhido');
-        if (g) overlay.setAttribute('data-guia', g);
-      } catch {}
+  window.JORNADA_STATE?.guiaSelecionado ||
+  window.JORNADA_STATE?.guia ||
+  window.JC?.data?.guiaSelecionado ||
+  window.JC?.data?.guia ||
+  sessionStorage.getItem('JORNADA_GUIA') ||
+  localStorage.getItem('JORNADA_GUIA') ||
+  localStorage.getItem('jc.guiaSelecionado') ||
+  localStorage.getItem('jc.guia') ||
+  sessionStorage.getItem('jornada.guia') ||
+  localStorage.getItem('guiaEscolhido');
+
+if (g) overlay.setAttribute('data-guia', String(g).toLowerCase());
+} catch {}
 
       // luz viva enquanto toca
       try { window.Luz?.startPulse({ min: 1, max: 1.5, speed: 120 }); } catch {}
