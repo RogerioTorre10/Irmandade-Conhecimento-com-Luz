@@ -383,41 +383,77 @@ try {
 // GARANTE INIT SEM DEPENDER DO CONTROLLER
 // ===================================================
 function initSelfieSection() {
-  const section = document.getElementById('section-selfie');
-  if (!section) return;
+  const root = document.getElementById('section-selfie');
+  if (!root) return;
 
-  // tenta achar botões por IDs comuns (ajuste se seus IDs forem diferentes)
-  const btnPreview  = section.querySelector('#btn-preview, #btn-selfie-preview, [data-action="preview"]');
-  const btnCapture  = section.querySelector('#btn-capture, #btn-selfie-capture, [data-action="capture"]');
-  const btnStart    = section.querySelector('#btn-start, #btn-selfie-start, [data-action="start"]');
-  const btnSemFoto  = section.querySelector('#btn-sem-foto, #btn-selfie-semfoto, [data-action="nofoto"]');
+  // pega elementos comuns (ajuste os seletores depois se necessário)
+  const video   = root.querySelector('video, #selfieVideo, #videoSelfie');
+  const canvas  = root.querySelector('canvas, #selfieCanvas, #canvasSelfie');
+  const preview = root.querySelector('img, #selfiePreview, #previewImg');
 
-  // Se nenhum botão for encontrado, pelo menos loga pra diagnosticar
-  if (!btnPreview && !btnCapture && !btnStart && !btnSemFoto) {
-    console.warn('[SELFIE] Nenhum botão encontrado — confira IDs/data-action no HTML.');
+  const btnPreview = root.querySelector('#btn-preview, #btn-selfie-preview, [data-action="preview"]');
+  const btnCapture = root.querySelector('#btn-capture, #btn-selfie-capture, [data-action="capture"]');
+  const btnStart   = root.querySelector('#btn-start, #btn-selfie-start, [data-action="start"]');
+  const btnNoPhoto = root.querySelector('#btn-sem-foto, #btn-selfie-semfoto, [data-action="nofoto"]');
+
+  // logs pra você ver o que ele achou
+  console.log('[SELFIE] bind direto:', {
+    hasVideo: !!video, hasCanvas: !!canvas, hasPreview: !!preview,
+    btnPreview: !!btnPreview, btnCapture: !!btnCapture, btnStart: !!btnStart, btnNoPhoto: !!btnNoPhoto
+  });
+
+  // Se nenhum botão apareceu, não tem o que bindar
+  if (!btnPreview && !btnCapture && !btnStart && !btnNoPhoto) {
+    console.warn('[SELFIE] Nenhum botão encontrado — manda o HTML dos botões pra eu fixar os IDs.');
     return;
   }
 
-  // Se você já tem bindUI(root) no seu arquivo, chama ele
-  if (typeof window.JCSelfie?.bindUI === 'function') {
-    window.JCSelfie.bindUI(section);
-  } else if (typeof bindUI === 'function') {
-    bindUI(section);
-  } else {
-    console.warn('[SELFIE] bindUI() não existe no escopo — botão não será ligado.');
+  // Funções que DEVEM existir no seu arquivo atual:
+  // startCamera(), stopCamera(), capture(), playTransitionThenGo() (ou goTo)
+  // Se os nomes forem diferentes, me diga quais são.
+
+  if (btnStart) {
+    btnStart.addEventListener('click', (ev) => {
+      ev.preventDefault(); ev.stopPropagation();
+      try { startCamera(); } catch (e) { console.error('[SELFIE] startCamera() falhou:', e); }
+    }, { passive: false });
+  }
+
+  if (btnPreview) {
+    btnPreview.addEventListener('click', (ev) => {
+      ev.preventDefault(); ev.stopPropagation();
+      // preview normalmente só alterna UI; se você já tem função, chame aqui
+      try {
+        // se houver uma função previewMode(), use
+        if (typeof previewMode === 'function') previewMode();
+      } catch (e) { console.error('[SELFIE] preview falhou:', e); }
+    }, { passive: false });
+  }
+
+  if (btnCapture) {
+    btnCapture.addEventListener('click', (ev) => {
+      ev.preventDefault(); ev.stopPropagation();
+      try { capture(); } catch (e) { console.error('[SELFIE] capture() falhou:', e); }
+    }, { passive: false });
+  }
+
+  if (btnNoPhoto) {
+    btnNoPhoto.addEventListener('click', (ev) => {
+      ev.preventDefault(); ev.stopPropagation();
+      try {
+        stopCamera();
+      } catch {}
+      try {
+        // se você tiver um fluxo "sem foto", ele deve salvar um placeholder
+        // e ir para a próxima seção
+        if (typeof playTransitionThenGo === 'function') playTransitionThenGo();
+        else if (typeof goTo === 'function') goTo('section-card');
+        else if (window.JC?.show) window.JC.show('section-card', { force: true });
+      } catch (e) {
+        console.error('[SELFIE] no-photo falhou:', e);
+      }
+    }, { passive: false });
   }
 }
-
-// roda quando a seção entra
-document.addEventListener('sectionLoaded', (e) => {
-  if (e?.detail?.sectionId === 'section-selfie') {
-    initSelfieSection();
-  }
-});
-
-// fallback (se sectionLoaded falhar)
-document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(initSelfieSection, 200);
-});
   
 })(window);
