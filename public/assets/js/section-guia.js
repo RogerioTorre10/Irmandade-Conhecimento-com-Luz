@@ -331,42 +331,43 @@
       }
 
      // usa o guia que acabou de ser escolhido
-     const guiaCanon = canonGuia(guiaId || selectedGuide);
+const guiaCanon = canonGuia(guiaId);
 
-     // grava nas chaves oficiais (fonte única da verdade)
-     sessionStorage.setItem('JORNADA_GUIA', guiaCanon);
-     localStorage.setItem('JORNADA_GUIA', guiaCanon);
+// grava nas chaves oficiais
+sessionStorage.setItem('JORNADA_GUIA', guiaCanon);
+localStorage.setItem('JORNADA_GUIA', guiaCanon);
 
-     // grava também no state global (usado pelo card/selfie/pdf)
-     window.JORNADA_STATE = window.JORNADA_STATE || {};
-     window.JORNADA_STATE.guia = guiaCanon;
-     window.JORNADA_STATE.guiaSelecionado = guiaCanon;
+// grava também no state global
+window.JORNADA_STATE = window.JORNADA_STATE || {};
+window.JORNADA_STATE.guia = guiaCanon;
+window.JORNADA_STATE.guiaSelecionado = guiaCanon;
 
-     console.log('[GUIA] guiaCanon gravado:', guiaCanon);
-     window.JC = window.JC || {};
-     window.JC.data = window.JC.data || {};
-     window.JC.data.guia = guiaAtual;
-     window.JC.data.guiaSelecionado = guiaAtual;
+// grava no JC também (card/selfie/pdf)
+window.JC = window.JC || {};
+window.JC.data = window.JC.data || {};
+window.JC.data.guia = guiaCanon;
+window.JC.data.guiaSelecionado = guiaCanon;
 
-    // reset de artefatos do guia anterior (evita “card do Zion com cor do Lumen”)
-    sessionStorage.removeItem('JORNADA_SELFIECARD');
-    sessionStorage.removeItem('SELFIE_CARD');
-    sessionStorage.removeItem('__SELFIECARD_SIG__');
+// aplica tema definitivo + avisa listeners
+try { document.dispatchEvent(new CustomEvent('guia:changed')); } catch {}
+try { window.applyGuideTheme?.(); } catch {}
+try { applyGuiaTheme(guiaCanon); } catch { document.body.setAttribute('data-guia', guiaCanon); }
 
-      try {
-        applyGuiaTheme(guiaAtual);
-      } catch {
-        document.body.setAttribute('data-guia', guiaAtual);
-      }
-      window.aplicarGuiaTheme = window.aplicarGuiaTheme || applyGuiaTheme;
+// reset de artefatos do guia anterior (evita “card do zion com cor do lumen”)
+sessionStorage.removeItem('JORNADA_SELFIECARD');
+sessionStorage.removeItem('SELFIE_CARD');
+sessionStorage.removeItem('__SELFIECARD_SIG__');
 
-      const btnAvancar = root.querySelector('#btn-avancar') || root.querySelector('[data-action="avancar"]');
-      if (btnAvancar) {
-        btnAvancar.disabled = false;
-        btnAvancar.classList.remove('is-hidden');
-        btnAvancar.focus?.();
-      }
+// expõe helper (se você usa em outro lugar)
+window.aplicarGuiaTheme = window.aplicarGuiaTheme || applyGuiaTheme;
 
+// libera botão avançar
+const btnAvancar = root.querySelector('#btn-avancar') || root.querySelector('[data-action="avancar"]');
+if (btnAvancar) {
+  btnAvancar.disabled = false;
+  btnAvancar.classList.remove('is-hidden');
+  btnAvancar.focus?.();
+}
       if (armTimer) { clearTimeout(armTimer); armTimer = null; }
       armedId = null;
 
