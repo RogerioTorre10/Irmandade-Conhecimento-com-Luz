@@ -65,83 +65,14 @@
     }, speed);
   }
 
-// ================================
-// LANG/I18N helpers (fallback safe)
-// ================================
-function getActiveLang() {
-  // 1) i18n global (se existir)
-  const l1 = window.i18n?.currentLang;
-
-  // 2) chaves comuns em storage (caso você salve em algum lugar)
-  const l2 = sessionStorage.getItem('jornada.lang') || sessionStorage.getItem('i18n.lang');
-  const l3 = localStorage.getItem('jc.lang') || localStorage.getItem('i18n.lang');
-
-  // 3) html lang
-  const l4 = document.documentElement?.lang;
-
-  const lang = (l1 || l2 || l3 || l4 || 'pt-BR').toString().trim();
-  return lang;
-}
-
-function tSelfie(key, vars = {}) {
-  // Se você tiver i18n.t / i18n.get / i18n.translate, usa
-  const it = window.i18n;
-  const lang = getActiveLang();
-
-  // tenta funções comuns
-  const candidates = [
-    typeof it?.t === 'function' ? it.t(key, vars) : null,
-    typeof it?.get === 'function' ? it.get(key, vars) : null,
-    typeof it?.translate === 'function' ? it.translate(key, vars) : null,
-  ].filter(Boolean);
-
-  if (candidates.length) return String(candidates[0]);
-
-  // fallback: dicionário mínimo
-  const dict = {
-    'pt-BR': {
-      'selfie.title': 'Prepare sua selfie',
-      'selfie.text': '{nome}, afaste o celular e posicione o rosto. {guia} te guiará.'
-    },
-    'en-US': {
-      'selfie.title': 'Prepare your selfie',
-      'selfie.text': '{nome}, hold your phone a bit farther and frame your face. {guia} will guide you.'
-    },
-    'es-ES': {
-      'selfie.title': 'Prepara tu selfie',
-      'selfie.text': '{nome}, aleja el teléfono y encuadra tu rostro. {guia} te guiará.'
+  function speak(text) {
+    if (window.speak) window.speak(text);
+    else if ('speechSynthesis' in window) {
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'pt-BR'; u.rate = 0.9;
+      speechSynthesis.speak(u);
     }
-  };
-
-  const base = dict[lang] || dict['pt-BR'];
-  let str = base[key] || dict['pt-BR'][key] || key;
-
-  // interpolação simples {nome} {guia}
-  Object.keys(vars).forEach(k => {
-    str = str.replaceAll(`{${k}}`, String(vars[k] ?? ''));
-  });
-  return str;
-}
-
-  
- function speak(text) {
-  const lang = getActiveLang();
-
-  if (window.speak) {
-    // Se existir um speak global seu, tente passar lang se ele aceitar
-    try { window.speak(text, { lang }); return; } catch (e) {}
-    window.speak(text); // fallback
-    return;
   }
-
-  if ('speechSynthesis' in window) {
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = lang;   // ✅ usa idioma ativo
-    u.rate = 0.9;
-    speechSynthesis.speak(u);
-  }
-}
-
 
   function updateZoom() {
     const all = +document.getElementById('zoomAll').value;
@@ -202,28 +133,13 @@ function tSelfie(key, vars = {}) {
     const sy = (video.videoHeight - sh) / 2;
 
     ctx.drawImage(video, sx, sy, sw, sh, 0, 0, w, h);
-lastCapture = canvas.toDataURL('image/jpeg', 0.92);
+    lastCapture = canvas.toDataURL('image/jpeg', 0.92);
 
-// ✅ SALVA SELFIE (fonte única para Card + SelfieCard + PDF)
-try {
-  const dataUrl = lastCapture;
+    videoEl.style.display = 'none';
+    canvasEl.style.display = 'block';
+    document.getElementById('btn-selfie-confirm').disabled = false;
+  }
 
-  sessionStorage.setItem('JORNADA_SELFIE', dataUrl);
-  localStorage.setItem('JORNADA_SELFIE', dataUrl);
-
-  // compat com versões antigas do projeto (card tenta ler isso)
-  sessionStorage.setItem('jc.selfieDataUrl', dataUrl);
-  localStorage.setItem('jc.selfieDataUrl', dataUrl);
-
-  window.JORNADA_STATE = window.JORNADA_STATE || {};
-  window.JORNADA_STATE.selfieDataUrl = dataUrl;
-  window.JORNADA_STATE.selfieDataUrlTs = Date.now();
-
-  console.log('[SELFIE] ✅ dataUrl salvo (JORNADA_SELFIE / jc.selfieDataUrl)');
-} catch (e) {
-  console.warn('[SELFIE] erro ao salvar dataUrl:', e);
-}
-    
   function playTransitionThenGo() {
     console.log(`[SELFIE] Transição → ${NEXT_SECTION_ID}`);
     if (window.playTransitionVideo) {
@@ -293,6 +209,7 @@ try {
         const guiaNomeMap = { arian: 'Arian', lumen: 'Lumen', zion: 'Zion' };
         const guiaNome = guiaNomeMap[guia] || 'Guia';
         const fullText = `${nome}, afaste o celular e posicione o rosto. ${guiaNome} te guiará.`;
+
         texto.textContent = '';
         typeWriter(texto, fullText, 36);
         speak(fullText);
@@ -312,34 +229,6 @@ try {
       stopCamera();
       playTransitionThenGo();
     };
-
-   // ==============================
-   // Helper local: canonGuia (SELFIE)
-   // ==============================
-  function canonGuia(v) {
-  const s = String(v || '').trim().toLowerCase();
-  if (!s) return '';
-  if (s.includes('lumen')) return 'lumen';
-  if (s.includes('zion')) return 'zion';
-  if (s.includes('arion') || s.includes('arian')) return 'arion';
-  if (s === 'guia') return '';
-  return s;
-}
-    
-    const guiaCanon =
-  canonGuia(window.JORNADA_STATE?.guiaSelecionado) ||
-  canonGuia(window.JORNADA_STATE?.guia) ||
-  canonGuia(sessionStorage.getItem('JORNADA_GUIA')) ||
-  canonGuia(localStorage.getItem('JORNADA_GUIA')) ||
-  canonGuia(guiaSelecionadoAgora) ||
-  'zion'; // fallback neutro (NUNCA lumen)
-
-  sessionStorage.setItem('JORNADA_GUIA', guiaCanon);
-  localStorage.setItem('JORNADA_GUIA', guiaCanon);
-  window.JORNADA_STATE = window.JORNADA_STATE || {};
-  window.JORNADA_STATE.guia = guiaCanon;
-  window.JORNADA_STATE.guiaSelecionado = guiaCanon;
-  console.log('[SELFIE] guiaCanon gravado:', guiaCanon);    
   });
 
   document.addEventListener('sectionWillHide', e => {
@@ -352,6 +241,11 @@ try {
       document.dispatchEvent(new CustomEvent('sectionLoaded', { detail: { sectionId: 'section-selfie' } }));
     }, 100);
   }
+/* =========================================================
+   TEMA DO GUIA — reaplica em qualquer seção quando necessário
+   ========================================================= */
+(function () {
+  'use strict';
 
   function applyThemeFromSession() {
     const guiaRaw = sessionStorage.getItem('jornada.guia');
@@ -377,83 +271,6 @@ try {
   document.addEventListener('DOMContentLoaded', applyThemeFromSession);
   document.addEventListener('sectionLoaded', () => setTimeout(applyThemeFromSession, 50));
   document.addEventListener('guia:changed', applyThemeFromSession);
-}
-
-  // ===================================================
-// GARANTE INIT SEM DEPENDER DO CONTROLLER
-// ===================================================
-function initSelfieSection() {
-  const root = document.getElementById('section-selfie');
-  if (!root) return;
-
-  // pega elementos comuns (ajuste os seletores depois se necessário)
-  const video   = root.querySelector('video, #selfieVideo, #videoSelfie');
-  const canvas  = root.querySelector('canvas, #selfieCanvas, #canvasSelfie');
-  const preview = root.querySelector('img, #selfiePreview, #previewImg');
-
-  const btnPreview = root.querySelector('#btn-preview, #btn-selfie-preview, [data-action="preview"]');
-  const btnCapture = root.querySelector('#btn-capture, #btn-selfie-capture, [data-action="capture"]');
-  const btnStart   = root.querySelector('#btn-start, #btn-selfie-start, [data-action="start"]');
-  const btnNoPhoto = root.querySelector('#btn-sem-foto, #btn-selfie-semfoto, [data-action="nofoto"]');
-
-  // logs pra você ver o que ele achou
-  console.log('[SELFIE] bind direto:', {
-    hasVideo: !!video, hasCanvas: !!canvas, hasPreview: !!preview,
-    btnPreview: !!btnPreview, btnCapture: !!btnCapture, btnStart: !!btnStart, btnNoPhoto: !!btnNoPhoto
-  });
-
-  // Se nenhum botão apareceu, não tem o que bindar
-  if (!btnPreview && !btnCapture && !btnStart && !btnNoPhoto) {
-    console.warn('[SELFIE] Nenhum botão encontrado — manda o HTML dos botões pra eu fixar os IDs.');
-    return;
-  }
-
-  // Funções que DEVEM existir no seu arquivo atual:
-  // startCamera(), stopCamera(), capture(), playTransitionThenGo() (ou goTo)
-  // Se os nomes forem diferentes, me diga quais são.
-
-  if (btnStart) {
-    btnStart.addEventListener('click', (ev) => {
-      ev.preventDefault(); ev.stopPropagation();
-      try { startCamera(); } catch (e) { console.error('[SELFIE] startCamera() falhou:', e); }
-    }, { passive: false });
-  }
-
-  if (btnPreview) {
-    btnPreview.addEventListener('click', (ev) => {
-      ev.preventDefault(); ev.stopPropagation();
-      // preview normalmente só alterna UI; se você já tem função, chame aqui
-      try {
-        // se houver uma função previewMode(), use
-        if (typeof previewMode === 'function') previewMode();
-      } catch (e) { console.error('[SELFIE] preview falhou:', e); }
-    }, { passive: false });
-  }
-
-  if (btnCapture) {
-    btnCapture.addEventListener('click', (ev) => {
-      ev.preventDefault(); ev.stopPropagation();
-      try { capture(); } catch (e) { console.error('[SELFIE] capture() falhou:', e); }
-    }, { passive: false });
-  }
-
-  if (btnNoPhoto) {
-    btnNoPhoto.addEventListener('click', (ev) => {
-      ev.preventDefault(); ev.stopPropagation();
-      try {
-        stopCamera();
-      } catch {}
-      try {
-        // se você tiver um fluxo "sem foto", ele deve salvar um placeholder
-        // e ir para a próxima seção
-        if (typeof playTransitionThenGo === 'function') playTransitionThenGo();
-        else if (typeof goTo === 'function') goTo('section-card');
-        else if (window.JC?.show) window.JC.show('section-card', { force: true });
-      } catch (e) {
-        console.error('[SELFIE] no-photo falhou:', e);
-      }
-    }, { passive: false });
-  }
-}
+})();
   
 })(window);
