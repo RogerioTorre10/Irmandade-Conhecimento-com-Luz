@@ -104,6 +104,20 @@
     overlay.appendChild(frame);
     document.body.appendChild(overlay);
 
+// ===============================
+// DIAMANTE: overlay sempre acima de tudo
+// ===============================
+overlay.style.position = 'fixed';
+overlay.style.inset = '0';
+overlay.style.width = '100vw';
+overlay.style.height = '100vh';
+overlay.style.zIndex = '2147483647';
+overlay.style.pointerEvents = 'auto';
+
+// trava “vazamento” de outras sections durante o filme
+document.body.classList.add('vt-playing');
+    
+
     // glamour fade-in do portal
     requestAnimationFrame(() => overlay.classList.add('show'));
 
