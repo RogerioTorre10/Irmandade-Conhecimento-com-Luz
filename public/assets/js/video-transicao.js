@@ -56,10 +56,8 @@
   window.__TRANSITION_LOCK = false;
   document.dispatchEvent(new CustomEvent('transition:ended'));
   document.documentElement.style.overflow = '';
-
-  document.body.classList.remove('vt-playing'); // <<< AQUI
-
-  if (overlay?.parentNode) overlay.parentNode.removeChild(overlay);
+document.body.classList.remove('vt-playing');
+if (overlay?.parentNode) overlay.parentNode.removeChild(overlay);
 } catch {}
 
     isPlaying = false;
