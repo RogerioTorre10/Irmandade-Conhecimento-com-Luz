@@ -1,18 +1,22 @@
 /* =======================================================
-   STYLES-CARD v7 — CARD FINAL FLUIDO
-   Deixa o layout.css controlar o pergaminho/vitrine.
-   Aqui cuidamos apenas da composição interna do card.
+   STYLES-CARD v8 — LIMPO / ORGANIZADO
+   - Base (desktop) + Tablet (<=900) + Mobile (<=600)
+   - Sem @media misturado
+   - Sem duplicações
+   - Sem vazamento para outras sections
    ======================================================= */
 
-/* ----- SECTION CARD: BASICO ----- */
-@media (max-width: 900px) {
-#section-card {
+/* =========================
+   BASE (DESKTOP / DEFAULT)
+   ========================= */
+
+#section-card{
   position: relative;
   overflow: visible !important;
 }
 
-/* Painel interno (aquele com brilho dourado) */
-#section-card .card-panel {
+/* Painel de vidro */
+#section-card .card-panel{
   position: relative;
   max-width: 520px;
   margin: 60px auto 80px;
@@ -25,34 +29,33 @@
   justify-content: flex-start;
 
   border-radius: 24px;
-  background: radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.14), transparent 60%),
-              rgba(0, 0, 0, 0.55);
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.14), transparent 60%),
+    rgba(0, 0, 0, 0.55);
   box-shadow:
-    0 18px 40px rgba(0, 0, 0, 0.7),
+    0 18px 40px rgba(0, 0, 0, 0.70),
     0 0 60px rgba(0, 0, 0, 0.85);
   overflow: visible !important;
 }
 
-/* Conteúdo interno */
-#section-card #section-conteudo.conteudo-pergaminho {
+/* Conteúdo interno do card (use essa classe no HTML) */
+#section-card .conteudo-pergaminho{
   width: 100%;
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: calc(100vh - 160px); 
+  min-height: calc(100vh - 160px);
 }
 
-/* ----- TÍTULO "EU NA IRMANDADE" ----- */
-
-#section-card .titulo-selfie {
+/* Título */
+#section-card .titulo-selfie{
   margin: 0 0 24px;
   text-align: center;
 }
 
-/* ----- SELFIE / FUNDO DO GUIA (CARTÃO GRANDE) ----- */
-
-#section-card .guide-bg {
+/* Fundo do Guia (cardão) */
+#section-card .guide-bg{
   display: block;
   width: 100%;
   max-width: 360px;
@@ -64,16 +67,15 @@
     0 0 30px rgba(0, 0, 0, 0.75);
 }
 
-/* ----- PLACEHOLDER 1x1 SOBRE O PEITO ----- */
-
-#section-card .flame-layer {
+/* PLACEHOLDER (cruz) sobre o peito */
+#section-card .flame-layer{
   position: absolute;
-  margin-top: 10px; 
   left: 50%;
-  top: 68%;                        /* posição vertical sobre o peito */
+  top: 68%;
   transform: translate(-50%, -50%);
+
+  width: 58% !important;
   max-width: 160px;
-  width: 58% !important; /* ajuste fino milimétrico */
   aspect-ratio: 4 / 3;
   border-radius: 20px;
   overflow: hidden;
@@ -83,14 +85,13 @@
   justify-content: flex-end;
   align-items: center;
 
-  pointer-events: none;            /* não bloqueia clique em nada */
+  pointer-events: none;
   box-shadow:
     0 0 30px rgba(255, 215, 0, 0.45),
     0 0 55px rgba(255, 180, 0, 0.35);
 }
 
-/* imagem interna do placeholder (chama/cruz) */
-#section-card .flame-layer .flame-selfie {
+#section-card .flame-layer .flame-selfie{
   position: absolute;
   inset: 0;
   width: 100%;
@@ -99,9 +100,8 @@
   z-index: 1;
 }
 
-/* ----- NOME DENTRO DO PLACEHOLDER (BASE INFERIOR) ----- */
-
-#section-card .flame-layer .card-footer {
+/* Footer escuro suave para destacar nome */
+#section-card .flame-layer .card-footer{
   position: relative;
   z-index: 2;
   width: 100%;
@@ -111,54 +111,55 @@
 
   background: linear-gradient(
     to top,
-    rgba(0, 0, 0, 0.9),
+    rgba(0, 0, 0, 0.90),
     rgba(0, 0, 0, 0.65),
     transparent
   );
 }
 
-#section-card .card-name-badge {
+#section-card .card-name-badge{
   display: inline-block;
   padding: 4px 16px 3px;
   border-radius: 999px;
   border: 1px solid rgba(255, 215, 160, 0.85);
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.70);
   box-shadow:
     0 0 12px rgba(255, 215, 0, 0.55),
     0 0 22px rgba(255, 215, 0, 0.35);
   letter-spacing: 0.08em;
 }
 
-#section-card #userNameSlot {
+#section-card #userNameSlot{
   font-family: "ManufacturingConsent-Regular", "Cardo", serif;
   font-size: 1rem;
   text-transform: uppercase;
 }
 
-/* ----- BOTÃO CONTINUAR (FORA DA SELFIE, TRANSLÚCIDO) ----- */
-
+/* Botão CONTINUAR (fora do placeholder) */
 #section-card .card-actions-below{
-  margin-top: auto;          /* empurra para o fim */
-  padding-bottom: 18px;      /* “borda inferior” */
+  margin-top: auto;
+  padding-bottom: 18px;
   display: flex;
   justify-content: center;
   position: relative;
   z-index: 5;
   width: 100%;
   text-align: center !important;
-  }
+}
 
-#section-card #btnNext {
+#section-card #btnNext{
   position: relative;
   padding: 11px 40px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 215, 160, 0.9);
-  background: rgba(10, 10, 10, 0.35);   /* translúcido */
+  border: 1px solid rgba(255, 215, 160, 0.90);
+  background: rgba(10, 10, 10, 0.35);
   backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+
   color: #f6e7c6;
   font-family: "ManufacturingConsent-Regular", "Cardo", serif;
   font-size: 0.95rem;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.20em;
   text-transform: uppercase;
   cursor: pointer;
 
@@ -167,361 +168,104 @@
     0 0 26px rgba(255, 160, 0, 0.35);
 }
 
-/* leve brilho no hover (continua translúcido) */
-#section-card #btnNext:hover {
+#section-card #btnNext:hover{
   background: rgba(20, 20, 20, 0.55);
 }
+
+/* Se existir moldura por cima do card (opcional) */
+#section-card .card-frame{
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
 }
 
+/* =========================
+   TABLET (<= 900px)
+   ========================= */
+@media (max-width: 900px){
 
-/* =======================================================
-   SECTION-CARD — MOBILE PERFECT (Lumen Mobile Fix v4)
-   ======================================================= */
-@media (max-width: 600px) {
-   
-  /* Palco principal do card no mobile */
-  #section-card .card-panel {
+  #section-card .card-panel{
+    margin: 40px auto 60px;
+    padding: 32px 20px 36px;
+  }
+
+  #section-card .guide-bg{
+    max-width: 340px;
+  }
+
+  #section-card .flame-layer{
+    top: 60%;
+    width: 65% !important;
+  }
+}
+
+/* =========================
+   MOBILE (<= 600px)
+   ========================= */
+@media (max-width: 600px){
+
+  /* Palco e respiro geral */
+  #section-card{
+    padding: 8px 0 calc(140px + env(safe-area-inset-bottom, 0px)) !important;
+    min-height: 100vh !important;
+    overflow: hidden !important;
+  }
+
+  /* Painel */
+  #section-card .card-panel{
     width: 110% !important;
     margin: 0 auto !important;
-    min-height: 720px !important;  
-    padding-top: 38px !important;
-    padding-left: 20px !important;
-    padding-right: 20px !important;
-    padding-bottom: 240px !important;  /* novo valor */
+    min-height: 720px !important;
+    padding: 38px 20px 240px !important;
     box-sizing: border-box;
   }
 
-  /* Guia (cardão verde da pessoa) */
-  #section-card .guide-bg {
-    display: block;
-    max-width: 520px; 
+  /* Fundo do Guia */
+  #section-card .guide-bg{
+    max-width: 520px;
     width: 100% !important;
     height: auto !important;
     margin: 0 auto !important;
     border-radius: 28px !important;
   }
 
-  /* PLACEHOLDER DOURADO (a cruz com o nome) */
-  #section-card .flame-layer {
-    position: absolute !important;
-    margin-top: 10px !important; 
-    left: 50% !important;
-    top: 73% !important;              /* desce até o peito */
-    transform: translate(-50%, -50%) !important;
-    width: 60% !important;            /* tamanho relativo ao card */
-    max-width: 180px !important;      /* teto pra não explodir */
-    aspect-ratio: 2.8 / 3 !important;   /* formato de carta vertical */
+  /* Placeholder (carta vertical) */
+  #section-card .flame-layer{
+    top: 73% !important;
+    width: 60% !important;
+    max-width: 180px !important;
+    aspect-ratio: 2.8 / 3 !important;
     border-radius: 22px !important;
-    overflow: hidden !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: flex-end !important;
-    align-items: center !important;
-    pointer-events: none !important;  /* não bloqueia toques */
-    box-shadow:
-      0 0 30px rgba(255, 215, 0, 0.45),
-      0 0 55px rgba(255, 180, 0, 0.35);
-  }
-   
-   /* Ajusta o nome para ficar sempre colado na parte inferior da carta */
-  #section-card .flame-layer .nome-guia {
-    margin: 0 !important;               /* sem folga */
-    padding-bottom: 2px !important;     /* leve respiro */
-    pointer-events: auto !important;
-    font-size: 0.6rem !important;      /* tamanho perfeito no mobile */
   }
 
-  /* Nome dentro do placeholder (badge GISELY) */
-  #section-card .card-name-badge {
-    margin-bottom: 3px !important;   /* sobe um tiquinho do fundo */
-    font-size: 0.5rem !important;
-  } 
-   
- #section-card #btnNext {
-    width: auto;
-    max-width: 260px;
-    pointer-events: auto !important;  /* garante clique normal */
-    padding: 6px 18px !important;   /* altura reduzida */
-    font-size: 0.70rem !important;   /* fonte levemente menor */
-    border-radius: 12px !important;  /* deixa mais slim */
-    background: rgba(10, 10, 10, 0.35);   /* translúcido */
-  }
-   
- #section-card .card-actions {
-    margin-top: 8px !important;   /* estava maior */
-    padding-bottom: 20px !important; /* menos espaço sobrando */
-  }
-   
-   #section-card .flame-layer .card-footer,
-  #section-card .flame-layer .card-name-badge {
-    margin-top: auto !important;      /* empurra o nome para a base */
-    margin-bottom: 2px !important;    /* encosta suavemente */
-    position: relative;
-    bottom: 0 !important;
-  }
-
-  #section-card #userNameSlot {
-    position: relative;
-    bottom: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
-   /* Seção senha: ocupa a tela com respiro */
- #section-card {
-    padding: 8px 0 140px !important;
-    min-height: 100vh !important;
-    overflow: hidden !important;
-  }
-
-  /* Painel de vidro (MESMA FAMÍLIA DO INTRO/TERMOS) */
-  #section-card .j-panel-glow {
-    position: relative !important;
-    left: 0 !important;
-    right: 0 !important;
-    width: calc(100vw - 84px) !important;  /* um pouco menor p/ não “explodir” */
-    max-width: 460px !important;           /* mesmo corpo da intro */
-    margin: 0 auto !important;
-    padding: 32px 24px 52px 24px !important;             /* borda fininha */
-    border-radius: 26px !important;
-    box-sizing: border-box !important;
-     transform: none !important;
-    -webkit-transform: translateY(0) translateZ(0) !important;
-    overflow: hidden !important;
-  }   
-
-  #section-card .j-panel-glow {
-    padding: 10px !important; /* igual Intro */
-  }  
-
-  #section-card .j-panel-glow::before {
-    content: '';
-  position: absolute;
-  pointer-events: none;
-  z-index: 1;
-  inset: 0;
-  border-radius: inherit;
-  border: 2px solid rgba(212,175,55,0.55);
-  box-shadow:
-    0 0 28px rgba(212,175,55,0.55),
-    inset 0 0 18px rgba(255,230,150,0.25);     
-  background: linear-gradient(
-    to bottom,
-    rgba(255,255,255,0.16),
-    transparent 45%,
-    transparent 100%
-  ) !important;
-  }   
-
-  /* Opcional: título e conteúdo respirando igual intro */
-  #section-card .senha-panel-inner {
-    padding: 0 10px !important;
-    box-sizing: border-box !important;
-  }
-  #section-card .pergaminho,
-  #section-card .pergaminho-v {
-  overflow-x: hidden !important;
-} 
-   
-  #section-card .card-stage {
-    max-width: 380px;
-    padding-bottom: 200px;
-  }
-
-  #section-card .placeholder-wrapper {
-    max-width: 240px;
-    margin-top: -20px;
-  }
-
- /* 1) Reserva espaço REAL embaixo (inclusive safe-area) */
-  #section-card{
-    padding-bottom: calc(140px + env(safe-area-inset-bottom, 0px)) !important;
-    overflow: visible !important;
-  }
-
-  /* 2) Se o seu botão for .btn-continuar ou #btn-continuar */
-  #section-card .btn-continuar,
-  #section-card #btn-continuar,
-  #section-card .btn-primary{
-    position: sticky !important; /* fica “grudado” ao rolar sem quebrar layout */
-    bottom: calc(18px + env(safe-area-inset-bottom, 0px)) !important;
-    z-index: 50 !important;
-    margin-top: 14px !important;
-    touch-action: manipulation !important; /* melhora toque no Android */
-  }
-
-  /* 3) Garante que nenhum overlay esteja bloqueando o clique */
-  #section-card .card-stage,
-  #section-card .j-panel-glow,
-  #section-card .j-perg-v-inner{
-    overflow: visible !important;
-  }
-
-  /* Se você tiver pseudo-camadas por cima (fog/glow) */
-  #section-card .j-panel-glow::before,
-  #section-card .j-panel-glow::after{
-    pointer-events: none !important;
-  }
-   /* ----- NOME DENTRO DO PLACEHOLDER (BASE INFERIOR) ----- */
-
-#section-card .flame-layer .card-footer {
-  position: relative;
-  z-index: 2;
-  width: 100%;
-  padding: 8px 10px 10px;
-  box-sizing: border-box;
-  text-align: center;
-
-  background: linear-gradient(
-    to top,
-    rgba(0, 0, 0, 0.9),
-    rgba(0, 0, 0, 0.65),
-    transparent
-  );
-}
-
-#section-card .card-name-badge {
-  display: inline-block;
-  padding: 4px 16px 3px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 215, 160, 0.85);
-  background: rgba(0, 0, 0, 0.7);
-  box-shadow:
-    0 0 12px rgba(255, 215, 0, 0.55),
-    0 0 22px rgba(255, 215, 0, 0.35);
-  letter-spacing: 0.08em;
-}
-
-#section-card #userNameSlot {
-  font-family: "ManufacturingConsent-Regular", "Cardo", serif;
-  font-size: 1rem;
-  text-transform: uppercase;
-}
-
-/* ----- BOTÃO CONTINUAR (FORA DA SELFIE, TRANSLÚCIDO) ----- */
-#section-card .card-actions-below{
-  margin-top: auto;          /* empurra para o fim */
-  padding-bottom: 18px;      /* “borda inferior” */
-  display: flex;
-  justify-content: center;
-  position: relative;
-  z-index: 5;
-  width: 100%;
-  text-align: center !important;
-  z-index: 5;
-  }
-
-#section-card #btnNext {
-  position: relative;
-  padding: 11px 40px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 215, 160, 0.9);
-  background: rgba(10, 10, 10, 0.35);   /* translúcido */
-  backdrop-filter: blur(3px);
-  color: #f6e7c6;
-  font-family: "ManufacturingConsent-Regular", "Cardo", serif;
-  font-size: 0.95rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  cursor: pointer;
-
-  box-shadow:
-    0 0 14px rgba(255, 215, 0, 0.45),
-    0 0 26px rgba(255, 160, 0, 0.35);
-}
-
-/* leve brilho no hover (continua translúcido) */
-#section-card #btnNext:hover {
-  background: rgba(20, 20, 20, 0.55);
-}
-   
-  /*#section-card #btnNext {
-    background: transparent !important;
-    border: 1px solid rgba(220, 190, 120, 0.7) !important;
-    box-shadow: 
-      inset 0 0 12px rgba(255, 215, 140, 0.25),
-      0 0 20px rgba(255, 180, 80, 0.4);
-    background-image: linear-gradient(
-      to bottom,
-      rgba(30, 25, 40, 0.45),
-      rgba(10, 10, 20, 0.65)
-    ) !important;
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-  }*/
-   
-   #section-card .flame-layer,
-  #section-card .card-actions-below,
-  #section-card .card-stage,
-  #section-card .j-panel-glow {
-    background: transparent !important;
-    isolation: auto !important;               /* ← importante */
-    backdrop-filter: none !important;         /* evita herança indesejada */
-  }
-
-}
-
-
-/* ----- TABLET (600–900px) ----- */
-
-@media (max-width: 900px) {
-  #section-card .card-panel {
-    margin: 40px auto 60px;
-    padding: 32px 20px 36px;
-  }
-
-  #section-card .guide-bg {
-    max-width: 340px;
-  }
-
-  #section-card .flame-layer {
-    top: 60%;
-    width: 65%;
-  }
-
-  #section-card .card-actions-below{
-  margin-top: auto;          /* empurra para o fim */
-  padding-bottom: 18px;      /* “borda inferior” */
-  display: flex;
-  justify-content: center;
-  position: relative;
-  z-index: 5;
-  width: 100%;
-  text-align: center !important;
-  z-index: 5;  
-  }
-}
- 
-/* =======================================================
-   SECTION-CARD — GLASS MOBILE (FIX FINAL)
-   (colar no FINAL do styles-card.css)
-   ======================================================= */
-@media (max-width: 600px) {
-
-  /* Remove “mancha” escura da base do placeholder (footer) */
+  /* Remove mancha escura no mobile (fica mais “vidro”) */
   #section-card .flame-layer .card-footer{
     background: transparent !important;
     box-shadow: none !important;
   }
 
-  /* Badge do nome: vidro translúcido */
+  /* Badge do nome em “vidro” */
   #section-card .card-name-badge{
     background: rgba(255,255,255,0.14) !important;
     backdrop-filter: blur(10px) !important;
     -webkit-backdrop-filter: blur(10px) !important;
-
     border: 1px solid rgba(255,255,255,0.26) !important;
     box-shadow:
       0 0 14px rgba(255,215,120,0.35),
       inset 0 0 14px rgba(255,255,255,0.10) !important;
-
     color: #f6e7c6 !important;
   }
 
-  /* Botão CONTINUAR: vidro translúcido (mata gradiente escuro) */
+  /* Botão mais slim no mobile */
   #section-card #btnNext{
+    max-width: 260px;
+    padding: 6px 18px !important;
+    font-size: 0.70rem !important;
+    border-radius: 12px !important;
+
     background: rgba(255,255,255,0.12) !important;
-    background-image: none !important; /* remove o “chapado” */
+    background-image: none !important;
     backdrop-filter: blur(10px) !important;
     -webkit-backdrop-filter: blur(10px) !important;
 
@@ -536,24 +280,10 @@
   #section-card #btnNext:hover{
     background: rgba(255,255,255,0.18) !important;
   }
-}
 
-#section-card { position: relative; }
-
-#guideBg{
-  position:absolute;
-  inset:0;
-  z-index:1;
-}
-
-.flame-layer{
-  position:relative;
-  z-index:2;
-}
-
-.card-frame{
-  position:absolute;
-  inset:0;
-  z-index:3;           /* acima de tudo */
-  pointer-events:none; /* não bloqueia cliques */
+  /* Anti-bloqueio de clique (glows não pegam pointer) */
+  #section-card .j-panel-glow::before,
+  #section-card .j-panel-glow::after{
+    pointer-events: none !important;
+  }
 }
