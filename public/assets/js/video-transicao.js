@@ -51,13 +51,16 @@
     if (cleaned) return;
     cleaned = true;
 
-    try {
-      document.removeEventListener('keydown', onKeydown, true);
-      window.__TRANSITION_LOCK = false;
-      document.dispatchEvent(new CustomEvent('transition:ended'));
-      document.documentElement.style.overflow = '';
-      if (overlay?.parentNode) overlay.parentNode.removeChild(overlay);
-    } catch {}
+   try {
+  document.removeEventListener('keydown', onKeydown, true);
+  window.__TRANSITION_LOCK = false;
+  document.dispatchEvent(new CustomEvent('transition:ended'));
+  document.documentElement.style.overflow = '';
+
+  document.body.classList.remove('vt-playing'); // <<< AQUI
+
+  if (overlay?.parentNode) overlay.parentNode.removeChild(overlay);
+} catch {}
 
     isPlaying = false;
     log('Overlay removido e estado resetado');
