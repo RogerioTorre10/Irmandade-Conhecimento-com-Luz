@@ -16,8 +16,7 @@
   lumen: '/assets/img/irmandade-quarteto-bg-lumen.png',
   zion:  '/assets/img/irmandade-quarteto-bg-zion.png',
 };
-
-  const FRAME_SRC = '/assets/img/borda-medieval-luminosa.png';
+  
   const PLACEHOLDER_SELFIE = '/assets/img/irmandade-card-placeholder.png';
 
   const qs  = (s, r = document) => r.querySelector(s);
@@ -78,7 +77,6 @@ function canonGuia(v) {
  function persistGuiaCanon(g) {
   const guiaCanon = canonGuia(g);
   if (!guiaCanon || !CARD_BG[guiaCanon]) return;
-
   try {
     window.JORNADA_STATE = window.JORNADA_STATE || {};
     window.JORNADA_STATE.guia = guiaCanon;
@@ -88,49 +86,6 @@ function canonGuia(v) {
     localStorage.setItem('JORNADA_GUIA', guiaCanon);
   } catch {}
 }
-
-  // -----------------------------
-  // Monta HTML interno 1x
-  // -----------------------------
-  function buildMarkup(section) {
-    if (!section || section.__CARD_BUILT__) return;
-
-    section.innerHTML = `
-      <div class="j-panel-glow card-panel">
-        <div class="conteudo-pergaminho">
-          <h2
-            data-typing="true"
-            data-text="Eu na Irmandade"
-            data-speed="40"
-            data-cursor="true"
-            class="titulo-selfie"
-          >Eu na Irmandade</h2>
-
-          <img id="guideBg" class="guide-bg" alt="Fundo do Guia" />
-
-          <div class="flame-layer show placeholder-only" aria-hidden="true">
-            <img
-              id="selfieImage"
-              class="flame-selfie"
-              src="${PLACEHOLDER_SELFIE}"
-              alt="Sua foto na Irmandade"
-            />
-            <div class="card-footer">
-              <span class="card-name-badge">
-                <span id="userNameSlot">Carregando...</span>
-              </span>
-            </div>
-          </div>
-
-          <div class="card-actions-below">
-            <button id="btnNext" class="btn btn-stone">✅ Continuar</button>
-          </div>
-        </div>
-      </div>
-    `.trim();
-
-    section.__CARD_BUILT__ = true;
-  }
 
   // -----------------------------
   // Render UI do Card
@@ -147,16 +102,25 @@ function canonGuia(v) {
 
     const selfieImg = qs('#selfieImage', section);
     if (selfieImg) {
-      let src = '';
-      try {
-        src =
-          window.JORNADA_STATE?.selfieDataUrl ||
-          window.JC?.data?.selfieDataUrl ||
-          localStorage.getItem('jc.selfieDataUrl') ||
-          localStorage.getItem('JORNADA_SELFIE') ||
-          '';
-      } catch {}
-      selfieImg.src = src || PLACEHOLDER_SELFIE;
+      let src = null;
+try {
+ src =
+  window.JORNADA_STATE?.selfieDataUrl ||
+  window.JC?.data?.selfieDataUrl ||
+  sessionStorage.getItem('JORNADA_SELFIE') ||   // ✅ add
+  localStorage.getItem('JORNADA_SELFIE') ||     // ✅ add
+  localStorage.getItem('jc.selfieDataUrl') ||
+  localStorage.getItem('JORNADA_SELFIE') ||
+  '';
+} catch {}
+
+try {
+  const sc1 = sessionStorage.getItem('JORNADA_SELFIECARD') || '';
+  const sc2 = sessionStorage.getItem('SELFIE_CARD') || '';
+  if (src && (src === sc1 || src === sc2)) src = '';
+} catch {}
+
+selfieImg.src = src || PLACEHOLDER_SELFIE;
     }
 
     const nameSlot = qs('#userNameSlot', section);
@@ -180,6 +144,76 @@ function canonGuia(v) {
       return false;
     }
   }
+
+   function drawGoldFrame(ctx, W, H, opts = {}) {
+  const pad = Math.max(10, opts.pad ?? 28);     // “largura” útil da moldura
+  const rad = Math.max(6, opts.radius ?? 28);  // raio dos cantos
+  const glow = opts.glow ?? true;
+
+  function rrPath(x, y, w, h, r) {
+    const rr = Math.min(r, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + rr, y);
+    ctx.arcTo(x + w, y, x + w, y + h, rr);
+    ctx.arcTo(x + w, y + h, x, y + h, rr);
+    ctx.arcTo(x, y + h, x, y, rr);
+    ctx.arcTo(x, y, x + w, y, rr);
+    ctx.closePath();
+  }
+
+  // 1) “faixa” da moldura = retângulo externo - retângulo interno
+  ctx.save();
+
+  // Glow externo sutil
+  if (glow) {
+    ctx.shadowBlur = 18;
+    ctx.shadowColor = "rgba(255, 210, 120, 0.55)";
+  }
+
+  rrPath(2, 2, W - 4, H - 4, rad + 6);
+  ctx.fillStyle = "rgba(255, 220, 160, 0.08)";
+  ctx.fill();
+
+  ctx.shadowBlur = 0;
+
+  // Cria faixa (stroke largo com gradiente)
+  const grad = ctx.createLinearGradient(0, 0, W, H);
+  grad.addColorStop(0.00, "rgba(255, 242, 210, 0.95)");
+  grad.addColorStop(0.25, "rgba(255, 205, 120, 0.95)");
+  grad.addColorStop(0.50, "rgba(210, 150, 70, 0.95)");
+  grad.addColorStop(0.75, "rgba(255, 205, 120, 0.95)");
+  grad.addColorStop(1.00, "rgba(255, 242, 210, 0.95)");
+
+  ctx.lineWidth = pad;                 // <<< aqui “vira” moldura
+  ctx.strokeStyle = grad;
+  rrPath(pad / 2, pad / 2, W - pad, H - pad, rad);
+  ctx.stroke();
+
+  // Filete interno pra acabamento (não cobre conteúdo)
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = "rgba(60, 30, 10, 0.35)";
+  rrPath(pad + 2, pad + 2, W - (pad + 4) * 2, H - (pad + 4) * 2, Math.max(8, rad - 10));
+  ctx.stroke();
+
+  // “Brilhinhos” discretos nos cantos
+  if (glow) {
+    const spark = (x, y, a = 0.85) => {
+      ctx.save();
+      ctx.globalAlpha = a;
+      ctx.beginPath();
+      ctx.arc(x, y, 4, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(255,255,255,0.9)";
+      ctx.fill();
+      ctx.restore();
+    };
+    spark(pad * 0.55, pad * 0.55, 0.55);
+    spark(W - pad * 0.55, pad * 0.55, 0.45);
+    spark(pad * 0.55, H - pad * 0.55, 0.45);
+    spark(W - pad * 0.55, H - pad * 0.55, 0.55);
+  }
+
+  ctx.restore();
+}
 
   function loadImg(src) {
     return new Promise((resolve) => {
@@ -220,16 +254,10 @@ function canonGuia(v) {
     return c;
   }
 
-// -----------------------------
-// SELFIECARD — SAFE MODE (FIX)
-// - 1x por sessão OU quando (nome+guia) mudar
-// - placeholder 2x2 (rounded square) no peito
-// - moldura FULL-BLEED (fora do card) sem “borda escura”
-// -----------------------------
 function selfieCardSafeMode(section, ctxData) {
   const nome = (ctxData?.nome || getNome() || 'PARTICIPANTE').trim();
 
-  // guia canon vem do ctxData primeiro, depois storages/state
+  // fonte única do guia (canon)
   const guia =
     canonGuia(ctxData?.guia) ||
     canonGuia(sessionStorage.getItem('JORNADA_GUIA')) ||
@@ -238,14 +266,14 @@ function selfieCardSafeMode(section, ctxData) {
     canonGuia(window.JORNADA_STATE?.guia) ||
     'zion';
 
-  // garante persistência pra não “voltar guia fantasma”
+  // grava também aqui (segurança)
   try {
     sessionStorage.setItem('JORNADA_GUIA', guia);
     localStorage.setItem('JORNADA_GUIA', guia);
     window.JORNADA_STATE = window.JORNADA_STATE || {};
     window.JORNADA_STATE.guia = guia;
     window.JORNADA_STATE.guiaSelecionado = guia;
-  } catch (_) {}
+  } catch {}
 
   const signature = `${nome}__${guia}`;
   const last = sessionStorage.getItem('__SELFIECARD_SIG__') || '';
@@ -253,140 +281,167 @@ function selfieCardSafeMode(section, ctxData) {
   sessionStorage.setItem('__SELFIECARD_SIG__', signature);
 
   const run = async () => {
-    try {
-      const sec = section || document.getElementById('section-card') || document;
+    const sec = section || document.getElementById('section-card') || document;
 
-      const selfieSrc = sec.querySelector('#selfieImage')?.src || '';
-      const bgSrc =
-        sec.querySelector('#guideBg')?.src ||
-        (CARD_BG?.[guia] || CARD_BG?.zion || '');
+   // pega a selfie SEM depender do DOM (fonte única)
+const selfieSrc =
+  (window.JORNADA_STATE?.selfieDataUrl || '') ||
+  (sessionStorage.getItem('JORNADA_SELFIE') || '') ||
+  (localStorage.getItem('JORNADA_SELFIE') || '') ||
+  (localStorage.getItem('jc.selfieDataUrl') || '') ||
+  (sec.querySelector('#selfieImage')?.src || '');
 
-      const selfieImg = await loadImg(selfieSrc);
-      const bgImg = await loadImg(bgSrc);
-      const frameImg = await loadImg(FRAME_SRC);
+// BG do guia (pode vir do DOM ou do mapa)
+const bgSrc =
+  (sec.querySelector('#guideBg')?.src || '') ||
+  (CARD_BG?.[guia] || CARD_BG?.zion || '');
+     
+    let selfieImg = await loadImg(selfieSrc);
 
-      if (!selfieImg) {
-        console.warn('[CARD][SELFIECARD] selfieImg não carregou.');
-        return;
-      }
-
-      // ✅ frameCanvas EXISTE e FICA DENTRO do run()
-      let frameCanvas = null;
-      if (frameImg) {
-        try {
-          // remove branco “sujo” se existir (se sua moldura já é transparente, isso não atrapalha)
-          frameCanvas = makeWhiteTransparent(frameImg, 245);
-        } catch {
-          frameCanvas = null;
-        }
-      }
-
-      const W = 512, H = 720;
-      const canvas = document.createElement('canvas');
-      canvas.width = W; canvas.height = H;
-      const c = canvas.getContext('2d', { alpha: true });
-
-      // 0) fundo sólido (evita “xadrez” em alguns viewers)
-      c.fillStyle = '#0b0f16';
-      c.fillRect(0, 0, W, H);
-
-      // 1) BG do guia (cover)
-      if (bgImg && bgImg.naturalWidth > 0) {
-        const r = Math.max(W / bgImg.naturalWidth, H / bgImg.naturalHeight);
-        const dw = bgImg.naturalWidth * r;
-        const dh = bgImg.naturalHeight * r;
-        c.drawImage(bgImg, (W - dw) / 2, (H - dh) / 2, dw, dh);
-      }
-
-      // helper: rounded rect
-      function roundRectPath(ctx, x, y, w, h, r) {
-        const rr = Math.max(0, Math.min(r, Math.min(w, h) / 2));
-        ctx.beginPath();
-        ctx.moveTo(x + rr, y);
-        ctx.arcTo(x + w, y, x + w, y + h, rr);
-        ctx.arcTo(x + w, y + h, x, y + h, rr);
-        ctx.arcTo(x, y + h, x, y, rr);
-        ctx.arcTo(x, y, x + w, y, rr);
-        ctx.closePath();
-      }
-
-      // 2) “2x2” no peito
-      const cx = W / 2;
-      const cy = Math.round(H * 0.66);        // ajuste fino (0.64~0.68)
-      const box = Math.round(W * 0.34);       // tamanho do quadrado
-      const rBox = Math.round(box * 0.18);    // arredondamento
-      const x0 = Math.round(cx - box / 2);
-      const y0 = Math.round(cy - box / 2);
-
-      c.save();
-      roundRectPath(c, x0, y0, box, box, rBox);
-      c.clip();
-
-      const sw = selfieImg.naturalWidth || 1;
-      const sh = selfieImg.naturalHeight || 1;
-      const scale = Math.max(box / sw, box / sh);
-      const dw = sw * scale;
-      const dh = sh * scale;
-      c.drawImage(selfieImg, cx - dw / 2, cy - dh / 2, dw, dh);
-      c.restore();
-
-      // 3) Moldura “por fora” (FULL BLEED)
-      //    Aumente/diminua o BLEED até ficar idêntico ao seu print 2.
-      const BLEED = 22; // 18~28 (quanto maior, mais “pra fora”)
-      if (frameCanvas) c.drawImage(frameCanvas, -BLEED, -BLEED, W + BLEED * 2, H + BLEED * 2);
-      else if (frameImg) c.drawImage(frameImg, -BLEED, -BLEED, W + BLEED * 2, H + BLEED * 2);
-
-      // 4) textos
-      const nomeY = Math.round(H * 0.86);
-      const guiaY = Math.round(H * 0.91);
-      const guiaNome = prettyGuia(guia);
-
-      c.textAlign = 'center';
-      c.fillStyle = 'rgba(255,255,255,0.92)';
-      c.font = 'bold 30px Cardo, serif';
-      c.fillText(nome.toUpperCase(), cx, nomeY);
-
-      c.fillStyle = 'rgba(255,255,255,0.75)';
-      c.font = '22px Cardo, serif';
-      c.fillText(guiaNome ? `Guia: ${guiaNome}` : 'Guia: —', cx, guiaY);
-
-      // 5) export
-      let dataUrl = '';
-      try {
-        dataUrl = canvas.toDataURL('image/png');
-      } catch (err) {
-        console.error('[CARD][SELFIECARD] toDataURL falhou (CORS/tainted?)', err);
-        return;
-      }
-
-      sessionStorage.setItem('JORNADA_SELFIECARD', dataUrl);
-      sessionStorage.setItem('SELFIE_CARD', dataUrl);
-      try {
-        localStorage.setItem('JORNADA_SELFIECARD', dataUrl);
-        localStorage.setItem('SELFIE_CARD', dataUrl);
-      } catch (_) {}
-
-      window.JORNADA_STATE = window.JORNADA_STATE || {};
-      window.JORNADA_STATE.selfieCard = dataUrl;
-
-      console.log('[CARD][SELFIECARD] ✅ salva!', signature);
-    } catch (e) {
-      console.error('[CARD][SELFIECARD] erro:', e);
-    }
-  };
-
-  // roda fora do paint
-  setTimeout(() => {
-    if ('requestIdleCallback' in window) requestIdleCallback(run, { timeout: 1200 });
-    else run();
-  }, 60);
+// fallback duro: nunca trava
+if (!selfieImg) {
+  console.warn('[CARD][SELFIECARD] selfieImg não carregou. Usando PLACEHOLDER_SELFIE.');
+  selfieImg = await loadImg(PLACEHOLDER_SELFIE);
 }
 
+// se até placeholder falhar, aí sim aborta
+if (!selfieImg) {
+  console.warn('[CARD][SELFIECARD] PLACEHOLDER_SELFIE também falhou.');
+  return;
+}
+    const W = 512, H = 720;
+    const canvas = document.createElement('canvas');
+    canvas.width = W; canvas.height = H;
+    const c = canvas.getContext('2d', { alpha: true });
+
+    // FUNDO sólido (evita “efeito xadrez” em alguns viewers)
+    c.fillStyle = '#0b0f16';
+    c.fillRect(0, 0, W, H);
+
+    // ==============================
+    // CONTEÚDO DENTRO DA MOLDURA
+    // padding garante moldura externa sem cobrir texto/bg
+    // ==============================
+    const P = 34; // ajuste fino (28~40). 34 costuma ficar perfeito p/ molduras grossas
+    const ix = P, iy = P, iw = W - 2 * P, ih = H - 2 * P;
+
+    // BG do guia (cover) DENTRO do retângulo interno
+    if (bgImg && bgImg.naturalWidth > 0) {
+      const r = Math.max(iw / bgImg.naturalWidth, ih / bgImg.naturalHeight);
+      const dw = bgImg.naturalWidth * r;
+      const dh = bgImg.naturalHeight * r;
+      c.drawImage(bgImg, ix + (iw - dw) / 2, iy + (ih - dh) / 2, dw, dh);
+    } else {
+      c.fillStyle = 'rgba(0,0,0,0.35)';
+      c.fillRect(ix, iy, iw, ih);
+    }
+
+    // helper: rounded rect
+    function roundRectPath(ctx, x, y, w, h, r) {
+      const rr = Math.max(0, Math.min(r, Math.min(w, h) / 2));
+      ctx.beginPath();
+      ctx.moveTo(x + rr, y);
+      ctx.arcTo(x + w, y, x + w, y + h, rr);
+      ctx.arcTo(x + w, y + h, x, y + h, rr);
+      ctx.arcTo(x, y + h, x, y, rr);
+      ctx.arcTo(x, y, x + w, y, rr);
+      ctx.closePath();
+    }
+
+    // Placeholder 2x2 (quadrado arredondado) no peito
+    const cx = ix + iw / 2;
+    const cy = iy + ih * 0.72;        // ajuste fino peito: 0.60~0.66
+    const box = iw * 0.42;            // “2x2”
+    const rBox = box * 0.18;
+    const x0 = Math.round(cx - box / 2);
+    const y0 = Math.round(cy - box / 2);
+
+    c.save();
+    roundRectPath(c, x0, y0, box, box, rBox);
+    c.clip();
+
+    const sw = selfieImg.naturalWidth || 1;
+    const sh = selfieImg.naturalHeight || 1;
+    const scale = Math.max(box / sw, box / sh);
+    const dw = sw * scale;
+    const dh = sh * scale;
+    c.drawImage(selfieImg, cx - dw / 2, cy - dh / 2, dw, dh);
+    c.restore();
+
+     // ===== NOVA MOLDURA GERADA POR CÓDIGO =====
+    drawGoldFrame(c, W, H, {
+    pad: 28,      // espessura da moldura
+    radius: 28,   // cantos arredondados
+    glow: true
+   });
+
+    // Textos dentro do retângulo interno (não ficam sob a moldura)
+    const guiaNome = (typeof prettyGuia === 'function') ? prettyGuia(guia) : guia;
+
+    c.textAlign = 'center';
+    c.fillStyle = 'rgba(255,255,255,0.92)';
+    c.font = 'bold 30px Cardo, serif';
+    c.fillText(nome.toUpperCase(), cx, iy + ih * 0.90);
+
+    c.fillStyle = 'rgba(255,255,255,0.78)';
+    c.font = '22px Cardo, serif';
+    c.fillText(`Guia: ${guiaNome || '—'}`, cx, iy + ih * 0.95);
+
+    // ==============================
+    // MOLDURA EXTERNA (full canvas)
+    // ==============================
+    //if (frameCanvas) c.drawImage(frameCanvas, 0, 0, W, H);
+    //else if (frameImg) c.drawImage(frameImg, 0, 0, W, H);
+
+    // Export
+    const dataUrl = canvas.toDataURL('image/png');
+
+    sessionStorage.setItem('JORNADA_SELFIECARD', dataUrl);
+    sessionStorage.setItem('SELFIE_CARD', dataUrl);
+    try {
+      localStorage.setItem('JORNADA_SELFIECARD', dataUrl);
+      localStorage.setItem('SELFIE_CARD', dataUrl);
+    } catch {}
+
+    window.JORNADA_STATE = window.JORNADA_STATE || {};
+    window.JORNADA_STATE.selfieCard = dataUrl;
+
+    console.log('[CARD][SELFIECARD] ✅ salva!', signature);
+  };
+
+  // expõe promise para o PDF aguardar (SEM async)
+try {
+  window.__SELFIECARD_PROMISE__ = new Promise((resolve) => {
+    setTimeout(() => {
+      const done = () => resolve(true);
+
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => {
+          Promise.resolve()
+            .then(() => run())
+            .then(done)
+            .catch(done);
+        }, { timeout: 1200 });
+      } else {
+        Promise.resolve()
+          .then(() => run())
+          .then(done)
+          .catch(done);
+      }
+    }, 60);
+  });
+} catch {
+  window.__SELFIECARD_PROMISE__ = Promise.resolve(true);
+}
+}
+   
   // -----------------------------
   // Navegação
   // -----------------------------
-  function goNext() {
-    try { speechSynthesis.cancel(); } catch {}
+function goNext() {
+  try { speechSynthesis.cancel(); } catch {}
+
+  const proceed = () => {
     if (typeof window.playTransitionVideo === 'function') {
       window.playTransitionVideo(VIDEO_SRC, NEXT_SECTION_ID);
       return;
@@ -394,7 +449,17 @@ function selfieCardSafeMode(section, ctxData) {
     if (window.JC && typeof window.JC.show === 'function') {
       window.JC.show(NEXT_SECTION_ID, { force: true });
     }
+  };
+
+  try {
+    Promise.race([
+      window.__SELFIECARD_PROMISE__ || Promise.resolve(),
+      new Promise((r) => setTimeout(r, 900)),
+    ]).then(proceed).catch(proceed);
+  } catch {
+    proceed();
   }
+}
 
   // -----------------------------
   // Init (section:shown friendly)
@@ -420,14 +485,13 @@ function selfieCardSafeMode(section, ctxData) {
     }
   }
 
-  function init(root) {
-    const section = findSection(root || null);
-    if (!section) return;
+  function init(root){
+  const section = findSection(root || null);
+  if (!section) return;
 
-    buildMarkup(section);
-    renderCard(section);
-    bind(section);
-  }
+  renderCard(section);   // agora o CSS volta a mandar
+  bind(section);
+}
 
   // boot
   document.addEventListener('DOMContentLoaded', () => init());
