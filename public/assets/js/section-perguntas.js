@@ -221,6 +221,14 @@
   async function typeQuestion(text) {
     if (completed) return;
 
+  // 🛑 DIAMANTE: NÃO renderiza perguntas durante transição de vídeo
+   if (window.__TRANSITION_LOCK) {
+   console.log('[PERGUNTAS] aguardando portal fechar...');
+   document.addEventListener('transition:ended', () => {
+    setTimeout(() => showCurrentQuestion(), 50);
+   }, { once:true });
+   return;
+  }
     const box = $('#jp-question-typed');
     const raw = $('#jp-question-raw');
     if (!box) return;
@@ -398,7 +406,12 @@ window.addEventListener('resize', () => setTimeout(applyGuiaTheme, 80));
   // NAVEGAÇÃO
   // --------------------------------------------------
 
-  function nextStep() {
+    function nextStep() {
+     if (window.__TRANSITION_LOCK) {
+     console.log('[PERGUNTAS] bloqueado aguardando portal...');
+     return;
+  }
+    
     if (completed) {
       log('Clique em confirmar após conclusão; ignorado.');
       return;
