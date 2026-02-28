@@ -51,27 +51,41 @@
   }
 
   // usa o portal dourado FULL + limelight
-  function playVideoWithCallback(src, onEnded, nextSectionId = null) {
-    src = resolveVideoSrc(src);
-    if (!src) {
-      if (typeof onEnded === 'function') onEnded();
-      return;
-    }
-
-    // Se existir player global cinematográfico, usa ele
-    if (typeof window.playTransitionVideo === 'function') {
-      window.playTransitionVideo(src, nextSectionId);
-      // quando o portal fecha ele navega; aqui só chamamos callback depois
-      document.addEventListener('transition:ended', function handler() {
-        document.removeEventListener('transition:ended', handler);
-        if (typeof onEnded === 'function') onEnded();
-      });
-      return;
-    }
-
-    // fallback (raríssimo): sem portal → só chama callback
+ function playVideoWithCallback(src, onEnded, nextSectionId = null) {
+  src = resolveVideoSrc(src);
+  if (!src) {
     if (typeof onEnded === 'function') onEnded();
+    return;
   }
+
+  // 🔒 TRAVA renderização das perguntas
+  window.__TRANSITION_LOCK = true;
+
+  if (typeof window.playTransitionVideo === 'function') {
+
+    const handler = () => {
+      document.removeEventListener('transition:ended', handler);
+
+      // 🔓 LIBERA renderização das perguntas
+      window.__TRANSITION_LOCK = false;
+
+      if (typeof onEnded === 'function') {
+        setTimeout(onEnded, 60);
+      }
+    };
+
+    document.addEventListener('transition:ended', handler);
+
+    // chama o portal SEM navegar de seção
+    window.playTransitionVideo(src, null);
+
+    return;
+  }
+
+  // fallback
+  window.__TRANSITION_LOCK = false;
+  if (typeof onEnded === 'function') onEnded();
+}
 
   window.playBlockTransition = function(videoSrc, onDone) {
     const src = resolveVideoSrc(videoSrc);
