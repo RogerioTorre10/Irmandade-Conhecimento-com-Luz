@@ -56,9 +56,10 @@
   window.__TRANSITION_LOCK = false;
   document.dispatchEvent(new CustomEvent('transition:ended'));
   document.documentElement.style.overflow = '';
-document.body.classList.remove('vt-playing');
-if (overlay?.parentNode) overlay.parentNode.removeChild(overlay);
-} catch {}
+  document.body.classList.remove('vt-playing');
+  document.documentElement.classList.remove('vt-playing'); // 💎 novo
+  if (overlay?.parentNode) overlay.parentNode.removeChild(overlay);
+  } catch {}
 
     isPlaying = false;
     log('Overlay removido e estado resetado');
@@ -119,7 +120,8 @@ overlay.style.overflow = 'hidden';
 overlay.style.zIndex = '2147483647';
 
 document.body.classList.add('vt-playing');
-
+document.documentElement.classList.add('vt-playing');
+    
 // glamour fade-in do portal
 requestAnimationFrame(() => overlay.classList.add('show'));
 
