@@ -50,52 +50,68 @@
     return url;
   }
 
-  // usa o portal dourado FULL + limelight
- function playVideoWithCallback(src, onEnded, nextSectionId = null) {
+function playVideoWithCallback(src, onEnded, nextSectionId = null) {
   src = resolveVideoSrc(src);
+
   if (!src) {
     if (typeof onEnded === 'function') onEnded();
     return;
   }
 
-  // 🔒 TRAVA renderização das perguntas
+  // 💎 se já tem transição rolando, não inicia outra
+  if (window.__TRANSITION_LOCK) {
+    console.log('[PERGUNTAS] transição já em andamento — ignorando nova chamada');
+    return;
+  }
+
+  // 💎 trava o fluxo enquanto o portal roda
   window.__TRANSITION_LOCK = true;
+  try { document.body.classList.add('vt-playing'); } catch {}
+  try { document.documentElement.classList.add('vt-playing'); } catch {}
 
+  const doneOnce = (() => {
+    let called = false;
+    return () => {
+      if (called) return;
+      called = true;
+
+      // 🔓 libera fluxo
+      window.__TRANSITION_LOCK = false;
+      try { document.body.classList.remove('vt-playing'); } catch {}
+      try { document.documentElement.classList.remove('vt-playing'); } catch {}
+
+      if (typeof onEnded === 'function') setTimeout(onEnded, 60);
+    };
+  })();
+
+  // Se existir player global cinematográfico, usa ele (PORTAL)
   if (typeof window.playTransitionVideo === 'function') {
-
     const handler = () => {
       document.removeEventListener('transition:ended', handler);
-
-      // 🔓 LIBERA renderização das perguntas
-      window.__TRANSITION_LOCK = false;
-
-      if (typeof onEnded === 'function') {
-        setTimeout(onEnded, 60);
-      }
+      doneOnce();
     };
 
-    document.addEventListener('transition:ended', handler);
+    document.addEventListener('transition:ended', handler, { once: true });
 
-    // chama o portal SEM navegar de seção
-    window.playTransitionVideo(src, null);
+    // ⚠️ IMPORTANTE: para bloco, NÃO navega de seção
+    window.playTransitionVideo(src, nextSectionId || null);
 
     return;
   }
 
-  // fallback
-  window.__TRANSITION_LOCK = false;
-  if (typeof onEnded === 'function') onEnded();
+  // fallback: sem portal → libera e chama callback
+  doneOnce();
 }
 
-  window.playBlockTransition = function(videoSrc, onDone) {
-    const src = resolveVideoSrc(videoSrc);
-    if (!src) {
-      if (typeof onDone === 'function') onDone();
-      return;
-    }
-    log('Transição entre blocos (PORTAL GLOBAL):', src);
-    playVideoWithCallback(src, onDone);
-  };
+window.playBlockTransition = function(videoSrc, onDone) {
+  const src = resolveVideoSrc(videoSrc);
+  if (!src) {
+    if (typeof onDone === 'function') onDone();
+    return;
+  }
+  console.log('[PERGUNTAS] Transição entre blocos (PORTAL GLOBAL):', src);
+  playVideoWithCallback(src, onDone, null);
+};
 
   // --------------------------------------------------
   // BLOCS / PERGUNTAS
