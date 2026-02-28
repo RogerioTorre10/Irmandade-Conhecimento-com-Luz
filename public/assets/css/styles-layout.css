@@ -2228,3 +2228,8 @@ body {
 /* opcional: esconde sections DURANTE o vídeo (não mexe no overlay) */
 body.vt-playing .section{ visibility: hidden !important; }
 body.vt-playing #vt-overlay{ visibility: visible !important; }
+
+html.vt-playing, body.vt-playing {
+  overflow: hidden !important;
+  max-width: 100vw !important;
+}
