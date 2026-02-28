@@ -108,16 +108,15 @@ document.body.appendChild(overlay);
 // ===============================
 // DIAMANTE: overlay acima de tudo
 // ===============================
+// DIAMANTE: overlay nunca pode empurrar layout
 overlay.style.position = 'fixed';
 overlay.style.inset = '0';
 overlay.style.width = '100vw';
 overlay.style.height = '100vh';
+overlay.style.maxWidth = '100vw';
+overlay.style.maxHeight = '100vh';
+overlay.style.overflow = 'hidden';
 overlay.style.zIndex = '2147483647';
-overlay.style.pointerEvents = 'auto';
-overlay.style.display = 'block';
-overlay.style.opacity = '1';
-overlay.style.visibility = 'visible';
-overlay.style.background = '#000';
 
 document.body.classList.add('vt-playing');
 
