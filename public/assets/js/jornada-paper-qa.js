@@ -328,17 +328,21 @@ updateProgress(currentBlock, currentQuestion);
 
       if (JC.currentPergunta < block.questions.length - 1) {
         JC.currentPergunta++;
-      } else if (JC.currentBloco < JORNADA_BLOCKS.length - 1) {
-        JC.currentBloco++;
-        JC.currentPergunta = 0;
-        const nextVideo = JORNADA_BLOCKS[JC.currentBloco - 1]?.video_after;
-        if (nextVideo && window.playBlockTransition) {
-          await new Promise(resolve => window.playBlockTransition(nextVideo, resolve));
-        }
-      } else {
-        document.dispatchEvent(new CustomEvent('qa:completed'));
-        return;
-      }
+     } else if (JC.currentBloco < JORNADA_BLOCKS.length - 1) {
+  JC.currentBloco++;
+  JC.currentPergunta = 0;
+
+  const nextVideo = JORNADA_BLOCKS[JC.currentBloco - 1]?.video_after;
+
+  // Transição ENTRE BLOCOS (SEM navegar de section)
+  if (nextVideo && typeof window.playBlockTransition === 'function') {
+    await new Promise((resolve) => window.playBlockTransition(nextVideo, resolve));
+  }
+
+} else {
+  document.dispatchEvent(new CustomEvent('qa:completed'));
+  return;
+}
 
       win.JC = JC;
       renderQuestions();
