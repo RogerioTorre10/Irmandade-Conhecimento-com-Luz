@@ -348,3 +348,9 @@ section.selfie-page {
   100% { transform: scale(1.00); filter: drop-shadow(0 0 14px var(--aura-gold)); }
 }
 
+body.is-transitioning #app,
+body.is-transitioning main,
+body.is-transitioning .jornada-root,
+body.is-transitioning #jornada-root{
+  opacity: 0 !important;
+}
