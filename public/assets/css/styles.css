@@ -354,3 +354,37 @@ body.is-transitioning .jornada-root,
 body.is-transitioning #jornada-root{
   opacity: 0 !important;
 }
+
+/* ======== VT FORCE FIXED (anti-transform) ======== */
+html.vt-force-fixed, body.vt-force-fixed{
+  transform: none !important;
+  filter: none !important;
+  perspective: none !important;
+  will-change: auto !important;
+}
+
+/* Overlay ENTRE BLOCOS (perguntas) */
+#videoOverlay{
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  display: none;
+  background: rgba(0,0,0,0.98) !important;
+  z-index: 2147483646 !important;
+  pointer-events: none !important;
+}
+
+#videoOverlay.is-on{ display:block !important; }
+
+/* vídeo cobrindo TUDO */
+#videoOverlay video,
+#videoTransicao{
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  background: #000 !important;
+}
