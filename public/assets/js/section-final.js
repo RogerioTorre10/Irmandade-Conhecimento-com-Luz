@@ -1,10 +1,9 @@
-/* /assets/js/section-final.js — v6.1 (Diamante + PDF/SelfieCard + Guia Normalizado + Voltar Portal)
+/* /assets/js/section-final.js — v6 (Diamante + PDF/SelfieCard)
  * Página final da Jornada Essencial
  * - Datilografia + voz (mantido)
  * - Botões existentes (PDF + SelfieCard) com feedback mágico
  * - Payload diamante robusto (pega nome/guia/respostas/selfieCard de onde existir)
- * - Normaliza guia (ex: "guia" -> tenta achar Lumen/Zion/Arion em chaves alternativas)
- * - Libera botão Voltar ao Portal mesmo se estiver fora de .final-acoes
+ * - Remove legado /api/jornada/finalizar (404)
  */
 
 (function () {
@@ -114,9 +113,9 @@
       }
     }
 
-    // 3) chaves “unitárias”
-    const nomeLS = (localStorage.getItem('JORNADA_NOME') || sessionStorage.getItem('JORNADA_NOME') || '').trim();
-    const guiaLS = (localStorage.getItem('JORNADA_GUIA') || sessionStorage.getItem('JORNADA_GUIA') || '').trim();
+    // 3) chaves “unitárias” que você realmente usa hoje
+    const nomeLS = (localStorage.getItem('JORNADA_NOME') || '').trim();
+    const guiaLS = (localStorage.getItem('JORNADA_GUIA') || '').trim();
 
     const merged = Object.assign({}, fromWindow, fromLS);
 
@@ -124,84 +123,19 @@
     if (!merged.nome && nomeLS) merged.nome = nomeLS;
     if (!merged.guiaSelecionado && !merged.guia && guiaLS) merged.guiaSelecionado = guiaLS;
 
-    // espelho opcional
+    // espelho opcional (ajuda outras sections)
     window.JORNADA_STATE = merged;
 
     return merged;
   }
 
   // --------------------------------------------------
-  // Normalização do guia (id para backend + nome para debug)
-  // --------------------------------------------------
-  function normalizeGuide(raw) {
-    const s = String(raw || '').trim();
-    const x = s.toLowerCase();
-
-    // casos “bons”
-    if (x === 'lumen' || x === 'guia-lumen' || x === 'guia_lumen' || x === 'lumen-1') return { id: 'lumen', nome: 'Lumen' };
-    if (x === 'zion'  || x === 'guia-zion'  || x === 'guia_zion'  || x === 'zion-1')  return { id: 'zion',  nome: 'Zion'  };
-    if (x === 'arion' || x === 'arian' || x === 'guia-arion' || x === 'guia_arion' || x === 'guia-arian' || x === 'guia_arian') {
-      return { id: 'arion', nome: 'Arion' };
-    }
-
-    // valores genéricos/ruins
-    if (!x || x === 'guia' || x === 'guide' || x === 'selected' || x === 'selecionado') return { id: '', nome: '' };
-
-    // fallback: manda “como veio”, mas padronizado
-    return { id: x, nome: s };
-  }
-
-  function readGuideFromEverywhere(stateObj) {
-    // 1) state (vários nomes)
-    let g =
-      stateObj?.guiaSelecionado ??
-      stateObj?.guia ??
-      stateObj?.guide ??
-      stateObj?.selectedGuide ??
-      stateObj?.guiaId ??
-      null;
-
-    // 1.1) se vier objeto (ex: {id:"lumen"})
-    if (g && typeof g === 'object') {
-      g = g.id || g.key || g.slug || g.nome || g.name || '';
-    }
-
-    // 2) storage (mais candidatos)
-    const candidates = [
-      'JORNADA_GUIA',
-      'JORNADA_GUIA_ID',
-      'JORNADA_GUIA_NOME',
-      'GUIA_SELECIONADO',
-      'jc.guia',
-      'jornada.guia',
-      'jornada.guiaSelecionado'
-    ];
-
-    let gs = '';
-    for (const k of candidates) {
-      const v = (localStorage.getItem(k) || sessionStorage.getItem(k) || '').trim();
-      if (v) { gs = v; break; }
-    }
-
-    // 3) se g for ruim ("guia"), tenta gs
-    const n1 = normalizeGuide(g);
-    if (n1.id) return n1;
-
-    const n2 = normalizeGuide(gs);
-    if (n2.id) return n2;
-
-    // 4) último recurso: tenta dataset do html/body
-    const d1 = document.documentElement?.dataset?.guia || document.body?.dataset?.guia || '';
-    const n3 = normalizeGuide(d1);
-    if (n3.id) return n3;
-
-    return { id: '', nome: '' };
-  }
-
-  // --------------------------------------------------
   // Respostas: tenta achar em vários locais
+  // - aceita array
+  // - aceita objeto {q1:"...", q2:"..."} -> vira array
   // --------------------------------------------------
   function readAnswersFromEverywhere(stateObj) {
+    // 1) state (vários nomes)
     let a =
       stateObj?.respostas ??
       stateObj?.answers ??
@@ -210,25 +144,26 @@
       stateObj?.answersArray ??
       null;
 
+    // 2) globais comuns do seu projeto
     if (a == null) a = window.JornadaAnswers || window.__QA_ANSWERS__ || window.JORNADA_ANSWERS || null;
 
+    // 3) storage fallback
     if (a == null) {
       const raw =
         localStorage.getItem('JORNADA_RESPOSTAS') ||
         localStorage.getItem('JORNADA_ANSWERS') ||
-        localStorage.getItem('JORNADA_PERGUNTAS_RESPOSTAS') ||
-        sessionStorage.getItem('JORNADA_RESPOSTAS') ||
-        sessionStorage.getItem('JORNADA_ANSWERS') ||
-        sessionStorage.getItem('JORNADA_PERGUNTAS_RESPOSTAS');
+        localStorage.getItem('JORNADA_PERGUNTAS_RESPOSTAS');
       const parsed = raw ? safeParseJSON(raw) : null;
       if (parsed) a = parsed;
     }
 
+    // normaliza
     if (Array.isArray(a)) {
       return a.map(v => String(v ?? '').trim()).filter(Boolean);
     }
 
     if (a && typeof a === 'object') {
+      // objeto -> ordena por chave quando possível
       const keys = Object.keys(a);
       keys.sort((k1, k2) => {
         const n1 = parseInt(String(k1).replace(/\D+/g, ''), 10);
@@ -243,42 +178,24 @@
   }
 
   // --------------------------------------------------
-  // SelfieCard: tenta achar em vários locais (LS + SS + state aninhado)
+  // SelfieCard: tenta achar em vários locais
   // --------------------------------------------------
   function readSelfieCardFromEverywhere(stateObj) {
-    // state direto
-    let s =
+    const s =
       stateObj?.selfieBase64 ??
       stateObj?.selfieCard ??
       stateObj?.cardImage ??
       stateObj?.cardBase64 ??
-      stateObj?.selfie_card ??
+      window.SELFIE_CARD ??
+      window.__SELFIE_CARD__ ??
       null;
-
-    // state aninhado (caso você use algo como state.selfie.base64)
-    if (!s && stateObj?.selfie && typeof stateObj.selfie === 'object') {
-      s = stateObj.selfie.base64 || stateObj.selfie.dataUrl || stateObj.selfie.image || '';
-    }
-
-    // globais
-    if (!s) s = window.SELFIE_CARD || window.__SELFIE_CARD__ || window.JORNADA_SELFIE_CARD || null;
 
     if (typeof s === 'string' && s.trim()) return s.trim();
 
-    // storage (mais chaves)
     const raw =
       localStorage.getItem('JORNADA_SELFIECARD') ||
       localStorage.getItem('SELFIE_CARD') ||
-      localStorage.getItem('JORNADA_CARD_IMAGE') ||
-      localStorage.getItem('JORNADA_SELFIE_CARD') ||
-      localStorage.getItem('JORNADA_SELFIECARD_B64') ||
-      sessionStorage.getItem('JORNADA_SELFIECARD') ||
-      sessionStorage.getItem('SELFIE_CARD') ||
-      sessionStorage.getItem('JORNADA_CARD_IMAGE') ||
-      sessionStorage.getItem('JORNADA_SELFIE_CARD') ||
-      sessionStorage.getItem('JORNADA_SELFIECARD_B64') ||
-      sessionStorage.getItem('jornada.selfieCard') ||
-      localStorage.getItem('jornada.selfieCard');
+      localStorage.getItem('JORNADA_CARD_IMAGE');
 
     return (raw || '').trim();
   }
@@ -292,19 +209,20 @@
 
     const nome = String(
       s.nome ?? s.name ?? s.participantName ?? s.participante ??
-      localStorage.getItem('JORNADA_NOME') ?? sessionStorage.getItem('JORNADA_NOME') ?? ''
+      localStorage.getItem('JORNADA_NOME') ?? ''
     ).trim();
 
-    const guiaNorm = readGuideFromEverywhere(s);
-
-    // backend costuma esperar "lumen|zion|arion" em lowercase
-    const guia = String(guiaNorm.id || '').trim().toLowerCase();
+    const guia = String(
+      s.guiaSelecionado ?? s.guia ?? s.guide ?? s.selectedGuide ??
+      localStorage.getItem('JORNADA_GUIA') ?? ''
+    ).trim().toLowerCase();
 
     const respostas = readAnswersFromEverywhere(s);
+
     const selfieCard = readSelfieCardFromEverywhere(s);
 
     const payload = { nome, guia, respostas, selfieCard };
-    console.log('[FINAL][PAYLOAD NORMALIZED]', payload, '[GUIA]', guiaNorm);
+    console.log('[FINAL][PAYLOAD NORMALIZED]', payload);
     return payload;
   }
 
@@ -346,6 +264,7 @@
       status.className = 'final-pdf-status';
       status.textContent = '✅ Você pode gerar o PDF agora, ou baixar depois.';
 
+      // host “natural”: logo abaixo dos botões
       const actions = root.querySelector('.final-acoes');
       if (actions && actions.parentNode) {
         actions.parentNode.insertBefore(status, actions.nextSibling);
@@ -354,7 +273,7 @@
       }
     }
 
-    // pega os botões EXISTENTES
+    // pega os dois botões EXISTENTES no container final
     const actionsRoot = root.querySelector('.final-acoes') || root;
 
     const btns = Array.from(actionsRoot.querySelectorAll('button'));
@@ -375,78 +294,8 @@
     if (btnPdf) btnPdf.dataset.pdfBound = '1';
     if (btnSelfie) btnSelfie.dataset.selfieBound = '1';
 
-    // ✅ garante botões extra na final
-let btnPortal = actionsRoot.querySelector('#btnVoltarPortal');
-if (!btnPortal) {
-  btnPortal = document.createElement('button');
-  btnPortal.id = 'btnVoltarPortal';
-  btnPortal.type = 'button';
-  btnPortal.className = 'btn btn-portal';
-  btnPortal.textContent = '🏰 VOLTAR AO PORTAL';
-  actionsRoot.appendChild(btnPortal);
-}
-
-let btnBaixarImg = actionsRoot.querySelector('#btnBaixarSelfie');
-if (!btnBaixarImg) {
-  btnBaixarImg = document.createElement('button');
-  btnBaixarImg.id = 'btnBaixarSelfie';
-  btnBaixarImg.type = 'button';
-  btnBaixarImg.className = 'btn btn-selfie';
-  btnBaixarImg.textContent = '🖼️ BAIXAR SELFIECARD';
-  actionsRoot.appendChild(btnBaixarImg);
-}
-
-// bind portal
-btnPortal.addEventListener('click', (ev) => {
-  ev.preventDefault();
-  ev.stopPropagation();
-  handleVoltarInicio();
-});
-
-// bind download selfie (usa o mesmo fluxo do btnSelfie)
-btnBaixarImg.addEventListener('click', (ev) => {
-  ev.preventDefault();
-  ev.stopPropagation();
-
-  const payload = buildFinalPayloadDiamante();
-  const img = payload.selfieCard;
-
-  if (!img || String(img).trim().length < 80) {
-    setPdfStatus(root, '⚠️ SelfieCard ainda não está disponível.', 'err');
-    return;
-  }
-
-  let dataUrl = String(img).trim();
-  if (!dataUrl.startsWith('data:image')) {
-    dataUrl = 'data:image/png;base64,' + dataUrl.replace(/^base64,/, '');
-  }
-
-  const a = document.createElement('a');
-  a.href = dataUrl;
-  a.download = (payload.nome ? payload.nome : 'selfiecard') + '-selfiecard.jpg';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-
-  setPdfStatus(root, '✅ SelfieCard baixado!', 'ok');
-});
-    
-// ✅ manter apenas 3 botões (pdf, selfie, voltar)
-(function enforce3Buttons(){
-  const actions = root.querySelector('.final-acoes') || root;
-
-  // defina os 3 IDs oficiais
-  const keep = new Set(['btnPdf', 'btnBaixarSelfie', 'btnVoltarPortal']);
-
-  // remove botões sobrando (qualquer <button> que não esteja na lista)
-  [...actions.querySelectorAll('button')].forEach(btn => {
-    const id = btn.id || '';
-    if (!keep.has(id)) btn.remove();
-  });
-  })();
-    
     // ------------------------------------------------------
-    // CLICK: PDF (gera + baixa)
+    // CLICK: PDF (gera + baixa) ✅ guard-rails + finally
     // ------------------------------------------------------
     if (btnPdf) {
       btnPdf.addEventListener('click', async (ev) => {
@@ -458,6 +307,7 @@ btnBaixarImg.addEventListener('click', (ev) => {
           return;
         }
 
+        // trava botões imediatamente
         btnPdf.disabled = true;
         if (btnSelfie) btnSelfie.disabled = true;
 
@@ -469,11 +319,6 @@ btnBaixarImg.addEventListener('click', (ev) => {
 
           if (!payload.nome || payload.nome.length < 2) {
             setPdfStatus(root, '⚠ Nome inválido. Volte e confirme o nome antes de gerar o PDF.', 'err');
-            return;
-          }
-
-          if (!payload.guia || payload.guia.length < 2) {
-            setPdfStatus(root, '⚠ Guia não identificado. Volte e selecione Lumen/Zion/Arion antes de gerar o PDF.', 'err');
             return;
           }
 
@@ -497,7 +342,7 @@ btnBaixarImg.addEventListener('click', (ev) => {
           setPdfStatus(root, '✖ Erro ao gerar o PDF. Confira o console (Network/Console).', 'err');
         } finally {
           if (timer) clearInterval(timer);
-          btnPdf.disabled = false;
+          btnPdf.disabled = false;            // ✅ sempre volta
           if (btnSelfie) btnSelfie.disabled = false;
         }
       });
@@ -539,87 +384,6 @@ btnBaixarImg.addEventListener('click', (ev) => {
         }
       });
     }
-
-    function bindFinalButtons(root) {
-  root = root || document.getElementById('section-final') || document;
-
-  const btnPdf   = root.querySelector('#btnPdf');
-  const btnSelf  = root.querySelector('#btnBaixarSelfie');
-  const btnVoltar= root.querySelector('#btnVoltarPortal');
-
-  // PDF
-  if (btnPdf) {
-  btnPdf.onclick = async (ev) => {
-    ev.preventDefault();
-    ev.stopPropagation();
-
-    try {
-      // ⏳ AGUARDA a selfiecard terminar de renderizar (máx 900ms)
-      try {
-        await Promise.race([
-          window.__SELFIECARD_PROMISE__ || Promise.resolve(),
-          new Promise(r => setTimeout(r, 900))
-        ]);
-      } catch {}
-
-      // 🔑 pega a selfieCard da fonte correta
-      const selfieCard =
-        sessionStorage.getItem('JORNADA_SELFIECARD') ||
-        localStorage.getItem('JORNADA_SELFIECARD') ||
-        window.JORNADA_STATE?.selfieCard ||
-        '';
-
-      const payload = buildFinalPayloadDiamante();
-
-      // garante que vai pro backend a imagem CERTA
-      payload.selfieCard = selfieCard;
-
-      await gerarPDFEHQ(payload);
-
-    } catch (e) {
-      console.error('[FINAL] erro ao gerar PDF:', e);
-    }
-  };
-}
-
-  // SelfieCard
-  if (btnSelf) {
-    btnSelf.onclick = (ev) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-
-      const payload = buildFinalPayloadDiamante();
-      const img = payload.selfieCard;
-
-      if (!img || String(img).trim().length < 80) {
-        setPdfStatus(root, '⚠️ SelfieCard ainda não está disponível.', 'err');
-        return;
-      }
-
-      const dataUrl = String(img).trim().startsWith('data:image')
-        ? String(img).trim()
-        : ('data:image/jpeg;base64,' + String(img).trim().replace(/^base64,/, ''));
-
-      const a = document.createElement('a');
-      a.href = dataUrl;
-      a.download = (payload.nome ? payload.nome : 'selfiecard') + '-selfiecard.jpg';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-
-      setPdfStatus(root, '✅ SelfieCard baixado!', 'ok');
-    };
-  }
-
-  // Voltar Portal
-  if (btnVoltar) {
-    btnVoltar.onclick = (ev) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-      handleVoltarInicio(); // sua função que volta ao portal
-    };
-  }
-}
   }
 
   // ================================
@@ -672,26 +436,6 @@ btnBaixarImg.addEventListener('click', (ev) => {
     const msgEl     = section.querySelector('#final-message');
     const botoes    = section.querySelector('.final-acoes');
     return { section, titleEl, msgEl, botoes };
-  }
-
-  function unlockPortalButton(section) {
-    if (!section) return;
-
-    const portalBtn =
-      section.querySelector('#btnVoltarPortal') ||
-      section.querySelector('#btnFinalizar') ||
-      section.querySelector('[data-action="finalizar"]') ||
-      section.querySelector('[data-action="voltar-portal"]') ||
-      section.querySelector('a[href*="portal"]');
-
-    if (!portalBtn) return;
-
-    portalBtn.disabled = false;
-    portalBtn.classList.remove('disabled');
-    portalBtn.removeAttribute('aria-disabled');
-    portalBtn.style.pointerEvents = 'auto';
-    portalBtn.style.opacity = '1';
-    portalBtn.style.filter = 'none';
   }
 
   // ------------------------ SEQUÊNCIA FINAL ------------------------
@@ -772,9 +516,6 @@ btnBaixarImg.addEventListener('click', (ev) => {
       });
     }
 
-    // ✅ garante o “Voltar ao Portal” livre mesmo fora da .final-acoes
-    unlockPortalButton(section);
-
     console.log('[FINAL] Sequência concluída com sucesso!');
   }
 
@@ -816,18 +557,17 @@ btnBaixarImg.addEventListener('click', (ev) => {
     if (sec) {
       sec.style.display = 'block';
       mountFinalPdfUI(sec);
-      unlockPortalButton(sec); // já libera cedo também
     }
 
     startFinalSequence();
   });
 
-  // botão “final/portal”
+  // opcional: se existir botão de “final/portal” e você quiser ligar aqui
   document.addEventListener('click', (e) => {
     const t = e.target;
     if (!t) return;
-
-    if (t.matches?.('[data-action="finalizar"], [data-action="voltar-portal"], #btnFinalizar, #btnVoltarPortal')) {
+    // ajuste o seletor conforme seu HTML (id/data-action)
+    if (t.matches?.('[data-action="finalizar"], #btnFinalizar, #btnVoltarPortal')) {
       e.preventDefault();
       handleVoltarInicio();
     }
