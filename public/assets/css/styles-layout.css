@@ -195,7 +195,7 @@
   #section-termos1 {
     padding: 8px 0 140px !important;  /* distância do topo + espaço pro botão */
     overflow: hidden !important;
-    min-height: 100dvh !important;
+    min-height: 100vh !important;
   }
 
   /* Painel de vidro dentro do pergaminho */
@@ -335,7 +335,7 @@
     #section-termos2 {
     padding: 8px 0 140px !important;  /* distância do topo + espaço pro botão */
     overflow: hidden !important;
-    min-height: 100dvh !important;
+    min-height: 100vh !important;
   }
 
   /* Painel de vidro dentro do pergaminho */
@@ -514,7 +514,7 @@
  /* Seção senha: ocupa a tela com respiro */
   #section-senha {
     padding: 8px 0 140px !important;
-    min-height: 100dvh !important;
+    min-height: 100vh !important;
     overflow: hidden !important;
   }
 
@@ -646,7 +646,7 @@
     justify-content: center !important;
     align-items: flex-start !important;  
     padding: 8px 0 140px !important;
-    min-height: 100dvh !important;
+    min-height: 100vh !important;
     overflow: hidden !important;
     height: auto !important; 
   }
@@ -851,7 +851,7 @@
 .jp-selfie-container{
   position: relative !important;
   height: auto !important;
-  min-height: 100dvh !important;
+  min-height: 100svh !important;
   overflow: visible !important; /* glow pode vazar */
   box-sizing: border-box !important;
 }
@@ -1149,7 +1149,7 @@ html, body{
   /* Seção: centraliza o painel */
   #section-guia {
     padding: 24px 0 120px !important;
-    min-height: 100dvh !important;
+    min-height: 100vh !important;
     display: flex !important;
     justify-content: center !important;
     align-items: flex-start !important;
@@ -1406,6 +1406,213 @@ html, body{
   display: flex;
   justify-content: center;
 }
+
+}
+/* =========================================================
+   SECTION-CARD MOBILE - BOTÃO CONTINUAR SEMPRE CLICÁVEL
+   ========================================================= */
+/* Mobile: ajusta o palco, mas mantém a lógica */
+@media (max-width: 600px) {
+   /* Seção senha: ocupa a tela com respiro */
+ #section-card {
+    padding: 8px 0 140px !important;
+    min-height: 100vh !important;
+    overflow: hidden !important;
+  }
+
+  /* Painel de vidro (MESMA FAMÍLIA DO INTRO/TERMOS) */
+  #section-card .j-panel-glow {
+    position: relative !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: calc(100vw - 84px) !important;  /* um pouco menor p/ não “explodir” */
+    max-width: 460px !important;           /* mesmo corpo da intro */
+    margin: 0 auto !important;
+    padding: 32px 24px 52px 24px !important;             /* borda fininha */
+    border-radius: 26px !important;
+    box-sizing: border-box !important;
+     transform: none !important;
+    -webkit-transform: translateY(0) translateZ(0) !important;
+    overflow: hidden !important;
+  } 
+  
+  #section-card .j-panel-glow {
+    padding: 10px !important; /* igual Intro */
+  }
+  
+  #section-card .j-panel-glow::before {
+    content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid rgba(212,175,55,0.55);
+  box-shadow:
+    0 0 28px rgba(212,175,55,0.55),
+    inset 0 0 18px rgba(255,230,150,0.25);     
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.16),
+    transparent 45%,
+    transparent 100%
+  ) !important;
+  }
+   
+  /* Opcional: título e conteúdo respirando igual intro */
+  #section-card .senha-panel-inner {
+    padding: 0 10px !important;
+    box-sizing: border-box !important;
+  }
+  #section-card .pergaminho,
+  #section-card .pergaminho-v {
+  overflow-x: hidden !important;
+}   
+  #section-card .card-stage {
+    max-width: 380px;
+    padding-bottom: 200px;
+  }
+
+  #section-card .placeholder-wrapper {
+    max-width: 240px;
+    margin-top: -20px;
+  }
+
+ /* 1) Reserva espaço REAL embaixo (inclusive safe-area) */
+  #section-card{
+    padding-bottom: calc(140px + env(safe-area-inset-bottom, 0px)) !important;
+    overflow: visible !important;
+  }
+
+  /* 2) Se o seu botão for .btn-continuar ou #btn-continuar */
+  #section-card .btn-continuar,
+  #section-card #btn-continuar,
+  #section-card .btn-primary{
+    position: sticky !important; /* fica “grudado” ao rolar sem quebrar layout */
+    bottom: calc(18px + env(safe-area-inset-bottom, 0px)) !important;
+    z-index: 50 !important;
+    margin-top: 14px !important;
+    touch-action: manipulation !important; /* melhora toque no Android */
+  }
+
+  /* 3) Garante que nenhum overlay esteja bloqueando o clique */
+  #section-card .card-stage,
+  #section-card .j-panel-glow,
+  #section-card .j-perg-v-inner{
+    overflow: visible !important;
+  }
+
+  /* Se você tiver pseudo-camadas por cima (fog/glow) */
+  #section-card .j-panel-glow::before,
+  #section-card .j-panel-glow::after{
+    pointer-events: none !important;
+  }
+ 
+}
+
+/* =========================================================
+   AJUSTE EXTRA PARA TELAS MUITO PEQUENAS (Motorola antigo, iPhone SE, etc.)
+   ========================================================= */
+@media (max-width: 400px) {
+  #section-card {
+    padding: 20px 8px 260px 8px !important; /* ainda mais espaço na base */
+    padding-bottom: calc(260px + env(safe-area-inset-bottom)) !important;
+  }
+
+  #section-card .j-panel-glow {
+    width: calc(100vw - 24px) !important; /* mais respiro lateral */
+    padding: 28px 16px 100px 16px !important; /* padding gigante na base */
+    margin: 20px auto 80px auto !important;
+  }
+
+  #section-card .card-stage {
+    padding-bottom: 300px !important; /* espaço absurdo pra botão nunca sumir */
+  }
+
+  /* Botão Continuar: maior e mais fácil de tocar em tela pequena */
+  #section-card .btn-continuar,
+  #section-card .btn-confirm,
+  #section-card .btn-primary,
+  #section-card [data-action="continuar"] {
+    min-height: 64px !important;
+    font-size: 16.5px !important;
+    padding: 18px !important;
+    margin-top: 40px !important;
+  }
+}
+
+/* Se o Motorola for EXTREMAMENTE pequeno (320-350px), reforço final */
+@media (max-width: 360px) {
+  #section-card {
+    padding-bottom: calc(300px + env(safe-area-inset-bottom)) !important;
+  }
+
+  #section-card .j-panel-glow {
+    padding-bottom: 120px !important;
+  }
+
+  #section-card .card-stage {
+    padding-bottom: 340px !important;
+  }
+
+  #section-card .btn-continuar,
+  #section-card .btn-confirm {
+    font-size: 17px !important;
+    min-height: 70px !important;
+  }
+}
+   /* =========================================================
+   CARD — ANDROID/MOTOROLA: botão não pode sumir na base
+   (apenas telas pequenas)
+   ========================================================= */
+
+/* 1) Garante espaço no final do card para não cortar */
+@media (max-width: 420px){
+  #section-card{
+    padding-bottom: calc(220px + env(safe-area-inset-bottom, 0px)) !important;
+    min-height: 100svh !important;  /* viewport estável no Android */
+    overflow: visible !important;
+  }
+
+  /* 2) Camadas do glow nunca podem bloquear toque */
+  #section-card .j-panel-glow::before,
+  #section-card .j-panel-glow::after,
+  #section-card .glow-fog{
+    pointer-events: none !important;
+  }
+
+  /* 3) BOTÃO: força aparecer sempre acima da barra inferior */
+  #section-card .btn-continuar,
+  #section-card #btn-continuar,
+  #section-card .btn-primary,
+  #section-card .btn-stone-espinhos{
+    position: fixed !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
+
+    z-index: 99999 !important;
+    width: min(88vw, 340px) !important;
+    max-width: 340px !important;
+
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+
+    touch-action: manipulation !important;
+  }
+}
+
+/* extra: telas muito pequenas (360/320) sobe mais um pouco */
+@media (max-width: 360px){
+  #section-card .btn-continuar,
+  #section-card #btn-continuar,
+  #section-card .btn-primary,
+  #section-card .btn-stone-espinhos{
+    bottom: calc(24px + env(safe-area-inset-bottom, 0px)) !important;
+    width: min(92vw, 320px) !important;
+    max-width: 320px !important;
+  }
 }
 
 
@@ -1419,7 +1626,7 @@ html, body{
   /* 1) Seção: sem cortar conteúdo (progresso/rodapé) */
   #section-perguntas{
     padding: 10px 0 110px !important;
-    min-height: 100dvh !important;
+    min-height: 100vh !important;
     height: auto !important;
     overflow: visible !important;            /* CHAVE: não corta barra */
   }
@@ -1589,7 +1796,7 @@ html, body{
   /* 1) Seção: sem cortar conteúdo (progresso/rodapé) */
   #section-perguntas{
     padding: 10px 0 110px !important;
-    min-height: 100dvh !important;
+    min-height: 100vh !important;
     height: auto !important;
     overflow: visible !important;            /* CHAVE: não corta barra */
   }
@@ -1877,7 +2084,7 @@ html, body{
     justify-content: center !important;
     align-items: flex-start !important;
     padding: 32px 20px 72px !important;
-    min-height: 100dvh !important;
+    min-height: 100vh !important;
     box-sizing: border-box !important;
   }
 
@@ -2077,156 +2284,5 @@ html, body{
   }
 }
    
-/* =========================================
-   DIAMANTE: para de piscar a scrollbar (desktop zoom)
-   ========================================= */
 
-html {
-  overflow-x: clip;   /* mantém teu eixo X blindado */
-  overflow-y: auto;
-}
 
-body {
-  overflow-x: clip;
-  overflow-y: auto;
-
-  /* Reserva o espaço da scrollbar SEM ficar ligando/desligando */
-  scrollbar-gutter: stable both-edges;
-}
-
-/* Fallback: browsers sem scrollbar-gutter → barra sempre presente */
-@supports not (scrollbar-gutter: stable) {
-  html, body { overflow-y: scroll; }
-}
-
-/* Fallback do clip */
-@supports not (overflow-x: clip) {
-  html, body { overflow-x: hidden; }
-}
-
-/* =========================
-   DIAMANTE: CONTROLES NO PÉ DO CARD
-   (placeholder / input nome / continuar)
-   ========================= */
-
-/* 1) Containers das seções viram "palco" */
-#section-guia,
-#section-selfie,
-#section-card {
-  position: relative !important;
-}
-
-/* 2) A “área útil” dentro do card ocupa a altura e empurra controles pra baixo */
-#section-guia .conteudo-pergaminho,
-#section-selfie .conteudo-pergaminho,
-#section-card .conteudo-pergaminho,
-#section-guia .j-perg-v-inner,
-#section-selfie .j-perg-v-inner,
-#section-card .j-perg-v-inner {
-  position: relative !important;
-  min-height: 72vh !important;     /* ajuste base (mobile) */
-  display: flex !important;
-  flex-direction: column !important;
-}
-
-/* 3) Wrapper de ações (botões) SEMPRE no final */
-#section-guia .card-actions,
-#section-selfie .card-actions,
-#section-card .card-actions,
-#section-guia .card-actions-below,
-#section-selfie .card-actions-below,
-#section-card .card-actions-below,
-#section-guia .actions,
-#section-selfie .actions,
-#section-card .actions {
-  margin-top: auto !important;
-  padding-bottom: 18px !important;
-}
-
-/* 4) Input de nome + botão continuar ancorados no fundo (CSS vence inline JS) */
-#section-guia .guia-name-input,
-#section-guia .name-input,
-#section-guia .name-wrap,
-#section-guia #guiaNameInput,
-#section-guia #btnContinuar,
-#section-guia #btnNext,
-#section-guia #btnContinue {
-  position: relative !important;
-  top: auto !important;
-  bottom: auto !important;
-  transform: none !important;
-}
-
-/* 5) Caso o teu layout use “overlay” no meio (como no print),
-      força o overlay a ir para baixo */
-#section-selfie .overlay,
-#section-card .overlay,
-#section-selfie .card-overlay,
-#section-card .card-overlay,
-#section-selfie .center-overlay,
-#section-card .center-overlay {
-  position: absolute !important;
-  left: 50% !important;
-  top: auto !important;
-  bottom: 20px !important;         /* << aqui desce pro pé */
-  transform: translateX(-50%) !important;
-  margin: 0 !important;
-}
-
-/* 6) Badge do nome (GISELY) sempre no rodapé do card */
-#section-selfie .card-name-badge,
-#section-card .card-name-badge,
-#section-selfie .name-badge,
-#section-card .name-badge {
-  position: absolute !important;
-  left: 50% !important;
-  bottom: 92px !important;         /* acima do botão */
-  transform: translateX(-50%) !important;
-}
-
-/* 7) Ajuste fino p/ mobile pequeno */
-@media (max-width: 420px) {
-  #section-guia .conteudo-pergaminho,
-  #section-selfie .conteudo-pergaminho,
-  #section-card .conteudo-pergaminho {
-    min-height: 76vh !important;
-  }
-  #section-selfie .overlay,
-  #section-card .overlay,
-  #section-selfie .card-overlay,
-  #section-card .card-overlay {
-    bottom: 16px !important;
-  }
-  #section-selfie .card-name-badge,
-  #section-card .card-name-badge {
-    bottom: 84px !important;
-  }
-}
-/* =========================
-   VT OVERLAY — SEM SUMIR
-   (último bloco do styles-layout.css)
-   ========================= */
-
-#vt-overlay{
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  z-index: 2147483647 !important;
-  display: block !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  background: #000 !important;
-}
-
-#vt-overlay video{
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-}
-
-/* opcional: esconde sections DURANTE o vídeo (não mexe no overlay) */
-body.vt-playing .section{ visibility: hidden !important; }
-body.vt-playing #vt-overlay{ visibility: visible !important; }
-body.vt-playing video { position: fixed !important; inset: 0 !important; z-index: 2147483647 !important; }
-html.vt-playing, body.vt-playing { overflow: hidden !important; max-width: 100vw !important;}
