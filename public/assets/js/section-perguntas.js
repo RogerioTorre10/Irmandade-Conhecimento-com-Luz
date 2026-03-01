@@ -51,38 +51,87 @@
   }
 
   // usa o portal dourado FULL + limelight
-  function playVideoWithCallback(src, onEnded, nextSectionId = null) {
-    src = resolveVideoSrc(src);
-    if (!src) {
-      if (typeof onEnded === 'function') onEnded();
-      return;
-    }
-
-    // Se existir player global cinematográfico, usa ele
-    if (typeof window.playTransitionVideo === 'function') {
-      window.playTransitionVideo(src, nextSectionId);
-      // quando o portal fecha ele navega; aqui só chamamos callback depois
-      document.addEventListener('transition:ended', function handler() {
-        document.removeEventListener('transition:ended', handler);
-        if (typeof onEnded === 'function') onEnded();
-      });
-      return;
-    }
-
-    // fallback (raríssimo): sem portal → só chama callback
+  function playVideoWithCallback(src, onEnded) {
+  src = resolveVideoSrc(src);
+  if (!src) {
     if (typeof onEnded === 'function') onEnded();
+    return;
   }
 
-  window.playBlockTransition = function(videoSrc, onDone) {
-    const src = resolveVideoSrc(videoSrc);
-    if (!src) {
-      if (typeof onDone === 'function') onDone();
-      return;
-    }
-    log('Transição entre blocos (PORTAL GLOBAL):', src);
-    playVideoWithCallback(src, onDone);
+  const { overlay, video } = ensureVideoOverlay();
+
+  // === Overlay FULLSCREEN real (sem mexer no DOM inteiro) ===
+  overlay.style.cssText = `
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background: rgba(0,0,0,0.98) !important;
+    display: block !important;
+    z-index: 2147483646 !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: opacity 0.25s ease !important;
+  `;
+
+  // Vídeo cobre a tela (não “fica na base”)
+  video.style.cssText = `
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: #000 !important;
+  `;
+
+  // Trava scroll e “esconde” o app sem sumir com o DOM (evita cascata)
+  document.body.style.overflow = 'hidden';
+  document.body.classList.add('is-transitioning');
+
+  // Mostra overlay
+  overlay.style.display = 'block';
+  requestAnimationFrame(() => {
+    overlay.style.opacity = '1';
+  });
+
+  // Play
+  video.muted = true;
+  video.playsInline = true;
+  video.preload = 'auto';
+  video.src = src;
+  video.load();
+
+  const endHandler = () => {
+    video.onended = null;
+    video.onerror = null;
+
+    overlay.style.opacity = '0';
+
+    setTimeout(() => {
+      overlay.style.display = 'none';
+
+      // limpa vídeo
+      try { video.pause(); } catch {}
+      video.removeAttribute('src');
+      video.load();
+
+      // restaura
+      document.body.style.overflow = '';
+      document.body.classList.remove('is-transitioning');
+
+      if (typeof onEnded === 'function') onEnded();
+    }, 260);
   };
 
+  video.onended = endHandler;
+  video.onerror = endHandler;
+
+  video.play().catch(() => endHandler());
+}
   // --------------------------------------------------
   // BLOCS / PERGUNTAS
   // --------------------------------------------------
