@@ -1,4 +1,4 @@
-// /assets/js/section-guia.js — v3.4 (Fase 1: preview com áudio; Fase 2: TTS da descrição)
+// /assets/js/section-guia.js — v3.3 (NOME + GUIA SALVOS + 2 PASSOS + TTS + AURA + PREVIEW 10s LIMPO)
 (function () {
   'use strict';
 
@@ -25,13 +25,6 @@
   const q  = (sel, root = document) => root.querySelector(sel);
   const qa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
-  // ============================
-  // ✅ FASES DE ÁUDIO/TTS (NOVO)
-  // ============================
-  // Fase 1 (antes de confirmar nome): preview com áudio, sem TTS de descrição
-  // Fase 2 (depois de confirmar nome): preview mudo, TTS da descrição ligado
-  let nomeConfirmado = false;
-
   // Estado do fluxo
   let hoverTimers = new Map();   // Map<guiaId, timeoutId>
   let armedId = null;            // guia armado
@@ -54,7 +47,8 @@
     previewVideo   = document.getElementById('guiaPreviewVideo');
     if (!previewOverlay || !previewVideo) return false;
 
-    // configurações seguras (não forçar muted aqui; quem decide é a fase)
+    // configurações seguras
+    previewVideo.muted = true;
     previewVideo.playsInline = true;
     previewVideo.preload = 'auto';
 
@@ -90,28 +84,16 @@
     hidePreview();
   }
 
-  // ✅ NOVO: withAudio controla se o preview toca com som
-  async function playPreviewSrc(src, root, withAudio = false) {
+  async function playPreviewSrc(src, root) {
     if (!src) return false;
     if (!ensurePreviewRefs(root)) return false;
 
     // se já está tocando o mesmo src, não reinicia
     if (previewPlaying && previewCurrentSrc === src) return true;
 
-    // Se vamos tocar com áudio (fase 1), cancela TTS para não “abafar”
-    if (withAudio) {
-      try { window.speechSynthesis?.cancel?.(); } catch {}
-    }
-
     stopPreview();
     previewPlaying = true;
     previewCurrentSrc = src;
-
-    // áudio conforme fase
-    try {
-      previewVideo.muted = !withAudio;
-      previewVideo.volume = withAudio ? 1 : 0;
-    } catch {}
 
     previewVideo.src = src;
     try { previewVideo.load(); } catch {}
@@ -143,9 +125,7 @@
 
       btn.addEventListener('mouseenter', () => {
         const src = getSrc();
-        if (!src) return;
-        // Fase 1: com áudio / Fase 2: mudo
-        playPreviewSrc(src, root, !nomeConfirmado);
+        if (src) playPreviewSrc(src, root);
       });
 
       btn.addEventListener('mouseleave', () => {
@@ -154,31 +134,20 @@
 
       btn.addEventListener('focusin', () => {
         const src = getSrc();
-        if (!src) return;
-        playPreviewSrc(src, root, !nomeConfirmado);
+        if (src) playPreviewSrc(src, root);
       });
 
       btn.addEventListener('focusout', () => stopPreview());
 
       btn.addEventListener('touchstart', () => {
         const src = getSrc();
-        if (!src) return;
-        playPreviewSrc(src, root, !nomeConfirmado);
+        if (src) playPreviewSrc(src, root);
       }, { passive: true });
     });
 
     // segurança: ao sair da seção, encerra preview
     window.addEventListener('jc:section:leave', stopPreview, { passive: true });
   }
-  
-  function canonGuia(v){
-  const s = String(v || '').trim().toLowerCase();
-  if (!s) return '';
-  if (s.includes('lumen')) return 'lumen';
-  if (s.includes('zion')) return 'zion';
-  if (s.includes('arion') || s.includes('arian')) return 'arion';
-  return '';
-}
 
   // ===== Lock de transição (vídeo) =====
   async function waitForTransitionUnlock(timeoutMs = 20000) {
@@ -267,29 +236,16 @@
       v.autoplay = true;
       v.preload = 'auto';
       v.style.cssText = `
-      position:fixed;
-      inset:0;
-      z-index:2147483647;
-      background:#000;
-      width:100vw;
-      height:100vh;
-      object-fit:cover;
-      display:block;
+        position:fixed;inset:0;z-index:9999;background:#000;
+        width:100%;height:100%;object-fit:cover
       `;
-     document.body.classList.add('vt-playing');
 
-     const endTransition = () => {
-
-  document.body.classList.remove('vt-playing');
-
-  v.remove();
-  window.__TRANSITION_LOCK = false;
-  (window.JC && JC.show)
-    ? JC.show(nextId, { force: true })
-    : (location.hash = '#' + nextId);
-
-  document.dispatchEvent(new CustomEvent('transition:ended'));
-};
+      const endTransition = () => {
+        v.remove();
+        window.__TRANSITION_LOCK = false;
+        (window.JC && JC.show) ? JC.show(nextId, { force: true }) : (location.hash = '#' + nextId);
+        document.dispatchEvent(new CustomEvent('transition:ended'));
+      };
 
       v.addEventListener('ended', endTransition, { once: true });
       v.addEventListener('error', () => {
@@ -326,57 +282,29 @@
       sessionStorage.setItem('jornada.nome', nome);
       localStorage.setItem('JORNADA_NOME', nome);
 
-      // =====================================================
-      // CANONIZA E GRAVA DEFINITIVAMENTE O GUIA ESCOLHIDO
-      // =====================================================
+      const guiaAtual = guiaId ? String(guiaId).toLowerCase().trim() : 'zion';
 
-      function canonGuia(v) {
-       const s = String(v || '').trim().toLowerCase();
-       if (!s) return 'zion';
-       if (s.includes('lumen')) return 'lumen';
-       if (s.includes('zion')) return 'zion';
-       if (s.includes('arion') || s.includes('arian')) return 'arion';
-       return 'zion';
+      sessionStorage.setItem('jornada.guia', guiaAtual);
+      try {
+        window.JC = window.JC || {};
+        window.JC.data = window.JC.data || {};
+        window.JC.data.guia = guiaAtual;
+      } catch {}
+
+      try {
+        applyGuiaTheme(guiaAtual);
+      } catch {
+        document.body.setAttribute('data-guia', guiaAtual);
+      }
+      window.aplicarGuiaTheme = window.aplicarGuiaTheme || applyGuiaTheme;
+
+      const btnAvancar = root.querySelector('#btn-avancar') || root.querySelector('[data-action="avancar"]');
+      if (btnAvancar) {
+        btnAvancar.disabled = false;
+        btnAvancar.classList.remove('is-hidden');
+        btnAvancar.focus?.();
       }
 
-     // usa o guia que acabou de ser escolhido
-const guiaCanon = canonGuia(guiaId);
-
-// grava nas chaves oficiais
-sessionStorage.setItem('JORNADA_GUIA', guiaCanon);
-localStorage.setItem('JORNADA_GUIA', guiaCanon);
-
-// grava também no state global
-window.JORNADA_STATE = window.JORNADA_STATE || {};
-window.JORNADA_STATE.guia = guiaCanon;
-window.JORNADA_STATE.guiaSelecionado = guiaCanon;
-
-// grava no JC também (card/selfie/pdf)
-window.JC = window.JC || {};
-window.JC.data = window.JC.data || {};
-window.JC.data.guia = guiaCanon;
-window.JC.data.guiaSelecionado = guiaCanon;
-
-// aplica tema definitivo + avisa listeners
-try { document.dispatchEvent(new CustomEvent('guia:changed')); } catch {}
-try { window.applyGuideTheme?.(); } catch {}
-try { applyGuiaTheme(guiaCanon); } catch { document.body.setAttribute('data-guia', guiaCanon); }
-
-// reset de artefatos do guia anterior (evita “card do zion com cor do lumen”)
-sessionStorage.removeItem('JORNADA_SELFIECARD');
-sessionStorage.removeItem('SELFIE_CARD');
-sessionStorage.removeItem('__SELFIECARD_SIG__');
-
-// expõe helper (se você usa em outro lugar)
-window.aplicarGuiaTheme = window.aplicarGuiaTheme || applyGuiaTheme;
-
-// libera botão avançar
-const btnAvancar = root.querySelector('#btn-avancar') || root.querySelector('[data-action="avancar"]');
-if (btnAvancar) {
-  btnAvancar.disabled = false;
-  btnAvancar.classList.remove('is-hidden');
-  btnAvancar.focus?.();
-}
       if (armTimer) { clearTimeout(armTimer); armTimer = null; }
       armedId = null;
 
@@ -484,7 +412,6 @@ if (btnAvancar) {
   function armGuide(root, btn, label) {
     const guiaId = (btn?.dataset?.guia || '').toLowerCase().trim();
     if (!guiaId) return;
-    const guiaCanon = canonGuia(guiaId);
 
     if (armedId === guiaId) {
       confirmGuide(guiaId);
@@ -517,13 +444,6 @@ if (btnAvancar) {
 
       showNotice(root, 'Tempo esgotado. Selecione o guia e clique novamente para confirmar.', { speak: true });
     }, ARM_TIMEOUT_MS);
-
-    //const guiaCanon = 'arion' // ou lumen/zion conforme escolhido
-    //localStorage.setItem('JORNADA_GUIA', guiaCanon);
-    //sessionStorage.setItem('JORNADA_GUIA', guiaCanon);
-    //window.JORNADA_STATE = window.JORNADA_STATE || {};
-    //window.JORNADA_STATE.guia = guiaCanon;
-    //window.JORNADA_STATE.guiaSelecionado = guiaCanon;
   }
 
   cancelArm = function (root) {
@@ -581,54 +501,27 @@ if (btnAvancar) {
       await typeOnce(els.title, null, { speed: 34, speak: true });
     }
 
-   // carrega guias
-let topBox = null;
-let bottomBox = null;
+    // carrega guias
+    try {
+      guias = await loadGuias();
+      renderButtons(els.optionsBox, guias);
+      hideNotice(root);
+    } catch {
+      showNotice(root, 'Não foi possível carregar os guias. Tente novamente mais tarde.', { speak: false });
+      return;
+    }
 
-try {
-  guias = await loadGuias();
+    guideButtons = qa('button[data-action="select-guia"]', els.optionsBox);
 
-  topBox = root.querySelector('.guia-options-top');
-  bottomBox = root.querySelector('.guia-options-bottom');
-
-  if (topBox) renderButtons(topBox, guias);
-  if (bottomBox) renderButtons(bottomBox, guias);
-
-  // estado inicial:
-  // botões de cima ATIVOS (preview apenas)
-  // botões de baixo DESABILITADOS
-  if (topBox) {
-    topBox.classList.remove('disabled');
-    topBox.classList.add('enabled');
-  }
-
-  if (bottomBox) {
-    bottomBox.classList.remove('enabled');
-    bottomBox.classList.add('disabled');
-  }
-
-  hideNotice(root);
-} catch {
-  showNotice(root, 'Não foi possível carregar os guias. Tente novamente mais tarde.', { speak: false });
-  return;
-}
-
-// pega botões dos DOIS containers (topo + baixo)
-guideButtons = [
-  ...qa('button[data-action="select-guia"]', topBox || root),
-  ...qa('button[data-action="select-guia"]', bottomBox || root),
-];
-
-// trava seleção nos dois grupos no início (mantém preview ok)
-guideButtons.forEach(b => {
-  b.dataset.locked = '1';
-  b.setAttribute('aria-disabled', 'true');
-  b.classList.add('is-locked');
-  b.style.opacity = '0.6';
-  b.style.cursor = 'pointer';
-  b.style.pointerEvents = 'auto';
-});
-
+    // mantém hover/preview funcionando, mas bloqueia seleção até confirmar nome
+    guideButtons.forEach(b => {
+      b.dataset.locked = '1';
+      b.setAttribute('aria-disabled', 'true');
+      b.classList.add('is-locked');
+      b.style.opacity = '0.6';
+      b.style.cursor = 'pointer';
+      b.style.pointerEvents = 'auto';
+    });
 
     // BIND preview (único e limpo)
     bindPreviewToButtons(root, guideButtons);
@@ -656,13 +549,6 @@ guideButtons.forEach(b => {
           els.nameInput?.focus();
           return;
         }
-
-        // ✅ ao confirmar o nome, entramos na FASE 2
-        nomeConfirmado = true;
-
-        // ✅ evita mix de áudio: para preview e cancela TTS antes de falar descrição
-        stopPreview();
-        try { window.speechSynthesis?.cancel?.(); } catch {}
 
         const upperName = name.toUpperCase();
         els.nameInput.value = upperName;
@@ -711,7 +597,7 @@ guideButtons.forEach(b => {
         const guiaId = (btn.dataset.guia || btn.textContent || '').toLowerCase().trim();
         const label = (btn.dataset.nome || btn.textContent || 'guia').toUpperCase();
 
-        // Hover: descrição + tema (com speak condicionado pela fase)
+        // Hover: descrição + tema (seu comportamento original)
         btn.addEventListener('mouseenter', () => {
           if (!guiaId) return;
 
@@ -721,9 +607,7 @@ guideButtons.forEach(b => {
             const g = findGuia(guias, guiaId);
             if (g && els.guiaTexto) {
               els.guiaTexto.dataset.spoken = '';
-              // ✅ Fase 1: NÃO fala descrição (para não abafar o vídeo)
-              // ✅ Fase 2: fala descrição normalmente
-              await typeOnce(els.guiaTexto, g.descricao, { speed: 34, speak: !!nomeConfirmado });
+              await typeOnce(els.guiaTexto, g.descricao, { speed: 34, speak: true });
             }
             applyGuiaTheme(guiaId);
           }, HOVER_DELAY_MS);
@@ -744,7 +628,7 @@ guideButtons.forEach(b => {
           const g = findGuia(guias, guiaId);
           if (g && els.guiaTexto) {
             els.guiaTexto.dataset.spoken = '';
-            typeOnce(els.guiaTexto, g.descricao, { speed: 34, speak: !!nomeConfirmado });
+            typeOnce(els.guiaTexto, g.descricao, { speed: 34, speak: true });
           }
         });
 
@@ -793,7 +677,7 @@ guideButtons.forEach(b => {
     }
   }
 
-   function onSectionShown(evt) {
+  function onSectionShown(evt) {
     const { sectionId, node } = evt?.detail || {};
     if (sectionId !== SECTION_ID) return;
     initOnce(node || document.getElementById(SECTION_ID));
@@ -809,39 +693,17 @@ guideButtons.forEach(b => {
     ? document.addEventListener('DOMContentLoaded', bind, { once: true })
     : bind();
 
-  // =====================================================
-  // TEMA: aplica quando o guia já foi escolhido (senão mantém dourado)
-  // =====================================================
-  function canonTheme(v) {
-    const s = String(v || '').toLowerCase();
-    if (s.includes('lumen')) return 'lumen';
-    if (s.includes('zion')) return 'zion';
-    if (s.includes('arion') || s.includes('arian')) return 'arion';
-    return '';
-  }
-
-  function readGuideTheme() {
-    return canonTheme(
-      window.JORNADA_STATE?.guiaSelecionado ||
-      window.JORNADA_STATE?.guia ||
-      window.JC?.data?.guiaSelecionado ||
-      window.JC?.data?.guia ||
-      sessionStorage.getItem('JORNADA_GUIA') ||
-      localStorage.getItem('JORNADA_GUIA') ||
-      localStorage.getItem('jc.guiaSelecionado') ||
-      localStorage.getItem('jc.guia') ||
-      localStorage.getItem('guiaEscolhido')
-    );
-  }
-
-  window.applyGuideTheme = function applyGuideTheme() {
-    const guia = readGuideTheme();
-    if (!guia) return false; // não mexe no dourado se ainda não escolheu
+  // =========================================================
+  // TEMA DO GUIA — reaplica em qualquer seção quando necessário
+  // =========================================================
+  function applyThemeFromSession() {
+    const guiaRaw = sessionStorage.getItem('jornada.guia');
+    const guia = guiaRaw ? guiaRaw.toLowerCase().trim() : '';
 
     let main = '#ffd700', g1 = 'rgba(255,230,180,0.85)', g2 = 'rgba(255,210,120,0.75)';
     if (guia === 'lumen') { main = '#00ff9d'; g1 = 'rgba(0,255,157,0.90)'; g2 = 'rgba(120,255,200,0.70)'; }
     if (guia === 'zion')  { main = '#00aaff'; g1 = 'rgba(0,170,255,0.90)'; g2 = 'rgba(255,214,91,0.70)'; }
-    if (guia === 'arion') { main = '#ff00ff'; g1 = 'rgba(255,120,255,0.95)'; g2 = 'rgba(255,180,255,0.80)'; }
+    if (guia === 'arian') { main = '#ff00ff'; g1 = 'rgba(255,120,255,0.95)'; g2 = 'rgba(255,180,255,0.80)'; }
 
     document.documentElement.style.setProperty('--theme-main-color', main);
     document.documentElement.style.setProperty('--progress-main', main);
@@ -849,14 +711,11 @@ guideButtons.forEach(b => {
     document.documentElement.style.setProperty('--progress-glow-2', g2);
     document.documentElement.style.setProperty('--guide-color', main);
 
-    document.body.setAttribute('data-guia', guia);
-    console.log('[THEME] aplicado:', guia);
-    return true;
-  };
+    if (guia) document.body.setAttribute('data-guia', guia);
+  }
 
-  // reaplica em momentos seguros (não quebra o dourado inicial)
-  const applyThemeSafe = () => { try { window.applyGuideTheme?.(); } catch {} };
-  document.addEventListener('sectionLoaded', () => setTimeout(applyThemeSafe, 50));
-  document.addEventListener('guia:changed', applyThemeSafe);
+  document.addEventListener('DOMContentLoaded', applyThemeFromSession);
+  document.addEventListener('sectionLoaded', () => setTimeout(applyThemeFromSession, 50));
+  document.addEventListener('guia:changed', applyThemeFromSession);
 
-})(); // <-- FECHAMENTO ÚNICO do IIFE principal (não coloque outro IIFE depois)
+})();
