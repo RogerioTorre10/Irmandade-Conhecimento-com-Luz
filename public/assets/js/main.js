@@ -450,53 +450,5 @@
         }
       }
     })();
-/* =====================================================
-   TEMA GLOBAL DO GUIA — APLICA EM TODA A JORNADA
-   (deve ficar no FINAL do main.js)
-   ===================================================== */
-
-(function(){
-
-  function canon(v){
-    const s = String(v||'').toLowerCase();
-    if (s.includes('lumen')) return 'lumen';
-    if (s.includes('zion')) return 'zion';
-    if (s.includes('arion') || s.includes('arian')) return 'arion';
-    return s;
-  }
-
-  function readGuide(){
-    return canon(
-      window.JORNADA_STATE?.guiaSelecionado ||
-      window.JORNADA_STATE?.guia ||
-      window.JC?.data?.guiaSelecionado ||
-      window.JC?.data?.guia ||
-      sessionStorage.getItem('JORNADA_GUIA') ||
-      localStorage.getItem('JORNADA_GUIA') ||
-      localStorage.getItem('jc.guiaSelecionado') ||
-      localStorage.getItem('jc.guia') ||
-      sessionStorage.getItem('jornada.guia') ||
-      localStorage.getItem('guiaEscolhido') ||
-      'zion'
-    );
-  }
-  })();
-/* =====================================================
-   DEFAULT DOURADO (início da jornada) — não força guia
-   (main.js deve ter SOMENTE isso de tema)
-   ===================================================== */
-(function(){
-  function applyGold(){
-    const main = '#ffd700';
-    document.documentElement.style.setProperty('--theme-main-color', main);
-    document.documentElement.style.setProperty('--progress-main', main);
-    document.documentElement.style.setProperty('--progress-glow-1', 'rgba(255,230,180,0.85)');
-    document.documentElement.style.setProperty('--progress-glow-2', 'rgba(255,210,120,0.75)');
-    document.documentElement.style.setProperty('--guide-color', main);
-    document.body.setAttribute('data-guia', 'gold');
-  }
-  document.addEventListener('DOMContentLoaded', applyGold);
-})();
   });
- 
 })();
