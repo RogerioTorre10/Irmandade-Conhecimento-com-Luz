@@ -170,6 +170,15 @@
     // segurança: ao sair da seção, encerra preview
     window.addEventListener('jc:section:leave', stopPreview, { passive: true });
   }
+  
+  function canonGuia(v){
+  const s = String(v || '').trim().toLowerCase();
+  if (!s) return '';
+  if (s.includes('lumen')) return 'lumen';
+  if (s.includes('zion')) return 'zion';
+  if (s.includes('arion') || s.includes('arian')) return 'arion';
+  return '';
+}
 
   // ===== Lock de transição (vídeo) =====
   async function waitForTransitionUnlock(timeoutMs = 20000) {
