@@ -37,129 +37,66 @@
 
   let completed = false;
 
-  // --------------------------------------------------
-  // OVERLAY DE VÍDEO (entre blocos e final)
-  // --------------------------------------------------
+// --------------------------------------------------
+// DIAMANTE — TRANSIÇÃO ENTRE BLOCOS (usa PORTAL GLOBAL)
+// --------------------------------------------------
 
- function ensureVideoOverlay() {
-  let overlay = document.getElementById('videoOverlay');
-  let video = document.getElementById('videoTransicao');
-
-  if (!overlay) {
-    overlay = document.createElement('div');
-    overlay.id = 'videoOverlay';
-    document.body.appendChild(overlay);
+function resolveVideoSrc(src) {
+  if (!src) return null;
+  let url = String(src).trim();
+  if (url.startsWith('/assets/img/') && url.endsWith('.mp4')) {
+    url = url.replace('/assets/img/', '/assets/videos/');
   }
-
-  if (!video) {
-    video = document.createElement('video');
-    video.id = 'videoTransicao';
-    video.playsInline = true;
-    video.preload = 'auto';
-    video.controls = false;
-    overlay.appendChild(video);
-  }
-
-  return { overlay, video };
+  return url;
 }
 
-  function resolveVideoSrc(src) {
-    if (!src) return null;
-    let url = String(src).trim();
-    if (url.startsWith('/assets/img/') && url.endsWith('.mp4')) {
-      url = url.replace('/assets/img/', '/assets/videos/');
-    }
-    return url;
-  }
-  
- function playVideoWithCallback(src, onEnded) {
+function playVideoWithCallback(src, onEnded) {
   src = resolveVideoSrc(src);
   if (!src) {
     if (typeof onEnded === 'function') onEnded();
     return;
   }
 
-  const { overlay, video } = ensureVideoOverlay();
+  // 💎 evita duplicar transição
+  if (window.__TRANSITION_LOCK) return;
 
-  // FORÇA ESTILO INLINE (ignora tudo)
-  overlay.style.cssText = `
-    position: fixed !important;
-    top: 0 !important; left: 0 !important;
-    width: 100vw !important; height: 100vh !important;
-    background: rgba(0,0,0,0.98) !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    z-index: 99999 !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-    transition: opacity 0.6s ease !important;
-  `;
+  // 💎 trava enquanto o portal roda
+  window.__TRANSITION_LOCK = true;
 
-  video.style.cssText = `
-  width: 94vw !important;
-  height: auto !important;
-  max-width: 94vw !important;
-  max-height: 90vh !important;
-  border: 8px solid #d4af37 !important;
-  border-radius: 12px !important;
-  box-shadow: 0 0 30px rgba(212,175,55,0.7) !important;
-  object-fit: contain !important;
-`;
+  const doneOnce = (() => {
+    let called = false;
+    return () => {
+      if (called) return;
+      called = true;
+      window.__TRANSITION_LOCK = false;
+      if (typeof onEnded === 'function') setTimeout(onEnded, 60);
+    };
+  })();
 
-  // Remove qualquer outro conteúdo visível
-  document.body.style.overflow = 'hidden';
-  document.querySelectorAll('section, div, header, footer').forEach(el => {
-    if (el.id !== 'videoOverlay') {
-      el.style.display = 'none';
-    }
-  });
+  // ✅ usa Portal Arcanum oficial
+  if (typeof window.playTransitionVideo === 'function') {
+    const handler = () => {
+      document.removeEventListener('transition:ended', handler);
+      doneOnce();
+    };
+    document.addEventListener('transition:ended', handler, { once: true });
 
-  // Mostra overlay
-  overlay.style.display = 'flex';
-  overlay.style.pointerEvents = 'all';
+    // ⚠️ entre blocos NÃO navega de seção
+    window.playTransitionVideo(src, null);
+    return;
+  }
 
-  // Força render antes de opacity
-  requestAnimationFrame(() => {
-    overlay.style.opacity = '1';
-  });
-
-  video.src = src;
-  video.load();
-
-  const endHandler = () => {
-    video.onended = null;
-    overlay.style.opacity = '0';
-    setTimeout(() => {
-      overlay.style.display = 'none';
-      // Restaura visibilidade
-      document.body.style.overflow = '';
-      document.querySelectorAll('section, div, header, footer').forEach(el => {
-        if (el.id !== 'videoOverlay') {
-          el.style.display = '';
-        }
-      });
-      if (typeof onEnded === 'function') onEnded();
-    }, 600);
-  };
-
-  video.onended = endHandler;
-
-  video.play().catch(e => {
-    console.error('[PERGUNTAS] Erro ao tocar vídeo:', e);
-    endHandler();
-  });
+  // fallback (se portal não existir)
+  doneOnce();
 }
 
-  window.playBlockTransition = function(videoSrc, onDone) {
-    const src = resolveVideoSrc(videoSrc);
-    if (!src) {
-      if (typeof onDone === 'function') onDone();
-      return;
-    }
-    log('Transição entre blocos:', src);
-    playVideoWithCallback(src, onDone);
-  };
+// cobre os dois nomes (às vezes o código chama um ou outro)
+window.playBlockTransition = function(videoSrc, onDone) {
+  playVideoWithCallback(videoSrc, onDone);
+};
+window.PlayBlockTransition = function(videoSrc, onDone) {
+  playVideoWithCallback(videoSrc, onDone);
+};
 
   // --------------------------------------------------
   // BLOCS / PERGUNTAS
