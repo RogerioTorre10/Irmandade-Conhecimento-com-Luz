@@ -136,7 +136,7 @@ function playVideoWithCallback(src, onEnded) {
 
   });
 });
-
+};
   video.onended = cleanup;
   video.onerror = cleanup;
 
