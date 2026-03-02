@@ -368,6 +368,16 @@ body.is-transitioning #jornada-root{
   inset: 0 !important;
   width: 100vw !important;
   height: 100vh !important;
+  display: block !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  transition: opacity .18s ease !important;
+}
+
+#videoOverlay.is-on{
+  visibility: visible !important;
+  opacity: 1 !important;
+}
 
   background: #000 !important;       /* fundo limpo */
   z-index: 2147483646 !important;
@@ -379,11 +389,6 @@ body.is-transitioning #jornada-root{
 
   overflow: hidden !important;
   pointer-events: auto !important;    /* IMPORTANTÍSSIMO: trava interação/scroll */
-}
-
-#videoOverlay.is-on{
-  visibility: visible !important;
-  opacity: 1 !important;
 }
 
 /* mata qualquer blur/espelho que alguém tenha criado */
