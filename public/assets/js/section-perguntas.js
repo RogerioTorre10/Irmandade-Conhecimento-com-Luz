@@ -51,45 +51,51 @@
   }
 
   // usa o portal dourado FULL + limelight
-  function playVideoWithCallback(src, onEnded) {
+ function playVideoWithCallback(src, onEnded) {
   src = resolveVideoSrc(src);
   if (!src) { if (typeof onEnded === 'function') onEnded(); return; }
 
   const { overlay, video } = ensureVideoOverlay();
 
-  // força overlay no body (blindagem)
+  // sempre no body (evita ficar preso em containers)
   if (overlay.parentElement !== document.body) document.body.appendChild(overlay);
 
-  // Classe que remove transform/filter que quebram position:fixed
+  // helper: aplica CSS com IMPORTANT de verdade
+  const S = (el, prop, val) => el.style.setProperty(prop, val, 'important');
+
+  // classe de modo transição (não destrói DOM)
   document.documentElement.classList.add('vt-force-fixed');
-  document.body.classList.add('vt-force-fixed');
+  document.body.classList.add('vt-force-fixed', 'is-transitioning');
 
-  // Mostra overlay com classe (CSS já está !important)
-  overlay.classList.add('is-on');
-
-  // Trava scroll sem sumir DOM
-  const prevOverflow = document.body.style.overflow;
-  document.body.style.overflow = 'hidden';
-
-  // Força propriedades críticas COM PRIORIDADE IMPORTANT
-  const S = (el, prop, value) => el.style.setProperty(prop, value, 'important');
-
+  // overlay FULLSCREEN real
   S(overlay, 'position', 'fixed');
   S(overlay, 'inset', '0');
   S(overlay, 'width', '100vw');
   S(overlay, 'height', '100vh');
+  S(overlay, 'display', 'block');
+  S(overlay, 'background', 'rgba(0,0,0,0.98)');
   S(overlay, 'z-index', '2147483646');
   S(overlay, 'pointer-events', 'none');
+  S(overlay, 'opacity', '1');
 
+  // vídeo cobrindo tudo (não fica na base)
   S(video, 'position', 'fixed');
   S(video, 'inset', '0');
   S(video, 'width', '100vw');
   S(video, 'height', '100vh');
   S(video, 'object-fit', 'cover');
   S(video, 'object-position', 'center');
+  S(video, 'border', '0');
   S(video, 'border-radius', '0');
+  S(video, 'box-shadow', 'none');
+  S(video, 'background', '#000');
+  S(video, 'display', 'block');
 
-  // Play robusto
+  // trava scroll sem sumir DOM
+  const prevOverflow = document.body.style.overflow;
+  document.body.style.overflow = 'hidden';
+
+  // play
   video.muted = true;
   video.playsInline = true;
   video.preload = 'auto';
@@ -98,15 +104,15 @@
     video.onended = null;
     video.onerror = null;
 
-    overlay.classList.remove('is-on');
-
     try { video.pause(); } catch {}
     video.removeAttribute('src');
     video.load();
 
+    S(overlay, 'display', 'none');
+
     document.body.style.overflow = prevOverflow || '';
     document.documentElement.classList.remove('vt-force-fixed');
-    document.body.classList.remove('vt-force-fixed');
+    document.body.classList.remove('vt-force-fixed', 'is-transitioning');
 
     if (typeof onEnded === 'function') onEnded();
   };
