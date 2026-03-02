@@ -50,8 +50,8 @@
     return url;
   }
 
-  // usa o portal dourado FULL + limelight
- function playVideoWithCallback(src, onEnded) {
+ // usa o portal dourado FULL + limelight
+function playVideoWithCallback(src, onEnded) {
   src = resolveVideoSrc(src);
   if (!src) { if (typeof onEnded === 'function') onEnded(); return; }
 
@@ -63,20 +63,30 @@
   // helper: aplica CSS com IMPORTANT de verdade
   const S = (el, prop, val) => el.style.setProperty(prop, val, 'important');
 
-  // classe de modo transição (não destrói DOM)
+  // classes de blindagem (anti-transform / modo transição)
   document.documentElement.classList.add('vt-force-fixed');
   document.body.classList.add('vt-force-fixed', 'is-transitioning');
+
+  // ============================
+  // Ao ligar (antes de dar play):
+  // ============================
+  overlay.classList.add('is-on');
+  document.body.style.overflow = 'hidden';
+  document.documentElement.style.overflow = 'hidden';
 
   // overlay FULLSCREEN real
   S(overlay, 'position', 'fixed');
   S(overlay, 'inset', '0');
   S(overlay, 'width', '100vw');
   S(overlay, 'height', '100vh');
+
+  // IMPORTANTE: não usar display:none aqui (use CSS com visibility/opacity)
   S(overlay, 'display', 'block');
   S(overlay, 'background', 'rgba(0,0,0,0.98)');
   S(overlay, 'z-index', '2147483646');
-  S(overlay, 'pointer-events', 'none');
-  S(overlay, 'opacity', '1');
+
+  // IMPORTANTE: precisa ser AUTO para travar interação e impedir scroll “vazar”
+  S(overlay, 'pointer-events', 'auto');
 
   // vídeo cobrindo tudo (não fica na base)
   S(video, 'position', 'fixed');
@@ -91,9 +101,8 @@
   S(video, 'background', '#000');
   S(video, 'display', 'block');
 
-  // trava scroll sem sumir DOM
-  const prevOverflow = document.body.style.overflow;
-  document.body.style.overflow = 'hidden';
+  // guarda overflow anterior (se quiser restaurar exatamente)
+  const prevBodyOverflow = document.body.style.overflow;
 
   // play
   video.muted = true;
@@ -108,9 +117,17 @@
     video.removeAttribute('src');
     video.load();
 
-    S(overlay, 'display', 'none');
+    // ============================
+    // No cleanup (ao finalizar):
+    // ============================
+    overlay.classList.remove('is-on');
+    document.body.style.overflow = prevBodyOverflow || '';
+    document.documentElement.style.overflow = '';
 
-    document.body.style.overflow = prevOverflow || '';
+    // NÃO usar display:none (evita colapsar w/h do overlay)
+    // Se você quiser “sumir” total, deixe isso por CSS via visibility/opacity
+    // S(overlay, 'display', 'none');
+
     document.documentElement.classList.remove('vt-force-fixed');
     document.body.classList.remove('vt-force-fixed', 'is-transitioning');
 
