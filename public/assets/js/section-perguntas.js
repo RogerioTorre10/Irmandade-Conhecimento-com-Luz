@@ -110,29 +110,32 @@ function playVideoWithCallback(src, onEnded) {
   video.preload = 'auto';
 
   const cleanup = () => {
-    video.onended = null;
-    video.onerror = null;
+  video.onended = null;
+  video.onerror = null;
 
-    try { video.pause(); } catch {}
-    video.removeAttribute('src');
-    video.load();
+  try { video.pause(); } catch {}
+  video.removeAttribute('src');
+  video.load();
 
-    // ============================
-    // No cleanup (ao finalizar):
-    // ============================
+  // restaura scroll (linhas azuis do seu print preservadas)
+  document.body.style.overflow = prevBodyOverflow || '';
+  document.documentElement.style.overflow = '';
+
+ requestAnimationFrame(() => {
+  requestAnimationFrame(() => {
+
     overlay.classList.remove('is-on');
-    document.body.style.overflow = prevBodyOverflow || '';
-    document.documentElement.style.overflow = '';
 
-    // NÃO usar display:none (evita colapsar w/h do overlay)
-    // Se você quiser “sumir” total, deixe isso por CSS via visibility/opacity
+    // NÃO usar display:none (evita colapso de largura/altura)
     // S(overlay, 'display', 'none');
 
     document.documentElement.classList.remove('vt-force-fixed');
     document.body.classList.remove('vt-force-fixed', 'is-transitioning');
 
     if (typeof onEnded === 'function') onEnded();
-  };
+
+  });
+});
 
   video.onended = cleanup;
   video.onerror = cleanup;
