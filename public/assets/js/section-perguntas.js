@@ -458,6 +458,31 @@ window.addEventListener('resize', () => setTimeout(applyGuiaTheme, 80));
   }
 
   // --------------------------------------------------
+// BLINDAGEM: transição entre blocos (não pode ser sobrescrita)
+// --------------------------------------------------
+function __playPerguntasBlockTransition(videoSrc, done) {
+  const src = resolveVideoSrc(videoSrc);
+  if (!src) { if (typeof done === 'function') done(); return; }
+
+  // se você não tiver log(), pode remover a linha abaixo
+  if (typeof log === 'function') log('Transição entre blocos:', src);
+
+  playVideoWithCallback(src, done);
+}
+
+// instala e TRAVA para evitar overwrite por outros scripts
+try {
+  Object.defineProperty(window, 'playBlockTransition', {
+    value: __playPerguntasBlockTransition,
+    writable: false,
+    configurable: false
+  });
+} catch (e) {
+  // fallback (caso o defineProperty falhe)
+  window.playBlockTransition = __playPerguntasBlockTransition;
+}
+  
+  // --------------------------------------------------
   // NAVEGAÇÃO
   // --------------------------------------------------
 
