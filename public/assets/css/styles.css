@@ -367,32 +367,25 @@ body.is-transitioning #jornada-root{
 }
 
 #videoOverlay{
+  #videoOverlay{
   position: fixed !important;
   inset: 0 !important;
   width: 100vw !important;
   height: 100vh !important;
+  z-index: 2147483647 !important;
+  background: #000 !important;
   display: block !important;
   visibility: hidden !important;
   opacity: 0 !important;
+  overflow: hidden !important;
+  pointer-events: auto !important;
   transition: opacity .18s ease !important;
 }
 
 #videoOverlay.is-on{
   visibility: visible !important;
   opacity: 1 !important;
-}
-
-  background: #000 !important;       /* fundo limpo */
-  z-index: 2147483646 !important;
-
-  display: block !important;          /* nunca colapsa */
-  visibility: hidden !important;
-  opacity: 0 !important;
-  transition: opacity .18s ease !important;
-
-  overflow: hidden !important;
-  pointer-events: auto !important;    /* IMPORTANTÍSSIMO: trava interação/scroll */
-}
+}   
 
 /* mata qualquer blur/espelho que alguém tenha criado */
 #videoOverlay::before,
@@ -401,17 +394,15 @@ body.is-transitioning #jornada-root{
   display: none !important;
 }
 
-/* o vídeo ocupa a tela toda, sem faixas */
+#videoOverlay video,
 #videoTransicao{
   position: absolute !important;
   inset: 0 !important;
   width: 100% !important;
   height: 100% !important;
-
-  object-fit: cover !important;       /* some com as barras */
+  object-fit: cover !important;
   object-position: center !important;
-
-  display: block !important;
+  display: block !important;  
   margin: 0 !important;
   padding: 0 !important;
   border: 0 !important;
