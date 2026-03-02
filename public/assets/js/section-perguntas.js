@@ -457,30 +457,48 @@ window.addEventListener('resize', () => setTimeout(applyGuiaTheme, 80));
     }
   }
 
-  // --------------------------------------------------
-// BLINDAGEM: transição entre blocos (não pode ser sobrescrita)
 // --------------------------------------------------
-function __playPerguntasBlockTransition(videoSrc, done) {
-  const src = resolveVideoSrc(videoSrc);
-  if (!src) { if (typeof done === 'function') done(); return; }
+// BLINDAGEM SEM QUEBRAR: playBlockTransition
+// - impede overwrite real
+// - mas NÃO estoura erro quando outro script tenta atribuir
+// --------------------------------------------------
+(function () {
+  let externalAttempt = null;
 
-  // se você não tiver log(), pode remover a linha abaixo
-  if (typeof log === 'function') log('Transição entre blocos:', src);
+  function __playPerguntasBlockTransition(videoSrc, done) {
+    const src = resolveVideoSrc(videoSrc);
+    if (!src) { if (typeof done === 'function') done(); return; }
 
-  playVideoWithCallback(src, done);
-}
+    if (typeof log === 'function') log('[Perguntas] Transição entre blocos:', src);
+    playVideoWithCallback(src, done);
+  }
 
-// instala e TRAVA para evitar overwrite por outros scripts
-try {
-  Object.defineProperty(window, 'playBlockTransition', {
-    value: __playPerguntasBlockTransition,
-    writable: false,
-    configurable: false
-  });
-} catch (e) {
-  // fallback (caso o defineProperty falhe)
-  window.playBlockTransition = __playPerguntasBlockTransition;
-}
+  try {
+    Object.defineProperty(window, 'playBlockTransition', {
+      configurable: true,
+      enumerable: true,
+
+      // sempre devolve a nossa (a correta para blocos)
+      get() {
+        return __playPerguntasBlockTransition;
+      },
+
+      // aceita a atribuição sem explodir, mas não troca a nossa
+      set(fn) {
+        externalAttempt = fn;
+        if (typeof log === 'function') {
+          log('[Perguntas] Tentativa de overwrite em playBlockTransition capturada (ignorada).', fn);
+        }
+      }
+    });
+  } catch (e) {
+    // fallback simples: se defineProperty falhar, volta pro básico
+    window.playBlockTransition = __playPerguntasBlockTransition;
+  }
+
+  // (opcional) se você quiser depurar quem tentou sobrescrever:
+  window.__playBlockTransition_externalAttempt = () => externalAttempt;
+})();
   
   // --------------------------------------------------
   // NAVEGAÇÃO
