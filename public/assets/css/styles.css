@@ -348,19 +348,19 @@ section.selfie-page {
   100% { transform: scale(1.00); filter: drop-shadow(0 0 14px var(--aura-gold)); }
 }
 
+/* anti-bug: se existir transform em html/body, fixed fica preso */
+html.vt-force-fixed, body.vt-force-fixed{
+  transform: none !important;
+  filter: none !important;
+  perspective: none !important;
+}
+
+/* durante transição, some só o app (sem destruir DOM) */
 body.is-transitioning #app,
 body.is-transitioning main,
 body.is-transitioning .jornada-root,
 body.is-transitioning #jornada-root{
   opacity: 0 !important;
-}
-
-/* ======== VT FORCE FIXED (anti-transform) ======== */
-html.vt-force-fixed, body.vt-force-fixed{
-  transform: none !important;
-  filter: none !important;
-  perspective: none !important;
-  will-change: auto !important;
 }
 
 /* Overlay ENTRE BLOCOS (perguntas) */
