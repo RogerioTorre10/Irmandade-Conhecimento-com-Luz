@@ -109,7 +109,7 @@ function playVideoWithCallback(src, onEnded) {
   video.playsInline = true;
   video.preload = 'auto';
 
-  const cleanup = () => {
+ const cleanup = () => {
   video.onended = null;
   video.onerror = null;
 
@@ -117,25 +117,31 @@ function playVideoWithCallback(src, onEnded) {
   video.removeAttribute('src');
   video.load();
 
-  // restaura scroll (linhas azuis do seu print preservadas)
+  // 1) restaura scroll/overflow primeiro (senão o navegador “segura” repaint)
+  overlay.classList.remove('is-on');
+
   document.body.style.overflow = prevBodyOverflow || '';
-  document.documentElement.style.overflow = '';
+  document.documentElement.style.overflow = prevHtmlOverflow || '';
 
- requestAnimationFrame(() => {
+  // (se você aplicou o “trava root” do print B, restaure também)
+  document.body.style.position = prevBodyPosition || '';
+  document.body.style.width    = prevBodyWidth || '';
+  document.body.style.height   = prevBodyHeight || '';
+  document.documentElement.style.height = prevHtmlHeight || '';
+
+  // 2) espera 2 frames pra garantir repaint antes de remover classes e chamar done
   requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
 
-    overlay.classList.remove('is-on');
+      // NÃO usar display:none aqui (evita colapsar w/h e bug de “grudar embaixo”)
+      // S(overlay, 'display', 'none');
 
-    // NÃO usar display:none (evita colapso de largura/altura)
-    // S(overlay, 'display', 'none');
+      document.documentElement.classList.remove('vt-force-fixed');
+      document.body.classList.remove('vt-force-fixed', 'is-transitioning');
 
-    document.documentElement.classList.remove('vt-force-fixed');
-    document.body.classList.remove('vt-force-fixed', 'is-transitioning');
-
-    if (typeof onEnded === 'function') onEnded();
-
+      if (typeof onEnded === 'function') onEnded();
+    });
   });
-});
 };
   video.onended = cleanup;
   video.onerror = cleanup;
