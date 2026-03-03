@@ -348,64 +348,6 @@ section.selfie-page {
   100% { transform: scale(1.00); filter: drop-shadow(0 0 14px var(--aura-gold)); }
 }
 
-/* anti-bug: se existir transform em html/body, fixed fica preso */
-html.vt-force-fixed, body.vt-force-fixed{
-  height: 100vh !important;
-  max-height: 100vh !important;
-  overflow: hidden !important;
-  transform: none !important;
-  filter: none !important;
-  perspective: none !important;
-}
-
-/* durante transição, some só o app (sem destruir DOM) */
-body.is-transitioning #app,
-body.is-transitioning main,
-body.is-transitioning .jornada-root,
-body.is-transitioning #jornada-root{
-  opacity: 0 !important;
-}
-
-#videoOverlay{
-  #videoOverlay{
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  z-index: 2147483647 !important;
-  background: #000 !important;
-  display: block !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  overflow: hidden !important;
-  pointer-events: auto !important;
-  transition: opacity .18s ease !important;
-}
-
-#videoOverlay.is-on{
-  visibility: visible !important;
-  opacity: 1 !important;
-}   
-
-/* mata qualquer blur/espelho que alguém tenha criado */
-#videoOverlay::before,
-#videoOverlay::after{
-  content: none !important;
-  display: none !important;
-}
-
-#videoOverlay video,
-#videoTransicao{
-  position: absolute !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-  object-position: center !important;
-  display: block !important;  
-  margin: 0 !important;
-  padding: 0 !important;
-  border: 0 !important;
   border-radius: 0 !important;
   background: #000 !important;
 }
