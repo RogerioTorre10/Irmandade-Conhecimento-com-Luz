@@ -850,44 +850,6 @@ textarea,
   animation: none !important; /* opcional: remove pulsação do texto */
 }
 
-/* ================================
-   VIDEO OVERLAY — FULLSCREEN FIX
-   ================================ */
-#videoOverlay.video-overlay{
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  z-index: 2147483646 !important;
-  background: rgba(0,0,0,.98) !important;
-  display: none; /* fica off por padrão */
-  pointer-events: auto !important;
-}
 
-#videoOverlay.video-overlay.is-on{
-  display: block !important;
-}
-
-#videoTransicao{
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  display: block !important;
-  object-fit: cover !important;
-  object-position: center !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  background: #000 !important;
-}
-
-/* anti “container transform” */
-html.vt-force-fixed, body.vt-force-fixed{
-  transform: none !important;
-}
-
-/* trava scroll durante transição */
-body.is-transitioning{
   overflow: hidden !important;
 }
