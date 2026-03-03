@@ -8,6 +8,8 @@
 
   let isPlaying = false;
   let cleaned = false;
+// trava scroll do ROOT durante a transição (evita “vazar” e evita pulo)
+let prevScroll = null;
 
   // ----------------------------- UTILIDADES -----------------------------
   const isMp4 = (src) => /\.mp4(\?|#|$)/i.test(src || '');
@@ -55,7 +57,23 @@
       document.removeEventListener('keydown', onKeydown, true);
       window.__TRANSITION_LOCK = false;
       document.dispatchEvent(new CustomEvent('transition:ended'));
-      document.documentElement.style.overflow = '';
+// restaura travas de scroll (se houver)
+if (prevScroll) {
+  document.body.style.position = prevScroll.bodyPosition || '';
+  document.body.style.top = prevScroll.bodyTop || '';
+  document.body.style.width = prevScroll.bodyWidth || '';
+  document.body.style.height = prevScroll.bodyHeight || '';
+  document.body.style.overflow = prevScroll.bodyOverflow || '';
+
+  document.documentElement.style.overflow = prevScroll.htmlOverflow || '';
+  document.documentElement.style.height = prevScroll.htmlHeight || '';
+
+  // volta para o scroll exato
+  window.scrollTo(0, prevScroll.scrollY || 0);
+  prevScroll = null;
+} else {
+  document.documentElement.style.overflow = '';
+}
       if (overlay?.parentNode) overlay.parentNode.removeChild(overlay);
     } catch {}
 
@@ -93,6 +111,36 @@
     ambient.preload = 'auto';
 
     // botão pular
+    // força fullscreen real (blindagem contra CSS externo)
+const S = (el, prop, val) => el.style.setProperty(prop, val, 'important');
+
+S(overlay, 'position', 'fixed');
+S(overlay, 'inset', '0');
+S(overlay, 'width', '100vw');
+S(overlay, 'height', '100vh');
+S(overlay, 'z-index', '2147483647');
+S(overlay, 'background', '#000');
+S(overlay, 'pointer-events', 'auto');
+
+S(frame, 'position', 'absolute');
+S(frame, 'inset', '0');
+S(frame, 'width', '100%');
+S(frame, 'height', '100%');
+
+S(video, 'position', 'absolute');
+S(video, 'inset', '0');
+S(video, 'width', '100%');
+S(video, 'height', '100%');
+S(video, 'object-fit', 'cover');
+S(video, 'object-position', 'center');
+
+S(ambient, 'position', 'absolute');
+S(ambient, 'inset', '0');
+S(ambient, 'width', '100%');
+S(ambient, 'height', '100%');
+S(ambient, 'object-fit', 'cover');
+S(ambient, 'object-position', 'center');
+
     const skip = document.createElement('button');
     skip.textContent = 'Pular';
     skip.setAttribute('aria-label', 'Pular vídeo');
@@ -126,6 +174,28 @@
     }
 
     isPlaying = true;
+
+// trava scroll do ROOT (evita “vazar” e evita pulo)
+const scrollY = window.scrollY || window.pageYOffset || 0;
+prevScroll = {
+  scrollY,
+  htmlOverflow: document.documentElement.style.overflow,
+  htmlHeight: document.documentElement.style.height,
+  bodyOverflow: document.body.style.overflow,
+  bodyPosition: document.body.style.position,
+  bodyTop: document.body.style.top,
+  bodyWidth: document.body.style.width,
+  bodyHeight: document.body.style.height
+};
+
+document.documentElement.style.overflow = 'hidden';
+document.documentElement.style.height = '100%';
+
+document.body.style.overflow = 'hidden';
+document.body.style.position = 'fixed';
+document.body.style.top = `-${scrollY}px`;
+document.body.style.width = '100%';
+document.body.style.height = '100%';
     cleaned = false;
 
     // Glamour: some a página antes do filme
