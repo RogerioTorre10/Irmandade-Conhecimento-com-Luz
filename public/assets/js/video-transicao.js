@@ -51,15 +51,13 @@
     if (cleaned) return;
     cleaned = true;
 
-   try {
-  document.removeEventListener('keydown', onKeydown, true);
-  window.__TRANSITION_LOCK = false;
-  document.dispatchEvent(new CustomEvent('transition:ended'));
-  document.documentElement.style.overflow = '';
-  document.body.classList.remove('vt-playing');
-  document.documentElement.classList.remove('vt-playing'); // 💎 novo
-  if (overlay?.parentNode) overlay.parentNode.removeChild(overlay);
-  } catch {}
+    try {
+      document.removeEventListener('keydown', onKeydown, true);
+      window.__TRANSITION_LOCK = false;
+      document.dispatchEvent(new CustomEvent('transition:ended'));
+      document.documentElement.style.overflow = '';
+      if (overlay?.parentNode) overlay.parentNode.removeChild(overlay);
+    } catch {}
 
     isPlaying = false;
     log('Overlay removido e estado resetado');
@@ -103,27 +101,11 @@
     frame.appendChild(ambient);
     frame.appendChild(video);
     frame.appendChild(skip);
-   overlay.appendChild(frame);
-document.body.appendChild(overlay);
+    overlay.appendChild(frame);
+    document.body.appendChild(overlay);
 
-// ===============================
-// DIAMANTE: overlay acima de tudo
-// ===============================
-// DIAMANTE: overlay nunca pode empurrar layout
-overlay.style.position = 'fixed';
-overlay.style.inset = '0';
-overlay.style.width = '100vw';
-overlay.style.height = '100vh';
-overlay.style.maxWidth = '100vw';
-overlay.style.maxHeight = '100vh';
-overlay.style.overflow = 'hidden';
-overlay.style.zIndex = '2147483647';
-
-document.body.classList.add('vt-playing');
-document.documentElement.classList.add('vt-playing');
-    
-// glamour fade-in do portal
-requestAnimationFrame(() => overlay.classList.add('show'));
+    // glamour fade-in do portal
+    requestAnimationFrame(() => overlay.classList.add('show'));
 
     return { overlay, frame, video, ambient, skip };
   }
@@ -172,19 +154,11 @@ requestAnimationFrame(() => overlay.classList.add('show'));
       // limelight: cor do guia no overlay (se já escolhido)
       try {
         const g =
-  window.JORNADA_STATE?.guiaSelecionado ||
-  window.JORNADA_STATE?.guia ||
-  window.JC?.data?.guiaSelecionado ||
-  window.JC?.data?.guia ||
-  sessionStorage.getItem('JORNADA_GUIA') ||
-  localStorage.getItem('JORNADA_GUIA') ||
-  localStorage.getItem('jc.guiaSelecionado') ||
-  localStorage.getItem('jc.guia') ||
-  sessionStorage.getItem('jornada.guia') ||
-  localStorage.getItem('guiaEscolhido');
-
-if (g) overlay.setAttribute('data-guia', String(g).toLowerCase());
-} catch {}
+          window.JC?.state?.guia ||
+          window.selectedGuide ||
+          localStorage.getItem('guiaEscolhido');
+        if (g) overlay.setAttribute('data-guia', g);
+      } catch {}
 
       // luz viva enquanto toca
       try { window.Luz?.startPulse({ min: 1, max: 1.5, speed: 120 }); } catch {}
