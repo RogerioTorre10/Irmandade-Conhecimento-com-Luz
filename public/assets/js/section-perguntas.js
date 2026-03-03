@@ -66,14 +66,30 @@ function playVideoWithCallback(src, onEnded) {
   // classes de blindagem (anti-transform / modo transição)
   document.documentElement.classList.add('vt-force-fixed');
   document.body.classList.add('vt-force-fixed', 'is-transitioning');
+  
+ // ============================
+// Ao ligar (antes de dar play):
+// ============================
 
-  // ============================
-  // Ao ligar (antes de dar play):
-  // ============================
-  overlay.classList.add('is-on');
-  document.body.style.overflow = 'hidden';
-  document.documentElement.style.overflow = 'hidden';
+// guarda estado anterior (ANTES de mexer em overflow/position)
+const prevBodyOverflow  = document.body.style.overflow;
+const prevHtmlOverflow  = document.documentElement.style.overflow;
 
+const prevBodyPosition  = document.body.style.position;
+const prevBodyWidth     = document.body.style.width;
+const prevBodyHeight    = document.body.style.height;
+const prevHtmlHeight    = document.documentElement.style.height;
+
+// liga overlay + trava scroll
+overlay.classList.add('is-on');
+document.body.style.overflow = 'hidden';
+document.documentElement.style.overflow = 'hidden';
+
+// trava ROOT (evita “grudar embaixo” / viewport errado em mobile/scroll)
+document.documentElement.style.height = '100%';
+document.body.style.height = '100%';
+document.body.style.position = 'fixed';
+document.body.style.width = '100%';
   // overlay FULLSCREEN real
   S(overlay, 'position', 'fixed');
   S(overlay, 'inset', '0');
@@ -100,10 +116,7 @@ function playVideoWithCallback(src, onEnded) {
   S(video, 'box-shadow', 'none');
   S(video, 'background', '#000');
   S(video, 'display', 'block');
-
-  // guarda overflow anterior (se quiser restaurar exatamente)
-  const prevBodyOverflow = document.body.style.overflow;
-
+ 
   // play
   video.muted = true;
   video.playsInline = true;
@@ -117,24 +130,21 @@ function playVideoWithCallback(src, onEnded) {
   video.removeAttribute('src');
   video.load();
 
-  // 1) restaura scroll/overflow primeiro (senão o navegador “segura” repaint)
+  // 1) desliga overlay + restaura scroll primeiro
   overlay.classList.remove('is-on');
 
   document.body.style.overflow = prevBodyOverflow || '';
   document.documentElement.style.overflow = prevHtmlOverflow || '';
 
-  // (se você aplicou o “trava root” do print B, restaure também)
+  // restaura ROOT lock
   document.body.style.position = prevBodyPosition || '';
   document.body.style.width    = prevBodyWidth || '';
   document.body.style.height   = prevBodyHeight || '';
   document.documentElement.style.height = prevHtmlHeight || '';
 
-  // 2) espera 2 frames pra garantir repaint antes de remover classes e chamar done
+  // 2) espera 2 frames para garantir repaint antes de remover classes/callback
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-
-      // NÃO usar display:none aqui (evita colapsar w/h e bug de “grudar embaixo”)
-      // S(overlay, 'display', 'none');
 
       document.documentElement.classList.remove('vt-force-fixed');
       document.body.classList.remove('vt-force-fixed', 'is-transitioning');
@@ -143,6 +153,7 @@ function playVideoWithCallback(src, onEnded) {
     });
   });
 };
+  
   video.onended = cleanup;
   video.onerror = cleanup;
 
