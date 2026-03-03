@@ -151,15 +151,18 @@
   });
 }
 
-  window.playBlockTransition = function(videoSrc, onDone) {
-    const src = resolveVideoSrc(videoSrc);
-    if (!src) {
-      if (typeof onDone === 'function') onDone();
-      return;
+ (function installPlayBlockTransitionSafe(){
+  const d = Object.getOwnPropertyDescriptor(window, 'playBlockTransition');
+  if (d && d.writable === false) return; // já travado por outro script
+
+  window.playBlockTransition = function(videoSrc, done){
+    if (typeof window.playVideoWithCallback === 'function') {
+      window.playVideoWithCallback(videoSrc, done);
+    } else if (typeof done === 'function') {
+      done();
     }
-    log('Transição entre blocos:', src);
-    playVideoWithCallback(src, onDone);
   };
+})();
 
   // --------------------------------------------------
   // BLOCS / PERGUNTAS
