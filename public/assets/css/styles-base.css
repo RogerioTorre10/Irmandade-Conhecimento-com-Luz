@@ -327,5 +327,23 @@ span.microphone {
   pointer-events: none !important;
 }
 
-
+#vt-overlay{
+position:fixed !important;
+inset:0 !important;
+width:100vw !important;
+height:100vh !important;
+display:flex !important;
+align-items:center;
+justify-content:center;
+background:#000;
+z-index:999999 !important;
+overflow:hidden;
+}
+#vt-video{
+position:absolute;
+inset:0;
+width:100%;
+height:100%;
+object-fit:cover;
+}
 
