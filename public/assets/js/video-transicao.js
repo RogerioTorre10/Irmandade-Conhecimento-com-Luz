@@ -184,8 +184,8 @@ function buildPortal() {
 
   // Anexa no body por último (garante que fica acima)
   overlay.appendChild(frame);
-  document.body.appendChild(overlay);
-
+  document.documentElement.appendChild(overlay);
+  
   // Glamour: portal aparece suave (mantém seu CSS se existir)
   requestAnimationFrame(() => overlay.classList.add('show'));
 
