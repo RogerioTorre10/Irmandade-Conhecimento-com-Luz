@@ -371,8 +371,53 @@
   }
 
   async function playCleanTransition(videoSrc, done) {
-    const overlay = ensureOverlay();
-    const video = overlay.querySelector('video');
+  const overlay = ensureOverlay();
+  const video = overlay.querySelector('#videoTransicao') || overlay.querySelector('video');
+
+  if (!videoSrc) {
+    // sem vídeo: apenas garante que não "pisca"
+    exitTransitionMode();
+    if (typeof done === 'function') done();
+    return;
+  }
+
+  enterTransitionMode();
+
+  overlay.classList.add('is-on');
+
+  // força repaint (remove "flash" em alguns Androids)
+  // eslint-disable-next-line no-unused-expressions
+  overlay.offsetHeight;
+
+  // prepara vídeo
+  try { video.pause(); } catch {}
+  video.currentTime = 0;
+  video.src = videoSrc;
+
+  const cleanup = () => {
+    video.onended = null;
+    video.onerror = null;
+
+    overlay.classList.remove('is-on');
+
+    // libera só depois de desligar overlay (evita 1 frame do antigo)
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        exitTransitionMode();
+        if (typeof done === 'function') done();
+      });
+    });
+  };
+
+  video.onerror = cleanup;
+  video.onended = cleanup;
+
+  try {
+    await video.play();
+  } catch (e) {
+    cleanup();
+  }
+}
 
     if (!videoSrc) {
       // sem vídeo: apenas garante que não "pisca"
