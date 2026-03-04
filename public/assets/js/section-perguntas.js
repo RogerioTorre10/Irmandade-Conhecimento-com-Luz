@@ -106,6 +106,13 @@ function playVideoWithCallback(src, onEnded) {
 
   // sempre no body (evita ficar preso em containers)
   if (overlay.parentElement !== document.body) document.body.appendChild(overlay);
+  
+  (() => {
+  const o = document.getElementById('videoOverlay');
+  if (!o) return;
+  o.classList.remove('is-on'); // garante OFF
+ })();
+  
 
   // helper: aplica CSS com IMPORTANT de verdade
   const S = (el, prop, val) => el.style.setProperty(prop, val, 'important');
