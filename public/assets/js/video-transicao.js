@@ -89,57 +89,108 @@
   }
 
   // -------------------------- PORTAL DOURADO ---------------------------
-  function buildPortal() {
-    // Overlay escuro
-    const overlay = document.createElement('div');
-    overlay.id = 'vt-overlay';
-    overlay.className = 'jp-video-overlay';
-    overlay.setAttribute('role', 'dialog');
+function buildPortal() {
+  // Overlay escuro (FULLSCREEN de verdade, independente de CSS externo)
+  const overlay = document.createElement('div');
+  overlay.id = 'vt-overlay';
+  overlay.className = 'jp-video-overlay';
+  overlay.setAttribute('role', 'dialog');
 
-    // Moldura dourada
-    const frame = document.createElement('div');
-    frame.className = 'jp-video-frame';
+  Object.assign(overlay.style, {
+    position: 'fixed',
+    inset: '0',
+    width: '100vw',
+    height: '100vh',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    background: 'rgba(0,0,0,0.88)',
+    zIndex: '2147483647',        // acima de tudo
+    overflow: 'hidden'
+  });
 
-    // Vídeo ambiente (limelight)
-    const ambient = document.createElement('video');
-    ambient.className = 'jp-video-ambient';
-    ambient.playsInline = true;
-    ambient.autoplay = false;
-    ambient.controls = false;
-    ambient.muted = true;
-    ambient.loop = true;
-    ambient.preload = 'auto';
+  // Moldura dourada (container central)
+  const frame = document.createElement('div');
+  frame.className = 'jp-video-frame';
 
-    // Vídeo principal (cenário completo)
-    const video = document.createElement('video');
-    video.id = 'vt-video';
-    video.playsInline = true;
-    video.autoplay = false;
-    video.controls = false;
-    video.muted = true;       // autoplay confiável
-    video.preload = 'auto';
+  Object.assign(frame.style, {
+    position: 'relative',
+    display: 'block',
+    maxWidth: '96vw',
+    maxHeight: '96vh',
+    borderRadius: '18px',
+    overflow: 'hidden'
+  });
 
-    // Injeta vídeos dentro da moldura
-    frame.appendChild(ambient); // fundo primeiro
-    frame.appendChild(video);   // principal por cima
+  // Vídeo ambiente (limelight)
+  const ambient = document.createElement('video');
+  ambient.className = 'jp-video-ambient';
+  ambient.playsInline = true;
+  ambient.autoplay = false;
+  ambient.controls = false;
+  ambient.muted = true;
+  ambient.loop = true;
+  ambient.preload = 'auto';
 
-    // Botão “Pular”
-    const skip = document.createElement('button');
-    skip.textContent = 'Pular';
-    skip.setAttribute('aria-label', 'Pular vídeo');
-    skip.className = 'jp-video-skip';
-    frame.appendChild(skip);
+  Object.assign(ambient.style, {
+    position: 'absolute',
+    inset: '0',
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    filter: 'blur(18px) brightness(0.7)',
+    transform: 'scale(1.08)',
+    opacity: '0.9'
+  });
 
-    // Adiciona frame e overlay no body
-    overlay.appendChild(frame);
-    document.body.appendChild(overlay);
+  // Vídeo principal
+  const video = document.createElement('video');
+  video.id = 'vt-video';
+  video.playsInline = true;
+  video.autoplay = false;
+  video.controls = false;
+  video.muted = true;
+  video.preload = 'auto';
 
-    // Glamour: portal aparece suave
-    requestAnimationFrame(() => overlay.classList.add('show'));
+  Object.assign(video.style, {
+    position: 'absolute',
+    inset: '0',
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover'
+  });
 
-    return { overlay, frame, video, ambient, skip };
-  }
+  frame.appendChild(ambient);
+  frame.appendChild(video);
 
+  // Botão “Pular”
+  const skip = document.createElement('button');
+  skip.textContent = 'Pular';
+  skip.setAttribute('aria-label', 'Pular vídeo');
+  skip.className = 'jp-video-skip';
+
+  Object.assign(skip.style, {
+    position: 'absolute',
+    top: '14px',
+    right: '14px',
+    zIndex: '3',
+    padding: '8px 14px',
+    borderRadius: '999px',
+    border: '0',
+    cursor: 'pointer'
+  });
+
+  frame.appendChild(skip);
+
+  // Anexa no body por último (garante que fica acima)
+  overlay.appendChild(frame);
+  document.body.appendChild(overlay);
+
+  // Glamour: portal aparece suave (mantém seu CSS se existir)
+  requestAnimationFrame(() => overlay.classList.add('show'));
+
+  return { overlay, frame, video, ambient, skip };
+}
   // ------------------------- PLAYER PRINCIPAL ---------------------------
   function playTransitionVideo(src, nextSectionId) {
     log('Recebido src:', src, 'nextSectionId:', nextSectionId);
