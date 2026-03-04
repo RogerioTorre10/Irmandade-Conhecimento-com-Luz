@@ -38,223 +38,94 @@
   let completed = false;
 
   // --------------------------------------------------
-// OVERLAY DE VÍDEO (TRANSIÇÕES) — BLINDADO
-// - Não mexe em display de outras seções (evita “pedaço da tela anterior”)
-// - Sempre FULLSCREEN real (fixed + 100vw/100vh + cover)
-// - Trava scroll do ROOT (html/body) e preserva posição
-// - Cleanup com 2 frames (evita flash no fim)
-// --------------------------------------------------
+  // OVERLAY DE VÍDEO (FULLSCREEN)
+  // --------------------------------------------------
 
-function ensureVideoOverlay() {
-  let overlay = document.getElementById('videoOverlay');
-  let video = document.getElementById('videoTransicao');
+  function ensureVideoOverlay() {
+    let overlay = $('#videoOverlay');
+    let video = $('#videoTransicao');
 
-  if (!overlay) {
-    overlay = document.createElement('div');
-    overlay.id = 'videoOverlay';
-    overlay.className = 'video-overlay';
-    overlay.setAttribute('aria-hidden', 'true');
-    document.body.appendChild(overlay);
-  }
-
-  if (!video) {
-    video = document.createElement('video');
-    video.id = 'videoTransicao';
-    overlay.appendChild(video);
-  }
-
-  // Garantias mínimas (sem depender de CSS externo)
-  overlay.style.setProperty('position', 'fixed', 'important');
-  overlay.style.setProperty('inset', '0', 'important');
-  overlay.style.setProperty('width', '100vw', 'important');
-  overlay.style.setProperty('height', '100vh', 'important');
-  overlay.style.setProperty('z-index', '2147483646', 'important');
-  overlay.style.setProperty('background', 'rgba(0,0,0,0.98)', 'important');
-  overlay.style.setProperty('display', 'block', 'important');
-  overlay.style.setProperty('opacity', '0', 'important');
-  overlay.style.setProperty('visibility', 'hidden', 'important');
-  overlay.style.setProperty('pointer-events', 'none', 'important');
-
-  video.style.setProperty('position', 'fixed', 'important');
-  video.style.setProperty('inset', '0', 'important');
-  video.style.setProperty('width', '100vw', 'important');
-  video.style.setProperty('height', '100vh', 'important');
-  video.style.setProperty('object-fit', 'cover', 'important');
-  video.style.setProperty('object-position', 'center', 'important');
-  video.style.setProperty('display', 'block', 'important');
-  video.style.setProperty('background', '#000', 'important');
-
-  return { overlay, video };
-}
-
-function resolveVideoSrc(src) {
-  if (!src) return '';
-  // já absoluto
-  if (/^https?:\/\//i.test(src)) return src;
-
-  // garante base correta (Render Static)
-  const clean = String(src).trim().replace(/^\/+/, '');
-  return '/' + clean;
-}
-
-// usa o portal dourado FULL + limelight (sem “sumir DOM”)
-function playVideoWithCallback(src, onEnded) {
-  src = resolveVideoSrc(src);
-  if (!src) { if (typeof onEnded === 'function') onEnded(); return; }
-
-  const { overlay, video } = ensureVideoOverlay();
-
-  // sempre no body (evita ficar preso em containers)
-  if (overlay.parentElement !== document.body) document.body.appendChild(overlay);
-  
-  (() => {
-  const o = document.getElementById('videoOverlay');
-  if (!o) return;
-  o.classList.remove('is-on'); // garante OFF
- })();
-  
-
-  // helper: aplica CSS com IMPORTANT de verdade
-  const S = (el, prop, val) => el.style.setProperty(prop, val, 'important');
-
-  // classes de blindagem (anti-transform / modo transição)
-  document.documentElement.classList.add('vt-force-fixed');
-  document.body.classList.add('vt-force-fixed', 'is-transitioning');
-
-  // ============================
-  // Ao ligar (antes de dar play):
-  // ============================
-  overlay.classList.add('is-on');
-  S(overlay, 'pointer-events', 'auto');
-  S(overlay, 'visibility', 'visible');
-  S(overlay, 'opacity', '1');
-
-  // --- TRAVA SCROLL DO ROOT (sem gambi “display:none”) ---
-  const scrollY = window.scrollY || window.pageYOffset || 0;
-
-  const prev = {
-    htmlOverflow: document.documentElement.style.overflow,
-    htmlHeight: document.documentElement.style.height,
-
-    bodyOverflow: document.body.style.overflow,
-    bodyPosition: document.body.style.position,
-    bodyTop: document.body.style.top,
-    bodyWidth: document.body.style.width,
-    bodyHeight: document.body.style.height
-  };
-
-  document.documentElement.style.overflow = 'hidden';
-  document.documentElement.style.height = '100%';
-
-  document.body.style.overflow = 'hidden';
-  document.body.style.position = 'fixed';
-  document.body.style.top = `-${scrollY}px`;
-  document.body.style.width = '100%';
-  document.body.style.height = '100%';
-
-  // play
-  video.muted = true;
-  video.playsInline = true;
-  video.preload = 'auto';
-
-  let cleaned = false;
-
-  const cleanup = () => {
-    if (cleaned) return;
-    cleaned = true;
-
-    video.onended = null;
-    video.onerror = null;
-
-    try { video.pause(); } catch {}
-    try {
-      video.removeAttribute('src');
-      video.load();
-    } catch {}
-
-    // 1) libera scroll primeiro (evita “segurar repaint”)
-    document.body.style.position = prev.bodyPosition || '';
-    document.body.style.top = prev.bodyTop || '';
-    document.body.style.width = prev.bodyWidth || '';
-    document.body.style.height = prev.bodyHeight || '';
-    document.body.style.overflow = prev.bodyOverflow || '';
-
-    document.documentElement.style.overflow = prev.htmlOverflow || '';
-    document.documentElement.style.height = prev.htmlHeight || '';
-
-    // volta ao ponto exato do scroll
-    window.scrollTo(0, scrollY);
-
-    // 2) espera 2 frames para browser pintar a tela seguinte, aí “some” overlay
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        overlay.classList.remove('is-on');
-        S(overlay, 'pointer-events', 'none');
-        S(overlay, 'opacity', '0');
-        S(overlay, 'visibility', 'hidden');
-
-        document.documentElement.classList.remove('vt-force-fixed');
-        document.body.classList.remove('vt-force-fixed', 'is-transitioning');
-
-        if (typeof onEnded === 'function') onEnded();
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'videoOverlay';
+      Object.assign(overlay.style, {
+        position: 'fixed',
+        top: '0',
+        left: '0',
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'black',
+        display: 'none',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: '9999'
       });
+      document.body.appendChild(overlay);
+    }
+
+    if (!video) {
+      video = document.createElement('video');
+      video.id = 'videoTransicao';
+      video.playsInline = true;
+      video.preload = 'auto';
+      video.controls = false;
+      Object.assign(video.style, {
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+        display: 'block'
+      });
+      overlay.appendChild(video);
+    }
+
+    return { overlay, video };
+  }
+
+  function resolveVideoSrc(src) {
+    if (!src) return null;
+    let url = String(src).trim();
+    if (url.startsWith('/assets/img/') && url.endsWith('.mp4')) {
+      url = url.replace('/assets/img/', '/assets/videos/');
+    }
+    return url;
+  }
+
+  function playVideoWithCallback(src, onEnded) {
+    const url = resolveVideoSrc(src);
+    if (!url) {
+      if (typeof onEnded === 'function') onEnded();
+      return;
+    }
+
+    const { overlay, video } = ensureVideoOverlay();
+
+    overlay.style.display = 'flex';
+    video.src = url;
+    video.load();
+
+    video.onended = () => {
+      video.onended = null;
+      overlay.style.display = 'none';
+      if (typeof onEnded === 'function') onEnded();
+    };
+
+    video.play().catch(e => {
+      console.error('[PERGUNTAS] Erro ao tocar vídeo:', e);
+      video.onended = null;
+      overlay.style.display = 'none';
+      if (typeof onEnded === 'function') onEnded();
     });
-  };
+  }
 
-  video.onended = cleanup;
-  video.onerror = cleanup;
-
-  // força fullscreen real (caso CSS externo tente interferir)
-  S(overlay, 'position', 'fixed');
-  S(overlay, 'inset', '0');
-  S(overlay, 'width', '100vw');
-  S(overlay, 'height', '100vh');
-  S(overlay, 'display', 'block');
-  S(overlay, 'z-index', '2147483646');
-
-  S(video, 'position', 'fixed');
-  S(video, 'inset', '0');
-  S(video, 'width', '100vw');
-  S(video, 'height', '100vh');
-  S(video, 'object-fit', 'cover');
-  S(video, 'object-position', 'center');
-  S(video, 'display', 'block');
-
-  // carrega e toca
-  try {
-    video.currentTime = 0;
-  } catch {}
-
-  video.src = src;
-  video.load();
-
-  const p = video.play();
-  if (p && typeof p.catch === 'function') p.catch(cleanup);
-}
-
-// Transição entre blocos: usa a função acima
-function playBlockTransition(videoSrc, done) {
-  playVideoWithCallback(videoSrc, done);
-}
-
-// Exporta / instala globalmente (sem quebrar se a propriedade estiver travada)
-try {
-  window.ensureVideoOverlay = ensureVideoOverlay;
-  window.resolveVideoSrc = resolveVideoSrc;
-  window.playVideoWithCallback = playVideoWithCallback;
-
-  const d = Object.getOwnPropertyDescriptor(window, 'playBlockTransition');
-  const canSet = !d || d.writable || d.configurable;
-
-  if (canSet) window.playBlockTransition = playBlockTransition;
-} catch (e) {
-  // silencioso: se estiver travado, mantém o existente
-}
-
-if (typeof window.playBlockTransition !== 'function') {
-  window.playBlockTransition = playBlockTransition;
-}
-
+  function playBlockTransition(videoSrc, onDone) {
+    const url = resolveVideoSrc(videoSrc);
+    if (!url) {
+      if (typeof onDone === 'function') onDone();
+      return;
+    }
+    log('Transição entre blocos:', url);
+    playVideoWithCallback(url, onDone);
+  }
 
   // --------------------------------------------------
   // BLOCS / PERGUNTAS
@@ -296,7 +167,7 @@ if (typeof window.playBlockTransition !== 'function') {
   }
 
   // --------------------------------------------------
-  // UI / BARRAS / DATILOGRAFIA + LEITURA
+  // PROGRESSO + DATILOGRAFIA + LEITURA
   // --------------------------------------------------
 
   function setText(sel, val) {
@@ -304,56 +175,37 @@ if (typeof window.playBlockTransition !== 'function') {
     if (el) el.textContent = String(val);
   }
 
-  function setWidth(sel, val) {
+  function setWidth(sel, pct) {
     const el = $(sel);
-    if (el) el.style.width = val;
+    if (el) el.style.width = pct;
   }
 
-     function updateCounters() {
+  function updateCounters() {
     const { bloco } = getCurrent();
     const blocoTotal = bloco?.questions?.length || 1;
 
-    // ---------- BLOCO (Régua superior: 1 a 5) ----------
-    if (State.totalBlocks > 0) {
-      const blocoAtual = State.blocoIdx + 1;
-      const pctBlocos = Math.max(0, Math.min(100,
-        (blocoAtual / State.totalBlocks) * 100
-      ));
+    // Global
+    setText('#jp-global-current', State.globalIdx + 1);
+    setText('#jp-global-total', State.totalQuestions || 1);
 
-      // texto "X de Y"
-      setText('#progress-block-value', `${blocoAtual} de ${State.totalBlocks}`);
+    // Bloco
+    setText('#jp-block-current', State.qIdx + 1);
+    setText('#jp-block-total', blocoTotal);
 
-      // barra dourada
-      const fillBloco = document.querySelector('#progress-block-fill');
-      if (fillBloco) {
-        fillBloco.style.width = pctBlocos + '%';
-      }
-    }
+    // "Bloco X de Y" (seu texto atual)
+    setText('#jp-block-num', State.blocoIdx + 1);
+    setText('#jp-block-num-2', State.blocoIdx + 1);
+    setText('#jp-block-max', State.totalBlocks || 1);
 
-    // ---------- PERGUNTA DO BLOCO (Régua do meio: 1 a 10) ----------
-    {
-      const perguntaAtual = State.qIdx + 1;
-      const pctPerguntas = Math.max(0, Math.min(100,
-        (perguntaAtual / blocoTotal) * 100
-      ));
+    const pctBloco = Math.max(0, Math.min(100, ((State.qIdx + 1) / blocoTotal) * 100));
+    const pctGlobal = Math.max(
+      0,
+      Math.min(100, ((State.globalIdx + 1) / (State.totalQuestions || 1)) * 100)
+    );
 
-      // texto "X / Y"
-      setText('#progress-question-value', `${perguntaAtual} / ${blocoTotal}`);
-
-      // barra prateada
-      const fillPerg = document.querySelector('#progress-question-fill');
-      if (fillPerg) {
-        fillPerg.style.width = pctPerguntas + '%';
-      }
-    }
-
-    // ---------- TOTAL GERAL (Ampulheta: 1 a 50) ----------
-    if (State.totalQuestions > 0) {
-      const globalAtual = State.globalIdx + 1;
-      setText('#progress-total-value', `${globalAtual} / ${State.totalQuestions}`);
-    }
+    setWidth('#jp-block-progress-fill', pctBloco + '%');
+    setWidth('#jp-global-progress-fill', pctGlobal + '%');
   }
-
 
   async function typeQuestion(text) {
     if (completed) return;
@@ -366,15 +218,34 @@ if (typeof window.playBlockTransition !== 'function') {
 
     if (raw) raw.textContent = pergunta;
 
+    // visual
     box.style.textAlign = 'left';
-    box.textContent = '';
     box.classList.remove('typing-done');
+    box.setAttribute('data-typing', 'true');
+
+    // PRIORIDADE: TypingBridge (runTyping) controla animação + leitura
+    if (typeof window.runTyping === 'function') {
+      box.textContent = pergunta;
+      try {
+        await window.runTyping(box); // jornada-typing-bridge cuida da mágica
+      } catch (e) {
+        console.warn('[PERGUNTAS] runTyping falhou, usando fallback manual.', e);
+        await manualTyping(box, pergunta);
+      }
+    } else {
+      // Fallback: nossa própria datilografia
+      await manualTyping(box, pergunta);
+    }
+
+    box.classList.add('typing-done');
     box.removeAttribute('data-typing');
+  }
 
-    let i = 0;
-    const speed = 24;
-
-    await new Promise(resolve => {
+  function manualTyping(box, pergunta) {
+    return new Promise(resolve => {
+      box.textContent = '';
+      let i = 0;
+      const speed = 24;
       const it = setInterval(() => {
         if (completed) {
           clearInterval(it);
@@ -384,33 +255,10 @@ if (typeof window.playBlockTransition !== 'function') {
         i++;
         if (i > pergunta.length) {
           clearInterval(it);
-          box.classList.add('typing-done');
           resolve();
         }
       }, speed);
     });
-
-    // LEITURA AUTOMÁTICA
-    if ('speechSynthesis' in window && pergunta.trim()) {
-      const utter = new SpeechSynthesisUtterance(pergunta);
-      utter.lang = 'pt-BR';
-      utter.rate = 0.9;
-      utter.pitch = 1;
-      speechSynthesis.cancel();
-      setTimeout(() => speechSynthesis.speak(utter), 300);
-    }
-
-    if (typeof window.runTyping === 'function') {
-      try {
-        box.setAttribute('data-typing', 'true');
-        await window.runTyping(box);
-      } catch (e) {
-        console.warn('[PERGUNTAS] runTyping falhou:', e);
-      } finally {
-        box.classList.add('typing-done');
-        box.removeAttribute('data-typing');
-      }
-    }
   }
 
   async function showCurrentQuestion() {
@@ -496,7 +344,7 @@ if (typeof window.playBlockTransition !== 'function') {
       State.blocoIdx = nextBlocoIdx;
       State.qIdx = 0;
 
-      window.playBlockTransition(video, () => {
+      playBlockTransition(video, () => {
         if (!completed) showCurrentQuestion();
       });
     } else {
@@ -505,78 +353,39 @@ if (typeof window.playBlockTransition !== 'function') {
     }
   }
 
-     // --------------------------------------------------
-  // FINALIZAÇÃO — FALLBACK LIMPO PARA SECTION-FINAL
+  // --------------------------------------------------
+  // FINALIZAÇÃO
   // --------------------------------------------------
 
   function ensureFinalSectionExists() {
-    let finalEl = document.getElementById(FINAL_SECTION_ID);
+    let finalEl =
+      document.getElementById(FINAL_SECTION_ID) ||
+      document.querySelector('[data-section="final"]') ||
+      document.querySelector('.section-final');
 
-    if (finalEl) {
-      log('section-final já existe, usando versão existente.');
-      return finalEl;
-    }
+    if (!finalEl) {
+      const container =
+        document.getElementById('jornada-sections') ||
+        document.querySelector('.jornada-sections') ||
+        document.body;
 
-    // Cria a seção final com o mesmo layout da section-final.html
-    finalEl = document.createElement('section');
-    finalEl.id = FINAL_SECTION_ID;
-    finalEl.className = 'section section-final';
-    finalEl.dataset.section = 'final';
-
-    finalEl.innerHTML = `
-      <div class="final-pergaminho-wrapper">
-        <div class="pergaminho-vertical">
-          <div class="pergaminho-content">
-
-            <h1 id="final-title" class="final-title"></h1>
-
-            <div id="final-message" class="final-message">
-              <p>Suas respostas foram recebidas com honra pela Irmandade.</p>
-              <p>Você plantou sementes de confiança, coragem e luz.</p>
-              <p>Continue caminhando. A jornada nunca termina.</p>
-              <p>Volte quando precisar reacender a chama.</p>
-              <p class="final-bold">Você é a luz. Você é a mudança.</p>
-            </div>
-
-            <div class="final-acoes">
-              <button id="btnBaixarPDFHQ" class="btn btn-gold" disabled>Baixar PDF e HQ</button>
-              <button id="btnVoltarInicio" class="btn btn-light">Voltar ao Início</button>
-            </div>
-
-          </div>
+      finalEl = document.createElement('section');
+      finalEl.id = FINAL_SECTION_ID;
+      finalEl.className = 'section section-final pergaminho';
+      finalEl.dataset.section = 'final';
+      finalEl.innerHTML = `
+        <div class="final-wrapper">
+          <h2 class="final-title">Gratidão por caminhar com Luz 🙏</h2>
+          <p class="final-text">
+            Suas respostas foram recebidas com honra. A Irmandade está preparando sua devolutiva especial.
+          </p>
         </div>
-      </div>
+      `;
+      container.appendChild(finalEl);
+      log('section-final criada automaticamente (fallback).');
+    }
 
-      <video id="final-video" playsinline preload="auto" style="display:none;"></video>
-    `;
-
-    const wrapper = document.getElementById('jornada-content-wrapper') || document.body;
-    wrapper.appendChild(finalEl);
-
-    log('section-final criada com HTML completo (fallback FINAL).');
     return finalEl;
-  }
-
-  function showFinalSection() {
-    const finalEl = ensureFinalSectionExists();
-
-    const wrapper = document.getElementById('jornada-content-wrapper');
-    if (wrapper) {
-      // limpa tudo que está dentro e deixa só a final
-      wrapper.innerHTML = '';
-      wrapper.appendChild(finalEl);
-    }
-
-    // Fluxo oficial controlado pelo JC
-    if (window.JC && typeof window.JC.show === 'function') {
-      window.JC.show(FINAL_SECTION_ID);
-    } else {
-      // Fallback simples
-      document.querySelectorAll('section.section').forEach(sec => {
-        sec.style.display = (sec.id === FINAL_SECTION_ID) ? 'block' : 'none';
-      });
-      finalEl.scrollIntoView({ behavior: 'smooth' });
-    }
   }
 
   function finishAll() {
@@ -607,15 +416,30 @@ if (typeof window.playBlockTransition !== 'function') {
       window.JORNADA_CHAMA.setChamaIntensidade('chama-perguntas', 'forte');
     }
 
+    const finalEl = ensureFinalSectionExists();
     const finalVideoSrc = resolveVideoSrc(
       window.JORNADA_FINAL_VIDEO || FINAL_VIDEO_FALLBACK
     );
 
     if (finalVideoSrc) {
       log('Iniciando vídeo final:', finalVideoSrc);
-      playVideoWithCallback(finalVideoSrc, showFinalSection);
+      playVideoWithCallback(finalVideoSrc, () => {
+        if (window.JC?.show && finalEl) {
+          window.JC.show(FINAL_SECTION_ID);
+        } else if (typeof window.showSection === 'function') {
+          window.showSection(FINAL_SECTION_ID);
+        } else {
+          window.location.hash = '#' + FINAL_SECTION_ID;
+        }
+      });
     } else {
-      showFinalSection();
+      if (window.JC?.show && finalEl) {
+        window.JC.show(FINAL_SECTION_ID);
+      } else if (typeof window.showSection === 'function') {
+        window.showSection(FINAL_SECTION_ID);
+      } else {
+        window.location.hash = '#' + FINAL_SECTION_ID;
+      }
     }
 
     try {
@@ -632,61 +456,56 @@ if (typeof window.playBlockTransition !== 'function') {
   // --------------------------------------------------
 
   function bindUI(root) {
-  root = root || document.getElementById(SECTION_ID) || document;
+    const btnFalar  = $('#jp-btn-falar', root);
+    const btnApagar = $('#jp-btn-apagar', root);
+    const btnConf   = $('#jp-btn-confirmar', root);
+    const input     = $('#jp-answer-input', root);
 
-  const btnFalar  = $('#jp-btn-falar', root);
-  const btnApagar = $('#jp-btn-apagar', root);
-  const btnConf   = $('#jp-btn-confirmar', root);
-  const input     = $('#jp-answer-input', root);
-
-  // MICROFONE
-  if (btnFalar && input && window.JORNADA_MICRO) {
-    btnFalar.addEventListener('click', (ev) => {
-      ev.preventDefault();
-      ev.stopPropagation();
+    if (input && window.JORNADA_MICRO) {
       window.JORNADA_MICRO.attach(input, { mode: 'append' });
-    });
-  }
+    }
 
-  // APAGAR
-  if (btnApagar && input) {
-    btnApagar.addEventListener('click', (ev) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-      input.value = '';
-      input.focus();
-      if (window.JORNADA_CHAMA) {
-        window.JORNADA_CHAMA.setChamaIntensidade('chama-perguntas', 'media');
-      }
-    });
-  }
+    if (input && window.JORNADA_CHAMA) {
+      input.addEventListener('input', () => {
+        const txt = input.value || '';
+        window.JORNADA_CHAMA.updateChamaFromText(txt, 'chama-perguntas');
+      });
+    }
 
-  // CONFIRMAR
-  if (btnConf) {
-    btnConf.addEventListener('click', (ev) => {
-      ev.preventDefault();
-      if (completed) {
-        log('Clique em confirmar após conclusão; ignorado.');
-        return;
-      }
-      saveCurrentAnswer();
-      nextStep();
-    });
-  }
+    if (btnFalar && input) {
+      btnFalar.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        if (window.JORNADA_MICRO) {
+          window.JORNADA_MICRO.attach(input, { mode: 'append' });
+        } else {
+          (window.toast || alert)('Reconhecimento de voz não disponível.');
+        }
+      });
+    }
 
-  // INPUT CHAMA
-  if (input && window.JORNADA_CHAMA) {
-    input.addEventListener('input', () => {
-      const txt = input.value || '';
-      window.JORNADA_CHAMA.updateChamaFromText(txt, 'chama-perguntas');
-    });
-  }
+    if (btnApagar && input) {
+      btnApagar.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        input.value = '';
+        input.focus();
+        if (window.JORNADA_CHAMA) {
+          window.JORNADA_CHAMA.setChamaIntensidade('chama-perguntas', 'media');
+        }
+      });
+    }
 
-  // MICROFONE AUTOMÁTICO (opcional)
-  if (input && window.JORNADA_MICRO) {
-    window.JORNADA_MICRO.attach(input, { mode: 'append' });
+    if (btnConf) {
+      btnConf.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        if (completed) {
+          log('Clique em confirmar após conclusão; ignorado.');
+          return;
+        }
+        saveCurrentAnswer();
+        nextStep();
+      });
+    }
   }
-}
 
   // --------------------------------------------------
   // INIT
@@ -736,42 +555,17 @@ if (typeof window.playBlockTransition !== 'function') {
   window.JPerguntas = {
     start(root) { init(root || document.getElementById(SECTION_ID)); },
     reset() {
-      Object.assign(State, {
-        mounted: false, loading: false, answers: {}, meta: null,
-        blocoIdx: 0, qIdx: 0, globalIdx: 0
-      });
+      State.mounted = false;
+      State.loading = false;
+      State.answers = {};
+      State.meta = null;
+      State.blocoIdx = 0;
+      State.qIdx = 0;
+      State.globalIdx = 0;
       completed = false;
       log('Reset concluído.');
     }
   };
-  
-  (function () {
-    try {
-    const labelEl = document.querySelector('.jp-block-label');
-    if (!labelEl) return;
-
-    // tenta descobrir o bloco atual (ex.: "2 de 5")
-    const counterEl = document.querySelector('.jp-block-counter');
-    let current = 1;
-    if (counterEl) {
-      const m = counterEl.textContent.match(/(\d+)/);
-      if (m) current = parseInt(m[1], 10) || 1;
-    }
-
-    const nomes = {
-      1: 'O CAMINHO',
-      2: 'A VERDADE',
-      3: 'A VIDA',
-      4: 'A MISSÃO',
-      5: 'A ALIANÇA'
-    };
-
-    const titulo = nomes[current] || 'O CAMINHO';
-    labelEl.textContent = `BLOCO ${current}: ${titulo}`;
-  } catch (e) {
-    console.warn('[PERGUNTAS][BLOCO] Não foi possível ajustar o título dinâmico:', e);
-  }
-})();  
 
   log(MOD, 'carregado');
 })();
