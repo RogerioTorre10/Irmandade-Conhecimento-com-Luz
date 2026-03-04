@@ -849,4 +849,47 @@ textarea,
   text-shadow: 0 2px 6px rgba(0,0,0,0.95) !important;
   animation: none !important; /* opcional: remove pulsação do texto */
 }
+/* =========================
+   VIDEO OVERLAY — DEFAULT OFF
+   ========================= */
 
+#videoOverlay.video-overlay{
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+
+  /* IMPORTANTÍSSIMO: não pode ocupar layout */
+  display: block !important;
+
+  /* OFF por padrão */
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+
+  background: rgba(0,0,0,0.98) !important;
+  z-index: 2147483646 !important;
+}
+
+/* quando estiver em transição */
+#videoOverlay.video-overlay.is-on{
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+/* vídeo sempre fullscreen */
+#videoOverlay.video-overlay > #videoTransicao{
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  display: block !important;
+
+  background: #000 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
