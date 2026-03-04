@@ -457,12 +457,12 @@
     video.onerror = cleanup;
     video.onended = cleanup;
 
-    try {
-      await video.play();
-    } catch (e) {
-      // se autoplay falhar, não trava o fluxo
-      cleanup();
-    }
+   try {
+   const p = video.play();
+   if (p && typeof p.catch === 'function') p.catch(() => cleanup());
+ } catch (e) {
+   cleanup();
+ }
   }
 
   // Se já existir uma função de transição, encapsula (sem quebrar seu fluxo)
