@@ -358,3 +358,30 @@ span.microphone {
   display: block;
   background: #000;
 }
+#videoOverlay.video-overlay{
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  display: none;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 2147483646 !important;
+  background: rgba(0,0,0,0.98);
+}
+
+#videoOverlay.video-overlay.is-on{
+  display: block !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+#videoOverlay video{
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  background: #000 !important;
+}
