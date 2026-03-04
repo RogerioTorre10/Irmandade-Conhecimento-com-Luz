@@ -73,15 +73,46 @@
     if (typeof onEnded === 'function') onEnded();
   }
 
-  window.playBlockTransition = function(videoSrc, onDone) {
-    const src = resolveVideoSrc(videoSrc);
-    if (!src) {
-      if (typeof onDone === 'function') onDone();
-      return;
+ function playBlockTransition(videoSrc, onDone) {
+
+  const url = resolveVideoSrc(videoSrc);
+
+  if (!url) {
+    if (typeof onDone === 'function') onDone();
+    return;
+  }
+
+  log('Transição entre blocos:', url);
+
+  // usa o player cinematográfico GLOBAL
+  if (window.playTransitionVideo) {
+
+    const fakeId = "__block_transition__";
+
+    // intercepta navegação
+    const originalShow = window.JC?.show;
+
+    if (window.JC) {
+      window.JC.show = function(id){
+
+        if (id === fakeId) {
+          if (typeof onDone === 'function') onDone();
+        }
+
+        if (originalShow) originalShow.call(window.JC, id);
+      };
     }
-    log('Transição entre blocos (PORTAL GLOBAL):', src);
-    playVideoWithCallback(src, onDone);
-  };
+
+    window.playTransitionVideo(url, fakeId);
+
+  } else {
+
+    console.warn('[PERGUNTAS] playTransitionVideo não encontrado.');
+    if (typeof onDone === 'function') onDone();
+
+  }
+
+}
 
   // --------------------------------------------------
   // BLOCS / PERGUNTAS
