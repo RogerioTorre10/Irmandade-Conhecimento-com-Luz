@@ -465,13 +465,13 @@
   }
 
   // Se já existir uma função de transição, encapsula (sem quebrar seu fluxo)
-  const prev = window.playBlockTransition;
-  window.playBlockTransition = function (videoSrc, done) {
+ // const prev = window.playBlockTransition;
+  //window.playBlockTransition = function (videoSrc, done) {
     // Sempre usa a transição limpa.
     // Se você quiser manter o comportamento antigo, dá para chamar prev dentro do done.
-    playCleanTransition(videoSrc, done);
-  };
-})();
+   // playCleanTransition(videoSrc, done);
+//  };
+// })();
 
     // ======== Boot ========
     (function init() {
