@@ -413,10 +413,11 @@
   video.onended = cleanup;
 
   try {
-    await video.play();
-  } catch (e) {
-    cleanup();
-  }
+  const p = video.play();
+  if (p && typeof p.catch === 'function') p.catch(() => cleanup());
+} catch (e) {
+  cleanup();
+}
 }
 
     if (!videoSrc) {
