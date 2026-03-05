@@ -1107,8 +1107,7 @@ waitForPerguntasSection((rootSection) => {
     document.addEventListener('click', handler, { capture: true, passive: false });
 
     log('delegação ativa');
-  })();
-
+ 
   // ---- 5. Hooks de atualização ----
   //
   // A maioria dos seus scripts dispara eventos do JC quando troca de pergunta/bloco.
@@ -1133,3 +1132,6 @@ waitForPerguntasSection((rootSection) => {
   log('Patch de mimos inicializado.');
 })();
 });
+})();
+
+})();
