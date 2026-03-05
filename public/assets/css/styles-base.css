@@ -385,3 +385,10 @@ span.microphone {
   object-position: center !important;
   background: #000 !important;
 }
+#videoTransicao{
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  object-fit: cover !important;
+}
