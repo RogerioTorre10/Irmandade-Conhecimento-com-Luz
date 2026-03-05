@@ -307,5 +307,83 @@ function buildPortal() {
     log('Transição simples (sem vídeo) para:', nextSectionId);
     navigateTo(nextSectionId);
   };
+  /* ======================================================================================
+ * BLOCO: Runner global para transição ENTRE BLOCOS (section-perguntas)
+ * - Garante window.playBlockTransition(videoSrc, done)
+ * - Reusa o motor do video-transicao.js (playTransitionVideo) sem navegar (nextSectionId = null)
+ * ====================================================================================== */
+(function ensurePlayBlockTransition() {
+  // se já existe e é função, não mexe
+  if (typeof window.playBlockTransition === 'function') return;
+
+  // precisamos do motor do video-transicao.js
+  if (typeof window.playTransitionVideo !== 'function') {
+    console.warn('[VIDEO_TRANSICAO] playTransitionVideo não disponível; playBlockTransition não instalado.');
+    // fallback “no-op” para não quebrar fluxo
+    window.playBlockTransition = function (_videoSrc, done) {
+      if (typeof done === 'function') done();
+    };
+    return;
+  }
+
+  // instala com blindagem (sem quebrar se alguém travou a prop)
+  const install = function () {
+    window.playBlockTransition = function (videoSrc, done) {
+      let called = false;
+
+      const finish = () => {
+        if (called) return;
+        called = true;
+        if (typeof done === 'function') done();
+      };
+
+      // garante que finaliza quando a transição realmente “encerra”
+      const onEnded = () => {
+        document.removeEventListener('transition:ended', onEnded, true);
+        finish();
+      };
+
+      document.addEventListener('transition:ended', onEnded, true);
+
+      try {
+        // roda o vídeo SEM navegar (nextSectionId = null)
+        window.playTransitionVideo(videoSrc, null);
+      } catch (e) {
+        document.removeEventListener('transition:ended', onEnded, true);
+        console.warn('[VIDEO_TRANSICAO] Falha ao iniciar playTransitionVideo:', e);
+        finish();
+      }
+
+      // segurança: se por algum motivo o evento não vier, não trava
+      setTimeout(() => {
+        document.removeEventListener('transition:ended', onEnded, true);
+        finish();
+      }, 12000);
+    };
+
+    console.log('[VIDEO_TRANSICAO] playBlockTransition instalado (runner de blocos).');
+  };
+
+  try {
+    // tenta instalar com defineProperty (mais estável contra overwrite acidental)
+    Object.defineProperty(window, 'playBlockTransition', {
+      value: undefined,
+      writable: true,
+      configurable: true,
+      enumerable: true
+    });
+    install();
+  } catch (_) {
+    // se a propriedade estiver “travada”, faz atribuição simples (ou fallback no-op)
+    try {
+      install();
+    } catch (e2) {
+      console.warn('[VIDEO_TRANSICAO] Não foi possível instalar playBlockTransition:', e2);
+      window.playBlockTransition = function (_videoSrc, done) {
+        if (typeof done === 'function') done();
+      };
+    }
+  }
+})();
 
 })();
