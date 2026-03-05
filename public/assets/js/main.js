@@ -4,9 +4,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     // ======== FALLBACKS MÍNIMOS ========
     window.toast = window.toast || function (m, t) {
-      try {
-        console.log('[toast]', t || 'info', m);
-      } catch {}
+      try { console.log('[toast]', t || 'info', m); } catch {}
     };
 
     const APP = window.APP_CONFIG || {};
@@ -37,22 +35,20 @@
       }
     };
 
-    const { qs, showSection, setProgress, setPergunta } = UI;
+    const qs = UI.qs;
+    const setProgress = UI.setProgress;
+    const setPergunta = UI.setPergunta;
+
     if (!qs) {
       toast('Falha ao carregar helpers de UI.', 'error');
       return;
-    }
-    if (!window.JQUESTIONS || !window.JSTATE) {
-      toast('Scripts de perguntas/estado não carregados (JQUESTIONS/JSTATE).', 'error');
     }
 
     // ======== AUTH ========
     const AUTH_KEY = 'jornada_auth_session';
     const AUTH_PASS = String(APP.PASS || JCFG.PASS || 'iniciar').toLowerCase();
 
-    try {
-      localStorage.removeItem('jornada_auth');
-    } catch (_) {}
+    try { localStorage.removeItem('jornada_auth'); } catch (_) {}
 
     const secAuth = document.getElementById('sec-auth');
     const secIntro = document.getElementById('sec-intro');
@@ -79,21 +75,25 @@
 
     function showOnly(sectionEl) {
       if (!sectionEl) return;
-      // Evitar esconder seções gerenciadas por jornada-controller.js
-      document.querySelectorAll('main > section:not([data-section])').forEach(s => {
+
+      // Evitar esconder seções gerenciadas por jornada-controller.js (data-section)
+      document.querySelectorAll('main > section:not([data-section])').forEach((s) => {
         s.classList.add('hidden');
         s.setAttribute('aria-hidden', 'true');
         s.style.display = 'none';
       });
+
       sectionEl.classList.remove('hidden');
       sectionEl.removeAttribute('aria-hidden');
       sectionEl.style.display = '';
+
       window.scrollTo({ top: 0, behavior: 'instant' });
       console.log('[main.js] Mostrando seção:', sectionEl.id);
     }
 
     function bindAuth() {
       if (!btnEntrar || !inputSenha) return;
+
       btnEntrar.addEventListener('click', () => {
         const val = (inputSenha.value || '').trim().toLowerCase();
         if (val === AUTH_PASS) {
@@ -106,6 +106,7 @@
           inputSenha.focus();
         }
       });
+
       inputSenha.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') btnEntrar.click();
       });
@@ -114,30 +115,36 @@
       const btnToggleSenha = document.getElementById('btnToggleSenha');
       if (btnToggleSenha && inputSenha) {
         let visible = false;
+
         const eye = `
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/>
             <circle cx="12" cy="12" r="3"/>
           </svg>`;
+
         const eyeOff = `
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M3 3l18 18M10.6 10.6a3 3 0 1 0 4.24 4.24M9.88 4.26A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a17.8 17.8 0 0 1-3.22 4.03M6.11 6.11A17.63 17.63 0 0 0 1 12s4 8 11 8a10.9 10.9 0 0 0 5.89-1.61"/>
           </svg>`;
+
         function renderEye() {
           btnToggleSenha.innerHTML = visible ? eyeOff : eye;
           btnToggleSenha.setAttribute('aria-label', visible ? 'Ocultar senha' : 'Mostrar senha');
           btnToggleSenha.setAttribute('title', visible ? 'Ocultar senha' : 'Mostrar senha');
           inputSenha.type = visible ? 'text' : 'password';
         }
+
         renderEye();
+
         btnToggleSenha.addEventListener('click', () => {
           visible = !visible;
           renderEye();
           inputSenha.focus();
         });
-        btnToggleSenha.addEventListener('mousedown', e => e.preventDefault());
+
+        btnToggleSenha.addEventListener('mousedown', (e) => e.preventDefault());
       }
     }
     bindAuth();
@@ -174,65 +181,6 @@
       if (btnProxima) btnProxima.disabled = !((input?.value || '').trim());
     }
 
-    // INTRO
-    if (chkTermo && btnIniciar) {
-      const toggleStart = () => {
-        btnIniciar.disabled = !chkTermo.checked;
-      };
-      toggleStart();
-      chkTermo.addEventListener('change', toggleStart);
-
-      btnIniciar.addEventListener('click', () => {
-        if (btnIniciar.disabled) return;
-        idx = 0;
-        ST.set('idx', idx);
-        hideAuth();
-        if (typeof window.JC?.show === 'function') {
-          window.JC.show('section-intro'); // Usar jornada-controller.js
-        } else {
-          showOnly(secIntro);
-        }
-      });
-    }
-
-    // WIZARD
-    if (btnLimparAtual) btnLimparAtual.addEventListener('click', () => {
-      if (input) {
-        input.value = '';
-        input.focus();
-        updateNavState();
-      }
-    });
-
-    if (btnVoltar) btnVoltar.addEventListener('click', () => {
-      if (idx > 0) {
-        idx--;
-        ST.set('idx', idx);
-        hideAuth();
-        showWizard();
-      }
-    });
-
-    if (btnProxima) btnProxima.addEventListener('click', () => {
-      const val = (input?.value || '').trim();
-      if (!val) {
-        input?.focus();
-        return;
-      }
-      salvarAtual();
-      if (idx < QUESTIONS.length - 1) {
-        idx++;
-        ST.set('idx', idx);
-        hideAuth();
-        showWizard();
-      } else {
-        hideAuth();
-        showFinal();
-      }
-    });
-
-    input && input.addEventListener('input', updateNavState);
-
     function salvarAtual() {
       const q = QUESTIONS[idx];
       if (!q || !input) return;
@@ -246,22 +194,23 @@
         toast('Pergunta não encontrada.', 'warn');
         return;
       }
-      try {
-        setPergunta(q);
-      } catch {}
-      try {
-        setProgress(idx, QUESTIONS.length);
-      } catch {}
+
+      try { setPergunta(q); } catch {}
+      try { setProgress(idx, QUESTIONS.length); } catch {}
+
       if (input) input.value = (respostas[q.id] || '');
+
       hideAuth();
+
       const sec = document.getElementById('sec-wizard');
       if (sec) {
         if (typeof window.JC?.show === 'function') {
-          window.JC.show('section-perguntas'); // Usar jornada-controller.js
+          window.JC.show('section-perguntas'); // controlador oficial
         } else {
           showOnly(sec);
         }
       }
+
       setTimeout(() => {
         input?.focus();
         updateNavState();
@@ -280,6 +229,62 @@
       }
     }
 
+    // INTRO
+    if (chkTermo && btnIniciar) {
+      const toggleStart = () => { btnIniciar.disabled = !chkTermo.checked; };
+      toggleStart();
+      chkTermo.addEventListener('change', toggleStart);
+
+      btnIniciar.addEventListener('click', () => {
+        if (btnIniciar.disabled) return;
+        idx = 0;
+        ST.set('idx', idx);
+        hideAuth();
+
+        if (typeof window.JC?.show === 'function') {
+          window.JC.show('section-intro');
+        } else {
+          showOnly(secIntro);
+        }
+      });
+    }
+
+    // WIZARD
+    if (btnLimparAtual) btnLimparAtual.addEventListener('click', () => {
+      if (!input) return;
+      input.value = '';
+      input.focus();
+      updateNavState();
+    });
+
+    if (btnVoltar) btnVoltar.addEventListener('click', () => {
+      if (idx > 0) {
+        idx--;
+        ST.set('idx', idx);
+        hideAuth();
+        showWizard();
+      }
+    });
+
+    if (btnProxima) btnProxima.addEventListener('click', () => {
+      const val = (input?.value || '').trim();
+      if (!val) { input?.focus(); return; }
+
+      salvarAtual();
+
+      if (idx < QUESTIONS.length - 1) {
+        idx++;
+        ST.set('idx', idx);
+        hideAuth();
+        showWizard();
+      } else {
+        hideAuth();
+        showFinal();
+      }
+    });
+
+    input && input.addEventListener('input', updateNavState);
+
     if (btnRevisar) btnRevisar.addEventListener('click', () => {
       idx = 0;
       ST.set('idx', idx);
@@ -290,14 +295,14 @@
     if (btnGerar) btnGerar.addEventListener('click', async () => {
       const val = (input?.value || '').trim();
       const wiz = document.getElementById('sec-wizard');
+
       if (wiz && !wiz.classList.contains('hidden')) {
-        if (!val) {
-          input?.focus();
-          return;
-        }
+        if (!val) { input?.focus(); return; }
         salvarAtual();
       }
+
       const payload = { respostas, meta: { quando: new Date().toISOString() } };
+
       try {
         btnGerar.disabled = true;
         btnGerar.textContent = 'Gerando…';
@@ -309,19 +314,16 @@
       } finally {
         btnGerar.disabled = false;
         btnGerar.textContent = 'Baixar PDF + HQ';
-        try {
-          ST.clearAll && ST.clearAll();
-        } catch {}
+        try { ST.clearAll && ST.clearAll(); } catch {}
         clearAuth();
       }
     });
 
     if (btnNova) btnNova.addEventListener('click', () => {
-      try {
-        ST.clearAll && ST.clearAll();
-      } catch {}
+      try { ST.clearAll && ST.clearAll(); } catch {}
       clearAuth();
       hideAuth();
+
       if (typeof window.JC?.show === 'function') {
         window.JC.show('section-intro');
       } else {
@@ -330,142 +332,111 @@
     });
 
     /* =========================================================
-   TRANSIÇÃO LIMPA (ANTI-FLASH)
-   - Durante o vídeo: esconde todas as seções
-   - No fim: remove overlay e libera a próxima
-   ========================================================= */
-(function () {
-  'use strict';
+       TRANSIÇÃO LIMPA (OPCIONAL)
+       - Overlay próprio (#transition-overlay), não conflita com section-perguntas
+       - NÃO tenta reatribuir window.playBlockTransition (evita "read only")
+       - Só define window.playCleanTransition se ainda não existir
+       ========================================================= */
+    (function installCleanTransitionIfMissing() {
+      if (typeof window.playCleanTransition === 'function') return;
 
-  // Cria overlay (1 vez)
-  function ensureOverlay() {
-    let ov = document.getElementById('transition-overlay');
-    if (ov) return ov;
+      function ensureOverlay() {
+        let ov = document.getElementById('transition-overlay');
+        if (ov) return ov;
 
-    ov = document.createElement('div');
-    ov.id = 'transition-overlay';
+        ov = document.createElement('div');
+        ov.id = 'transition-overlay';
 
-    const vid = document.createElement('video');
-    vid.setAttribute('playsinline', '');
-    vid.setAttribute('webkit-playsinline', '');
-    vid.preload = 'auto';
-    vid.muted = true;  // transição deve ser muda (evita bloqueio autoplay)
-    vid.autoplay = true;
+        // Estilo mínimo inline (caso CSS não tenha sido carregado)
+        ov.style.position = 'fixed';
+        ov.style.inset = '0';
+        ov.style.zIndex = '2147483646';
+        ov.style.background = 'rgba(0,0,0,0.98)';
+        ov.style.display = 'none';
 
-    ov.appendChild(vid);
-    document.body.appendChild(ov);
-    return ov;
-  }
+        const vid = document.createElement('video');
+        vid.setAttribute('playsinline', '');
+        vid.setAttribute('webkit-playsinline', '');
+        vid.preload = 'auto';
+        vid.muted = true;
+        vid.autoplay = false; // vamos dar play manual
 
-  function enterTransitionMode() {
-    document.body.classList.add('is-transitioning');
-    // trava scroll (evita repintura esquisita)
-    document.documentElement.style.overflow = 'hidden';
-    document.body.style.overflow = 'hidden';
-  }
+        vid.style.position = 'fixed';
+        vid.style.inset = '0';
+        vid.style.width = '100vw';
+        vid.style.height = '100vh';
+        vid.style.objectFit = 'cover';
+        vid.style.objectPosition = 'center';
+        vid.style.background = '#000';
 
-  function exitTransitionMode() {
-    document.body.classList.remove('is-transitioning');
-    document.documentElement.style.overflow = '';
-    document.body.style.overflow = '';
-  }
+        ov.appendChild(vid);
+        document.body.appendChild(ov);
+        return ov;
+      }
 
-  async function playCleanTransition(videoSrc, done) {
-  const overlay = ensureOverlay();
-  const video = overlay.querySelector('#videoTransicao') || overlay.querySelector('video');
+      function enterTransitionMode() {
+        document.body.classList.add('is-transitioning');
+        document.documentElement.style.overflow = 'hidden';
+        document.body.style.overflow = 'hidden';
+      }
 
-  if (!videoSrc) {
-    // sem vídeo: apenas garante que não "pisca"
-    exitTransitionMode();
-    if (typeof done === 'function') done();
-    return;
-  }
+      function exitTransitionMode(prevHtmlOverflow, prevBodyOverflow) {
+        document.body.classList.remove('is-transitioning');
+        document.documentElement.style.overflow = prevHtmlOverflow || '';
+        document.body.style.overflow = prevBodyOverflow || '';
+      }
 
-  enterTransitionMode();
+      window.playCleanTransition = function playCleanTransition(videoSrc, done) {
+        const overlay = ensureOverlay();
+        const video = overlay.querySelector('video');
 
-  overlay.classList.add('is-on');
+        const prevHtmlOverflow = document.documentElement.style.overflow;
+        const prevBodyOverflow = document.body.style.overflow;
 
-  // força repaint (remove "flash" em alguns Androids)
-  // eslint-disable-next-line no-unused-expressions
-  overlay.offsetHeight;
+        if (!videoSrc) {
+          exitTransitionMode(prevHtmlOverflow, prevBodyOverflow);
+          if (typeof done === 'function') done();
+          return;
+        }
 
-  // prepara vídeo
-  try { video.pause(); } catch {}
-  video.currentTime = 0;
-  video.src = videoSrc;
+        enterTransitionMode();
+        overlay.style.display = 'block';
 
-  const cleanup = () => {
-    video.onended = null;
-    video.onerror = null;
+        // força repaint
+        // eslint-disable-next-line no-unused-expressions
+        overlay.offsetHeight;
 
-    overlay.classList.remove('is-on');
+        // prepara vídeo
+        try { video.pause(); } catch {}
+        try { video.currentTime = 0; } catch {}
+        video.src = videoSrc;
 
-    // libera só depois de desligar overlay (evita 1 frame do antigo)
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        exitTransitionMode();
-        if (typeof done === 'function') done();
-      });
-    });
-  };
+        const cleanup = () => {
+          video.onended = null;
+          video.onerror = null;
 
-  video.onerror = cleanup;
-  video.onended = cleanup;
+          // some o overlay ANTES de liberar o scroll (evita 1-frame vazado)
+          overlay.style.display = 'none';
 
-  try {
-  const p = video.play();
-  if (p && typeof p.catch === 'function') p.catch(() => cleanup());
-} catch (e) {
-  cleanup();
-}
-}
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              exitTransitionMode(prevHtmlOverflow, prevBodyOverflow);
+              if (typeof done === 'function') done();
+            });
+          });
+        };
 
-    if (!videoSrc) {
-      // sem vídeo: apenas garante que não "pisca"
-      exitTransitionMode();
-      if (typeof done === 'function') done();
-      return;
-    }
+        video.onended = cleanup;
+        video.onerror = cleanup;
 
-    enterTransitionMode();
-
-    overlay.classList.add('is-on');
-
-    // força repaint (isso remove o "flash" em vários Androids)
-    // eslint-disable-next-line no-unused-expressions
-    overlay.offsetHeight;
-
-    // prepara vídeo
-    video.pause();
-    video.currentTime = 0;
-    video.src = videoSrc;
-
-    const cleanup = () => {
-      video.onended = null;
-      video.onerror = null;
-
-      overlay.classList.remove('is-on');
-
-      // IMPORTANTÍSSIMO: só libera depois de desligar overlay (evita 1 frame do antigo)
-      // ainda força 1 frame de repaint
-      requestAnimationFrame(() => {
-        exitTransitionMode();
-        if (typeof done === 'function') done();
-      });
-    };
-
-    video.onerror = cleanup;
-    video.onended = cleanup;
-
-   try {
-   const p = video.play();
-   if (p && typeof p.catch === 'function') p.catch(() => cleanup());
- } catch (e) {
-   cleanup();
- }
-  })();
-   
- })();
+        try {
+          const p = video.play();
+          if (p && typeof p.catch === 'function') p.catch(cleanup);
+        } catch (e) {
+          cleanup();
+        }
+      };
+    })();
 
     // ======== Boot ========
     (function init() {
@@ -475,7 +446,9 @@
         secAuth ? showOnly(secAuth) : toast('Área bloqueada — autenticação necessária.', 'warn');
         return;
       }
+
       hideAuth();
+
       const st = ST.load ? ST.load() : null;
       if (st && st.respostas && Object.keys(st.respostas).length > 0 && Number.isInteger(st.idx)) {
         idx = Math.max(0, Math.min(QUESTIONS.length - 1, st.idx | 0));
@@ -489,4 +462,5 @@
         }
       }
     })();
-  })();
+  });
+})();
