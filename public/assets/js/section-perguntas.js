@@ -459,13 +459,20 @@ window.addEventListener('resize', () => setTimeout(applyGuiaTheme, 80));
       State.blocoIdx = nextBlocoIdx;
       State.qIdx = 0;
 
-      window.playBlockTransition(video, () => {
-        if (!completed) showCurrentQuestion();
-      });
-    } else {
-      State.qIdx++;
-      showCurrentQuestion();
-    }
+      const playBT =
+  (typeof window.playBlockTransition === 'function' && window.playBlockTransition) ||
+  (typeof window.playCleanTransition === 'function' && window.playCleanTransition) ||
+  (typeof window.playVideoWithCallback === 'function' && window.playVideoWithCallback) ||
+  null;
+
+if (playBT) {
+  playBT(video, () => {
+    if (!completed) showCurrentQuestion();
+  });
+} else {
+  console.warn('[PERGUNTAS] playBlockTransition/playCleanTransition não disponível. Seguindo sem vídeo.');
+  if (!completed) showCurrentQuestion();
+}
   }
 
   function finishAll() {
