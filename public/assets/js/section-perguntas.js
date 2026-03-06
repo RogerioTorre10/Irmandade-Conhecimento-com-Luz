@@ -563,50 +563,64 @@
       }
     }
 
-    function advancePergunta() {
-      if (completed) return;
+function advancePergunta() {
+  if (completed) return;
 
-      const textarea = $('#jp-answer-input');
-      const resposta = textarea ? String(textarea.value || '').trim() : '';
+  const textarea = $('#jp-answer-input');
+  const resposta = textarea ? String(textarea.value || '').trim() : '';
 
-      if (!resposta) {
-        if (typeof window.toast === 'function') {
-          window.toast('Escreva sua resposta antes de continuar.');
-        } else {
-          alert('Escreva sua resposta antes de continuar.');
-        }
-        textarea?.focus();
-        return;
-      }
+  if (!resposta) {
+    if (typeof window.toast === 'function') {
+      window.toast('Escreva sua resposta antes de continuar.');
+    } else {
+      alert('Escreva sua resposta antes de continuar.');
+    }
+    textarea?.focus();
+    return;
+  }
 
-      const current = getCurrent();
-      const nextBlockIndex = State.blocoIdx + 1;
-      const hasNextBlock = nextBlockIndex < State.totalBlocks;
+  const current = getCurrent();
 
-      // modo teste: 1 pergunta por bloco
-      State.globalIdx = Math.min(State.totalQuestions - 1, State.blocoIdx);
+  const blocksNow = Array.isArray(State.blocks) && State.blocks.length
+    ? State.blocks
+    : (Array.isArray(window.JORNADA_BLOCKS) ? window.JORNADA_BLOCKS : []);
 
-      if (hasNextBlock) {
-        const onDone = () => {
-          State.blocoIdx = nextBlockIndex;
-          State.qIdx = 0;
-          State.globalIdx = State.blocoIdx;
+  const totalBlocksNow = blocksNow.length || State.totalBlocks || 1;
+  const nextBlockIndex = State.blocoIdx + 1;
+  const hasNextBlock = nextBlockIndex < totalBlocksNow;
 
-          document.dispatchEvent(new CustomEvent('perguntas:state-changed'));
-          updateCounters();
-          showCurrentQuestion();
-        };
+  State.totalBlocks = totalBlocksNow;
+  State.globalIdx = Math.min(totalBlocksNow - 1, State.blocoIdx);
 
-        if (typeof window.playBlockTransition === 'function') {
-          window.playBlockTransition(
-            current.bloco?.transitionVideo || current.bloco?.video_after || FINAL_VIDEO_FALLBACK,
-            onDone
-          );
-        } else {
-          onDone();
-        }
-        return;
-      }
+  if (hasNextBlock) {
+    const onDone = () => {
+      State.blocoIdx = nextBlockIndex;
+      State.qIdx = 0;
+      State.globalIdx = State.blocoIdx;
+      State.totalBlocks = totalBlocksNow;
+
+      document.dispatchEvent(new CustomEvent('perguntas:state-changed'));
+      updateCounters();
+      showCurrentQuestion();
+    };
+
+    if (typeof window.playBlockTransition === 'function') {
+      window.playBlockTransition(
+        current.bloco?.transitionVideo ||
+        current.bloco?.video_after ||
+        FINAL_VIDEO_FALLBACK,
+        onDone
+      );
+    } else {
+      onDone();
+    }
+    return;
+  }
+
+  completed = true;
+  document.dispatchEvent(new CustomEvent('perguntas:state-changed'));
+  goToFinalSection();
+}
 
       // último bloco -> final
       completed = true;
