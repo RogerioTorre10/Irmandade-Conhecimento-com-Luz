@@ -522,6 +522,112 @@
         } catch (e) { err('[TTS]', e); }
       });
     }
+        // BOTÕES — Falar / Apagar / Confirmar
+    const btnApagar =
+      rootSection.querySelector('[data-action="clear"], .btn-apagar, #jp-btn-apagar');
+
+    const btnConfirmar =
+      rootSection.querySelector('[data-action="confirm"], .btn-confirmar, .btn-confirm, #jp-btn-confirmar');
+
+    function clearAnswer() {
+      const textarea = $('#jp-answer-input');
+      const aiResp = $('#jp-ai-response');
+
+      if (textarea) {
+        textarea.value = '';
+        textarea.focus();
+      }
+
+      if (aiResp) {
+        aiResp.hidden = true;
+        aiResp.textContent = '';
+      }
+    }
+
+    function goToFinalSection() {
+      if (typeof window.playTransitionVideo === 'function') {
+        window.playTransitionVideo(FINAL_VIDEO_FALLBACK, FINAL_SECTION_ID);
+        return;
+      }
+
+      if (window.JC && typeof window.JC.show === 'function') {
+        window.JC.show(FINAL_SECTION_ID);
+        return;
+      }
+
+      const finalEl = document.getElementById(FINAL_SECTION_ID);
+      if (finalEl) {
+        document.querySelectorAll('.section').forEach(el => el.classList.add('hidden'));
+        finalEl.classList.remove('hidden');
+      }
+    }
+
+    function advancePergunta() {
+      if (completed) return;
+
+      const textarea = $('#jp-answer-input');
+      const resposta = textarea ? String(textarea.value || '').trim() : '';
+
+      if (!resposta) {
+        if (typeof window.toast === 'function') {
+          window.toast('Escreva sua resposta antes de continuar.');
+        } else {
+          alert('Escreva sua resposta antes de continuar.');
+        }
+        textarea?.focus();
+        return;
+      }
+
+      const current = getCurrent();
+      const nextBlockIndex = State.blocoIdx + 1;
+      const hasNextBlock = nextBlockIndex < State.totalBlocks;
+
+      // modo teste: 1 pergunta por bloco
+      State.globalIdx = Math.min(State.totalQuestions - 1, State.blocoIdx);
+
+      if (hasNextBlock) {
+        const onDone = () => {
+          State.blocoIdx = nextBlockIndex;
+          State.qIdx = 0;
+          State.globalIdx = State.blocoIdx;
+
+          document.dispatchEvent(new CustomEvent('perguntas:state-changed'));
+          updateCounters();
+          showCurrentQuestion();
+        };
+
+        if (typeof window.playBlockTransition === 'function') {
+          window.playBlockTransition(
+            current.bloco?.transitionVideo || current.bloco?.video_after || FINAL_VIDEO_FALLBACK,
+            onDone
+          );
+        } else {
+          onDone();
+        }
+        return;
+      }
+
+      // último bloco -> final
+      completed = true;
+      document.dispatchEvent(new CustomEvent('perguntas:state-changed'));
+      goToFinalSection();
+    }
+
+    if (btnApagar && !btnApagar.dataset.boundPerguntas) {
+      btnApagar.dataset.boundPerguntas = '1';
+      btnApagar.addEventListener('click', function (ev) {
+        ev.preventDefault();
+        clearAnswer();
+      });
+    }
+
+    if (btnConfirmar && !btnConfirmar.dataset.boundPerguntas) {
+      btnConfirmar.dataset.boundPerguntas = '1';
+      btnConfirmar.addEventListener('click', function (ev) {
+        ev.preventDefault();
+        advancePergunta();
+      });
+    }
 
     // ── MIC delegation ───────────────────────────────────────────────────────
     (function micDelegationRobusta() {
