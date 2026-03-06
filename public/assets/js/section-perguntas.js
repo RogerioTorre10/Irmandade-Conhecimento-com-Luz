@@ -593,36 +593,32 @@ function advancePergunta() {
   State.globalIdx = Math.min(totalBlocksNow - 1, State.blocoIdx);
 
   if (hasNextBlock) {
-    const onDone = () => {
-      State.blocoIdx = nextBlockIndex;
-      State.qIdx = 0;
-      State.globalIdx = State.blocoIdx;
-      State.totalBlocks = totalBlocksNow;
+  const onDone = () => {
+    State.blocoIdx = nextBlockIndex;
+    State.qIdx = 0;
+    State.globalIdx = State.blocoIdx;
+    State.totalBlocks = totalBlocksNow;
 
-      document.dispatchEvent(new CustomEvent('perguntas:state-changed'));
-      updateCounters();
-      showCurrentQuestion();
-    };
+    document.dispatchEvent(new CustomEvent('perguntas:state-changed'));
+    updateCounters();
+    showCurrentQuestion();
+  };
 
-    if (typeof window.playBlockTransition === 'function') {
-      window.playBlockTransition(
-        current.bloco?.transitionVideo ||
-        current.bloco?.video_after ||
-        FINAL_VIDEO_FALLBACK,
-        onDone
-      );
-    } else {
-      onDone();
-    }
-    return;
+  if (typeof window.playBlockTransition === 'function') {
+    window.playBlockTransition(
+      current.bloco?.transitionVideo ||
+      current.bloco?.video_after ||
+      FINAL_VIDEO_FALLBACK,
+      onDone
+    );
+  } else {
+    onDone();
   }
 
-  completed = true;
-  document.dispatchEvent(new CustomEvent('perguntas:state-changed'));
-  goToFinalSection();
+  return;
 }
 
-      // último bloco -> final
+       // último bloco -> final
       completed = true;
       document.dispatchEvent(new CustomEvent('perguntas:state-changed'));
       goToFinalSection();
