@@ -8,10 +8,9 @@
   }
   win.jornadaPaperQALoaded = true;
 
-  const log  = (...args) => console.log('[JORNADA_PAPER]', ...args);
+  const log = (...args) => console.log('[JORNADA_PAPER]', ...args);
   const warn = (...args) => console.warn('[JORNADA_PAPER]', ...args);
 
-  // Fallback leve de i18n
   const i18n = win.i18n || {
     lang: 'pt-BR',
     ready: false,
@@ -30,7 +29,6 @@
 
   const VIDEO_BASE = CFG.VIDEO_BASE;
 
-  // Vídeos globais da Jornada
   win.JORNADA_VIDEOS = win.JORNADA_VIDEOS || {
     intro: VIDEO_BASE + 'filme-0-ao-encontro-da-jornada.mp4',
     afterBlocks: {
@@ -45,7 +43,7 @@
 
   // Blocos multilíngues
   const blockTranslations = {
-     'pt-BR': [
+    'pt-BR': [
       {
         id: 'raizes',
         title: 'Bloco 1 — Raízes',
@@ -187,7 +185,10 @@
       }
     ]
   };
-
+  
+// Exponho para o section-perguntas usar como fallback
+  win.blockTranslations = blockTranslations;
+  
   let JORNADA_BLOCKS = [];
   win.JORNADA_BLOCKS = JORNADA_BLOCKS;
 
