@@ -18,6 +18,7 @@
   const MOD = 'section-perguntas.js';
   const SECTION_ID       = 'section-perguntas';
   const FINAL_SECTION_ID = 'section-final';
+  const FINAL_VIDEO_FALLBACK = window.JORNADA_FINAL_VIDEO || '/assets/videos/filme-5-fim-da-jornada.mp4';
 
   const log  = (...a) => console.log('[PERGUNTAS]', ...a);
   const warn = (...a) => console.warn('[PERGUNTAS]', ...a);
