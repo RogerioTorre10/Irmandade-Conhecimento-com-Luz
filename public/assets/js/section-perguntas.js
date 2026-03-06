@@ -1,6 +1,6 @@
 /* /assets/js/section-perguntas.js
- * Jornada de Perguntas + Vídeos + Progresso + Export para API
- */
+* Jornada de Perguntas + Vídeos + Progresso + Export para API
+*/
 
 (function () {
   'use strict';
@@ -9,6 +9,7 @@
     console.log('[PERGUNTAS] Já inicializado, ignorando.');
     return;
   }
+
   window.__PERGUNTAS_BOUND__ = true;
 
   const MOD = 'section-perguntas.js';
@@ -16,10 +17,10 @@
   const FINAL_SECTION_ID = 'section-final';
   const FINAL_VIDEO_FALLBACK = '/assets/videos/filme-5-fim-da-jornada.mp4';
 
-  const log  = (...a) => console.log('[PERGUNTAS]', ...a);
+  const log = (...a) => console.log('[PERGUNTAS]', ...a);
   const warn = (...a) => console.warn('[PERGUNTAS]', ...a);
-  const err  = (...a) => console.error('[PERGUNTAS]', ...a);
-  const $    = (sel, root = document) => (root || document).querySelector(sel);
+  const err = (...a) => console.error('[PERGUNTAS]', ...a);
+  const $ = (sel, root = document) => (root || document).querySelector(sel);
 
   const State = {
     mounted: false,
@@ -68,10 +69,42 @@
 
     if (typeof onEnded === 'function') onEnded();
   }
- 
-      window.playTransitionVideo(url, fakeId);
+
+  // ===== NOVA IMPLEMENTAÇÃO: transição ENTRE BLOCOS =====
+  function playBlockTransition(videoSrc, onDone) {
+    // Se o runner global já estiver instalado (video-transicao.js),
+    // usa ele para garantir o mesmo overlay centralizado usado no resto do site.
+    if (typeof window.playBlockTransition === 'function') {
+      try {
+        window.playBlockTransition(videoSrc, onDone);
+        return;
+      } catch (e) {
+        console.warn('[PERGUNTAS] playBlockTransition global falhou, usando fallback local:', e);
+      }
+    }
+
+    // Fallback local (mantém robustez caso o global não exista ou dê erro)
+    const url = resolveVideoSrc(videoSrc);
+    if (!url) {
+      if (typeof onDone === 'function') onDone();
+      return;
+    }
+
+    log('Transição entre blocos (fallback local):', url);
+
+    if (typeof window.playTransitionVideo === 'function') {
+      // Aqui NÃO navegamos para seção alguma; passamos null,
+      // e escutamos o evento global "transition:ended" como o runner global faz.
+      window.playTransitionVideo(url, null);
+
+      const handler = () => {
+        document.removeEventListener('transition:ended', handler, true);
+        if (typeof onDone === 'function') onDone();
+      };
+
+      document.addEventListener('transition:ended', handler, true);
     } else {
-      console.warn('[PERGUNTAS] playTransitionVideo não encontrado.');
+      console.warn('[PERGUNTAS] playTransitionVideo não encontrado (fallback).');
       if (typeof onDone === 'function') onDone();
     }
   }
@@ -100,7 +133,7 @@
 
     State.blocks = window.JORNADA_BLOCKS || [];
   }
-   
+
   function computeTotals() {
     State.totalBlocks = State.blocks.length;
     State.totalQuestions = State.blocks.reduce(
@@ -144,7 +177,7 @@
       blocks.reduce((acc, b) => acc + (b.questions?.length || 0), 0) ||
       1;
 
-    const currentBlockNum    = blocoIdx + 1;
+    const currentBlockNum = blocoIdx + 1;
     const currentQuestionNum = Math.min(qIdx + 1, blocoTotal);
 
     let globalIdx = 0;
@@ -207,6 +240,7 @@
           clearInterval(it);
           return resolve();
         }
+
         box.textContent = pergunta.slice(0, i);
         i++;
         if (i > pergunta.length) {
@@ -256,6 +290,7 @@
       aiResp.hidden = true;
       aiResp.textContent = '';
     }
+
     if (textarea) {
       textarea.value = '';
       textarea.focus();
@@ -274,12 +309,11 @@
     const guiaRaw = sessionStorage.getItem('jornada.guia');
     const guia = guiaRaw ? guiaRaw.toLowerCase().trim() : 'default';
 
-    // Aqui você pode adicionar lógica para aplicar classes ou estilos baseados no guia
     document.body.setAttribute('data-guia', guia);
 
     const colorMap = {
       lumen: '#00d4ff',
-      zion:  '#ff3366',
+      zion: '#ff3366',
       arian: '#33ff99',
       default: '#ffd700'
     };
@@ -307,10 +341,10 @@
 
     const elBlocoIndicador = rootSection.querySelector('[data-perguntas-bloco-indicador], .perg-bloco-indicador');
 
-    const barraMacroFill  = rootSection.querySelector('.perg-progress-outer[data-kind="macro"] .perg-progress-fill');
+    const barraMacroFill = rootSection.querySelector('.perg-progress-outer[data-kind="macro"] .perg-progress-fill');
     const barraMacroLabel = rootSection.querySelector('.perguntas-progress-top, .perg-progress-top-label');
 
-    const barraMicroFill  = rootSection.querySelector('.perg-progress-outer[data-kind="micro"] .perg-progress-fill');
+    const barraMicroFill = rootSection.querySelector('.perg-progress-outer[data-kind="micro"] .perg-progress-fill');
     const barraMicroLabel = rootSection.querySelector('.perguntas-progress-bottom, .perg-progress-bottom-label');
 
     const perguntaBox = rootSection.querySelector('.perg-pergunta-titulo, .perguntas-pergunta-titulo');
@@ -321,7 +355,7 @@
       if (!fillEl) return;
       const nAtual = Math.max(0, Number(atual) || 0);
       const nTotal = Math.max(1, Number(total) || 1);
-      const pct    = Math.min(100, (nAtual / nTotal) * 100);
+      const pct = Math.min(100, (nAtual / nTotal) * 100);
 
       fillEl.style.width = pct + '%';
 
@@ -333,6 +367,7 @@
         qBar.style.background = `linear-gradient(to right, transparent, ${guideColor})`;
         qBar.style.boxShadow = `0 0 10px ${guideColor}`;
       }
+
       if (qBadge) qBadge.style.color = guideColor;
 
       if (labelEl) {
@@ -346,7 +381,7 @@
 
       perguntaBox.classList.remove('guia-lumen', 'guia-zion', 'guia-arian');
       if (guia === 'lumen') perguntaBox.classList.add('guia-lumen');
-      if (guia === 'zion')  perguntaBox.classList.add('guia-zion');
+      if (guia === 'zion') perguntaBox.classList.add('guia-zion');
       if (guia === 'arian') perguntaBox.classList.add('guia-arian');
     }
 
@@ -360,9 +395,9 @@
     function getStateSnapshot() {
       const S = window.PERGUNTAS_STATE || {};
       return {
-        blocoAtual:   S.blocoIdx ?? 0,
-        blocosTotal:  S.totalBlocks ?? 1,
-        perguntaIdx:  S.qIdx ?? 0,
+        blocoAtual: S.blocoIdx ?? 0,
+        blocosTotal: S.totalBlocks ?? 1,
+        perguntaIdx: S.qIdx ?? 0,
         perguntasBloco: (S.blocks[S.blocoIdx]?.questions?.length) ?? 1,
         perguntaGlobal: S.globalIdx ?? 0,
         perguntasTotal: S.totalQuestions ?? 1,
@@ -499,9 +534,9 @@
     // ────────────────────────────────────────────────
 
     document.addEventListener('perguntas:state-changed', refreshUIFromState);
-    document.addEventListener('JC.perguntas:next',        refreshUIFromState);
-    document.addEventListener('JC.perguntas:prev',        refreshUIFromState);
-    document.addEventListener('JC.perguntas:jump',        refreshUIFromState);
+    document.addEventListener('JC.perguntas:next', refreshUIFromState);
+    document.addEventListener('JC.perguntas:prev', refreshUIFromState);
+    document.addEventListener('JC.perguntas:jump', refreshUIFromState);
 
     document.addEventListener('JC.section:shown', function (ev) {
       if (!ev?.detail || ev.detail.id !== 'section-perguntas') return;
@@ -519,4 +554,4 @@
   window.PERGUNTAS_STATE = State;
 
   log(MOD, 'carregado');
-})();  // <--- FECHAMENTO FINAL DO ARQUIVO PRINCIPAL
+})(); // <--- FECHAMENTO FINAL DO ARQUIVO PRINCIPAL
