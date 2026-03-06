@@ -277,24 +277,47 @@
     if (saved) input.value = saved;
 
 // === ATUALIZA TODAS AS BARRAS ===
-function updateProgress(block = 1, question = 1) {
-  const totalBlocks = 5;
-  const questionsPerBlock = 1;
-  const totalQuestions = 5;
-  const currentTotal = ((block - 1) * questionsPerBlock) + question;
+function updateProgress(currentBlock = 1, currentQuestion = 1) {
+  // Pegue os valores reais do state (melhor prática)
+  const blocks = window.JORNADA_BLOCKS || [];
+  const totalBlocks = blocks.length || 5;  // fallback pro teste
 
-  // Bloco
-  const blockPercent = (block / totalBlocks) * 100;
-  document.getElementById('progress-block-fill').style.width = `${blockPercent}%`;
-  document.getElementById('progress-block-value').textContent = `${block} de ${totalBlocks}`;
+  let totalQuestions = 0;
+  let globalQuestionCount = 0;
 
-  // Pergunta do bloco
-  const questionPercent = (question / questionsPerBlock) * 100;
-  document.getElementById('progress-question-fill').style.width = `${questionPercent}%`;
-  document.getElementById('progress-question-value').textContent = `${question} / ${questionsPerBlock}`;
+  for (let i = 0; i < blocks.length; i++) {
+    const qCount = blocks[i].questions?.length || 1;
+    totalQuestions += qCount;
+    if (i < currentBlock - 1) {
+      globalQuestionCount += qCount;
+    }
+  }
+  globalQuestionCount += currentQuestion;
 
-  // Total com ampulheta
-  document.getElementById('progress-total-value').textContent = `${currentTotal} / ${totalQuestions}`;
+  // Barra de blocos
+  const blockPercent = (currentBlock / totalBlocks) * 100;
+  const blockFill = document.getElementById('progress-block-fill');
+  if (blockFill) blockFill.style.width = `${blockPercent}%`;
+
+  const blockValue = document.getElementById('progress-block-value');
+  if (blockValue) blockValue.textContent = `${currentBlock} de ${totalBlocks}`;
+
+  // Barra de perguntas no bloco atual (útil mesmo com 1 pergunta)
+  const questionsInBlock = blocks[currentBlock - 1]?.questions?.length || 1;
+  const questionPercent = (currentQuestion / questionsInBlock) * 100;
+  const qFill = document.getElementById('progress-question-fill');
+  if (qFill) qFill.style.width = `${questionPercent}%`;
+
+  const qValue = document.getElementById('progress-question-value');
+  if (qValue) qValue.textContent = `${currentQuestion} / ${questionsInBlock}`;
+
+  // Barra global (ampulheta)
+  const globalPercent = (globalQuestionCount / totalQuestions) * 100;
+  const totalFill = document.getElementById('progress-total-fill');  // ajuste ID se necessário
+  if (totalFill) totalFill.style.width = `${globalPercent}%`;
+
+  const totalValue = document.getElementById('progress-total-value');
+  if (totalValue) totalValue.textContent = `${globalQuestionCount} / ${totalQuestions}`;
 }
 
 // CHAME SEMPRE QUE MUDAR DE PERGUNTA:
