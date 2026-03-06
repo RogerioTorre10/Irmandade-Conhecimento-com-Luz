@@ -68,29 +68,7 @@
 
     if (typeof onEnded === 'function') onEnded();
   }
-
-  function playBlockTransition(videoSrc, onDone) {
-    const url = resolveVideoSrc(videoSrc);
-    if (!url) {
-      if (typeof onDone === 'function') onDone();
-      return;
-    }
-
-    log('Transição entre blocos:', url);
-
-    if (window.playTransitionVideo) {
-      const fakeId = "__block_transition__";
-      const originalShow = window.JC?.show;
-
-      if (window.JC) {
-        window.JC.show = function(id) {
-          if (id === fakeId) {
-            if (typeof onDone === 'function') onDone();
-          }
-          if (originalShow) originalShow.call(window.JC, id);
-        };
-      }
-
+ 
       window.playTransitionVideo(url, fakeId);
     } else {
       console.warn('[PERGUNTAS] playTransitionVideo não encontrado.');
@@ -122,22 +100,7 @@
 
     State.blocks = window.JORNADA_BLOCKS || [];
   }
-  
-// Quando termina a última pergunta do bloco atual
-playBlockTransition(current.bloco.transitionVideo || FINAL_VIDEO_FALLBACK, () => {
-  // Callback chamado quando o vídeo termina ou é pulado
-  State.blocoIdx++;
-  State.qIdx = 0;
-  updateCounters();           // ou refreshUIFromState()
-  showCurrentQuestion();
-  
-  if (State.blocoIdx >= State.totalBlocks) {
-    // Último bloco → vai pro final com vídeo final se quiser
-    playTransitionVideo(FINAL_VIDEO_FALLBACK, FINAL_SECTION_ID);
-  }
-});
-
-  
+   
   function computeTotals() {
     State.totalBlocks = State.blocks.length;
     State.totalQuestions = State.blocks.reduce(
