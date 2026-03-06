@@ -70,10 +70,8 @@
     if (typeof onEnded === 'function') onEnded();
   }
 
-  // ===== NOVA IMPLEMENTAÇÃO: transição ENTRE BLOCOS =====
+  // Transição ENTRE BLOCOS (usa runner global quando existir)
   function playBlockTransition(videoSrc, onDone) {
-    // Se o runner global já estiver instalado (video-transicao.js),
-    // usa ele para garantir o mesmo overlay centralizado usado no resto do site.
     if (typeof window.playBlockTransition === 'function') {
       try {
         window.playBlockTransition(videoSrc, onDone);
@@ -83,7 +81,6 @@
       }
     }
 
-    // Fallback local (mantém robustez caso o global não exista ou dê erro)
     const url = resolveVideoSrc(videoSrc);
     if (!url) {
       if (typeof onDone === 'function') onDone();
@@ -93,8 +90,6 @@
     log('Transição entre blocos (fallback local):', url);
 
     if (typeof window.playTransitionVideo === 'function') {
-      // Aqui NÃO navegamos para seção alguma; passamos null,
-      // e escutamos o evento global "transition:ended" como o runner global faz.
       window.playTransitionVideo(url, null);
 
       const handler = () => {
@@ -114,37 +109,51 @@
   // --------------------------------------------------
 
   async function ensureBlocks() {
+    // 1) Se já vieram prontos (ex: do servidor), usa direto
     if (Array.isArray(window.JORNADA_BLOCKS) && window.JORNADA_BLOCKS.length) {
       State.blocks = window.JORNADA_BLOCKS;
+      computeTotals();
       return;
     }
 
+    // 2) Tenta carregar dinâmico
     if (window.JPaperQA && typeof window.JPaperQA.loadDynamicBlocks === 'function') {
       try {
         await window.JPaperQA.loadDynamicBlocks();
-        if (Array.isArray(window.JORNADA_BLOCKS) && window.JORNADA_BLOCKS.length) {
-          State.blocks = window.JORNADA_BLOCKS;
-          return;
-        }
       } catch (e) {
         err('Erro ao carregar blocos via JPaperQA.loadDynamicBlocks:', e);
       }
     }
 
+    // 3) Fallback: usa blockTranslations do jornada-paper-qa-1.js
+    if (!Array.isArray(window.JORNADA_BLOCKS) || !window.JORNADA_BLOCKS.length) {
+      const lang = (window.i18n?.lang) || 'pt-BR';
+      if (window.blockTranslations && window.blockTranslations[lang]) {
+        window.JORNADA_BLOCKS = window.blockTranslations[lang];
+      } else if (window.blockTranslations && window.blockTranslations['pt-BR']) {
+        window.JORNADA_BLOCKS = window.blockTranslations['pt-BR'];
+      } else {
+        window.JORNADA_BLOCKS = [];
+      }
+    }
+
     State.blocks = window.JORNADA_BLOCKS || [];
+    computeTotals();
   }
 
+  // MODO TESTE: 1 pergunta por bloco nos contadores
   function computeTotals() {
     State.totalBlocks = State.blocks.length;
     State.totalQuestions = State.blocks.reduce(
-      (sum, b) => sum + (b.questions?.length || 0),
+      (sum, b) => sum + Math.min(1, (b.questions?.length || 0)),
       0
     );
   }
 
+  // MODO TESTE: sempre a primeira pergunta do bloco
   function getCurrent() {
     const bloco = State.blocks[State.blocoIdx];
-    const pergunta = bloco?.questions?.[State.qIdx] || null;
+    const pergunta = bloco?.questions ? bloco.questions[0] : null;
     return { bloco, pergunta };
   }
 
@@ -152,42 +161,24 @@
   // UI / BARRAS / DATILOGRAFIA + LEITURA
   // --------------------------------------------------
 
-  function setText(sel, val) {
-    const el = $(sel);
-    if (el) el.textContent = String(val);
-  }
-
-  function setWidth(sel, val) {
-    const el = $(sel);
-    if (el) el.style.width = val;
-  }
-
   function updateCounters() {
     const blocks = State.blocks || [];
     if (!blocks.length) return;
 
     const blocoIdx = Math.max(0, Math.min(blocks.length - 1, State.blocoIdx || 0));
-    const qIdx = Math.max(0, State.qIdx || 0);
 
     const bloco = blocks[blocoIdx] || { questions: [] };
-    const blocoTotal = (bloco.questions?.length) || 1;
 
+    const blocoTotal = 1; // teste: 1 pergunta por bloco
     const totalBlocks = State.totalBlocks || blocks.length || 1;
-    const totalQuestions = State.totalQuestions ||
-      blocks.reduce((acc, b) => acc + (b.questions?.length || 0), 0) ||
-      1;
+    const totalQuestions = State.totalQuestions || 1;
 
     const currentBlockNum = blocoIdx + 1;
-    const currentQuestionNum = Math.min(qIdx + 1, blocoTotal);
+    const currentQuestionNum = 1; // sempre 1/1 na barra do bloco
 
-    let globalIdx = 0;
-    for (let i = 0; i < blocks.length; i++) {
-      if (i < blocoIdx) globalIdx += (blocks[i].questions?.length || 0);
-    }
-    globalIdx += qIdx;
-    const currentGlobalNum = Math.min(globalIdx + 1, totalQuestions);
+    // Index global também baseado em 1 pergunta por bloco
+    const currentGlobalNum = currentBlockNum;
 
-    // Barra topo (blocos)
     const elBlockValue = document.getElementById('progress-block-value');
     if (elBlockValue) elBlockValue.textContent = `${currentBlockNum} de ${totalBlocks}`;
 
@@ -200,7 +191,6 @@
     const elBlockLabel = document.querySelector('.progress-top .progress-label');
     if (elBlockLabel) elBlockLabel.textContent = bloco.title || `Bloco ${currentBlockNum}`;
 
-    // Barra meio (perguntas no bloco)
     const elQuestionValue = document.getElementById('progress-question-value');
     if (elQuestionValue) elQuestionValue.textContent = `${currentQuestionNum} / ${blocoTotal}`;
 
@@ -210,7 +200,6 @@
       elQuestionFill.style.width = pct + '%';
     }
 
-    // Ampulheta total
     const elTotal = document.getElementById('progress-total-value');
     if (elTotal) elTotal.textContent = `${currentGlobalNum} / ${totalQuestions}`;
   }
@@ -251,7 +240,6 @@
       }, speed);
     });
 
-    // LEITURA AUTOMÁTICA
     if ('speechSynthesis' in window && pergunta.trim()) {
       const utter = new SpeechSynthesisUtterance(pergunta);
       utter.lang = 'pt-BR';
@@ -304,7 +292,7 @@
     }
   }
 
-  // ====== APLICAR TEMA DO GUIA CORRETAMENTE ======
+   // ====== APLICAR TEMA DO GUIA CORRETAMENTE ======
   function applyGuiaTheme() {
     const guiaRaw = sessionStorage.getItem('jornada.guia');
     const guia = guiaRaw ? guiaRaw.toLowerCase().trim() : 'default';
