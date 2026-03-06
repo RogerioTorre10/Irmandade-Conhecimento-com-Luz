@@ -156,7 +156,53 @@
     const pergunta = bloco?.questions ? bloco.questions[0] : null;
     return { bloco, pergunta };
   }
+  
+ // BOOTSTRAP SIMPLES DA SECTION-PERGUNTAS
+   async function bootstrapPerguntas() {
+   try {
+    await ensureBlocks();
 
+    if (!State.blocks.length) {
+      console.warn('[PERGUNTAS] Nenhum bloco carregado, usando fallback blockTranslations pt-BR.');
+      const lang = (window.i18n?.lang) || 'pt-BR';
+      if (window.blockTranslations && window.blockTranslations[lang]) {
+        State.blocks = window.blockTranslations[lang];
+      }
+    }
+
+    if (!State.blocks.length) {
+      console.error('[PERGUNTAS] Ainda sem blocos, abortando bootstrap.');
+      return;
+    }
+
+    // Modo teste: força 1 pergunta por bloco
+    State.totalBlocks = State.blocks.length;
+    State.totalQuestions = State.blocks.length;
+
+    State.blocoIdx = 0;
+    State.qIdx = 0;
+    State.globalIdx = 0;
+
+    showCurrentQuestion();
+  } catch (e) {
+    console.error('[PERGUNTAS] Erro no bootstrapPerguntas:', e);
+  }
+}
+
+// Quando a seção de perguntas aparece, dispara o bootstrap
+document.addEventListener('JC.section:shown', function (ev) {
+  if (!ev?.detail || ev.detail.id !== 'section-perguntas') return;
+  bootstrapPerguntas();
+});
+
+// Fallback se o evento não vier
+window.addEventListener('load', function () {
+  const sec = document.getElementById('section-perguntas');
+  if (sec && !sec.classList.contains('hidden')) {
+    setTimeout(bootstrapPerguntas, 300);
+  }
+});
+  
   // --------------------------------------------------
   // UI / BARRAS / DATILOGRAFIA + LEITURA
   // --------------------------------------------------
