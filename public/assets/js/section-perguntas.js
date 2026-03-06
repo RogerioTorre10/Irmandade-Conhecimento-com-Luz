@@ -122,7 +122,22 @@
 
     State.blocks = window.JORNADA_BLOCKS || [];
   }
+  
+// Quando termina a última pergunta do bloco atual
+playBlockTransition(current.bloco.transitionVideo || FINAL_VIDEO_FALLBACK, () => {
+  // Callback chamado quando o vídeo termina ou é pulado
+  State.blocoIdx++;
+  State.qIdx = 0;
+  updateCounters();           // ou refreshUIFromState()
+  showCurrentQuestion();
+  
+  if (State.blocoIdx >= State.totalBlocks) {
+    // Último bloco → vai pro final com vídeo final se quiser
+    playTransitionVideo(FINAL_VIDEO_FALLBACK, FINAL_SECTION_ID);
+  }
+});
 
+  
   function computeTotals() {
     State.totalBlocks = State.blocks.length;
     State.totalQuestions = State.blocks.reduce(
