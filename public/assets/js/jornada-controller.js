@@ -6,16 +6,20 @@
   window.__JC_IS_TYPING = window.__JC_IS_TYPING || false;
 
   const sectionOrder = [
-    'section-intro',
-    'section-termos1',
-    'section-termos2',
-    'section-senha',
-    'section-guia',
-    'section-selfie',
-    'section-card',
-    'section-perguntas',
-    'section-final'
-  ];
+  'section-intro',
+  'section-termos1',
+  'section-termos2',
+  'section-senha',
+  'section-guia',
+  'section-selfie',
+  'section-card',
+  'section-perguntas-raizes',
+  'section-perguntas-reflexoes',
+  'section-perguntas-crescimento',
+  'section-perguntas-integracao',
+  'section-perguntas-sintese',
+  'section-final'
+];
 
   let targetId = 'section-card';
   let lastShownSection = null;
