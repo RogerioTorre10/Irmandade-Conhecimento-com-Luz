@@ -12,10 +12,21 @@
     guia: '/html/section-guia.html',
     filme4: '/assets/videos/conhecimento-com-luz-jardim.mp4',
     selfie: '/html/section-selfie.html',
-    filme5: '/assets/videos/filme-0-ao-encontro-da-jornada.mp4',
-    perguntas: '/html/section-perguntas.html',
-    filme6: '/assets/videos/filme-5-fim-da-jornada.mp4',
-    final: '/html/section-final.html'
+    filme5: '/assets/videos/filme-card-dourado.mp4',
+    card: '/html/section-card.html',
+    filme6: '/assets/videos/filme-0-ao-encontro-da-jornada.mp4',
+    perguntas_raizes: '/html/section-perguntas-raizes.html',
+    filme7: '/assets/videos/filme-1-entrando-na-jornada.mp4',
+    perguntas_reflexoes: '/html/section-perguntas-reflexoes.html',
+    filme8: '/assets/videos/filme-2-dentro-da-jornada.mp4',
+    perguntas_crescimento: '/html/section-perguntas-crescimento.html',
+    filme9: '/assets/videos/filme-3-traumas-na-jornada.mp4',
+    perguntas_integracao: '/html/section-perguntas-integracao.html',
+    filme10: '/assets/videos/filme-4-aproximando-do-final.mp4',
+    perguntas_sintese: '/html/section-perguntas-sintese.html',
+    filme11: '/assets/videos/filme-5-fim-da-jornada.mp4',
+    final: '/html/section-final.html',
+    filme12: '/assets/videos/filme-5-fim-da-jornada.mp4'
   };
 
   async function carregarEtapa(nome) {
