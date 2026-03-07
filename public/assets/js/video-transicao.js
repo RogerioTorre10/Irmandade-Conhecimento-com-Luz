@@ -168,9 +168,7 @@ if (!globalOverlay) {
 
   document.body.appendChild(globalOverlay);
 }
-
-globalOverlay.appendChild(video);
-      
+    
    video.playsInline = true;
    video.autoplay = false;
    video.controls = false;
@@ -187,6 +185,7 @@ globalOverlay.appendChild(video);
 
     frame.appendChild(ambient);
     frame.appendChild(video);
+    globalOverlay.appendChild(frame);
 
   // Botão “Pular”
     const skip = document.createElement('button');
