@@ -4,7 +4,7 @@
 
   const MOD = 'section-card.js';
   const SECTION_IDS = ['section-card', 'section-eu-na-irmandade'];
-  const NEXT_SECTION_ID = 'section-perguntas';
+  const NEXT_SECTION_ID = 'section-perguntas-raizes';
   const VIDEO_SRC = '/assets/videos/filme-0-ao-encontro-da-jornada.mp4';
 
   const CARD_BG = {
