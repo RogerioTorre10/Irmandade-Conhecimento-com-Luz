@@ -63,26 +63,39 @@
   font-weight: 800 !important;
 }
 
-/* 4) Botões — voltar a ficar lado a lado no desktop e “cabíveis” no zoom 100% */
+/* 4) Botões — 3 por linha no desktop, 1 por linha no mobile */
 #section-final .final-acoes {
   margin-top: 14px !important;
-  display: flex !important;
-  flex-direction: row !important;
-  justify-content: center !important;
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  justify-content: stretch !important;
   align-items: stretch !important;
   gap: 12px !important;
-  flex-wrap: wrap !important;
-  padding-bottom: 6px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: visible !important;
+  padding: 0 8px 6px !important;
+  box-sizing: border-box !important;
 }
 
 #section-final .final-acoes > button,
 #section-final .final-acoes > a {
-  flex: 1 1 210px !important;            /* garante 2 colunas quando couber */
-  max-width: 260px !important;
-  min-height: 52px !important;
-  padding: 10px 14px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  padding: 10px 12px !important;
   box-sizing: border-box !important;
-  white-space: nowrap !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
+}
+
+/* tablet */
+@media (max-width: 900px) {
+  #section-final .final-acoes {
+    grid-template-columns: 1fr !important;
+    padding: 0 10px 6px !important;
+  }
 }
 
 /* Caso em algum breakpoint o layout force 1 coluna, ainda fica bonito */
