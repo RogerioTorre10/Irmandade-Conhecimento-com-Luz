@@ -72,21 +72,29 @@
   }
 
   // ---------------------------- LIMPEZA --------------------------------
-  function cleanup(overlay) {
-    if (cleaned) return;
-    cleaned = true;
+ function cleanup() {
+  try {
+    const overlay = document.getElementById('vt-overlay');
+    const video = document.getElementById('vt-video');
+    const ambient = document.getElementById('vt-ambient');
+    const frame = document.getElementById('vt-frame');
 
-    try {
-      document.removeEventListener('keydown', onKeydown, true);
-      window.__TRANSITION_LOCK = false;
-      document.dispatchEvent(new CustomEvent('transition:ended'));
-      document.documentElement.style.overflow = '';
-      if (overlay?.parentNode) overlay.parentNode.removeChild(overlay);
-    } catch {}
+    try { if (video) { video.pause(); video.removeAttribute('src'); video.load(); } } catch (e) {}
+    try { if (ambient) { ambient.pause(); ambient.removeAttribute('src'); ambient.load(); } } catch (e) {}
 
-    isPlaying = false;
+    try { video?.remove(); } catch (e) {}
+    try { ambient?.remove(); } catch (e) {}
+    try { frame?.remove(); } catch (e) {}
+    try { overlay?.remove(); } catch (e) {}
+
+    document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
+
     log('Overlay removido e estado resetado');
+  } catch (e) {
+    warn('Erro no cleanup:', e);
   }
+}
 
   // -------------------------- PORTAL DOURADO ---------------------------
 function buildPortal() {
