@@ -1376,13 +1376,16 @@ html, body{
 }
 
 /* 4) Placeholder + selfie em posição RELATIVA (sem top: 380px) */
-
-#section-card .placeholder-wrapper {
-  width: 100%;
-  max-width: 260px;
-  margin: -40px auto 12px; /* sobe um pouco, e já abre espaço pro nome */
-  position: relative;
-  z-index: 40;
+.selfiecard-placeholder,
+.card-placeholder {
+  position: absolute;
+  bottom: -30px;        /* faz ele sobrepor a base do card */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 140px;
+  height: 140px;
+  z-index: 5;
+  pointer-events: none;
 }
 
 #section-card .flame-layer {
@@ -1402,9 +1405,17 @@ html, body{
 
 /* Botão continuar sempre abaixo do nome, dentro da seção */
 #section-card .card-actions {
-  margin-top: 8px;
-  display: flex;
-  justify-content: center;
+  position: relative;
+  z-index: 20;
+  margin-top: 60px;
+  text-align: center;
+  overflow: visible;
+}
+
+#section-card .card-actions button {
+  min-width: 240px;
+  padding: 14px 28px;
+  font-size: 16px;
 }
 
 }
@@ -1472,11 +1483,23 @@ html, body{
     max-width: 380px;
     padding-bottom: 200px;
   }
-
-  #section-card .placeholder-wrapper {
-    max-width: 240px;
-    margin-top: -20px;
-  }
+   
+.selfiecard-container,
+.card-frame,
+.card-wrapper {
+  position: relative;
+}
+  .selfiecard-placeholder,
+.card-placeholder {
+  position: absolute;
+  bottom: -30px;        /* faz ele sobrepor a base do card */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 140px;
+  height: 140px;
+  z-index: 5;
+  pointer-events: none;
+}
 
  /* 1) Reserva espaço REAL embaixo (inclusive safe-area) */
   #section-card{
@@ -1494,6 +1517,21 @@ html, body{
     margin-top: 14px !important;
     touch-action: manipulation !important; /* melhora toque no Android */
   }
+   /* ===== BOTÃO CONTINUAR ===== */
+
+#section-card .card-actions {
+  position: relative;
+  z-index: 20;
+  margin-top: 60px;
+  text-align: center;
+  overflow: visible;
+}
+
+#section-card .card-actions button {
+  min-width: 240px;
+  padding: 14px 28px;
+  font-size: 16px;
+}
 
   /* 3) Garante que nenhum overlay esteja bloqueando o clique */
   #section-card .card-stage,
