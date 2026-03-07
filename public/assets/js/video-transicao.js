@@ -147,14 +147,13 @@ function buildPortal() {
    const video = document.createElement('video');
    video.id = 'vt-video';
 
-// PATCH DO OVERLAY
-   let overlay = document.getElementById('video-transition-overlay');
+let globalOverlay = document.getElementById('video-transition-overlay');
 
-   if (!overlay) {
-   overlay = document.createElement('div');
-   overlay.id = 'video-transition-overlay';
+if (!globalOverlay) {
+  globalOverlay = document.createElement('div');
+  globalOverlay.id = 'video-transition-overlay';
 
-   Object.assign(overlay.style, {
+  Object.assign(globalOverlay.style, {
     position: 'fixed',
     top: '0',
     left: '0',
@@ -165,13 +164,13 @@ function buildPortal() {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center'
-   });
+  });
 
-    document.body.appendChild(overlay);
-  }
+  document.body.appendChild(globalOverlay);
+ }
 
-    overlay.appendChild(video);
-    
+  globalOverlay.appendChild(video);
+      
    video.playsInline = true;
    video.autoplay = false;
    video.controls = false;
