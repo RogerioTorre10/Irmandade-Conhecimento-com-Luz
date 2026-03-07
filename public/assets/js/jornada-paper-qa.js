@@ -1,375 +1,342 @@
-/* jornada-paper-qa.js — versão FINAL (usa window/win, sem global) */
-(function (win) {
+/* /assets/js/jornada-paper-qa.js
+ * Fonte oficial de configuração dos blocos da jornada
+ * NÃO renderiza UI
+ * NÃO controla progresso
+ * NÃO controla navegação
+ * Apenas fornece dados por idioma / section
+ */
+(function (window) {
   'use strict';
 
-  if (win.jornadaPaperQALoaded) {
-    console.log('[JORNADA_PAPER] Script já carregado, ignorando...');
+  if (window.__JORNADA_PAPER_QA_CONFIG__) {
+    console.log('[JORNADA_PAPER] Config já carregada, ignorando...');
     return;
   }
-  win.jornadaPaperQALoaded = true;
+  window.__JORNADA_PAPER_QA_CONFIG__ = true;
 
-  const log = (...args) => console.log('[JORNADA_PAPER]', ...args);
-  const warn = (...args) => console.warn('[JORNADA_PAPER]', ...args);
+  const MOD = '[JORNADA_PAPER]';
 
-  const i18n = win.i18n || {
-    lang: 'pt-BR',
-    ready: false,
-    t: (k, fallback) => fallback || k,
-    apply: () => {},
-    waitForReady: async () => {}
-  };
+  const VIDEO_BASE = '/assets/videos/';
 
-  const CFG = Object.assign({
-    CANVAS_ID: 'jornada-canvas',
-    CONTENT_ID: 'jornada-conteudo',
-    PERGAMINHO_HORIZ: '/assets/img/pergaminho-rasgado-horiz.png',
-    PERGAMINHO_VERT: '/assets/img/pergaminho-rasgado-horiz.png',
-    VIDEO_BASE: '/assets/img/'
-  }, win.JORNADA_CFG || {});
-
-  const VIDEO_BASE = CFG.VIDEO_BASE;
-
-  win.JORNADA_VIDEOS = win.JORNADA_VIDEOS || {
-    intro: VIDEO_BASE + 'filme-0-ao-encontro-da-jornada.mp4',
-    afterBlocks: {
-      0: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
-      1: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4',
-      2: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4',
-      3: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4'
-    },
-    final: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4'
-  };
-  win.JORNADA_FINAL_VIDEO = win.JORNADA_VIDEOS.final;
-
-  // Blocos multilíngues
-  const blockTranslations = {
+  const CONFIG = {
     'pt-BR': [
       {
+        sectionId: 'section-perguntas-raizes',
         id: 'raizes',
+        index: 0,
         title: 'Bloco 1 — Raízes',
         data_i18n: 'bloco_raizes_title',
+        nextSection: 'section-perguntas-reflexoes',
+        transitionVideo: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
         questions: [
-          { id: 'sonho_espiritual', label: 'Qual é o seu maior sonho espiritual?', data_i18n: 'pergunta_sonho_espiritual' }
-        ],
-        video_after: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4'
+          {
+            id: 'sonho_espiritual',
+            label: 'Qual é o seu maior sonho espiritual?',
+            data_i18n: 'pergunta_sonho_espiritual'
+          }
+        ]
       },
       {
+        sectionId: 'section-perguntas-reflexoes',
         id: 'reflexoes',
+        index: 1,
         title: 'Bloco 2 — Reflexões',
         data_i18n: 'bloco_reflexoes_title',
+        nextSection: 'section-perguntas-crescimento',
+        transitionVideo: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4',
         questions: [
-          { id: 'significado_luz', label: 'O que "luz" significa para você?', data_i18n: 'pergunta_significado_luz' }
-        ],
-        video_after: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4'
+          {
+            id: 'significado_luz',
+            label: 'O que "luz" significa para você?',
+            data_i18n: 'pergunta_significado_luz'
+          }
+        ]
       },
       {
+        sectionId: 'section-perguntas-crescimento',
         id: 'crescimento',
+        index: 2,
         title: 'Bloco 3 — Crescimento',
         data_i18n: 'bloco_crescimento_title',
+        nextSection: 'section-perguntas-integracao',
+        transitionVideo: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4',
         questions: [
-          { id: 'pratica_gratidao', label: 'Como você pratica gratidão diariamente?', data_i18n: 'pergunta_pratica_gratidao' }
-        ],
-        video_after: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4'
+          {
+            id: 'pratica_gratidao',
+            label: 'Como você pratica gratidão diariamente?',
+            data_i18n: 'pergunta_pratica_gratidao'
+          }
+        ]
       },
       {
+        sectionId: 'section-perguntas-integracao',
         id: 'integracao',
+        index: 3,
         title: 'Bloco 4 — Integração',
         data_i18n: 'bloco_integracao_title',
+        nextSection: 'section-perguntas-sintese',
+        transitionVideo: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4',
         questions: [
-          { id: 'mensagem_futuro', label: 'Uma mensagem para o seu eu futuro.', data_i18n: 'pergunta_mensagem_futuro' }
-        ],
-        video_after: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4'
+          {
+            id: 'mensagem_futuro',
+            label: 'Uma mensagem para o seu eu futuro.',
+            data_i18n: 'pergunta_mensagem_futuro'
+          }
+        ]
       },
       {
+        sectionId: 'section-perguntas-sintese',
         id: 'sintese',
+        index: 4,
         title: 'Bloco 5 — Síntese e Entrega',
         data_i18n: 'bloco_sintese_title',
+        nextSection: 'section-final',
+        transitionVideo: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4',
         questions: [
-          { id: 'passo_fe', label: 'Qual será seu próximo passo de fé e coragem?', data_i18n: 'pergunta_passo_fe' }
-        ],
-        video_after: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4'
+          {
+            id: 'passo_fe',
+            label: 'Qual será seu próximo passo de fé e coragem?',
+            data_i18n: 'pergunta_passo_fe'
+          }
+        ]
       }
     ],
+
     'en-US': [
       {
+        sectionId: 'section-perguntas-raizes',
         id: 'raizes',
+        index: 0,
         title: 'Block 1 — Roots',
         data_i18n: 'bloco_raizes_title',
+        nextSection: 'section-perguntas-reflexoes',
+        transitionVideo: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
         questions: [
-          { id: 'sonho_espiritual', label: 'What is your greatest spiritual dream?', data_i18n: 'pergunta_sonho_espiritual' }
-        ],
-        video_after: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4'
+          {
+            id: 'sonho_espiritual',
+            label: 'What is your greatest spiritual dream?',
+            data_i18n: 'pergunta_sonho_espiritual'
+          }
+        ]
       },
       {
+        sectionId: 'section-perguntas-reflexoes',
         id: 'reflexoes',
+        index: 1,
         title: 'Block 2 — Reflections',
         data_i18n: 'bloco_reflexoes_title',
+        nextSection: 'section-perguntas-crescimento',
+        transitionVideo: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4',
         questions: [
-          { id: 'significado_luz', label: 'What does "light" mean to you?', data_i18n: 'pergunta_significado_luz' }
-        ],
-        video_after: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4'
+          {
+            id: 'significado_luz',
+            label: 'What does "light" mean to you?',
+            data_i18n: 'pergunta_significado_luz'
+          }
+        ]
       },
       {
+        sectionId: 'section-perguntas-crescimento',
         id: 'crescimento',
+        index: 2,
         title: 'Block 3 — Growth',
         data_i18n: 'bloco_crescimento_title',
+        nextSection: 'section-perguntas-integracao',
+        transitionVideo: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4',
         questions: [
-          { id: 'pratica_gratidao', label: 'How do you practice gratitude daily?', data_i18n: 'pergunta_pratica_gratidao' }
-        ],
-        video_after: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4'
+          {
+            id: 'pratica_gratidao',
+            label: 'How do you practice gratitude daily?',
+            data_i18n: 'pergunta_pratica_gratidao'
+          }
+        ]
       },
       {
+        sectionId: 'section-perguntas-integracao',
         id: 'integracao',
+        index: 3,
         title: 'Block 4 — Integration',
         data_i18n: 'bloco_integracao_title',
+        nextSection: 'section-perguntas-sintese',
+        transitionVideo: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4',
         questions: [
-          { id: 'mensagem_futuro', label: 'A message for your future self.', data_i18n: 'pergunta_mensagem_futuro' }
-        ],
-        video_after: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4'
+          {
+            id: 'mensagem_futuro',
+            label: 'A message for your future self.',
+            data_i18n: 'pergunta_mensagem_futuro'
+          }
+        ]
       },
       {
+        sectionId: 'section-perguntas-sintese',
         id: 'sintese',
+        index: 4,
         title: 'Block 5 — Synthesis and Delivery',
         data_i18n: 'bloco_sintese_title',
+        nextSection: 'section-final',
+        transitionVideo: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4',
         questions: [
-          { id: 'passo_fe', label: 'What will be your next step of faith and courage?', data_i18n: 'pergunta_passo_fe' }
-        ],
-        video_after: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4'
+          {
+            id: 'passo_fe',
+            label: 'What will be your next step of faith and courage?',
+            data_i18n: 'pergunta_passo_fe'
+          }
+        ]
       }
     ],
+
     'es-ES': [
       {
+        sectionId: 'section-perguntas-raizes',
         id: 'raizes',
+        index: 0,
         title: 'Bloque 1 — Raíces',
         data_i18n: 'bloco_raizes_title',
+        nextSection: 'section-perguntas-reflexoes',
+        transitionVideo: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
         questions: [
-          { id: 'sonho_espiritual', label: '¿Cuál es tu mayor sueño espiritual?', data_i18n: 'pergunta_sonho_espiritual' }
-        ],
-        video_after: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4'
+          {
+            id: 'sonho_espiritual',
+            label: '¿Cuál es tu mayor sueño espiritual?',
+            data_i18n: 'pergunta_sonho_espiritual'
+          }
+        ]
       },
       {
+        sectionId: 'section-perguntas-reflexoes',
         id: 'reflexoes',
+        index: 1,
         title: 'Bloque 2 — Reflexiones',
         data_i18n: 'bloco_reflexoes_title',
+        nextSection: 'section-perguntas-crescimento',
+        transitionVideo: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4',
         questions: [
-          { id: 'significado_luz', label: '¿Qué significa la "luz" para ti?', data_i18n: 'pergunta_significado_luz' }
-        ],
-        video_after: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4'
+          {
+            id: 'significado_luz',
+            label: '¿Qué significa la "luz" para ti?',
+            data_i18n: 'pergunta_significado_luz'
+          }
+        ]
       },
       {
+        sectionId: 'section-perguntas-crescimento',
         id: 'crescimento',
+        index: 2,
         title: 'Bloque 3 — Crecimiento',
         data_i18n: 'bloco_crescimento_title',
+        nextSection: 'section-perguntas-integracao',
+        transitionVideo: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4',
         questions: [
-          { id: 'pratica_gratidao', label: '¿Cómo practicas la gratitud a diario?', data_i18n: 'pergunta_pratica_gratidao' }
-        ],
-        video_after: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4'
+          {
+            id: 'pratica_gratidao',
+            label: '¿Cómo practicas la gratitud a diario?',
+            data_i18n: 'pergunta_pratica_gratidao'
+          }
+        ]
       },
       {
+        sectionId: 'section-perguntas-integracao',
         id: 'integracao',
+        index: 3,
         title: 'Bloque 4 — Integración',
         data_i18n: 'bloco_integracao_title',
+        nextSection: 'section-perguntas-sintese',
+        transitionVideo: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4',
         questions: [
-          { id: 'mensagem_futuro', label: 'Un mensaje para tu yo futuro.', data_i18n: 'pergunta_mensagem_futuro' }
-        ],
-        video_after: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4'
+          {
+            id: 'mensagem_futuro',
+            label: 'Un mensaje para tu yo futuro.',
+            data_i18n: 'pergunta_mensagem_futuro'
+          }
+        ]
       },
       {
+        sectionId: 'section-perguntas-sintese',
         id: 'sintese',
+        index: 4,
         title: 'Bloque 5 — Síntesis y Entrega',
         data_i18n: 'bloco_sintese_title',
+        nextSection: 'section-final',
+        transitionVideo: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4',
         questions: [
-          { id: 'passo_fe', label: '¿Cuál será tu próximo paso de fe y coraje?', data_i18n: 'pergunta_passo_fe' }
-        ],
-        video_after: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4'
+          {
+            id: 'passo_fe',
+            label: '¿Cuál será tu próximo paso de fe y coraje?',
+            data_i18n: 'pergunta_passo_fe'
+          }
+        ]
       }
     ]
   };
 
-  // Exponho para o section-perguntas usar como fallback
-  win.blockTranslations = blockTranslations;
+  function detectLang() {
+    const htmlLang = document.documentElement.lang;
+    const saved =
+      window.LANG ||
+      localStorage.getItem('JORNADA_LANG') ||
+      sessionStorage.getItem('JORNADA_LANG') ||
+      htmlLang ||
+      'pt-BR';
 
-  let JORNADA_BLOCKS = [];
-  win.JORNADA_BLOCKS = JORNADA_BLOCKS;
+    const lang = String(saved).trim();
+    if (CONFIG[lang]) return lang;
 
-  function elCanvas() {
-    return document.getElementById(CFG.CANVAS_ID);
+    const low = lang.toLowerCase();
+    if (low.startsWith('en')) return 'en-US';
+    if (low.startsWith('es')) return 'es-ES';
+    return 'pt-BR';
   }
 
-  function elContent() {
-    return document.getElementById(CFG.CONTENT_ID);
+  function getBlocks(lang) {
+    const useLang = lang || detectLang();
+    return CONFIG[useLang] || CONFIG['pt-BR'];
   }
 
-  function ensureCanvas() {
-    if (win.__currentSectionId !== 'section-perguntas') {
-      return { root: null, content: null };
-    }
-
-    let root = elCanvas();
-    if (!root) {
-      root = document.createElement('section');
-      root.id = CFG.CANVAS_ID;
-      root.className = 'card pergaminho';
-      document.getElementById('section-perguntas')?.querySelector('.content')?.appendChild(root);
-    }
-
-    let content = elContent();
-    if (!content && root) {
-      content = document.createElement('div');
-      content.id = CFG.CONTENT_ID;
-      content.className = 'conteudo-pergaminho';
-      root.appendChild(content);
-    }
-
-    return { root, content };
+  function getBlockBySection(sectionId, lang) {
+    const blocks = getBlocks(lang);
+    return blocks.find((b) => b.sectionId === sectionId) || null;
   }
 
-  function setPergaminho(mode = 'h') {
-    const { root } = ensureCanvas();
-    if (!root) return;
-
-    root.classList.remove('pergaminho-v', 'pergaminho-h');
-    root.classList.add(mode === 'v' ? 'pergaminho-v' : 'pergaminho-h');
-    root.style.backgroundImage = `url("${mode === 'v' ? CFG.PERGAMINHO_VERT : CFG.PERGAMINHO_HORIZ}")`;
-    root.style.backgroundRepeat = 'no-repeat';
-    root.style.backgroundPosition = 'center';
-    root.style.backgroundSize = 'cover';
-    root.style.minHeight = '82vh';
+  function getBlockById(blockId, lang) {
+    const blocks = getBlocks(lang);
+    return blocks.find((b) => b.id === blockId) || null;
   }
 
-  // VÍDEO: DESATIVADO AQUI
-  function loadVideo(videoSrc) {
-    console.log('[JORNADA_PAPER] Vídeo solicitado (ignorado):', videoSrc);
+  function getBlockByIndex(index, lang) {
+    const blocks = getBlocks(lang);
+    return blocks[index] || null;
   }
 
-  async function renderQuestions() {
-    setPergaminho('h');
-
-    const { content } = ensureCanvas();
-    if (!content || !JORNADA_BLOCKS.length) return;
-
-    content.innerHTML = '';
-
-    const JC = win.JC || { currentBloco: 0, currentPergunta: 0 };
-    const block = JORNADA_BLOCKS[JC.currentBloco] || JORNADA_BLOCKS[0];
-    const q = block.questions[JC.currentPergunta] || block.questions[0];
-    const perguntaTexto = i18n.t(q.data_i18n, q.label);
-
-    const header = document.createElement('div');
-    header.className = 'perguntas-header';
-    header.innerHTML = `...`;
-    content.appendChild(header);
-
-    const pergaminho = document.createElement('div');
-    pergaminho.className = 'pergaminho-container';
-    pergaminho.innerHTML = `
-      <div class="jp-question-display">
-        <div class="jp-question-typed" id="question-display"></div>
-      </div>
-      <div class="jp-answer-container">
-        <div class="jp-answer-frame">
-          <div class="jp-answer-bg"></div>
-          <textarea class="jp-answer-input" id="answer-input" placeholder="Digite com verdade e calma..." maxlength="1000"></textarea>
-        </div>
-      </div>
-      <div class="perguntas-controls">
-        <button class="btn-perguntas btn-confirm" id="btn-next">
-          ${JC.currentPergunta < block.questions.length - 1 ? 'Próxima' : 'Concluir'}
-        </button>
-      </div>
-    `;
-    content.appendChild(pergaminho);
-
-    const input = document.getElementById('answer-input');
-    const saved = localStorage.getItem(`jornada_answer_${JC.currentBloco}_${JC.currentPergunta}`);
-    if (saved) input.value = saved;
-
-    // DATILOGRAFIA
-    let i = 0;
-    const display = document.getElementById('question-display');
-    display.textContent = '';
-    const speed = 38;
-
-    await new Promise((res) => {
-      const int = setInterval(() => {
-        display.textContent = perguntaTexto.slice(0, i);
-        i++;
-        if (i > perguntaTexto.length) {
-          clearInterval(int);
-          display.classList.add('typing-done');
-          res();
-        }
-      }, speed);
-    });
-
-    document.getElementById('btn-next').onclick = async () => {
-      const resposta = input.value.trim();
-
-      if (!resposta && JC.currentPergunta < block.questions.length - 1) {
-        win.toast?.('Escreva sua resposta antes de avançar.');
-        return;
-      }
-
-      localStorage.setItem(`jornada_answer_${JC.currentBloco}_${JC.currentPergunta}`, resposta);
-
-      if (JC.currentPergunta < block.questions.length - 1) {
-        JC.currentPergunta++;
-      } else if (JC.currentBloco < JORNADA_BLOCKS.length - 1) {
-        const finishedBlockIndex = JC.currentBloco;
-        const nextVideo = JORNADA_BLOCKS[finishedBlockIndex]?.video_after;
-
-        JC.currentBloco++;
-        JC.currentPergunta = 0;
-
-        if (nextVideo && typeof window.playBlockTransition === 'function') {
-          await new Promise((resolve) => window.playBlockTransition(nextVideo, resolve));
-        }
-      } else {
-        document.dispatchEvent(new CustomEvent('qa:completed'));
-        return;
-      }
-
-      win.JC = JC;
-      renderQuestions();
-    };
-
-    log('Pergunta renderizada com sucesso');
+  function getTotalBlocks(lang) {
+    return getBlocks(lang).length;
   }
 
-  async function loadDynamicBlocks() {
-    await i18n.waitForReady(10000);
-
-    const lang = i18n.lang || 'pt-BR';
-    const base = blockTranslations[lang] || blockTranslations['pt-BR'];
-
-    JORNADA_BLOCKS = base.map((b) => ({
-      id: b.id,
-      title: b.title,
-      data_i18n: b.data_i18n,
-      questions: b.questions,
-      video_after: b.video_after,
-      tipo: 'perguntas'
-    }));
-
-    win.JORNADA_BLOCKS = JORNADA_BLOCKS;
-    log('Blocos carregados:', JORNADA_BLOCKS.length);
-    return true;
+  function getGlobalQuestionTotal(lang) {
+    return getBlocks(lang).reduce((acc, bloco) => {
+      const q = Array.isArray(bloco.questions) ? bloco.questions.length : 0;
+      return acc + q;
+    }, 0);
   }
 
-  async function initPaperQA() {
-    await loadDynamicBlocks();
+  function getSectionSequence(lang) {
+    return getBlocks(lang).map((b) => b.sectionId);
   }
 
-  document.addEventListener('DOMContentLoaded', initPaperQA);
-
-  win.JPaperQA = {
-    loadDynamicBlocks,
-    renderQuestions,
-    loadVideo,
-    setPergaminho,
-    ensureCanvas,
-    init: initPaperQA
+  window.JORNADA_PAPER_QA = {
+    CONFIG,
+    detectLang,
+    getBlocks,
+    getBlockBySection,
+    getBlockById,
+    getBlockByIndex,
+    getTotalBlocks,
+    getGlobalQuestionTotal,
+    getSectionSequence
   };
 
-  log('jornada-paper-qa.js carregado com sucesso');
+  // compatibilidade leve com código antigo
+  window.JORNADA_BLOCKS = getBlocks();
+  window.blockTranslations = CONFIG;
+
+  console.log(`${MOD} Config carregada com sucesso. Idioma:`, detectLang(), 'Blocos:', getTotalBlocks());
 })(window);
