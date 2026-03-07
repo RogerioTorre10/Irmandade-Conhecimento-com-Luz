@@ -2136,7 +2136,7 @@ html, body{
 /* ===== SECTION FINAL — BOTÕES AJUSTE FINO ===== */
 #section-final .final-acoes {
   display: grid !important;
-  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  grid-template-columns: 1fr 1.25fr 1fr !important;
   justify-content: stretch !important;
   align-items: stretch !important;
   gap: 14px !important;
@@ -2196,7 +2196,7 @@ html, body{
 /* ===== MOBILE / TABLET ===== */
 @media (max-width: 900px) {
   #section-final .final-acoes {
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    grid-template-columns: 1fr 1.25fr 1fr !important;
     gap: 10px !important;
     padding: 0 10px 6px !important;
   }
@@ -2334,7 +2334,7 @@ html, body{
   /* botões: 2 colunas (se faltar espaço, eles truncam) */
   #section-final .final-acoes{
     display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
+    grid-template-columns: 1fr 1.25fr 1fr !important;
     gap: 10px !important;
     padding: 0 10px !important;
   }
