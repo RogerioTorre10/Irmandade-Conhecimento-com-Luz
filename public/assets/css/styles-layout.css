@@ -2133,32 +2133,54 @@ html, body{
     line-height: 1.55 !important;
   }
 
-  /* BOTÕES LADO A LADO (desfaz o width:100% do styles-final.css) */
-  #section-final .final-acoes {
-    display: flex !important;
-    flex-direction: row !important;
-    justify-content: center !important;
-    align-items: center !important;
-    gap: 14px !important;
-    flex-wrap: nowrap !important;
-    margin-top: 16px !important;
-    padding-right: 12px !important; 
-  }
-
-  #section-final .final-acoes button,
-  #section-final .final-acoes a {
-    width: auto !important;
-    min-width: 220px !important;
-    max-width: 280px !important;
-    flex: 0 0 auto !important;
-    white-space: nowrap !important;
-  }
-
-   #section-final .pergaminho-content {
-  padding-left: 28px !important;
-  padding-right: 56px !important; /* MAIS respiro à direita */
-  box-sizing: border-box;
+/* BOTÕES LADO A LADO (desfaz o width:100% do styles-final.css) */
+#section-final .final-acoes {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  justify-content: stretch !important;
+  align-items: stretch !important;
+  gap: 12px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-top: 16px !important;
+  padding: 0 16px 6px !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
 }
+
+#section-final .final-acoes button,
+#section-final .final-acoes a {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  flex: initial !important;
+  padding: 10px 12px !important;
+  box-sizing: border-box !important;
+  white-space: normal !important;
+  text-align: center !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
+}
+
+#section-final .pergaminho-content {
+  padding-left: 28px !important;
+  padding-right: 28px !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+}
+
+#section-final .final-wrap,
+#section-final .final-panel,
+#section-final .j-arcane-card {
+  overflow: visible !important;
+}
+
+@media (max-width: 900px) {
+  #section-final .final-acoes {
+    grid-template-columns: 1fr !important;
+    padding: 0 12px 6px !important;
+  }
+}}
    
 }
 
