@@ -147,11 +147,11 @@ function buildPortal() {
    const video = document.createElement('video');
    video.id = 'vt-video';
 
-let globalOverlay = document.getElementById('video-transition-overlay');
+let globalOverlay = document.getElementById('vt-overlay');
 
 if (!globalOverlay) {
   globalOverlay = document.createElement('div');
-  globalOverlay.id = 'video-transition-overlay';
+  globalOverlay.id = 'vt-overlay';
 
   Object.assign(globalOverlay.style, {
     position: 'fixed',
@@ -167,9 +167,9 @@ if (!globalOverlay) {
   });
 
   document.body.appendChild(globalOverlay);
- }
+}
 
-  globalOverlay.appendChild(video);
+globalOverlay.appendChild(video);
       
    video.playsInline = true;
    video.autoplay = false;
