@@ -144,13 +144,39 @@ function buildPortal() {
   });
 
   // Vídeo principal
-  const video = document.createElement('video');
-  video.id = 'vt-video';
-  video.playsInline = true;
-  video.autoplay = false;
-  video.controls = false;
-  video.muted = true;
-  video.preload = 'auto';
+   const video = document.createElement('video');
+   video.id = 'vt-video';
+
+// PATCH DO OVERLAY
+   let overlay = document.getElementById('video-transition-overlay');
+
+   if (!overlay) {
+   overlay = document.createElement('div');
+   overlay.id = 'video-transition-overlay';
+
+   Object.assign(overlay.style, {
+    position: 'fixed',
+    top: '0',
+    left: '0',
+    width: '100vw',
+    height: '100vh',
+    background: 'black',
+    zIndex: '999999',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+   });
+
+    document.body.appendChild(overlay);
+  }
+
+    overlay.appendChild(video);
+    
+   video.playsInline = true;
+   video.autoplay = false;
+   video.controls = false;
+   video.muted = true;
+   video.preload = 'auto';
 
   Object.assign(video.style, {
     position: 'absolute',
@@ -160,14 +186,14 @@ function buildPortal() {
     objectFit: 'cover'
   });
 
-  frame.appendChild(ambient);
-  frame.appendChild(video);
+    frame.appendChild(ambient);
+    frame.appendChild(video);
 
   // Botão “Pular”
-  const skip = document.createElement('button');
-  skip.textContent = 'Pular';
-  skip.setAttribute('aria-label', 'Pular vídeo');
-  skip.className = 'jp-video-skip';
+    const skip = document.createElement('button');
+    skip.textContent = 'Pular';
+    skip.setAttribute('aria-label', 'Pular vídeo');
+    skip.className = 'jp-video-skip';
 
   Object.assign(skip.style, {
     position: 'absolute',
