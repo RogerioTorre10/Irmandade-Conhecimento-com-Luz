@@ -1013,3 +1013,183 @@ textarea,
     font-size: 13px;
   }
 }
+/* =======================================================
+   PERGUNTAS BLOCO — TEMA DO GUIA + 4 BOTÕES
+   ======================================================= */
+
+/* Variáveis padrão */
+#section-perguntas-raizes,
+#section-perguntas-reflexoes,
+#section-perguntas-crescimento,
+#section-perguntas-integracao,
+#section-perguntas-sintese {
+  --guia-main: #ffd54a;
+  --guia-soft: rgba(255, 213, 74, 0.32);
+  --guia-strong: rgba(255, 213, 74, 0.68);
+  --guia-text: #fff4c8;
+  --btn-press: #b31217;
+}
+
+/* Lumen */
+body[data-guia="lumen"] #section-perguntas-raizes,
+body[data-guia="lumen"] #section-perguntas-reflexoes,
+body[data-guia="lumen"] #section-perguntas-crescimento,
+body[data-guia="lumen"] #section-perguntas-integracao,
+body[data-guia="lumen"] #section-perguntas-sintese {
+  --guia-main: #9cff57;
+  --guia-soft: rgba(156, 255, 87, 0.30);
+  --guia-strong: rgba(156, 255, 87, 0.64);
+  --guia-text: #efffde;
+}
+
+/* Zion */
+body[data-guia="zion"] #section-perguntas-raizes,
+body[data-guia="zion"] #section-perguntas-reflexoes,
+body[data-guia="zion"] #section-perguntas-crescimento,
+body[data-guia="zion"] #section-perguntas-integracao,
+body[data-guia="zion"] #section-perguntas-sintese {
+  --guia-main: #ffd54a;
+  --guia-soft: rgba(255, 213, 74, 0.30);
+  --guia-strong: rgba(255, 213, 74, 0.66);
+  --guia-text: #fff4c8;
+}
+
+/* Arion */
+body[data-guia="arion"] #section-perguntas-raizes,
+body[data-guia="arion"] #section-perguntas-reflexoes,
+body[data-guia="arion"] #section-perguntas-crescimento,
+body[data-guia="arion"] #section-perguntas-integracao,
+body[data-guia="arion"] #section-perguntas-sintese {
+  --guia-main: #6dc8ff;
+  --guia-soft: rgba(109, 200, 255, 0.30);
+  --guia-strong: rgba(109, 200, 255, 0.66);
+  --guia-text: #e3f7ff;
+}
+
+/* título do bloco */
+.jp-block-title,
+.perguntas-title,
+#question-block-title {
+  color: var(--guia-main) !important;
+  text-shadow:
+    0 0 10px var(--guia-soft),
+    0 0 24px var(--guia-strong) !important;
+}
+
+/* pergunta */
+#question-display,
+.jp-question-typed {
+  color: var(--guia-text) !important;
+}
+
+/* caixa de resposta */
+#jp-answer-input,
+.jp-answer-input {
+  border: 2px solid var(--guia-main) !important;
+  box-shadow:
+    0 0 12px var(--guia-soft),
+    inset 0 0 10px rgba(255,255,255,0.04) !important;
+}
+
+/* devolutiva do guia */
+.jp-ai-response-label,
+#jp-ai-response-wrap {
+  color: var(--guia-text) !important;
+}
+
+#jp-ai-response {
+  border: 1px solid var(--guia-soft) !important;
+  box-shadow: 0 0 18px var(--guia-soft) !important;
+}
+
+/* barra do bloco */
+.jp-progress-fill,
+#progress-question-fill {
+  background: linear-gradient(90deg, var(--guia-main), color-mix(in srgb, var(--guia-main) 72%, white)) !important;
+  box-shadow: 0 0 12px var(--guia-soft) !important;
+}
+
+.jp-progress-value,
+#progress-question-value,
+.jp-total-value,
+#progress-total-value {
+  color: var(--guia-text) !important;
+  text-shadow: 0 0 8px var(--guia-soft) !important;
+}
+
+/* 4 botões lado a lado */
+.perguntas-controls {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+  width: 100% !important;
+  max-width: 720px !important;
+  margin: 14px auto 0 !important;
+  align-items: stretch !important;
+}
+
+/* botões */
+.perguntas-controls .btn-perguntas,
+#jp-btn-falar,
+#jp-btn-mic,
+#jp-btn-apagar,
+#jp-btn-confirmar {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 54px !important;
+  border-radius: 999px !important;
+  border: 1px solid var(--guia-strong) !important;
+  box-shadow:
+    0 0 16px var(--guia-soft),
+    inset 0 0 12px rgba(255,255,255,0.04) !important;
+  color: #fff !important;
+  transition: transform .14s ease, box-shadow .14s ease, filter .14s ease, background .14s ease !important;
+}
+
+.perguntas-controls .btn-perguntas:hover,
+#jp-btn-falar:hover,
+#jp-btn-mic:hover,
+#jp-btn-apagar:hover,
+#jp-btn-confirmar:hover {
+  transform: translateY(-1px) scale(1.02) !important;
+  box-shadow:
+    0 0 22px var(--guia-strong),
+    inset 0 0 12px rgba(255,255,255,0.06) !important;
+}
+
+/* clique vermelho forte */
+.perguntas-controls .btn-perguntas:active,
+#jp-btn-falar:active,
+#jp-btn-mic:active,
+#jp-btn-apagar:active,
+#jp-btn-confirmar:active,
+.perguntas-controls .btn-perguntas.is-pressed,
+#jp-btn-falar.is-pressed,
+#jp-btn-mic.is-pressed,
+#jp-btn-apagar.is-pressed,
+#jp-btn-confirmar.is-pressed {
+  background: var(--btn-press) !important;
+  box-shadow:
+    0 0 18px rgba(179, 18, 23, 0.78),
+    inset 0 0 16px rgba(255,255,255,0.06) !important;
+  transform: scale(0.98) !important;
+}
+
+/* mobile */
+@media (max-width: 700px) {
+  .perguntas-controls {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+
+  .perguntas-controls .btn-perguntas,
+  #jp-btn-falar,
+  #jp-btn-mic,
+  #jp-btn-apagar,
+  #jp-btn-confirmar {
+    min-height: 46px !important;
+    font-size: 13px !important;
+    padding: 8px 6px !important;
+  }
+}
+
