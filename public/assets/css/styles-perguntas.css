@@ -890,3 +890,126 @@ textarea,
   background: #000 !important;
   display: block !important;
 }
+/* ===== TOPO DIREITO — TOTAL GERAL ===== */
+.jp-total-top {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 5;
+}
+
+.jp-total-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.jp-total-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff3c0;
+  text-shadow: 0 0 10px rgba(255, 220, 120, 0.35);
+}
+
+/* ===== DEVOLUTIVA DO GUIA ===== */
+.jp-ai-response-wrap {
+  width: 100%;
+  max-width: 720px;
+  margin: 18px auto 14px;
+  min-height: 92px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.jp-ai-response-label {
+  margin-bottom: 8px;
+  font-size: 14px;
+  text-align: left;
+  color: #f1ddb0;
+  opacity: 0.92;
+}
+
+.jp-ai-response {
+  min-height: 72px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.36);
+  border: 1px solid rgba(255, 215, 80, 0.22);
+  box-shadow:
+    0 0 16px rgba(255, 215, 80, 0.08),
+    inset 0 0 12px rgba(255,255,255,0.04);
+  color: #fff6df;
+  line-height: 1.45;
+  text-align: left;
+}
+
+/* ===== PROGRESSO DO BLOCO ===== */
+.jp-progress-inline {
+  width: 100%;
+  max-width: 720px;
+  margin: 10px auto 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.jp-progress-bar {
+  flex: 1;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.12);
+  overflow: hidden;
+}
+
+.jp-progress-fill {
+  width: 10%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ffe067, #ffc400);
+  box-shadow: 0 0 12px rgba(255, 210, 70, 0.45);
+}
+
+.jp-progress-value {
+  min-width: 64px;
+  text-align: right;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff3c0;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 600px) {
+  .jp-total-top {
+    top: 12px;
+    right: 12px;
+    gap: 6px;
+  }
+
+  .jp-total-value {
+    font-size: 13px;
+  }
+
+  .jp-ai-response-wrap {
+    margin: 14px auto 12px;
+    min-height: 84px;
+  }
+
+  .jp-ai-response {
+    min-height: 64px;
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  .jp-progress-inline {
+    gap: 8px;
+    margin: 8px auto 14px;
+  }
+
+  .jp-progress-value {
+    min-width: 54px;
+    font-size: 13px;
+  }
+}
