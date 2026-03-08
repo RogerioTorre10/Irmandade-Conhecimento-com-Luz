@@ -324,30 +324,6 @@
     z-index: 6 !important;
   }
 
-/* 1) Isola o fundo global dentro do card */
-#section-card,
-#section-card * {
-  background-image: none !important;
-  background: transparent !important;
-}
-
-/* 2) Mas NÃO mexe no próprio CARD (mantém intacto) */
-#section-card .card-frame,
-#section-card .card-shell,
-#section-card .card-stage,
-#section-card .card-wrapper,
-#section-card .card-container {
-  background: transparent !important;
-}
-
-/* 3) Impede qualquer pseudo-elemento global de aparecer */
-#section-card::before,
-#section-card::after,
-#section-card *::before,
-#section-card *::after {
-  content: none !important;
-}
-
 #section-card .j-panel-glow::before {
   content: '';
   position: absolute;
@@ -407,6 +383,349 @@
   margin-top: 8px;
   display: flex;
   justify-content: center;
+} 
+  /* =======================================================
+   STYLES-CARD v9 — AJUSTE FINO FINAL
+   Cola no FINAL do styles-card.css
+   ======================================================= */
+
+#section-card{
+  position: relative;
+  overflow: visible !important;
+}
+
+#section-card .card-panel,
+#section-card .j-panel-glow,
+#section-card .conteudo-pergaminho,
+#section-card .card-stage,
+#section-card .card-wrapper,
+#section-card .card-container{
+  overflow: visible !important;
+  position: relative !important;
+}
+
+/* painel principal */
+#section-card .card-panel{
+  max-width: 560px !important;
+  margin: 34px auto 56px !important;
+  padding: 34px 28px 44px !important;
+  min-height: auto !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* conteúdo do card */
+#section-card .conteudo-pergaminho{
+  width: 100% !important;
+  min-height: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+}
+
+/* título */
+#section-card .titulo-selfie{
+  margin: 0 0 18px !important;
+  text-align: center !important;
+}
+
+/* palco do card */
+#section-card .card-stage{
+  position: relative !important;
+  width: 100% !important;
+  max-width: 420px !important;
+  margin: 0 auto !important;
+  padding-bottom: 105px !important; /* reserva espaço para a cruz */
+  overflow: visible !important;
+}
+
+/* card grande */
+#section-card .guide-bg{
+  display: block !important;
+  width: 100% !important;
+  max-width: 420px !important;
+  height: auto !important;
+  margin: 0 auto !important;
+  border-radius: 26px !important;
+  box-shadow:
+    0 14px 34px rgba(0,0,0,.62),
+    0 0 28px rgba(0,0,0,.55) !important;
+}
+
+/* placeholder / cruz SEMPRE dentro do card */
+#section-card .flame-layer,
+#section-card .selfiecard-placeholder,
+#section-card .card-placeholder{
+  position: absolute !important;
+  left: 50% !important;
+  top: auto !important;
+  bottom: -18px !important;
+  transform: translateX(-50%) !important;
+
+  width: 170px !important;
+  max-width: 44% !important;
+  aspect-ratio: 2.8 / 3 !important;
+  border-radius: 22px !important;
+  overflow: hidden !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+
+  pointer-events: none !important;
+  z-index: 8 !important;
+
+  box-shadow:
+    0 0 22px rgba(255,215,80,.30),
+    0 0 42px rgba(255,180,0,.20) !important;
+}
+
+#section-card .flame-layer .flame-selfie{
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  z-index: 1 !important;
+}
+
+#section-card .flame-layer .card-footer{
+  position: relative !important;
+  z-index: 2 !important;
+  width: 100% !important;
+  padding: 10px 10px 12px !important;
+  box-sizing: border-box !important;
+  text-align: center !important;
+  background: linear-gradient(
+    to top,
+    rgba(0,0,0,.88),
+    rgba(0,0,0,.58),
+    transparent
+  ) !important;
+}
+
+#section-card .card-name-badge{
+  display: inline-block !important;
+  padding: 4px 16px 3px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(255,215,160,.85) !important;
+  background: rgba(0,0,0,.70) !important;
+  box-shadow:
+    0 0 12px rgba(255,215,0,.40),
+    0 0 18px rgba(255,215,0,.22) !important;
+}
+
+#section-card #userNameSlot{
+  font-size: 1rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: .06em !important;
+}
+
+/* ações e botão continuar */
+#section-card .card-actions-below,
+#section-card .card-actions{
+  position: relative !important;
+  z-index: 20 !important;
+  width: 100% !important;
+  margin-top: 24px !important;
+  padding: 0 0 10px !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  overflow: visible !important;
+}
+
+#section-card #btnNext,
+#section-card .btn-continuar,
+#section-card #btn-continuar,
+#section-card .btn-primary,
+#section-card .btn-confirm,
+#section-card [data-action="continuar"]{
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+
+  width: min(84vw, 320px) !important;
+  max-width: 320px !important;
+  min-width: 240px !important;
+  min-height: 54px !important;
+
+  padding: 12px 24px !important;
+  border-radius: 999px !important;
+  box-sizing: border-box !important;
+
+  display: inline-flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+
+  font-size: .95rem !important;
+  letter-spacing: .16em !important;
+  text-transform: uppercase !important;
+  text-align: center !important;
+
+  z-index: 30 !important;
+  pointer-events: auto !important;
+  touch-action: manipulation !important;
+}
+
+/* molduras nunca bloqueiam clique */
+#section-card .j-panel-glow::before,
+#section-card .j-panel-glow::after,
+#section-card .card-frame{
+  pointer-events: none !important;
+}
+
+/* =========================
+   TABLET
+   ========================= */
+@media (max-width: 900px){
+
+  #section-card .card-panel{
+    max-width: 500px !important;
+    margin: 20px auto 40px !important;
+    padding: 24px 18px 34px !important;
+  }
+
+  #section-card .card-stage{
+    max-width: 360px !important;
+    padding-bottom: 95px !important;
+  }
+
+  #section-card .guide-bg{
+    max-width: 360px !important;
+  }
+
+  #section-card .flame-layer,
+  #section-card .selfiecard-placeholder,
+  #section-card .card-placeholder{
+    width: 148px !important;
+    max-width: 46% !important;
+    bottom: -16px !important;
+  }
+
+  #section-card #btnNext,
+  #section-card .btn-continuar,
+  #section-card #btn-continuar,
+  #section-card .btn-primary,
+  #section-card .btn-confirm,
+  #section-card [data-action="continuar"]{
+    width: min(86vw, 300px) !important;
+    max-width: 300px !important;
+    min-height: 50px !important;
+    padding: 11px 20px !important;
+    font-size: .88rem !important;
+  }
+}
+
+/* =========================
+   MOBILE
+   ========================= */
+@media (max-width: 600px){
+
+  #section-card{
+    padding: 8px 0 56px !important;
+    min-height: 100vh !important;
+    overflow: visible !important;
+  }
+
+  #section-card .card-panel{
+    width: calc(100vw - 28px) !important;
+    max-width: 430px !important;
+    margin: 8px auto 28px !important;
+    padding: 18px 14px 28px !important;
+    min-height: auto !important;
+  }
+
+  #section-card .conteudo-pergaminho{
+    min-height: auto !important;
+  }
+
+  #section-card .card-stage{
+    max-width: 310px !important;
+    padding-bottom: 92px !important;
+  }
+
+  #section-card .guide-bg{
+    width: 100% !important;
+    max-width: 310px !important;
+    border-radius: 22px !important;
+  }
+
+  #section-card .flame-layer,
+  #section-card .selfiecard-placeholder,
+  #section-card .card-placeholder{
+    width: 132px !important;
+    max-width: 48% !important;
+    bottom: -14px !important;
+    border-radius: 18px !important;
+  }
+
+  #section-card .card-name-badge{
+    padding: 4px 12px 3px !important;
+  }
+
+  #section-card #userNameSlot{
+    font-size: .88rem !important;
+  }
+
+  #section-card .card-actions-below,
+  #section-card .card-actions{
+    margin-top: 18px !important;
+    padding-bottom: 8px !important;
+  }
+
+  #section-card #btnNext,
+  #section-card .btn-continuar,
+  #section-card #btn-continuar,
+  #section-card .btn-primary,
+  #section-card .btn-confirm,
+  #section-card [data-action="continuar"]{
+    width: min(88vw, 270px) !important;
+    max-width: 270px !important;
+    min-width: 0 !important;
+    min-height: 46px !important;
+    padding: 10px 16px !important;
+    font-size: .78rem !important;
+    letter-spacing: .12em !important;
+    border-radius: 16px !important;
+  }
+}
+
+/* =========================
+   MOBILE MUITO PEQUENO
+   ========================= */
+@media (max-width: 380px){
+
+  #section-card .card-stage{
+    max-width: 290px !important;
+    padding-bottom: 86px !important;
+  }
+
+  #section-card .guide-bg{
+    max-width: 290px !important;
+  }
+
+  #section-card .flame-layer,
+  #section-card .selfiecard-placeholder,
+  #section-card .card-placeholder{
+    width: 120px !important;
+    bottom: -12px !important;
+  }
+
+  #section-card #btnNext,
+  #section-card .btn-continuar,
+  #section-card #btn-continuar,
+  #section-card .btn-primary,
+  #section-card .btn-confirm,
+  #section-card [data-action="continuar"]{
+    width: min(90vw, 250px) !important;
+    max-width: 250px !important;
+    font-size: .74rem !important;
+  }
 } 
 }
 
