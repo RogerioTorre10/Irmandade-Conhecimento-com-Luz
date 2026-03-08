@@ -76,11 +76,11 @@
   top: 68%;
   transform: translate(-50%, -50%);
 
-  width: 58% !important;
-  max-width: 160px;
-  aspect-ratio: 4 / 3;
-  border-radius: 20px;
-  overflow: hidden;
+   width: 170px !important;
+  max-width: 44% !important;
+  aspect-ratio: 4 / 3 !important;
+  border-radius: 22px !important;
+  overflow: hidden !important;
 
   display: flex;
   flex-direction: column;
@@ -104,30 +104,29 @@
 
 /* Footer escuro suave para destacar nome */
 #section-card .flame-layer .card-footer{
-  position: relative;
-  z-index: 2;
-  width: 100%;
-  padding: 8px 10px 10px;
-  box-sizing: border-box;
-  text-align: center;
-
+  position: relative !important;
+  z-index: 2 !important;
+  width: 100% !important;
+  padding: 10px 10px 12px !important;
+  box-sizing: border-box !important;
+  text-align: center !important;
   background: linear-gradient(
     to top,
-    rgba(0, 0, 0, 0.90),
-    rgba(0, 0, 0, 0.65),
+    rgba(0,0,0,.88),
+    rgba(0,0,0,.58),
     transparent
-  );
+  ) !important;
 }
 
 #section-card .card-name-badge{
-  display: inline-block;
-  padding: 4px 16px 3px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 215, 160, 0.85);
-  background: rgba(0, 0, 0, 0.70);
+  display: inline-block !important;
+  padding: 4px 16px 3px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(255,215,160,.85) !important;
+  background: rgba(0,0,0,.70) !important;
   box-shadow:
-    0 0 12px rgba(255, 215, 0, 0.55),
-    0 0 22px rgba(255, 215, 0, 0.35);
+    0 0 12px rgba(255,215,0,.40),
+    0 0 18px rgba(255,215,0,.22) !important;
   letter-spacing: 0.08em;
 }
 
@@ -138,16 +137,19 @@
 }
 
 /* Botão CONTINUAR (fora do placeholder) */
-#section-card .card-actions-below{
-  margin-top: auto;
-  padding-bottom: 18px;
-  display: flex;
-  justify-content: center;
-  position: relative;
-  z-index: 5;
-  width: 100%;
-  text-align: center !important;
+#section-card .card-actions-below,
+#section-card .card-actions{
+  position: relative !important;
+  z-index: 20 !important;
+  width: 100% !important;
+  margin-top: 24px !important;
+  padding: 0 0 10px !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  overflow: visible !important;
 }
+
 
 #section-card #btnNext{
   position: relative;
