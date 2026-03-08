@@ -746,8 +746,8 @@
   }
 
   /* dá espaço interno suficiente na base do palco */
-  #section-card .card-stage {
-    padding-bottom: 150px !important;
+   #section-card .card-stage {
+    padding-bottom: 172px !important; /* compensa a descida do botão */
   }
 
   /* nome continua ligado ao placeholder */
@@ -760,7 +760,7 @@
   #section-card .card-actions {
     position: absolute !important;
     left: 50% !important;
-    bottom: 18px !important;
+    bottom: -8px !important; /* desce mais um pouco */
     transform: translateX(-50%) !important;
     width: calc(100% - 40px) !important;
     max-width: 360px !important;
@@ -803,13 +803,13 @@
   #section-card .card-actions {
     position: absolute !important;
     left: 50% !important;
-    bottom: 14px !important;
+    bottom: -6px !important;   /* traz o botão para dentro da área visível */
     transform: translateX(-50%) !important;
-    width: calc(100% - 24px) !important;
-    max-width: 300px !important;
+    width: calc(100% - 20px) !important;
+    max-width: 290px !important;
     margin-top: 0 !important;
     padding: 0 !important;
-    z-index: 30 !important;
+    z-index: 40 !important;
   }
 
   #section-card #btnNext,
@@ -819,7 +819,7 @@
   #section-card .btn-confirm,
   #section-card [data-action="continuar"] {
     width: 100% !important;
-    max-width: 300px !important;
+    max-width: 290px !important;
     min-width: 0 !important;
     min-height: 48px !important;
   }
@@ -836,13 +836,13 @@
   }
 
   #section-card .card-stage {
-    padding-bottom: 130px !important;
+    padding-bottom: 142px !important;
   }
 
   #section-card .card-actions-below,
   #section-card .card-actions {
-    bottom: 10px !important;
-    max-width: 270px !important;
+    bottom: -2px !important;
+    max-width: 260px !important;
   }
 
   #section-card #btnNext,
@@ -851,8 +851,8 @@
   #section-card .btn-primary,
   #section-card .btn-confirm,
   #section-card [data-action="continuar"] {
-    max-width: 270px !important;
-    min-height: 46px !important;
+    max-width: 260px !important;
+    min-height: 48px !important;
     font-size: .78rem !important;
   }
 }
