@@ -86,7 +86,7 @@
 
   width: 190px !important;           /* um pouco maior */
   max-width: 46% !important;
-  aspect-ratio: 3 / 4 !important;   /* proporção 3x4 */
+  aspect-ratio: 4 / 3 !important;   /* proporção 3x4 */
   border-radius: 22px !important;
   overflow: hidden !important;
 
