@@ -727,6 +727,134 @@
     font-size: .74rem !important;
   }
 } 
+/* =======================================================
+   STYLES-CARD v9.1 — AJUSTE FINO PLACEHOLDER + BOTÃO
+   Cola no FINAL do styles-card.css
+   ======================================================= */
+
+/* ===== DESKTOP ===== */
+@media (min-width: 901px) {
+
+  /* sobe a cruz para o peito do guia */
+  #section-card .flame-layer,
+  #section-card .selfiecard-placeholder,
+  #section-card .card-placeholder {
+    bottom: 78px !important;
+    width: 150px !important;
+    max-width: 38% !important;
+    z-index: 12 !important;
+  }
+
+  /* dá espaço interno suficiente na base do palco */
+  #section-card .card-stage {
+    padding-bottom: 150px !important;
+  }
+
+  /* nome continua ligado ao placeholder */
+  #section-card .card-name-badge {
+    margin-top: 2px !important;
+  }
+
+  /* botão vai para a base inferior do card */
+  #section-card .card-actions-below,
+  #section-card .card-actions {
+    position: absolute !important;
+    left: 50% !important;
+    bottom: 18px !important;
+    transform: translateX(-50%) !important;
+    width: calc(100% - 40px) !important;
+    max-width: 360px !important;
+    margin-top: 0 !important;
+    padding: 0 !important;
+    z-index: 30 !important;
+  }
+
+  #section-card #btnNext,
+  #section-card .btn-continuar,
+  #section-card #btn-continuar,
+  #section-card .btn-primary,
+  #section-card .btn-confirm,
+  #section-card [data-action="continuar"] {
+    width: 100% !important;
+    max-width: 360px !important;
+    min-width: 260px !important;
+    min-height: 56px !important;
+  }
+}
+
+/* ===== MOBILE / TABLET ===== */
+@media (max-width: 900px) {
+
+  /* mantém a cruz no peito, sem exagerar */
+  #section-card .flame-layer,
+  #section-card .selfiecard-placeholder,
+  #section-card .card-placeholder {
+    bottom: 56px !important;
+    z-index: 12 !important;
+  }
+
+  /* reserva espaço para o botão dentro da área visível */
+  #section-card .card-stage {
+    padding-bottom: 140px !important;
+  }
+
+  /* botão sobe para dentro da área clicável */
+  #section-card .card-actions-below,
+  #section-card .card-actions {
+    position: absolute !important;
+    left: 50% !important;
+    bottom: 14px !important;
+    transform: translateX(-50%) !important;
+    width: calc(100% - 24px) !important;
+    max-width: 300px !important;
+    margin-top: 0 !important;
+    padding: 0 !important;
+    z-index: 30 !important;
+  }
+
+  #section-card #btnNext,
+  #section-card .btn-continuar,
+  #section-card #btn-continuar,
+  #section-card .btn-primary,
+  #section-card .btn-confirm,
+  #section-card [data-action="continuar"] {
+    width: 100% !important;
+    max-width: 300px !important;
+    min-width: 0 !important;
+    min-height: 48px !important;
+  }
+}
+
+/* ===== MOBILE PEQUENO ===== */
+@media (max-width: 480px) {
+
+  #section-card .flame-layer,
+  #section-card .selfiecard-placeholder,
+  #section-card .card-placeholder {
+    bottom: 48px !important;
+    width: 126px !important;
+  }
+
+  #section-card .card-stage {
+    padding-bottom: 130px !important;
+  }
+
+  #section-card .card-actions-below,
+  #section-card .card-actions {
+    bottom: 10px !important;
+    max-width: 270px !important;
+  }
+
+  #section-card #btnNext,
+  #section-card .btn-continuar,
+  #section-card #btn-continuar,
+  #section-card .btn-primary,
+  #section-card .btn-confirm,
+  #section-card [data-action="continuar"] {
+    max-width: 270px !important;
+    min-height: 46px !important;
+    font-size: .78rem !important;
+  }
 }
 
 
