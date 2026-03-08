@@ -1,5 +1,7 @@
 /* =======================================================
-   STYLES-CARD v11 — AJUSTES FINOS DESKTOP + MOBILE
+   STYLES-CARD v12 — AJUSTES FINOS
+   Placeholder: 4x4 (quadrado) para teste em ambos
+   Botão: mais abaixo do card em mobile e desktop
    ======================================================= */
 
 
@@ -51,17 +53,15 @@
   text-align: center;
 }
 
-/* Palco: contém cardão, placeholder e botão */
 #section-card .card-stage {
   position: relative !important;
   width: 100% !important;
   max-width: 420px !important;
   margin: 0 auto !important;
-  padding-bottom: 200px !important;
+  padding-bottom: 220px !important;
   overflow: visible !important;
 }
 
-/* Cardão do guia */
 #section-card .guide-bg {
   display: block !important;
   width: 100% !important;
@@ -74,19 +74,19 @@
     0 0 28px rgba(0, 0, 0, 0.55) !important;
 }
 
-/* Placeholder / cruz */
+/* Placeholder / cruz — base (sobrescrito por breakpoints) */
 #section-card .flame-layer,
 #section-card .selfiecard-placeholder,
 #section-card .card-placeholder {
   position: absolute !important;
   left: 50% !important;
   top: auto !important;
-  bottom: 68px !important;          /* dentro do card, borda inferior */
+  bottom: 68px !important;
   transform: translateX(-50%) !important;
 
-  width: 190px !important;           /* um pouco maior */
+  width: 190px !important;
   max-width: 46% !important;
-  aspect-ratio: 4 / 3 !important;   /* proporção 3x4 */
+  aspect-ratio: 1 / 1 !important;    /* 4x4 quadrado para teste */
   border-radius: 22px !important;
   overflow: hidden !important;
 
@@ -164,7 +164,7 @@
   overflow: visible !important;
 }
 
-/* Botão Continuar */
+/* Botão Continuar — base */
 #section-card #btnNext,
 #section-card .btn-continuar,
 #section-card #btn-continuar,
@@ -259,33 +259,31 @@
 
 /* =========================
    DESKTOP GRANDE (≥ 901px)
-   Placeholder: borda inferior interna do card
-   Botão: bem abaixo do card, externo
+   Placeholder: borda inferior interna
+   Botão: externo, mais abaixo
    ========================= */
 
 @media (min-width: 901px) {
 
   #section-card .card-stage {
-    padding-bottom: 210px !important;
+    padding-bottom: 230px !important;
   }
 
-  /* Placeholder: borda inferior interna, tamanho 3x4 maior */
   #section-card .flame-layer,
   #section-card .selfiecard-placeholder,
   #section-card .card-placeholder {
-    bottom: 14px !important;         /* cola na borda interna inferior */
+    bottom: 14px !important;
     width: 200px !important;
     max-width: 42% !important;
-    aspect-ratio: 3 / 4 !important;
+    aspect-ratio: 1 / 1 !important;   /* 4x4 quadrado */
     z-index: 12 !important;
   }
 
-  /* Botão: externo, bem abaixo do card */
   #section-card .card-actions-below,
   #section-card .card-actions {
     position: absolute !important;
     left: 50% !important;
-    bottom: -42px !important;        /* fora do card, mais abaixo */
+    bottom: -56px !important;          /* mais abaixo que antes (-42px) */
     transform: translateX(-50%) !important;
     width: calc(100% - 40px) !important;
     max-width: 360px !important;
@@ -322,7 +320,7 @@
 
   #section-card .card-stage {
     max-width: 360px !important;
-    padding-bottom: 160px !important;
+    padding-bottom: 175px !important;
   }
 
   #section-card .guide-bg {
@@ -334,8 +332,8 @@
   #section-card .card-placeholder {
     width: 160px !important;
     max-width: 46% !important;
-    aspect-ratio: 3 / 4 !important;
-    bottom: 56px !important;        /* dentro do card */
+    aspect-ratio: 1 / 1 !important;   /* 4x4 quadrado */
+    bottom: 56px !important;
     z-index: 12 !important;
   }
 
@@ -343,7 +341,7 @@
   #section-card .card-actions {
     position: absolute !important;
     left: 50% !important;
-    bottom: -22px !important;       /* fora do card */
+    bottom: -22px !important;
     transform: translateX(-50%) !important;
     width: calc(100% - 20px) !important;
     max-width: 300px !important;
@@ -370,14 +368,14 @@
 
 /* =========================
    MOBILE (≤ 600px)
-   Placeholder: sobe para dentro do card
-   Botão: desce para fora do card
+   Placeholder: abaixo do queixo (desce)
+   Botão: bem fora do card (desce)
    ========================= */
 
 @media (max-width: 600px) {
 
   #section-card {
-    padding: 8px 0 72px !important;
+    padding: 8px 0 80px !important;
     min-height: 100vh !important;
     overflow: visible !important;
   }
@@ -385,7 +383,7 @@
   #section-card .card-panel {
     width: calc(100vw - 28px) !important;
     max-width: 430px !important;
-    margin: 8px auto 36px !important;
+    margin: 8px auto 44px !important;
     padding: 18px 14px 28px !important;
     min-height: auto !important;
   }
@@ -396,7 +394,7 @@
 
   #section-card .card-stage {
     max-width: 310px !important;
-    padding-bottom: 160px !important;
+    padding-bottom: 185px !important;
   }
 
   #section-card .guide-bg {
@@ -405,18 +403,17 @@
     border-radius: 22px !important;
   }
 
-  /* Placeholder: dentro do card, na borda inferior */
+  /* Placeholder: desce para abaixo do queixo do guia */
   #section-card .flame-layer,
   #section-card .selfiecard-placeholder,
   #section-card .card-placeholder {
     width: 148px !important;
     max-width: 50% !important;
-    aspect-ratio: 3 / 4 !important;
-    bottom: 52px !important;       /* dentro do card, sobe do fundo */
+    aspect-ratio: 1 / 1 !important;   /* 4x4 quadrado */
+    bottom: 34px !important;           /* desceu de 52px para 34px */
     border-radius: 18px !important;
   }
 
-  /* Footer do placeholder sem fundo escuro */
   #section-card .flame-layer .card-footer {
     background: transparent !important;
     box-shadow: none !important;
@@ -430,12 +427,12 @@
     font-size: 0.88rem !important;
   }
 
-  /* Botão: fora do card, abaixo */
+  /* Botão: mais abaixo, fora do card */
   #section-card .card-actions-below,
   #section-card .card-actions {
     position: absolute !important;
     left: 50% !important;
-    bottom: -26px !important;      /* fora do card */
+    bottom: -44px !important;          /* desceu de -26px para -44px */
     transform: translateX(-50%) !important;
     width: calc(100% - 20px) !important;
     max-width: 280px !important;
@@ -484,19 +481,19 @@
 @media (max-width: 480px) {
 
   #section-card .card-stage {
-    padding-bottom: 158px !important;
+    padding-bottom: 178px !important;
   }
 
   #section-card .flame-layer,
   #section-card .selfiecard-placeholder,
   #section-card .card-placeholder {
     width: 136px !important;
-    bottom: 50px !important;
+    bottom: 30px !important;
   }
 
   #section-card .card-actions-below,
   #section-card .card-actions {
-    bottom: -24px !important;
+    bottom: -40px !important;
     max-width: 260px !important;
   }
 
@@ -507,7 +504,7 @@
   #section-card .btn-confirm,
   #section-card [data-action="continuar"] {
     max-width: 260px !important;
-    min-height: 48px !important;
+    min-height: 46px !important;
     font-size: 0.78rem !important;
   }
 }
@@ -521,7 +518,7 @@
 
   #section-card .card-stage {
     max-width: 290px !important;
-    padding-bottom: 148px !important;
+    padding-bottom: 165px !important;
   }
 
   #section-card .guide-bg {
@@ -532,12 +529,12 @@
   #section-card .selfiecard-placeholder,
   #section-card .card-placeholder {
     width: 120px !important;
-    bottom: 46px !important;
+    bottom: 28px !important;
   }
 
   #section-card .card-actions-below,
   #section-card .card-actions {
-    bottom: -22px !important;
+    bottom: -36px !important;
     max-width: 250px !important;
   }
 
