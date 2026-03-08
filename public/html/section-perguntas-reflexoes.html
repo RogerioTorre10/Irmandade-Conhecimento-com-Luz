@@ -4,18 +4,12 @@
 <link rel="stylesheet" href="/assets/css/styles-layout.css">
 
 <section id="section-perguntas-reflexoes" class="section section-perguntas">
-
   <div class="perguntas-pergaminho-wrapper">
-
     <div class="j-panel-glow perguntas-panel">
-
       <div class="j-perg-v-inner">
-
         <div class="j-arcane-card perguntas-wrap">
-
           <div class="parchment-rough">
             <div class="parchment-inner-rough">
-
               <div class="pergaminho-content">
 
                 <!-- TÍTULO DO BLOCO -->
@@ -23,57 +17,55 @@
                   Bloco 2 — Reflexões
                 </h1>
 
-                <!-- PERGUNTA -->
-                <div class="jp-question-display">
-                  <div id="question-display" class="jp-question-typed typing-text"></div>
+             <!-- AMPULHETA / TOTAL GERAL -->
+<div class="jp-total-top">
+  <div class="jp-total-icon">⏳</div>
+  <div id="progress-total-value" class="jp-total-value">1 / 50</div>
+</div>
+
+<!-- PERGUNTA -->
+<div class="jp-question-display">
+  <div id="question-display" class="jp-question-typed typing-text"></div>
+</div>
+
+<!-- RESPOSTA -->
+<div class="jp-answer-container">
+  <div class="jp-answer-frame">
+    <div class="jp-answer-bg"></div>
+    <textarea
+      id="jp-answer-input"
+      class="jp-answer-input"
+      placeholder="Digite com verdade e calma..."
+      maxlength="1200"
+    ></textarea>
+  </div>
+</div>
+
+<!-- DEVOLUTIVA DO GUIA -->
+<div id="jp-ai-response-wrap" class="jp-ai-response-wrap">
+  <div class="jp-ai-response-label">Devolutiva do Guia</div>
+  <div id="jp-ai-response" class="jp-ai-response" hidden></div>
+</div>
+
+<!-- PROGRESSO DO BLOCO -->
+<div class="jp-progress-inline">
+  <div class="jp-progress-bar">
+    <div id="progress-question-fill" class="jp-progress-fill"></div>
+  </div>
+  <div id="progress-question-value" class="jp-progress-value">1 / 10</div>
+</div>
+
+<!-- BOTÕES -->
+<div class="perguntas-controls">
+  <button id="jp-btn-falar" class="btn-perguntas btn-falar">🔊</button>
+  <button id="jp-btn-apagar" class="btn-perguntas btn-apagar">✖</button>
+  <button id="jp-btn-confirmar" class="btn-perguntas btn-confirm">Continuar</button>
+</div>
                 </div>
-
-                <!-- RESPOSTA -->
-                <div class="jp-answer-container">
-
-                  <div class="jp-answer-frame">
-
-                    <div class="jp-answer-bg"></div>
-
-                    <textarea
-                      id="jp-answer-input"
-                      class="jp-answer-input"
-                      placeholder="Digite com verdade e calma..."
-                      maxlength="1200"
-                    ></textarea>
-
-                  </div>
-
-                </div>
-
-                <!-- CONTROLES -->
-                <div class="perguntas-controls">
-
-                  <button id="jp-btn-falar" class="btn-perguntas btn-falar">
-                    🔊
-                  </button>
-
-                  <button id="jp-btn-apagar" class="btn-perguntas btn-apagar">
-                    ✖
-                  </button>
-
-                  <button id="jp-btn-confirmar" class="btn-perguntas btn-confirm">
-                    Continuar
-                  </button>
-
-                </div>
-
               </div>
-
             </div>
           </div>
-
         </div>
-
       </div>
-
     </div>
-
-  </div>
-
-</section>
+ </section>
