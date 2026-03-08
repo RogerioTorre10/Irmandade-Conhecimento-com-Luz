@@ -74,7 +74,7 @@
   width: 100% !important;
   max-width: 100% !important;
   margin-top: 18px !important;
-  padding: 0 10px 4px !important;     /* menos padding lateral = botões mais largos */
+  padding: 0 6px 8px !important;     /* menos padding lateral = botões mais largos */
   box-sizing: border-box !important;
   overflow: visible !important;
 }
@@ -85,14 +85,14 @@
   min-width: 0 !important;
   max-width: 100% !important;
   flex: initial !important;
-  padding: 12px 10px !important;
+  padding: 8px 6px !important;
   min-height: 54px !important;
   box-sizing: border-box !important;
   white-space: normal !important;
   text-align: center !important;
   overflow: visible !important;
   text-overflow: unset !important;
-  font-size: 14px !important;
+  font-size: 15px !important;
   line-height: 1.2 !important;
 }
 
@@ -117,7 +117,7 @@
   #section-final .final-acoes button,
   #section-final .final-acoes a {
     min-height: 58px !important;
-    padding: 13px 10px !important;      /* padding horizontal suficiente sem apertar */
+    padding: 8px 6px !important;      /* padding horizontal suficiente sem apertar */
     font-size: 15px !important;
     white-space: normal !important;
     overflow: visible !important;
