@@ -1,5 +1,5 @@
 /* =========================================
-   STYLES-FINAL — Somente estética interna
+   STYLES-FINAL v2 — Somente estética interna
    (Layout/vitrine fica no styles-layout.css)
    ========================================= */
 
@@ -17,7 +17,7 @@
   margin: 0 !important;
 }
 
-/* wrappers não devem “criar caixa preta” gigante */
+/* wrappers não devem "criar caixa preta" gigante */
 #section-final .final-pergaminho-wrapper,
 #section-final .final-panel,
 #section-final .j-perg-v-inner {
@@ -25,35 +25,36 @@
   overflow: visible !important;
 }
 
-/* 2) Conteúdo: manter elegante, mas sem forçar centralização global
-      (isso é o que fazia o texto “mudar”/centralizar) */
+/* 2) Conteúdo */
 #section-final .pergaminho-content {
-  text-align: left !important;            /* fixa LTR visual */
+  text-align: left !important;
   direction: ltr !important;
   unicode-bidi: plaintext !important;
-  padding: 18px 18px 14px !important;
+  padding: 18px 28px 14px !important;
   box-sizing: border-box !important;
+  overflow: visible !important;
 }
 
-/* 3) Título e mensagens — tamanhos mais próximos das outras telas */
+/* 3) Título */
 #section-final .final-title,
 #section-final #final-title {
   margin: 0 0 12px !important;
-  text-align: center !important;          /* título pode ser centro sem afetar LTR */
+  text-align: center !important;
   direction: ltr !important;
   unicode-bidi: plaintext !important;
   font-size: clamp(22px, 2.0vw, 30px) !important;
   line-height: 1.18 !important;
 }
 
+/* 4) Mensagens */
 #section-final .final-message {
   margin: 0 !important;
 }
 
 #section-final .final-message p {
   margin: 0 0 12px !important;
-  text-align: center !important;          /* se quiser “oração” central, mantém */
-  direction: ltr !important;              /* garante datilografia esquerda→direita */
+  text-align: center !important;
+  direction: ltr !important;
   unicode-bidi: plaintext !important;
   font-size: clamp(15px, 1.25vw, 17px) !important;
   line-height: 1.45 !important;
@@ -63,17 +64,17 @@
   font-weight: 800 !important;
 }
 
-/* ===== SECTION FINAL — BOTÕES AJUSTE FINO ===== */
+/* 5) Botões — BASE */
 #section-final .final-acoes {
   display: grid !important;
-  grid-template-columns: 1fr 1.25fr 1fr !important;
+  grid-template-columns: 1fr 1.35fr 1fr !important;  /* centro levemente maior */
   justify-content: stretch !important;
   align-items: stretch !important;
   gap: 14px !important;
   width: 100% !important;
   max-width: 100% !important;
   margin-top: 18px !important;
-  padding: 0 18px 6px !important;
+  padding: 0 10px 6px !important;     /* menos padding lateral = botões mais largos */
   box-sizing: border-box !important;
   overflow: visible !important;
 }
@@ -84,22 +85,15 @@
   min-width: 0 !important;
   max-width: 100% !important;
   flex: initial !important;
-  padding: 12px 18px !important;
+  padding: 12px 10px !important;
   min-height: 54px !important;
   box-sizing: border-box !important;
   white-space: normal !important;
   text-align: center !important;
   overflow: visible !important;
   text-overflow: unset !important;
-  font-size: 15px !important;
+  font-size: 14px !important;
   line-height: 1.2 !important;
-}
-
-#section-final .pergaminho-content {
-  padding-left: 28px !important;
-  padding-right: 28px !important;
-  box-sizing: border-box !important;
-  overflow: visible !important;
 }
 
 #section-final .final-wrap,
@@ -108,23 +102,32 @@
   overflow: visible !important;
 }
 
-/* ===== DESKTOP LARGO ===== */
+/* ===== DESKTOP LARGO (≥ 901px) =====
+   Ajuste principal: padding reduzido no container
+   para os rótulos caberem sem truncamento
+   ===================================== */
 @media (min-width: 901px) {
+
   #section-final .final-acoes {
-    gap: 16px !important;
-    padding: 0 22px 8px !important;
+    grid-template-columns: 1fr 1.4fr 1fr !important; /* centro ainda mais folgado */
+    gap: 18px !important;
+    padding: 0 6px 8px !important;      /* <- era 22px, agora 6px: abre espaço nos botões */
   }
 
   #section-final .final-acoes button,
   #section-final .final-acoes a {
     min-height: 58px !important;
-    padding: 13px 16px !important;
-    font-size: 16px !important;
+    padding: 13px 12px !important;      /* padding horizontal suficiente sem apertar */
+    font-size: 15px !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: unset !important;
   }
 }
 
-/* ===== MOBILE / TABLET ===== */
+/* ===== MOBILE / TABLET (≤ 900px) ===== */
 @media (max-width: 900px) {
+
   #section-final .final-acoes {
     grid-template-columns: 1fr 1.25fr 1fr !important;
     gap: 10px !important;
@@ -140,9 +143,11 @@
   }
 }
 
-/* ===== MOBILE PEQUENO ===== */
-@media (max-width: 480px) {
+/* ===== MOBILE PEQUENO (≤ 520px) ===== */
+@media (max-width: 520px) {
+
   #section-final .final-acoes {
+    grid-template-columns: 1fr 1.25fr 1fr !important;
     gap: 8px !important;
     padding: 0 8px 6px !important;
   }
@@ -153,18 +158,24 @@
     padding: 7px 4px !important;
     font-size: 11px !important;
   }
-}
 
-/* Caso em algum breakpoint o layout force 1 coluna, ainda fica bonito */
-@media (max-width: 520px) {
-  #section-final .final-acoes > button,
-  #section-final .final-acoes > a {
-    flex: 1 1 100% !important;
-    max-width: 100% !important;
+  /* Botões individuais */
+  #btnPdf, #btnBaixarSelfie, #btnVoltarPortal {
+    height: 42px !important;
+    font-size: 13px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 0 10px !important;
+  }
+
+  /* VOLTAR ocupa linha inteira no mobile mínimo */
+  #btnVoltarPortal {
+    grid-column: 1 / -1;
   }
 }
 
-/* 5) Datilografia: nunca “puxar” para RTL/centro inesperado */
+/* 6) Datilografia */
 #section-final .typing-text,
 #section-final .typing-active,
 #section-final .typing-done {
@@ -172,60 +183,48 @@
   unicode-bidi: plaintext !important;
 }
 
-/* 6) Evitar qualquer scroll lateral “fantasma” causado por sombras/glows */
+/* 7) Sem scroll lateral */
 #section-final,
 #section-final * {
   max-width: 100%;
 }
 
 body.final-lock {
-  overflow-y: hidden !important; /* você pode manter isso */
+  overflow-y: hidden !important;
 }
 
-/* 7) Vídeo final: NÃO estilizar aqui se o video-transicao.js já cria overlay próprio.
-      Mantemos só um “fallback” seguro, sem criar barra de rolagem. */
+/* 8) Vídeo final */
 #final-video {
   display: none !important;
 }
 
 /* =========================================================
-   GLOW DO GUIA — (Guia / Selfie / Card) igual Perguntas
-   Usa: --progress-main, --progress-glow-1, --progress-glow-2
+   GLOW DO GUIA
    ========================================================= */
-
-/* 1) Glow "ambiente" no fundo da seção (como Perguntas) */
 
 #section-final {
   position: relative;
-  overflow: visible !important; /* não cortar o glow */
+  overflow: visible !important;
 }
-
-/* Glow inferior (vazando) */
 
 #section-final::before {
   content: "";
   position: absolute;
   left: 0;
   right: 0;
-  bottom: -70px;                 /* ajuste fino do vazamento */
-  height: 160px;                 /* altura do glow */
+  bottom: -70px;
+  height: 160px;
   pointer-events: none;
   z-index: 0;
   opacity: 0.75;
-
   background: linear-gradient(
     to bottom,
     transparent,
-    var(--progress-glow-1, rgba(255,210,120,0.85)),
-    var(--progress-glow-2, rgba(255,210,120,0.40))
+    var(--progress-glow-1, rgba(255, 210, 120, 0.85)),
+    var(--progress-glow-2, rgba(255, 210, 120, 0.40))
   );
-
   filter: blur(22px);
 }
-
-/* 2) Glow forte no “quadro principal” (borda + aura) 
-   Aqui usamos seletores em camadas pra pegar o container real, independente do HTML exato.
-*/
 
 #section-final .card,
 #section-final .glass,
@@ -234,34 +233,17 @@ body.final-lock {
 #section-final .j-card,
 #section-final .j-panel {
   position: relative;
-  z-index: 1; /* acima do glow da seção */
-
+  z-index: 1;
   border: 2px solid var(--progress-main, #ffd700) !important;
-
   box-shadow:
     0 0 18px var(--progress-main, #ffd700),
-    0 0 42px var(--progress-glow-1, rgba(255,210,120,0.85)),
-    inset 0 0 26px rgba(0,0,0,0.55) !important;
-
-  /* dá um “ar” de luz suave em volta */
+    0 0 42px var(--progress-glow-1, rgba(255, 210, 120, 0.85)),
+    inset 0 0 26px rgba(0, 0, 0, 0.55) !important;
   filter: saturate(1.05);
 }
 
-/* 3) Borda iluminada em elementos-chave (inputs/caixas) — opcional, mas fica lindo */
-##section-final input,
-##section-final .input-espinhos,
-##section-final .preview-frame,
-##section-final .ranges-panel,
-##section-final .card,
-##section-final .card-inner,
-##section-final .card-frame {
-  border-color: var(--progress-main, #ffd700) !important;
-  box-shadow: 0 0 14px var(--progress-main, #ffd700) !important;
-}
-
-/* 4) Responsivo: reduz “vazamento” no mobile para não cortar clique nem estourar layout */
 @media (max-width: 600px) {
-  
+
   #section-final::before {
     bottom: -55px;
     height: 130px;
@@ -270,39 +252,9 @@ body.final-lock {
   }
 }
 
-.final-acoes{
-  display: grid;
-  grid-template-columns: 1fr 1.25fr 1fr !important;
-  gap: 12px;
-  align-items: center;
-  justify-items: stretch;
-  margin-top: 16px;
-}
-
-/* 3 botões com a mesma altura/visual */
-#btnPdf, #btnBaixarSelfie, #btnVoltarPortal{
-  height: 42px !important;
-  font-size: 13px !important;
-  border-radius: 12px !important;
-  width: 100% !important;
-  min-width: 0 !important;/* importante pra não estourar */
-  padding: 0 10px !important;
-}
-.final-acoes{ gap: 10px !important; }
-
-/* mobile: vira 2 linhas (2 em cima, 1 embaixo centralizado) */
-@media (max-width: 520px){
-  .final-acoes{
-    grid-template-columns: 1fr 1.25fr 1fr !important;
-  }
-  #btnVoltarPortal{
-    grid-column: 1 / -1;   /* ocupa a linha toda */
-  }
-}
-
-/* =========================
-   DIAMANTE: VÍDEO DE TRANSIÇÃO ACIMA DE TUDO
-   ========================= */
+/* =========================================================
+   VÍDEO DE TRANSIÇÃO ACIMA DE TUDO
+   ========================================================= */
 
 #video-transition-overlay,
 .video-transition-overlay,
@@ -313,7 +265,7 @@ body.final-lock {
   width: 100vw !important;
   height: 100vh !important;
   background: #000 !important;
-  z-index: 2147483647 !important; /* topo absoluto */
+  z-index: 2147483647 !important;
   pointer-events: auto !important;
 }
 
@@ -326,10 +278,10 @@ body.final-lock {
   object-fit: cover !important;
 }
 
-/* enquanto o vídeo toca, impede “vazamento” visual */
 body.vt-playing .section {
   visibility: hidden !important;
 }
+
 body.vt-playing #video-transition-overlay,
 body.vt-playing .video-transition-overlay,
 body.vt-playing #videoOverlay,
