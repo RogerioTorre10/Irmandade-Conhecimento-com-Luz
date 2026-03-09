@@ -86,42 +86,86 @@
     return x;
   }
 
-  function applyGuiaTheme(section) {
-    const guiaRaw =
-      sessionStorage.getItem('jornada.guia') ||
-      localStorage.getItem('JORNADA_GUIA') ||
-      localStorage.getItem('jornada.guia') ||
-      document.body.dataset.guia ||
-      'lumen';
+function applyGuiaTheme(section) {
+  const guiaRaw =
+    sessionStorage.getItem('jornada.guia') ||
+    localStorage.getItem('JORNADA_GUIA') ||
+    localStorage.getItem('jornada.guia') ||
+    document.body.dataset.guia ||
+    'lumen';
 
-    const guia = normalizeGuide(guiaRaw);
-    document.body.dataset.guia = guia;
-    if (section) section.dataset.guia = guia;
+  const guia = normalizeGuide(guiaRaw);
 
-    const colorMap = {
-      lumen: '#9cff57',
-      zion: '#ffd54a',
-      arion: '#6dc8ff',
-      default: '#ffd54a'
-    };
+  // mantém dataset para o CSS temático
+  document.body.dataset.guia = guia;
+  document.documentElement.dataset.guia = guia;
+  if (section) section.dataset.guia = guia;
 
-    const color = colorMap[guia] || colorMap.default;
-    localStorage.setItem('JORNADA_GUIA_COLOR', color);
-
-    const title =
-      section?.querySelector('.perguntas-title, .jp-block-title, #question-block-title');
-    if (title) {
-      title.style.color = color;
-      title.style.textShadow = `0 0 10px ${color}55, 0 0 24px ${color}88`;
+  const themeMap = {
+    lumen: {
+      main: '#9cff57',
+      soft: 'rgba(156,255,87,0.30)',
+      strong: 'rgba(156,255,87,0.66)',
+      text: '#efffde'
+    },
+    zion: {
+      main: '#ffd54a',
+      soft: 'rgba(255,213,74,0.30)',
+      strong: 'rgba(255,213,74,0.66)',
+      text: '#fff4c8'
+    },
+    arion: {
+      main: '#6dc8ff',
+      soft: 'rgba(109,200,255,0.30)',
+      strong: 'rgba(109,200,255,0.66)',
+      text: '#e3f7ff'
     }
+  };
 
-    const totalValue = section?.querySelector('#progress-total-value');
-    const qValue = section?.querySelector('#progress-question-value');
-    if (totalValue) totalValue.style.color = color;
-    if (qValue) qValue.style.color = color;
+  const theme = themeMap[guia] || themeMap.lumen;
 
-    log('Tema do guia aplicado:', guia, color);
+  // injeta variáveis globais
+  const root = document.documentElement;
+  root.style.setProperty('--guia-main', theme.main);
+  root.style.setProperty('--guia-soft', theme.soft);
+  root.style.setProperty('--guia-strong', theme.strong);
+  root.style.setProperty('--guia-text', theme.text);
+
+  root.style.setProperty('--guide-color', theme.main);
+  root.style.setProperty('--theme-main-color', theme.main);
+  root.style.setProperty('--progress-main', theme.main);
+  root.style.setProperty('--progress-glow-1', theme.soft);
+  root.style.setProperty('--progress-glow-2', theme.strong);
+
+  localStorage.setItem('JORNADA_GUIA_COLOR', theme.main);
+
+  const title =
+    section?.querySelector('.perguntas-title, .jp-block-title, #question-block-title');
+  if (title) {
+    title.style.color = theme.main;
+    title.style.textShadow = `0 0 10px ${theme.soft}, 0 0 24px ${theme.strong}`;
   }
+
+  const q = section?.querySelector('#question-display, .jp-question-typed');
+  if (q) {
+    q.style.color = theme.text;
+    q.style.textShadow = `0 0 6px ${theme.soft}`;
+  }
+
+  const textarea = section?.querySelector('#jp-answer-input, .jp-answer-input');
+  if (textarea) {
+    textarea.style.borderColor = theme.main;
+    textarea.style.boxShadow = `0 0 12px ${theme.soft}, inset 0 0 10px rgba(255,255,255,0.04)`;
+  }
+
+  const bar = section?.querySelector('#progress-question-fill, .jp-progress-fill');
+  if (bar) {
+    bar.style.background = `linear-gradient(90deg, ${theme.main}, ${theme.main})`;
+    bar.style.boxShadow = `0 0 12px ${theme.soft}, 0 0 20px ${theme.strong}`;
+  }
+
+  log('Tema do guia aplicado:', guia, theme.main);
+}
 
   function getQuestionText(bloco, qIndex = 0) {
     const pergunta = bloco?.questions?.[qIndex];
