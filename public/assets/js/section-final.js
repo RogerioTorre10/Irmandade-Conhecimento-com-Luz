@@ -660,6 +660,58 @@
     console.log('[FINAL] Sequência concluída com sucesso!');
   }
 
+function applyFinalGuideTheme(section) {
+  const guiaRaw =
+    sessionStorage.getItem('jornada.guia') ||
+    localStorage.getItem('JORNADA_GUIA') ||
+    localStorage.getItem('jornada.guia') ||
+    document.body.dataset.guia ||
+    localStorage.getItem('JORNADA_GUIA_ATIVO') ||
+    'lumen';
+
+  const guia = String(guiaRaw || 'lumen').trim().toLowerCase();
+
+  const themeMap = {
+    lumen: {
+      main: '#00c781',
+      soft: 'rgba(0,199,129,0.28)',
+      strong: 'rgba(0,199,129,0.62)',
+      text: '#e8fff7'
+    },
+    zion: {
+      main: '#59c8ff',
+      soft: 'rgba(89,200,255,0.28)',
+      strong: 'rgba(89,200,255,0.62)',
+      text: '#eefaff'
+    },
+    arian: {
+      main: '#ff4fd8',
+      soft: 'rgba(255,79,216,0.28)',
+      strong: 'rgba(255,79,216,0.62)',
+      text: '#fff0fb'
+    },
+    arion: {
+      main: '#ff4fd8',
+      soft: 'rgba(255,79,216,0.28)',
+      strong: 'rgba(255,79,216,0.62)',
+      text: '#fff0fb'
+    }
+  };
+
+  const theme = themeMap[guia] || themeMap.lumen;
+  const root = document.documentElement;
+
+  root.style.setProperty('--guia-main', theme.main);
+  root.style.setProperty('--guia-soft', theme.soft);
+  root.style.setProperty('--guia-strong', theme.strong);
+  root.style.setProperty('--guia-text', theme.text);
+
+  document.body.dataset.guia = guia;
+  if (section) section.dataset.guia = guia;
+
+  console.log('[FINAL] tema do guia aplicado:', guia, theme.main);
+}
+  
   // ================================
   // EVENTOS
   // ================================
