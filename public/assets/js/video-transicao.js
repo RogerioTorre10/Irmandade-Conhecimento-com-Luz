@@ -273,16 +273,17 @@
 
       overlay.classList.remove('show');
       overlay.classList.add('hide');
+   
+     setTimeout(() => {
+     navigateTo(nextSectionId);              // ← nova seção ativa primeiro
+     requestAnimationFrame(() => {           // ← overlay some 1 frame depois
+     cleanup(overlay);
+     document.body.classList.remove('vt-fade-out');
+     document.body.classList.add('vt-fade-in');
+     setTimeout(() => document.body.classList.remove('vt-fade-in'), 650);
+     });
+   }, 360);
 
-      setTimeout(() => {
-        cleanup();
-        navigateTo(nextSectionId);
-
-        document.body.classList.remove('vt-fade-out');
-        document.body.classList.add('vt-fade-in');
-        setTimeout(() => document.body.classList.remove('vt-fade-in'), 650);
-      }, 360);
-    });
 
     skip.addEventListener('click', finishAndGo);
 
