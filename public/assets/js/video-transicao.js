@@ -277,7 +277,7 @@
      setTimeout(() => {
      navigateTo(nextSectionId);
      requestAnimationFrame(() => {
-     cleanup();
+     cleanup(overlay);
      document.body.classList.remove('vt-fade-out');
      document.body.classList.add('vt-fade-in');
      setTimeout(() => document.body.classList.remove('vt-fade-in'), 650);
@@ -334,7 +334,7 @@
     video.load();
     ambient.load();
   }
-
+ }
   // ----------------- API PÚBLICA -----------------
   window.playTransitionVideo = playTransitionVideo;
 
