@@ -25,7 +25,29 @@
   background-position: top center;
 }
 
-/* ── Borda dourada + guia — valem para todos os breakpoints ── */
+/* ── B/* ── Botões lado a lado ── */
+#section-senha .senha-actions,
+#section-senha .card-actions,
+#section-senha .btn-row {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 12px !important;
+  width: 100% !important;
+  flex-wrap: nowrap !important;
+}
+
+#section-senha .senha-actions .btn,
+#section-senha .senha-actions button,
+#section-senha .card-actions .btn,
+#section-senha .card-actions button {
+  flex: 1 1 0 !important;
+  max-width: 48% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+orda dourada + guia — valem para todos os breakpoints ── */
 #section-senha .j-panel-glow {
   padding: 10px;
 }
