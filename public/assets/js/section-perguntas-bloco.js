@@ -375,6 +375,25 @@
     window.location.hash = '#' + nextSection;
   }
 
+  function clearAnswerUI() {
+  const ta = document.getElementById('jp-answer-input');
+  if (ta) {
+    ta.value = '';
+    ta.focus();
+  }
+
+  const wrap = document.getElementById('jp-ai-response-wrap');
+  const box  = document.getElementById('jp-ai-response');
+
+  if (wrap) wrap.dataset.kind = '';
+  if (box) {
+    box.hidden = true;
+    box.textContent = '';
+    box.innerHTML = '';
+    box.classList.remove('is-visible', 'is-revealing');
+  }
+}
+  
   function bindButtons(section, bloco, perguntaText) {
     const btnTTS = $('#jp-btn-falar', section);
     const btnMic = $('#jp-btn-mic', section);
