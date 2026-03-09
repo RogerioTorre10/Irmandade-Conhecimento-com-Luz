@@ -25,32 +25,81 @@
   background-position: top center;
 }
 
-/* ── B/* ── Botões lado a lado ── */
-#section-senha .senha-actions,
-#section-senha .card-actions,
-#section-senha .btn-row {
+orda dourada + guia — valem para todos os breakpoints ── */
+#section-senha .j-panel-glow {
+  padding: 10px;
+}
+
+/* ── Botões Voltar / Avançar lado a lado ── */
+#section-senha .senha-actions {
   display: flex !important;
   flex-direction: row !important;
   justify-content: center !important;
   align-items: center !important;
   gap: 12px !important;
-  width: 100% !important;
   flex-wrap: nowrap !important;
 }
 
-#section-senha .senha-actions .btn,
-#section-senha .senha-actions button,
-#section-senha .card-actions .btn,
-#section-senha .card-actions button {
+#section-senha .senha-actions .btn-stone {
   flex: 1 1 0 !important;
   max-width: 48% !important;
   min-width: 0 !important;
   box-sizing: border-box !important;
 }
-orda dourada + guia — valem para todos os breakpoints ── */
-#section-senha .j-panel-glow {
-  padding: 10px;
+
+/* ── Card senha: mesmo porte da intro/termos ── */
+#section-senha .j-arcane-card {
+  min-height: 72vh !important;
+  max-height: 88vh !important;
+  width: min(520px, 92vw) !important;
+  max-width: 470px !important;
 }
+/* ── Botão olho mágico ── */
+#section-senha .btn-toggle-senha,
+#section-senha [data-action="toggle-password"] {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-top: 10px !important;
+  height: 36px !important;
+  width: 100% !important;
+  max-width: 260px !important;
+}
+
+#section-senha .btn-toggle-senha svg,
+#section-senha [data-action="toggle-password"] svg,
+#section-senha .btn-toggle-senha i,
+#section-senha [data-action="toggle-password"] i {
+  margin: 0 auto !important;
+  display: block !important;
+  line-height: 1 !important;
+}
+/* ── Botão Voltar: efeito pedra igual ao Avançar ── */
+#btn-senha-prev {
+  background: transparent !important;
+  background-image: url('/assets/img/moldura-medieval-espinhos.png') !important;
+  background-size: 100% 100% !important;
+  background-repeat: no-repeat !important;
+  border: none !important;
+  color: #f9e7c2 !important;
+  text-shadow: 0 1px 1px rgba(0,0,0,.75) !important;
+  font-family: 'ManufacturingConsent', sans-serif !important;
+  cursor: pointer;
+}
+
+#btn-senha-prev:hover:not(:disabled) {
+  filter: brightness(1.08) !important;
+  transform: translateY(-1px) !important;
+  animation: brilhoDivino 1.8s ease-in-out infinite !important;
+}
+
+#btn-senha-prev:disabled {
+  opacity: .7 !important;
+  filter: grayscale(.15) !important;
+  cursor: not-allowed !important;
+  animation: none !important;
+}
+
 
 #section-senha .j-panel-glow::before {
   content: '';
