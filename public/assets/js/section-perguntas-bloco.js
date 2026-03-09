@@ -96,36 +96,40 @@ function applyGuiaTheme(section) {
 
   const guia = normalizeGuide(guiaRaw);
 
-  // mantém dataset para o CSS temático
   document.body.dataset.guia = guia;
   document.documentElement.dataset.guia = guia;
   if (section) section.dataset.guia = guia;
 
   const themeMap = {
     lumen: {
-      main: '#9cff57',
-      soft: 'rgba(156,255,87,0.30)',
-      strong: 'rgba(156,255,87,0.66)',
-      text: '#efffde'
+      main: '#00c781',   // esmeralda
+      soft: 'rgba(0,199,129,0.28)',
+      strong: 'rgba(0,199,129,0.62)',
+      text: '#e8fff7'
     },
     zion: {
-      main: '#ffd54a',
-      soft: 'rgba(255,213,74,0.30)',
-      strong: 'rgba(255,213,74,0.66)',
-      text: '#fff4c8'
+      main: '#59c8ff',   // azul celeste
+      soft: 'rgba(89,200,255,0.28)',
+      strong: 'rgba(89,200,255,0.62)',
+      text: '#eefaff'
+    },
+    arian: {
+      main: '#ff4fd8',   // magenta
+      soft: 'rgba(255,79,216,0.28)',
+      strong: 'rgba(255,79,216,0.62)',
+      text: '#fff0fb'
     },
     arion: {
-      main: '#6dc8ff',
-      soft: 'rgba(109,200,255,0.30)',
-      strong: 'rgba(109,200,255,0.66)',
-      text: '#e3f7ff'
+      main: '#ff4fd8',
+      soft: 'rgba(255,79,216,0.28)',
+      strong: 'rgba(255,79,216,0.62)',
+      text: '#fff0fb'
     }
   };
 
   const theme = themeMap[guia] || themeMap.lumen;
-
-  // injeta variáveis globais
   const root = document.documentElement;
+
   root.style.setProperty('--guia-main', theme.main);
   root.style.setProperty('--guia-soft', theme.soft);
   root.style.setProperty('--guia-strong', theme.strong);
@@ -138,18 +142,18 @@ function applyGuiaTheme(section) {
   root.style.setProperty('--progress-glow-2', theme.strong);
 
   localStorage.setItem('JORNADA_GUIA_COLOR', theme.main);
+  localStorage.setItem('JORNADA_GUIA_ATIVO', guia);
 
-  const title =
-    section?.querySelector('.perguntas-title, .jp-block-title, #question-block-title');
+  const title = section?.querySelector('.perguntas-title, .jp-block-title, #question-block-title');
   if (title) {
     title.style.color = theme.main;
     title.style.textShadow = `0 0 10px ${theme.soft}, 0 0 24px ${theme.strong}`;
   }
 
-  const q = section?.querySelector('#question-display, .jp-question-typed');
-  if (q) {
-    q.style.color = theme.text;
-    q.style.textShadow = `0 0 6px ${theme.soft}`;
+  const question = section?.querySelector('#question-display, .jp-question-typed');
+  if (question) {
+    question.style.color = theme.text;
+    question.style.textShadow = `0 0 6px ${theme.soft}`;
   }
 
   const textarea = section?.querySelector('#jp-answer-input, .jp-answer-input');
