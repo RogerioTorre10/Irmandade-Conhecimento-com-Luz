@@ -277,7 +277,7 @@
      setTimeout(() => {
      navigateTo(nextSectionId);
      requestAnimationFrame(() => {
-     cleanup(overlay);
+     cleanup();
      document.body.classList.remove('vt-fade-out');
      document.body.classList.add('vt-fade-in');
      setTimeout(() => document.body.classList.remove('vt-fade-in'), 650);
