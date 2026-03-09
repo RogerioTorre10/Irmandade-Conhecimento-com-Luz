@@ -1,9 +1,16 @@
 @import url("/assets/css/styles-base.css");
 @import url("/assets/css/styles-layout.css");
 
-/* ========== SEÇÃO INTRO (TIPOGRAFIA + EFEITOS) ========== */
+/* =========================================================
+   STYLES-INTRO v2.0 — LIMPO
+   Tipografia, efeitos, cursor, halo, ajustes desktop/mobile
+   ========================================================= */
 
-/* A section em si não manda mais no tamanho, só no fundo */
+
+/* ============================
+   SECTION BASE
+   ============================ */
+
 #section-intro {
   background: transparent !important;
   box-shadow: none;
@@ -11,14 +18,11 @@
   text-align: left !important;
 }
 
-/* Pergaminho interno da intro (layout vem do j-perg-v-inner global) */
 #section-intro .parchment-inner-rough {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   text-align: left !important;
-
-  /* pan sutil do pergaminho durante a intro */
   animation: introPan 9s ease-in-out 1;
 }
 
@@ -28,7 +32,20 @@
   text-align: left !important;
 }
 
-/* Título com fade suave */
+.pergaminho {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  background-size: 100% auto !important;
+  background-repeat: no-repeat;
+  background-position: top center;
+}
+
+
+/* ============================
+   TIPOGRAFIA
+   ============================ */
+
 .intro-title {
   font-family: 'ManufacturingConsent', sans-serif;
   font-size: 36px;
@@ -36,24 +53,20 @@
   color: var(--theme-main-color, #ffd700);
   margin-top: 40px;
   margin-bottom: 20px;
-  text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
-
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
   opacity: 0;
   transform: translateY(6px);
   animation: introTitleIn 600ms ease forwards;
 }
 
-/* Texto-base da intro (começa invisível para o typing) */
 .parchment-text-rough {
   font-family: 'BerkshireSwash', cursive;
   font-size: 13px;
   margin-bottom: 8px;
   color: var(--theme-main-color, #ffd700);
-
-  opacity: 0;   /* hidden até o typing */
+  opacity: 0;
   visibility: visible;
   display: block;
-
   text-align: left !important;
   background: transparent;
   line-height: 1.4;
@@ -64,7 +77,6 @@
   direction: ltr !important;
 }
 
-/* Quando o JS marca typing/done, mostramos */
 .parchment-text-rough.typing-active,
 .parchment-text-rough.typing-done {
   opacity: 1 !important;
@@ -74,7 +86,6 @@
   transition: opacity .25s ease;
 }
 
-/* Área de ações (botão Iniciar) */
 #section-intro .parchment-actions-rough {
   display: flex;
   justify-content: center;
@@ -82,29 +93,43 @@
   margin-top: 18px;
 }
 
-/* Utilitários usados pelo JS */
-.is-hidden { opacity: 0; pointer-events: none; transition: opacity .25s ease; }
-.is-disabled { opacity: .6; pointer-events: none; }
-.btn-ready-pulse { animation: btnReady .6s ease-out 1; }
 
-/* ================== MIMOS DA INTRO (SÓ INTRO) ================== */
-@keyframes btnReady {
-  0% { transform: scale(0.98); filter: brightness(0.9); }
-  60% { transform: scale(1.02); filter: brightness(1.1); }
-  100% { transform: scale(1); filter: none; }
+/* ============================
+   VIDRO / CARD (j-panel-glow)
+   — compartilhado desktop+mobile
+   ============================ */
+
+#section-intro .j-panel-glow {
+  padding: 10px !important;
+  width: 90% !important;
+  max-width: 470px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
 }
 
-@keyframes introTitleIn {
-  to { opacity: 1; transform: translateY(0); }
+#section-intro .j-panel-glow::before {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid rgba(212, 175, 55, 0.55);
+  box-shadow:
+    0 0 28px rgba(212, 175, 55, 0.55),
+    inset 0 0 18px rgba(255, 230, 150, 0.25);
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.16),
+    transparent 45%
+  ) !important;
 }
 
-@keyframes introPan {
-  0%   { transform: translateY(4px); }
-  50%  { transform: translateY(-4px); }
-  100% { transform: translateY(0); }
-}
 
-/* Cursor de datilografia */
+/* ============================
+   CURSOR DE DATILOGRAFIA
+   ============================ */
+
 #section-intro [data-typing="true"][data-cursor="true"] {
   position: relative;
   display: inline-block;
@@ -129,12 +154,19 @@
   content: none;
 }
 
-@keyframes caretBlink {
-  0%, 45%   { opacity: 0.95; }
-  50%, 100% { opacity: 0; }
+/* Cursor slim nos parágrafos */
+#section-intro .parchment-text-rough[data-cursor="true"].typing-active::after {
+  width: 2px;
+  height: 1em;
+  border-radius: 1px;
+  right: 0;
 }
 
-/* Halo dourado enquanto digita */
+
+/* ============================
+   HALO DOURADO (digitando)
+   ============================ */
+
 #section-intro:has(.typing-active) .parchment-inner-rough {
   outline: 2px solid rgba(255, 204, 102, 0.25);
   outline-offset: 6px;
@@ -149,27 +181,116 @@
   transition: box-shadow .35s ease, outline-color .35s ease;
 }
 
+
+/* ============================
+   UTILITÁRIOS (usados pelo JS)
+   ============================ */
+
+.is-hidden   { opacity: 0; pointer-events: none; transition: opacity .25s ease; }
+.is-disabled { opacity: .6; pointer-events: none; }
+.btn-ready-pulse { animation: btnReady .6s ease-out 1; }
+
+
+/* ============================
+   ANIMAÇÕES
+   ============================ */
+
+@keyframes btnReady {
+  0%   { transform: scale(0.98); filter: brightness(0.9); }
+  60%  { transform: scale(1.02); filter: brightness(1.1); }
+  100% { transform: scale(1);    filter: none; }
+}
+
+@keyframes introTitleIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes introPan {
+  0%   { transform: translateY(4px);  }
+  50%  { transform: translateY(-4px); }
+  100% { transform: translateY(0);    }
+}
+
+@keyframes caretBlink {
+  0%, 45%  { opacity: 0.95; }
+  50%, 100% { opacity: 0;   }
+}
+
 @keyframes parchmentGlow {
-  0%   { box-shadow:
-          0 0 0 2px rgba(255, 204, 102, 0.15) inset,
-          0 0 18px rgba(255, 204, 102, 0.35),
-          0 0 32px rgba(255, 153, 0, 0.18); }
-  50%  { box-shadow:
-          0 0 0 2px rgba(255, 204, 102, 0.18) inset,
-          0 0 26px rgba(255, 204, 102, 0.50),
-          0 0 52px rgba(255, 153, 0, 0.30); }
-  100% { box-shadow:
-          0 0 0 2px rgba(255, 204, 102, 0.15) inset,
-          0 0 18px rgba(255, 204, 102, 0.35),
-          0 0 32px rgba(255, 153, 0, 0.18); }
+  0%   {
+    box-shadow:
+      0 0 0 2px rgba(255, 204, 102, 0.15) inset,
+      0 0 18px rgba(255, 204, 102, 0.35),
+      0 0 32px rgba(255, 153, 0, 0.18);
+  }
+  50%  {
+    box-shadow:
+      0 0 0 2px rgba(255, 204, 102, 0.18) inset,
+      0 0 26px rgba(255, 204, 102, 0.50),
+      0 0 52px rgba(255, 153, 0, 0.30);
+  }
+  100% {
+    box-shadow:
+      0 0 0 2px rgba(255, 204, 102, 0.15) inset,
+      0 0 18px rgba(255, 204, 102, 0.35),
+      0 0 32px rgba(255, 153, 0, 0.18);
+  }
 }
 
-/* Cursor slim nos parágrafos */
-#section-intro .parchment-text-rough[data-cursor="true"].typing-active::after {
-  width: 2px;
-  height: 1em;
-  border-radius: 1px;
-  right: 0;
+
+/* ============================
+   DESKTOP (≥ 900px)
+   ============================ */
+
+@media (min-width: 900px) {
+
+  #section-intro .j-perg-v-inner {
+    position: relative !important;
+    transform: translateY(40px) !important;
+    top: 40px !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    overflow: visible !important;
+    z-index: 5 !important;
+  }
+
+  #section-intro .j-panel-glow {
+    position: relative !important;
+    transform: translate(-16px, -70px) !important;
+    top: 10px !important;
+    z-index: 6 !important;
+  }
+
+  #section-intro .j-arcane-card {
+    margin-top: -18px !important;
+    margin-bottom: 24px !important;
+  }
 }
 
 
+/* ============================
+   MOBILE (≤ 600px)
+   ============================ */
+
+@media (max-width: 600px) {
+
+  #section-intro .j-perg-v-inner {
+    position: relative;
+    transform: translateY(40px);
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 850px;
+    width: 100%;
+    overflow: visible;
+  }
+
+  #section-intro .j-panel-glow {
+    transform: translate(-6px, -26px);
+  }
+
+  #section-intro .j-arcane-card {
+    max-height: 72vh;
+    margin-top: -18px !important;
+    margin-bottom: 24px !important;
+  }
+}
