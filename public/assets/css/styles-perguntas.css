@@ -259,7 +259,7 @@
 .perguntas-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: left;
   gap: 8px;
   margin-bottom: 8px;
   font-size: 12px;
@@ -269,7 +269,7 @@
 .jp-block-title,
 .perguntas-title,
 #question-block-title {
-  font-size: 32px;
+  font-size: 30px;
   font-weight: 600;
   letter-spacing: 0.03em;
   text-transform: uppercase;
