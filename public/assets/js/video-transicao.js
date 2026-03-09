@@ -283,7 +283,7 @@
      setTimeout(() => document.body.classList.remove('vt-fade-in'), 650);
      });
     }, 360);
-
+   });
 
     skip.addEventListener('click', finishAndGo);
 
@@ -334,7 +334,7 @@
     video.load();
     ambient.load();
   }
- }
+ 
   // ----------------- API PÚBLICA -----------------
   window.playTransitionVideo = playTransitionVideo;
 
