@@ -269,7 +269,7 @@
 .jp-block-title,
 .perguntas-title,
 #question-block-title {
-  font-size: 15px;
+  font-size: 22px;
   font-weight: 600;
   letter-spacing: 0.03em;
   text-transform: uppercase;
@@ -298,7 +298,7 @@
   margin-bottom: 14px;
   font-size: 20px;
   line-height: 1.5;
-  color: #000 !important;
+  color: #f5e9d6 !important;
   font-weight: 600;
   text-shadow: 0 2px 6px rgba(0, 0, 0, 0.95) !important;
   animation: none !important;
