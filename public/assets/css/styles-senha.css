@@ -49,8 +49,11 @@ orda dourada + guia — valem para todos os breakpoints ── */
 
 /* ── Card senha: mesmo porte da intro/termos ── */
 #section-senha .j-arcane-card {
-  margin-top: -18px !important;
-  margin-bottom: 24px !important;
+  min-height: 36vh !important;
+  max-height: 44vh !important;
+  width: min(260px, 46vw) !important;
+  max-width: 230px !important;
+}
 }
 
 /* ── Botão olho mágico ── */
