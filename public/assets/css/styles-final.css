@@ -288,3 +288,62 @@ body.vt-playing #videoOverlay,
 body.vt-playing #video-transicao-overlay {
   visibility: visible !important;
 }
+/* =======================================================
+   SECTION FINAL — REFLETE COR DO GUIA
+   ======================================================= */
+
+#section-final{
+  --guia-main: #00c781;
+  --guia-soft: rgba(0,199,129,0.28);
+  --guia-strong: rgba(0,199,129,0.62);
+  --guia-text: #e8fff7;
+}
+
+/* Lumen */
+body[data-guia="lumen"] #section-final{
+  --guia-main: #00c781;
+  --guia-soft: rgba(0,199,129,0.28);
+  --guia-strong: rgba(0,199,129,0.62);
+  --guia-text: #e8fff7;
+}
+
+/* Zion */
+body[data-guia="zion"] #section-final{
+  --guia-main: #59c8ff;
+  --guia-soft: rgba(89,200,255,0.28);
+  --guia-strong: rgba(89,200,255,0.62);
+  --guia-text: #eefaff;
+}
+
+/* Arian / Arion */
+body[data-guia="arian"] #section-final,
+body[data-guia="arion"] #section-final{
+  --guia-main: #ff4fd8;
+  --guia-soft: rgba(255,79,216,0.28);
+  --guia-strong: rgba(255,79,216,0.62);
+  --guia-text: #fff0fb;
+}
+
+#section-final .final-title{
+  color: var(--guia-main) !important;
+  text-shadow:
+    0 0 10px var(--guia-soft),
+    0 0 24px var(--guia-strong) !important;
+}
+
+#section-final .final-message,
+#section-final .final-message p{
+  color: var(--guia-text) !important;
+  text-shadow: 0 0 6px var(--guia-soft) !important;
+}
+
+#section-final .final-acoes button,
+#section-final .final-acoes a,
+#section-final .btn,
+#section-final .final-pdf-status{
+  border-color: var(--guia-strong) !important;
+  box-shadow:
+    0 0 16px var(--guia-soft),
+    inset 0 0 12px rgba(255,255,255,0.04) !important;
+  color: var(--guia-text) !important;
+}
