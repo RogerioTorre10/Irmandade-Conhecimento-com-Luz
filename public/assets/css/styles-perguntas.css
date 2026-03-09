@@ -914,6 +914,59 @@ textarea,
   color: #fff3c0;
   text-shadow: 0 0 10px rgba(255,220,120,.35);
 }
+/* =====================================================
+   AMPULHETA ANIMADA — JORNADA
+   ===================================================== */
+
+.jp-total-icon{
+  font-size: 22px;
+  display: inline-block;
+
+  animation: ampulheta-flow 6s ease-in-out infinite;
+  transform-origin: center;
+
+  filter: drop-shadow(0 0 6px rgba(255,220,120,0.5));
+}
+
+/* giro simbólico da ampulheta */
+@keyframes ampulheta-flow{
+
+  0%{
+    transform: rotate(0deg) scale(1);
+  }
+
+  40%{
+    transform: rotate(180deg) scale(1.05);
+  }
+
+  60%{
+    transform: rotate(180deg) scale(1.05);
+  }
+
+  100%{
+    transform: rotate(360deg) scale(1);
+  }
+
+}
+/* brilho espiritual da ampulheta */
+
+.jp-total-icon{
+  animation:
+    ampulheta-flow 6s ease-in-out infinite,
+    ampulheta-glow 3s ease-in-out infinite alternate;
+}
+
+@keyframes ampulheta-glow{
+
+  0%{
+    filter: drop-shadow(0 0 4px rgba(255,210,120,0.4));
+  }
+
+  100%{
+    filter: drop-shadow(0 0 12px rgba(255,210,120,0.8));
+  }
+
+}
 
 /* ===== DEVOLUTIVA DO GUIA ===== */
 .jp-ai-response-wrap {
