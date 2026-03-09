@@ -827,3 +827,139 @@ body[data-guia="arion"] .perguntas-controls .btn-perguntas {
     font-size: 13px;
   }
 }
+/* =====================================================
+   DEVOLUTIVA DO GUIA — EFEITO REVELAÇÃO
+   ===================================================== */
+
+.jp-ai-response-wrap {
+  position: relative;
+}
+
+/* estado base */
+#jp-ai-response,
+.jp-ai-response {
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(10px) scale(0.985);
+  filter: blur(4px);
+  transition:
+    opacity .55s ease,
+    transform .55s ease,
+    filter .55s ease,
+    box-shadow .55s ease,
+    border-color .55s ease;
+
+  background: rgba(0, 0, 0, 0.42);
+  border: 1px solid rgba(255, 215, 80, 0.22);
+  box-shadow:
+    0 0 16px rgba(255, 215, 80, 0.08),
+    inset 0 0 12px rgba(255,255,255,0.04);
+}
+
+/* quando revela */
+#jp-ai-response.is-visible,
+.jp-ai-response.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+}
+
+/* brilho superior varrendo */
+#jp-ai-response::before,
+.jp-ai-response::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-120%);
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgba(255,255,255,0.02) 35%,
+    rgba(255,255,255,0.18) 50%,
+    rgba(255,255,255,0.02) 65%,
+    transparent 100%
+  );
+  pointer-events: none;
+  opacity: 0;
+}
+
+#jp-ai-response.is-revealing::before,
+.jp-ai-response.is-revealing::before {
+  opacity: 1;
+  animation: guiaRevealSweep 1.2s ease forwards;
+}
+
+@keyframes guiaRevealSweep {
+  0%   { transform: translateX(-120%); }
+  100% { transform: translateX(120%); }
+}
+
+/* pulsação suave após aparecer */
+#jp-ai-response.is-visible,
+.jp-ai-response.is-visible {
+  animation: guiaRevealPulse 2.8s ease-in-out infinite alternate;
+}
+
+@keyframes guiaRevealPulse {
+  0% {
+    box-shadow:
+      0 0 14px var(--guia-soft, rgba(255,215,80,.18)),
+      inset 0 0 12px rgba(255,255,255,.04);
+  }
+  100% {
+    box-shadow:
+      0 0 24px var(--guia-strong, rgba(255,215,80,.30)),
+      0 0 42px var(--guia-soft, rgba(255,215,80,.18)),
+      inset 0 0 14px rgba(255,255,255,.06);
+  }
+}
+
+/* texto interno */
+#jp-ai-response .ai-line,
+.jp-ai-response .ai-line {
+  opacity: 0;
+  transform: translateY(6px);
+  filter: blur(3px);
+}
+
+#jp-ai-response.is-visible .ai-line,
+.jp-ai-response.is-visible .ai-line {
+  animation: aiLineReveal .45s ease forwards;
+}
+
+@keyframes aiLineReveal {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+/* aura por guia */
+body[data-guia="lumen"] #jp-ai-response.is-visible,
+body[data-guia="lumen"] .jp-ai-response.is-visible {
+  border-color: rgba(156,255,87,.38) !important;
+  box-shadow:
+    0 0 18px rgba(156,255,87,.16),
+    0 0 38px rgba(156,255,87,.12),
+    inset 0 0 12px rgba(255,255,255,.05) !important;
+}
+
+body[data-guia="zion"] #jp-ai-response.is-visible,
+body[data-guia="zion"] .jp-ai-response.is-visible {
+  border-color: rgba(255,213,74,.38) !important;
+  box-shadow:
+    0 0 18px rgba(255,213,74,.16),
+    0 0 38px rgba(255,213,74,.12),
+    inset 0 0 12px rgba(255,255,255,.05) !important;
+}
+
+body[data-guia="arion"] #jp-ai-response.is-visible,
+body[data-guia="arion"] .jp-ai-response.is-visible {
+  border-color: rgba(109,200,255,.38) !important;
+  box-shadow:
+    0 0 18px rgba(109,200,255,.16),
+    0 0 38px rgba(109,200,255,.12),
+    inset 0 0 12px rgba(255,255,255,.05) !important;
+}
