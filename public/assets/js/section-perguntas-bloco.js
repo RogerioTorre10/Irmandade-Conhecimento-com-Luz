@@ -148,31 +148,41 @@
     return localStorage.getItem(answerKey(bloco, qIndex)) || '';
   }
 
-  function setGuideResponse(text, kind = 'info') {
-    const wrap = document.getElementById('jp-ai-response-wrap');
-    const box  = document.getElementById('jp-ai-response');
-    if (!wrap || !box) return;
+ async function setGuideResponse(text, kind = 'info') {
 
-    if (!text || !String(text).trim()) {
-      box.hidden = true;
-      box.textContent = '';
-      wrap.dataset.kind = '';
-      return;
-    }
+  const wrap = document.getElementById('jp-ai-response-wrap');
+  const box  = document.getElementById('jp-ai-response');
 
-    box.hidden = false;
-    box.textContent = String(text).trim();
-    wrap.dataset.kind = kind;
+  if (!wrap || !box) return;
+
+  const content = String(text || '').trim();
+
+  if (!content) {
+    box.hidden = true;
+    box.textContent = '';
+    box.classList.remove('is-visible','is-revealing');
+    wrap.dataset.kind = '';
+    return;
   }
 
-  function clearAnswerUI() {
-    const ta = document.getElementById('jp-answer-input');
-    if (ta) {
-      ta.value = '';
-      ta.focus();
-    }
-    setGuideResponse('');
-  }
+  wrap.dataset.kind = kind;
+  box.hidden = false;
+
+  box.innerHTML = content
+    .split('\n')
+    .map((line,i)=>`<div class="ai-line" style="animation-delay:${i*120}ms">${line}</div>`)
+    .join('');
+
+  void box.offsetWidth;
+
+  box.classList.add('is-revealing');
+  box.classList.add('is-visible');
+
+  setTimeout(()=>{
+    box.classList.remove('is-revealing');
+  },1300);
+
+}
 
   function updateProgress(bloco) {
     const totalBlocks = window.JORNADA_PAPER_QA?.getTotalBlocks?.(getLang()) || 5;
