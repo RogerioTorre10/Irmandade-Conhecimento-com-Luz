@@ -963,3 +963,41 @@ body[data-guia="arion"] .jp-ai-response.is-visible {
     0 0 38px rgba(109,200,255,.12),
     inset 0 0 12px rgba(255,255,255,.05) !important;
 }
+#section-perguntas-raizes .perguntas-title,
+#section-perguntas-reflexoes .perguntas-title,
+#section-perguntas-crescimento .perguntas-title,
+#section-perguntas-integracao .perguntas-title,
+#section-perguntas-sintese .perguntas-title,
+#section-perguntas-raizes #question-display,
+#section-perguntas-reflexoes #question-display,
+#section-perguntas-crescimento #question-display,
+#section-perguntas-integracao #question-display,
+#section-perguntas-sintese #question-display,
+#section-perguntas-raizes #progress-question-fill,
+#section-perguntas-reflexoes #progress-question-fill,
+#section-perguntas-crescimento #progress-question-fill,
+#section-perguntas-integracao #progress-question-fill,
+#section-perguntas-sintese #progress-question-fill {
+  transition: color .25s ease, box-shadow .25s ease, background .25s ease;
+}
+
+.perguntas-title {
+  color: var(--guia-main) !important;
+  text-shadow: 0 0 10px var(--guia-soft), 0 0 24px var(--guia-strong) !important;
+}
+
+#question-display,
+.jp-question-typed {
+  color: var(--guia-text) !important;
+}
+
+#progress-question-fill,
+.jp-progress-fill {
+  background: linear-gradient(90deg, var(--guia-main), var(--guia-main)) !important;
+  box-shadow: 0 0 12px var(--guia-soft), 0 0 20px var(--guia-strong) !important;
+}
+
+.perguntas-controls .btn-perguntas {
+  border-color: var(--guia-strong) !important;
+  box-shadow: 0 0 16px var(--guia-soft), inset 0 0 12px rgba(255,255,255,.04) !important;
+}
