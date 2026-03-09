@@ -50,9 +50,10 @@
 }
 
 #section-senha .j-arcane-card {
-  max-height: 72vh !important;
-  margin-top: -18px !important;
-  margin-bottom: 24px !important;
+  min-height: 72vh !important;
+  max-height: 88vh !important;
+  width: min(520px, 92vw) !important;
+  max-width: 470px !important;
 }
 
 /* ======================================================
