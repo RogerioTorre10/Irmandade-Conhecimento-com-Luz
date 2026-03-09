@@ -49,7 +49,6 @@ orda dourada + guia — valem para todos os breakpoints ── */
 
 /* ── Card senha: mesmo porte da intro/termos ── */
 #section-senha .j-arcane-card {
-  max-height: 72vh !important;
   margin-top: -18px !important;
   margin-bottom: 24px !important;
 }
