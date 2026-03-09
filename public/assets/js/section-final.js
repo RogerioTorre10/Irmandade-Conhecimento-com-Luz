@@ -721,13 +721,15 @@ function applyFinalGuideTheme(section) {
 
     console.log('[FINAL] section:shown recebido para section-final, iniciando sequência...');
 
-    const sec = document.getElementById(SECTION_ID);
-    if (sec) {
-      sec.style.display = 'block';
-      applyFinalGuideTheme(sec);
-      mountFinalPdfUI(sec);
-      unlockPortalButton(sec);
-    }
+   const sec = document.getElementById(SECTION_ID);
+if (sec) {
+
+  applyFinalGuideTheme(sec);   // aplica tema primeiro
+
+  sec.style.display = 'block';
+  mountFinalPdfUI(sec);
+  unlockPortalButton(sec);
+}
 
     startFinalSequence();
   });
