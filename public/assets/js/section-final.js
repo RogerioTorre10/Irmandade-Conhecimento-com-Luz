@@ -724,6 +724,7 @@ function applyFinalGuideTheme(section) {
     const sec = document.getElementById(SECTION_ID);
     if (sec) {
       sec.style.display = 'block';
+      applyFinalGuideTheme(sec);
       mountFinalPdfUI(sec);
       unlockPortalButton(sec);
     }
