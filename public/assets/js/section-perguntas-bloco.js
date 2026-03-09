@@ -212,61 +212,58 @@
     }));
   }
 
-  function stopSpeaking() {
-    try { window.speechSynthesis?.cancel(); } catch {}
-  }
+ function stopSpeaking() {
+  try {
+    window.speechSynthesis?.cancel();
+  } catch {}
+}
 
-  async function speakText(text) {
-    const clean = String(text || '').trim();
-    if (!clean) return;
+function speakText(text) {
+  const clean = String(text || '').trim();
+  if (!clean) return Promise.resolve();
 
+  return new Promise((resolve) => {
     try {
       stopSpeaking();
 
-      if (typeof window.typeAndSpeak === 'function') {
-        // Só fala; a datilografia já foi feita por nós
-        const fake = document.createElement('span');
-        fake.textContent = clean;
-        await window.typeAndSpeak(fake, clean, 0);
-        return;
-      }
+      const utter = new SpeechSynthesisUtterance(clean);
+      utter.lang = document.documentElement.lang || getLang() || 'pt-BR';
+      utter.rate = 0.92;
+      utter.pitch = 1;
+      utter.volume = 1;
 
-      if ('speechSynthesis' in window) {
-        const utter = new SpeechSynthesisUtterance(clean);
-        utter.lang = document.documentElement.lang || getLang() || 'pt-BR';
-        utter.rate = 0.92;
-        utter.pitch = 1;
-        utter.volume = 1;
+      utter.onend = () => resolve();
+      utter.onerror = () => resolve();
 
-        await new Promise((resolve) => {
-          utter.onend = resolve;
-          utter.onerror = resolve;
-          window.speechSynthesis.speak(utter);
-        });
-      }
+      window.speechSynthesis.speak(utter);
     } catch (e) {
       warn('TTS falhou:', e);
+      resolve();
     }
+  });
+}
+
+async function typeQuestion(el, text, speed = 26, withVoice = true) {
+  if (!el) return;
+
+  const content = String(text || '').trim();
+  el.textContent = '';
+  el.classList.remove('typing-done');
+
+  // fala começa junto com a datilografia
+  const speechPromise = withVoice ? speakText(content) : Promise.resolve();
+
+  for (let i = 0; i <= content.length; i++) {
+    el.textContent = content.slice(0, i);
+    await new Promise(r => setTimeout(r, speed));
   }
 
-  async function typeQuestion(el, text, speed = 26, withVoice = true) {
-    if (!el) return;
-    const content = String(text || '').trim();
-    el.textContent = '';
-    el.classList.remove('typing-done');
+  el.classList.add('typing-done');
 
-    for (let i = 0; i <= content.length; i++) {
-      el.textContent = content.slice(0, i);
-      await new Promise(r => setTimeout(r, speed));
-    }
-
-    el.classList.add('typing-done');
-
-    if (withVoice) {
-      await speakText(content);
-    }
-  }
-
+  // só aguarda terminar a fala, sem atrasar o início
+  await speechPromise;
+}
+  
   function bindPressFx(btn) {
     if (!btn || btn.dataset.pressFxBound === '1') return;
     btn.dataset.pressFxBound = '1';
