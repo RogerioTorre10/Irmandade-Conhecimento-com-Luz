@@ -1,1 +1,16 @@
+/* =========================================================
+   STYLES-INTRO v2.0 — LIMPO
+   Tipografia, efeitos, cursor, halo, ajustes desktop/mobile
+   ========================================================= */
 
+
+/* ============================
+   SECTION BASE
+   ============================ */
+
+#section-intro {
+  background: transparent;
+  box-shadow: none;
+  border: none;
+  text-align: left;
+}
