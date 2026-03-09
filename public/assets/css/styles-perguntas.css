@@ -896,21 +896,23 @@ textarea,
   top: 18px;
   right: 18px;
   display: flex;
+  flex-direction: column;   /* empilha verticalmente */
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 2px;
   z-index: 5;
 }
 
 .jp-total-icon {
-  font-size: 20px;
+  font-size: 22px;
   line-height: 1;
 }
 
 .jp-total-value {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
   color: #fff3c0;
-  text-shadow: 0 0 10px rgba(255, 220, 120, 0.35);
+  text-shadow: 0 0 10px rgba(255,220,120,.35);
 }
 
 /* ===== DEVOLUTIVA DO GUIA ===== */
