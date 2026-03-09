@@ -289,6 +289,25 @@ input[type=range]::-webkit-slider-thumb {
   cursor: pointer;
 }
 
+/* ── Botões Voltar / Avançar lado a lado ── */
+#section-senha .senha-actions {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 12px !important;
+  flex-wrap: nowrap !important;
+}
+
+#section-senha .senha-actions .btn-stone {
+  flex: 1 1 0 !important;
+  max-width: 48% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+
+
 /* ── Botões espinhos ── */
 .btn-row {
   display: flex;
