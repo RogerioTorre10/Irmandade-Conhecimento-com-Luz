@@ -1,24 +1,32 @@
 /* ===========================================================
-   STYLES-PERGUNTAS — REFRATORADO v2.0 (LIMPO)
-   Caminho: /assets/css/styles-perguntas.css
-   Objetivo: Desktop + Mobile polivalente, sem duplicações
+   STYLES-PERGUNTAS v3.0 — LIMPO / SEM DUPLICAÇÕES
+   Escopo: .section-perguntas / #section-perguntas
+   Estrutura: Variáveis → Layout → HUD → Pergaminho →
+              Botões → Temas → Animações → Mobile
    =========================================================== */
 
-/* ---------- Variáveis ---------- */
-:root{
-  --gold-gradient: linear-gradient(90deg, #d4af37, #ffd700, #ffcc33);
-  --silver-gradient: linear-gradient(90deg, #d3d3d3, #b0b0b0, #f0f0f0);
 
-  /* fallback caso guia não injete cor */
-  --progress-main: var(--theme-main-color, #f5d47b);
-  --progress-glow-1: rgba(255,230,180,.85);
-  --progress-glow-2: rgba(255,210,120,.75);
+/* ============================
+   VARIÁVEIS GLOBAIS
+   ============================ */
+
+:root {
+  --progress-main:   var(--theme-main-color, #f5d47b);
+  --progress-glow-1: rgba(255, 230, 180, 0.85);
+  --progress-glow-2: rgba(255, 210, 120, 0.75);
+  --guide-color:     var(--theme-main-color, #ffd700);
+  --guide-glow-1:    rgba(255, 230, 180, 0.85);
+  --guide-glow-2:    rgba(255, 210, 120, 0.75);
+  --gold-gradient:   linear-gradient(90deg, #d4af37, #ffd700, #ffcc33);
+  --silver-gradient: linear-gradient(90deg, #d3d3d3, #b0b0b0, #f0f0f0);
 }
 
-/* ===========================================================
-   WRAPPER GERAL DA SEÇÃO
-   =========================================================== */
-.section-perguntas{
+
+/* ============================
+   WRAPPER GERAL
+   ============================ */
+
+.section-perguntas {
   position: relative;
   min-height: 100dvh;
   padding: 32px 12px 18px;
@@ -30,61 +38,60 @@
   background: transparent;
 }
 
-.section-perguntas .perguntas-wrap{
+.section-perguntas .perguntas-wrap {
   position: relative;
   width: min(1024px, 100%);
   margin: 0 auto;
-  padding: 74px 14px 78px;  /* topo HUD + ampulheta | base HUD inferior */
-  padding-top: 18px;          /* abre espaço entre o vidro e a régua */
-  padding-bottom: 16px;
+  padding: 18px 14px 16px;
   border-radius: 18px;
-  background: rgba(0,0,0,0.45);
-  box-shadow: 0 18px 60px rgba(0,0,0,0.85);
+  background: rgba(0, 0, 0, 0.45);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(6px);
   box-sizing: border-box;
 }
 
-/* não encolher nada dentro da j-panel */
 .perguntas-panel .j-arcane-card,
 .perguntas-panel .perguntas-wrap,
-.perguntas-panel #jp-blocks-wrapper{
+.perguntas-panel #jp-blocks-wrapper {
   width: 100%;
   max-width: 100%;
 }
 
-/* ===========================================================
-   HUD DE PROGRESSO (TOPO + INFERIOR) + AMPULHETA
-   =========================================================== */
 
-.progress-top{
+/* ============================
+   HUD — BARRA TOPO (BLOCOS)
+   ============================ */
+
+.progress-top {
   position: absolute;
   top: 14px;
-  margin-bottom: 25px;        /* descola a pergunta da régua de cima */
   left: 14px;
-  right: 88px;     /* mais folga pra ampulheta */
-  padding-top: 14px; /* espaço pro número ficar em cima */
+  right: 88px;
+  padding-top: 14px;
+  margin-bottom: 25px;
   z-index: 12;
 }
 
-/* trilha mais larga e com glow forte */
-.progress-top .progress-bar{
+.progress-top .progress-bar {
   height: 8px;
   border-radius: 999px;
-  background: rgba(0,0,0,0.60);
+  background: rgba(0, 0, 0, 0.60);
   box-shadow:
-    inset 0 0 10px rgba(0,0,0,0.95),
+    inset 0 0 10px rgba(0, 0, 0, 0.95),
     0 0 10px color-mix(in srgb, var(--theme-main-color, #d4af37) 70%, transparent),
     0 0 24px color-mix(in srgb, var(--theme-main-color, #d4af37) 45%, transparent);
 }
 
-.progress-top .progress-fill{
+.progress-top .progress-fill {
+  background: var(--guide-color) !important;
   box-shadow:
     0 0 10px color-mix(in srgb, var(--theme-main-color, #ffd700) 80%, transparent),
     0 0 22px color-mix(in srgb, var(--theme-main-color, #ffd700) 60%, transparent),
-    inset 0 0 6px rgba(255,255,255,0.35);
+    inset 0 0 6px rgba(255, 255, 255, 0.35);
+  animation: guiaGlow 1.9s ease-in-out infinite !important;
 }
 
-.progress-top .progress-value{
+.progress-top .progress-value {
   position: absolute;
   top: -2px;
   left: 50%;
@@ -97,63 +104,72 @@
   pointer-events: none;
 }
 
-/* ---------- BARRA INFERIOR (PERGUNTAS NO BLOCO) ---------- */
-.progress-middle{
+
+/* ============================
+   HUD — BARRA MEIO (PERGUNTAS)
+   ============================ */
+
+.progress-middle {
   position: absolute;
-  margin-top: 12px; 
   left: 50%;
-  bottom: -6px;          
+  bottom: -6px;
   transform: translateX(-50%);
   width: min(90%, 560px);
-
   display: flex;
   align-items: center;
   gap: 8px;
-
   font-size: 12.5px;
   font-family: "Cinzel", serif;
   z-index: 12;
-
   margin: 0;
   padding: 0;
   background: transparent;
   box-shadow: none;
 }
 
-.progress-middle .progress-bar{
+.progress-middle .progress-bar {
   height: 8px !important;
   border-radius: 999px;
-  background: rgba(0,0,0,0.65);
+  background: rgba(0, 0, 0, 0.65);
   box-shadow:
-    inset 0 0 10px rgba(0,0,0,1),
+    inset 0 0 10px rgba(0, 0, 0, 1),
     0 0 8px color-mix(in srgb, var(--theme-main-color, #d4af37) 60%, transparent),
     0 0 20px color-mix(in srgb, var(--theme-main-color, #d4af37) 40%, transparent);
 }
 
-.progress-middle .progress-fill{
+.progress-middle .progress-fill {
+  background: var(--guide-color) !important;
   box-shadow:
     0 0 10px color-mix(in srgb, var(--theme-main-color, #ffd700) 80%, transparent),
     0 0 22px color-mix(in srgb, var(--theme-main-color, #ffd700) 60%, transparent),
-    inset 0 0 6px rgba(255,255,255,0.35);
+    inset 0 0 6px rgba(255, 255, 255, 0.35);
+  animation: guiaGlow 1.9s ease-in-out infinite !important;
 }
 
-.progress-middle .progress-value{
+.progress-middle .progress-value {
   position: relative;
   margin-left: 6px;
   white-space: nowrap;
   font-size: 14px;
   font-weight: 600;
-  letter-spacing: .04em;  
+  letter-spacing: 0.04em;
 }
 
-/* ---------- Ampulheta total ---------- */
-.progress-total{
+
+/* ============================
+   HUD — AMPULHETA / TOTAL
+   ============================ */
+
+.progress-total,
+.jp-total-top {
   position: absolute;
   top: 14px;
   right: 16px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  gap: 2px;
   z-index: 11;
   font-size: 1.05rem;
   color: #ffd700;
@@ -161,23 +177,86 @@
   font-weight: 800;
 }
 
-.progress-total .ampulheta{
+.progress-total .ampulheta,
+.jp-total-icon {
   font-size: 1.9rem;
   display: inline-block;
-  animation: spinHourglass 8s infinite linear;
-  filter: drop-shadow(0 0 10px #ffda6b);
+  animation: ampulheta-flow 6s ease-in-out infinite,
+             ampulheta-glow 3s ease-in-out infinite alternate;
+  transform-origin: center;
 }
 
-@keyframes spinHourglass{
-  0%,100%{ transform: rotate(0deg); }
-  50%{ transform: rotate(180deg); }
+.jp-total-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff3c0;
+  text-shadow: 0 0 10px rgba(255, 220, 120, 0.35);
 }
 
-/* ===========================================================
-   CABEÇALHO / PERGAMINHO / PERGUNTA
-   =========================================================== */
 
-.perguntas-header{
+/* ============================
+   BARRAS DE PROGRESSO INLINE
+   ============================ */
+
+#progress-block-outer,
+#progress-question-outer,
+.progress-block-outer,
+.progress-question-outer,
+.perg-progress-outer,
+.progress-bar {
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4)),
+    url('/assets/img/textura-de-pedra.jpg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  border-radius: 20px !important;
+  box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.7) !important;
+  height: 12px !important;
+}
+
+#progress-block-fill,
+#progress-question-fill,
+.progress-block-fill,
+.progress-question-fill,
+.perg-progress-inner,
+.progress-fill {
+  height: 100% !important;
+  border-radius: inherit !important;
+  position: relative !important;
+  overflow: hidden !important;
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3)),
+    url('/assets/img/textura-de-pedra.jpg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  box-shadow:
+    0 0 20px var(--progress-main),
+    0 0 40px var(--progress-glow-1),
+    inset 0 0 25px var(--progress-glow-2) !important;
+  animation: barra-glow 4s infinite alternate !important;
+}
+
+.progress-inline,
+#progress-inline {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  margin: 20px auto !important;
+  padding: 10px 20px !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+  border-radius: 30px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7) !important;
+  width: fit-content !important;
+  font-size: 1rem !important;
+}
+
+
+/* ============================
+   CABEÇALHO / BLOCO / PERGAMINHO
+   ============================ */
+
+.perguntas-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -186,21 +265,23 @@
   font-size: 12px;
 }
 
-.jp-block-label{
-  font-size: 15px;            /* nome do bloco */
+.jp-block-label,
+.jp-block-title,
+.perguntas-title,
+#question-block-title {
+  font-size: 15px;
   font-weight: 600;
-  letter-spacing: .03em;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
   color: #ffd38a;
 }
 
-.jp-global-counter{
+.jp-global-counter {
   font-size: 11px;
   color: #f5e9d6;
 }
 
-/* Pergaminho interno */
-.perguntas-pergaminho{
+.perguntas-pergaminho {
   margin-top: 6px;
   padding: 12px 10px 10px;
   border-radius: 16px;
@@ -211,21 +292,42 @@
 }
 
 /* Pergunta datilografada */
-.jp-question-typed{
+.jp-question-typed,
+#jp-question-typed {
   min-height: 42px;
   margin-bottom: 14px;
   font-size: 20px;
   line-height: 1.5;
-  color: #000;
+  color: #000 !important;
   font-weight: 600;
-  text-shadow: 0 1px 2px #000;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.95) !important;
+  animation: none !important;
 }
 
-/* ===========================================================
-   ANSWER FRAME (moldura medieval)
-   =========================================================== */
+/* container do progresso no bloco */
+.perguntas-no-bloco {
+  position: relative !important;
+  margin-top: 15px !important;
+  margin-bottom: 10px !important;
+}
 
-.jp-answer-frame{
+.perguntas-no-bloco .titulo-bloco,
+.perguntas-no-bloco h3 {
+  margin-bottom: 6px !important;
+  text-align: center;
+}
+
+.perguntas-no-bloco .barra-progresso,
+.perguntas-no-bloco .progress-bar {
+  margin-top: 4px !important;
+}
+
+
+/* ============================
+   ANSWER FRAME (moldura medieval)
+   ============================ */
+
+.jp-answer-frame {
   position: relative;
   margin-top: 4px;
   padding: 12px 14px;
@@ -234,18 +336,18 @@
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  box-shadow: 0 10px 26px rgba(0,0,0,0.9);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.9);
 }
 
-.jp-answer-bg{
+.jp-answer-bg {
   position: absolute;
   inset: 8px;
   border-radius: 10px;
-  background: radial-gradient(circle at top, rgba(255,255,255,0.06), transparent);
+  background: radial-gradient(circle at top, rgba(255, 255, 255, 0.06), transparent);
   pointer-events: none;
 }
 
-.jp-answer-input{
+.jp-answer-input {
   position: relative;
   width: 100%;
   min-height: 80px;
@@ -261,722 +363,42 @@
   z-index: 5;
 }
 
-/* Microfone */
-.jp-answer-frame .jp-mic{
+/* Microfone oculto */
+.jp-answer-frame .jp-mic {
   display: none !important;
   visibility: hidden !important;
-  opacity: 0 !important; 
- /*position: absolute;
-   right: 10px;
-   bottom: 10px;
-   width: 26px;
-   height: 26px;
-   z-index: 20;
-   pointer-events: auto !important;
-//  cursor: pointer; */
+  opacity: 0 !important;
 }
 
-/* ===========================================================
-   DEVOLUTIVA DA API (reserva de espaço no miolo)
-   =========================================================== */
+
+/* ============================
+   DEVOLUTIVA DA API
+   ============================ */
+
+.jp-ai-response-wrap,
 #jp-ai-response,
-.jp-ai-response{
+.jp-ai-response {
   display: block;
   width: 100%;
+  max-width: 720px;
   margin: 10px auto 12px;
   padding: 10px 12px;
-
   min-height: 88px;
   border-radius: 12px;
-
-  background: rgba(0,0,0,0.55);
-  border: 1px solid rgba(255,215,120,0.35);
-  box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
-
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 215, 120, 0.35);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
   font-family: "Cardo", serif;
   font-size: 14px;
   line-height: 1.5;
   color: #f7e7c4;
   text-shadow: 0 1px 2px #000;
-
   overflow: hidden;
 }
 
-#jp-ai-response[hidden]{
+#jp-ai-response[hidden] {
   visibility: hidden;
   opacity: 0;
-}
-
-/* ===========================================================
-   CONTROLES / BOTÕES
-   =========================================================== */
-
-.perguntas-controls{
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  width: 100%;
-  max-width: 520px;
-  margin: 0 auto;
-}
-
-.btn-perguntas{
-  height: 42px;
-  width: 100%;
-  padding: 0 8px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,220,170,0.6);
-  background-image: url('/assets/img/textura-de-pedra.jpg');
-  background-size: cover;
-  background-position: center;
-  color: #ffd38a;
-  font-size: 12px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  box-shadow: 0 6px 14px rgba(0,0,0,0.85);
-  text-shadow: 0 1px 2px rgba(0,0,0,0.9);
-  white-space: nowrap;
-  transition: transform .12s ease, box-shadow .12s ease;
-}
-
-.btn-perguntas.btn-confirm{
-  font-weight: 700;
-  border-color: rgba(255,230,180,0.9);
-}
-
-.btn-perguntas:hover{
-  transform: translateY(-1px);
-  box-shadow: 0 8px 18px rgba(0,0,0,0.95);
-}
-
-
-/* ===========================================================
-   PULSO DO GUIA — MAIS INTENSO E VIVO
-   (versão única — sem duplicar keyframes)
-   =========================================================== */
-@keyframes guiaGlow{
-  0%{
-    filter: brightness(1) saturate(1.05);
-    box-shadow:
-      0 0 8px  color-mix(in srgb, var(--theme-main-color, #ffd700) 70%, transparent),
-      0 0 18px color-mix(in srgb, var(--theme-main-color, #ffd700) 50%, transparent),
-      inset 0 0 4px rgba(255,255,255,0.25);
-  }
-  35%{
-    filter: brightness(1.45) saturate(1.45);
-    box-shadow:
-      0 0 14px color-mix(in srgb, var(--theme-main-color, #ffd700) 90%, transparent),
-      0 0 34px color-mix(in srgb, var(--theme-main-color, #ffd700) 70%, transparent),
-      0 0 70px color-mix(in srgb, var(--theme-main-color, #ffd700) 45%, transparent),
-      inset 0 0 8px rgba(255,255,255,0.40);
-  }
-  70%{
-    filter: brightness(1.2) saturate(1.25);
-    box-shadow:
-      0 0 11px color-mix(in srgb, var(--theme-main-color, #ffd700) 80%, transparent),
-      0 0 26px color-mix(in srgb, var(--theme-main-color, #ffd700) 60%, transparent),
-      inset 0 0 6px rgba(255,255,255,0.32);
-  }
-  100%{
-    filter: brightness(1) saturate(1.05);
-    box-shadow:
-      0 0 8px  color-mix(in srgb, var(--theme-main-color, #ffd700) 70%, transparent),
-      0 0 18px color-mix(in srgb, var(--theme-main-color, #ffd700) 50%, transparent),
-      inset 0 0 4px rgba(255,255,255,0.25);
-  }
-}
-
-.progress-top .progress-fill,
-.progress-middle .progress-fill{
-  animation: guiaGlow 1.9s ease-in-out infinite !important;
-}
-
-/* =========================================================
-   ESTILO BASE - FUNCIONA EM TODAS AS TELAS (DESKTOP E MOBILE)
-   ========================================================= */
-
-/* Barra "Perguntas no Bloco" - posicionamento fixo e bonito sempre */
-.progress-inline,
-#progress-inline {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 12px !important;
-  margin: 20px auto !important;
-  padding: 10px 20px !important;
-  background: rgba(0,0,0,0.5) !important;
-  border-radius: 30px !important;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.7) !important;
-  width: fit-content !important;
-  font-size: 1rem !important;
-}
-
-/* Aura do guia na barra - SEMPRE ativa */
-.progress-question-fill,
-#progress-question-fill {
-  background: var(--progress-main, #ff00ff) !important;
-  box-shadow: 0 0 30px var(--progress-main), 0 0 60px var(--progress-glow-1) !important;
-  height: 100% !important;
-  border-radius: inherit !important;
-}
-
-/* Aura específica por guia - FORTE e SEMPRE VISÍVEL */
-body[data-guia="lumen"] .progress-question-fill {
-  box-shadow: 0 0 30px #00ff9d, 0 0 60px rgba(0,255,157,0.9), inset 0 0 30px rgba(120,255,200,0.7) !important;
-}
-
-body[data-guia="zion"] .progress-question-fill {
-  box-shadow: 0 0 30px #00aaff, 0 0 60px rgba(0,170,255,0.9), 0 0 45px rgba(255,214,91,0.7) !important;
-}
-
-body[data-guia="arian"] .progress-question-fill {
-  box-shadow: 0 0 35px #ff00ff, 0 0 70px rgba(255,120,255,0.95), inset 0 0 35px rgba(255,180,255,0.8) !important;
-}
-
-/* Botões com aura do guia - SEMPRE */
-.perguntas-controls .btn-perguntas {
-  border-color: var(--progress-main) !important;
-  box-shadow: 
-    0 6px 18px rgba(0,0,0,0.6),
-    0 0 20px var(--progress-glow-1),
-    0 0 35px var(--progress-glow-2) !important;
-}
-
-/* Aura específica nos botões */
-body[data-guia="lumen"] .perguntas-controls .btn-perguntas {
-  box-shadow: 0 6px 18px rgba(0,0,0,0.6), 0 0 25px #00ff9d, 0 0 50px rgba(0,255,157,0.8) !important;
-}
-body[data-guia="zion"] .perguntas-controls .btn-perguntas {
-  box-shadow: 0 6px 18px rgba(0,0,0,0.6), 0 0 25px #00aaff, 0 0 50px rgba(0,170,255,0.8), 0 0 35px rgba(255,214,91,0.6) !important;
-}
-body[data-guia="arian"] .perguntas-controls .btn-perguntas {
-  box-shadow: 0 6px 18px rgba(0,0,0,0.6), 0 0 30px #ff00ff, 0 0 60px rgba(255,120,255,0.9) !important;
-}
-
-/* Botão Falar gravando - VERMELHO FORTE sempre */
-#jp-btn-falar.recording {
-  background: linear-gradient(135deg, #ff1744, #d50000) !important;
-  border-color: #ff1744 !important;
-  box-shadow: 0 0 40px #ff1744, 0 0 80px #ff4444, 0 0 120px rgba(255,23,68,0.9) !important;
-  animation: pulse-recording 1.3s infinite !important;
-  transform: scale(1.1) !important;
-}
-
-@keyframes pulse-recording {
-  0%, 100% { box-shadow: 0 0 40px #ff1744, 0 0 80px #ff4444; }
-  50% { box-shadow: 0 0 60px #ff1744, 0 0 110px #ff6666; }
-}
-
-/* =======================================================
-   BOTÕES PERGUNTAS - TEXTURA PEDRA + COR DO GUIA
-   ======================================================= */
-
-/* FORÇA 3 BOTÕES LADO A LADO - MOBILE E DESKTOP */
-.perguntas-controls {
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  gap: 16px !important;
-  margin: 28px auto 0 !important;
-  padding: 10px 20px !important;
-  width: 100% !important;
-  max-width: 600px !important;
-  box-sizing: border-box !important;
-}
-
-/* BOTÕES BASE - TEXTURA DE PEDRA OBRIGATÓRIA */
-.perguntas-controls .btn-perguntas {
-  flex: 1 !important;
-  min-width: 100px !important;
-  max-width: 140px !important;
-  height: 64px !important;
-  padding: 10px !important;
-  font-size: 15px !important;
-  font-weight: bold !important;
-  border-radius: 32px !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: center !important;
-  align-items: center !important;
-  gap: 4px !important;
-  position: relative !important;
-  overflow: hidden !important;
-
-  /* TEXTURA DE PEDRA FORÇADA - NUNCA SOME */
-  background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.3)),
-              url('/assets/img/textura-de-pedra.jpg') !important;
-  background-size: cover !important;
-  background-position: center !important;
-
-  border: 3px solid transparent !important;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.6) !important;
-  transition: all 0.4s ease !important;
-  text-shadow: 1px 1px 2px black !important;
-  color: white !important;
-}
-
-/* AVANÇA MAIOR */
-.perguntas-controls .btn-confirm {
-  flex: 1.6 !important;
-  max-width: 170px !important;
-  height: 70px !important;
-  font-size: 17px !important;
-}
-
-/* AURA DO GUIA NOS BOTÕES (borda + glow) */
-body[data-guia="lumen"] .perguntas-controls .btn-perguntas {
-  border-color: #00ff9d !important;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.6), 0 0 20px rgba(0,255,157,0.7) !important;
-}
-
-body[data-guia="zion"] .perguntas-controls .btn-perguntas {
-  border-color: #00aaff !important;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.6), 0 0 20px rgba(0,170,255,0.7), 0 0 30px rgba(255,214,91,0.5) !important;
-}
-
-body[data-guia="arian"] .perguntas-controls .btn-perguntas {
-  border-color: #ff00ff !important;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.6), 0 0 25px rgba(255,0,255,0.8) !important;
-}
-
-/* EFEITO AO CLICAR EM AVANÇA - EXPLOSÃO DE LUZ DO GUIA */
-.perguntas-controls .btn-confirm:active {
-  transform: scale(0.94) !important;
-  box-shadow: 0 0 50px var(--progress-main), 0 0 80px var(--progress-glow-1) !important;
-}
-
-/* MICROFONE ATIVO - VERMELHO FORTE E PULSANDO (prioridade máxima) */
-#jp-btn-falar.recording,
-.perguntas-controls #jp-btn-falar.recording,
-.perguntas-controls .btn-perguntas.recording,
-.btn-perguntas[data-action="start-mic"].recording {
-  background: linear-gradient(135deg, #ff1744, #d50000) !important;
-  background-color: #f44336 !important; /* fallback sólido */
-  border-color: #ff1744 !important;
-  color: white !important;
-  box-shadow: 
-    0 0 30px #ff1744,
-    0 0 60px #ff4444,
-    0 0 90px rgba(255, 23, 68, 0.8) !important;
-  animation: pulse-recording 1.4s infinite !important;
-  transform: scale(1.12) !important;
-  z-index: 9999 !important;
-}
-
-@keyframes pulse-recording {
-  0% {
-    box-shadow: 0 0 30px #ff1744, 0 0 60px #ff4444, 0 0 90px rgba(255, 23, 68, 0.8);
-  }
-  50% {
-    box-shadow: 0 0 45px #ff1744, 0 0 80px #ff6666, 0 0 120px rgba(255, 23, 68, 1);
-  }
-  100% {
-    box-shadow: 0 0 30px #ff1744, 0 0 60px #ff4444, 0 0 90px rgba(255, 23, 68, 0.8);
-  }
-}
-
-/* Opcional: texto "Gravando" enquanto ativo */
-#jp-btn-falar.recording::after {
-  content: " ● Gravando";
-  font-size: 0.8em;
-  margin-left: 6px;
-  animation: blink 1s infinite;
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
-}
-/* BARRAS DE PROGRESSO - TEXTURA PEDRA + AURA DO GUIA (igual aos botões) */
-
-/* Barra externa (fundo vazio) - pedra sutil */
-#progress-block-outer,
-#progress-question-outer,
-.progress-block-outer,
-.progress-question-outer,
-.perg-progress-outer,
-.progress-bar {
-  background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.4)),
-              url('/assets/img/textura-de-pedra.jpg') !important; /* ajuste o nome exato se for diferente */
-  background-size: cover !important;
-  background-position: center !important;
-  border-radius: 20px !important;
-  box-shadow: inset 0 4px 12px rgba(0,0,0,0.7) !important;
-  height: 12px !important; /* um pouco mais grossa pra textura aparecer melhor */
-}
-
-/* Preenchimento da barra (o que cresce com JS) */
-#progress-block-fill,
-#progress-question-fill,
-.progress-block-fill,
-.progress-question-fill,
-.perg-progress-inner,
-.progress-fill {
-  height: 100% !important;
-  border-radius: inherit !important;
-  position: relative !important;
-  overflow: hidden !important;
-
-  /* TEXTURA DE PEDRA NO PREENCHIMENTO */
-  background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.3)),
-              url('/assets/img/textura-de-pedra.jpg') !important;
-  background-size: cover !important;
-  background-position: center !important;
-
-  /* AURA LUMINOSA PULSANDO NA COR DO GUIA */
-  box-shadow: 
-    0 0 20px var(--progress-main),
-    0 0 40px var(--progress-glow-1),
-    inset 0 0 25px var(--progress-glow-2) !important;
-  animation: barra-glow 4s infinite alternate !important;
-}
-
-@keyframes barra-glow {
-  0% { 
-    box-shadow: 0 0 15px var(--progress-main), 0 0 30px var(--progress-glow-1); 
-  }
-  100% { 
-    box-shadow: 0 0 30px var(--progress-main), 0 0 60px var(--progress-glow-1), inset 0 0 35px var(--progress-glow-2); 
-  }
-}
-
-/* Garante aura do guia na barra movida (qualquer tela) */
-.progress-inline .progress-question-fill,
-#progress-question-fill {
-  background: var(--progress-main, #00ff9d) !important;
-  box-shadow: var(--progress-glow-1, 0 0 20px #00ff9d), var(--progress-glow-2, 0 0 40px rgba(0,255,157,0.8)) !important;
-}
-
-/* Aura específica por guia (reforçada) */
-body[data-guia="lumen"] .progress-inline .progress-question-fill {
-  box-shadow: 0 0 25px #00ff9d, 0 0 50px rgba(0,255,157,0.9) !important;
-}
-body[data-guia="zion"] .progress-inline .progress-question-fill {
-  box-shadow: 0 0 25px #00aaff, 0 0 50px rgba(0,170,255,0.9), 0 0 35px rgba(255,214,91,0.7) !important;
-}
-body[data-guia="arian"] .progress-inline .progress-question-fill {
-  box-shadow: 0 0 30px #ff00ff, 0 0 60px rgba(255,120,255,0.95) !important;
-}
-
-/* Wrapper da barra movida - sempre bonito */
-.progress-inline {
-  background: rgba(0,0,0,0.5) !important;
-  border-radius: 20px !important;
-  padding: 8px 16px !important;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.6) !important;
-}
-/* ======================================================
-   PERGUNTAS — título e barra no mesmo eixo vertical
-   ====================================================== */
-
-/* container do bloco */
-.perguntas-no-bloco{
-  position: relative !important;
-  margin-top: 15px !important;
-  margin-bottom: 10px !important;
-}
-
-/* título */
-.perguntas-no-bloco .titulo-bloco,
-.perguntas-no-bloco h3{
-  margin-bottom: 6px !important;
-  text-align: center;
-}
-
-/* barra logo abaixo do título */
-.perguntas-no-bloco .barra-progresso,
-.perguntas-no-bloco .progress-bar{
-  margin-top: 4px !important;
-}
-   /* ======================================================
-   BOTÕES — magia consistente em todos os estados
-   ====================================================== */
-
-.j-pergunta .btn,
-.j-pergunta button{
-  box-shadow:
-    0 0 12px color-mix(in srgb, var(--guide-color, #ffd700) 45%, transparent);
-  border-color: var(--guide-color, #ffd700);
-}
-
-/* hover / ativo */
-.j-pergunta .btn:hover,
-.j-pergunta .btn.ativo{
-  box-shadow:
-    0 0 26px color-mix(in srgb, var(--guide-color, #ffd700) 75%, transparent);
-}
-
-/* ===========================================================
-   AURA DO GUIA — IGUALZINHA À DOS BOTÕES (Falar, Apagar, Avançar)
-   =========================================================== */
-
-/* Barra superior de blocos */
-.progress-top,
-.progress-top .progress-fill,
-#progress-block-fill {
-  background: linear-gradient(90deg, rgba(0,0,0,0.8), var(--progress-main, #ffd700)) !important;
-  border: 2px solid var(--progress-main, #ffd700) !important;
-  box-shadow:
-    0 0 20px var(--progress-main, #ffd700),
-    0 0 40px var(--progress-glow-1, rgba(255,210,120,0.85)),
-    0 0 60px var(--progress-glow-2, rgba(255,210,120,0.6)) !important;
-  animation: btn-glow 3s infinite alternate !important;
-}
-
-/* Caixa de resposta */
-.jp-question-box,
-.pergunta-box,
-.question-card,
-.perguntas-caixa,
-.response-box,
-#jp-response-input,
-textarea {
-  border: 3px solid var(--progress-main, #ffd700) !important;
-  box-shadow:
-    0 0 20px var(--progress-main, #ffd700),
-    0 0 40px var(--progress-glow-1, rgba(255,210,120,0.85)),
-    inset 0 0 40px rgba(0,0,0,0.7) !important;
-  background: rgba(0,0,0,0.9) !important;
-  animation: btn-glow 3s infinite alternate !important;
-}
-
-/* Texto da pergunta datilografada */
-#jp-question-typed,
-.perguntas-titulo,
-.question-typed,
-.titulo-pergunta {
-  color: var(--progress-main, #000) !important;
-  text-shadow:
-    0 0 12px var(--progress-main, #ffd700),
-    0 0 25px var(--progress-glow-1, rgba(255,210,120,0.85)),
-    0 0 40px var(--progress-glow-2, rgba(255,210,120,0.6)) !important;
-  animation: text-pulse 3s infinite alternate !important;
-}
-
-/* Animações iguais aos botões */
-@keyframes btn-glow {
-  0% {
-    box-shadow:
-      0 0 15px var(--progress-main),
-      0 0 30px var(--progress-glow-1),
-      0 0 50px var(--progress-glow-2);
-  }
-  100% {
-    box-shadow:
-      0 0 25px var(--progress-main),
-      0 0 50px var(--progress-glow-1),
-      0 0 80px var(--progress-glow-2);
-  }
-}
-
-@keyframes text-pulse {
-  0% { text-shadow: 0 0 10px var(--progress-main), 0 0 20px var(--progress-glow-1); }
-  100% { text-shadow: 0 0 20px var(--progress-main), 0 0 40px var(--progress-glow-1); }
-}
-/* =========================================================
-   TEMA DO GUIA — Força auras a usar a cor do guia
-   (cole no FINAL do CSS global)
-   ========================================================= */
-
-:root{
-  --guide-color: #ffd700;
-  --guide-glow-1: rgba(255,230,180,0.85);
-  --guide-glow-2: rgba(255,210,120,0.75);
-}
-
-/* 1) Qualquer “bordo dourado” vira variável */
-.progress-top .progress-bar,
-.progress-middle .progress-bar,
-.progress-bottom .progress-bar,
-.progress-top .progress-fill,
-.progress-middle .progress-fill,
-.progress-bottom .progress-fill,
-#progress-block-fill,
-.progress-question-fill{
-  background: var(--guide-color) !important;
-  box-shadow:
-    0 0 18px var(--guide-color),
-    0 0 36px var(--guide-glow-1),
-    inset 0 0 24px var(--guide-glow-2) !important;
-  border-color: var(--guide-color) !important;
-}
-
-/* 2) Pílulas / contadores / badges */
-.progress-middle,
-.progress-question-value,
-.progress-label,
-.badge,
-.pill,
-.pill-bloco{
-  border-color: var(--guide-color) !important;
-  box-shadow:
-    0 0 14px var(--guide-color),
-    0 0 28px var(--guide-glow-1) !important;
-}
-
-/* 3) Aura em inputs/textarea (moldura) */
-#jp-answer-input,
-textarea,
-.input-box,
-.answer-box{
-  border-color: var(--guide-color) !important;
-  box-shadow:
-    0 0 16px var(--guide-color),
-    inset 0 0 20px rgba(0,0,0,0.6) !important;
-}
-
-/* 4) “Aro” dos botões (se já existe, reforça) */
-.btn, button{
-  box-shadow:
-    0 0 18px color-mix(in srgb, var(--guide-color) 60%, transparent) !important;
-}
-
-/* 5) Qualquer pseudo aura dourada (glows) */
-.j-panel-glow::before,
-.j-panel-glow::after{
-  box-shadow:
-    0 0 22px color-mix(in srgb, var(--guide-color) 45%, transparent),
-    inset 0 0 24px color-mix(in srgb, var(--guide-glow-1) 45%, transparent) !important;
-}
-
-/* DIAMANTE: pergunta sempre branca (não sofre com aura do guia) */
-.section-perguntas .jp-question-typed,
-#jp-question-typed {
-  color: #000 !important;
-  text-shadow: 0 2px 6px rgba(0,0,0,0.95) !important;
-  animation: none !important; /* opcional: remove pulsação do texto */
-}
-/* =========================================================
-   VIDEO TRANSIÇÃO — overlay fora do layout (ANTI “PLACA PRETA”)
-   ========================================================= */
-
-#videoOverlay,
-.video-overlay{
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-
-  /* invisível por padrão (não ocupa layout) */
-  display: none !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
-
-  background: rgba(0,0,0,0.98) !important;
-  z-index: 2147483646 !important;
-  pointer-events: none !important;
-}
-
-#videoOverlay.is-on,
-.video-overlay.is-on{
-  display: block !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  pointer-events: auto !important;
-}
-
-#videoOverlay video,
-.video-overlay video,
-#videoTransicao{
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  object-fit: cover !important;
-  object-position: center !important;
-  background: #000 !important;
-  display: block !important;
-}
-/* ===== TOPO DIREITO — TOTAL GERAL ===== */
-.jp-total-top {
-  position: absolute;
-  top: 18px;
-  right: 18px;
-  display: flex;
-  flex-direction: column;   /* empilha verticalmente */
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  z-index: 5;
-}
-
-.jp-total-icon {
-  font-size: 22px;
-  line-height: 1;
-}
-
-.jp-total-value {
-  font-size: 14px;
-  font-weight: 700;
-  color: #fff3c0;
-  text-shadow: 0 0 10px rgba(255,220,120,.35);
-}
-/* =====================================================
-   AMPULHETA ANIMADA — JORNADA
-   ===================================================== */
-
-.jp-total-icon{
-  font-size: 22px;
-  display: inline-block;
-
-  animation: ampulheta-flow 6s ease-in-out infinite;
-  transform-origin: center;
-
-  filter: drop-shadow(0 0 6px rgba(255,220,120,0.5));
-}
-
-/* giro simbólico da ampulheta */
-@keyframes ampulheta-flow{
-
-  0%{
-    transform: rotate(0deg) scale(1);
-  }
-
-  40%{
-    transform: rotate(180deg) scale(1.05);
-  }
-
-  60%{
-    transform: rotate(180deg) scale(1.05);
-  }
-
-  100%{
-    transform: rotate(360deg) scale(1);
-  }
-
-}
-/* brilho espiritual da ampulheta */
-
-.jp-total-icon{
-  animation:
-    ampulheta-flow 6s ease-in-out infinite,
-    ampulheta-glow 3s ease-in-out infinite alternate;
-}
-
-@keyframes ampulheta-glow{
-
-  0%{
-    filter: drop-shadow(0 0 4px rgba(255,210,120,0.4));
-  }
-
-  100%{
-    filter: drop-shadow(0 0 12px rgba(255,210,120,0.8));
-  }
-
-}
-
-/* ===== DEVOLUTIVA DO GUIA ===== */
-.jp-ai-response-wrap {
-  width: 100%;
-  max-width: 720px;
-  margin: 18px auto 14px;
-  min-height: 92px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
 }
 
 .jp-ai-response-label {
@@ -987,21 +409,7 @@ textarea,
   opacity: 0.92;
 }
 
-.jp-ai-response {
-  min-height: 72px;
-  padding: 12px 14px;
-  border-radius: 16px;
-  background: rgba(0, 0, 0, 0.36);
-  border: 1px solid rgba(255, 215, 80, 0.22);
-  box-shadow:
-    0 0 16px rgba(255, 215, 80, 0.08),
-    inset 0 0 12px rgba(255,255,255,0.04);
-  color: #fff6df;
-  line-height: 1.45;
-  text-align: left;
-}
-
-/* ===== PROGRESSO DO BLOCO ===== */
+/* barra de progresso inline do bloco */
 .jp-progress-inline {
   width: 100%;
   max-width: 720px;
@@ -1015,7 +423,7 @@ textarea,
   flex: 1;
   height: 10px;
   border-radius: 999px;
-  background: rgba(255,255,255,0.12);
+  background: rgba(255, 255, 255, 0.12);
   overflow: hidden;
 }
 
@@ -1035,9 +443,360 @@ textarea,
   color: #fff3c0;
 }
 
-/* ===== MOBILE ===== */
-@media (max-width: 600px) {
-  .jp-total-top {
+
+/* ============================
+   BOTÕES — 4 LADO A LADO
+   ============================ */
+
+.perguntas-controls {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+  width: 100% !important;
+  max-width: 720px !important;
+  margin: 14px auto 0 !important;
+  padding: 10px 20px !important;
+  align-items: stretch !important;
+  box-sizing: border-box !important;
+}
+
+.perguntas-controls .btn-perguntas,
+#jp-btn-falar,
+#jp-btn-mic,
+#jp-btn-apagar,
+#jp-btn-confirmar {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 54px !important;
+  height: 64px !important;
+  padding: 10px !important;
+  border-radius: 999px !important;
+  border: 1px solid var(--guia-strong, rgba(255, 220, 170, 0.6)) !important;
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3)),
+    url('/assets/img/textura-de-pedra.jpg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  box-shadow:
+    0 6px 18px rgba(0, 0, 0, 0.6),
+    0 0 16px var(--guia-soft, rgba(255, 220, 170, 0.3)) !important;
+  color: #fff !important;
+  font-size: 15px !important;
+  font-weight: bold !important;
+  text-shadow: 1px 1px 2px black !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 4px !important;
+  cursor: pointer;
+  transition: transform 0.14s ease, box-shadow 0.14s ease, filter 0.14s ease !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* Botão Confirmar/Avançar — ligeiramente maior */
+.perguntas-controls .btn-confirm,
+#jp-btn-confirmar {
+  flex: 1.6 !important;
+  height: 70px !important;
+  font-size: 17px !important;
+}
+
+.perguntas-controls .btn-perguntas:hover,
+#jp-btn-falar:hover,
+#jp-btn-mic:hover,
+#jp-btn-apagar:hover,
+#jp-btn-confirmar:hover {
+  transform: translateY(-1px) scale(1.02) !important;
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.95),
+    0 0 22px var(--guia-strong, rgba(255, 220, 170, 0.5)) !important;
+}
+
+.perguntas-controls .btn-perguntas:active,
+.perguntas-controls .btn-perguntas.is-pressed,
+#jp-btn-falar:active,
+#jp-btn-falar.is-pressed,
+#jp-btn-mic:active,
+#jp-btn-apagar:active,
+#jp-btn-confirmar:active {
+  background: var(--btn-press, #b31217) !important;
+  box-shadow:
+    0 0 18px rgba(179, 18, 23, 0.78),
+    inset 0 0 16px rgba(255, 255, 255, 0.06) !important;
+  transform: scale(0.98) !important;
+}
+
+
+/* ============================
+   MIC — ESTADO GRAVANDO
+   ============================ */
+
+#jp-btn-falar.recording,
+.perguntas-controls #jp-btn-falar.recording,
+.perguntas-controls .btn-perguntas.recording,
+.btn-perguntas[data-action="start-mic"].recording {
+  background: linear-gradient(135deg, #ff1744, #d50000) !important;
+  border-color: #ff1744 !important;
+  color: white !important;
+  box-shadow:
+    0 0 30px #ff1744,
+    0 0 60px #ff4444,
+    0 0 90px rgba(255, 23, 68, 0.8) !important;
+  animation: pulse-recording 1.4s infinite !important;
+  transform: scale(1.12) !important;
+  z-index: 9999 !important;
+}
+
+#jp-btn-falar.recording::after {
+  content: " ● Gravando";
+  font-size: 0.8em;
+  margin-left: 6px;
+  animation: blink 1s infinite;
+}
+
+
+/* ============================
+   TEMAS POR GUIA — VARIÁVEIS
+   ============================ */
+
+/* Padrão / Zion */
+#section-perguntas-raizes,
+#section-perguntas-reflexoes,
+#section-perguntas-crescimento,
+#section-perguntas-integracao,
+#section-perguntas-sintese {
+  --guia-main:   #ffd54a;
+  --guia-soft:   rgba(255, 213, 74, 0.32);
+  --guia-strong: rgba(255, 213, 74, 0.68);
+  --guia-text:   #fff4c8;
+  --btn-press:   #b31217;
+}
+
+/* Lumen */
+body[data-guia="lumen"] #section-perguntas-raizes,
+body[data-guia="lumen"] #section-perguntas-reflexoes,
+body[data-guia="lumen"] #section-perguntas-crescimento,
+body[data-guia="lumen"] #section-perguntas-integracao,
+body[data-guia="lumen"] #section-perguntas-sintese {
+  --guia-main:   #9cff57;
+  --guia-soft:   rgba(156, 255, 87, 0.30);
+  --guia-strong: rgba(156, 255, 87, 0.64);
+  --guia-text:   #efffde;
+}
+
+/* Arion */
+body[data-guia="arion"] #section-perguntas-raizes,
+body[data-guia="arion"] #section-perguntas-reflexoes,
+body[data-guia="arion"] #section-perguntas-crescimento,
+body[data-guia="arion"] #section-perguntas-integracao,
+body[data-guia="arion"] #section-perguntas-sintese {
+  --guia-main:   #6dc8ff;
+  --guia-soft:   rgba(109, 200, 255, 0.30);
+  --guia-strong: rgba(109, 200, 255, 0.66);
+  --guia-text:   #e3f7ff;
+}
+
+
+/* ============================
+   TEMAS POR GUIA — APLICAÇÃO
+   ============================ */
+
+/* Título do bloco */
+.jp-block-title,
+.perguntas-title,
+#question-block-title {
+  color: var(--guia-main) !important;
+  text-shadow:
+    0 0 10px var(--guia-soft),
+    0 0 24px var(--guia-strong) !important;
+}
+
+/* Caixa de resposta */
+#jp-answer-input,
+.jp-answer-input {
+  border: 2px solid var(--guia-main) !important;
+  box-shadow:
+    0 0 12px var(--guia-soft),
+    inset 0 0 10px rgba(255, 255, 255, 0.04) !important;
+}
+
+/* Devolutiva */
+.jp-ai-response-label,
+#jp-ai-response-wrap {
+  color: var(--guia-text) !important;
+}
+
+#jp-ai-response {
+  border: 1px solid var(--guia-soft) !important;
+  box-shadow: 0 0 18px var(--guia-soft) !important;
+}
+
+/* Barra de progresso do bloco */
+.jp-progress-fill,
+#progress-question-fill {
+  background: linear-gradient(
+    90deg,
+    var(--guia-main),
+    color-mix(in srgb, var(--guia-main) 72%, white)
+  ) !important;
+  box-shadow: 0 0 12px var(--guia-soft) !important;
+}
+
+.jp-progress-value,
+#progress-question-value,
+.jp-total-value,
+#progress-total-value {
+  color: var(--guia-text) !important;
+  text-shadow: 0 0 8px var(--guia-soft) !important;
+}
+
+/* Botões com aura do guia */
+body[data-guia="lumen"] .perguntas-controls .btn-perguntas {
+  border-color: #00ff9d !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.6), 0 0 20px rgba(0,255,157,0.7) !important;
+}
+
+body[data-guia="zion"] .perguntas-controls .btn-perguntas {
+  border-color: #00aaff !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.6), 0 0 20px rgba(0,170,255,0.7), 0 0 30px rgba(255,214,91,0.5) !important;
+}
+
+body[data-guia="arian"] .perguntas-controls .btn-perguntas,
+body[data-guia="arion"] .perguntas-controls .btn-perguntas {
+  border-color: #ff00ff !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.6), 0 0 25px rgba(255,0,255,0.8) !important;
+}
+
+
+/* ============================
+   VÍDEO DE TRANSIÇÃO
+   ============================ */
+
+#videoOverlay,
+.video-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  background: rgba(0, 0, 0, 0.98) !important;
+  z-index: 2147483646 !important;
+  pointer-events: none !important;
+}
+
+#videoOverlay.is-on,
+.video-overlay.is-on {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+#videoOverlay video,
+.video-overlay video,
+#videoTransicao {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  background: #000 !important;
+  display: block !important;
+}
+
+
+/* ============================
+   ANIMAÇÕES (uma de cada)
+   ============================ */
+
+@keyframes guiaGlow {
+  0%, 100% {
+    filter: brightness(1) saturate(1.05);
+    box-shadow:
+      0 0 8px color-mix(in srgb, var(--theme-main-color, #ffd700) 70%, transparent),
+      0 0 18px color-mix(in srgb, var(--theme-main-color, #ffd700) 50%, transparent),
+      inset 0 0 4px rgba(255, 255, 255, 0.25);
+  }
+  35% {
+    filter: brightness(1.45) saturate(1.45);
+    box-shadow:
+      0 0 14px color-mix(in srgb, var(--theme-main-color, #ffd700) 90%, transparent),
+      0 0 34px color-mix(in srgb, var(--theme-main-color, #ffd700) 70%, transparent),
+      0 0 70px color-mix(in srgb, var(--theme-main-color, #ffd700) 45%, transparent),
+      inset 0 0 8px rgba(255, 255, 255, 0.40);
+  }
+  70% {
+    filter: brightness(1.2) saturate(1.25);
+    box-shadow:
+      0 0 11px color-mix(in srgb, var(--theme-main-color, #ffd700) 80%, transparent),
+      0 0 26px color-mix(in srgb, var(--theme-main-color, #ffd700) 60%, transparent),
+      inset 0 0 6px rgba(255, 255, 255, 0.32);
+  }
+}
+
+@keyframes barra-glow {
+  0%   { box-shadow: 0 0 15px var(--progress-main), 0 0 30px var(--progress-glow-1); }
+  100% { box-shadow: 0 0 30px var(--progress-main), 0 0 60px var(--progress-glow-1), inset 0 0 35px var(--progress-glow-2); }
+}
+
+@keyframes ampulheta-flow {
+  0%   { transform: rotate(0deg) scale(1); }
+  40%  { transform: rotate(180deg) scale(1.05); }
+  60%  { transform: rotate(180deg) scale(1.05); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+@keyframes ampulheta-glow {
+  0%   { filter: drop-shadow(0 0 4px rgba(255, 210, 120, 0.4)); }
+  100% { filter: drop-shadow(0 0 12px rgba(255, 210, 120, 0.8)); }
+}
+
+@keyframes pulse-recording {
+  0%, 100% { box-shadow: 0 0 30px #ff1744, 0 0 60px #ff4444, 0 0 90px rgba(255, 23, 68, 0.8); }
+  50%       { box-shadow: 0 0 45px #ff1744, 0 0 80px #ff6666, 0 0 120px rgba(255, 23, 68, 1); }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+@keyframes btn-glow {
+  0%   { box-shadow: 0 0 15px var(--progress-main), 0 0 30px var(--progress-glow-1), 0 0 50px var(--progress-glow-2); }
+  100% { box-shadow: 0 0 25px var(--progress-main), 0 0 50px var(--progress-glow-1), 0 0 80px var(--progress-glow-2); }
+}
+
+
+/* ============================
+   MOBILE (≤ 700px)
+   ============================ */
+
+@media (max-width: 700px) {
+
+  .perguntas-controls {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    padding: 8px 10px !important;
+  }
+
+  .perguntas-controls .btn-perguntas,
+  #jp-btn-falar,
+  #jp-btn-mic,
+  #jp-btn-apagar,
+  #jp-btn-confirmar {
+    min-height: 46px !important;
+    height: auto !important;
+    font-size: 13px !important;
+    padding: 8px 6px !important;
+  }
+
+  .jp-total-top,
+  .progress-total {
     top: 12px;
     right: 12px;
     gap: 6px;
@@ -1068,183 +827,3 @@ textarea,
     font-size: 13px;
   }
 }
-/* =======================================================
-   PERGUNTAS BLOCO — TEMA DO GUIA + 4 BOTÕES
-   ======================================================= */
-
-/* Variáveis padrão */
-#section-perguntas-raizes,
-#section-perguntas-reflexoes,
-#section-perguntas-crescimento,
-#section-perguntas-integracao,
-#section-perguntas-sintese {
-  --guia-main: #ffd54a;
-  --guia-soft: rgba(255, 213, 74, 0.32);
-  --guia-strong: rgba(255, 213, 74, 0.68);
-  --guia-text: #fff4c8;
-  --btn-press: #b31217;
-}
-
-/* Lumen */
-body[data-guia="lumen"] #section-perguntas-raizes,
-body[data-guia="lumen"] #section-perguntas-reflexoes,
-body[data-guia="lumen"] #section-perguntas-crescimento,
-body[data-guia="lumen"] #section-perguntas-integracao,
-body[data-guia="lumen"] #section-perguntas-sintese {
-  --guia-main: #9cff57;
-  --guia-soft: rgba(156, 255, 87, 0.30);
-  --guia-strong: rgba(156, 255, 87, 0.64);
-  --guia-text: #efffde;
-}
-
-/* Zion */
-body[data-guia="zion"] #section-perguntas-raizes,
-body[data-guia="zion"] #section-perguntas-reflexoes,
-body[data-guia="zion"] #section-perguntas-crescimento,
-body[data-guia="zion"] #section-perguntas-integracao,
-body[data-guia="zion"] #section-perguntas-sintese {
-  --guia-main: #ffd54a;
-  --guia-soft: rgba(255, 213, 74, 0.30);
-  --guia-strong: rgba(255, 213, 74, 0.66);
-  --guia-text: #fff4c8;
-}
-
-/* Arion */
-body[data-guia="arion"] #section-perguntas-raizes,
-body[data-guia="arion"] #section-perguntas-reflexoes,
-body[data-guia="arion"] #section-perguntas-crescimento,
-body[data-guia="arion"] #section-perguntas-integracao,
-body[data-guia="arion"] #section-perguntas-sintese {
-  --guia-main: #6dc8ff;
-  --guia-soft: rgba(109, 200, 255, 0.30);
-  --guia-strong: rgba(109, 200, 255, 0.66);
-  --guia-text: #e3f7ff;
-}
-
-/* título do bloco */
-.jp-block-title,
-.perguntas-title,
-#question-block-title {
-  color: var(--guia-main) !important;
-  text-shadow:
-    0 0 10px var(--guia-soft),
-    0 0 24px var(--guia-strong) !important;
-}
-
-/* pergunta */
-#question-display,
-.jp-question-typed {
-  color: var(--guia-text) !important;
-}
-
-/* caixa de resposta */
-#jp-answer-input,
-.jp-answer-input {
-  border: 2px solid var(--guia-main) !important;
-  box-shadow:
-    0 0 12px var(--guia-soft),
-    inset 0 0 10px rgba(255,255,255,0.04) !important;
-}
-
-/* devolutiva do guia */
-.jp-ai-response-label,
-#jp-ai-response-wrap {
-  color: var(--guia-text) !important;
-}
-
-#jp-ai-response {
-  border: 1px solid var(--guia-soft) !important;
-  box-shadow: 0 0 18px var(--guia-soft) !important;
-}
-
-/* barra do bloco */
-.jp-progress-fill,
-#progress-question-fill {
-  background: linear-gradient(90deg, var(--guia-main), color-mix(in srgb, var(--guia-main) 72%, white)) !important;
-  box-shadow: 0 0 12px var(--guia-soft) !important;
-}
-
-.jp-progress-value,
-#progress-question-value,
-.jp-total-value,
-#progress-total-value {
-  color: var(--guia-text) !important;
-  text-shadow: 0 0 8px var(--guia-soft) !important;
-}
-
-/* 4 botões lado a lado */
-.perguntas-controls {
-  display: grid !important;
-  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-  gap: 12px !important;
-  width: 100% !important;
-  max-width: 720px !important;
-  margin: 14px auto 0 !important;
-  align-items: stretch !important;
-}
-
-/* botões */
-.perguntas-controls .btn-perguntas,
-#jp-btn-falar,
-#jp-btn-mic,
-#jp-btn-apagar,
-#jp-btn-confirmar {
-  width: 100% !important;
-  min-width: 0 !important;
-  min-height: 54px !important;
-  border-radius: 999px !important;
-  border: 1px solid var(--guia-strong) !important;
-  box-shadow:
-    0 0 16px var(--guia-soft),
-    inset 0 0 12px rgba(255,255,255,0.04) !important;
-  color: #fff !important;
-  transition: transform .14s ease, box-shadow .14s ease, filter .14s ease, background .14s ease !important;
-}
-
-.perguntas-controls .btn-perguntas:hover,
-#jp-btn-falar:hover,
-#jp-btn-mic:hover,
-#jp-btn-apagar:hover,
-#jp-btn-confirmar:hover {
-  transform: translateY(-1px) scale(1.02) !important;
-  box-shadow:
-    0 0 22px var(--guia-strong),
-    inset 0 0 12px rgba(255,255,255,0.06) !important;
-}
-
-/* clique vermelho forte */
-.perguntas-controls .btn-perguntas:active,
-#jp-btn-falar:active,
-#jp-btn-mic:active,
-#jp-btn-apagar:active,
-#jp-btn-confirmar:active,
-.perguntas-controls .btn-perguntas.is-pressed,
-#jp-btn-falar.is-pressed,
-#jp-btn-mic.is-pressed,
-#jp-btn-apagar.is-pressed,
-#jp-btn-confirmar.is-pressed {
-  background: var(--btn-press) !important;
-  box-shadow:
-    0 0 18px rgba(179, 18, 23, 0.78),
-    inset 0 0 16px rgba(255,255,255,0.06) !important;
-  transform: scale(0.98) !important;
-}
-
-/* mobile */
-@media (max-width: 700px) {
-  .perguntas-controls {
-    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-    gap: 8px !important;
-  }
-
-  .perguntas-controls .btn-perguntas,
-  #jp-btn-falar,
-  #jp-btn-mic,
-  #jp-btn-apagar,
-  #jp-btn-confirmar {
-    min-height: 46px !important;
-    font-size: 13px !important;
-    padding: 8px 6px !important;
-  }
-}
-
