@@ -535,7 +535,7 @@ async function typeQuestion(el, text, speed = 26, withVoice = true) {
 
   };
 }
-
+  }
   async function renderBloco(section) {
     const sectionId = getSectionId(section);
     if (!sectionId || !sectionId.startsWith('section-perguntas-')) return;
