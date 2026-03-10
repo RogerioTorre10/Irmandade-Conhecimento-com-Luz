@@ -8,22 +8,35 @@
   position: relative !important;
   inset: auto !important;
   height: auto !important;
-  min-height: auto !important;
+  min-height: 100vh !important;
   width: auto !important;
-  display: block !important;
+  display: flex !important;
   background: transparent !important;
   overflow: visible !important;
-  padding: 0 !important;
-  margin: 0 !important;
+  overflow-x: clip !important;
+  overflow-y: visible !important;
+  padding: 14px 0 34px !important;
+  margin: 0 !important;  
+  justify-content: center !important;
+  align-items: flex-start !important;
+  box-sizing: border-box !important;
+}
+
+   
 }
 
 /* wrappers não devem "criar caixa preta" gigante */
 #section-final .final-pergaminho-wrapper,
 #section-final .final-panel,
 #section-final .j-perg-v-inner {
+  position: relative !important;
+  width: 100% !important;
+  max-width: 980px !important;
+  margin: 0 auto !important;
   background: transparent !important;
   overflow: visible !important;
 }
+
 
 /* 2) Conteúdo */
 #section-final .pergaminho-content {
@@ -346,4 +359,205 @@ body[data-guia="arion"] #section-final{
     0 0 16px var(--guia-soft),
     inset 0 0 12px rgba(255,255,255,0.04) !important;
   color: var(--guia-text) !important;
+}
+/* =======================================================
+   SECTION FINAL — LAPIDAÇÃO ÉPICA
+   corta vazamento + melhora proporção + mantém cor do guia
+   ======================================================= */
+
+
+/* PAINEL PRINCIPAL — agora segura a luz */
+#section-final .final-panel,
+#section-final .j-panel-glow{
+  position: relative !important;
+  width: min(92vw, 620px) !important;
+  max-width: 620px !important;
+  margin: 0 auto !important;
+  border-radius: 28px !important;
+  overflow: hidden !important;
+  isolation: isolate !important;
+  z-index: 4 !important;
+  padding: 10px !important;
+  box-sizing: border-box !important;
+}
+
+/* glow preso no painel */
+#section-final .final-panel::before,
+#section-final .j-panel-glow::before{
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  border-radius: inherit !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
+
+  border: 2px solid color-mix(in srgb, var(--guia-main, var(--progress-main, #ffd700)) 72%, transparent) !important;
+
+  background:
+    radial-gradient(
+      circle at 50% 18%,
+      color-mix(in srgb, var(--guia-strong, rgba(255,210,120,.42)) 34%, transparent) 0%,
+      transparent 58%
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.08),
+      transparent 34%,
+      transparent 100%
+    ) !important;
+
+  box-shadow:
+    inset 0 0 18px color-mix(in srgb, var(--guia-main, #ffd700) 14%, transparent),
+    inset 0 0 44px color-mix(in srgb, var(--guia-strong, rgba(255,210,120,.42)) 14%, transparent),
+    0 0 10px color-mix(in srgb, var(--guia-main, #ffd700) 18%, transparent) !important;
+}
+
+/* miolo elegante */
+#section-final .final-wrap,
+#section-final .j-arcane-card{
+  position: relative !important;
+  z-index: 2 !important;
+  width: 100% !important;
+  min-height: auto !important;
+  margin: 0 auto !important;
+  padding: 22px 20px 22px !important;
+  border-radius: 24px !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+
+  background:
+    linear-gradient(to bottom, rgba(255,255,255,0.04), rgba(0,0,0,0.18)) !important;
+  border: 1px solid color-mix(in srgb, var(--guia-main, var(--progress-main, #ffd700)) 56%, transparent) !important;
+  box-shadow:
+    inset 0 0 20px rgba(255,255,255,0.04),
+    inset 0 0 42px rgba(0,0,0,0.44),
+    0 0 16px color-mix(in srgb, var(--guia-main, var(--progress-main, #ffd700)) 22%, transparent) !important;
+}
+
+/* conteúdo interno */
+#section-final .pergaminho-content{
+  position: relative !important;
+  z-index: 3 !important;
+  padding: 18px 26px 14px !important;
+  text-align: left !important;
+  overflow: visible !important;
+}
+
+/* título */
+#section-final .final-title,
+#section-final #final-title{
+  margin: 0 0 14px !important;
+  text-align: center !important;
+  font-size: clamp(22px, 2.1vw, 30px) !important;
+  line-height: 1.18 !important;
+}
+
+/* mensagem */
+#section-final .final-message p{
+  margin: 0 0 14px !important;
+  text-align: center !important;
+  font-size: clamp(15px, 1.24vw, 17px) !important;
+  line-height: 1.46 !important;
+}
+
+/* ações */
+#section-final .final-acoes{
+  position: relative !important;
+  z-index: 4 !important;
+  margin-top: 18px !important;
+}
+
+#section-final .final-pdf-status{
+  position: relative !important;
+  z-index: 4 !important;
+  margin-top: 16px !important;
+  border-radius: 16px !important;
+  padding: 14px 18px !important;
+  background: rgba(0,0,0,0.28) !important;
+}
+
+/* névoa inferior controlada */
+#section-final::after{
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: -22px;
+  height: 82px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: .42;
+  filter: blur(18px);
+  background: radial-gradient(
+    ellipse at center,
+    color-mix(in srgb, var(--guia-strong, rgba(255,210,120,.42)) 34%, transparent) 0%,
+    transparent 72%
+  );
+}
+
+/* MOBILE */
+@media (max-width: 600px){
+
+  #section-final{
+    padding: 8px 0 22px !important;
+    min-height: auto !important;
+  }
+
+  #section-final .final-panel,
+  #section-final .j-panel-glow{
+    width: min(96vw, 430px) !important;
+    max-width: 430px !important;
+    border-radius: 22px !important;
+    padding: 8px !important;
+  }
+
+  #section-final .final-wrap,
+  #section-final .j-arcane-card{
+    border-radius: 18px !important;
+    padding: 14px 12px 16px !important;
+  }
+
+  #section-final .pergaminho-content{
+    padding: 12px 12px 10px !important;
+  }
+
+  #section-final .final-title,
+  #section-final #final-title{
+    font-size: 18px !important;
+    line-height: 1.16 !important;
+    margin-bottom: 12px !important;
+  }
+
+  #section-final .final-message p{
+    font-size: 13px !important;
+    line-height: 1.38 !important;
+    margin-bottom: 12px !important;
+  }
+
+  #section-final .final-acoes{
+    grid-template-columns: 1fr 1.2fr 1fr !important;
+    gap: 8px !important;
+    padding: 0 4px 6px !important;
+  }
+
+  #section-final .final-acoes button,
+  #section-final .final-acoes a{
+    min-height: 42px !important;
+    font-size: 11px !important;
+    padding: 7px 4px !important;
+    border-radius: 12px !important;
+  }
+
+  #section-final .final-pdf-status{
+    margin-top: 14px !important;
+    padding: 12px 12px !important;
+    border-radius: 14px !important;
+    font-size: 12px !important;
+  }
+
+  #section-final::after{
+    bottom: -16px !important;
+    height: 68px !important;
+    opacity: .34 !important;
+  }
 }
