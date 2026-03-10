@@ -6,13 +6,15 @@
  * - section-perguntas-integracao
  * - section-perguntas-sintese
  *
- * Unifica o melhor do section-perguntas.js antigo:
+ * Unifica:
  * - tema por guia
  * - datilografia + TTS
  * - botão de microfone
  * - botões com efeito de clique
- * - devolutiva do guia
+ * - devolutiva do guia via API
  * - progresso do bloco e total
+ * - botão Continuar em 2 cliques:
+ *    1º envia para API / 2º avança
  */
 
 (function (window, document) {
@@ -86,90 +88,90 @@
     return x;
   }
 
-function applyGuiaTheme(section) {
-  const guiaRaw =
-    sessionStorage.getItem('jornada.guia') ||
-    localStorage.getItem('JORNADA_GUIA') ||
-    localStorage.getItem('jornada.guia') ||
-    document.body.dataset.guia ||
-    'lumen';
+  function applyGuiaTheme(section) {
+    const guiaRaw =
+      sessionStorage.getItem('jornada.guia') ||
+      localStorage.getItem('JORNADA_GUIA') ||
+      localStorage.getItem('jornada.guia') ||
+      document.body.dataset.guia ||
+      'lumen';
 
-  const guia = normalizeGuide(guiaRaw);
+    const guia = normalizeGuide(guiaRaw);
 
-  document.body.dataset.guia = guia;
-  document.documentElement.dataset.guia = guia;
-  if (section) section.dataset.guia = guia;
+    document.body.dataset.guia = guia;
+    document.documentElement.dataset.guia = guia;
+    if (section) section.dataset.guia = guia;
 
-  const themeMap = {
-    lumen: {
-      main: '#00c781',   // esmeralda
-      soft: 'rgba(0,199,129,0.28)',
-      strong: 'rgba(0,199,129,0.62)',
-      text: '#e8fff7'
-    },
-    zion: {
-      main: '#59c8ff',   // azul celeste
-      soft: 'rgba(89,200,255,0.28)',
-      strong: 'rgba(89,200,255,0.62)',
-      text: '#eefaff'
-    },
-    arian: {
-      main: '#ff4fd8',   // magenta
-      soft: 'rgba(255,79,216,0.28)',
-      strong: 'rgba(255,79,216,0.62)',
-      text: '#fff0fb'
-    },
-    arion: {
-      main: '#ff4fd8',
-      soft: 'rgba(255,79,216,0.28)',
-      strong: 'rgba(255,79,216,0.62)',
-      text: '#fff0fb'
+    const themeMap = {
+      lumen: {
+        main: '#00c781',
+        soft: 'rgba(0,199,129,0.28)',
+        strong: 'rgba(0,199,129,0.62)',
+        text: '#e8fff7'
+      },
+      zion: {
+        main: '#59c8ff',
+        soft: 'rgba(89,200,255,0.28)',
+        strong: 'rgba(89,200,255,0.62)',
+        text: '#eefaff'
+      },
+      arian: {
+        main: '#ff4fd8',
+        soft: 'rgba(255,79,216,0.28)',
+        strong: 'rgba(255,79,216,0.62)',
+        text: '#fff0fb'
+      },
+      arion: {
+        main: '#ff4fd8',
+        soft: 'rgba(255,79,216,0.28)',
+        strong: 'rgba(255,79,216,0.62)',
+        text: '#fff0fb'
+      }
+    };
+
+    const theme = themeMap[guia] || themeMap.lumen;
+    const root = document.documentElement;
+
+    root.style.setProperty('--guia-main', theme.main);
+    root.style.setProperty('--guia-soft', theme.soft);
+    root.style.setProperty('--guia-strong', theme.strong);
+    root.style.setProperty('--guia-text', theme.text);
+
+    root.style.setProperty('--guide-color', theme.main);
+    root.style.setProperty('--theme-main-color', theme.main);
+    root.style.setProperty('--progress-main', theme.main);
+    root.style.setProperty('--progress-glow-1', theme.soft);
+    root.style.setProperty('--progress-glow-2', theme.strong);
+
+    localStorage.setItem('JORNADA_GUIA_COLOR', theme.main);
+    localStorage.setItem('JORNADA_GUIA_ATIVO', guia);
+
+    const title = section?.querySelector('.perguntas-title, .jp-block-title, #question-block-title');
+    if (title) {
+      title.style.color = theme.main;
+      title.style.textShadow = `0 0 10px ${theme.soft}, 0 0 24px ${theme.strong}`;
     }
-  };
 
-  const theme = themeMap[guia] || themeMap.lumen;
-  const root = document.documentElement;
+    const question = section?.querySelector('#question-display, .jp-question-typed');
+    if (question) {
+      question.style.color = theme.text;
+      question.style.textShadow = `0 0 6px ${theme.soft}`;
+    }
 
-  root.style.setProperty('--guia-main', theme.main);
-  root.style.setProperty('--guia-soft', theme.soft);
-  root.style.setProperty('--guia-strong', theme.strong);
-  root.style.setProperty('--guia-text', theme.text);
+    const textarea = section?.querySelector('#jp-answer-input, .jp-answer-input');
+    if (textarea) {
+      textarea.style.borderColor = theme.main;
+      textarea.style.boxShadow = `0 0 12px ${theme.soft}, inset 0 0 10px rgba(255,255,255,0.04)`;
+    }
 
-  root.style.setProperty('--guide-color', theme.main);
-  root.style.setProperty('--theme-main-color', theme.main);
-  root.style.setProperty('--progress-main', theme.main);
-  root.style.setProperty('--progress-glow-1', theme.soft);
-  root.style.setProperty('--progress-glow-2', theme.strong);
+    const bar = section?.querySelector('#progress-question-fill, .jp-progress-fill');
+    if (bar) {
+      bar.style.background = `linear-gradient(90deg, ${theme.main}, ${theme.main})`;
+      bar.style.boxShadow = `0 0 12px ${theme.soft}, 0 0 20px ${theme.strong}`;
+    }
 
-  localStorage.setItem('JORNADA_GUIA_COLOR', theme.main);
-  localStorage.setItem('JORNADA_GUIA_ATIVO', guia);
-
-  const title = section?.querySelector('.perguntas-title, .jp-block-title, #question-block-title');
-  if (title) {
-    title.style.color = theme.main;
-    title.style.textShadow = `0 0 10px ${theme.soft}, 0 0 24px ${theme.strong}`;
+    log('Tema do guia aplicado:', guia, theme.main);
   }
-
-  const question = section?.querySelector('#question-display, .jp-question-typed');
-  if (question) {
-    question.style.color = theme.text;
-    question.style.textShadow = `0 0 6px ${theme.soft}`;
-  }
-
-  const textarea = section?.querySelector('#jp-answer-input, .jp-answer-input');
-  if (textarea) {
-    textarea.style.borderColor = theme.main;
-    textarea.style.boxShadow = `0 0 12px ${theme.soft}, inset 0 0 10px rgba(255,255,255,0.04)`;
-  }
-
-  const bar = section?.querySelector('#progress-question-fill, .jp-progress-fill');
-  if (bar) {
-    bar.style.background = `linear-gradient(90deg, ${theme.main}, ${theme.main})`;
-    bar.style.boxShadow = `0 0 12px ${theme.soft}, 0 0 20px ${theme.strong}`;
-  }
-
-  log('Tema do guia aplicado:', guia, theme.main);
-}
 
   function getQuestionText(bloco, qIndex = 0) {
     const pergunta = bloco?.questions?.[qIndex];
@@ -196,41 +198,40 @@ function applyGuiaTheme(section) {
     return localStorage.getItem(answerKey(bloco, qIndex)) || '';
   }
 
- async function setGuideResponse(text, kind = 'info') {
+  async function setGuideResponse(text, kind = 'info') {
+    const wrap = document.getElementById('jp-ai-response-wrap');
+    const box = document.getElementById('jp-ai-response');
 
-  const wrap = document.getElementById('jp-ai-response-wrap');
-  const box  = document.getElementById('jp-ai-response');
+    if (!wrap || !box) return;
 
-  if (!wrap || !box) return;
+    const content = String(text || '').trim();
 
-  const content = String(text || '').trim();
+    if (!content) {
+      box.hidden = true;
+      box.textContent = '';
+      box.innerHTML = '';
+      box.classList.remove('is-visible', 'is-revealing');
+      wrap.dataset.kind = '';
+      return;
+    }
 
-  if (!content) {
-    box.hidden = true;
-    box.textContent = '';
-    box.classList.remove('is-visible','is-revealing');
-    wrap.dataset.kind = '';
-    return;
+    wrap.dataset.kind = kind;
+    box.hidden = false;
+
+    box.innerHTML = content
+      .split('\n')
+      .map((line, i) => `<div class="ai-line" style="animation-delay:${i * 120}ms">${line}</div>`)
+      .join('');
+
+    void box.offsetWidth;
+
+    box.classList.add('is-revealing');
+    box.classList.add('is-visible');
+
+    setTimeout(() => {
+      box.classList.remove('is-revealing');
+    }, 1300);
   }
-
-  wrap.dataset.kind = kind;
-  box.hidden = false;
-
-  box.innerHTML = content
-    .split('\n')
-    .map((line,i)=>`<div class="ai-line" style="animation-delay:${i*120}ms">${line}</div>`)
-    .join('');
-
-  void box.offsetWidth;
-
-  box.classList.add('is-revealing');
-  box.classList.add('is-visible');
-
-  setTimeout(()=>{
-    box.classList.remove('is-revealing');
-  },1300);
-
-}
 
   function updateProgress(bloco) {
     const totalBlocks = window.JORNADA_PAPER_QA?.getTotalBlocks?.(getLang()) || 5;
@@ -241,7 +242,6 @@ function applyGuiaTheme(section) {
     if (totalValue) totalValue.textContent = `${currentBlock} / ${totalBlocks}`;
     if (totalFill) totalFill.style.width = `${(currentBlock / totalBlocks) * 100}%`;
 
-    // No modelo atual: 1 pergunta por bloco
     const questionValue = document.getElementById('progress-question-value');
     const questionFill = document.getElementById('progress-question-fill');
     if (questionValue) questionValue.textContent = `1 / 1`;
@@ -260,58 +260,55 @@ function applyGuiaTheme(section) {
     }));
   }
 
- function stopSpeaking() {
-  try {
-    window.speechSynthesis?.cancel();
-  } catch {}
-}
-
-function speakText(text) {
-  const clean = String(text || '').trim();
-  if (!clean) return Promise.resolve();
-
-  return new Promise((resolve) => {
+  function stopSpeaking() {
     try {
-      stopSpeaking();
-
-      const utter = new SpeechSynthesisUtterance(clean);
-      utter.lang = document.documentElement.lang || getLang() || 'pt-BR';
-      utter.rate = 0.92;
-      utter.pitch = 1;
-      utter.volume = 1;
-
-      utter.onend = () => resolve();
-      utter.onerror = () => resolve();
-
-      window.speechSynthesis.speak(utter);
-    } catch (e) {
-      warn('TTS falhou:', e);
-      resolve();
-    }
-  });
-}
-
-async function typeQuestion(el, text, speed = 26, withVoice = true) {
-  if (!el) return;
-
-  const content = String(text || '').trim();
-  el.textContent = '';
-  el.classList.remove('typing-done');
-
-  // fala começa junto com a datilografia
-  const speechPromise = withVoice ? speakText(content) : Promise.resolve();
-
-  for (let i = 0; i <= content.length; i++) {
-    el.textContent = content.slice(0, i);
-    await new Promise(r => setTimeout(r, speed));
+      window.speechSynthesis?.cancel();
+    } catch {}
   }
 
-  el.classList.add('typing-done');
+  function speakText(text) {
+    const clean = String(text || '').trim();
+    if (!clean) return Promise.resolve();
 
-  // só aguarda terminar a fala, sem atrasar o início
-  await speechPromise;
-}
-  
+    return new Promise((resolve) => {
+      try {
+        stopSpeaking();
+
+        const utter = new SpeechSynthesisUtterance(clean);
+        utter.lang = document.documentElement.lang || getLang() || 'pt-BR';
+        utter.rate = 0.92;
+        utter.pitch = 1;
+        utter.volume = 1;
+
+        utter.onend = () => resolve();
+        utter.onerror = () => resolve();
+
+        window.speechSynthesis.speak(utter);
+      } catch (e) {
+        warn('TTS falhou:', e);
+        resolve();
+      }
+    });
+  }
+
+  async function typeQuestion(el, text, speed = 26, withVoice = true) {
+    if (!el) return;
+
+    const content = String(text || '').trim();
+    el.textContent = '';
+    el.classList.remove('typing-done');
+
+    const speechPromise = withVoice ? speakText(content) : Promise.resolve();
+
+    for (let i = 0; i <= content.length; i++) {
+      el.textContent = content.slice(0, i);
+      await new Promise((r) => setTimeout(r, speed));
+    }
+
+    el.classList.add('typing-done');
+    await speechPromise;
+  }
+
   function bindPressFx(btn) {
     if (!btn || btn.dataset.pressFxBound === '1') return;
     btn.dataset.pressFxBound = '1';
@@ -357,13 +354,15 @@ async function typeQuestion(el, text, speed = 26, withVoice = true) {
       return;
     }
 
-    // fallback robusto
     try {
       if (typeof window.startMic === 'function') return window.startMic();
       if (typeof window.initSpeechRecognition === 'function') return window.initSpeechRecognition();
 
       const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SR) { warn('SpeechRecognition não suportado.'); return; }
+      if (!SR) {
+        warn('SpeechRecognition não suportado.');
+        return;
+      }
 
       if (!window.__REC__) {
         const rec = new SR();
@@ -421,24 +420,53 @@ async function typeQuestion(el, text, speed = 26, withVoice = true) {
   }
 
   function clearAnswerUI() {
-  const ta = document.getElementById('jp-answer-input');
-  if (ta) {
-    ta.value = '';
-    ta.focus();
+    const ta = document.getElementById('jp-answer-input');
+    if (ta) {
+      ta.value = '';
+      ta.focus();
+    }
+
+    const wrap = document.getElementById('jp-ai-response-wrap');
+    const box = document.getElementById('jp-ai-response');
+
+    if (wrap) wrap.dataset.kind = '';
+    if (box) {
+      box.hidden = true;
+      box.textContent = '';
+      box.innerHTML = '';
+      box.classList.remove('is-visible', 'is-revealing');
+    }
   }
 
-  const wrap = document.getElementById('jp-ai-response-wrap');
-  const box  = document.getElementById('jp-ai-response');
+  function setContinueState(section, state) {
+    if (!section) return;
 
-  if (wrap) wrap.dataset.kind = '';
-  if (box) {
-    box.hidden = true;
-    box.textContent = '';
-    box.innerHTML = '';
-    box.classList.remove('is-visible', 'is-revealing');
+    section.dataset.continueState = state || 'idle';
+
+    const btn = section.querySelector('#jp-btn-confirmar');
+    if (!btn) return;
+
+    if (state === 'loading') {
+      btn.disabled = true;
+      btn.textContent = 'Lumen refletindo...';
+      btn.classList.add('is-loading');
+      btn.classList.remove('is-ready');
+      return;
+    }
+
+    if (state === 'ready') {
+      btn.disabled = false;
+      btn.textContent = 'Continuar';
+      btn.classList.remove('is-loading');
+      btn.classList.add('is-ready');
+      return;
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Continuar';
+    btn.classList.remove('is-loading', 'is-ready');
   }
-}
-  
+
   function bindButtons(section, bloco, perguntaText) {
     const btnTTS = $('#jp-btn-falar', section);
     const btnMic = $('#jp-btn-mic', section);
@@ -466,76 +494,96 @@ async function typeQuestion(el, text, speed = 26, withVoice = true) {
       btnApagar.onclick = (ev) => {
         ev.preventDefault();
         clearAnswerUI();
+        setContinueState(section, 'idle');
       };
     }
 
     if (btnConfirm) {
-  btnConfirm.onclick = async (ev) => {
+      btnConfirm.onclick = async (ev) => {
+        ev.preventDefault();
 
-    ev.preventDefault();
+        const state = section?.dataset?.continueState || 'idle';
 
-    const val = String(textarea?.value || '').trim();
+        // 2º clique: devolutiva já recebida / ou estado liberado para seguir
+        if (state === 'ready') {
+          goNext(bloco);
+          return;
+        }
 
-    if (!val) {
-      showMissingAnswerFeedback();
-      textarea?.focus();
-      return;
+        // evita clique repetido enquanto API responde
+        if (state === 'loading') {
+          return;
+        }
+
+        const val = String(textarea?.value || '').trim();
+
+        if (!val) {
+          showMissingAnswerFeedback();
+          textarea?.focus();
+          return;
+        }
+
+        saveAnswer(bloco, 0, val);
+        setContinueState(section, 'loading');
+        await setGuideResponse('Lumen está refletindo sobre tua resposta...', 'info');
+
+        try {
+          const guia =
+            sessionStorage.getItem('jornada.guia') ||
+            localStorage.getItem('JORNADA_GUIA') ||
+            localStorage.getItem('jornada.guia') ||
+            document.body.dataset.guia ||
+            'lumen';
+
+          const nome =
+            sessionStorage.getItem('jornada.nome') ||
+            localStorage.getItem('JORNADA_NOME') ||
+            localStorage.getItem('jc.nome') ||
+            'Participante';
+
+          if (!window.API?.gerarDevolutiva) {
+            await setGuideResponse(
+              'A conexão com o guia ainda não está pronta nesta etapa. Toque novamente em Continuar para seguir.',
+              'warn'
+            );
+            setContinueState(section, 'ready');
+            return;
+          }
+
+          const resp = await window.API.gerarDevolutiva({
+            nome,
+            guia,
+            bloco: bloco?.title || bloco?.id || 'Bloco',
+            pergunta: perguntaText,
+            resposta: val,
+            idioma: document.documentElement.lang || getLang() || 'pt-BR'
+          });
+
+          if (resp?.ok && resp.texto) {
+            await setGuideResponse(resp.texto, 'success');
+            setContinueState(section, 'ready');
+            return;
+          }
+
+          await setGuideResponse(
+            'O guia não concluiu a devolutiva a tempo. Toque novamente em Continuar para seguir.',
+            'warn'
+          );
+          setContinueState(section, 'ready');
+
+        } catch (e) {
+          console.warn('Erro devolutiva IA', e);
+
+          await setGuideResponse(
+            'A conexão com o guia oscilou. Toque novamente em Continuar para seguir.',
+            'warn'
+          );
+          setContinueState(section, 'ready');
+        }
+      };
     }
-
-    saveAnswer(bloco, 0, val);
-
-    // -----------------------------
-    // CHAMA DEVOLUTIVA DA IA
-    // -----------------------------
-
-    try {
-
-      const guia =
-        sessionStorage.getItem('jornada.guia') ||
-        localStorage.getItem('JORNADA_GUIA') ||
-        'lumen';
-
-      const resp = await window.API.gerarDevolutiva({
-
-        nome:
-          sessionStorage.getItem('jornada.nome') ||
-          localStorage.getItem('JORNADA_NOME') ||
-          'Participante',
-
-        guia: guia,
-
-        bloco: bloco.title || bloco.id,
-
-        pergunta: perguntaText,
-
-        resposta: val,
-
-        idioma:
-          document.documentElement.lang ||
-          'pt-BR'
-
-      });
-
-      if (resp?.ok && resp.texto) {
-
-        await setGuideResponse(resp.texto, 'success');
-
-      }
-
-    } catch (e) {
-
-      console.warn('Erro devolutiva IA', e);
-
-    }
-
-    // pequena pausa dramática antes de avançar
-    await new Promise(r => setTimeout(r, 1200));
-
-    goNext(bloco);
-
-  };
-}
   }
+
   async function renderBloco(section) {
     const sectionId = getSectionId(section);
     if (!sectionId || !sectionId.startsWith('section-perguntas-')) return;
@@ -581,6 +629,7 @@ async function typeQuestion(el, text, speed = 26, withVoice = true) {
     }
 
     setGuideResponse('');
+    setContinueState(section, 'idle');
     updateProgress(bloco);
     bindButtons(section, bloco, perguntaText);
 
@@ -607,7 +656,6 @@ async function typeQuestion(el, text, speed = 26, withVoice = true) {
     }
   });
 
-  // API pública para futura devolutiva do Lumen / Zion / Arion
   window.JORNADA_PERGUNTAS_BLOCO = {
     setGuideResponse,
     rerender() {
