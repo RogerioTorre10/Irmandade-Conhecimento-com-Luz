@@ -191,6 +191,40 @@
         : undefined
     };
   }
+  
+// --------------------------------------------------
+// Devolutiva do Guia (Lumen / Zion / Arion)
+// --------------------------------------------------
+
+async function gerarDevolutiva(payload) {
+
+  const base = API_PRIMARY;
+
+  try {
+
+    const { data } = await postJSON(
+      base,
+      '/jornada/devolutiva',
+      payload,
+      { timeout: 30000 }
+    );
+
+    if (data && data.devolutiva) {
+      return { ok: true, texto: data.devolutiva };
+    }
+
+    return { ok: false };
+
+  } catch (e) {
+
+    console.warn('[API] devolutiva falhou', e);
+    return { ok: false };
+
+  }
+}
+
+window.API.gerarDevolutiva = gerarDevolutiva;
+  
 
   // Expondo
   window.API = window.API || {};
