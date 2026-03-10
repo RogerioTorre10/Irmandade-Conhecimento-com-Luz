@@ -549,3 +549,111 @@
     font-size: 0.74rem !important;
   }
 }
+/* =======================================================
+   AURA DINÂMICA DO GUIA — CARD
+   ======================================================= */
+
+/* container geral */
+#section-card::before{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:40%;
+  transform:translate(-50%,-50%);
+  width:560px;
+  height:560px;
+  pointer-events:none;
+  z-index:0;
+  opacity:.45;
+  filter:blur(60px);
+}
+
+/* LUMEN — verde */
+body[data-guia="lumen"] #section-card::before{
+  background:
+  radial-gradient(circle,
+  rgba(140,255,160,.55) 0%,
+  rgba(140,255,160,.25) 40%,
+  transparent 70%);
+}
+
+/* ZION — azul */
+body[data-guia="zion"] #section-card::before{
+  background:
+  radial-gradient(circle,
+  rgba(120,200,255,.55) 0%,
+  rgba(120,200,255,.25) 40%,
+  transparent 70%);
+}
+
+/* ARIAN — magenta */
+body[data-guia="arian"] #section-card::before{
+  background:
+  radial-gradient(circle,
+  rgba(255,120,255,.55) 0%,
+  rgba(255,120,255,.25) 40%,
+  transparent 70%);
+}
+/* =======================================================
+   HALO ATRÁS DO GUIA
+   ======================================================= */
+
+#section-card .guide-bg{
+  position:relative;
+  z-index:2;
+}
+
+#section-card .guide-bg::after{
+  content:"";
+  position:absolute;
+  inset:-12%;
+  border-radius:50%;
+  z-index:-1;
+  filter:blur(40px);
+  opacity:.55;
+}
+
+body[data-guia="lumen"] #section-card .guide-bg::after{
+  background:radial-gradient(circle,
+  rgba(150,255,170,.65) 0%,
+  rgba(150,255,170,.25) 40%,
+  transparent 70%);
+}
+
+body[data-guia="zion"] #section-card .guide-bg::after{
+  background:radial-gradient(circle,
+  rgba(130,210,255,.65) 0%,
+  rgba(130,210,255,.25) 40%,
+  transparent 70%);
+}
+
+body[data-guia="arian"] #section-card .guide-bg::after{
+  background:radial-gradient(circle,
+  rgba(255,150,255,.65) 0%,
+  rgba(255,150,255,.25) 40%,
+  transparent 70%);
+}
+/* =======================================================
+   BOTÃO COM COR DO GUIA
+   ======================================================= */
+
+body[data-guia="lumen"] #section-card #btnNext{
+  box-shadow:
+  0 0 22px rgba(140,255,160,.75),
+  0 0 40px rgba(140,255,160,.35),
+  inset 0 0 12px rgba(255,255,255,.15);
+}
+
+body[data-guia="zion"] #section-card #btnNext{
+  box-shadow:
+  0 0 22px rgba(120,200,255,.75),
+  0 0 40px rgba(120,200,255,.35),
+  inset 0 0 12px rgba(255,255,255,.15);
+}
+
+body[data-guia="arian"] #section-card #btnNext{
+  box-shadow:
+  0 0 22px rgba(255,120,255,.75),
+  0 0 40px rgba(255,120,255,.35),
+  inset 0 0 12px rgba(255,255,255,.15);
+}
