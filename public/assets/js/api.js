@@ -197,11 +197,9 @@
 // --------------------------------------------------
 
 async function gerarDevolutiva(payload) {
-
   const base = API_PRIMARY;
 
   try {
-
     const { data } = await postJSON(
       base,
       '/jornada/devolutiva',
@@ -214,21 +212,15 @@ async function gerarDevolutiva(payload) {
     }
 
     return { ok: false };
-
   } catch (e) {
-
     console.warn('[API] devolutiva falhou', e);
     return { ok: false };
-
   }
 }
 
+window.API = window.API || {};
+window.API.gerarPDFEHQ = gerarPDFEHQ;
 window.API.gerarDevolutiva = gerarDevolutiva;
-  
-
-  // Expondo
-  window.API = window.API || {};
-  window.API.gerarPDFEHQ = gerarPDFEHQ;
 
   // Log de sanidade
   try {
