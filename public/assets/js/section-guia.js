@@ -1,64 +1,137 @@
-// /assets/js/section-guia.js — v3.4 (Fase 1: preview com áudio; Fase 2: TTS da descrição)
+// /assets/js/section-guia.js — v3.5 (lapidado)
+// Guia: preview com áudio antes do nome; TTS da descrição após confirmar nome.
+
 (function () {
   'use strict';
 
-  const SECTION_ID      = 'section-guia';
+  const SECTION_ID = 'section-guia';
   const NEXT_SECTION_ID = 'section-selfie';
-  const HIDE_CLASS      = 'hidden';
+  const HIDE_CLASS = 'hidden';
 
   const TYPING_SPEED = 42;
   const TTS_LATCH_MS = 600;
-  const DATA_URL     = '/assets/data/guias.json';
+  const DATA_URL = '/assets/data/guias.json';
 
   // UX: confirmação em 2 passos
   const ARM_TIMEOUT_MS = 10000;
   const HOVER_DELAY_MS = 150;
 
-  // Preview (10s)
+  // Preview
   const PREVIEW_TIMEOUT_MS = 10200;
 
-  if (window.JCGuia?.__bound) { return; }
+  if (window.JCGuia?.__bound) return;
   window.JCGuia = window.JCGuia || {};
   window.JCGuia.__bound = true;
 
-  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-  const q  = (sel, root = document) => root.querySelector(sel);
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const q = (sel, root = document) => root.querySelector(sel);
   const qa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
-  // ============================
-  // ✅ FASES DE ÁUDIO/TTS (NOVO)
-  // ============================
-  // Fase 1 (antes de confirmar nome): preview com áudio, sem TTS de descrição
-  // Fase 2 (depois de confirmar nome): preview mudo, TTS da descrição ligado
+  // =====================================================
+  // ESTADO
+  // =====================================================
   let nomeConfirmado = false;
 
-  // Estado do fluxo
-  let hoverTimers = new Map();   // Map<guiaId, timeoutId>
-  let armedId = null;            // guia armado
-  let armTimer = null;           // timer do arm
-  let cancelArm = null;          // função de cancelamento (definida abaixo)
+  let hoverTimers = new Map();
+  let armedId = null;
+  let armTimer = null;
+  let cancelArm = null;
 
-  // =========================
-  // PREVIEW 10s (escopo único)
-  // =========================
   let previewOverlay = null;
-  let previewVideo   = null;
+  let previewVideo = null;
   let previewStopTimer = null;
   let previewPlaying = false;
   let previewCurrentSrc = null;
 
-  function ensurePreviewRefs(root) {
+  // =====================================================
+  // HELPERS
+  // =====================================================
+  function canonGuia(v) {
+    const s = String(v || '').trim().toLowerCase();
+    if (!s) return '';
+    if (s.includes('lumen')) return 'lumen';
+    if (s.includes('zion')) return 'zion';
+    if (s.includes('arion') || s.includes('arian')) return 'arion';
+    return '';
+  }
+
+  function ensureVisible(el) {
+    if (!el) return;
+    el.classList.remove(HIDE_CLASS);
+    el.setAttribute('aria-hidden', 'false');
+    el.style.removeProperty('display');
+    el.style.removeProperty('opacity');
+    el.style.removeProperty('visibility');
+  }
+
+  function safeSpeechCancel() {
+    try { window.speechSynthesis?.cancel?.(); } catch {}
+  }
+
+  function readSavedGuide() {
+    return canonGuia(
+      window.JORNADA_STATE?.guiaSelecionado ||
+      window.JORNADA_STATE?.guia ||
+      window.JC?.data?.guiaSelecionado ||
+      window.JC?.data?.guia ||
+      sessionStorage.getItem('JORNADA_GUIA') ||
+      localStorage.getItem('JORNADA_GUIA') ||
+      sessionStorage.getItem('jornada.guia') ||
+      localStorage.getItem('jc.guiaSelecionado') ||
+      localStorage.getItem('jc.guia') ||
+      localStorage.getItem('guiaEscolhido')
+    );
+  }
+
+  function persistGuide(guiaCanon) {
+    if (!guiaCanon) return;
+
+    sessionStorage.setItem('JORNADA_GUIA', guiaCanon);
+    localStorage.setItem('JORNADA_GUIA', guiaCanon);
+
+    // chaves legadas compatíveis
+    sessionStorage.setItem('jornada.guia', guiaCanon);
+    localStorage.setItem('jc.guia', guiaCanon);
+    localStorage.setItem('jc.guiaSelecionado', guiaCanon);
+    localStorage.setItem('guiaEscolhido', guiaCanon);
+
+    window.JORNADA_STATE = window.JORNADA_STATE || {};
+    window.JORNADA_STATE.guia = guiaCanon;
+    window.JORNADA_STATE.guiaSelecionado = guiaCanon;
+
+    window.JC = window.JC || {};
+    window.JC.data = window.JC.data || {};
+    window.JC.data.guia = guiaCanon;
+    window.JC.data.guiaSelecionado = guiaCanon;
+  }
+
+  function persistName(nome) {
+    const upperName = String(nome || '').trim().toUpperCase();
+    if (!upperName) return;
+
+    sessionStorage.setItem('jornada.nome', upperName);
+    localStorage.setItem('JORNADA_NOME', upperName);
+    localStorage.setItem('jc.nome', upperName);
+
+    window.JC = window.JC || {};
+    window.JC.data = window.JC.data || {};
+    window.JC.data.nome = upperName;
+  }
+
+  // =====================================================
+  // PREVIEW
+  // =====================================================
+  function ensurePreviewRefs() {
     if (previewOverlay && previewVideo) return true;
-    // overlay/video são globais no HTML do guia
+
     previewOverlay = document.getElementById('guiaPreviewOverlay');
-    previewVideo   = document.getElementById('guiaPreviewVideo');
+    previewVideo = document.getElementById('guiaPreviewVideo');
+
     if (!previewOverlay || !previewVideo) return false;
 
-    // configurações seguras (não forçar muted aqui; quem decide é a fase)
     previewVideo.playsInline = true;
     previewVideo.preload = 'auto';
 
-    // se der erro no vídeo, para preview sem barulho
     previewVideo.addEventListener('error', () => {
       stopPreview();
     });
@@ -79,35 +152,35 @@
   }
 
   function stopPreview() {
-    if (previewStopTimer) { clearTimeout(previewStopTimer); previewStopTimer = null; }
+    if (previewStopTimer) {
+      clearTimeout(previewStopTimer);
+      previewStopTimer = null;
+    }
+
     previewPlaying = false;
     previewCurrentSrc = null;
 
     if (previewVideo) {
       try { previewVideo.pause(); } catch {}
       try { previewVideo.currentTime = 0; } catch {}
+      try { previewVideo.removeAttribute('src'); previewVideo.load(); } catch {}
     }
+
     hidePreview();
   }
 
-  // ✅ NOVO: withAudio controla se o preview toca com som
-  async function playPreviewSrc(src, root, withAudio = false) {
+  async function playPreviewSrc(src, withAudio = false) {
     if (!src) return false;
-    if (!ensurePreviewRefs(root)) return false;
+    if (!ensurePreviewRefs()) return false;
 
-    // se já está tocando o mesmo src, não reinicia
     if (previewPlaying && previewCurrentSrc === src) return true;
 
-    // Se vamos tocar com áudio (fase 1), cancela TTS para não “abafar”
-    if (withAudio) {
-      try { window.speechSynthesis?.cancel?.(); } catch {}
-    }
+    if (withAudio) safeSpeechCancel();
 
     stopPreview();
     previewPlaying = true;
     previewCurrentSrc = src;
 
-    // áudio conforme fase
     try {
       previewVideo.muted = !withAudio;
       previewVideo.volume = withAudio ? 1 : 0;
@@ -117,7 +190,7 @@
     try { previewVideo.load(); } catch {}
 
     showPreview();
-    previewStopTimer = setTimeout(() => stopPreview(), PREVIEW_TIMEOUT_MS);
+    previewStopTimer = setTimeout(stopPreview, PREVIEW_TIMEOUT_MS);
 
     try {
       await previewVideo.play();
@@ -129,13 +202,11 @@
   }
 
   function bindPreviewToButtons(root, buttons) {
-    if (!root || !buttons || !buttons.length) return;
+    if (!root || !buttons?.length) return;
     if (root.dataset.previewBound === '1') return;
     root.dataset.previewBound = '1';
 
-    // preview por botão (SEM delegação em container)
     buttons.forEach((btn) => {
-      // evita duplicar se re-renderizar
       if (btn.dataset.previewBtnBound === '1') return;
       btn.dataset.previewBtnBound = '1';
 
@@ -144,115 +215,57 @@
       btn.addEventListener('mouseenter', () => {
         const src = getSrc();
         if (!src) return;
-        // Fase 1: com áudio / Fase 2: mudo
-        playPreviewSrc(src, root, !nomeConfirmado);
+        playPreviewSrc(src, !nomeConfirmado);
       });
 
-      btn.addEventListener('mouseleave', () => {
-        stopPreview();
-      });
+      btn.addEventListener('mouseleave', stopPreview);
 
       btn.addEventListener('focusin', () => {
         const src = getSrc();
         if (!src) return;
-        playPreviewSrc(src, root, !nomeConfirmado);
+        playPreviewSrc(src, !nomeConfirmado);
       });
 
-      btn.addEventListener('focusout', () => stopPreview());
+      btn.addEventListener('focusout', stopPreview);
 
       btn.addEventListener('touchstart', () => {
         const src = getSrc();
         if (!src) return;
-        playPreviewSrc(src, root, !nomeConfirmado);
+        playPreviewSrc(src, !nomeConfirmado);
       }, { passive: true });
     });
 
-    // segurança: ao sair da seção, encerra preview
     window.addEventListener('jc:section:leave', stopPreview, { passive: true });
   }
-  
-  function canonGuia(v){
-  const s = String(v || '').trim().toLowerCase();
-  if (!s) return '';
-  if (s.includes('lumen')) return 'lumen';
-  if (s.includes('zion')) return 'zion';
-  if (s.includes('arion') || s.includes('arian')) return 'arion';
-  return '';
-}
 
-  // ===== Lock de transição (vídeo) =====
+  // =====================================================
+  // TRANSIÇÃO
+  // =====================================================
   async function waitForTransitionUnlock(timeoutMs = 20000) {
     if (!window.__TRANSITION_LOCK) return;
+
     await Promise.race([
-      new Promise(res => document.addEventListener('transition:ended', () => res(), { once: true })),
-      new Promise(res => setTimeout(res, timeoutMs))
+      new Promise((res) =>
+        document.addEventListener('transition:ended', () => res(), { once: true })
+      ),
+      new Promise((res) => setTimeout(res, timeoutMs))
     ]);
   }
 
-  function ensureVisible(el) {
-    if (!el) return;
-    el.classList.remove(HIDE_CLASS);
-    el.setAttribute('aria-hidden', 'false');
-    el.style.removeProperty('display');
-    el.style.removeProperty('opacity');
-    el.style.removeProperty('visibility');
-  }
-
-  // ===== Datilografia + TTS =====
-  async function localType(el, text, speed = TYPING_SPEED) {
-    return new Promise(resolve => {
-      let i = 0; el.textContent = '';
-      (function tick() {
-        if (i < text.length) { el.textContent += text.charAt(i++); setTimeout(tick, speed); }
-        else resolve();
-      })();
-    });
-  }
-
-  async function typeOnce(el, text, { speed = TYPING_SPEED, speak = true } = {}) {
-    if (!el) return;
-    const msg = (text || el.dataset?.text || el.textContent || '').trim();
-    if (!msg) return;
-
-    el.classList.add('typing-active'); el.classList.remove('typing-done');
-
-    let usedFallback = false;
-    if (typeof window.runTyping === 'function') {
-      await new Promise(res => {
-        try { window.runTyping(el, msg, () => res(), { speed, cursor: true }); }
-        catch { usedFallback = true; res(); }
-      });
-    } else usedFallback = true;
-
-    if (usedFallback) await localType(el, msg, speed);
-
-    el.classList.remove('typing-active'); el.classList.add('typing-done');
-
-    if (speak && msg && !el.dataset.spoken) {
-      try {
-        speechSynthesis.cancel?.();
-        if (window.EffectCoordinator?.speak) {
-          await window.EffectCoordinator.speak(msg, { lang: 'pt-BR', rate: 1.06, pitch: 1.0 });
-          await sleep(TTS_LATCH_MS);
-          el.dataset.spoken = 'true';
-        }
-      } catch {}
-    }
-    await sleep(60);
-  }
-
   function getTransitionSrc(root, btn) {
-    return (btn?.dataset?.transitionSrc)
-      || (root?.dataset?.transitionSrc)
-      || '/assets/videos/filme-conhecimento-com-luz-jardim.mp4';
+    return (
+      btn?.dataset?.transitionSrc ||
+      root?.dataset?.transitionSrc ||
+      '/assets/videos/filme-conhecimento-com-luz-jardim.mp4'
+    );
   }
 
-  // ===== Fallback de vídeo de transição =====
   function playTransitionSafe(src, nextId) {
     if (typeof window.playTransitionVideo === 'function') {
       window.playTransitionVideo(src, nextId);
       return;
     }
+
     if (typeof window.playTransitionThenGo === 'function') {
       window.playTransitionThenGo(nextId, src);
       return;
@@ -260,6 +273,7 @@
 
     try {
       window.__TRANSITION_LOCK = true;
+
       const v = document.createElement('video');
       v.src = src || '/assets/videos/filme-conhecimento-com-luz-jardim.mp4';
       v.playsInline = true;
@@ -267,136 +281,187 @@
       v.autoplay = true;
       v.preload = 'auto';
       v.style.cssText = `
-      position:fixed;
-      inset:0;
-      z-index:2147483647;
-      background:#000;
-      width:100vw;
-      height:100vh;
-      object-fit:cover;
-      display:block;
+        position: fixed;
+        inset: 0;
+        z-index: 2147483647;
+        background: #000;
+        width: 100vw;
+        height: 100vh;
+        object-fit: cover;
+        display: block;
       `;
-     document.body.classList.add('vt-playing');
 
-     const endTransition = () => {
+      document.body.classList.add('vt-playing');
 
-  document.body.classList.remove('vt-playing');
+      const endTransition = () => {
+        document.body.classList.remove('vt-playing');
+        try { v.remove(); } catch {}
+        window.__TRANSITION_LOCK = false;
 
-  v.remove();
-  window.__TRANSITION_LOCK = false;
-  (window.JC && JC.show)
-    ? JC.show(nextId, { force: true })
-    : (location.hash = '#' + nextId);
+        if (window.JC && typeof window.JC.show === 'function') {
+          window.JC.show(nextId, { force: true });
+        } else {
+          location.hash = '#' + nextId;
+        }
 
-  document.dispatchEvent(new CustomEvent('transition:ended'));
-};
+        document.dispatchEvent(new CustomEvent('transition:ended'));
+      };
 
       v.addEventListener('ended', endTransition, { once: true });
-      v.addEventListener('error', () => {
-        endTransition();
-      }, { once: true });
+      v.addEventListener('error', endTransition, { once: true });
 
       document.body.appendChild(v);
+
       const p = v.play();
       if (p && typeof p.catch === 'function') {
-        p.catch(() => endTransition());
+        p.catch(endTransition);
       }
     } catch {
       window.__TRANSITION_LOCK = false;
-      (window.JC && JC.show) ? JC.show(nextId, { force: true }) : (location.hash = '#' + nextId);
+      if (window.JC && typeof window.JC.show === 'function') {
+        window.JC.show(nextId, { force: true });
+      } else {
+        location.hash = '#' + nextId;
+      }
       document.dispatchEvent(new CustomEvent('transition:ended'));
     }
   }
 
-  // ===== CONFIRMAÇÃO FINAL =====
-  async function confirmGuide(guiaId) {
-    const root = document.getElementById(SECTION_ID);
-    if (!root) return;
+  // =====================================================
+  // DATILOGRAFIA / TTS
+  // =====================================================
+  async function localType(el, text, speed = TYPING_SPEED) {
+    return new Promise((resolve) => {
+      let i = 0;
+      el.textContent = '';
 
-    const input = root.querySelector('#guiaNameInput');
-    if (!input) return;
-
-    try {
-      // encerra preview antes de transicionar
-      stopPreview();
-
-      const nome = (input.value || '').trim();
-      if (!nome) return;
-
-      sessionStorage.setItem('jornada.nome', nome);
-      localStorage.setItem('JORNADA_NOME', nome);
-
-      // =====================================================
-      // CANONIZA E GRAVA DEFINITIVAMENTE O GUIA ESCOLHIDO
-      // =====================================================
-
-      function canonGuia(v) {
-       const s = String(v || '').trim().toLowerCase();
-       if (!s) return 'zion';
-       if (s.includes('lumen')) return 'lumen';
-       if (s.includes('zion')) return 'zion';
-       if (s.includes('arion') || s.includes('arian')) return 'arion';
-       return 'zion';
-      }
-
-     // usa o guia que acabou de ser escolhido
-const guiaCanon = canonGuia(guiaId);
-
-// grava nas chaves oficiais
-sessionStorage.setItem('JORNADA_GUIA', guiaCanon);
-localStorage.setItem('JORNADA_GUIA', guiaCanon);
-
-// grava também no state global
-window.JORNADA_STATE = window.JORNADA_STATE || {};
-window.JORNADA_STATE.guia = guiaCanon;
-window.JORNADA_STATE.guiaSelecionado = guiaCanon;
-
-// grava no JC também (card/selfie/pdf)
-window.JC = window.JC || {};
-window.JC.data = window.JC.data || {};
-window.JC.data.guia = guiaCanon;
-window.JC.data.guiaSelecionado = guiaCanon;
-
-// aplica tema definitivo + avisa listeners
-try { document.dispatchEvent(new CustomEvent('guia:changed')); } catch {}
-try { window.applyGuideTheme?.(); } catch {}
-try { applyGuiaTheme(guiaCanon); } catch { document.body.setAttribute('data-guia', guiaCanon); }
-
-// reset de artefatos do guia anterior (evita “card do zion com cor do lumen”)
-sessionStorage.removeItem('JORNADA_SELFIECARD');
-sessionStorage.removeItem('SELFIE_CARD');
-sessionStorage.removeItem('__SELFIECARD_SIG__');
-
-// expõe helper (se você usa em outro lugar)
-window.aplicarGuiaTheme = window.aplicarGuiaTheme || applyGuiaTheme;
-
-// libera botão avançar
-const btnAvancar = root.querySelector('#btn-avancar') || root.querySelector('[data-action="avancar"]');
-if (btnAvancar) {
-  btnAvancar.disabled = false;
-  btnAvancar.classList.remove('is-hidden');
-  btnAvancar.focus?.();
-}
-      if (armTimer) { clearTimeout(armTimer); armTimer = null; }
-      armedId = null;
-
-      const src = getTransitionSrc(root, btnAvancar);
-      playTransitionSafe(src, NEXT_SECTION_ID);
-    } catch {
-      playTransitionSafe(getTransitionSrc(root, null), NEXT_SECTION_ID);
-    }
+      (function tick() {
+        if (i < text.length) {
+          el.textContent += text.charAt(i++);
+          setTimeout(tick, speed);
+        } else {
+          resolve();
+        }
+      })();
+    });
   }
 
+  async function typeOnce(el, text, { speed = TYPING_SPEED, speak = true } = {}) {
+    if (!el) return;
+
+    const msg = (text || el.dataset?.text || el.textContent || '').trim();
+    if (!msg) return;
+
+    el.classList.add('typing-active');
+    el.classList.remove('typing-done');
+
+    let usedFallback = false;
+
+    if (typeof window.runTyping === 'function') {
+      await new Promise((res) => {
+        try {
+          window.runTyping(el, msg, () => res(), { speed, cursor: true });
+        } catch {
+          usedFallback = true;
+          res();
+        }
+      });
+    } else {
+      usedFallback = true;
+    }
+
+    if (usedFallback) {
+      await localType(el, msg, speed);
+    }
+
+    el.classList.remove('typing-active');
+    el.classList.add('typing-done');
+
+    if (speak && msg && !el.dataset.spoken) {
+      try {
+        safeSpeechCancel();
+
+        if (window.EffectCoordinator?.speak) {
+          await window.EffectCoordinator.speak(msg, {
+            lang: 'pt-BR',
+            rate: 1.06,
+            pitch: 1.0
+          });
+          await sleep(TTS_LATCH_MS);
+          el.dataset.spoken = 'true';
+        }
+      } catch {}
+    }
+
+    await sleep(60);
+  }
+
+  // =====================================================
+  // TEMA
+  // =====================================================
+  function applyGuiaTheme(guiaIdOrNull) {
+    const guia = guiaIdOrNull ? canonGuia(guiaIdOrNull) : readSavedGuide();
+
+    if (!guia) {
+      delete document.body.dataset.guia;
+      return false;
+    }
+
+    document.body.setAttribute('data-guia', guia);
+    return true;
+  }
+
+  function applyGuideThemeVars() {
+    const guia = readSavedGuide();
+    if (!guia) return false;
+
+    let main = '#ffd700';
+    let g1 = 'rgba(255,230,180,0.85)';
+    let g2 = 'rgba(255,210,120,0.75)';
+
+    if (guia === 'lumen') {
+      main = '#00ff9d';
+      g1 = 'rgba(0,255,157,0.90)';
+      g2 = 'rgba(120,255,200,0.70)';
+    }
+    if (guia === 'zion') {
+      main = '#00aaff';
+      g1 = 'rgba(0,170,255,0.90)';
+      g2 = 'rgba(255,214,91,0.70)';
+    }
+    if (guia === 'arion') {
+      main = '#ff00ff';
+      g1 = 'rgba(255,120,255,0.95)';
+      g2 = 'rgba(255,180,255,0.80)';
+    }
+
+    document.documentElement.style.setProperty('--theme-main-color', main);
+    document.documentElement.style.setProperty('--progress-main', main);
+    document.documentElement.style.setProperty('--progress-glow-1', g1);
+    document.documentElement.style.setProperty('--progress-glow-2', g2);
+    document.documentElement.style.setProperty('--guide-color', main);
+
+    document.body.setAttribute('data-guia', guia);
+    console.log('[THEME] aplicado:', guia);
+    return true;
+  }
+
+  window.applyGuideTheme = applyGuideThemeVars;
+  window.aplicarGuiaTheme = window.aplicarGuiaTheme || applyGuiaTheme;
+
+  // =====================================================
+  // DADOS / RENDER
+  // =====================================================
   function pick(root) {
     return {
       root,
-      title:      q('.titulo-pergaminho', root),
-      nameInput:  q('#guiaNameInput', root),
+      title: q('.titulo-pergaminho', root),
+      nameInput: q('#guiaNameInput', root),
       confirmBtn: q('#btn-confirmar-nome', root),
-      moldura:    q('.moldura-grande', root),
-      guiaTexto:  q('#guiaTexto', root),
+      moldura: q('.moldura-grande', root),
+      guiaTexto: q('#guiaTexto', root),
       optionsBox: q('.guia-options', root),
-      errorBox:   q('#guia-error', root)
+      errorBox: q('#guia-error', root)
     };
   }
 
@@ -407,31 +472,31 @@ if (btnAvancar) {
   }
 
   function renderButtons(optionsBox, guias) {
+    if (!optionsBox) return;
+
     optionsBox.innerHTML = '';
-    guias.forEach(g => {
+
+    guias.forEach((g) => {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'btn btn-stone-espinhos no-anim guia-option';
       btn.dataset.action = 'select-guia';
-      btn.dataset.guia = String(g.id || '').trim().toLowerCase();
-
-      // trava por lógica (não usar disabled)
+      btn.dataset.guia = canonGuia(g.id || g.nome || '');
       btn.dataset.locked = '1';
+      btn.dataset.nome = g.nome || '';
       btn.setAttribute('aria-disabled', 'true');
+      btn.setAttribute('aria-label', `Escolher o guia ${g.nome || ''}`);
       btn.classList.add('is-locked');
 
-      // Preview do guia (10s) — nomes reais do repo
       const gid = btn.dataset.guia;
       const PREVIEW_BY_ID = {
-        zion:  '/assets/videos/Zion-escolhido.mp4',
+        zion: '/assets/videos/Zion-escolhido.mp4',
         lumen: '/assets/videos/Lumen-escolhida.mp4',
-        arian: '/assets/videos/Arian-escolhida.mp4',
+        arion: '/assets/videos/Arian-escolhida.mp4'
       };
-      btn.dataset.previewSrc = encodeURI(PREVIEW_BY_ID[gid] || '');
 
-      btn.dataset.nome = g.nome;
-      btn.setAttribute('aria-label', `Escolher o guia ${g.nome}`);
-      btn.innerHTML = `<span class="label">${g.nome}</span>`;
+      btn.dataset.previewSrc = encodeURI(PREVIEW_BY_ID[gid] || '');
+      btn.innerHTML = `<span class="label">${g.nome || gid}</span>`;
 
       if (g.bgImage) {
         btn.style.backgroundImage = `url('${g.bgImage}')`;
@@ -444,14 +509,17 @@ if (btnAvancar) {
   }
 
   function findGuia(guias, id) {
-    id = (id || '').toLowerCase();
-    return guias.find(g => (g.id || '').toLowerCase() === id);
+    const canon = canonGuia(id);
+    return guias.find((g) => canonGuia(g.id || g.nome || '') === canon);
   }
 
-  // ===== AVISO (#guia-error) =====
+  // =====================================================
+  // NOTICE
+  // =====================================================
   function getNoticeRefs(root) {
     const box = q('#guia-error', root);
     if (!box) return { box: null, span: null };
+
     let span = box.querySelector('#guia-notice-text');
     if (!span) {
       span = document.createElement('span');
@@ -459,32 +527,66 @@ if (btnAvancar) {
       box.innerHTML = '';
       box.appendChild(span);
     }
+
     return { box, span };
   }
 
   async function showNotice(root, text, { speak = true } = {}) {
     const { box, span } = getNoticeRefs(root);
     if (!box || !span) return;
+
     box.classList.remove(HIDE_CLASS);
     box.setAttribute('aria-hidden', 'false');
     span.dataset.text = text;
+    span.dataset.spoken = '';
     span.textContent = '';
+
     await typeOnce(span, null, { speed: 30, speak });
   }
 
   function hideNotice(root) {
     const { box, span } = getNoticeRefs(root);
     if (!box) return;
-    if (span) span.textContent = '';
+
+    if (span) {
+      span.textContent = '';
+      delete span.dataset.spoken;
+    }
+
     box.classList.add(HIDE_CLASS);
     box.setAttribute('aria-hidden', 'true');
   }
 
-  // ===== ARMAR GUIA (2 CLICKS) =====
+  // =====================================================
+  // ARM / CONFIRM
+  // =====================================================
+  function unlockGuideButtons(buttons) {
+    buttons.forEach((b) => {
+      b.dataset.locked = '0';
+      b.removeAttribute('aria-disabled');
+      b.classList.remove('is-locked');
+      b.disabled = false;
+      b.style.opacity = '1';
+      b.style.cursor = 'pointer';
+      b.style.pointerEvents = 'auto';
+    });
+  }
+
+  function lockGuideButtons(buttons) {
+    buttons.forEach((b) => {
+      b.dataset.locked = '1';
+      b.setAttribute('aria-disabled', 'true');
+      b.classList.add('is-locked');
+      b.disabled = false; // mantém preview funcionando
+      b.style.opacity = '0.6';
+      b.style.cursor = 'pointer';
+      b.style.pointerEvents = 'auto';
+    });
+  }
+
   function armGuide(root, btn, label) {
-    const guiaId = (btn?.dataset?.guia || '').toLowerCase().trim();
+    const guiaId = canonGuia(btn?.dataset?.guia || '');
     if (!guiaId) return;
-    const guiaCanon = canonGuia(guiaId);
 
     if (armedId === guiaId) {
       confirmGuide(guiaId);
@@ -492,9 +594,12 @@ if (btnAvancar) {
       return;
     }
 
-    if (armTimer) { clearTimeout(armTimer); armTimer = null; }
+    if (armTimer) {
+      clearTimeout(armTimer);
+      armTimer = null;
+    }
 
-    root.querySelectorAll('.guia-option').forEach(el => {
+    root.querySelectorAll('.guia-option').forEach((el) => {
       el.classList.remove('armed');
       el.setAttribute('aria-pressed', 'false');
     });
@@ -510,27 +615,24 @@ if (btnAvancar) {
       armedId = null;
       armTimer = null;
 
-      root.querySelectorAll('.guia-option').forEach(el => {
+      root.querySelectorAll('.guia-option').forEach((el) => {
         el.classList.remove('armed');
         el.setAttribute('aria-pressed', 'false');
       });
 
       showNotice(root, 'Tempo esgotado. Selecione o guia e clique novamente para confirmar.', { speak: true });
     }, ARM_TIMEOUT_MS);
-
-    //const guiaCanon = 'arion' // ou lumen/zion conforme escolhido
-    //localStorage.setItem('JORNADA_GUIA', guiaCanon);
-    //sessionStorage.setItem('JORNADA_GUIA', guiaCanon);
-    //window.JORNADA_STATE = window.JORNADA_STATE || {};
-    //window.JORNADA_STATE.guia = guiaCanon;
-    //window.JORNADA_STATE.guiaSelecionado = guiaCanon;
   }
 
   cancelArm = function (root) {
     armedId = null;
-    if (armTimer) { clearTimeout(armTimer); armTimer = null; }
 
-    root?.querySelectorAll('.guia-option').forEach(el => {
+    if (armTimer) {
+      clearTimeout(armTimer);
+      armTimer = null;
+    }
+
+    root?.querySelectorAll('.guia-option').forEach((el) => {
       el.classList.remove('armed');
       el.setAttribute('aria-pressed', 'false');
     });
@@ -538,22 +640,65 @@ if (btnAvancar) {
     hideNotice(root);
   };
 
-  // ===== TEMA DINÂMICO =====
-  function applyGuiaTheme(guiaIdOrNull) {
-    if (guiaIdOrNull) {
-      document.body.dataset.guia = guiaIdOrNull.toLowerCase();
-      return;
+  async function confirmGuide(guiaId) {
+    const root = document.getElementById(SECTION_ID);
+    if (!root) return;
+
+    const input = root.querySelector('#guiaNameInput');
+    if (!input) return;
+
+    try {
+      stopPreview();
+
+      const nome = (input.value || '').trim();
+      if (!nome) {
+        input.focus();
+        return;
+      }
+
+      const guiaCanon = canonGuia(guiaId);
+      if (!guiaCanon) return;
+
+      persistName(nome);
+      persistGuide(guiaCanon);
+
+      try { document.dispatchEvent(new CustomEvent('guia:changed')); } catch {}
+      try { applyGuideThemeVars(); } catch {}
+      try { applyGuiaTheme(guiaCanon); } catch {
+        document.body.setAttribute('data-guia', guiaCanon);
+      }
+
+      // limpa artefatos antigos
+      sessionStorage.removeItem('JORNADA_SELFIECARD');
+      sessionStorage.removeItem('SELFIE_CARD');
+      sessionStorage.removeItem('__SELFIECARD_SIG__');
+
+      const btnAvancar =
+        root.querySelector('#btn-avancar') ||
+        root.querySelector('[data-action="avancar"]');
+
+      if (btnAvancar) {
+        btnAvancar.disabled = false;
+        btnAvancar.classList.remove('is-hidden');
+        btnAvancar.focus?.();
+      }
+
+      if (armTimer) {
+        clearTimeout(armTimer);
+        armTimer = null;
+      }
+      armedId = null;
+
+      const src = getTransitionSrc(root, btnAvancar);
+      playTransitionSafe(src, NEXT_SECTION_ID);
+    } catch {
+      playTransitionSafe(getTransitionSrc(root, null), NEXT_SECTION_ID);
     }
-
-    const saved =
-      (window.JC && window.JC.data && window.JC.data.guia) ||
-      sessionStorage.getItem('jornada.guia') ||
-      '';
-
-    if (saved) document.body.dataset.guia = saved.toLowerCase();
-    else delete document.body.dataset.guia;
   }
 
+  // =====================================================
+  // INIT
+  // =====================================================
   async function initOnce(root) {
     if (!root || root.dataset.guiaInitialized === 'true') return;
     root.dataset.guiaInitialized = 'true';
@@ -565,6 +710,9 @@ if (btnAvancar) {
     let guias = [];
     let guideButtons = [];
 
+    const topBox = root.querySelector('.guia-options-top');
+    const bottomBox = root.querySelector('.guia-options-bottom');
+
     // nome em maiúsculo
     if (els.nameInput && !els.nameInput.dataset.upperBound) {
       els.nameInput.dataset.upperBound = '1';
@@ -572,8 +720,16 @@ if (btnAvancar) {
         const start = els.nameInput.selectionStart;
         const end = els.nameInput.selectionEnd;
         els.nameInput.value = (els.nameInput.value || '').toUpperCase();
-        els.nameInput.setSelectionRange(start, end);
+        try { els.nameInput.setSelectionRange(start, end); } catch {}
       });
+    }
+
+    // garante botão confirmar visível no JS também
+    if (els.confirmBtn) {
+      els.confirmBtn.hidden = false;
+      els.confirmBtn.style.removeProperty('display');
+      els.confirmBtn.style.removeProperty('visibility');
+      els.confirmBtn.style.removeProperty('opacity');
     }
 
     // título
@@ -581,72 +737,65 @@ if (btnAvancar) {
       await typeOnce(els.title, null, { speed: 34, speak: true });
     }
 
-   // carrega guias
-let topBox = null;
-let bottomBox = null;
+    try {
+      guias = await loadGuias();
 
-try {
-  guias = await loadGuias();
+      if (topBox) renderButtons(topBox, guias);
+      if (bottomBox) renderButtons(bottomBox, guias);
 
-  topBox = root.querySelector('.guia-options-top');
-  bottomBox = root.querySelector('.guia-options-bottom');
+      if (topBox) {
+        topBox.classList.remove('disabled');
+        topBox.classList.add('enabled');
+      }
 
-  if (topBox) renderButtons(topBox, guias);
-  if (bottomBox) renderButtons(bottomBox, guias);
+      if (bottomBox) {
+        bottomBox.classList.remove('enabled');
+        bottomBox.classList.add('disabled');
+      }
 
-  // estado inicial:
-  // botões de cima ATIVOS (preview apenas)
-  // botões de baixo DESABILITADOS
-  if (topBox) {
-    topBox.classList.remove('disabled');
-    topBox.classList.add('enabled');
-  }
+      hideNotice(root);
+    } catch {
+      showNotice(root, 'Não foi possível carregar os guias. Tente novamente mais tarde.', {
+        speak: false
+      });
+      return;
+    }
 
-  if (bottomBox) {
-    bottomBox.classList.remove('enabled');
-    bottomBox.classList.add('disabled');
-  }
+    guideButtons = [
+      ...qa('button[data-action="select-guia"]', topBox || root),
+      ...qa('button[data-action="select-guia"]', bottomBox || root)
+    ];
 
-  hideNotice(root);
-} catch {
-  showNotice(root, 'Não foi possível carregar os guias. Tente novamente mais tarde.', { speak: false });
-  return;
-}
-
-// pega botões dos DOIS containers (topo + baixo)
-guideButtons = [
-  ...qa('button[data-action="select-guia"]', topBox || root),
-  ...qa('button[data-action="select-guia"]', bottomBox || root),
-];
-
-// trava seleção nos dois grupos no início (mantém preview ok)
-guideButtons.forEach(b => {
-  b.dataset.locked = '1';
-  b.setAttribute('aria-disabled', 'true');
-  b.classList.add('is-locked');
-  b.style.opacity = '0.6';
-  b.style.cursor = 'pointer';
-  b.style.pointerEvents = 'auto';
-});
-
-
-    // BIND preview (único e limpo)
+    lockGuideButtons(guideButtons);
     bindPreviewToButtons(root, guideButtons);
 
-    // confirmar começa bloqueado; libera conforme input
-    let __NAME_CONFIRMED__ = false;
-    if (els.confirmBtn) els.confirmBtn.disabled = true;
+    let nameConfirmedOnce = false;
+
+    if (els.confirmBtn) {
+      els.confirmBtn.disabled = true;
+      els.confirmBtn.setAttribute('aria-disabled', 'true');
+    }
 
     if (els.nameInput && !els.nameInput.dataset.confirmGateBound) {
       els.nameInput.dataset.confirmGateBound = '1';
-      els.nameInput.addEventListener('input', () => {
+
+      const syncConfirmState = () => {
         const v = (els.nameInput?.value || '').trim();
-        if (els.confirmBtn) els.confirmBtn.disabled = (v.length < 2);
-      });
+        const enable = v.length >= 2;
+
+        if (els.confirmBtn) {
+          els.confirmBtn.disabled = !enable;
+          els.confirmBtn.setAttribute('aria-disabled', enable ? 'false' : 'true');
+        }
+      };
+
+      els.nameInput.addEventListener('input', syncConfirmState);
+      syncConfirmState();
     }
 
     if (els.confirmBtn && !els.confirmBtn.dataset.confirmBound) {
       els.confirmBtn.dataset.confirmBound = '1';
+
       els.confirmBtn.addEventListener('click', async (ev) => {
         ev.preventDefault();
         ev.stopPropagation();
@@ -657,73 +806,63 @@ guideButtons.forEach(b => {
           return;
         }
 
-        // ✅ ao confirmar o nome, entramos na FASE 2
         nomeConfirmado = true;
-
-        // ✅ evita mix de áudio: para preview e cancela TTS antes de falar descrição
         stopPreview();
-        try { window.speechSynthesis?.cancel?.(); } catch {}
+        safeSpeechCancel();
 
         const upperName = name.toUpperCase();
         els.nameInput.value = upperName;
 
-        try {
-          window.JC = window.JC || {};
-          window.JC.data = window.JC.data || {};
-          window.JC.data.nome = upperName;
+        persistName(upperName);
 
-          sessionStorage.setItem('jornada.nome', upperName);
-          localStorage.setItem('jc.nome', upperName);
-        } catch {}
-
-        if (!__NAME_CONFIRMED__) {
-          __NAME_CONFIRMED__ = true;
+        if (!nameConfirmedOnce) {
+          nameConfirmedOnce = true;
 
           if (els.guiaTexto) {
-            const base = (els.guiaTexto.dataset?.text || els.guiaTexto.textContent || 'Escolha seu guia para a Jornada.').trim();
+            const base = (
+              els.guiaTexto.dataset?.text ||
+              els.guiaTexto.textContent ||
+              'Escolha seu guia para a Jornada.'
+            ).trim();
+
             const msg = base.replace(/\{\{\s*(nome|name)\s*\}\}/gi, upperName);
+
             els.guiaTexto.textContent = '';
+            els.guiaTexto.dataset.spoken = '';
             await typeOnce(els.guiaTexto, msg, { speed: 38, speak: true });
+
             els.moldura?.classList.add('glow');
             els.guiaTexto?.classList.add('glow');
           }
         }
 
-        // destrava seleção (preview já funciona antes)
-        guideButtons.forEach(b => {
-          b.dataset.locked = '0';
-          b.removeAttribute('aria-disabled');
-          b.classList.remove('is-locked');
-          b.style.opacity = '1';
-          b.style.cursor = 'pointer';
-          b.style.pointerEvents = 'auto';
-        });
-
+        unlockGuideButtons(guideButtons);
         hideNotice(root);
       });
     }
 
-    // eventos dos botões de guia (bind 1x)
     if (root.dataset.guiaButtonsBound !== '1') {
       root.dataset.guiaButtonsBound = '1';
 
-      guideButtons.forEach(btn => {
-        const guiaId = (btn.dataset.guia || btn.textContent || '').toLowerCase().trim();
-        const label = (btn.dataset.nome || btn.textContent || 'guia').toUpperCase();
+      guideButtons.forEach((btn) => {
+        const guiaId = canonGuia(btn.dataset.guia || btn.textContent || '');
+        const label = (btn.dataset.nome || btn.textContent || 'guia').trim().toUpperCase();
 
-        // Hover: descrição + tema (com speak condicionado pela fase)
         btn.addEventListener('mouseenter', () => {
           if (!guiaId) return;
 
-          if (hoverTimers.has(guiaId)) clearTimeout(hoverTimers.get(guiaId));
+          if (hoverTimers.has(guiaId)) {
+            clearTimeout(hoverTimers.get(guiaId));
+          }
 
           const timer = setTimeout(async () => {
             const g = findGuia(guias, guiaId);
             if (g && els.guiaTexto) {
               els.guiaTexto.dataset.spoken = '';
-              // ✅ Fase 1: NÃO fala descrição (para não abafar o vídeo)
-              // ✅ Fase 2: fala descrição normalmente
-              await typeOnce(els.guiaTexto, g.descricao, { speed: 34, speak: !!nomeConfirmado });
+              await typeOnce(els.guiaTexto, g.descricao, {
+                speed: 34,
+                speak: !!nomeConfirmado
+              });
             }
             applyGuiaTheme(guiaId);
           }, HOVER_DELAY_MS);
@@ -733,22 +872,27 @@ guideButtons.forEach(b => {
 
         btn.addEventListener('mouseleave', () => {
           if (!guiaId) return;
+
           if (hoverTimers.has(guiaId)) {
             clearTimeout(hoverTimers.get(guiaId));
             hoverTimers.delete(guiaId);
           }
-          applyGuiaTheme(null);
+
+          const saved = readSavedGuide();
+          applyGuiaTheme(saved || null);
         });
 
         btn.addEventListener('focus', () => {
           const g = findGuia(guias, guiaId);
           if (g && els.guiaTexto) {
             els.guiaTexto.dataset.spoken = '';
-            typeOnce(els.guiaTexto, g.descricao, { speed: 34, speak: !!nomeConfirmado });
+            typeOnce(els.guiaTexto, g.descricao, {
+              speed: 34,
+              speak: !!nomeConfirmado
+            });
           }
         });
 
-        // Clique simples: armar
         btn.addEventListener('click', (ev) => {
           ev.preventDefault();
           ev.stopPropagation();
@@ -756,7 +900,6 @@ guideButtons.forEach(b => {
           armGuide(root, btn, label);
         });
 
-        // Double-click: confirmar direto
         btn.addEventListener('dblclick', (ev) => {
           ev.preventDefault();
           ev.stopPropagation();
@@ -765,7 +908,6 @@ guideButtons.forEach(b => {
           if (cancelArm) cancelArm(root);
         });
 
-        // Teclado: Enter/Espaço
         btn.addEventListener('keydown', (ev) => {
           if (ev.key === 'Enter' || ev.key === ' ') {
             ev.preventDefault();
@@ -779,11 +921,13 @@ guideButtons.forEach(b => {
         btn.setAttribute('aria-pressed', 'false');
       });
 
-      // cancelar arm ao clicar fora (1x global)
       if (!document.documentElement.dataset.guiaOutsideCancelBound) {
         document.documentElement.dataset.guiaOutsideCancelBound = '1';
+
         document.addEventListener('click', (e) => {
-          const inside = e.target.closest('.guia-option, .guia-options, #btn-confirmar-nome, #guiaNameInput');
+          const inside = e.target.closest(
+            '.guia-option, .guia-options, #btn-confirmar-nome, #guiaNameInput'
+          );
           if (!inside && armedId && cancelArm) {
             const r = document.getElementById(SECTION_ID);
             if (r) cancelArm(r);
@@ -791,9 +935,19 @@ guideButtons.forEach(b => {
         }, { passive: true });
       }
     }
+
+    // reaplica tema salvo se já existir
+    setTimeout(() => {
+      try {
+        applyGuideThemeVars();
+      } catch {}
+    }, 50);
   }
 
-   function onSectionShown(evt) {
+  // =====================================================
+  // BIND GLOBAL
+  // =====================================================
+  function onSectionShown(evt) {
     const { sectionId, node } = evt?.detail || {};
     if (sectionId !== SECTION_ID) return;
     initOnce(node || document.getElementById(SECTION_ID));
@@ -801,62 +955,21 @@ guideButtons.forEach(b => {
 
   function bind() {
     document.addEventListener('section:shown', onSectionShown, { passive: true });
+
     const now = document.getElementById(SECTION_ID);
-    if (now && !now.classList.contains(HIDE_CLASS)) initOnce(now);
+    if (now && !now.classList.contains(HIDE_CLASS)) {
+      initOnce(now);
+    }
   }
 
   document.readyState === 'loading'
     ? document.addEventListener('DOMContentLoaded', bind, { once: true })
     : bind();
 
-  // =====================================================
-  // TEMA: aplica quando o guia já foi escolhido (senão mantém dourado)
-  // =====================================================
-  function canonTheme(v) {
-    const s = String(v || '').toLowerCase();
-    if (s.includes('lumen')) return 'lumen';
-    if (s.includes('zion')) return 'zion';
-    if (s.includes('arion') || s.includes('arian')) return 'arion';
-    return '';
-  }
-
-  function readGuideTheme() {
-    return canonTheme(
-      window.JORNADA_STATE?.guiaSelecionado ||
-      window.JORNADA_STATE?.guia ||
-      window.JC?.data?.guiaSelecionado ||
-      window.JC?.data?.guia ||
-      sessionStorage.getItem('JORNADA_GUIA') ||
-      localStorage.getItem('JORNADA_GUIA') ||
-      localStorage.getItem('jc.guiaSelecionado') ||
-      localStorage.getItem('jc.guia') ||
-      localStorage.getItem('guiaEscolhido')
-    );
-  }
-
-  window.applyGuideTheme = function applyGuideTheme() {
-    const guia = readGuideTheme();
-    if (!guia) return false; // não mexe no dourado se ainda não escolheu
-
-    let main = '#ffd700', g1 = 'rgba(255,230,180,0.85)', g2 = 'rgba(255,210,120,0.75)';
-    if (guia === 'lumen') { main = '#00ff9d'; g1 = 'rgba(0,255,157,0.90)'; g2 = 'rgba(120,255,200,0.70)'; }
-    if (guia === 'zion')  { main = '#00aaff'; g1 = 'rgba(0,170,255,0.90)'; g2 = 'rgba(255,214,91,0.70)'; }
-    if (guia === 'arion') { main = '#ff00ff'; g1 = 'rgba(255,120,255,0.95)'; g2 = 'rgba(255,180,255,0.80)'; }
-
-    document.documentElement.style.setProperty('--theme-main-color', main);
-    document.documentElement.style.setProperty('--progress-main', main);
-    document.documentElement.style.setProperty('--progress-glow-1', g1);
-    document.documentElement.style.setProperty('--progress-glow-2', g2);
-    document.documentElement.style.setProperty('--guide-color', main);
-
-    document.body.setAttribute('data-guia', guia);
-    console.log('[THEME] aplicado:', guia);
-    return true;
+  const applyThemeSafe = () => {
+    try { window.applyGuideTheme?.(); } catch {}
   };
 
-  // reaplica em momentos seguros (não quebra o dourado inicial)
-  const applyThemeSafe = () => { try { window.applyGuideTheme?.(); } catch {} };
   document.addEventListener('sectionLoaded', () => setTimeout(applyThemeSafe, 50));
   document.addEventListener('guia:changed', applyThemeSafe);
-
-})(); // <-- FECHAMENTO ÚNICO do IIFE principal (não coloque outro IIFE depois)
+})();
