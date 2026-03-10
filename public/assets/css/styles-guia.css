@@ -259,7 +259,7 @@ body[data-guia-hover="arian"] {
 }
 
 #btn-confirmar-nome {
-  display: inline-flex !important;
+  display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   visibility: visible !important;
@@ -271,7 +271,7 @@ body[data-guia-hover="arian"] {
   font-size: 15px !important;
   font-family: 'ManufacturingConsent', sans-serif;
   position: relative !important;
-  z-index: 8 !important;
+  z-index: 50 !important;
 }
 
 /* ======================================================
