@@ -470,21 +470,71 @@ async function typeQuestion(el, text, speed = 26, withVoice = true) {
     }
 
     if (btnConfirm) {
-      btnConfirm.onclick = (ev) => {
-        ev.preventDefault();
+  btnConfirm.onclick = async (ev) => {
 
-        const val = String(textarea?.value || '').trim();
-        if (!val) {
-          showMissingAnswerFeedback();
-          textarea?.focus();
-          return;
-        }
+    ev.preventDefault();
 
-        saveAnswer(bloco, 0, val);
-        goNext(bloco);
-      };
+    const val = String(textarea?.value || '').trim();
+
+    if (!val) {
+      showMissingAnswerFeedback();
+      textarea?.focus();
+      return;
     }
-  }
+
+    saveAnswer(bloco, 0, val);
+
+    // -----------------------------
+    // CHAMA DEVOLUTIVA DA IA
+    // -----------------------------
+
+    try {
+
+      const guia =
+        sessionStorage.getItem('jornada.guia') ||
+        localStorage.getItem('JORNADA_GUIA') ||
+        'lumen';
+
+      const resp = await window.API.gerarDevolutiva({
+
+        nome:
+          sessionStorage.getItem('jornada.nome') ||
+          localStorage.getItem('JORNADA_NOME') ||
+          'Participante',
+
+        guia: guia,
+
+        bloco: bloco.title || bloco.id,
+
+        pergunta: perguntaText,
+
+        resposta: val,
+
+        idioma:
+          document.documentElement.lang ||
+          'pt-BR'
+
+      });
+
+      if (resp?.ok && resp.texto) {
+
+        await setGuideResponse(resp.texto, 'success');
+
+      }
+
+    } catch (e) {
+
+      console.warn('Erro devolutiva IA', e);
+
+    }
+
+    // pequena pausa dramática antes de avançar
+    await new Promise(r => setTimeout(r, 1200));
+
+    goNext(bloco);
+
+  };
+}
 
   async function renderBloco(section) {
     const sectionId = getSectionId(section);
