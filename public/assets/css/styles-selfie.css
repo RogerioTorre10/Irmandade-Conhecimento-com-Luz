@@ -1,125 +1,217 @@
 /* =======================================================
-   STYLES-SELFIE.CSS — LIMPO E RESPONSIVO
-   3 ZOOMS + MOLDURA ESPINHOS + MOBILE
-   (sem duplicar mimos globais)
+   SELFIE — BASE ESTRUTURAL CORRIGIDA
    ======================================================= */
 
 #section-selfie {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
   width: 100%;
   min-height: 100vh;
   background: transparent !important;
-  padding: 10px 0 30px;
+  padding: 10px 0 24px;
   box-sizing: border-box;
-  justify-content: center;
+  overflow-x: clip !important;
+  overflow-y: visible !important;
+}
+
+#section-selfie .j-perg-v-inner{
+  position: relative;
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  padding-top: 10px;
+  overflow: visible !important;
+  z-index: 2;
 }
 
 #section-selfie .j-panel-glow.selfie-panel{
-  overflow: visible !important;
-  padding-bottom: max(22px, env(safe-area-inset-bottom)) !important;
+  position: relative !important;
+  width: min(92vw, 620px) !important;
+  max-width: 620px !important;
+  margin: 0 auto !important;
+  padding: 10px !important;
+  border-radius: 28px !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  isolation: isolate !important;
+  z-index: 3 !important;
+  padding-bottom: max(20px, env(safe-area-inset-bottom)) !important;
 }
 
 #section-selfie .selfie-wrap{
-  padding-bottom: 22px !important;
+  position: relative;
+  z-index: 2;
+  width: 100% !important;
+  min-height: auto !important;
+  margin: 0 auto !important;
+  padding: 20px 18px 18px !important;
+  border-radius: 24px !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  padding-bottom: 20px !important;
+}
+
+/* =======================================================
+   SELFIE — AURA REAL DO GUIA
+   ======================================================= */
+
+#section-selfie .j-panel-glow.selfie-panel{
+  border: 1px solid color-mix(in srgb, var(--progress-main, #ffd700) 78%, transparent) !important;
+  box-shadow:
+    0 0 16px color-mix(in srgb, var(--progress-main, #ffd700) 42%, transparent),
+    0 0 36px color-mix(in srgb, var(--progress-glow-1, rgba(255,210,120,.85)) 48%, transparent),
+    inset 0 0 22px rgba(255,255,255,0.05) !important;
+}
+
+#section-selfie .j-panel-glow.selfie-panel::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+
+  border: 2px solid color-mix(in srgb, var(--progress-main, #ffd700) 68%, transparent);
+
+  background:
+    radial-gradient(
+      circle at 50% 18%,
+      color-mix(in srgb, var(--progress-glow-1, rgba(255,210,120,.85)) 32%, transparent) 0%,
+      transparent 58%
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.08),
+      transparent 28%,
+      transparent 100%
+    );
+
+  box-shadow:
+    inset 0 0 16px color-mix(in srgb, var(--progress-main, #ffd700) 18%, transparent),
+    inset 0 0 40px color-mix(in srgb, var(--progress-glow-2, rgba(255,210,120,.40)) 18%, transparent),
+    0 0 10px color-mix(in srgb, var(--progress-main, #ffd700) 20%, transparent);
+}
+
+#section-selfie .selfie-wrap{
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.05),
+      rgba(0,0,0,0.22)
+    ) !important;
+  border: 1px solid color-mix(in srgb, var(--progress-main, #ffd700) 62%, transparent) !important;
+  box-shadow:
+    inset 0 0 18px rgba(255,255,255,0.04),
+    inset 0 0 38px rgba(0,0,0,0.45),
+    0 0 14px color-mix(in srgb, var(--progress-main, #ffd700) 28%, transparent) !important;
+}
+
+#section-selfie .preview-frame,
+#section-selfie .ranges-panel{
+  border: 1px solid color-mix(in srgb, var(--progress-main, #ffd700) 82%, transparent) !important;
+  box-shadow:
+    0 0 12px color-mix(in srgb, var(--progress-main, #ffd700) 42%, transparent),
+    inset 0 0 10px rgba(255,255,255,0.04) !important;
+}
+
+#section-selfie .selfie-header h2,
+#section-selfie #selfieTexto,
+#section-selfie .ranges-panel{
+  color: var(--progress-main, var(--theme-main-color, #ffd700)) !important;
 }
 
 /* ================= HEADER ================= */
 .selfie-header {
-  width: 92%;
-  max-width: 820px;
+  width: 100%;
+  max-width: 520px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 10px auto 4px;
+  gap: 12px;
+  margin: 2px auto 8px;
 }
 
 .selfie-header h2 {
   font-family: 'ManufacturingConsent-Regular', 'Cardo', serif;
-  color: var(--theme-main-color, #ffd700);
-  font-size: 22px;
+  color: var(--progress-main, var(--theme-main-color, #ffd700));
+  font-size: clamp(20px, 2.2vw, 28px);
   margin: 0;
   text-shadow: 0 1px 3px rgba(0,0,0,0.75);
-  opacity: 0;
+  opacity: 1;
   transition: opacity 0.5s ease;
 }
 
-/* ================= TEXTO ORIENTAÇÃO ================= */
 #selfieOrientWrap {
-  width: 92%;
-  max-width: 820px;
-  margin: 16px auto 12px;
+  width: 100%;
+  max-width: 520px;
+  margin: 10px auto 12px;
   text-align: left;
-  padding: 0 12px;
+  padding: 0 4px;
   box-sizing: border-box;
 }
 
 #selfieTexto {
-  color: var(--theme-main-color, #ffd700);
+  color: var(--progress-main, var(--theme-main-color, #ffd700));
   font-family: 'Cardo', serif;
   font-size: 15px;
-  line-height: 1.5;
+  line-height: 1.45;
   margin: 0;
-  opacity: 0;
+  opacity: 1;
   transition: opacity .5s ease;
   white-space: normal;
   word-wrap: break-word;
 }
 
-/* ================= 3 ZOOMS ================= */
+.selfie-preview-wrap {
+  width: 100%;
+  max-width: 340px;
+  margin: 0 auto 8px;
+  position: relative;
+}
+
+.preview-frame {
+  position: relative;
+  width: 100%;
+  padding-bottom: 112%;
+  background: #000;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
 .ranges-panel {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  width: 100%;
+  max-width: 340px;
   padding: 12px 12px;
-  border-radius: 12px;
-  background: rgba(0,0,0,.32);
-  border: 1px solid rgba(255,255,255,.07);
-  max-width: 460px;
-  margin: 10px auto 14px;
-  color: var(--theme-main-color, #ffd700);
+  border-radius: 14px;
+  background: rgba(0,0,0,.34);
+  margin: 10px auto 8px;
   font-family: 'Cardo', serif;
   font-size: 14px;
 }
 
 .range-row {
   display: grid;
-  grid-template-columns: 110px 1fr 40px;
+  grid-template-columns: 92px 1fr 42px;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
-.range-label { opacity: .9; font-weight: 600; }
-.range-val { text-align: right; font-variant-numeric: tabular-nums; }
-
-input[type=range] {
-  width: 100%;
-  height: 4px;
-  border-radius: 2px;
-  background: #555;
-  outline: none;
-  -webkit-appearance: none;
-}
-
-input[type=range]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  background: #f9e7c2;
-  border-radius: 50%;
-  width: 14px;
-  height: 14px;
-  cursor: pointer;
-}
-
-/* ================= BOTÕES ESPINHOS ================= */
+/* ================= BOTÕES ================= */
 .btn-row {
   display: flex;
   gap: 10px;
   justify-content: center;
-  margin: 6px auto 12px;
+  margin: 8px auto 12px;
+  width: 100%;
   max-width: 520px;
   overflow-x: auto;
-  padding: 0 8px;
+  padding: 0 2px;
   -ms-overflow-style: none;
   scrollbar-width: none;
   flex-wrap: nowrap !important;
@@ -127,16 +219,16 @@ input[type=range]::-webkit-slider-thumb {
 .btn-row::-webkit-scrollbar { display: none; }
 
 .btn-stone-espinhos {
-  flex: 1;
-  min-width: 100px;
-  max-width: 160px;
-  height: 36px;
-  line-height: 36px;
-  padding: 0 12px;
+  flex: 1 1 0;
+  min-width: 92px;
+  max-width: 148px;
+  height: 38px;
+  line-height: 38px;
+  padding: 0 10px;
   font-size: 13px;
   font-family: 'Cardo', serif;
   font-weight: 700;
-  letter-spacing: .3px;
+  letter-spacing: .2px;
 
   background: transparent !important;
   background-image: url('/assets/img/moldura-medieval-espinhos.png') !important;
@@ -160,178 +252,103 @@ input[type=range]::-webkit-slider-thumb {
   border-radius: 10px;
   box-shadow:
     0 2px 8px rgba(0,0,0,.35),
-    inset 0 0 0 1px rgba(255,215,0,.25);
+    inset 0 0 0 1px rgba(255,255,255,.14);
   pointer-events: none;
 }
 
-/* ✅ Usa o brilhoDivino do GLOBAL (j-panel-glow.css) */
-.btn-stone-espinhos:hover:not(:disabled) {
-  filter: brightness(1.08);
-  transform: translateY(-1px);
-  animation: brilhoDivino 1.8s ease-in-out infinite;
-}
+/* =======================================================
+   SELFIE — MOBILE CIRÚRGICO
+   ======================================================= */
 
-.btn-stone-espinhos:active:not(:disabled) {
-  transform: translateY(0);
-  filter: brightness(0.98);
-  animation: none;
-}
-
-.btn-stone-espinhos:disabled {
-  opacity: .7;
-  filter: grayscale(.15);
-  cursor: not-allowed;
-  animation: none;
-}
-
-/* Mobile pequeno */
-@media (max-width: 380px) {
-  .btn-stone-espinhos {
-    min-width: 85px;
-    font-size: 12px;
-    padding: 0 6px;
-  }
-  .btn-row { gap: 6px; }
-}
-
-/* ================= PREVIEW ================= */
-.selfie-preview-wrap {
-  width: 92%;
-  max-width: 380px;
-  margin: 0 auto 8px;
-  position: relative;
-}
-
-.preview-frame {
-  position: relative;
-  width: 100%;
-  padding-bottom: 120%;
-  background: #000;
-  border-radius: 14px;
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,.08);
-  box-shadow: 0 4px 16px rgba(0,0,0,.4);
-}
-
-#selfiePreview {
-  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-  object-fit: contain; z-index: 1;
-}
-
-#selfieVideo, #selfieCanvas {
-  position: absolute; top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  min-width: 100%; min-height: 100%;
-  object-fit: cover;
-}
-
-.preview-hint {
-  display: block;
-  text-align: left !important ;
-  color: #f9e7c2;
-  font-family: 'Cardo', serif;
-  font-size: 13px;
-  margin: 4px 0 12px;
-  opacity: .8;
-}
-
-#selfie-error {
-  color: #ff6b6b;
-  font-size: 14px;
-  text-align: center;
-  margin: 10px auto;
-  max-width: 520px;
-  display: none;
-}
-/* =========================================================
-   GLOW DO GUIA — (Guia / Selfie / Card) igual Perguntas
-   Usa: --progress-main, --progress-glow-1, --progress-glow-2
-   ========================================================= */
-
-/* 1) Glow "ambiente" no fundo da seção (como Perguntas) */
-
-#section-selfie {
-  position: relative;
-  overflow: visible !important; /* não cortar o glow */
-}
-
-/* Glow inferior (vazando) */
-
-#section-selfie::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -70px;                 /* ajuste fino do vazamento */
-  height: 160px;                 /* altura do glow */
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.75;
-
-  background: linear-gradient(
-    to bottom,
-    transparent,
-    var(--progress-glow-1, rgba(255,210,120,0.85)),
-    var(--progress-glow-2, rgba(255,210,120,0.40))
-  );
-
-  filter: blur(22px);
-}
-
-/* 2) Glow forte no “quadro principal” (borda + aura) 
-   Aqui usamos seletores em camadas pra pegar o container real, independente do HTML exato.
-*/
-
-#section-selfie .card,
-#section-selfie .glass,
-#section-selfie .glass-panel,
-#section-selfie .selfie-card,
-#section-selfie .j-card,
-#section-selfie .j-panel {
-  position: relative;
-  z-index: 1; /* acima do glow da seção */
-
-  border: 2px solid var(--progress-main, #ffd700) !important;
-
-  box-shadow:
-    0 0 18px var(--progress-main, #ffd700),
-    0 0 42px var(--progress-glow-1, rgba(255,210,120,0.85)),
-    inset 0 0 26px rgba(0,0,0,0.55) !important;
-
-  /* dá um “ar” de luz suave em volta */
-  filter: saturate(1.05);
-}
-
-/* 3) Borda iluminada em elementos-chave (inputs/caixas) — opcional, mas fica lindo */
-
-#section-selfie .preview-frame,
-#section-selfie .ranges-panel {
-  border-color: var(--progress-main, #ffd700) !important;
-  box-shadow: 0 0 14px var(--progress-main, #ffd700) !important;
-}
-
-/* 4) Responsivo: reduz “vazamento” no mobile para não cortar clique nem estourar layout */
 @media (max-width: 600px) {
-  
-  #section-selfie::before {
-    bottom: -55px;
-    height: 130px;
-    filter: blur(18px);
-    opacity: 0.65;
+
+  #section-selfie {
+    padding: 6px 0 18px !important;
+    min-height: auto !important;
+    justify-content: flex-start !important;
+  }
+
+  #section-selfie .j-perg-v-inner{
+    padding-top: 4px !important;
+  }
+
+  #section-selfie .j-panel-glow.selfie-panel{
+    width: min(96vw, 430px) !important;
+    max-width: 430px !important;
+    padding: 8px !important;
+    border-radius: 22px !important;
+  }
+
+  #section-selfie .selfie-wrap{
+    padding: 14px 12px 14px !important;
+    border-radius: 18px !important;
+  }
+
+  .selfie-header{
+    max-width: 100% !important;
+    margin: 0 auto 8px !important;
+    gap: 8px !important;
+  }
+
+  .selfie-header h2{
+    font-size: 18px !important;
+    line-height: 1.15 !important;
+  }
+
+  #selfieOrientWrap{
+    max-width: 100% !important;
+    margin: 8px auto 10px !important;
+    padding: 0 2px !important;
+  }
+
+  #selfieTexto{
+    font-size: 13px !important;
+    line-height: 1.38 !important;
+  }
+
+  .btn-row{
+    gap: 8px !important;
+    margin: 6px auto 10px !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  .btn-stone-espinhos{
+    min-width: 84px !important;
+    max-width: 130px !important;
+    height: 34px !important;
+    line-height: 34px !important;
+    font-size: 12px !important;
+    padding: 0 8px !important;
+  }
+
+  .selfie-preview-wrap{
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  .preview-frame{
+    padding-bottom: 104% !important;
+    border-radius: 14px !important;
+  }
+
+  .ranges-panel{
+    max-width: 100% !important;
+    padding: 10px 10px !important;
+    border-radius: 12px !important;
+    font-size: 12px !important;
+    gap: 8px !important;
+  }
+
+  .range-row{
+    grid-template-columns: 78px 1fr 38px !important;
+    gap: 6px !important;
+  }
+
+  #section-selfie::before{
+    bottom: -42px !important;
+    height: 96px !important;
+    filter: blur(14px) !important;
+    opacity: 0.55 !important;
   }
 }
-
-/* =========================================================
-   DIAMANTE: esconder scrollbar SÓ na selfie (sem matar o scroll)
-   ========================================================= */
-body.no-selfie-scrollbar {
-  scrollbar-width: none;            /* Firefox */
-  -ms-overflow-style: none;         /* IE/Edge antigo */
-}
-
-body.no-selfie-scrollbar::-webkit-scrollbar {
-  width: 0 !important;              /* Chrome/Safari */
-  height: 0 !important;
-}
-
-
