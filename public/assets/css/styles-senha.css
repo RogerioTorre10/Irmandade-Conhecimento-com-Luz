@@ -1,107 +1,41 @@
 /* ======================================================
-   SECTION-SENHA — estilos específicos e limpos
+   SECTION-SENHA — proporção alinhada com INTRO / TERMOS
+   Caminho: /assets/css/styles-senha.css
    ====================================================== */
 
-/* ── Palco base ── */
-#section-senha .j-perg-v-inner {
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 850px;
-  width: 100%;
+/* =========================
+   PALCO BASE
+   ========================= */
+
+#section-senha{
   position: relative;
+  min-height: 100vh;
+  overflow: visible !important;
 }
 
-#section-senha .j-panel-glow {
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.pergaminho {
+#section-senha .j-perg-v-inner{
+  position: relative;
   width: 100%;
-  max-width: 900px;
+  max-width: 980px;
   margin: 0 auto;
-  background-size: 100% auto !important;
-  background-repeat: no-repeat;
-  background-position: top center;
+  padding-top: 18px;
+  overflow: visible !important;
+  z-index: 5;
 }
 
-orda dourada + guia — valem para todos os breakpoints ── */
-#section-senha .j-panel-glow {
-  padding: 10px;
-}
-
-/* ── Botões Voltar / Avançar lado a lado ── */
-#section-senha .senha-actions {
-  display: flex !important;
-  flex-direction: row !important;
-  justify-content: center !important;
-  align-items: center !important;
-  gap: 12px !important;
-  flex-wrap: nowrap !important;
-}
-
-#section-senha .senha-actions .btn-stone {
-  flex: 1 1 0 !important;
-  max-width: 48% !important;
-  min-width: 0 !important;
-  box-sizing: border-box !important;
-}
-
- #section-senha .j-arcane-card{
-    max-height: 72vh;      /* mesma “altura de vidro interno” das outras */
-    margin-top: 26px;      /* mantém o topo bonito */
-    margin-bottom: 32px;   /* sobe a base, abre respiro no rodapé */
-  }
-
-
-/* ── Botão olho mágico ── */
-#section-senha .btn-toggle-senha,
-#section-senha [data-action="toggle-password"] {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  margin-top: 10px !important;
-  height: 36px !important;
-  width: 100% !important;
-  max-width: 260px !important;
-}
-
-#section-senha .btn-toggle-senha svg,
-#section-senha [data-action="toggle-password"] svg,
-#section-senha .btn-toggle-senha i,
-#section-senha [data-action="toggle-password"] i {
+#section-senha .j-panel-glow{
+  position: relative !important;
+  width: min(92vw, 620px) !important;
+  max-width: 620px !important;
   margin: 0 auto !important;
-  display: block !important;
-  line-height: 1 !important;
-}
-/* ── Botão Voltar: efeito pedra igual ao Avançar ── */
-#btn-senha-prev {
-  background: transparent !important;
-  background-image: url('/assets/img/moldura-medieval-espinhos.png') !important;
-  background-size: 100% 100% !important;
-  background-repeat: no-repeat !important;
-  border: none !important;
-  color: #f9e7c2 !important;
-  text-shadow: 0 1px 1px rgba(0,0,0,.75) !important;
-  font-family: 'ManufacturingConsent', sans-serif !important;
-  cursor: pointer;
+  padding: 10px !important;
+  border-radius: 28px !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+  z-index: 6 !important;
 }
 
-#btn-senha-prev:hover:not(:disabled) {
-  filter: brightness(1.08) !important;
-  transform: translateY(-1px) !important;
-  animation: brilhoDivino 1.8s ease-in-out infinite !important;
-}
-
-#btn-senha-prev:disabled {
-  opacity: .7 !important;
-  filter: grayscale(.15) !important;
-  cursor: not-allowed !important;
-  animation: none !important;
-}
-
-
-#section-senha .j-panel-glow::before {
+#section-senha .j-panel-glow::before{
   content: '';
   position: absolute;
   pointer-events: none;
@@ -116,34 +50,265 @@ orda dourada + guia — valem para todos os breakpoints ── */
     to bottom,
     rgba(255,255,255,0.16),
     transparent 45%,
-    transparent 100%)important;
+    transparent 100%
+  ) !important;
 }
 
+#section-senha .j-arcane-card{
+  width: 100% !important;
+  min-height: 620px !important;
+  max-height: none !important;
+  margin-top: 18px !important;
+  margin-bottom: 28px !important;
+  padding: 28px 26px 34px !important;
+  border-radius: 24px !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+}
 
-/* ======================================================
-   DESKTOP  (≥ 900px)
-   ====================================================== */
-@media (min-width: 900px) {
+/* =========================
+   ÁREA INTERNA / CONTEÚDO
+   ========================= */
 
-  #section-senha .j-perg-v-inner {
-    position: relative !important;
-    transform: translateY(40px) !important;
-    top: 40px !important;
-    margin-top: 0 !important;
-    padding-top: 0 !important;
-    overflow: visible !important;
-    z-index: 5 !important;
+#section-senha .senha-panel-inner,
+#section-senha .conteudo-pergaminho,
+#section-senha .senha-wrap,
+#section-senha .senha-container{
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: visible !important;
+}
+
+#section-senha h1,
+#section-senha .senha-title{
+  text-align: center;
+  margin: 0 0 18px !important;
+}
+
+#section-senha .senha-texto,
+#section-senha .senha-copy,
+#section-senha .typing-text{
+  text-align: left;
+  line-height: 1.55;
+}
+
+/* =========================
+   INPUT / OLHO MÁGICO
+   ========================= */
+
+#section-senha input[type="password"],
+#section-senha input[type="text"],
+#section-senha .input-senha,
+#section-senha #senha-input{
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 54px !important;
+  padding: 14px 18px !important;
+  box-sizing: border-box !important;
+  border-radius: 16px !important;
+}
+
+#section-senha .btn-toggle-senha,
+#section-senha [data-action="toggle-password"]{
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  max-width: 320px !important;
+  min-height: 42px !important;
+  margin: 14px auto 0 !important;
+}
+
+#section-senha .btn-toggle-senha svg,
+#section-senha [data-action="toggle-password"] svg,
+#section-senha .btn-toggle-senha i,
+#section-senha [data-action="toggle-password"] i{
+  margin: 0 auto !important;
+  display: block !important;
+  line-height: 1 !important;
+}
+
+/* =========================
+   BOTÕES VOLTAR / AVANÇAR
+   ========================= */
+
+#section-senha .senha-actions{
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: center !important;
+  align-items: stretch !important;
+  gap: 14px !important;
+  flex-wrap: nowrap !important;
+  width: 100% !important;
+  max-width: 420px !important;
+  margin: 22px auto 0 !important;
+}
+
+#section-senha .senha-actions .btn-stone,
+#section-senha .senha-actions button{
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  min-height: 52px !important;
+  box-sizing: border-box !important;
+}
+
+#btn-senha-prev{
+  background: transparent !important;
+  background-image: url('/assets/img/moldura-medieval-espinhos.png') !important;
+  background-size: 100% 100% !important;
+  background-repeat: no-repeat !important;
+  border: none !important;
+  color: #f9e7c2 !important;
+  text-shadow: 0 1px 1px rgba(0,0,0,.75) !important;
+  font-family: 'ManufacturingConsent', sans-serif !important;
+  cursor: pointer;
+}
+
+#btn-senha-prev:hover:not(:disabled){
+  filter: brightness(1.08) !important;
+  transform: translateY(-1px) !important;
+}
+
+#btn-senha-prev:disabled{
+  opacity: .7 !important;
+  filter: grayscale(.15) !important;
+  cursor: not-allowed !important;
+}
+
+/* =========================
+   PERGAMINHO DE FUNDO
+   ========================= */
+
+#section-senha .pergaminho,
+#section-senha .pergaminho-v{
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  background-size: 100% auto !important;
+  background-repeat: no-repeat;
+  background-position: top center;
+  overflow-x: hidden !important;
+}
+
+/* =========================
+   DESKTOP
+   ========================= */
+
+@media (min-width: 900px){
+
+  #section-senha{
+    padding: 18px 0 54px !important;
   }
 
-  #section-senha .j-panel-glow {
-    position: relative !important;
-    transform: translate(-16px, -70px) !important;
-    top: 10px !important;
+  #section-senha .j-perg-v-inner{
+    transform: translateY(16px) !important;
+    top: 0 !important;
     margin-top: 0 !important;
-    width: 90% !important;
-    max-width: 470px !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    z-index: 6 !important;  
-} 
+    padding-top: 0 !important;
+  }
+
+  #section-senha .j-panel-glow{
+    width: min(92vw, 620px) !important;
+    max-width: 620px !important;
+    transform: none !important;
+    top: 0 !important;
+  }
+
+  #section-senha .j-arcane-card{
+    min-height: 640px !important;
+    padding: 30px 30px 38px !important;
+  }
+
+  #section-senha .senha-actions{
+    max-width: 440px !important;
+  }
+}
+
+/* =========================
+   TABLET / MOBILE
+   ========================= */
+
+@media (max-width: 899px){
+
+  #section-senha{
+    padding: 8px 0 42px !important;
+    min-height: 100vh !important;
+    overflow: visible !important;
+  }
+
+  #section-senha .j-perg-v-inner{
+    width: 100%;
+    max-width: 100%;
+    transform: none !important;
+    top: 0 !important;
+    padding-top: 0 !important;
+  }
+
+  #section-senha .j-panel-glow{
+    width: calc(100vw - 40px) !important;
+    max-width: 520px !important;
+    margin: 0 auto !important;
+    transform: none !important;
+    top: 0 !important;
+    padding: 10px !important;
+    overflow: visible !important;
+  }
+
+  #section-senha .j-arcane-card{
+    min-height: 540px !important;
+    margin-top: 12px !important;
+    margin-bottom: 20px !important;
+    padding: 22px 18px 28px !important;
+    border-radius: 22px !important;
+  }
+
+  #section-senha .senha-panel-inner{
+    padding: 0 6px !important;
+    box-sizing: border-box !important;
+  }
+
+  #section-senha .senha-actions{
+    max-width: 100% !important;
+    gap: 10px !important;
+  }
+
+  #section-senha .senha-actions .btn-stone,
+  #section-senha .senha-actions button{
+    min-height: 48px !important;
+  }
+}
+
+/* =========================
+   MOBILE PEQUENO
+   ========================= */
+
+@media (max-width: 480px){
+
+  #section-senha{
+    padding: 8px 0 34px !important;
+  }
+
+  #section-senha .j-panel-glow{
+    width: calc(100vw - 24px) !important;
+    max-width: 430px !important;
+  }
+
+  #section-senha .j-arcane-card{
+    min-height: 500px !important;
+    padding: 18px 14px 24px !important;
+  }
+
+  #section-senha input[type="password"],
+  #section-senha input[type="text"],
+  #section-senha .input-senha,
+  #section-senha #senha-input{
+    min-height: 50px !important;
+    padding: 12px 14px !important;
+  }
+
+  #section-senha .senha-actions{
+    gap: 8px !important;
+  }
 }
