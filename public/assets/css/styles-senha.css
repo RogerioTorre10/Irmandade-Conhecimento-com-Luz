@@ -47,14 +47,12 @@ orda dourada + guia — valem para todos os breakpoints ── */
   box-sizing: border-box !important;
 }
 
-/* ── Card senha: mesmo porte da intro/termos ── */
-#section-senha .j-arcane-card {
-  min-height: 50vh !important;
-  max-height: 60vh !important;
-  width: min(434px, 55vw) !important;
-  max-width: 360px !important;
-}
-}
+ #section-senha .j-arcane-card{
+    max-height: 72vh;      /* mesma “altura de vidro interno” das outras */
+    margin-top: 26px;      /* mantém o topo bonito */
+    margin-bottom: 32px;   /* sobe a base, abre respiro no rodapé */
+  }
+
 
 /* ── Botão olho mágico ── */
 #section-senha .btn-toggle-senha,
@@ -118,9 +116,9 @@ orda dourada + guia — valem para todos os breakpoints ── */
     to bottom,
     rgba(255,255,255,0.16),
     transparent 45%,
-    transparent 100%
-  );
+    transparent 100%)important;
 }
+
 
 /* ======================================================
    DESKTOP  (≥ 900px)
@@ -146,4 +144,6 @@ orda dourada + guia — valem para todos os breakpoints ── */
     max-width: 470px !important;
     margin-left: auto !important;
     margin-right: auto !important;
-    z-index: 6 
+    z-index: 6 !important;  
+} 
+}
