@@ -369,6 +369,29 @@ utter.lang = lang;
 utter.rate = 1.02;
 utter.pitch = 1;
 
+const guide = getGuideForVoice();
+
+if (guide === 'zion') {
+  utter.pitch = 0.9;
+  utter.rate = 1;
+}
+
+if (guide === 'lumen') {
+  utter.pitch = 1.1;
+  utter.rate = 1.02;
+}
+
+if (guide === 'arian') {
+  utter.pitch = 1.2;
+  utter.rate = 1.05;
+}
+
+const voice = pickVoiceForGuide(lang);
+if (voice) utter.voice = voice;
+
+speechSynthesis.speak(utter);
+  
+
 function pickVoiceForGuide(lang = 'pt-BR') {
 
   const voices = speechSynthesis.getVoices() || [];
