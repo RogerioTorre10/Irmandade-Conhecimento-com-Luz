@@ -14,7 +14,11 @@
  * - devolutiva do guia via API
  * - progresso do bloco e total
  * - botão Continuar em 2 cliques:
- *    1º envia para API / 2º avança
+ *    1º envia para API
+ *    2º só avança se devolutiva pronta
+ * - se a devolutiva falhar:
+ *    botão vira "Tentar novamente"
+ *    e NÃO avança
  * - botão Ouvir:
  *    antes da devolutiva => narra a pergunta
  *    depois da devolutiva => narra a devolutiva
@@ -291,6 +295,40 @@
     } catch {}
   }
 
+  function pickVoiceForGuide() {
+    const guideRaw =
+      sessionStorage.getItem('jornada.guia') ||
+      localStorage.getItem('JORNADA_GUIA') ||
+      document.body.dataset.guia ||
+      'lumen';
+
+    const guide = normalizeGuide(guideRaw);
+    const voices = window.speechSynthesis?.getVoices?.() || [];
+    if (!voices.length) return null;
+
+    const lang = document.documentElement.lang || getLang() || 'pt-BR';
+    const langShort = String(lang).slice(0, 2).toLowerCase();
+
+    const filtered = voices.filter(v =>
+      String(v.lang || '').toLowerCase().startsWith(langShort)
+    );
+
+    const list = filtered.length ? filtered : voices;
+
+    const femaleHints = ['female', 'woman', 'maria', 'luciana', 'helena', 'samantha', 'victoria', 'google português do brasil'];
+    const maleHints = ['male', 'man', 'paulo', 'daniel', 'ricardo', 'jorge', 'google português'];
+
+    if (guide === 'lumen') {
+      return list.find(v => femaleHints.some(h => String(v.name || '').toLowerCase().includes(h))) || list[0] || null;
+    }
+
+    if (guide === 'zion' || guide === 'arion') {
+      return list.find(v => maleHints.some(h => String(v.name || '').toLowerCase().includes(h))) || list[0] || null;
+    }
+
+    return list[0] || null;
+  }
+
   function speakText(text) {
     const clean = String(text || '').trim();
     if (!clean) return Promise.resolve();
@@ -304,6 +342,9 @@
         utter.rate = 0.92;
         utter.pitch = 1;
         utter.volume = 1;
+
+        const voice = pickVoiceForGuide();
+        if (voice) utter.voice = voice;
 
         utter.onend = () => resolve();
         utter.onerror = () => resolve();
@@ -488,25 +529,31 @@
     const btn = section.querySelector('#jp-btn-confirmar');
     if (!btn) return;
 
+    btn.classList.remove('is-loading', 'is-ready', 'is-error');
+
     if (state === 'loading') {
       btn.disabled = true;
       btn.textContent = 'Lumen refletindo...';
       btn.classList.add('is-loading');
-      btn.classList.remove('is-ready');
       return;
     }
 
     if (state === 'ready') {
       btn.disabled = false;
       btn.textContent = 'Continuar';
-      btn.classList.remove('is-loading');
       btn.classList.add('is-ready');
+      return;
+    }
+
+    if (state === 'error') {
+      btn.disabled = false;
+      btn.textContent = 'Tentar novamente';
+      btn.classList.add('is-error');
       return;
     }
 
     btn.disabled = false;
     btn.textContent = 'Continuar';
-    btn.classList.remove('is-loading', 'is-ready');
   }
 
   function bindButtons(section, bloco, perguntaText) {
@@ -546,11 +593,13 @@
 
         const state = section?.dataset?.continueState || 'idle';
 
+        // só avança se a devolutiva já estiver pronta
         if (state === 'ready') {
           goNext(bloco);
           return;
         }
 
+        // evita clique duplo durante carregamento
         if (state === 'loading') {
           return;
         }
@@ -583,10 +632,10 @@
 
           if (!window.API?.gerarDevolutiva) {
             await setGuideResponse(
-              'A conexão com o guia ainda não está pronta nesta etapa. Toque novamente em Continuar para seguir.',
+              'A conexão com o guia ainda não está pronta. Toque em "Tentar novamente".',
               'warn'
             );
-            setContinueState(section, 'ready');
+            setContinueState(section, 'error');
             return;
           }
 
@@ -606,19 +655,19 @@
           }
 
           await setGuideResponse(
-            'O guia não concluiu a devolutiva a tempo. Toque novamente em Continuar para seguir.',
+            'A devolutiva ainda não chegou. Toque em "Tentar novamente" para reenviar tua resposta ao guia.',
             'warn'
           );
-          setContinueState(section, 'ready');
+          setContinueState(section, 'error');
 
         } catch (e) {
           console.warn('Erro devolutiva IA', e);
 
           await setGuideResponse(
-            'A conexão com o guia oscilou. Toque novamente em Continuar para seguir.',
+            'A conexão com o guia oscilou neste momento. Toque em "Tentar novamente" para buscar a devolutiva.',
             'warn'
           );
-          setContinueState(section, 'ready');
+          setContinueState(section, 'error');
         }
       };
     }
@@ -695,6 +744,16 @@
       renderBloco(section);
     }
   });
+
+  // garante vozes carregadas para o TTS por guia
+  try {
+    if (window.speechSynthesis) {
+      window.speechSynthesis.getVoices();
+      window.speechSynthesis.onvoiceschanged = () => {
+        try { window.speechSynthesis.getVoices(); } catch {}
+      };
+    }
+  } catch {}
 
   window.JORNADA_PERGUNTAS_BLOCO = {
     setGuideResponse,
