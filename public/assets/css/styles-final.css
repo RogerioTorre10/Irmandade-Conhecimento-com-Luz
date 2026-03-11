@@ -561,3 +561,151 @@ body[data-guia="arion"] #section-final{
     opacity: .34 !important;
   }
 }
+/* =========================================
+   SECTION FINAL — DEVOLUTIVA GLAMOROSA
+   ========================================= */
+
+#section-final .same-block-shell {
+  width: min(100%, 920px);
+  margin: 0 auto;
+}
+
+#section-final .final-content {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 18px 18px 22px;
+}
+
+#section-final .final-topo {
+  text-align: center;
+}
+
+#section-final .final-title {
+  margin: 0 0 8px;
+  line-height: 1.15;
+}
+
+#section-final .final-subtitle {
+  margin: 0;
+  opacity: 0.95;
+}
+
+#section-final .same-block-box {
+  position: relative;
+  min-height: 360px;
+  border-radius: 18px;
+  padding: 18px 16px;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(4px);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
+}
+
+#section-final .final-guide-header {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+#section-final .final-guide-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 130px;
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  background: rgba(255,255,255,0.12);
+  box-shadow: 0 0 18px rgba(255,255,255,0.10);
+}
+
+#section-final .final-text-block {
+  white-space: pre-wrap;
+  line-height: 1.7;
+  font-size: 1rem;
+  min-height: 92px;
+}
+
+#section-final .final-summary-wrap.hidden {
+  display: none;
+}
+
+#section-final .final-section-label {
+  text-align: center;
+  margin: 14px 0 10px;
+  font-size: 1.08rem;
+}
+
+#section-final .final-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+#section-final .btn-medieval.is-locked {
+  opacity: 0.55;
+  filter: grayscale(0.15);
+  pointer-events: none;
+}
+
+#section-final .final-status {
+  text-align: center;
+  min-height: 24px;
+  opacity: 0.92;
+  font-size: 0.96rem;
+}
+
+#section-final.theme-lumen .final-guide-badge,
+#section-final.theme-lumen .same-block-box {
+  box-shadow:
+    inset 0 0 0 1px rgba(80,255,190,0.18),
+    0 0 24px rgba(80,255,190,0.14);
+}
+
+#section-final.theme-zion .final-guide-badge,
+#section-final.theme-zion .same-block-box {
+  box-shadow:
+    inset 0 0 0 1px rgba(98,190,255,0.20),
+    0 0 24px rgba(98,190,255,0.16);
+}
+
+#section-final.theme-arian .final-guide-badge,
+#section-final.theme-arian .same-block-box,
+#section-final.theme-arion .final-guide-badge,
+#section-final.theme-arion .same-block-box {
+  box-shadow:
+    inset 0 0 0 1px rgba(255,80,210,0.20),
+    0 0 24px rgba(255,80,210,0.16);
+}
+
+#section-final.theme-gold .final-guide-badge,
+#section-final.theme-gold .same-block-box {
+  box-shadow:
+    inset 0 0 0 1px rgba(255,215,120,0.20),
+    0 0 24px rgba(255,215,120,0.18);
+}
+
+@media (max-width: 600px) {
+  #section-final .final-content {
+    padding: 14px 12px 18px;
+    gap: 14px;
+  }
+
+  #section-final .same-block-box {
+    min-height: 320px;
+    padding: 14px 12px;
+  }
+
+  #section-final .final-text-block {
+    font-size: 0.97rem;
+    line-height: 1.65;
+  }
+
+  #section-final .final-actions {
+    gap: 10px;
+  }
+}
