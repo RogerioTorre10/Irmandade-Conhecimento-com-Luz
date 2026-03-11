@@ -659,6 +659,19 @@ body[data-guia="arion"] #section-final{
   font-size: 0.96rem;
 }
 
+@font-face {
+  font-family: 'ManufacturingConsent';
+  src: url('/assets/fonts/ManufacturingConsent-Regular.ttf') format('truetype');
+  font-display: swap;
+}
+
+#section-final .final-title,
+#section-final #final-title,
+#section-final .final-guide-feedback,
+#section-final .final-pdf-status {
+  font-family: 'ManufacturingConsent', serif !important;
+}
+
 #section-final.theme-lumen .final-guide-badge,
 #section-final.theme-lumen .same-block-box {
   box-shadow:
