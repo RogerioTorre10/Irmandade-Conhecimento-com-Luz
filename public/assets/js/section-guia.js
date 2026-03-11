@@ -327,6 +327,8 @@
     }
   }
 
+
+  
   // =====================================================
   // DATILOGRAFIA / TTS
   // =====================================================
@@ -346,6 +348,55 @@
     });
   }
 
+// ===============================================
+// VOZ DO GUIA (NOVO)
+// ===============================================
+
+function getGuideForVoice() {
+  const g =
+    sessionStorage.getItem('jornada.guia') ||
+    localStorage.getItem('JORNADA_GUIA') ||
+    document.body.dataset.guia ||
+    'lumen';
+
+  return String(g).toLowerCase();
+}
+
+function pickVoiceForGuide(lang = 'pt-BR') {
+  const voices = speechSynthesis.getVoices() || [];
+  if (!voices.length) return null;
+
+  const guide = getGuideForVoice();
+
+  const femaleHints = [
+    'female','woman','maria','luciana','helena','samantha','victoria'
+  ];
+
+  const maleHints = [
+    'male','man','paulo','daniel','ricardo','jorge'
+  ];
+
+  const filtered = voices.filter(v =>
+    String(v.lang || '').toLowerCase().startsWith('pt')
+  );
+
+  const list = filtered.length ? filtered : voices;
+
+  if (guide === 'lumen') {
+    return list.find(v =>
+      femaleHints.some(h => v.name.toLowerCase().includes(h))
+    ) || list[0];
+  }
+
+  if (guide === 'zion' || guide === 'arian') {
+    return list.find(v =>
+      maleHints.some(h => v.name.toLowerCase().includes(h))
+    ) || list[0];
+  }
+
+  return list[0];
+}
+  
   async function typeOnce(el, text, { speed = TYPING_SPEED, speak = true } = {}) {
     if (!el) return;
 
