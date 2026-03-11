@@ -6,7 +6,7 @@
  * - section-perguntas-integracao
  * - section-perguntas-sintese
  *
- * Unifica:
+ * Recursos:
  * - tema por guia
  * - datilografia + TTS
  * - botão de microfone
@@ -15,6 +15,10 @@
  * - progresso do bloco e total
  * - botão Continuar em 2 cliques:
  *    1º envia para API / 2º avança
+ * - botão Ouvir:
+ *    antes da devolutiva => narra a pergunta
+ *    depois da devolutiva => narra a devolutiva
+ * - efeito "oráculo medieval" na devolutiva
  */
 
 (function (window, document) {
@@ -199,51 +203,60 @@
   }
 
   async function setGuideResponse(text, kind = 'info') {
-  const wrap = document.getElementById('jp-ai-response-wrap');
-  const box = document.getElementById('jp-ai-response');
+    const wrap = document.getElementById('jp-ai-response-wrap');
+    const box = document.getElementById('jp-ai-response');
 
-  if (!wrap || !box) return;
+    if (!wrap || !box) return;
 
-  const content = String(text || '').trim();
+    const content = String(text || '').trim();
 
-  if (!content) {
-    box.hidden = true;
-    box.textContent = '';
-    box.innerHTML = '';
-    box.classList.remove('is-visible', 'is-revealing', 'oracle-ready');
-    wrap.dataset.kind = '';
-    wrap.dataset.responseText = '';
-    return;
-  }
-
-  wrap.dataset.kind = kind;
-  wrap.dataset.responseText = content;
-  box.hidden = false;
-  box.textContent = '';
-  box.innerHTML = '';
-  box.classList.add('is-visible', 'is-revealing');
-
-  // efeito "oráculo medieval" — datilografia em blocos
-  const lines = content.split('\n').filter(Boolean);
-  if (!lines.length) lines.push(content);
-
-  for (let i = 0; i < lines.length; i++) {
-    const lineEl = document.createElement('div');
-    lineEl.className = 'ai-line oracle-line';
-    box.appendChild(lineEl);
-
-    const line = lines[i];
-    for (let j = 0; j <= line.length; j++) {
-      lineEl.textContent = line.slice(0, j);
-      await new Promise((r) => setTimeout(r, 16));
+    if (!content) {
+      box.hidden = true;
+      box.textContent = '';
+      box.innerHTML = '';
+      box.classList.remove('is-visible', 'is-revealing', 'oracle-ready');
+      wrap.dataset.kind = '';
+      wrap.dataset.responseText = '';
+      return;
     }
 
-    await new Promise((r) => setTimeout(r, 120));
+    wrap.dataset.kind = kind;
+    wrap.dataset.responseText = content;
+
+    box.hidden = false;
+    box.textContent = '';
+    box.innerHTML = '';
+    box.classList.add('is-visible', 'is-revealing');
+
+    const lines = content.split('\n').filter(Boolean);
+    if (!lines.length) lines.push(content);
+
+    for (let i = 0; i < lines.length; i++) {
+      const lineEl = document.createElement('div');
+      lineEl.className = 'ai-line oracle-line';
+      box.appendChild(lineEl);
+
+      const line = lines[i];
+      for (let j = 0; j <= line.length; j++) {
+        lineEl.textContent = line.slice(0, j);
+        await new Promise((r) => setTimeout(r, 16));
+      }
+
+      await new Promise((r) => setTimeout(r, 120));
+    }
+
+    box.classList.remove('is-revealing');
+    box.classList.add('oracle-ready');
+
+    box.style.textShadow = '0 0 8px var(--guia-soft), 0 0 18px rgba(255,255,255,0.08)';
+    box.style.borderColor = 'var(--guia-main)';
   }
 
-  box.classList.remove('is-revealing');
-  box.classList.add('oracle-ready');
-}
+  function getCurrentGuideResponseText() {
+    const wrap = document.getElementById('jp-ai-response-wrap');
+    const txt = wrap?.dataset?.responseText || '';
+    return String(txt || '').trim();
+  }
 
   function updateProgress(bloco) {
     const totalBlocks = window.JORNADA_PAPER_QA?.getTotalBlocks?.(getLang()) || 5;
@@ -301,6 +314,17 @@
         resolve();
       }
     });
+  }
+
+  async function speakQuestionOrGuideResponse(perguntaText) {
+    const guideText = getCurrentGuideResponseText();
+
+    if (guideText) {
+      await speakText(guideText);
+      return;
+    }
+
+    await speakText(perguntaText);
   }
 
   async function typeQuestion(el, text, speed = 26, withVoice = true) {
@@ -441,12 +465,18 @@
     const wrap = document.getElementById('jp-ai-response-wrap');
     const box = document.getElementById('jp-ai-response');
 
-    if (wrap) wrap.dataset.kind = '';
+    if (wrap) {
+      wrap.dataset.kind = '';
+      wrap.dataset.responseText = '';
+    }
+
     if (box) {
       box.hidden = true;
       box.textContent = '';
       box.innerHTML = '';
-      box.classList.remove('is-visible', 'is-revealing');
+      box.classList.remove('is-visible', 'is-revealing', 'oracle-ready');
+      box.style.removeProperty('text-shadow');
+      box.style.removeProperty('border-color');
     }
   }
 
@@ -491,7 +521,7 @@
     if (btnTTS) {
       btnTTS.onclick = async (ev) => {
         ev.preventDefault();
-        await speakText(perguntaText);
+        await speakQuestionOrGuideResponse(perguntaText);
       };
     }
 
@@ -516,13 +546,11 @@
 
         const state = section?.dataset?.continueState || 'idle';
 
-        // 2º clique: devolutiva já recebida / ou estado liberado para seguir
         if (state === 'ready') {
           goNext(bloco);
           return;
         }
 
-        // evita clique repetido enquanto API responde
         if (state === 'loading') {
           return;
         }
