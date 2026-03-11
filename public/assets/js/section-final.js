@@ -300,15 +300,36 @@
     if (!('speechSynthesis' in window) || !text) return Promise.resolve();
 
     speechChain = speechChain.then(() => new Promise((resolve) => {
-      const utter = new SpeechSynthesisUtterance(text);
-      utter.lang = getActiveLang();
-      utter.rate = 0.9;
-      utter.pitch = 1;
-      utter.volume = 0.9;
-      utter.onend = resolve;
-      utter.onerror = resolve;
-      window.speechSynthesis.speak(utter);
-    }));
+     const utter = new SpeechSynthesisUtterance(clean);
+     utter.lang = document.documentElement.lang || getLang() || 'pt-BR';
+     utter.rate = 0.92;
+    utter.pitch = 1;
+    utter.volume = 1;
+
+    const guide = normalizeGuide(
+    sessionStorage.getItem('jornada.guia') ||
+    localStorage.getItem('JORNADA_GUIA') ||
+    document.body.dataset.guia ||
+   'lumen'
+  );
+
+  if (guide === 'zion') {
+  utter.pitch = 0.88;
+  utter.rate = 0.96;
+  }
+
+   if (guide === 'lumen') {
+    utter.pitch = 1.06;
+    utter.rate = 0.92;
+   }
+
+   if (guide === 'arian' || guide === 'arion') {
+    utter.pitch = 1.14;
+    utter.rate = 0.94;
+   }
+
+   const voice = pickVoiceForGuide();
+    if (voice) utter.voice = voice;
 
     return speechChain;
   }
