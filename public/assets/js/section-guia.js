@@ -497,19 +497,12 @@
     el.classList.remove('typing-active');
     el.classList.add('typing-done');
 
-    if (speak && msg && !el.dataset.spoken) {
+       if (speak && msg && !el.dataset.spoken) {
       try {
         safeSpeechCancel();
-
-        if (window.EffectCoordinator?.speak) {
-          await window.EffectCoordinator.speak(msg, {
-            lang: 'pt-BR',
-            rate: 1.06,
-            pitch: 1.0
-          });
-          await sleep(TTS_LATCH_MS);
-          el.dataset.spoken = 'true';
-        }
+        await speakGuideText(msg);
+        await sleep(TTS_LATCH_MS);
+        el.dataset.spoken = 'true';
       } catch {}
     }
 
