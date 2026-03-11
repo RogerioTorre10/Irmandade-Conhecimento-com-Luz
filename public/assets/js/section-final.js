@@ -328,10 +328,79 @@
     utter.rate = 0.94;
    }
 
-   const voice = pickVoiceForGuide();
-    if (voice) utter.voice = voice;
+   function pickVoiceForGuide() {
+  const guideRaw =
+    sessionStorage.getItem('jornada.guia') ||
+    localStorage.getItem('JORNADA_GUIA') ||
+    document.body.dataset.guia ||
+    'lumen';
 
-    return speechChain;
+  const guide = normalizeGuide(guideRaw);
+  const voices = window.speechSynthesis?.getVoices?.() || [];
+  if (!voices.length) return null;
+
+  const femaleHints = [
+    'female', 'woman', 'maria', 'luciana', 'helena', 'samantha',
+    'victoria', 'google português do brasil', 'portuguese brazil'
+  ];
+
+  const maleHints = [
+    'male', 'man', 'paulo', 'daniel', 'ricardo', 'jorge',
+    'google português', 'felipe', 'antonio', 'carlos'
+  ];
+
+  const ptVoices = voices.filter(v =>
+    String(v.lang || '').toLowerCase().startsWith('pt')
+  );
+
+  // LUMEN → feminina em pt; se não achar, feminina em qualquer idioma
+  if (guide === 'lumen') {
+    return (
+      ptVoices.find(v =>
+        femaleHints.some(h => String(v.name || '').toLowerCase().includes(h))
+      ) ||
+      voices.find(v =>
+        femaleHints.some(h => String(v.name || '').toLowerCase().includes(h))
+      ) ||
+      ptVoices[0] ||
+      voices[0] ||
+      null
+    );
+  }
+
+  // ZION → masculina em pt; se não achar, masculina em qualquer idioma
+  if (guide === 'zion') {
+    return (
+      ptVoices.find(v =>
+        maleHints.some(h => String(v.name || '').toLowerCase().includes(h))
+      ) ||
+      voices.find(v =>
+        maleHints.some(h => String(v.name || '').toLowerCase().includes(h))
+      ) ||
+      ptVoices[0] ||
+      voices[0] ||
+      null
+    );
+  }
+
+  // ARIAN → feminina inspiradora
+  if (guide === 'arian' || guide === 'arion') {
+    return (
+      ptVoices.find(v =>
+        femaleHints.some(h => String(v.name || '').toLowerCase().includes(h))
+      ) ||
+      voices.find(v =>
+        femaleHints.some(h => String(v.name || '').toLowerCase().includes(h))
+      ) ||
+      ptVoices[0] ||
+      voices[0] ||
+      null
+    );
+  }
+
+  return ptVoices[0] || voices[0] || null;
+}
+    }  
   }
 
   async function typeText(el, text, delay = 55, withVoice = false) {
@@ -732,6 +801,15 @@ function applyFinalGuideTheme(section) {
 
   console.log('[FINAL] tema do guia aplicado:', guia, theme.main);
 }
+
+try {
+  if (window.speechSynthesis) {
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.onvoiceschanged = () => {
+      try { window.speechSynthesis.getVoices(); } catch {}
+    };
+  }
+} catch {}
   
   // ================================
   // EVENTOS
