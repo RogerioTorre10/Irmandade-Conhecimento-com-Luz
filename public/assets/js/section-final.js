@@ -368,39 +368,37 @@
     );
   }
 
-  // ZION → masculina em pt; se não achar, masculina em qualquer idioma
-  if (guide === 'zion') {
-    return (
-      ptVoices.find(v =>
-        maleHints.some(h => String(v.name || '').toLowerCase().includes(h))
-      ) ||
-      voices.find(v =>
-        maleHints.some(h => String(v.name || '').toLowerCase().includes(h))
-      ) ||
-      ptVoices[0] ||
-      voices[0] ||
-      null
-    );
-  }
+     // (ZION = masculina em pt; se não achar, masculina em qualquer idioma)
+    if (guide === 'zion') {
+      return (
+        ptVoices.find(v =>
+          maleHints.some(h => String(v.name || '').toLowerCase().includes(h))
+        ) ||
+        voices.find(v =>
+          maleHints.some(h => String(v.name || '').toLowerCase().includes(h))
+        ) ||
+        ptVoices[0] ||
+        voices[0] ||
+        null
+      );
+    }
 
-  // ARIAN → feminina inspiradora
-  if (guide === 'arian' || guide === 'arion') {
-    return (
-      ptVoices.find(v =>
-        femaleHints.some(h => String(v.name || '').toLowerCase().includes(h))
-      ) ||
-      voices.find(v =>
-        femaleHints.some(h => String(v.name || '').toLowerCase().includes(h))
-      ) ||
-      ptVoices[0] ||
-      voices[0] ||
-      null
-    );
-  }
+    // (ARIAN / ARION = feminina inspiradora)
+    if (guide === 'arian' || guide === 'arion') {
+      return (
+        ptVoices.find(v =>
+          femaleHints.some(h => String(v.name || '').toLowerCase().includes(h))
+        ) ||
+        voices.find(v =>
+          femaleHints.some(h => String(v.name || '').toLowerCase().includes(h))
+        ) ||
+        ptVoices[0] ||
+        voices[0] ||
+        null
+      );
+    }
 
-  return ptVoices[0] || voices[0] || null;
-}
-    }  
+    return ptVoices[0] || voices[0] || null;
   }
 
   async function typeText(el, text, delay = 55, withVoice = false) {
