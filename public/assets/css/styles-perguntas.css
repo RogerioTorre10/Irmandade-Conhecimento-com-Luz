@@ -1295,3 +1295,21 @@ body[data-guia="arion"]{
     padding:8px 6px !important;
   }
 }
+#jp-ai-response.oracle-ready,
+#jp-ai-response.is-visible{
+  opacity: 1;
+}
+
+#jp-ai-response .oracle-line{
+  min-height: 1.2em;
+  animation: oracleGlow 2.2s ease-in-out infinite alternate;
+}
+
+@keyframes oracleGlow{
+  from{
+    text-shadow: 0 0 6px var(--guia-soft), 0 0 10px rgba(255,255,255,0.04);
+  }
+  to{
+    text-shadow: 0 0 10px var(--guia-soft), 0 0 18px var(--guia-strong);
+  }
+}
