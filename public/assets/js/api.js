@@ -204,24 +204,26 @@ async function gerarDevolutiva(payload) {
       base,
       '/jornada/devolutiva',
       payload,
-      { timeout: 30000 }
+      { timeout: 120000 } // 120s
     );
 
     if (data && data.devolutiva) {
       return { ok: true, texto: data.devolutiva };
     }
 
-    return { ok: false };
+    return { ok: false, error: 'Resposta sem devolutiva' };
   } catch (e) {
     console.warn('[API] devolutiva falhou', e);
-    return { ok: false };
+    return {
+      ok: false,
+      error: String(e?.message || e || 'Erro desconhecido')
+    };
   }
 }
 
 window.API = window.API || {};
 window.API.gerarPDFEHQ = gerarPDFEHQ;
 window.API.gerarDevolutiva = gerarDevolutiva;
-
   // Log de sanidade
   try {
     console.log('[API] pronto · PRIMARY=', API_PRIMARY, '· PDF_PATHS=', PDF_PATHS);
