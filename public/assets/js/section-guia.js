@@ -363,13 +363,14 @@ function getGuideForVoice() {
 }
 
 function pickVoiceForGuide(lang = 'pt-BR') {
+
   const voices = speechSynthesis.getVoices() || [];
   if (!voices.length) return null;
 
   const guide = getGuideForVoice();
 
   const femaleHints = [
-    'female','woman','maria','luciana','helena','samantha','victoria'
+    'female','woman','maria','luciana','helena','samantha','victoria','google português brasil'
   ];
 
   const maleHints = [
@@ -382,15 +383,24 @@ function pickVoiceForGuide(lang = 'pt-BR') {
 
   const list = filtered.length ? filtered : voices;
 
+  // LUMEN → feminina suave
   if (guide === 'lumen') {
     return list.find(v =>
       femaleHints.some(h => v.name.toLowerCase().includes(h))
     ) || list[0];
   }
 
-  if (guide === 'zion' || guide === 'arian') {
+  // ZION → masculina
+  if (guide === 'zion') {
     return list.find(v =>
       maleHints.some(h => v.name.toLowerCase().includes(h))
+    ) || list[0];
+  }
+
+  // ARIAN → feminina inspiradora
+  if (guide === 'arian') {
+    return list.find(v =>
+      femaleHints.some(h => v.name.toLowerCase().includes(h))
     ) || list[0];
   }
 
@@ -426,6 +436,23 @@ function pickVoiceForGuide(lang = 'pt-BR') {
       usedFallback = true;
     }
 
+     const guide = getGuideForVoice();
+
+     if (guide === 'zion') {
+     utter.pitch = 0.9;
+     utter.rate = 1;
+   }
+
+    if (guide === 'lumen') {
+    utter.pitch = 1.1;
+    utter.rate = 1.02;
+  }
+
+    if (guide === 'arian') {
+    utter.pitch = 1.2;
+    utter.rate = 1.05;
+  }
+    
     if (usedFallback) {
       await localType(el, msg, speed);
     }
@@ -442,7 +469,7 @@ function pickVoiceForGuide(lang = 'pt-BR') {
       } catch {}
     }
 
-    await sleep(60);
+    await sleep(60);    
   }
 
   // =====================================================
