@@ -1313,3 +1313,7 @@ body[data-guia="arion"]{
     text-shadow: 0 0 10px var(--guia-soft), 0 0 18px var(--guia-strong);
   }
 }
+
+#jp-btn-confirmar.is-error{
+  box-shadow: 0 0 14px rgba(255,120,120,.45);
+}
