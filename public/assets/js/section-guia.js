@@ -369,15 +369,15 @@ utter.lang = lang;
 utter.rate = 1.02;
 utter.pitch = 1;
 
-const voice = pickVoiceForGuide(lang);
-if (voice) utter.voice = voice;
+function pickVoiceForGuide(lang = 'pt-BR') {
 
-speechSynthesis.speak(utter);
-  
-const guide = getGuideForVoice();
+  const voices = speechSynthesis.getVoices() || [];
+  if (!voices.length) return null;
+
+  const guide = getGuideForVoice();
 
   const femaleHints = [
-    'female','woman','maria','luciana','helena','samantha','victoria'
+    'female','woman','maria','luciana','helena','samantha','victoria','google português brasil'
   ];
 
   const maleHints = [
@@ -390,15 +390,24 @@ const guide = getGuideForVoice();
 
   const list = filtered.length ? filtered : voices;
 
+  // LUMEN → feminina suave
   if (guide === 'lumen') {
     return list.find(v =>
       femaleHints.some(h => v.name.toLowerCase().includes(h))
     ) || list[0];
   }
 
-  if (guide === 'zion' || guide === 'arian') {
+  // ZION → masculina
+  if (guide === 'zion') {
     return list.find(v =>
       maleHints.some(h => v.name.toLowerCase().includes(h))
+    ) || list[0];
+  }
+
+  // ARIAN → feminina inspiradora
+  if (guide === 'arian') {
+    return list.find(v =>
+      femaleHints.some(h => v.name.toLowerCase().includes(h))
     ) || list[0];
   }
 
