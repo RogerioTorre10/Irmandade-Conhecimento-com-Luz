@@ -362,11 +362,19 @@ function getGuideForVoice() {
   return String(g).toLowerCase();
 }
 
-function pickVoiceForGuide(lang = 'pt-BR') {
-  const voices = speechSynthesis.getVoices() || [];
-  if (!voices.length) return null;
+const utter = new SpeechSynthesisUtterance(msg);
 
-  const guide = getGuideForVoice();
+const lang = document.documentElement.lang || 'pt-BR';
+utter.lang = lang;
+utter.rate = 1.02;
+utter.pitch = 1;
+
+const voice = pickVoiceForGuide(lang);
+if (voice) utter.voice = voice;
+
+speechSynthesis.speak(utter);
+  
+const guide = getGuideForVoice();
 
   const femaleHints = [
     'female','woman','maria','luciana','helena','samantha','victoria'
