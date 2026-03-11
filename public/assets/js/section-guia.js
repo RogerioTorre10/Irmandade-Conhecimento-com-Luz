@@ -51,7 +51,7 @@
     if (!s) return '';
     if (s.includes('lumen')) return 'lumen';
     if (s.includes('zion')) return 'zion';
-    if (s.includes('arion') || s.includes('arian')) return 'arion';
+    if (s.includes('arian') || s.includes('arion')) return 'arian';
     return '';
   }
 
@@ -327,90 +327,86 @@
     }
   }
 
-// ===============================================
-// DATILOGRAFIA / TTS
-// ===============================================
+  // =====================================================
+  // DATILOGRAFIA / TTS
+  // =====================================================
+  async function localType(el, text, speed = TYPING_SPEED) {
+    return new Promise((resolve) => {
+      let i = 0;
+      el.textContent = '';
 
-async function localType(el, text, speed = TYPING_SPEED) {
-  return new Promise((resolve) => {
-    let i = 0;
-    el.textContent = '';
-
-    (function tick() {
-      if (i < text.length) {
-        el.textContent += text.charAt(i++);
-        setTimeout(tick, speed);
-      } else {
-        resolve();
-      }
-    })();
-  });
-}
-
-
-// ===============================================
-// VOZ DO GUIA (NOVO)
-// ===============================================
-
-function getGuideForVoice() {
-  const g =
-    sessionStorage.getItem('jornada.guia') ||
-    localStorage.getItem('JORNADA_GUIA') ||
-    document.body.dataset.guia ||
-    'lumen';
-
-  return String(g).toLowerCase();
-}
-
-function pickVoiceForGuide(lang = 'pt-BR') {
-
-  const voices = speechSynthesis.getVoices() || [];
-  if (!voices.length) return null;
-
-  const guide = getGuideForVoice();
-
-  const femaleHints = [
-    'female','woman','maria','luciana','helena','samantha','victoria','google português brasil'
-  ];
-
-  const maleHints = [
-    'male','man','paulo','daniel','ricardo','jorge'
-  ];
-
-  const filtered = voices.filter(v =>
-    String(v.lang || '').toLowerCase().startsWith('pt')
-  );
-
-  const list = filtered.length ? filtered : voices;
-
-  // LUMEN → feminina suave
-  if (guide === 'lumen') {
-    return list.find(v =>
-      femaleHints.some(h => v.name.toLowerCase().includes(h))
-    ) || list[0];
+      (function tick() {
+        if (i < text.length) {
+          el.textContent += text.charAt(i++);
+          setTimeout(tick, speed);
+        } else {
+          resolve();
+        }
+      })();
+    });
   }
 
-  // ZION → masculina
-  if (guide === 'zion') {
-    return list.find(v =>
-      maleHints.some(h => v.name.toLowerCase().includes(h))
-    ) || list[0];
+  // ===============================================
+  // VOZ DO GUIA
+  // ===============================================
+  function getGuideForVoice() {
+    const g =
+      sessionStorage.getItem('jornada.guia') ||
+      localStorage.getItem('JORNADA_GUIA') ||
+      document.body.dataset.guia ||
+      'lumen';
+
+    return canonGuia(g) || 'lumen';
   }
 
-  // ARIAN → feminina inspiradora
-  if (guide === 'arian') {
-    return list.find(v =>
-      femaleHints.some(h => v.name.toLowerCase().includes(h))
-    ) || list[0];
+  function pickVoiceForGuide(lang = 'pt-BR') {
+    const voices = window.speechSynthesis?.getVoices?.() || [];
+    if (!voices.length) return null;
+
+    const guide = getGuideForVoice();
+
+    const femaleHints = [
+      'female', 'woman', 'maria', 'luciana', 'helena', 'samantha', 'victoria',
+      'google português brasil', 'portuguese brazil', 'natural female'
+    ];
+
+    const maleHints = [
+      'male', 'man', 'paulo', 'daniel', 'ricardo', 'jorge',
+      'natural male', 'google português'
+    ];
+
+    const langNorm = String(lang || 'pt-BR').toLowerCase();
+    const langShort = langNorm.slice(0, 2);
+
+    const filtered = voices.filter(v =>
+      String(v.lang || '').toLowerCase().startsWith(langShort)
+    );
+
+    const list = filtered.length ? filtered : voices;
+
+    // Lumen → feminina suave
+    if (guide === 'lumen') {
+      return list.find(v =>
+        femaleHints.some(h => String(v.name || '').toLowerCase().includes(h))
+      ) || list[0] || null;
+    }
+
+    // Zion → masculina
+    if (guide === 'zion') {
+      return list.find(v =>
+        maleHints.some(h => String(v.name || '').toLowerCase().includes(h))
+      ) || list[0] || null;
+    }
+
+    // Arian → feminina inspiradora
+    if (guide === 'arian') {
+      return list.find(v =>
+        femaleHints.some(h => String(v.name || '').toLowerCase().includes(h))
+      ) || list[0] || null;
+    }
+
+    return list[0] || null;
   }
-
-  return list[0];
-}
-
-
-// ===============================================
-// TYPE ONCE
-// ===============================================
 
   async function typeOnce(el, text, { speed = TYPING_SPEED, speak = true } = {}) {
     if (!el) return;
@@ -436,23 +432,6 @@ function pickVoiceForGuide(lang = 'pt-BR') {
       usedFallback = true;
     }
 
-     const guide = getGuideForVoice();
-
-     if (guide === 'zion') {
-     utter.pitch = 0.9;
-     utter.rate = 1;
-   }
-
-    if (guide === 'lumen') {
-    utter.pitch = 1.1;
-    utter.rate = 1.02;
-  }
-
-    if (guide === 'arian') {
-    utter.pitch = 1.2;
-    utter.rate = 1.05;
-  }
-    
     if (usedFallback) {
       await localType(el, msg, speed);
     }
@@ -460,16 +439,48 @@ function pickVoiceForGuide(lang = 'pt-BR') {
     el.classList.remove('typing-active');
     el.classList.add('typing-done');
 
-       if (speak && msg && !el.dataset.spoken) {
+    if (speak && msg && !el.dataset.spoken) {
       try {
         safeSpeechCancel();
-        await speakGuideText(msg);
+
+        const lang = document.documentElement.lang || 'pt-BR';
+        const guide = getGuideForVoice();
+
+        const utter = new SpeechSynthesisUtterance(msg);
+        utter.lang = lang;
+        utter.rate = 1.02;
+        utter.pitch = 1;
+
+        if (guide === 'zion') {
+          utter.pitch = 0.9;
+          utter.rate = 1.0;
+        }
+
+        if (guide === 'lumen') {
+          utter.pitch = 1.1;
+          utter.rate = 1.02;
+        }
+
+        if (guide === 'arian') {
+          utter.pitch = 1.2;
+          utter.rate = 1.05;
+        }
+
+        const voice = pickVoiceForGuide(lang);
+        if (voice) utter.voice = voice;
+
+        await new Promise((resolve) => {
+          utter.onend = () => resolve();
+          utter.onerror = () => resolve();
+          window.speechSynthesis.speak(utter);
+        });
+
         await sleep(TTS_LATCH_MS);
         el.dataset.spoken = 'true';
       } catch {}
     }
 
-    await sleep(60);    
+    await sleep(60);
   }
 
   // =====================================================
@@ -505,7 +516,7 @@ function pickVoiceForGuide(lang = 'pt-BR') {
       g1 = 'rgba(0,170,255,0.90)';
       g2 = 'rgba(255,214,91,0.70)';
     }
-    if (guia === 'arion') {
+    if (guia === 'arian') {
       main = '#ff00ff';
       g1 = 'rgba(255,120,255,0.95)';
       g2 = 'rgba(255,180,255,0.80)';
@@ -568,7 +579,7 @@ function pickVoiceForGuide(lang = 'pt-BR') {
       const PREVIEW_BY_ID = {
         zion: '/assets/videos/Zion-escolhido.mp4',
         lumen: '/assets/videos/Lumen-escolhida.mp4',
-        arion: '/assets/videos/Arian-escolhida.mp4'
+        arian: '/assets/videos/Arian-escolhida.mp4'
       };
 
       btn.dataset.previewSrc = encodeURI(PREVIEW_BY_ID[gid] || '');
@@ -1041,6 +1052,15 @@ function pickVoiceForGuide(lang = 'pt-BR') {
   document.readyState === 'loading'
     ? document.addEventListener('DOMContentLoaded', bind, { once: true })
     : bind();
+
+  try {
+    if (window.speechSynthesis) {
+      window.speechSynthesis.getVoices();
+      window.speechSynthesis.onvoiceschanged = () => {
+        try { window.speechSynthesis.getVoices(); } catch {}
+      };
+    }
+  } catch {}
 
   const applyThemeSafe = () => {
     try { window.applyGuideTheme?.(); } catch {}
