@@ -1,9 +1,10 @@
-/* /assets/js/section-final.js — v7.0 (limpo para blocos + PDF + SelfieCard + Portal)
+/* /assets/js/section-final.js — v8.0
  * Página final da Jornada Essencial
  * - Compatível com section-perguntas-bloco.js
  * - Coleta respostas via jornada-paper-qa.js
- * - Remove legado de HQ
- * - Mantém PDF + SelfieCard + Voltar ao Portal
+ * - Integra devolutiva final do Guia
+ * - PDF só libera após devolutiva final
+ * - Mantém PDF + SelfieCard + Portal
  */
 
 (function () {
@@ -72,6 +73,22 @@
     .final-pdf-status.err {
       border-color: rgba(255,120,120,.35);
       box-shadow: 0 0 18px rgba(255,120,120,.18);
+    }
+    .final-guide-feedback {
+      width: min(700px, 92%);
+      margin: 18px auto 12px;
+      padding: 18px 18px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.22);
+      backdrop-filter: blur(4px);
+      line-height: 1.72;
+      white-space: pre-wrap;
+      text-align: center;
+      box-shadow: 0 0 18px rgba(0,0,0,.20);
+    }
+    .final-guide-feedback.typing-active {
+      opacity: 1;
     }
     `;
     const style = document.createElement('style');
@@ -261,6 +278,44 @@
     return Array.isArray(respostas) && respostas.some(item => String(item?.resposta || '').trim().length > 0);
   }
 
+  function collectIntermediateFeedbacks() {
+    const bag = [];
+
+    const candidates = [
+      window.__BLOCK_FEEDBACKS__,
+      window.__JORNADA_DEVOLUTIVAS__,
+      window.JornadaState?.feedbacks,
+      window.JornadaState?.blockFeedbacks
+    ];
+
+    for (const c of candidates) {
+      if (Array.isArray(c)) {
+        c.forEach(item => {
+          const txt = String(typeof item === 'string' ? item : item?.text || item?.content || '').trim();
+          if (txt) bag.push(txt);
+        });
+      }
+    }
+
+    try {
+      const raw =
+        sessionStorage.getItem('jornada.blockFeedbacks') ||
+        localStorage.getItem('jornada.blockFeedbacks');
+
+      if (raw) {
+        const arr = JSON.parse(raw);
+        if (Array.isArray(arr)) {
+          arr.forEach(item => {
+            const txt = String(typeof item === 'string' ? item : item?.text || item?.content || '').trim();
+            if (txt) bag.push(txt);
+          });
+        }
+      }
+    } catch {}
+
+    return [...new Set(bag)];
+  }
+
   // ================================
   // PAYLOAD FINAL
   // ================================
@@ -296,7 +351,7 @@
   // ================================
   // TTS
   // ================================
-   function queueSpeak(text) {
+  function queueSpeak(text) {
     if (!('speechSynthesis' in window) || !text) return Promise.resolve();
 
     const clean = String(text || '').trim();
@@ -329,7 +384,6 @@
         String(v.lang || '').toLowerCase().startsWith('pt')
       );
 
-      // LUMEN → feminina em pt; se não achar, feminina em qualquer idioma
       if (guide === 'lumen') {
         return (
           ptVoices.find(v =>
@@ -344,7 +398,6 @@
         );
       }
 
-      // ZION → masculina em pt; se não achar, masculina em qualquer idioma
       if (guide === 'zion') {
         return (
           ptVoices.find(v =>
@@ -359,7 +412,6 @@
         );
       }
 
-      // ARIAN / ARION → feminina inspiradora
       if (guide === 'arian' || guide === 'arion') {
         return (
           ptVoices.find(v =>
@@ -451,6 +503,91 @@
   }
 
   // ================================
+  // DEVOLUTIVA FINAL
+  // ================================
+  async function fetchFinalGuideFeedback() {
+    const payload = buildFinalPayloadDiamante();
+
+    const respostas = Array.isArray(payload?.respostas)
+      ? payload.respostas.filter(Boolean)
+      : [];
+
+    const devolutivas = collectIntermediateFeedbacks();
+
+    if (!respostas.length && !devolutivas.length) return '';
+
+    const body = {
+      nome: payload.nome || '',
+      guia: payload.guia || 'lumen',
+      respostas,
+      devolutivas,
+      idioma: getActiveLang()
+    };
+
+    const apiBase =
+      window.API?.PRIMARY ||
+      window.API_BASE ||
+      window.APP_CONFIG?.API_BASE ||
+      '/api';
+
+    const base = String(apiBase).replace(/\/$/, '');
+    const url = base.endsWith('/api')
+      ? `${base}/jornada/devolutiva-final`
+      : `${base}/api/jornada/devolutiva-final`;
+
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+
+    const data = await resp.json().catch(() => ({}));
+
+    if (!resp.ok || !data?.ok) {
+      throw new Error(data?.detail || 'Falha ao gerar devolutiva final');
+    }
+
+    return String(data.devolutivaFinal || '').trim();
+  }
+
+  async function renderFinalGuideFeedback(section) {
+    if (!section) return '';
+
+    let box = section.querySelector('#finalGuideFeedback');
+    if (!box) {
+      box = document.createElement('div');
+      box.id = 'finalGuideFeedback';
+      box.className = 'final-guide-feedback';
+
+      const status = section.querySelector('#finalPdfStatus');
+      if (status && status.parentNode) {
+        status.parentNode.insertBefore(box, status);
+      } else {
+        section.appendChild(box);
+      }
+    }
+
+    box.textContent = 'O Guia está reunindo as chamas da sua jornada...';
+
+    const texto = await fetchFinalGuideFeedback();
+
+    if (!texto) {
+      box.textContent = 'O Guia não encontrou conteúdo suficiente para compor a devolutiva final.';
+      return '';
+    }
+
+    box.textContent = '';
+    await typeText(box, texto, 22, true);
+
+    try {
+      window.__JORNADA_DEVOLUTIVA_FINAL__ = texto;
+      sessionStorage.setItem('JORNADA_DEVOLUTIVA_FINAL', texto);
+    } catch {}
+
+    return texto;
+  }
+
+  // ================================
   // DOM
   // ================================
   function ensureFinalDOM() {
@@ -527,7 +664,7 @@
       status = document.createElement('div');
       status.id = 'finalPdfStatus';
       status.className = 'final-pdf-status';
-      status.textContent = '✅ Você pode gerar o PDF agora, ou baixar a SelfieCard.';
+      status.textContent = 'O Guia está reunindo as chamas da sua jornada...';
       const actions = root.querySelector('.final-acoes');
       if (actions && actions.parentNode) {
         actions.parentNode.insertBefore(status, actions.nextSibling);
@@ -577,6 +714,10 @@
       });
     })();
 
+    // PDF começa travado
+    btnPdf.disabled = true;
+    btnPdf.classList.add('disabled');
+
     if (!btnPdf.dataset.boundFinalPdf) {
       btnPdf.dataset.boundFinalPdf = '1';
 
@@ -604,6 +745,11 @@
 
           const payload = buildFinalPayloadDiamante();
 
+          payload.devolutivaFinal =
+            window.__JORNADA_DEVOLUTIVA_FINAL__ ||
+            sessionStorage.getItem('JORNADA_DEVOLUTIVA_FINAL') ||
+            '';
+
           if (!payload.nome || payload.nome.length < 2) {
             setPdfStatus(root, '⚠ Nome inválido. Volte e confirme o nome antes de gerar o PDF.', 'err');
             return;
@@ -627,7 +773,7 @@
 
           payload.selfieCard = selfieCard;
 
-          timer = startMagicDots(root, 'Forjando seu pergaminho');
+          timer = startMagicDots(root, 'O Guia está forjando seu pergaminho');
 
           const result = await window.API.gerarPDFEHQ(payload);
 
@@ -644,6 +790,7 @@
           if (timer) clearInterval(timer);
           btnPdf.disabled = false;
           btnBaixarSelfie.disabled = false;
+          btnPdf.classList.remove('disabled');
         }
       });
     }
@@ -772,70 +919,86 @@
     }
 
     unlockPortalButton(section);
+
+    try {
+      setPdfStatus(section, 'O Guia está reunindo as chamas da sua jornada...', null);
+      await renderFinalGuideFeedback(section);
+      setPdfStatus(section, '✅ Devolutiva final concluída. Agora você pode gerar o PDF ou baixar a SelfieCard.', 'ok');
+    } catch (e) {
+      console.error('[FINAL][DEVOLUTIVA FINAL] erro:', e);
+      setPdfStatus(section, '⚠ Não consegui concluir a devolutiva final do Guia.', 'err');
+    }
+
+    const btnPdf = section.querySelector('#btnPdf');
+    if (btnPdf) {
+      btnPdf.disabled = false;
+      btnPdf.classList.remove('disabled');
+    }
+
     console.log('[FINAL] Sequência concluída com sucesso!');
   }
 
-function applyFinalGuideTheme(section) {
-  const guiaRaw =
-    sessionStorage.getItem('jornada.guia') ||
-    localStorage.getItem('JORNADA_GUIA') ||
-    localStorage.getItem('jornada.guia') ||
-    document.body.dataset.guia ||
-    localStorage.getItem('JORNADA_GUIA_ATIVO') ||
-    'lumen';
+  function applyFinalGuideTheme(section) {
+    const guiaRaw =
+      sessionStorage.getItem('jornada.guia') ||
+      localStorage.getItem('JORNADA_GUIA') ||
+      localStorage.getItem('jornada.guia') ||
+      document.body.dataset.guia ||
+      localStorage.getItem('JORNADA_GUIA_ATIVO') ||
+      'lumen';
 
-  const guia = String(guiaRaw || 'lumen').trim().toLowerCase();
+    const guia = String(guiaRaw || 'lumen').trim().toLowerCase();
 
-  const themeMap = {
-    lumen: {
-      main: '#00c781',
-      soft: 'rgba(0,199,129,0.28)',
-      strong: 'rgba(0,199,129,0.62)',
-      text: '#e8fff7'
-    },
-    zion: {
-      main: '#59c8ff',
-      soft: 'rgba(89,200,255,0.28)',
-      strong: 'rgba(89,200,255,0.62)',
-      text: '#eefaff'
-    },
-    arian: {
-      main: '#ff4fd8',
-      soft: 'rgba(255,79,216,0.28)',
-      strong: 'rgba(255,79,216,0.62)',
-      text: '#fff0fb'
-    },
-    arion: {
-      main: '#ff4fd8',
-      soft: 'rgba(255,79,216,0.28)',
-      strong: 'rgba(255,79,216,0.62)',
-      text: '#fff0fb'
-    }
-  };
-
-  const theme = themeMap[guia] || themeMap.lumen;
-  const root = document.documentElement;
-
-  root.style.setProperty('--guia-main', theme.main);
-  root.style.setProperty('--guia-soft', theme.soft);
-  root.style.setProperty('--guia-strong', theme.strong);
-  root.style.setProperty('--guia-text', theme.text);
-
-  document.body.dataset.guia = guia;
-  if (section) section.dataset.guia = guia;
-
-  console.log('[FINAL] tema do guia aplicado:', guia, theme.main);
-}
-
-try {
-  if (window.speechSynthesis) {
-    window.speechSynthesis.getVoices();
-    window.speechSynthesis.onvoiceschanged = () => {
-      try { window.speechSynthesis.getVoices(); } catch {}
+    const themeMap = {
+      lumen: {
+        main: '#00c781',
+        soft: 'rgba(0,199,129,0.28)',
+        strong: 'rgba(0,199,129,0.62)',
+        text: '#e8fff7'
+      },
+      zion: {
+        main: '#59c8ff',
+        soft: 'rgba(89,200,255,0.28)',
+        strong: 'rgba(89,200,255,0.62)',
+        text: '#eefaff'
+      },
+      arian: {
+        main: '#ff4fd8',
+        soft: 'rgba(255,79,216,0.28)',
+        strong: 'rgba(255,79,216,0.62)',
+        text: '#fff0fb'
+      },
+      arion: {
+        main: '#ff4fd8',
+        soft: 'rgba(255,79,216,0.28)',
+        strong: 'rgba(255,79,216,0.62)',
+        text: '#fff0fb'
+      }
     };
+
+    const theme = themeMap[guia] || themeMap.lumen;
+    const root = document.documentElement;
+
+    root.style.setProperty('--guia-main', theme.main);
+    root.style.setProperty('--guia-soft', theme.soft);
+    root.style.setProperty('--guia-strong', theme.strong);
+    root.style.setProperty('--guia-text', theme.text);
+
+    document.body.dataset.guia = guia;
+    if (section) section.dataset.guia = guia;
+
+    console.log('[FINAL] tema do guia aplicado:', guia, theme.main);
   }
-} catch {}
-  
+
+  try {
+    if (window.speechSynthesis) {
+      window.speechSynthesis.getVoices();
+      window.speechSynthesis.onvoiceschanged = () => {
+        try { window.speechSynthesis.getVoices(); } catch {}
+      };
+    }
+  } catch {}
+
   // ================================
   // EVENTOS
   // ================================
@@ -845,15 +1008,13 @@ try {
 
     console.log('[FINAL] section:shown recebido para section-final, iniciando sequência...');
 
-   const sec = document.getElementById(SECTION_ID);
-if (sec) {
-
-  applyFinalGuideTheme(sec);   // aplica tema primeiro
-
-  sec.style.display = 'block';
-  mountFinalPdfUI(sec);
-  unlockPortalButton(sec);
-}
+    const sec = document.getElementById(SECTION_ID);
+    if (sec) {
+      applyFinalGuideTheme(sec);
+      sec.style.display = 'block';
+      mountFinalPdfUI(sec);
+      unlockPortalButton(sec);
+    }
 
     startFinalSequence();
   });
