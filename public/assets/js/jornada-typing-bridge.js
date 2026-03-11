@@ -1,5 +1,6 @@
 // /assets/js/jornada-typing-bridge.js — FINAL (Voice Manager + anti-eco seguro + latch)
-// - Voz correta por idioma (aguarda voices carregarem)
+// - Voz correta por idioma + guia
+// - Aguarda voices carregarem
 // - Anti-eco NÃO deixa texto sumir (forceShow)
 // - getLangNow alinhado: i18n.currentLang + sessionStorage jornada.lang + etc.
 
@@ -30,22 +31,55 @@
     );
   }
 
+  function getGuideNow() {
+    return String(
+      sessionStorage.getItem('jornada.guide') ||
+      sessionStorage.getItem('guiaEscolhido') ||
+      localStorage.getItem('jornada.guide') ||
+      localStorage.getItem('guiaEscolhido') ||
+      window.currentGuide ||
+      'lumen'
+    ).trim().toLowerCase();
+  }
+
   // =========================
   // VOICE MANAGER (global)
   // - aguarda voices carregarem (voiceschanged / timeout)
-  // - cache por idioma
+  // - cache por idioma + guia
   // =========================
   let __voices = [];
   let __voicesPromise = null;
-  const __voiceCache = new Map(); // lang -> SpeechSynthesisVoice|null
+  const __voiceCache = new Map(); // `${lang}::${guide}` -> SpeechSynthesisVoice|null
+
+  const GUIDE_VOICE_PROFILE = {
+    zion:  { gender: 'male',   style: 'firm' },
+    lumen: { gender: 'female', style: 'warm' },
+    arian: { gender: 'female', style: 'inspiring' },
+    ariane:{ gender: 'female', style: 'inspiring' }
+  };
 
   function __loadVoicesNow() {
-    try { __voices = speechSynthesis.getVoices?.() || []; } catch { __voices = []; }
+    try {
+      __voices = speechSynthesis.getVoices?.() || [];
+    } catch {
+      __voices = [];
+    }
     return __voices;
   }
 
   function __normalizeLang(lang) {
-    return String(lang || 'pt-BR').trim();
+    const raw = String(lang || 'pt-BR').trim().replace('_', '-');
+
+    const map = {
+      pt: 'pt-BR',
+      'pt-br': 'pt-BR',
+      en: 'en-US',
+      'en-us': 'en-US',
+      es: 'es-ES',
+      'es-es': 'es-ES'
+    };
+
+    return map[raw.toLowerCase()] || raw;
   }
 
   function __ensureVoicesReady(timeoutMs = 1400) {
@@ -57,56 +91,141 @@
     if (!__voicesPromise) {
       __voicesPromise = new Promise((resolve) => {
         const t0 = Date.now();
+        let done = false;
+
+        const finish = () => {
+          if (done) return;
+          done = true;
+          resolve();
+        };
 
         const tick = () => {
           __loadVoicesNow();
-          if (__voices.length) return resolve();
-          if (Date.now() - t0 > timeoutMs) return resolve();
+          if (__voices.length) return finish();
+          if (Date.now() - t0 > timeoutMs) return finish();
           setTimeout(tick, 80);
         };
 
         try {
+          const prev = speechSynthesis.onvoiceschanged;
           speechSynthesis.onvoiceschanged = () => {
+            try { if (typeof prev === 'function') prev(); } catch {}
             __loadVoicesNow();
-            resolve();
+            finish();
           };
         } catch {}
 
         tick();
       });
     }
+
     return __voicesPromise;
   }
 
-  function __pickBestVoice(lang) {
+  function __voiceNameScore(name, profile = {}) {
+    const n = String(name || '').toLowerCase();
+    let score = 0;
+
+    // gênero
+    if (profile.gender === 'male') {
+      if (/male|man|homem|masculin/.test(n)) score += 40;
+      if (/daniel|david|alex|jorge|paul|carlos|felipe|ricardo|antonio|bruno|google uk english male/.test(n)) score += 30;
+    }
+
+    if (profile.gender === 'female') {
+      if (/female|woman|mulher|feminin/.test(n)) score += 40;
+      if (/zira|samantha|helena|luciana|maria|sofia|victoria|ana|paulina|monica|google uk english female/.test(n)) score += 30;
+    }
+
+    // estilo
+    if (profile.style === 'warm') {
+      if (/helena|luciana|maria|sofia|samantha|paulina|monica/.test(n)) score += 12;
+    }
+
+    if (profile.style === 'inspiring') {
+      if (/sofia|victoria|helena|maria|ana|paulina|monica/.test(n)) score += 12;
+    }
+
+    if (profile.style === 'firm') {
+      if (/alex|daniel|david|jorge|carlos|paul|ricardo|antonio|bruno/.test(n)) score += 12;
+    }
+
+    return score;
+  }
+
+  function __rankVoices(candidates, lang, profile) {
+    const L = String(lang || '').toLowerCase();
+    const prefix = L.split('-')[0];
+
+    return candidates
+      .map((v) => {
+        let score = __voiceNameScore(v.name, profile);
+
+        const vLang = String(v.lang || '').toLowerCase();
+
+        if (vLang === L) score += 25;
+        else if (vLang.startsWith(prefix)) score += 14;
+
+        if (typeof v.localService === 'boolean' && v.localService) score += 8;
+
+        // Algumas vozes do Google / Microsoft costumam ser mais estáveis
+        if (/google|microsoft|natural|neural/i.test(String(v.name || ''))) score += 6;
+
+        return { v, score };
+      })
+      .sort((a, b) => b.score - a.score);
+  }
+
+  function __pickBestVoice(lang, guide) {
     lang = __normalizeLang(lang);
-    if (__voiceCache.has(lang)) return __voiceCache.get(lang);
+    guide = String(guide || 'lumen').toLowerCase();
+
+    const cacheKey = `${lang}::${guide}`;
+    if (__voiceCache.has(cacheKey)) return __voiceCache.get(cacheKey);
 
     const L = lang.toLowerCase();
     const prefix = L.split('-')[0];
+    const profile = GUIDE_VOICE_PROFILE[guide] || GUIDE_VOICE_PROFILE.lumen;
 
-    // 1) match exato
-    let v = __voices.find(x => (x.lang || '').toLowerCase() === L) || null;
+    // 1) candidatos exatos do idioma
+    let candidates = __voices.filter(v => String(v.lang || '').toLowerCase() === L);
 
-    // 2) match por prefixo (pt/en/es)
-    if (!v) v = __voices.find(x => (x.lang || '').toLowerCase().startsWith(prefix)) || null;
-
-    // 3) prefere localService (quando existir)
-    if (v && typeof v.localService === 'boolean') {
-      const same = __voices.filter(x => (x.lang || '').toLowerCase() === (v.lang || '').toLowerCase());
-      const local = same.find(x => x.localService);
-      if (local) v = local;
+    // 2) candidatos por prefixo
+    if (!candidates.length) {
+      candidates = __voices.filter(v => String(v.lang || '').toLowerCase().startsWith(prefix));
     }
 
-    __voiceCache.set(lang, v);
-    return v;
+    // 3) fallback global
+    if (!candidates.length) {
+      candidates = [...__voices];
+    }
+
+    if (!candidates.length) {
+      __voiceCache.set(cacheKey, null);
+      return null;
+    }
+
+    const ranked = __rankVoices(candidates, lang, profile);
+    const best = ranked[0]?.v || null;
+
+    __voiceCache.set(cacheKey, best);
+    return best;
   }
 
   async function __applyVoice(utt, lang) {
     if (!utt || !('speechSynthesis' in window)) return;
+
     await __ensureVoicesReady();
-    const v = __pickBestVoice(lang);
-    if (v) utt.voice = v;
+
+    const guide = getGuideNow();
+    const voice = __pickBestVoice(lang, guide);
+
+    if (voice) {
+      utt.voice = voice;
+      utt.lang = voice.lang || __normalizeLang(lang);
+    } else {
+      utt.lang = __normalizeLang(lang);
+    }
   }
 
   // Teste rápido (console):
@@ -116,14 +235,25 @@
       console.log('speechSynthesis não disponível.');
       return;
     }
+
     await __ensureVoicesReady();
+
+    const guide = getGuideNow();
+    const lang = __normalizeLang(getLangNow());
+    const picked = __pickBestVoice(lang, guide);
+
     const list = (__voices || []).map(v => ({
       name: v.name,
       lang: v.lang,
-      local: v.localService
+      local: v.localService,
+      default: v.default
     }));
+
     console.table(list);
     console.log('Idiomas detectados:', [...new Set(list.map(x => x.lang))]);
+    console.log('Guia atual:', guide);
+    console.log('Idioma atual:', lang);
+    console.log('Voz escolhida:', picked ? { name: picked.name, lang: picked.lang } : null);
   };
 
   // ====== ESTILO DO CURSOR ======
@@ -178,7 +308,6 @@
     element.style.opacity = '1';
     element.classList.add('typing-done');
     element.dataset.typingDone = '1';
-    // marca para latch por elemento
     try { element.dataset.typingSig = makeTypingSig(text); } catch {}
   }
 
@@ -279,7 +408,7 @@
   window.EffectCoordinator.speak = (text, options = {}) => {
     if (!text || !('speechSynthesis' in window)) return;
 
-    const lang = getLangNow();
+    const lang = __normalizeLang(getLangNow());
     const clean = String(text).trim();
     const sig = `${lang}::${clean}`;
     const now = Date.now();
@@ -291,18 +420,33 @@
     try { speechSynthesis.cancel(); } catch {}
 
     const utt = new SpeechSynthesisUtterance(clean);
-    utt.lang  = lang;
-    utt.rate  = options.rate  ?? 1.03;
+    utt.lang = lang;
+    utt.rate = options.rate ?? 1.03;
     utt.pitch = options.pitch ?? 1.0;
     utt.volume = options.volume ?? 1.0;
 
-    utt.onboundary = () => { try { window.Luz?.startPulse({ min: 1, max: 1.45, speed: 120 }); } catch {} };
-    utt.onend = () => { try { window.Luz?.stopPulse(); } catch {} };
-    utt.onerror = () => { try { window.Luz?.stopPulse(); } catch {} };
+    utt.onboundary = () => {
+      try { window.Luz?.startPulse({ min: 1, max: 1.45, speed: 120 }); } catch {}
+    };
+    utt.onend = () => {
+      try { window.Luz?.stopPulse(); } catch {}
+    };
+    utt.onerror = () => {
+      try { window.Luz?.stopPulse(); } catch {}
+    };
 
     const speakNow = () => {
-      speechSynthesis.speak(utt);
-      typingLog('TTS falando…', lang);
+      try {
+        speechSynthesis.speak(utt);
+        typingLog(
+          'TTS falando…',
+          {
+            lang: utt.lang,
+            guide: getGuideNow(),
+            voice: utt.voice?.name || '(default)'
+          }
+        );
+      } catch {}
     };
 
     Promise.resolve(__applyVoice(utt, lang))
@@ -334,19 +478,21 @@
     let terminou = false;
 
     if ('speechSynthesis' in window) {
-      const lang = getLangNow();
+      const lang = __normalizeLang(getLangNow());
       const utt = new SpeechSynthesisUtterance(String(text).trim());
-      utt.lang  = lang;
-      utt.rate  = 0.95;
+
+      utt.lang = lang;
+      utt.rate = 0.95;
       utt.pitch = 1.0;
       utt.volume = 1.0;
+
       utt.onend = () => { terminou = true; };
       utt.onerror = () => { terminou = true; };
 
       try { await __applyVoice(utt, lang); } catch {}
 
       try { speechSynthesis.cancel(); } catch {}
-      speechSynthesis.speak(utt);
+      try { speechSynthesis.speak(utt); } catch { terminou = true; }
     } else {
       terminou = true;
     }
