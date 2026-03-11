@@ -709,3 +709,42 @@ body[data-guia="arion"] #section-final{
     gap: 10px;
   }
 }
+
+.final-guide-feedback {
+  width: min(700px, 92%);
+  margin: 18px auto 12px;
+  padding: 18px 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(0,0,0,.22);
+  backdrop-filter: blur(4px);
+  line-height: 1.72;
+  white-space: pre-wrap;
+  text-align: center;
+  box-shadow: 0 0 18px rgba(0,0,0,.20);
+
+  max-height: 420px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0,199,129,.75) rgba(255,255,255,.08);
+}
+
+.final-guide-feedback::-webkit-scrollbar {
+  width: 10px;
+}
+
+.final-guide-feedback::-webkit-scrollbar-track {
+  background: rgba(255,255,255,.08);
+  border-radius: 999px;
+}
+
+.final-guide-feedback::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(0,199,129,.95), rgba(0,120,90,.95));
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.16);
+}
+
+.final-guide-feedback::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(0,225,145,1), rgba(0,145,105,1));
+}
