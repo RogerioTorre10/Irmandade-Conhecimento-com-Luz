@@ -199,39 +199,51 @@
   }
 
   async function setGuideResponse(text, kind = 'info') {
-    const wrap = document.getElementById('jp-ai-response-wrap');
-    const box = document.getElementById('jp-ai-response');
+  const wrap = document.getElementById('jp-ai-response-wrap');
+  const box = document.getElementById('jp-ai-response');
 
-    if (!wrap || !box) return;
+  if (!wrap || !box) return;
 
-    const content = String(text || '').trim();
+  const content = String(text || '').trim();
 
-    if (!content) {
-      box.hidden = true;
-      box.textContent = '';
-      box.innerHTML = '';
-      box.classList.remove('is-visible', 'is-revealing');
-      wrap.dataset.kind = '';
-      return;
+  if (!content) {
+    box.hidden = true;
+    box.textContent = '';
+    box.innerHTML = '';
+    box.classList.remove('is-visible', 'is-revealing', 'oracle-ready');
+    wrap.dataset.kind = '';
+    wrap.dataset.responseText = '';
+    return;
+  }
+
+  wrap.dataset.kind = kind;
+  wrap.dataset.responseText = content;
+  box.hidden = false;
+  box.textContent = '';
+  box.innerHTML = '';
+  box.classList.add('is-visible', 'is-revealing');
+
+  // efeito "oráculo medieval" — datilografia em blocos
+  const lines = content.split('\n').filter(Boolean);
+  if (!lines.length) lines.push(content);
+
+  for (let i = 0; i < lines.length; i++) {
+    const lineEl = document.createElement('div');
+    lineEl.className = 'ai-line oracle-line';
+    box.appendChild(lineEl);
+
+    const line = lines[i];
+    for (let j = 0; j <= line.length; j++) {
+      lineEl.textContent = line.slice(0, j);
+      await new Promise((r) => setTimeout(r, 16));
     }
 
-    wrap.dataset.kind = kind;
-    box.hidden = false;
-
-    box.innerHTML = content
-      .split('\n')
-      .map((line, i) => `<div class="ai-line" style="animation-delay:${i * 120}ms">${line}</div>`)
-      .join('');
-
-    void box.offsetWidth;
-
-    box.classList.add('is-revealing');
-    box.classList.add('is-visible');
-
-    setTimeout(() => {
-      box.classList.remove('is-revealing');
-    }, 1300);
+    await new Promise((r) => setTimeout(r, 120));
   }
+
+  box.classList.remove('is-revealing');
+  box.classList.add('oracle-ready');
+}
 
   function updateProgress(bloco) {
     const totalBlocks = window.JORNADA_PAPER_QA?.getTotalBlocks?.(getLang()) || 5;
