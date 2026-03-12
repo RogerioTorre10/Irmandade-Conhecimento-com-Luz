@@ -503,7 +503,8 @@
     }));
 
     return speechChain;
-  }
+
+ 
 
   async function typeText(el, text, delay = 55, withVoice = false) {
     if (!el || !text) return;
@@ -1071,5 +1072,6 @@
       handleVoltarInicio();
     }
   });
-
+  }
+  
 })();
