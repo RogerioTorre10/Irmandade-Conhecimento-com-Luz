@@ -1065,5 +1065,5 @@
       handleVoltarInicio();
     }
   });
-  } 
+
 })();
