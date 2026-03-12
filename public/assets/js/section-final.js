@@ -357,74 +357,99 @@
     const clean = String(text || '').trim();
     if (!clean) return Promise.resolve();
 
-    function pickVoiceForGuide() {
-      const guideRaw =
-        sessionStorage.getItem('jornada.guia') ||
-        localStorage.getItem('JORNADA_GUIA') ||
-        document.body?.dataset?.guia ||
-        'lumen';
+   function pickVoiceForGuide() {
+  const guideRaw =
+    sessionStorage.getItem('jornada.guia') ||
+    localStorage.getItem('JORNADA_GUIA') ||
+    document.body?.dataset?.guia ||
+    'lumen';
 
-      const guideObj = normalizeGuide(guideRaw);
-      const guide = String(guideObj?.id || guideObj?.nome || guideRaw || 'lumen').toLowerCase();
+  const guideObj = normalizeGuide(guideRaw);
+  const guide = String(guideObj?.id || guideObj?.nome || guideRaw || 'lumen').toLowerCase();
 
-      const voices = window.speechSynthesis?.getVoices?.() || [];
-      if (!voices.length) return null;
+  const lang = String(document.documentElement.lang || getActiveLang() || 'pt-BR').toLowerCase();
+  const langPrefix = lang.split('-')[0];
 
-      const femaleHints = [
-        'female', 'woman', 'maria', 'luciana', 'helena', 'samantha',
-        'victoria', 'google português do brasil', 'portuguese brazil'
-      ];
+  const voices = window.speechSynthesis?.getVoices?.() || [];
+  if (!voices.length) return null;
 
-      const maleHints = [
-        'male', 'man', 'paulo', 'daniel', 'ricardo', 'jorge',
-        'google português', 'felipe', 'antonio', 'carlos'
-      ];
+  const femaleHints = [
+    'female', 'woman', 'mulher', 'feminina', 'feminine',
+    'maria', 'luciana', 'helena', 'samantha', 'victoria', 'sofia', 'ana', 'monica',
+    'zira', 'google uk english female'
+  ];
 
-      const ptVoices = voices.filter(v =>
-        String(v.lang || '').toLowerCase().startsWith('pt')
-      );
+  const maleHints = [
+    'male', 'man', 'homem', 'masculina', 'masculine',
+    'paulo', 'daniel', 'ricardo', 'jorge', 'felipe', 'antonio', 'carlos', 'alex', 'david',
+    'google uk english male'
+  ];
 
-      if (guide === 'lumen') {
-        return (
-          ptVoices.find(v =>
-            femaleHints.some(h => String(v.name || '').toLowerCase().includes(h))
-          ) ||
-          voices.find(v =>
-            femaleHints.some(h => String(v.name || '').toLowerCase().includes(h))
-          ) ||
-          ptVoices[0] ||
-          voices[0] ||
-          null
-        );
-      }
+  const langVoices = voices.filter(v =>
+    String(v.lang || '').toLowerCase().startsWith(langPrefix)
+  );
 
-      if (guide === 'zion') {
-        return (
-          ptVoices.find(v =>
-            maleHints.some(h => String(v.name || '').toLowerCase().includes(h))
-          ) ||
-          voices.find(v =>
-            maleHints.some(h => String(v.name || '').toLowerCase().includes(h))
-          ) ||
-          ptVoices[0] ||
-          voices[0] ||
-          null
-        );
-      }
+  const ptVoices = voices.filter(v =>
+    String(v.lang || '').toLowerCase().startsWith('pt')
+  );
 
-      if (guide === 'arian' || guide === 'arion') {
-        return (
-          ptVoices.find(v =>
-            femaleHints.some(h => String(v.name || '').toLowerCase().includes(h))
-          ) ||
-          voices.find(v =>
-            femaleHints.some(h => String(v.name || '').toLowerCase().includes(h))
-          ) ||
-          ptVoices[0] ||
-          voices[0] ||
-          null
-        );
-      }
+  const enVoices = voices.filter(v =>
+    String(v.lang || '').toLowerCase().startsWith('en')
+  );
+
+  const esVoices = voices.filter(v =>
+    String(v.lang || '').toLowerCase().startsWith('es')
+  );
+
+  const preferredLangVoices =
+    langPrefix === 'pt' ? ptVoices :
+    langPrefix === 'en' ? enVoices :
+    langPrefix === 'es' ? esVoices :
+    langVoices;
+
+  function findByHints(pool, hints) {
+    return pool.find(v =>
+      hints.some(h => String(v.name || '').toLowerCase().includes(h))
+    );
+  }
+
+  // ZION -> masculina primeiro no idioma escolhido, depois qualquer masculina
+  if (guide === 'zion') {
+    return (
+      findByHints(preferredLangVoices, maleHints) ||
+      findByHints(langVoices, maleHints) ||
+      findByHints(voices, maleHints) ||
+      preferredLangVoices[0] ||
+      langVoices[0] ||
+      voices[0] ||
+      null
+    );
+  }
+
+  // ARIAN / ARION -> feminina primeiro no idioma escolhido
+  if (guide === 'arian' || guide === 'arion') {
+    return (
+      findByHints(preferredLangVoices, femaleHints) ||
+      findByHints(langVoices, femaleHints) ||
+      findByHints(voices, femaleHints) ||
+      preferredLangVoices[0] ||
+      langVoices[0] ||
+      voices[0] ||
+      null
+    );
+  }
+
+  // LUMEN -> feminina acolhedora
+  return (
+    findByHints(preferredLangVoices, femaleHints) ||
+    findByHints(langVoices, femaleHints) ||
+    findByHints(voices, femaleHints) ||
+    preferredLangVoices[0] ||
+    langVoices[0] ||
+    voices[0] ||
+    null
+  );
+}
 
       return ptVoices[0] || voices[0] || null;
     }
@@ -446,19 +471,19 @@
       const guide = String(guideObj?.id || guideObj?.nome || 'lumen').toLowerCase();
 
       if (guide === 'zion') {
-        utter.pitch = 0.88;
-        utter.rate = 0.96;
-      }
+      utter.pitch = 0.82;
+      utter.rate = 0.94;
+    }
 
       if (guide === 'lumen') {
-        utter.pitch = 1.06;
-        utter.rate = 0.92;
-      }
+      utter.pitch = 1.04;
+      utter.rate = 0.92;
+   }
 
       if (guide === 'arian' || guide === 'arion') {
-        utter.pitch = 1.14;
-        utter.rate = 0.94;
-      }
+      utter.pitch = 1.12;
+      utter.rate = 0.95;
+   }
 
       const picked = pickVoiceForGuide();
       if (picked) {
