@@ -830,8 +830,8 @@
     btnPdf.textContent = '✅ PDF';
     btnPdf.classList.remove('is-loading');
   }
-});
-
+  });
+  }
     if (!btnBaixarSelfie.dataset.boundFinalSelfie) {
       btnBaixarSelfie.dataset.boundFinalSelfie = '1';
 
@@ -1065,5 +1065,6 @@
       handleVoltarInicio();
     }
   });
+ 
 
 })();
