@@ -721,79 +721,97 @@
     if (!btnPdf.dataset.boundFinalPdf) {
       btnPdf.dataset.boundFinalPdf = '1';
 
-      btnPdf.addEventListener('click', async (ev) => {
-        ev.preventDefault();
-        ev.stopPropagation();
+     btnPdf.addEventListener('click', async (ev) => {
+  ev.preventDefault();
+  ev.stopPropagation();
 
-        if (!window.API || typeof window.API.gerarPDFEHQ !== 'function') {
-          setPdfStatus(root, '✖ API não está pronta. Verifique se /assets/js/api.js carregou.', 'err');
-          return;
-        }
+  if (btnPdf.dataset.loading === '1') {
+    btnPdf.disabled = true;
+    btnPdf.textContent = 'Guia Pensando...';
+    btnPdf.classList.add('is-loading');
+    return;
+  }
 
-        btnPdf.disabled = true;
-        btnBaixarSelfie.disabled = true;
+  btnPdf.dataset.loading = '1';
+  btnPdf.disabled = true;
+  btnPdf.textContent = 'Guia Pensando...';
+  btnPdf.classList.add('is-loading');
 
-        let timer = null;
+  if (!window.API || typeof window.API.gerarPDFEHQ !== 'function') {
+    setPdfStatus(root, '✖ API não está pronta. Verifique se /assets/js/api.js carregou.', 'err');
+    btnPdf.dataset.loading = '0';
+    btnPdf.disabled = false;
+    btnPdf.textContent = '✅ PDF';
+    btnPdf.classList.remove('is-loading');
+    return;
+  }
 
-        try {
-          try {
-            await Promise.race([
-              window.__SELFIECARD_PROMISE__ || Promise.resolve(),
-              new Promise(r => setTimeout(r, 900))
-            ]);
-          } catch {}
+  btnBaixarSelfie.disabled = true;
 
-          const payload = buildFinalPayloadDiamante();
+  let timer = null;
 
-          payload.devolutivaFinal =
-            window.__JORNADA_DEVOLUTIVA_FINAL__ ||
-            sessionStorage.getItem('JORNADA_DEVOLUTIVA_FINAL') ||
-            '';
+  try {
+    try {
+      await Promise.race([
+        window.__SELFIECARD_PROMISE__ || Promise.resolve(),
+        new Promise(r => setTimeout(r, 900))
+      ]);
+    } catch {}
 
-          if (!payload.nome || payload.nome.length < 2) {
-            setPdfStatus(root, '⚠ Nome inválido. Volte e confirme o nome antes de gerar o PDF.', 'err');
-            return;
-          }
+    const payload = buildFinalPayloadDiamante();
 
-          if (!payload.guia || payload.guia.length < 2) {
-            setPdfStatus(root, '⚠ Guia não identificado. Volte e selecione Lumen/Zion/Arion antes de gerar o PDF.', 'err');
-            return;
-          }
+    payload.devolutivaFinal =
+      window.__JORNADA_DEVOLUTIVA_FINAL__ ||
+      sessionStorage.getItem('JORNADA_DEVOLUTIVA_FINAL') ||
+      '';
 
-          if (!hasAnyRespostaValida(payload.respostasEstruturadas)) {
-            setPdfStatus(root, '⚠ Sem respostas. Finalize as perguntas antes de gerar o PDF.', 'err');
-            return;
-          }
-
-          const selfieCard =
-            sessionStorage.getItem('JORNADA_SELFIECARD') ||
-            localStorage.getItem('JORNADA_SELFIECARD') ||
-            payload.selfieCard ||
-            '';
-
-          payload.selfieCard = selfieCard;
-
-          timer = startMagicDots(root, 'O Guia está forjando seu pergaminho');
-
-          const result = await window.API.gerarPDFEHQ(payload);
-
-          if (result && result.ok) {
-            setPdfStatus(root, '✅ Pergaminho gerado e baixado com sucesso!', 'ok');
-          } else {
-            setPdfStatus(root, '✖ Não consegui gerar o PDF. Veja o console para detalhes.', 'err');
-            console.warn('[FINAL][PDF] result:', result);
-          }
-        } catch (e) {
-          console.error('[FINAL][PDF] erro:', e);
-          setPdfStatus(root, '✖ Erro ao gerar o PDF. Confira o console (Network/Console).', 'err');
-        } finally {
-          if (timer) clearInterval(timer);
-          btnPdf.disabled = false;
-          btnBaixarSelfie.disabled = false;
-          btnPdf.classList.remove('disabled');
-        }
-      });
+    if (!payload.nome || payload.nome.length < 2) {
+      setPdfStatus(root, '⚠ Nome inválido. Volte e confirme o nome antes de gerar o PDF.', 'err');
+      return;
     }
+
+    if (!payload.guia || payload.guia.length < 2) {
+      setPdfStatus(root, '⚠ Guia não identificado. Volte e selecione Lumen/Zion/Arion antes de gerar o PDF.', 'err');
+      return;
+    }
+
+    if (!hasAnyRespostaValida(payload.respostasEstruturadas)) {
+      setPdfStatus(root, '⚠ Sem respostas. Finalize as perguntas antes de gerar o PDF.', 'err');
+      return;
+    }
+
+    const selfieCard =
+      sessionStorage.getItem('JORNADA_SELFIECARD') ||
+      localStorage.getItem('JORNADA_SELFIECARD') ||
+      payload.selfieCard ||
+      '';
+
+    payload.selfieCard = selfieCard;
+
+    timer = startMagicDots(root, 'O Guia está forjando seu pergaminho');
+
+    const result = await window.API.gerarPDFEHQ(payload);
+
+    if (result && result.ok) {
+      setPdfStatus(root, '✅ Pergaminho gerado e baixado com sucesso!', 'ok');
+    } else {
+      setPdfStatus(root, '✖ Não consegui gerar o PDF. Veja o console para detalhes.', 'err');
+      console.warn('[FINAL][PDF] result:', result);
+    }
+
+  } catch (e) {
+    console.error('[FINAL][PDF] erro:', e);
+    setPdfStatus(root, '✖ Erro ao gerar o PDF. Confira o console (Network/Console).', 'err');
+
+  } finally {
+    if (timer) clearInterval(timer);
+    btnPdf.dataset.loading = '0';
+    btnPdf.disabled = false;
+    btnBaixarSelfie.disabled = false;
+    btnPdf.textContent = '✅ PDF';
+    btnPdf.classList.remove('is-loading');
+  }
+});
 
     if (!btnBaixarSelfie.dataset.boundFinalSelfie) {
       btnBaixarSelfie.dataset.boundFinalSelfie = '1';
