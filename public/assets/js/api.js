@@ -78,55 +78,68 @@
   }
 
   async function postJSON(base, path, body, opts = {}) {
-    const timeout = opts.timeout || 30000;
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeout);
+  const timeout = Number(opts.timeout || 45000);
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort('timeout'), timeout);
 
-    const url = base + path;
+  const url = base + path;
 
-    try {
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body || {}),
-        signal: controller.signal
-      });
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body || {}),
+      signal: controller.signal
+    });
 
-      clearTimeout(timer);
+    clearTimeout(timer);
 
-      if (!res.ok) {
-        // tenta extrair mensagem (sem quebrar)
-        let extra = '';
-        try { extra = await res.text(); } catch {}
-        const err = new Error(`HTTP ${res.status}`);
-        err.status = res.status;
-        err.url = url;
-        err.body = extra;
-        throw err;
-      }
+    if (!res.ok) {
+      // tenta extrair mensagem (sem quebrar)
+      let extra = '';
+      try {
+        extra = await res.text();
+      } catch {}
 
-      const contentType = (res.headers.get('content-type') || '').toLowerCase();
-
-      // JSON
-      if (contentType.includes('application/json')) {
-        const json = await res.json();
-        return { data: json };
-      }
-
-      // PDF (ou octet-stream que pareça PDF)
-      if (guessPdfFromHeaders(res)) {
-        const blob = await res.blob();
-        return { data: blob, filename: opts.filename };
-      }
-
-      // texto/outros
-      const text = await res.text();
-      return { data: text };
-    } catch (e) {
-      clearTimeout(timer);
-      throw e;
+      const err = new Error(`HTTP ${res.status}`);
+      err.status = res.status;
+      err.url = url;
+      err.body = extra;
+      throw err;
     }
+
+    const contentType = ((res.headers.get('content-type') || '').toLowerCase());
+
+    // JSON
+    if (contentType.includes('application/json')) {
+      const json = await res.json();
+      return { data: json };
+    }
+
+    // PDF (ou octet-stream que pareça PDF)
+    if (guessPdfFromHeaders(res)) {
+      const blob = await res.blob();
+      return { data: blob, filename: opts.filename };
+    }
+
+    // texto/outros
+    const text = await res.text();
+    return { data: text };
+
+  } catch (e) {
+    clearTimeout(timer);
+
+    if (e?.name === 'AbortError') {
+      const err = new Error(`Timeout após ${timeout}ms`);
+      err.name = 'AbortError';
+      err.status = 408;
+      err.url = url;
+      throw err;
+    }
+
+    throw e;
   }
+}
 
   // --------------------------------------------------
   // API pública
