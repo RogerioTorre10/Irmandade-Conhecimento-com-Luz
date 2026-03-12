@@ -217,25 +217,35 @@ async function gerarDevolutiva(payload) {
       base,
       '/jornada/devolutiva',
       payload,
-      { timeout: 120000 } // 120s
+      { timeout: 120000 }
     );
 
     if (data && data.devolutiva) {
-      return { ok: true, texto: data.devolutiva };
+      return {
+        ok: true,
+        texto: data.devolutiva,
+        guia: data.guia || payload?.guia || 'lumen'
+      };
     }
 
-    return { ok: false, error: 'Resposta sem devolutiva' };
-  } catch (e) {
-   console.warn('[API] devolutiva falhou', {
-  message: e?.message,
-  status: e?.status,
-  body: e?.body,
-  url: e?.url,
-  raw: e
-});
     return {
       ok: false,
-      error: String(e?.message || e || 'Erro desconhecido')
+      error: 'Resposta sem devolutiva',
+      raw: data
+    };
+
+  } catch (e) {
+    console.warn('[API] devolutiva falhou', {
+      message: e?.message,
+      status: e?.status,
+      body: e?.body,
+      url: e?.url,
+      raw: e
+    });
+
+    return {
+      ok: false,
+      error: String(e?.body || e?.message || e || 'Erro desconhecido')
     };
   }
 }
