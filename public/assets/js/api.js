@@ -226,7 +226,13 @@ async function gerarDevolutiva(payload) {
 
     return { ok: false, error: 'Resposta sem devolutiva' };
   } catch (e) {
-    console.warn('[API] devolutiva falhou', e);
+   console.warn('[API] devolutiva falhou', {
+  message: e?.message,
+  status: e?.status,
+  body: e?.body,
+  url: e?.url,
+  raw: e
+});
     return {
       ok: false,
       error: String(e?.message || e || 'Erro desconhecido')
