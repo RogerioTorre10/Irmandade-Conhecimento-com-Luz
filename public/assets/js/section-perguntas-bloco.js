@@ -533,7 +533,7 @@
 
     if (state === 'loading') {
       btn.disabled = true;
-      btn.textContent = 'Lumen refletindo...';
+      btn.textContent = 'Guia refletindo...';
       btn.classList.add('is-loading');
       return;
     }
@@ -614,7 +614,7 @@
 
         saveAnswer(bloco, 0, val);
         setContinueState(section, 'loading');
-        await setGuideResponse('Lumen está refletindo sobre tua resposta...', 'info');
+        await setGuideResponse('O Guia está refletindo sobre tua resposta...', 'info');
 
         try {
           const guia =
