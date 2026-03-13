@@ -232,7 +232,6 @@ async function setGuideResponse(text, kind = 'info') {
   box.innerHTML = '';
   box.classList.add('is-visible', 'is-revealing');
 
-  // dispara TTS em paralelo à datilografia
   let ttsPromise = null;
   try {
     if (typeof window.speakGuideText === 'function') {
@@ -259,7 +258,6 @@ async function setGuideResponse(text, kind = 'info') {
     await new Promise((r) => setTimeout(r, 120));
   }
 
-  // espera a fala terminar sem quebrar a UI
   if (ttsPromise && typeof ttsPromise.then === 'function') {
     try {
       await ttsPromise;
@@ -273,16 +271,6 @@ async function setGuideResponse(text, kind = 'info') {
 
   box.style.textShadow = '0 0 8px var(--guia-soft), 0 0 18px rgba(255,255,255,0.08)';
   box.style.borderColor = 'var(--guia-main)';
-}
-
-  // leitura automática da devolutiva após a datilografia
-  try {
-    if (typeof window.speakGuideText === 'function') {
-      await window.speakGuideText(content);
-    }
-  } catch (err) {
-    console.warn('[DEVOLUTIVA][TTS] falhou:', err);
-  }
 }
 
   function getCurrentGuideResponseText() {
