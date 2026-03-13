@@ -649,7 +649,12 @@ async function gerarDevolutivaDoBloco(bloco) {
 
   return {
     ok: !!resp?.ok,
-    texto: String(resp?.texto || resp?.devolutiva || '').trim()
+    texto: String(
+      resp?.texto ||
+      resp?.devolutivaBloco ||
+      resp?.devolutiva ||
+      ''
+    ).trim()
   };
 }
 
