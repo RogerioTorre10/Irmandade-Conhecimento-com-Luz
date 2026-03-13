@@ -1,17 +1,18 @@
-/* /assets/js/section-final.js — v8.0
+/* /assets/js/section-final.js — v8.1
  * Página final da Jornada Essencial
  * - Compatível com section-perguntas-bloco.js
  * - Coleta respostas via jornada-paper-qa.js
  * - Integra devolutiva final do Guia
  * - PDF só libera após devolutiva final
  * - Mantém PDF + SelfieCard + Portal
+ * - Fallback automático para Lumen quando Zion/Arion falharem
  */
 
 (function () {
   'use strict';
 
-  const SECTION_ID  = 'section-final';
-  const HOME_URL    = 'https://irmandade-conhecimento-com-luz.onrender.com/portal.html';
+  const SECTION_ID = 'section-final';
+  const HOME_URL = 'https://irmandade-conhecimento-com-luz.onrender.com/portal.html';
   const FINAL_MOVIE = '/assets/videos/filme-5-fim-da-jornada.mp4';
 
   let started = false;
@@ -21,7 +22,7 @@
   // ================================
   // HELPERS
   // ================================
-  const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   function safeParseJSON(raw) {
     try { return JSON.parse(raw); } catch { return null; }
@@ -90,6 +91,13 @@
     .final-guide-feedback.typing-active {
       opacity: 1;
     }
+    #section-final .btn.is-busy,
+    #section-final button.is-busy,
+    #section-final a.is-busy {
+      pointer-events: none !important;
+      opacity: .55 !important;
+      filter: grayscale(.15);
+    }
     `;
     const style = document.createElement('style');
     style.id = 'final-pdf-magic-style';
@@ -98,7 +106,7 @@
   }
 
   function setPdfStatus(root, msg, kind) {
-    const el = root.querySelector('#finalPdfStatus');
+    const el = root?.querySelector?.('#finalPdfStatus');
     if (!el) return;
     el.classList.remove('ok', 'err');
     if (kind) el.classList.add(kind);
@@ -113,6 +121,72 @@
     };
     tick();
     return setInterval(tick, 420);
+  }
+
+  function getFinalFeedbackBox(section) {
+    return (
+      section?.querySelector?.('#finalGuideFeedback') ||
+      document.getElementById('finalGuideFeedback') ||
+      document.getElementById('final-guide-feedback') ||
+      document.querySelector('.final-guide-feedback')
+    );
+  }
+
+  function getFinalButtons(section) {
+    const scope = section || document.getElementById(SECTION_ID) || document;
+    return [
+      scope.querySelector('#btnPdf'),
+      scope.querySelector('#btn-gerar-pdf'),
+      scope.querySelector('#btnBaixarSelfie'),
+      scope.querySelector('#btn-whatsapp'),
+      scope.querySelector('#btn-email'),
+      scope.querySelector('#btnVoltarPortal'),
+      scope.querySelector('#btnReiniciar'),
+      ...Array.from(scope.querySelectorAll('.final-acoes button, .final-acoes a'))
+    ].filter((el, idx, arr) => el && arr.indexOf(el) === idx);
+  }
+
+  function setFinalButtonsBusy(section, isBusy, opts = {}) {
+    const buttons = getFinalButtons(section);
+    const thinkingText = opts.thinkingText || 'Guia pensando...';
+
+    buttons.forEach((btn) => {
+      try {
+        if (!btn.dataset.originalText) {
+          btn.dataset.originalText = (btn.textContent || '').trim();
+        }
+
+        btn.disabled = !!isBusy;
+        btn.setAttribute('aria-disabled', isBusy ? 'true' : 'false');
+        btn.style.pointerEvents = isBusy ? 'none' : 'auto';
+        btn.classList.toggle('is-busy', !!isBusy);
+
+        if (isBusy) {
+          if (btn.id === 'btnBaixarSelfie') {
+            btn.textContent = 'Guia refletindo...';
+          } else if (btn.id === 'btnPdf') {
+            btn.textContent = thinkingText;
+          }
+        } else if (btn.dataset.originalText) {
+          btn.textContent = btn.dataset.originalText;
+        }
+      } catch (_) {}
+    });
+  }
+
+  function lockFinalButtons(section, thinkingText = 'Guia pensando...') {
+    setFinalButtonsBusy(section, true, { thinkingText });
+  }
+
+  function unlockFinalButtons(section) {
+    setFinalButtonsBusy(section, false);
+  }
+
+  function showFinalError(section, msg) {
+    const box = getFinalFeedbackBox(section);
+    if (box) {
+      box.textContent = msg || 'Não consegui concluir a devolutiva final do guia.';
+    }
   }
 
   // ================================
@@ -159,8 +233,14 @@
     const s = String(raw || '').trim();
     const x = s.toLowerCase();
 
-    if (x === 'lumen' || x === 'guia-lumen' || x === 'guia_lumen' || x === 'lumen-1') return { id: 'lumen', nome: 'Lumen' };
-    if (x === 'zion'  || x === 'guia-zion'  || x === 'guia_zion'  || x === 'zion-1')  return { id: 'zion',  nome: 'Zion'  };
+    if (x === 'lumen' || x === 'guia-lumen' || x === 'guia_lumen' || x === 'lumen-1') {
+      return { id: 'lumen', nome: 'Lumen' };
+    }
+
+    if (x === 'zion' || x === 'guia-zion' || x === 'guia_zion' || x === 'zion-1') {
+      return { id: 'zion', nome: 'Zion' };
+    }
+
     if (x === 'arion' || x === 'arian' || x === 'guia-arion' || x === 'guia_arion' || x === 'guia-arian' || x === 'guia_arian') {
       return { id: 'arion', nome: 'Arion' };
     }
@@ -198,7 +278,10 @@
     let gs = '';
     for (const k of candidates) {
       const v = (localStorage.getItem(k) || sessionStorage.getItem(k) || '').trim();
-      if (v) { gs = v; break; }
+      if (v) {
+        gs = v;
+        break;
+      }
     }
 
     const n1 = normalizeGuide(g);
@@ -275,7 +358,7 @@
   }
 
   function hasAnyRespostaValida(respostas) {
-    return Array.isArray(respostas) && respostas.some(item => String(item?.resposta || '').trim().length > 0);
+    return Array.isArray(respostas) && respostas.some((item) => String(item?.resposta || '').trim().length > 0);
   }
 
   function collectIntermediateFeedbacks() {
@@ -290,7 +373,7 @@
 
     for (const c of candidates) {
       if (Array.isArray(c)) {
-        c.forEach(item => {
+        c.forEach((item) => {
           const txt = String(typeof item === 'string' ? item : item?.text || item?.content || '').trim();
           if (txt) bag.push(txt);
         });
@@ -305,7 +388,7 @@
       if (raw) {
         const arr = JSON.parse(raw);
         if (Array.isArray(arr)) {
-          arr.forEach(item => {
+          arr.forEach((item) => {
             const txt = String(typeof item === 'string' ? item : item?.text || item?.content || '').trim();
             if (txt) bag.push(txt);
           });
@@ -331,7 +414,7 @@
 
     const respostasEstruturadas = collectPerguntasPayload();
     const respostas = respostasEstruturadas
-      .map(item => String(item.resposta || '').trim())
+      .map((item) => String(item.resposta || '').trim())
       .filter(Boolean);
 
     const selfieCard = readSelfieCardFromEverywhere(s);
@@ -351,7 +434,7 @@
   // ================================
   // TTS
   // ================================
-   function queueSpeak(text) {
+  function queueSpeak(text) {
     if (!('speechSynthesis' in window) || !text) return Promise.resolve();
 
     const clean = String(text || '').trim();
@@ -385,21 +468,10 @@
         'google uk english male'
       ];
 
-      const langVoices = voices.filter(v =>
-        String(v.lang || '').toLowerCase().startsWith(langPrefix)
-      );
-
-      const ptVoices = voices.filter(v =>
-        String(v.lang || '').toLowerCase().startsWith('pt')
-      );
-
-      const enVoices = voices.filter(v =>
-        String(v.lang || '').toLowerCase().startsWith('en')
-      );
-
-      const esVoices = voices.filter(v =>
-        String(v.lang || '').toLowerCase().startsWith('es')
-      );
+      const langVoices = voices.filter((v) => String(v.lang || '').toLowerCase().startsWith(langPrefix));
+      const ptVoices = voices.filter((v) => String(v.lang || '').toLowerCase().startsWith('pt'));
+      const enVoices = voices.filter((v) => String(v.lang || '').toLowerCase().startsWith('en'));
+      const esVoices = voices.filter((v) => String(v.lang || '').toLowerCase().startsWith('es'));
 
       const preferredLangVoices =
         langPrefix === 'pt' ? ptVoices :
@@ -408,9 +480,7 @@
         langVoices;
 
       function findByHints(pool, hints) {
-        return pool.find(v =>
-          hints.some(h => String(v.name || '').toLowerCase().includes(h))
-        );
+        return pool.find((v) => hints.some((h) => String(v.name || '').toLowerCase().includes(h)));
       }
 
       if (guide === 'zion') {
@@ -524,25 +594,7 @@
   // ================================
   // DEVOLUTIVA FINAL
   // ================================
-  async function fetchFinalGuideFeedback() {
-    const payload = buildFinalPayloadDiamante();
-
-    const respostas = Array.isArray(payload?.respostas)
-      ? payload.respostas.filter(Boolean)
-      : [];
-
-    const devolutivas = collectIntermediateFeedbacks();
-
-    if (!respostas.length && !devolutivas.length) return '';
-
-    const body = {
-      nome: payload.nome || '',
-      guia: payload.guia || 'lumen',
-      respostas,
-      devolutivas,
-      idioma: getActiveLang()
-    };
-
+  async function postFinalFeedback(body) {
     const apiBase =
       window.API?.PRIMARY ||
       window.API_BASE ||
@@ -562,15 +614,84 @@
 
     const data = await resp.json().catch(() => ({}));
 
-    if (!resp.ok || !data?.ok) {
-      throw new Error(data?.detail || 'Falha ao gerar devolutiva final');
+    if (!resp.ok || data?.ok === false) {
+      throw new Error(data?.detail || data?.message || data?.error || `HTTP ${resp.status}`);
     }
 
-    return String(data.devolutivaFinal || '').trim();
+    const texto = String(
+      data?.devolutivaFinal ||
+      data?.texto ||
+      data?.text ||
+      data?.message ||
+      ''
+    ).trim();
+
+    if (!texto) {
+      throw new Error('Resposta vazia da devolutiva final');
+    }
+
+    return texto;
+  }
+
+  async function fetchFinalGuideFeedback() {
+    const payload = buildFinalPayloadDiamante();
+
+    const respostas = Array.isArray(payload?.respostas)
+      ? payload.respostas.filter(Boolean)
+      : [];
+
+    const devolutivas = collectIntermediateFeedbacks();
+
+    if (!respostas.length && !devolutivas.length) {
+      return {
+        ok: false,
+        error: 'Sem respostas e sem devolutivas intermediárias para gerar a devolutiva final.'
+      };
+    }
+
+    const guiaOriginal = normalizeGuide(payload.guia || 'lumen').id || 'lumen';
+    const guiasParaTentar = [guiaOriginal];
+
+    if (guiaOriginal !== 'lumen') {
+      guiasParaTentar.push('lumen');
+    }
+
+    let ultimoErro = null;
+
+    for (const guiaId of guiasParaTentar) {
+      try {
+        const body = {
+          nome: payload.nome || '',
+          guia: guiaId,
+          respostas,
+          devolutivas,
+          idioma: getActiveLang()
+        };
+
+        console.log('[FINAL][DEVOLUTIVA] tentando com guia:', guiaId);
+        const texto = await postFinalFeedback(body);
+
+        return {
+          ok: true,
+          text: texto,
+          guiaUsado: guiaId,
+          guiaOriginal,
+          fallbackUsed: guiaId !== guiaOriginal
+        };
+      } catch (err) {
+        ultimoErro = err;
+        console.error(`[FINAL][DEVOLUTIVA] falha com ${guiaId}:`, err);
+      }
+    }
+
+    return {
+      ok: false,
+      error: ultimoErro?.message || 'Falha ao gerar devolutiva final'
+    };
   }
 
   async function renderFinalGuideFeedback(section) {
-    if (!section) return '';
+    if (!section) return null;
 
     let box = section.querySelector('#finalGuideFeedback');
     if (!box) {
@@ -586,34 +707,43 @@
       }
     }
 
-   try {
+    lockFinalButtons(section, 'Guia pensando...');
 
-  box.textContent = "O Guia está reunindo as chamas da sua jornada...";
+    try {
+      box.textContent = 'O Guia está reunindo as chamas da sua jornada...';
 
-  const result = await fetchFinalGuideFeedback();
+      const result = await fetchFinalGuideFeedback();
 
-  if (!result?.ok) {
-    throw new Error(result?.error || "Falha ao gerar devolutiva final");
+      if (!result?.ok) {
+        throw new Error(result?.error || 'Falha ao gerar devolutiva final');
+      }
+
+      const texto = result.text;
+
+      box.textContent = '';
+      await typeText(box, texto, 22, true);
+
+      window.__JORNADA_DEVOLUTIVA_FINAL__ = texto;
+      sessionStorage.setItem('JORNADA_DEVOLUTIVA_FINAL', texto);
+
+      if (result.fallbackUsed && result.guiaUsado === 'lumen') {
+        window.__GUIA_FINAL_EFETIVO__ = 'lumen';
+        sessionStorage.setItem('JORNADA_GUIA_FINAL_EFETIVO', 'lumen');
+        console.warn('[FINAL] Lumen assumiu e concluiu a devolutiva.');
+      } else {
+        window.__GUIA_FINAL_EFETIVO__ = result.guiaUsado || 'lumen';
+        sessionStorage.setItem('JORNADA_GUIA_FINAL_EFETIVO', result.guiaUsado || 'lumen');
+      }
+
+      unlockFinalButtons(section);
+      return texto;
+    } catch (err) {
+      console.error('[FINAL] Sequência final falhou:', err);
+      showFinalError(section, 'Não consegui concluir a devolutiva final do guia.');
+      unlockFinalButtons(section);
+      return null;
+    }
   }
-
-  const texto = result.text;
-
-  box.textContent = "";
-  await typeText(box, texto, 22, true);
-
-  window.__JORNADA_DEVOLUTIVA_FINAL__ = texto;
-  sessionStorage.setItem('JORNADA_DEVOLUTIVA_FINAL', texto);
-
-  return texto;
-
-} catch (err) {
-
-  console.error("[FINAL] Sequência final falhou:", err);
-
-  showFinalError("Não consegui concluir a devolutiva final do guia.");
-
-  return null;
-}
 
   // ================================
   // DOM
@@ -623,8 +753,8 @@
     if (!section) return {};
 
     const titleEl = section.querySelector('#final-title');
-    const msgEl   = section.querySelector('#final-message');
-    const botoes  = section.querySelector('.final-acoes');
+    const msgEl = section.querySelector('#final-message');
+    const botoes = section.querySelector('.final-acoes');
 
     return { section, titleEl, msgEl, botoes };
   }
@@ -733,120 +863,123 @@
       actionsRoot.appendChild(btnPortal);
     }
 
-    // mantém só 3 botões
     (function enforce3Buttons() {
       const keep = new Set(['btnPdf', 'btnBaixarSelfie', 'btnVoltarPortal']);
-      [...actionsRoot.querySelectorAll('button')].forEach(btn => {
+      [...actionsRoot.querySelectorAll('button')].forEach((btn) => {
         const id = btn.id || '';
         if (!keep.has(id)) btn.remove();
       });
     })();
 
-    // PDF começa travado
     btnPdf.disabled = true;
     btnPdf.classList.add('disabled');
+
+    if (!btnPdf.dataset.originalText) btnPdf.dataset.originalText = btnPdf.textContent.trim();
+    if (!btnBaixarSelfie.dataset.originalText) btnBaixarSelfie.dataset.originalText = btnBaixarSelfie.textContent.trim();
+    if (!btnPortal.dataset.originalText) btnPortal.dataset.originalText = btnPortal.textContent.trim();
 
     if (!btnPdf.dataset.boundFinalPdf) {
       btnPdf.dataset.boundFinalPdf = '1';
 
-     btnPdf.addEventListener('click', async (ev) => {
-  ev.preventDefault();
-  ev.stopPropagation();
+      btnPdf.addEventListener('click', async (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
 
-  if (btnPdf.dataset.loading === '1') {
-    btnPdf.disabled = true;
-    btnPdf.textContent = 'Guia Pensando...';
-    btnPdf.classList.add('is-loading');
-    return;
-  }
+        if (btnPdf.dataset.loading === '1') return;
+        if (btnPdf.disabled) return;
 
-  btnPdf.dataset.loading = '1';
-  btnPdf.disabled = true;
-  btnPdf.textContent = 'Guia Pensando...';
-  btnPdf.classList.add('is-loading');
+        btnPdf.dataset.loading = '1';
+        btnPdf.disabled = true;
+        btnPdf.textContent = 'Guia pensando...';
+        btnPdf.classList.add('is-loading');
 
-  if (!window.API || typeof window.API.gerarPDFEHQ !== 'function') {
-    setPdfStatus(root, '✖ API não está pronta. Verifique se /assets/js/api.js carregou.', 'err');
-    btnPdf.dataset.loading = '0';
-    btnPdf.disabled = false;
-    btnPdf.textContent = '✅ PDF';
-    btnPdf.classList.remove('is-loading');
-    return;
-  }
+        if (!window.API || typeof window.API.gerarPDFEHQ !== 'function') {
+          setPdfStatus(root, '✖ API não está pronta. Verifique se /assets/js/api.js carregou.', 'err');
+          btnPdf.dataset.loading = '0';
+          btnPdf.disabled = false;
+          btnPdf.textContent = btnPdf.dataset.originalText || '✅ PDF';
+          btnPdf.classList.remove('is-loading');
+          return;
+        }
 
-  btnBaixarSelfie.disabled = true;
+        btnBaixarSelfie.disabled = true;
+        btnPortal.disabled = true;
 
-  let timer = null;
+        let timer = null;
 
-  try {
-    try {
-      await Promise.race([
-        window.__SELFIECARD_PROMISE__ || Promise.resolve(),
-        new Promise(r => setTimeout(r, 900))
-      ]);
-    } catch {}
+        try {
+          try {
+            await Promise.race([
+              window.__SELFIECARD_PROMISE__ || Promise.resolve(),
+              new Promise((r) => setTimeout(r, 900))
+            ]);
+          } catch {}
 
-    const payload = buildFinalPayloadDiamante();
+          const payload = buildFinalPayloadDiamante();
 
-    payload.devolutivaFinal =
-      window.__JORNADA_DEVOLUTIVA_FINAL__ ||
-      sessionStorage.getItem('JORNADA_DEVOLUTIVA_FINAL') ||
-      '';
+          payload.devolutivaFinal =
+            window.__JORNADA_DEVOLUTIVA_FINAL__ ||
+            sessionStorage.getItem('JORNADA_DEVOLUTIVA_FINAL') ||
+            '';
 
-    if (!payload.nome || payload.nome.length < 2) {
-      setPdfStatus(root, '⚠ Nome inválido. Volte e confirme o nome antes de gerar o PDF.', 'err');
-      return;
+          if (!payload.nome || payload.nome.length < 2) {
+            setPdfStatus(root, '⚠ Nome inválido. Volte e confirme o nome antes de gerar o PDF.', 'err');
+            return;
+          }
+
+          if (!payload.guia || payload.guia.length < 2) {
+            setPdfStatus(root, '⚠ Guia não identificado. Volte e selecione Lumen/Zion/Arion antes de gerar o PDF.', 'err');
+            return;
+          }
+
+          if (!hasAnyRespostaValida(payload.respostasEstruturadas)) {
+            setPdfStatus(root, '⚠ Sem respostas. Finalize as perguntas antes de gerar o PDF.', 'err');
+            return;
+          }
+
+          const selfieCard =
+            sessionStorage.getItem('JORNADA_SELFIECARD') ||
+            localStorage.getItem('JORNADA_SELFIECARD') ||
+            payload.selfieCard ||
+            '';
+
+          payload.selfieCard = selfieCard;
+
+          timer = startMagicDots(root, 'O Guia está forjando seu pergaminho');
+
+          const result = await window.API.gerarPDFEHQ(payload);
+
+          if (result && result.ok) {
+            setPdfStatus(root, '✅ Pergaminho gerado e baixado com sucesso!', 'ok');
+          } else {
+            setPdfStatus(root, '✖ Não consegui gerar o PDF. Veja o console para detalhes.', 'err');
+            console.warn('[FINAL][PDF] result:', result);
+          }
+        } catch (e) {
+          console.error('[FINAL][PDF] erro:', e);
+          setPdfStatus(root, '✖ Erro ao gerar o PDF. Confira o console (Network/Console).', 'err');
+        } finally {
+          if (timer) clearInterval(timer);
+          btnPdf.dataset.loading = '0';
+          btnPdf.disabled = false;
+          btnBaixarSelfie.disabled = false;
+          btnPortal.disabled = false;
+          btnPdf.textContent = btnPdf.dataset.originalText || '✅ PDF';
+          btnBaixarSelfie.textContent = btnBaixarSelfie.dataset.originalText || '🖼️ SELFIECARD';
+          btnPortal.textContent = btnPortal.dataset.originalText || '🏰 PORTAL';
+          btnPdf.classList.remove('is-loading');
+        }
+      });
     }
 
-    if (!payload.guia || payload.guia.length < 2) {
-      setPdfStatus(root, '⚠ Guia não identificado. Volte e selecione Lumen/Zion/Arion antes de gerar o PDF.', 'err');
-      return;
-    }
-
-    if (!hasAnyRespostaValida(payload.respostasEstruturadas)) {
-      setPdfStatus(root, '⚠ Sem respostas. Finalize as perguntas antes de gerar o PDF.', 'err');
-      return;
-    }
-
-    const selfieCard =
-      sessionStorage.getItem('JORNADA_SELFIECARD') ||
-      localStorage.getItem('JORNADA_SELFIECARD') ||
-      payload.selfieCard ||
-      '';
-
-    payload.selfieCard = selfieCard;
-
-    timer = startMagicDots(root, 'O Guia está forjando seu pergaminho');
-
-    const result = await window.API.gerarPDFEHQ(payload);
-
-    if (result && result.ok) {
-      setPdfStatus(root, '✅ Pergaminho gerado e baixado com sucesso!', 'ok');
-    } else {
-      setPdfStatus(root, '✖ Não consegui gerar o PDF. Veja o console para detalhes.', 'err');
-      console.warn('[FINAL][PDF] result:', result);
-    }
-
-  } catch (e) {
-    console.error('[FINAL][PDF] erro:', e);
-    setPdfStatus(root, '✖ Erro ao gerar o PDF. Confira o console (Network/Console).', 'err');
-
-  } finally {
-    if (timer) clearInterval(timer);
-    btnPdf.dataset.loading = '0';
-    btnPdf.disabled = false;
-    btnBaixarSelfie.disabled = false;
-    btnPdf.textContent = '✅ PDF';
-    btnPdf.classList.remove('is-loading');
-  }
-  });
-  }
     if (!btnBaixarSelfie.dataset.boundFinalSelfie) {
       btnBaixarSelfie.dataset.boundFinalSelfie = '1';
 
       btnBaixarSelfie.addEventListener('click', (ev) => {
         ev.preventDefault();
         ev.stopPropagation();
+
+        if (btnBaixarSelfie.disabled) return;
 
         const payload = buildFinalPayloadDiamante();
         const img = payload.selfieCard;
@@ -882,6 +1015,7 @@
       btnPortal.addEventListener('click', (ev) => {
         ev.preventDefault();
         ev.stopPropagation();
+        if (btnPortal.disabled) return;
         handleVoltarInicio();
       });
     }
@@ -913,7 +1047,7 @@
     titleEl.style.transform = 'translateY(-16px)';
 
     const ps = msgEl.querySelectorAll('p');
-    ps.forEach(p => {
+    ps.forEach((p) => {
       const txt = p.dataset.original || p.textContent.trim();
       p.dataset.original = txt;
       p.textContent = '';
@@ -955,24 +1089,25 @@
       botoes.classList.add('show');
       botoes.style.opacity = '1';
       botoes.style.transform = 'scale(1)';
-
-      botoes.querySelectorAll('button, a').forEach(el => {
-        el.disabled = false;
-        el.classList.remove('disabled');
-        el.removeAttribute('aria-disabled');
-        el.style.pointerEvents = 'auto';
-      });
     }
 
+    mountFinalPdfUI(section);
     unlockPortalButton(section);
+    lockFinalButtons(section, 'Guia pensando...');
 
     try {
       setPdfStatus(section, 'O Guia está reunindo as chamas da sua jornada...', null);
-      await renderFinalGuideFeedback(section);
-      setPdfStatus(section, '✅ Devolutiva final concluída. Agora você pode gerar o PDF ou baixar a SelfieCard.', 'ok');
+      const textoFinal = await renderFinalGuideFeedback(section);
+
+      if (textoFinal) {
+        setPdfStatus(section, '✅ Devolutiva final concluída. Agora você pode gerar o PDF ou baixar a SelfieCard.', 'ok');
+      } else {
+        setPdfStatus(section, '⚠ Não consegui concluir a devolutiva final do Guia.', 'err');
+      }
     } catch (e) {
       console.error('[FINAL][DEVOLUTIVA FINAL] erro:', e);
       setPdfStatus(section, '⚠ Não consegui concluir a devolutiva final do Guia.', 'err');
+      unlockFinalButtons(section);
     }
 
     const btnPdf = section.querySelector('#btnPdf');
@@ -1074,6 +1209,4 @@
       handleVoltarInicio();
     }
   });
- 
-
 })();
