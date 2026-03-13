@@ -586,25 +586,34 @@
       }
     }
 
-    box.textContent = 'O Guia está reunindo as chamas da sua jornada...';
+   try {
 
-    const texto = await fetchFinalGuideFeedback();
+  box.textContent = "O Guia está reunindo as chamas da sua jornada...";
 
-    if (!texto) {
-      box.textContent = 'O Guia não encontrou conteúdo suficiente para compor a devolutiva final.';
-      return '';
-    }
+  const result = await fetchFinalGuideFeedback();
 
-    box.textContent = '';
-    await typeText(box, texto, 22, true);
-
-    try {
-      window.__JORNADA_DEVOLUTIVA_FINAL__ = texto;
-      sessionStorage.setItem('JORNADA_DEVOLUTIVA_FINAL', texto);
-    } catch {}
-
-    return texto;
+  if (!result?.ok) {
+    throw new Error(result?.error || "Falha ao gerar devolutiva final");
   }
+
+  const texto = result.text;
+
+  box.textContent = "";
+  await typeText(box, texto, 22, true);
+
+  window.__JORNADA_DEVOLUTIVA_FINAL__ = texto;
+  sessionStorage.setItem('JORNADA_DEVOLUTIVA_FINAL', texto);
+
+  return texto;
+
+} catch (err) {
+
+  console.error("[FINAL] Sequência final falhou:", err);
+
+  showFinalError("Não consegui concluir a devolutiva final do guia.");
+
+  return null;
+}
 
   // ================================
   // DOM
