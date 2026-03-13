@@ -1024,16 +1024,21 @@
   // ================================
   // SEQUÊNCIA FINAL
   // ================================
-  async function startFinalSequence() {
-    if (started) return;
-    started = true;
+async function startFinalSequence() {
+  if (started) return;
+  started = true;
 
-    try { speechSynthesis.cancel(); } catch {}
-    speechChain = Promise.resolve();
+  try { speechSynthesis.cancel(); } catch {}
+  speechChain = Promise.resolve();
 
-    const { section, titleEl, msgEl, botoes } = ensureFinalDOM();
-    if (!section || !titleEl || !msgEl) return;
+  const { section, titleEl, msgEl, botoes } = ensureFinalDOM();
+  if (!section || !titleEl || !msgEl) return;
 
+  setFinalButtonsBusy(section, true, {
+    thinkingText: 'Guia refletindo...'
+  });
+
+  try {
     section.style.display = 'block';
 
     const tituloOriginal =
@@ -1064,6 +1069,17 @@
     titleEl.style.transform = 'translateY(0)';
     await typeText(titleEl, tituloOriginal, 65, true);
     await sleep(600);
+
+    // restante da sequência...
+    // typing dos parágrafos, áudio, devolutiva etc.
+
+    setFinalButtonsBusy(section, false);
+
+  } catch (err) {
+    console.error('[FINAL] Erro na sequência inicial:', err);
+    setFinalButtonsBusy(section, false);
+  }
+}
 
     for (let i = 0; i < ps.length; i++) {
       const p = ps[i];
