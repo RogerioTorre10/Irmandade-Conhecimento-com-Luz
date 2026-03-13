@@ -550,6 +550,146 @@ async function setGuideResponse(text, kind = 'info') {
     }
   }
 
+function getStoredBlockFeedbacks() {
+  try {
+    return JSON.parse(sessionStorage.getItem('JORNADA_DEVOLUTIVAS_BLOCO') || '[]');
+  } catch {
+    return [];
+  }
+}
+
+function setStoredBlockFeedbacks(items) {
+  try {
+    sessionStorage.setItem('JORNADA_DEVOLUTIVAS_BLOCO', JSON.stringify(items || []));
+  } catch {}
+}
+
+function getBlockQuestionsCount(bloco) {
+  if (!bloco) return 0;
+  if (Array.isArray(bloco.questions)) return bloco.questions.length;
+  if (Array.isArray(bloco.perguntas)) return bloco.perguntas.length;
+  return Number(bloco.totalQuestions || bloco.total || 0);
+}
+
+function getCurrentQuestionIndex(bloco) {
+  if (!bloco) return 0;
+
+  if (typeof bloco.currentIndex === 'number') return bloco.currentIndex;
+  if (typeof bloco.questionIndex === 'number') return bloco.questionIndex;
+  if (typeof bloco.idx === 'number') return bloco.idx;
+
+  const raw =
+    sessionStorage.getItem(`jp:${bloco.id}:idx`) ||
+    sessionStorage.getItem(`bloco:${bloco.id}:idx`) ||
+    '0';
+
+  return Number(raw || 0);
+}
+
+function isLastQuestionOfBlock(bloco) {
+  const total = getBlockQuestionsCount(bloco);
+  const current = getCurrentQuestionIndex(bloco);
+  return total > 0 && current >= total - 1;
+}
+
+function getAllAnswersFromBlock(bloco) {
+  const total = getBlockQuestionsCount(bloco);
+  const out = [];
+
+  for (let i = 0; i < total; i++) {
+    try {
+      const val = getAnswer(bloco, i);
+      const txt = String(val || '').trim();
+      if (txt) out.push(txt);
+    } catch {}
+  }
+
+  return out;
+}
+
+async function gerarDevolutivaDoBloco(bloco) {
+  const nome =
+    sessionStorage.getItem('jornada.nome') ||
+    localStorage.getItem('JORNADA_NOME') ||
+    localStorage.getItem('jc.nome') ||
+    'Participante';
+
+  const guia =
+    sessionStorage.getItem('jornada.guia') ||
+    localStorage.getItem('JORNADA_GUIA') ||
+    localStorage.getItem('jornada.guia') ||
+    document.body.dataset.guia ||
+    'lumen';
+
+  const idioma = document.documentElement.lang || getLang() || 'pt-BR';
+  const respostas = getAllAnswersFromBlock(bloco);
+
+  if (!respostas.length) {
+    return {
+      ok: false,
+      texto: ''
+    };
+  }
+
+  if (!window.API || typeof window.API.gerarDevolutivaBloco !== 'function') {
+    console.warn('[BLOCO] API de devolutiva do bloco ainda não disponível.');
+    return {
+      ok: false,
+      texto: ''
+    };
+  }
+
+  const resp = await window.API.gerarDevolutivaBloco({
+    nome,
+    guia,
+    bloco: bloco?.title || bloco?.id || 'Bloco',
+    respostas,
+    idioma
+  });
+
+  return {
+    ok: !!resp?.ok,
+    texto: String(resp?.texto || resp?.devolutiva || '').trim()
+  };
+}
+
+async function maybeHandleBlockClosure(section, bloco) {
+  if (!isLastQuestionOfBlock(bloco)) {
+    goNext(bloco);
+    return;
+  }
+
+  try {
+    setContinueState(section, 'loading');
+
+    await setGuideResponse('O guia está reunindo os sinais deste bloco...', 'info');
+
+    const result = await gerarDevolutivaDoBloco(bloco);
+
+    if (result?.ok && result.texto) {
+      const existentes = getStoredBlockFeedbacks();
+      existentes.push({
+        blocoId: bloco?.id || '',
+        blocoTitulo: bloco?.title || bloco?.id || 'Bloco',
+        texto: result.texto
+      });
+      setStoredBlockFeedbacks(existentes);
+
+      await setGuideResponse(result.texto, 'success');
+      goNext(bloco);
+      return;
+    }
+
+    console.warn('[BLOCO] devolutiva não retornou conteúdo, seguindo fluxo.');
+    goNext(bloco);
+
+  } catch (e) {
+    console.warn('[BLOCO] erro ao gerar devolutiva do bloco:', e);
+    goNext(bloco);
+  }
+}
+
+
   function setContinueState(section, state) {
     if (!section) return;
 
@@ -584,6 +724,7 @@ async function setGuideResponse(text, kind = 'info') {
     btn.disabled = false;
     btn.textContent = 'Continuar';
   }
+
 
   function bindButtons(section, bloco, perguntaText) {
     const btnTTS = $('#jp-btn-falar', section);
