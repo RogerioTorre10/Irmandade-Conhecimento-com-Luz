@@ -1067,32 +1067,33 @@ async function startFinalSequence() {
     titleEl.style.transition = 'all 0.9s ease';
     titleEl.style.opacity = 1;
     titleEl.style.transform = 'translateY(0)';
-    await typeText(titleEl, tituloOriginal, 65, true);
-    await sleep(600);
+   // título
+   await typeText(titleEl, tituloOriginal, 65, true);
+   await sleep(600);
 
-    // restante da sequência...
-    // typing dos parágrafos, áudio, devolutiva etc.
+   // PARÁGRAFOS
+   for (let i = 0; i < ps.length; i++) {
+  const p = ps[i];
+  const txt = p.dataset.original || '';
+  if (!txt) continue;
 
-    setFinalButtonsBusy(section, false);
+  p.style.transition = 'all 0.8s ease';
+  p.style.opacity = 1;
+  p.style.transform = 'translateY(0)';
 
-  } catch (err) {
-    console.error('[FINAL] Erro na sequência inicial:', err);
-    setFinalButtonsBusy(section, false);
+  await typeText(p, txt, 55, true);
+  p.classList.add('revealed');
+
+  await sleep(300);
+ }
+
+  // AGORA SIM liberar botões
+   setFinalButtonsBusy(section, false);
+
+ } catch (err) {
+   console.error('[FINAL] Erro na sequência inicial:', err);
+   setFinalButtonsBusy(section, false);
   }
-}
-
-    for (let i = 0; i < ps.length; i++) {
-      const p = ps[i];
-      const txt = p.dataset.original || '';
-      if (!txt) continue;
-
-      p.style.transition = 'all 0.8s ease';
-      p.style.opacity = 1;
-      p.style.transform = 'translateY(0)';
-      await typeText(p, txt, 55, true);
-      p.classList.add('revealed');
-      await sleep(300);
-    }
 
     if (botoes) {
       botoes.style.opacity = '0';
