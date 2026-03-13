@@ -623,10 +623,10 @@ async function setGuideResponse(text, kind = 'info') {
         const state = section?.dataset?.continueState || 'idle';
 
         // só avança se a devolutiva já estiver pronta
-        if (state === 'ready') {
-          goNext(bloco);
-          return;
-        }
+       if (state === 'ready') {
+       await maybeHandleBlockClosure(section, bloco);
+       return;
+      }
 
         // evita clique duplo durante carregamento
         if (state === 'loading') {
