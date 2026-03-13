@@ -206,55 +206,64 @@
     return localStorage.getItem(answerKey(bloco, qIndex)) || '';
   }
 
-  async function setGuideResponse(text, kind = 'info') {
-    const wrap = document.getElementById('jp-ai-response-wrap');
-    const box = document.getElementById('jp-ai-response');
+ async function setGuideResponse(text, kind = 'info') {
+  const wrap = document.getElementById('jp-ai-response-wrap');
+  const box = document.getElementById('jp-ai-response');
 
-    if (!wrap || !box) return;
+  if (!wrap || !box) return;
 
-    const content = String(text || '').trim();
+  const content = String(text || '').trim();
 
-    if (!content) {
-      box.hidden = true;
-      box.textContent = '';
-      box.innerHTML = '';
-      box.classList.remove('is-visible', 'is-revealing', 'oracle-ready');
-      wrap.dataset.kind = '';
-      wrap.dataset.responseText = '';
-      return;
-    }
-
-    wrap.dataset.kind = kind;
-    wrap.dataset.responseText = content;
-
-    box.hidden = false;
+  if (!content) {
+    box.hidden = true;
     box.textContent = '';
     box.innerHTML = '';
-    box.classList.add('is-visible', 'is-revealing');
+    box.classList.remove('is-visible', 'is-revealing', 'oracle-ready');
+    wrap.dataset.kind = '';
+    wrap.dataset.responseText = '';
+    return;
+  }
 
-    const lines = content.split('\n').filter(Boolean);
-    if (!lines.length) lines.push(content);
+  wrap.dataset.kind = kind;
+  wrap.dataset.responseText = content;
 
-    for (let i = 0; i < lines.length; i++) {
-      const lineEl = document.createElement('div');
-      lineEl.className = 'ai-line oracle-line';
-      box.appendChild(lineEl);
+  box.hidden = false;
+  box.textContent = '';
+  box.innerHTML = '';
+  box.classList.add('is-visible', 'is-revealing');
 
-      const line = lines[i];
-      for (let j = 0; j <= line.length; j++) {
-        lineEl.textContent = line.slice(0, j);
-        await new Promise((r) => setTimeout(r, 16));
-      }
+  const lines = content.split('\n').filter(Boolean);
+  if (!lines.length) lines.push(content);
 
-      await new Promise((r) => setTimeout(r, 120));
+  for (let i = 0; i < lines.length; i++) {
+    const lineEl = document.createElement('div');
+    lineEl.className = 'ai-line oracle-line';
+    box.appendChild(lineEl);
+
+    const line = lines[i];
+    for (let j = 0; j <= line.length; j++) {
+      lineEl.textContent = line.slice(0, j);
+      await new Promise((r) => setTimeout(r, 16));
     }
 
-    box.classList.remove('is-revealing');
-    box.classList.add('oracle-ready');
-
-    box.style.textShadow = '0 0 8px var(--guia-soft), 0 0 18px rgba(255,255,255,0.08)';
-    box.style.borderColor = 'var(--guia-main)';
+    await new Promise((r) => setTimeout(r, 120));
   }
+
+  box.classList.remove('is-revealing');
+  box.classList.add('oracle-ready');
+
+  box.style.textShadow = '0 0 8px var(--guia-soft), 0 0 18px rgba(255,255,255,0.08)';
+  box.style.borderColor = 'var(--guia-main)';
+
+  // leitura automática da devolutiva após a datilografia
+  try {
+    if (typeof window.speakGuideText === 'function') {
+      await window.speakGuideText(content);
+    }
+  } catch (err) {
+    console.warn('[DEVOLUTIVA][TTS] falhou:', err);
+  }
+}
 
   function getCurrentGuideResponseText() {
     const wrap = document.getElementById('jp-ai-response-wrap');
