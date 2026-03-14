@@ -131,7 +131,32 @@
       document.querySelector('.final-guide-feedback')
     );
   }
+  
+function getStoredBlockFeedbacks() {
+  try {
+    return JSON.parse(sessionStorage.getItem('JORNADA_DEVOLUTIVAS_BLOCO') || '[]');
+  } catch {
+    return [];
+  }
+}
 
+function buildPdfBlocksFromSession() {
+  const feedbacks = getStoredBlockFeedbacks();
+
+  // tenta usar estrutura persistida do fluxo de perguntas
+  const rawBlocks =
+    window.JORNADA_PAPER_QA?.getTotalBlocks
+      ? null
+      : null;
+
+  // fallback baseado só no que já foi salvo das devolutivas por bloco
+  return feedbacks.map((item) => ({
+    titulo: item?.blocoTitulo || item?.blocoId || 'Bloco',
+    respostas: Array.isArray(item?.respostas) ? item.respostas : [],
+    devolutiva: String(item?.texto || '').trim()
+  }));
+}
+  
   function getFinalButtons(section) {
     const scope = section || document.getElementById(SECTION_ID) || document;
     return [
