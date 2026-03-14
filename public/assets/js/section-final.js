@@ -445,13 +445,14 @@ function buildPdfBlocksFromSession() {
     const selfieCard = readSelfieCardFromEverywhere(s);
 
     const payload = {
-      nome,
-      guia,
-      respostas,
-      respostasEstruturadas,
-      selfieCard
-    };
-
+  nome,
+  guia,
+  respostas,
+  blocos: buildPdfBlocksFromSession(),
+  selfieCard,
+  devolutivaFinal
+};
+    
     console.log('[FINAL][PAYLOAD NORMALIZED]', payload, '[GUIA]', guiaNorm);
     return payload;
   }
