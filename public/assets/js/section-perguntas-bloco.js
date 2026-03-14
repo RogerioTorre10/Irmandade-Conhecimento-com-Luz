@@ -232,15 +232,30 @@ async function setGuideResponse(text, kind = 'info') {
   box.innerHTML = '';
   box.classList.add('is-visible', 'is-revealing');
 
-  let ttsPromise = null;
-  try {
-    if (typeof window.speakGuideText === 'function') {
-      ttsPromise = window.speakGuideText(content);
-    }
-  } catch (err) {
-    console.warn('[DEVOLUTIVA][TTS] falhou ao iniciar:', err);
-  }
+ let ttsPromise = null;
 
+try {
+  if (typeof window.speakGuideText === 'function') {
+    ttsPromise = window.speakGuideText(content);
+  } else if (typeof speakQuestionOrGuideResponse === 'function') {
+    ttsPromise = speakQuestionOrGuideResponse(content);
+  } else if (typeof window.speakQuestionOrGuideResponse === 'function') {
+    ttsPromise = window.speakQuestionOrGuideResponse(content);
+  } else {
+    console.warn('[DEVOLUTIVA][TTS] nenhum motor de voz disponível.');
+  }
+} catch (err) {
+  console.warn('[DEVOLUTIVA][TTS] falhou ao iniciar:', err);
+}
+  
+if (ttsPromise && typeof ttsPromise.then === 'function') {
+  try {
+    await ttsPromise;
+  } catch (err) {
+    console.warn('[DEVOLUTIVA][TTS] falhou durante execução:', err);
+  }
+}
+  
   const lines = content.split('\n').filter(Boolean);
   if (!lines.length) lines.push(content);
 
