@@ -250,9 +250,51 @@ async function gerarDevolutiva(payload) {
   }
 }
 
+async function gerarDevolutivaBloco(payload) {
+  const base = API_PRIMARY;
+
+  try {
+    const { data } = await postJSON(
+      base,
+      '/jornada/devolutiva-bloco',
+      payload,
+      { timeout: 120000 }
+    );
+
+    if (data && data.devolutivaBloco) {
+      return {
+        ok: true,
+        texto: data.devolutivaBloco,
+        guia: data.guia || payload?.guia || 'lumen'
+      };
+    }
+
+    return {
+      ok: false,
+      error: 'Resposta sem devolutiva de bloco',
+      raw: data
+    };
+
+  } catch (e) {
+    console.warn('[API] devolutiva do bloco falhou', {
+      message: e?.message,
+      status: e?.status,
+      body: e?.body,
+      url: e?.url,
+      raw: e
+    });
+
+    return {
+      ok: false,
+      error: String(e?.body || e?.message || e || 'Erro desconhecido')
+    };
+  }
+}
+  
 window.API = window.API || {};
 window.API.gerarPDFEHQ = gerarPDFEHQ;
 window.API.gerarDevolutiva = gerarDevolutiva;
+window.API.gerarDevolutivaBloco = gerarDevolutivaBloco;
   // Log de sanidade
   try {
     console.log('[API] pronto · PRIMARY=', API_PRIMARY, '· PDF_PATHS=', PDF_PATHS);
