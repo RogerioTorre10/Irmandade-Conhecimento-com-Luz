@@ -662,7 +662,7 @@ async function maybeHandleBlockClosure(section, bloco) {
   try {
     setContinueState(section, 'loading');
 
-    await setGuideResponse('O guia está reunindo os sinais deste bloco...', 'info');
+    await setGuideResponse('PARABÉNS!!! Finalizamos esta etapa. Peço que aguarde um breve instante; vou meditar sobre o que você compartilhou para lhe oferecer uma devolutiva.', 'info');
 
     const result = await gerarDevolutivaDoBloco(bloco);
 
