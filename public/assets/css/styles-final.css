@@ -761,3 +761,30 @@ body[data-guia="arion"] #section-final{
 .final-guide-feedback::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(180deg, rgba(0,225,145,1), rgba(0,145,105,1));
 }
+.final-acoes {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: stretch;
+  flex-wrap: nowrap;
+}
+
+.final-acoes > button,
+.final-acoes > a {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 220px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#btnVoltarPortal,
+#btn-voltarPortal,
+#btn-voltar {
+  flex: 1 1 0 !important;
+  max-width: 220px !important;
+  width: auto !important;
+  margin: 0 !important;
+}
