@@ -79,14 +79,15 @@
 
 /* 5) Botões — BASE */
 #section-final .final-acoes {
-  display: grid !important;
+  display: flex !important;
   grid-template-columns: 1fr 1.45fr 1fr !important;  /* centro levemente maior */
-  justify-content: stretch !important;
-  align-items: stretch !important;
-  gap: 14px !important;
+  justify-content: center !important;
+  align-items: stretch !important;   
+  gap: 12px !important;
   width: 100% !important;
   max-width: 100% !important;
   margin-top: 18px !important;
+  flex-wrap: nowrap !important;
   padding: 0 6px 8px !important;     /* menos padding lateral = botões mais largos */
   box-sizing: border-box !important;
   overflow: visible !important;
@@ -761,31 +762,50 @@ body[data-guia="arion"] #section-final{
 .final-guide-feedback::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(180deg, rgba(0,225,145,1), rgba(0,145,105,1));
 }
-.final-acoes {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-  align-items: stretch;
-  flex-wrap: nowrap;
+/* =========================================
+   FIX FINAL — AÇÕES ALINHADAS
+========================================= */
+
+#section-final .final-acoes {
+  display: flex !important;
+  gap: 12px !important;
+  justify-content: center !important;
+  align-items: stretch !important;
+  flex-wrap: nowrap !important;
+  padding: 0 6px 8px !important;
 }
 
-.final-acoes > button,
-.final-acoes > a {
-  flex: 1 1 0;
-  min-width: 0;
-  max-width: 220px;
-  height: 44px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-#btnVoltarPortal,
-#btn-voltarPortal,
-#btn-voltar {
+#section-final .final-acoes > button,
+#section-final .final-acoes > a,
+#section-final #btnPdf,
+#section-final #btnBaixarSelfie,
+#section-final #btnVoltarPortal {
   flex: 1 1 0 !important;
+  width: 100% !important;
+  min-width: 0 !important;
   max-width: 220px !important;
-  width: auto !important;
+  min-height: 54px !important;
+  height: 54px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   margin: 0 !important;
-  grid-column: auto !important;  
+  grid-column: auto !important;
+}
+
+@media (max-width: 520px) {
+  #section-final .final-acoes {
+    gap: 8px !important;
+  }
+
+  #section-final .final-acoes > button,
+  #section-final .final-acoes > a,
+  #section-final #btnPdf,
+  #section-final #btnBaixarSelfie,
+  #section-final #btnVoltarPortal {
+    max-width: none !important;
+    min-height: 42px !important;
+    height: 42px !important;
+    font-size: 11px !important;
+  }
 }
