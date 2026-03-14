@@ -784,7 +784,7 @@ async function maybeHandleBlockClosure(section, bloco) {
 
         saveAnswer(bloco, 0, val);
         setContinueState(section, 'loading');
-        await setGuideResponse('O Guia está refletindo sobre tua resposta...', 'info');
+        await setGuideResponse('Só um momento, estou refletindo sobre tua resposta...', 'info');
 
         try {
           const guia =
