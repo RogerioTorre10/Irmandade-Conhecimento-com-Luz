@@ -688,10 +688,11 @@ async function maybeHandleBlockClosure(section, bloco) {
     if (result?.ok && result.texto) {
       const existentes = getStoredBlockFeedbacks();
       existentes.push({
-        blocoId: bloco?.id || '',
-        blocoTitulo: bloco?.title || bloco?.id || 'Bloco',
-        texto: result.texto
-      });
+      blocoId: bloco?.id || '',
+      blocoTitulo: bloco?.title || bloco?.id || 'Bloco',
+      respostas: getAllAnswersFromBlock(bloco),
+      texto: result.texto
+   });
       setStoredBlockFeedbacks(existentes);
 
       await setGuideResponse(result.texto, 'success');
