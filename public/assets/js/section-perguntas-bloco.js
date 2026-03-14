@@ -653,6 +653,25 @@ async function gerarDevolutivaDoBloco(bloco) {
   };
 }
 
+  function getBlockClosingLead(bloco) {
+  const blocoNome = bloco?.title || bloco?.id || 'este bloco';
+
+  const frases = [
+    `PARABÉNS!!! Finalizamos ${blocoNome}. O guia está recolhendo os sinais mais preciosos desta etapa...`,
+    `Encerramos ${blocoNome}. Aguarde um instante: o guia está contemplando o sentido desta travessia...`,
+    `Que belo passo em ${blocoNome}. O guia agora reúne as chamas deste trecho para te devolver uma síntese viva...`,
+    `Fim de ${blocoNome}. O guia está observando os fios desta etapa para transformar respostas em direção...`,
+    `Etapa concluída: ${blocoNome}. O guia recolhe agora os ecos deste bloco para te responder com clareza e luz...`
+  ];
+
+  const idx =
+    typeof bloco?.index === 'number'
+      ? bloco.index % frases.length
+      : Math.floor(Math.random() * frases.length);
+
+  return frases[idx];
+}
+
 async function maybeHandleBlockClosure(section, bloco) {
   if (!isLastQuestionOfBlock(bloco)) {
     goNext(bloco);
@@ -662,8 +681,8 @@ async function maybeHandleBlockClosure(section, bloco) {
   try {
     setContinueState(section, 'loading');
 
-    await setGuideResponse('PARABÉNS!!! Finalizamos esta etapa. Peço que aguarde um breve instante; vou meditar sobre o que você compartilhou para lhe oferecer uma devolutiva.', 'info');
-
+    await setGuideResponse(getBlockClosingLead(bloco), 'info');
+    
     const result = await gerarDevolutivaDoBloco(bloco);
 
     if (result?.ok && result.texto) {
