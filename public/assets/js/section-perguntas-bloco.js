@@ -232,30 +232,22 @@ async function setGuideResponse(text, kind = 'info') {
   box.innerHTML = '';
   box.classList.add('is-visible', 'is-revealing');
 
- let ttsPromise = null;
+  let ttsPromise = null;
 
-try {
-  if (typeof window.speakGuideText === 'function') {
-    ttsPromise = window.speakGuideText(content);
-  } else if (typeof speakQuestionOrGuideResponse === 'function') {
-    ttsPromise = speakQuestionOrGuideResponse(content);
-  } else if (typeof window.speakQuestionOrGuideResponse === 'function') {
-    ttsPromise = window.speakQuestionOrGuideResponse(content);
-  } else {
-    console.warn('[DEVOLUTIVA][TTS] nenhum motor de voz disponível.');
-  }
-} catch (err) {
-  console.warn('[DEVOLUTIVA][TTS] falhou ao iniciar:', err);
-}
-  
-if (ttsPromise && typeof ttsPromise.then === 'function') {
   try {
-    await ttsPromise;
+    if (typeof window.speakGuideText === 'function') {
+      ttsPromise = window.speakGuideText(content);
+    } else if (typeof speakQuestionOrGuideResponse === 'function') {
+      ttsPromise = speakQuestionOrGuideResponse(content);
+    } else if (typeof window.speakQuestionOrGuideResponse === 'function') {
+      ttsPromise = window.speakQuestionOrGuideResponse(content);
+    } else {
+      console.warn('[DEVOLUTIVA][TTS] nenhum motor de voz disponível.');
+    }
   } catch (err) {
-    console.warn('[DEVOLUTIVA][TTS] falhou durante execução:', err);
+    console.warn('[DEVOLUTIVA][TTS] falhou ao iniciar:', err);
   }
-}
-  
+
   const lines = content.split('\n').filter(Boolean);
   if (!lines.length) lines.push(content);
 
@@ -287,7 +279,7 @@ if (ttsPromise && typeof ttsPromise.then === 'function') {
   box.style.textShadow = '0 0 8px var(--guia-soft), 0 0 18px rgba(255,255,255,0.08)';
   box.style.borderColor = 'var(--guia-main)';
 }
-
+  
   function getCurrentGuideResponseText() {
     const wrap = document.getElementById('jp-ai-response-wrap');
     const txt = wrap?.dataset?.responseText || '';
