@@ -1317,3 +1317,30 @@ body[data-guia="arion"]{
 #jp-btn-confirmar.is-error{
   box-shadow: 0 0 14px rgba(255,120,120,.45);
 }
+#jp-ai-response {
+  max-height: 180px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 10px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 215, 90, 0.9) rgba(255,255,255,0.08);
+}
+
+#jp-ai-response::-webkit-scrollbar {
+  width: 8px;
+}
+
+#jp-ai-response::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.06);
+  border-radius: 999px;
+}
+
+#jp-ai-response::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    rgba(255,220,120,0.95),
+    rgba(214,160,20,0.95)
+  );
+  border-radius: 999px;
+  border: 1px solid rgba(0,0,0,0.18);
+}
