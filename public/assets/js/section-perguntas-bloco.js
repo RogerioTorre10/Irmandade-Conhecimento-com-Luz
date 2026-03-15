@@ -657,12 +657,12 @@ async function gerarDevolutivaDoBloco(bloco) {
   const blocoNome = bloco?.title || bloco?.id || 'este bloco';
 
   const frases = [
-    `PARABÉNS!!! Finalizamos ${blocoNome}. O guia está recolhendo os sinais mais preciosos desta etapa...`,
-    `Encerramos ${blocoNome}. Aguarde um instante: o guia está contemplando o sentido desta travessia...`,
-    `Que belo passo em ${blocoNome}. O guia agora reúne as chamas deste trecho para te devolver uma síntese viva...`,
-    `Fim de ${blocoNome}. O guia está observando os fios desta etapa para transformar respostas em direção...`,
-    `Etapa concluída: ${blocoNome}. O guia recolhe agora os ecos deste bloco para te responder com clareza e luz...`
-  ];
+    `PARABÉNS!!! Finalizamos o ${blocoNome}. Estou recolhendo os sinais mais preciosos que você deixou nesta etapa...`,
+    `Encerramos o ${blocoNome}. Aguarde um instante: estou contemplando com carinho o sentido desta nossa travessia...`,
+    `Que belo passo demos no ${blocoNome}! Agora, reúno as chamas deste trecho para te devolver uma síntese viva e inspiradora...`,
+    `Concluímos o ${blocoNome}. Estou observando cada fio desta etapa para transformar suas respostas em direção e clareza...`,
+    `Etapa concluída: ${blocoNome}. Recolho agora os ecos deste bloco para te responder com toda a luz que você compartilhou...`
+];
 
   const idx =
     typeof bloco?.index === 'number'
@@ -804,7 +804,7 @@ async function maybeHandleBlockClosure(section, bloco) {
 
         saveAnswer(bloco, 0, val);
         setContinueState(section, 'loading');
-        await setGuideResponse('Só um momento, estou refletindo sobre tua resposta...', 'info');
+        await setGuideResponse('Só um momento, vou refletir sobre sua resposta...', 'info');
 
         try {
           const guia =
