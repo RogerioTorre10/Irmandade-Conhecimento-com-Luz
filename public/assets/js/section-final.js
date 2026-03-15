@@ -156,6 +156,80 @@ function buildPdfBlocksFromSession() {
     devolutiva: String(item?.texto || '').trim()
   }));
 }
+
+  function getStoredFinalFeedback() {
+  return String(
+    window.__JORNADA_DEVOLUTIVA_FINAL__ ||
+    sessionStorage.getItem('JORNADA_DEVOLUTIVA_FINAL') ||
+    ''
+  ).trim();
+}
+
+function getStoredAnswersFlat() {
+  try {
+    const raw =
+      JSON.parse(sessionStorage.getItem('JORNADA_RESPOSTAS') || '[]') ||
+      JSON.parse(localStorage.getItem('JORNADA_RESPOSTAS') || '[]') ||
+      [];
+
+    if (Array.isArray(raw)) {
+      return raw.map((x) => String(x || '').trim()).filter(Boolean);
+    }
+
+    return [];
+  } catch {
+    return [];
+  }
+}
+
+function getParticipantNameFinal() {
+  return (
+    sessionStorage.getItem('jornada.nome') ||
+    localStorage.getItem('JORNADA_NOME') ||
+    localStorage.getItem('jc.nome') ||
+    'Participante'
+  );
+}
+
+function getGuideFinal() {
+  return (
+    window.__GUIA_FINAL_EFETIVO__ ||
+    sessionStorage.getItem('jornada.guia') ||
+    localStorage.getItem('JORNADA_GUIA') ||
+    localStorage.getItem('jornada.guia') ||
+    document.body.dataset.guia ||
+    'lumen'
+  );
+}
+
+function getSelfieCardFinal() {
+  return (
+    sessionStorage.getItem('JORNADA_SELFIE_CARD') ||
+    localStorage.getItem('JORNADA_SELFIE_CARD') ||
+    ''
+  );
+}
+
+function buildFinalPdfPayload() {
+  const nome = getParticipantNameFinal();
+  const guia = getGuideFinal();
+  const selfieCard = getSelfieCardFinal();
+  const devolutivaFinal = getStoredFinalFeedback();
+  const blocos = buildPdfBlocksFromSession();
+
+  const respostas = blocos.length
+    ? blocos.flatMap((b) => Array.isArray(b.respostas) ? b.respostas : [])
+    : getStoredAnswersFlat();
+
+  return {
+    nome,
+    guia,
+    respostas,
+    blocos,
+    selfieCard,
+    devolutivaFinal
+  };
+}
   
   function getFinalButtons(section) {
     const scope = section || document.getElementById(SECTION_ID) || document;
