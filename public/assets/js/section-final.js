@@ -533,6 +533,8 @@ function buildFinalPayloadDiamant() {
   return payload;
 }
 
+window.buildFinalPayloadDiamante = buildFinalPayloadDiamante;
+  
   // ================================
   // TTS
   // ================================
