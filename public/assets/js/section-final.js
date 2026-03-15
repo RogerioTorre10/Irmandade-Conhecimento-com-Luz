@@ -501,7 +501,7 @@ function buildFinalPdfPayload() {
   // ================================
   // PAYLOAD FINAL
   // ================================
-function buildFinalPayloadDiamant() {
+function buildFinalPayloadDiamante() {
   const s = getJornadaState();
 
   const nome = String(
