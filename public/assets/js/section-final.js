@@ -743,7 +743,7 @@ window.buildFinalPayloadDiamante = buildFinalPayloadDiamante;
     if (!respostas.length && !devolutivas.length) {
       return {
         ok: false,
-        error: 'Sem respostas e sem devolutivas intermediárias para gerar a devolutiva final.'
+        error: 'Peço desculpas, mas devido a instabilidade na conexão, não estou conseguindo gerar a devolutiva.'
       };
     }
 
