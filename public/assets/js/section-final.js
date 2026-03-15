@@ -501,35 +501,37 @@ function buildFinalPdfPayload() {
   // ================================
   // PAYLOAD FINAL
   // ================================
-  function buildFinalPayloadDiamante() {
-    const s = getJornadaState();
-    const nome = String(
-      s.nome ?? s.name ?? s.participantName ?? s.participante ??
-      localStorage.getItem('JORNADA_NOME') ?? sessionStorage.getItem('JORNADA_NOME') ?? ''
-    ).trim();
+function buildFinalPayloadDiamant() {
+  const s = getJornadaState();
 
-    const guiaNorm = readGuideFromEverywhere(s);
-    const guia = String(guiaNorm.id || '').trim().toLowerCase();
+  const nome = String(
+    s.nome ?? s.name ?? s.participantName ?? s.participante ??
+    localStorage.getItem('JORNADA_NOME') ?? sessionStorage.getItem('JORNADA_NOME') ?? ''
+  ).trim();
 
-    const respostasEstruturadas = collectPerguntasPayload();
-    const respostas = respostasEstruturadas
-      .map((item) => String(item.resposta || '').trim())
-      .filter(Boolean);
+  const guiaNorm = readGuideFromEverywhere(s);
+  const guia = String(guiaNorm.id || '').trim().toLowerCase();
 
-    const selfieCard = readSelfieCardFromEverywhere(s);
+  const respostasEstruturadas = collectPerguntasPayload();
+  const respostas = respostasEstruturadas
+    .map((item) => String(item.resposta || '').trim())
+    .filter(Boolean);
 
-    const payload = {
-  nome,
-  guia,
-  respostas,
-  blocos: buildPdfBlocksFromSession(),
-  selfieCard,
-  devolutivaFinal
-};
-    
-    console.log('[FINAL][PAYLOAD NORMALIZED]', payload, '[GUIA]', guiaNorm);
-    return payload;
-  }
+  const selfieCard = readSelfieCardFromEverywhere(s);
+  const devolutivaFinal = getStoredFinalFeedback();
+
+  const payload = {
+    nome,
+    guia,
+    respostas,
+    blocos: buildPdfBlocksFromSession(),
+    selfieCard,
+    devolutivaFinal
+  };
+
+  console.log('[FINAL][PAYLOAD NORMALIZED]', payload, '[GUIA]', guiaNorm);
+  return payload;
+}
 
   // ================================
   // TTS
