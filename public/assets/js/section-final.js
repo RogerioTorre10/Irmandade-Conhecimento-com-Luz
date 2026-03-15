@@ -143,12 +143,6 @@ function getStoredBlockFeedbacks() {
 function buildPdfBlocksFromSession() {
   const feedbacks = getStoredBlockFeedbacks();
 
-  // tenta usar estrutura persistida do fluxo de perguntas
-  const rawBlocks =
-    window.JORNADA_PAPER_QA?.getTotalBlocks
-      ? null
-      : null;
-
   // fallback baseado só no que já foi salvo das devolutivas por bloco
   return feedbacks.map((item) => ({
     titulo: item?.blocoTitulo || item?.blocoId || 'Bloco',
