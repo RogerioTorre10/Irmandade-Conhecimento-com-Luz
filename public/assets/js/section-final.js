@@ -1047,8 +1047,9 @@ function buildFinalPdfPayload() {
 
           timer = startMagicDots(root, 'O Guia está forjando seu pergaminho');
 
-          const result = await window.API.gerarPDFEHQ(payload);
-
+          const payloadFinal = buildFinalPdfPayload();
+          const result = await window.API.gerarPDFEHQ(payloadFinal);
+          
           if (result && result.ok) {
             setPdfStatus(root, '✅ Pergaminho gerado e baixado com sucesso!', 'ok');
           } else {
