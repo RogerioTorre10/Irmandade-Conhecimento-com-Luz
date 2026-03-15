@@ -143,7 +143,7 @@ function getStoredBlockFeedbacks() {
 function buildPdfBlocksFromSession() {
   const feedbacks = getStoredBlockFeedbacks();
 
-  // fallback baseado só no que já foi salvo das devolutivas por bloco
+  // fallback baseado no que já foi salvo das devolutivas por bloco
   return feedbacks.map((item) => ({
     titulo: item?.blocoTitulo || item?.blocoId || 'Bloco',
     respostas: Array.isArray(item?.respostas) ? item.respostas : [],
@@ -690,6 +690,42 @@ window.buildFinalPayloadDiamante = buildFinalPayloadDiamante;
   }
 
   // ================================
+  // ROBUSTEZ DE DEVOLUTIVA
+  // ================================
+  function countSentences(text) {
+    return String(text || '')
+      .split(/[.!?…]+/)
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .length;
+  }
+
+  function isWeakFeedback(text, opts = {}) {
+    const minChars = Number(opts.minChars ?? 180);
+    const minSentences = Number(opts.minSentences ?? 3);
+    const txt = String(text || '').replace(/\s+/g, ' ').trim();
+
+    if (!txt) return true;
+    if (txt.length < minChars) return true;
+    if (countSentences(txt) < minSentences) return true;
+    if (!/[.!?…]$/.test(txt)) return true;
+    return false;
+  }
+
+  function buildGuideFallbackText(guiaRaw, nomeRaw) {
+    const guia = normalizeGuide(guiaRaw).id || 'lumen';
+    const nome = String(nomeRaw || 'Caminhante').trim() || 'Caminhante';
+
+    const fallbackPorGuia = {
+      lumen: `${nome}, sua jornada revelou sinais de sensibilidade, coragem e abertura interior. Cada resposta sua deixou marcas de verdade no pergaminho da alma. Continue avançando com fé, porque a luz que você procura também cresce dentro de você. Que esta travessia permaneça viva no seu coração e ilumine os próximos passos do seu caminho.`,
+      zion: `${nome}, você atravessou esta jornada com honestidade e presença. Houve reflexão, enfrentamento e busca real por sentido. O que foi despertado aqui não deve ficar parado: transforme percepção em passo, passo em caminho, caminho em propósito. Há força em sua travessia, e essa força merece seguir acesa com coragem.`,
+      arion: `${nome}, sua travessia demonstrou delicadeza, profundidade e desejo sincero de evolução. Em cada resposta houve um traço do seu mundo interior. Que esta experiência fortaleça sua conexão consigo, com sua verdade e com a luz que insiste em florescer dentro de você. Permita que esse amadurecimento siga com acolhimento, presença e esperança.`
+    };
+
+    return fallbackPorGuia[guia] || fallbackPorGuia.lumen;
+  }
+
+  // ================================
   // DEVOLUTIVA FINAL
   // ================================
   async function postFinalFeedback(body) {
@@ -739,39 +775,59 @@ window.buildFinalPayloadDiamante = buildFinalPayloadDiamante;
       : [];
 
     const devolutivas = collectIntermediateFeedbacks();
+    const guiaOriginal = normalizeGuide(payload?.guia || 'lumen').id || 'lumen';
+    const nome = String(payload?.nome || 'Caminhante').trim() || 'Caminhante';
+    const fallbackText = buildGuideFallbackText(guiaOriginal, nome);
 
     if (!respostas.length && !devolutivas.length) {
       return {
-        ok: false,
-        error: 'Peço desculpas, mas devido a instabilidade na conexão, não estou conseguindo gerar a devolutiva.'
+        ok: true,
+        text: fallbackText,
+        guiaUsado: 'lumen',
+        guiaOriginal,
+        fallbackUsed: true
       };
     }
 
-    const guiaOriginal = normalizeGuide(payload.guia || 'lumen').id || 'lumen';
-    const guiasParaTentar = [guiaOriginal];
-
+    const guiasParaTentar = [guiaOriginal, guiaOriginal];
     if (guiaOriginal !== 'lumen') {
       guiasParaTentar.push('lumen');
     }
 
     let ultimoErro = null;
 
-    for (const guiaId of guiasParaTentar) {
+    for (let idx = 0; idx < guiasParaTentar.length; idx++) {
+      const guiaId = guiasParaTentar[idx];
+      const isRetry = idx === 1 && guiaId === guiaOriginal;
+
       try {
         const body = {
-          nome: payload.nome || '',
+          nome,
           guia: guiaId,
           respostas,
           devolutivas,
-          idioma: getActiveLang()
+          idioma: getActiveLang(),
+          retry: isRetry,
+          forceComplete: true,
+          minSentences: guiaId === 'lumen' ? 4 : 3,
+          minChars: guiaId === 'lumen' ? 220 : 180
         };
 
-        console.log('[FINAL][DEVOLUTIVA] tentando com guia:', guiaId);
+        console.log('[FINAL][DEVOLUTIVA] tentando com guia:', guiaId, { retry: isRetry });
         const texto = await postFinalFeedback(body);
+
+        if (isWeakFeedback(texto, {
+          minChars: guiaId === 'lumen' ? 220 : 180,
+          minSentences: guiaId === 'lumen' ? 4 : 3
+        })) {
+          ultimoErro = new Error(`Devolutiva curta ou incompleta para ${guiaId}`);
+          console.warn('[FINAL][DEVOLUTIVA] resposta fraca, tentando próxima camada:', guiaId);
+          continue;
+        }
 
         return {
           ok: true,
-          text: texto,
+          text: texto.trim(),
           guiaUsado: guiaId,
           guiaOriginal,
           fallbackUsed: guiaId !== guiaOriginal
@@ -782,9 +838,13 @@ window.buildFinalPayloadDiamante = buildFinalPayloadDiamante;
       }
     }
 
+    console.warn('[FINAL] usando fallback local após falhas:', ultimoErro);
     return {
-      ok: false,
-      error: ultimoErro?.message || 'Falha ao gerar devolutiva final'
+      ok: true,
+      text: fallbackText,
+      guiaUsado: 'lumen',
+      guiaOriginal,
+      fallbackUsed: true
     };
   }
 
@@ -1030,7 +1090,7 @@ window.buildFinalPayloadDiamante = buildFinalPayloadDiamante;
             return;
           }
 
-          if (!hasAnyRespostaValida(payload.respostasEstruturadas)) {
+          if (!hasAnyRespostaValida(collectPerguntasPayload())) {
             setPdfStatus(root, '⚠ Sem respostas. Finalize as perguntas antes de gerar o PDF.', 'err');
             return;
           }
