@@ -32,10 +32,7 @@
   // Rotas tentadas (base já inclui /api)
   // --------------------------------------------------
   const PDF_PATHS = [
-  '/jornada/essencial/pdf',
-  '/jornada-essencial/pdf',
-  '/pdf',
-  '/gerar-pdf'
+  '/jornada/essencial/pdf'
 ];
 
   // --------------------------------------------------
