@@ -15,15 +15,31 @@
   const API_URL_NO_API = API_BASE_NORM.replace(/\/api$/, "");   // ex.: https://... (sem /api)
 
   // Config geral da aplicação (mantém o que já existir e garante defaults)
-  window.APP_CONFIG = Object.assign(
-    {
-      ENV: "prod",
-      API_BASE: API_BASE_NORM,
-      STORAGE_KEY: DEFAULT_STORAGE_KEY,
-      PASS: DEFAULT_PASS
-    },
-    window.APP_CONFIG || {}
-  );
+window.APP_CONFIG = Object.assign(
+  {
+    ENV: "prod",
+    API_BASE: API_BASE_NORM,
+    STORAGE_KEY: DEFAULT_STORAGE_KEY,
+    PASS: DEFAULT_PASS,
+  },
+  window.APP_CONFIG || {}
+);
+
+// ========================================
+// CONFIG DE VOZ E DATILOGRAFIA
+// ========================================
+window.GUIDE_SPEED = {
+  typing: {
+    base: 28,
+    zion: 26,
+    lumen: 28,
+    arian: 30
+  },
+  speech: {
+    rate: 1.0,
+    pitch: 1.0
+  }
+};
 
   // Defaults da Jornada
   const JORNADA_DEFAULTS = {
