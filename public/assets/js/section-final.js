@@ -1096,6 +1096,150 @@ window.buildFinalPayloadDiamante = buildFinalPayloadDiamante;
   }
 }
 
+    async function baixarPdfComFeedback(ev) {
+  if (ev) {
+    ev.preventDefault();
+    ev.stopPropagation();
+  }
+
+  if (btnPdf.dataset.loading === '1') return;
+  if (btnPdf.disabled) return;
+
+  btnPdf.dataset.loading = '1';
+  btnPdf.disabled = true;
+  btnPdf.textContent = 'Guia pensando...';
+  btnPdf.classList.add('is-loading');
+
+  if (!window.API || typeof window.API.gerarPDFEHQ !== 'function') {
+    setPdfStatus(root, '⚠ API não está pronta. Verifique se /assets/js/api.js carregou.', 'err');
+    btnPdf.dataset.loading = '0';
+    btnPdf.disabled = false;
+    btnPdf.textContent = btnPdf.dataset.originalText || '✅ PDF';
+    btnPdf.classList.remove('is-loading');
+    return;
+  }
+
+  btnBaixarSelfie.disabled = true;
+  btnPortal.disabled = true;
+
+  let timer = null;
+  let retryTimer = null;
+
+  try {
+    try {
+      await Promise.race([
+        window.__SELFIECARD_PROMISE__ || Promise.resolve(),
+        new Promise((r) => setTimeout(r, 900))
+      ]);
+    } catch {}
+
+    const payload = buildFinalPayloadDiamante();
+
+    payload.devolutivaFinal =
+      window.__JORNADA_DEVOLUTIVA_FINAL__ ||
+      sessionStorage.getItem('JORNADA_DEVOLUTIVA_FINAL') ||
+      '';
+
+    if (!payload.nome || payload.nome.length < 2) {
+      setPdfStatus(root, '⚠ Nome inválido. Volte e confirme o nome antes de gerar o PDF.', 'err');
+      return;
+    }
+
+    if (!payload.guia || payload.guia.length < 2) {
+      setPdfStatus(root, '⚠ Guia não identificado. Volte e selecione Lumen/Zion/Arian antes de gerar o PDF.', 'err');
+      return;
+    }
+
+    if (!hasAnyRespostaValida(collectPerguntasPayload())) {
+      setPdfStatus(root, '⚠ Sem respostas. Finalize as perguntas antes de gerar o PDF.', 'err');
+      return;
+    }
+
+    const selfiecard =
+      sessionStorage.getItem('JORNADA_SELFIECARD') ||
+      localStorage.getItem('JORNADA_SELFIECARD') ||
+      sessionStorage.getItem('selfiecard') ||
+      localStorage.getItem('selfiecard') ||
+      sessionStorage.getItem('selfieCard') ||
+      localStorage.getItem('selfieCard') ||
+      sessionStorage.getItem('selfie_base64') ||
+      localStorage.getItem('selfie_base64') ||
+      payload.selfiecard ||
+      payload.selfieCard ||
+      payload.selfie_base64 ||
+      '';
+
+    payload.selfiecard = selfiecard;
+    payload.selfieCard = selfiecard;
+    payload.selfie_base64 = selfiecard;
+
+    console.log('[FINAL][PDF] selfie length:', selfiecard ? String(selfiecard).length : 0);
+
+    setPdfStatus(
+      root,
+      '⏳ Estou tendo dificuldades de conexão. Caso demore muito, o botão "Enviar novamente" será habilitado.',
+      'warn'
+    );
+
+    retryTimer = setTimeout(() => {
+      let btnRetry = root.querySelector('#btn-pdf-retry');
+      if (!btnRetry) {
+        btnRetry = document.createElement('button');
+        btnRetry.id = 'btn-pdf-retry';
+        btnRetry.type = 'button';
+        btnRetry.className = 'btn btn-pdf-retry';
+        btnRetry.textContent = '🔁 Enviar novamente';
+
+        const actionsHost =
+          root.querySelector('.final-acoes') ||
+          root.querySelector('.final-actions') ||
+          btnPdf.parentNode;
+
+        if (actionsHost) actionsHost.appendChild(btnRetry);
+
+        btnRetry.addEventListener('click', baixarPdfComFeedback);
+      }
+
+      btnRetry.disabled = false;
+      btnRetry.style.display = '';
+      setPdfStatus(root, '⚠ A solicitação está demorando. Você já pode tentar "Enviar novamente".', 'warn');
+    }, 12000);
+
+    timer = setTypingDots(root, 'O Guia está forjando seu pergaminho...');
+
+    const payloadFinal = buildFinalPayload(payload);
+    const result = await window.API.gerarPDFEHQ(payloadFinal);
+
+    if (timer) clearInterval(timer);
+    timer = null;
+
+    if (!result || !result.ok) {
+      throw new Error('PDF inválido');
+    }
+
+    setPdfStatus(root, '✅ Pergaminho gerado e baixado com sucesso!', 'ok');
+
+    const btnRetry = root.querySelector('#btn-pdf-retry');
+    if (btnRetry) {
+      btnRetry.disabled = true;
+      btnRetry.style.display = 'none';
+    }
+  } catch (e) {
+    console.error('[FINAL][PDF] erro:', e);
+    setPdfStatus(root, '❌ Erro ao gerar o PDF. Confira o console (Network/Console).', 'err');
+  } finally {
+    if (timer) clearInterval(timer);
+    if (retryTimer) clearTimeout(retryTimer);
+
+    btnPdf.dataset.loading = '0';
+    btnPdf.disabled = false;
+    btnBaixarSelfie.disabled = false;
+    btnPortal.disabled = false;
+    btnPdf.textContent = btnPdf.dataset.originalText || '✅ PDF';
+    btnPdf.classList.remove('is-loading');
+  }
+}
+
     
     (function enforce3Buttons() {
       const keep = new Set(['btnPdf', 'btnBaixarSelfie', 'btnVoltarPortal']);
@@ -1113,8 +1257,9 @@ window.buildFinalPayloadDiamante = buildFinalPayloadDiamante;
     if (!btnPortal.dataset.originalText) btnPortal.dataset.originalText = btnPortal.textContent.trim();
 
     if (!btnPdf.dataset.boundFinalPdf) {
-      btnPdf.dataset.boundFinalPdf = '1';
-     
+    btnPdf.dataset.boundFinalPdf = '1';
+    btnPdf.addEventListener('click', baixarPdfComFeedback);
+  }
 
     if (!btnBaixarSelfie.dataset.boundFinalSelfie) {
       btnBaixarSelfie.dataset.boundFinalSelfie = '1';
