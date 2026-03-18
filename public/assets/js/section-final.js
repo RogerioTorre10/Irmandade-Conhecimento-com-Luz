@@ -1021,6 +1021,82 @@ window.buildFinalPayloadDiamante = buildFinalPayloadDiamante;
       actionsRoot.appendChild(btnPortal);
     }
 
+    async function baixarPdfComFeedback() {
+  const btnPdf = document.getElementById('btn-pdf');
+  const root = document;
+  let timer = null;
+
+  function setStatus(msg, type = 'info') {
+    if (typeof setFinalStatus === 'function') {
+      setFinalStatus(root, msg, type);
+    } else {
+      console.log('[PDF STATUS]', msg);
+    }
+  }
+
+  try {
+    btnPdf.disabled = true;
+
+    setStatus(
+      '⏳ Estou tendo dificuldades de conexão. Caso demore muito, o botão "Enviar novamente" será liberado...',
+      'warn'
+    );
+
+    timer = setTimeout(() => {
+      setStatus('⚠️ Demora detectada. Você já pode tentar novamente.', 'warn');
+    }, 12000);
+
+    // ⬇️ ESPERA A SELFIE (IMPORTANTE PRO SEU CASO)
+    try {
+      await Promise.race([
+        window.__SELFIECARD_PROMISE__ || Promise.resolve(),
+        new Promise(r => setTimeout(r, 3000))
+      ]);
+    } catch {}
+
+    const payload = buildFinalPayloadDiamante();
+
+    payload.devolutivaFinal =
+      window.__JORNADA_DEVOLUTIVA_FINAL__ ||
+      sessionStorage.getItem('JORNADA_DEVOLUTIVA_FINAL') ||
+      '';
+
+    const selfiecard =
+      sessionStorage.getItem('JORNADA_SELFIECARD') ||
+      localStorage.getItem('JORNADA_SELFIECARD') ||
+      payload.selfiecard ||
+      '';
+
+    payload.selfiecard = selfiecard;
+
+    console.log('[PDF] selfie length:', selfiecard ? selfiecard.length : 0);
+
+    const payloadFinal = buildFinalPayload(payload);
+    const result = await window.API.gerarPDF(payloadFinal);
+
+    clearTimeout(timer);
+
+    if (!result || !result.ok) {
+      throw new Error('PDF inválido');
+    }
+
+    setStatus('✅ Pergaminho gerado e baixado com sucesso!', 'ok');
+
+  } catch (err) {
+    console.error('[PDF ERROR]', err);
+
+    setStatus(
+      '❌ Não foi possível gerar o PDF. Clique novamente em "PDF" para tentar.',
+      'error'
+    );
+
+  } finally {
+    clearTimeout(timer);
+    btnPdf.disabled = false;
+  }
+}
+
+    
     (function enforce3Buttons() {
       const keep = new Set(['btnPdf', 'btnBaixarSelfie', 'btnVoltarPortal']);
       [...actionsRoot.querySelectorAll('button')].forEach((btn) => {
