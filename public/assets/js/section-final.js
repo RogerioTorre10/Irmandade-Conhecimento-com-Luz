@@ -1133,86 +1133,100 @@ window.buildFinalPayloadDiamante = buildFinalPayloadDiamante;
       ]);
     } catch {}
 
-    const payload = buildFinalPayloadDiamante();
+   const payload =
+  (typeof buildFinalPayloadDiamante === 'function' && buildFinalPayloadDiamante()) ||
+  (typeof buildFinalPayload === 'function' && buildFinalPayload()) ||
+  window.__LAST_FINAL_PAYLOAD__ ||
+  null;
 
-    payload.devolutivaFinal =
-      window.__JORNADA_DEVOLUTIVA_FINAL__ ||
-      sessionStorage.getItem('JORNADA_DEVOLUTIVA_FINAL') ||
-      '';
+if (!payload) {
+  setPdfStatus(root, '❌ Não foi possível montar o payload do PDF.', 'err');
+  return;
+}
 
-    if (!payload.nome || payload.nome.length < 2) {
-      setPdfStatus(root, '⚠ Nome inválido. Volte e confirme o nome antes de gerar o PDF.', 'err');
-      return;
-    }
+payload.devolutivaFinal =
+  window.__JORNADA_DEVOLUTIVA_FINAL__ ||
+  sessionStorage.getItem('JORNADA_DEVOLUTIVA_FINAL') ||
+  '';
 
-    if (!payload.guia || payload.guia.length < 2) {
-      setPdfStatus(root, '⚠ Guia não identificado. Volte e selecione Lumen/Zion/Arian antes de gerar o PDF.', 'err');
-      return;
-    }
+if (!payload.nome || payload.nome.length < 2) {
+  setPdfStatus(root, '⚠ Nome inválido. Volte e confirme o nome antes de gerar o PDF.', 'err');
+  return;
+}
 
-    if (!hasAnyRespostaValida(collectPerguntasPayload())) {
-      setPdfStatus(root, '⚠ Sem respostas. Finalize as perguntas antes de gerar o PDF.', 'err');
-      return;
-    }
+if (!payload.guia || payload.guia.length < 2) {
+  setPdfStatus(root, '⚠ Guia não identificado. Volte e selecione Lumen/Zion/Arian antes de gerar o PDF.', 'err');
+  return;
+}
 
-    const selfiecard =
-      sessionStorage.getItem('JORNADA_SELFIECARD') ||
-      localStorage.getItem('JORNADA_SELFIECARD') ||
-      sessionStorage.getItem('selfiecard') ||
-      localStorage.getItem('selfiecard') ||
-      sessionStorage.getItem('selfieCard') ||
-      localStorage.getItem('selfieCard') ||
-      sessionStorage.getItem('selfie_base64') ||
-      localStorage.getItem('selfie_base64') ||
-      payload.selfiecard ||
-      payload.selfieCard ||
-      payload.selfie_base64 ||
-      '';
+if (!hasAnyRespostaValida(collectPerguntasPayload())) {
+  setPdfStatus(root, '⚠ Sem respostas. Finalize as perguntas antes de gerar o PDF.', 'err');
+  return;
+}
 
-    payload.selfiecard = selfiecard;
-    payload.selfieCard = selfiecard;
-    payload.selfie_base64 = selfiecard;
+const selfiecard =
+  sessionStorage.getItem('JORNADA_SELFIECARD') ||
+  localStorage.getItem('JORNADA_SELFIECARD') ||
+  sessionStorage.getItem('selfiecard') ||
+  localStorage.getItem('selfiecard') ||
+  sessionStorage.getItem('selfieCard') ||
+  localStorage.getItem('selfieCard') ||
+  sessionStorage.getItem('selfie_base64') ||
+  localStorage.getItem('selfie_base64') ||
+  payload.selfiecard ||
+  payload.selfieCard ||
+  payload.selfie_base64 ||
+  '';
 
-    console.log('[FINAL][PDF] selfie length:', selfiecard ? String(selfiecard).length : 0);
+payload.selfiecard = selfiecard;
+payload.selfieCard = selfiecard;
+payload.selfie_base64 = selfiecard;
 
-    setPdfStatus(
-      root,
-      '⏳ Estou tendo dificuldades de conexão. Caso demore muito, o botão "Enviar novamente" será habilitado.',
-      'warn'
-    );
+console.log('[FINAL][PDF] selfie length:', selfiecard ? String(selfiecard).length : 0);
 
-    retryTimer = setTimeout(() => {
-      let btnRetry = root.querySelector('#btn-pdf-retry');
-      if (!btnRetry) {
-        btnRetry = document.createElement('button');
-        btnRetry.id = 'btn-pdf-retry';
-        btnRetry.type = 'button';
-        btnRetry.className = 'btn btn-pdf-retry';
-        btnRetry.textContent = '🔁 Enviar novamente';
+setPdfStatus(
+  root,
+  '⏳ Estou tendo dificuldades de conexão. Caso demore muito, o botão "Enviar novamente" será habilitado.',
+  'warn'
+);
 
-        const actionsHost =
-          root.querySelector('.final-acoes') ||
-          root.querySelector('.final-actions') ||
-          btnPdf.parentNode;
+retryTimer = setTimeout(() => {
+  let btnRetry = root.querySelector('#btn-pdf-retry');
+  if (!btnRetry) {
+    btnRetry = document.createElement('button');
+    btnRetry.id = 'btn-pdf-retry';
+    btnRetry.type = 'button';
+    btnRetry.className = 'btn btn-pdf-retry';
+    btnRetry.textContent = '🔁 Enviar novamente';
 
-        if (actionsHost) actionsHost.appendChild(btnRetry);
+    const actionsHost =
+      root.querySelector('.final-acoes') ||
+      root.querySelector('.final-actions') ||
+      btnPdf.parentNode;
 
-        btnRetry.addEventListener('click', baixarPdfComFeedback);
-      }
+    if (actionsHost) actionsHost.appendChild(btnRetry);
 
-      btnRetry.disabled = false;
-      btnRetry.style.display = '';
-      setPdfStatus(root, '⚠ A solicitação está demorando. Você já pode tentar "Enviar novamente".', 'warn');
-    }, 12000);
+    btnRetry.addEventListener('click', baixarPdfComFeedback);
+  }
 
-    if (typeof setTypingDots === 'function') {
-    timer = setTypingDots(root, 'O Guia está forjando seu pergaminho...');
-    } else {
-    setPdfStatus(root, '⏳ O Guia está forjando seu pergaminho...', 'warn');
-    timer = null;
-   }
-    const payloadFinal = buildFinalPayload(payload);
-    const result = await window.API.gerarPDFEHQ(payloadFinal);
+  btnRetry.disabled = false;
+  btnRetry.style.display = '';
+  setPdfStatus(root, '⚠ A solicitação está demorando. Você já pode tentar "Enviar novamente".', 'warn');
+}, 12000);
+
+if (typeof setTypingDots === 'function') {
+  timer = setTypingDots(root, 'O Guia está forjando seu pergaminho...');
+} else {
+  setPdfStatus(root, '⏳ O Guia está forjando seu pergaminho...', 'warn');
+  timer = null;
+}
+
+const payloadFinal =
+  (typeof buildFinalPdfPayload === 'function' && buildFinalPdfPayload(payload)) ||
+  (typeof buildFinalPayload === 'function' && buildFinalPayload(payload)) ||
+  payload;
+
+const result = await window.API.gerarPDFEHQ(payloadFinal);
 
     if (timer) clearInterval(timer);
     timer = null;
