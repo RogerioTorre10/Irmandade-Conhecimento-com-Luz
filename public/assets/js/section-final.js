@@ -1205,8 +1205,12 @@ window.buildFinalPayloadDiamante = buildFinalPayloadDiamante;
       setPdfStatus(root, '⚠ A solicitação está demorando. Você já pode tentar "Enviar novamente".', 'warn');
     }, 12000);
 
+    if (typeof setTypingDots === 'function') {
     timer = setTypingDots(root, 'O Guia está forjando seu pergaminho...');
-
+    } else {
+    setPdfStatus(root, '⏳ O Guia está forjando seu pergaminho...', 'warn');
+    timer = null;
+   }
     const payloadFinal = buildFinalPayload(payload);
     const result = await window.API.gerarPDFEHQ(payloadFinal);
 
@@ -1228,7 +1232,7 @@ window.buildFinalPayloadDiamante = buildFinalPayloadDiamante;
     console.error('[FINAL][PDF] erro:', e);
     setPdfStatus(root, '❌ Erro ao gerar o PDF. Confira o console (Network/Console).', 'err');
   } finally {
-    if (timer) clearInterval(timer);
+    if (timer && typeof clearInterval === 'function') clearInterval(timer);
     if (retryTimer) clearTimeout(retryTimer);
 
     btnPdf.dataset.loading = '0';
