@@ -1,5 +1,5 @@
 /* ============================================
-/* API.js — Irmandade Conhecimento com Luz
+/* API.js — Irmandade Conhecimento com Luz (BLINDADO)
 /* Geração de PDF com SelfieCard + Respostas
 /* ============================================ */
 
@@ -7,36 +7,32 @@
   'use strict';
 
   // --------------------------------------------------
-  // BASE do backend (prioridade: APP_CONFIG -> API_BASE -> fallback explícito)
+  // BASE API
   // --------------------------------------------------
   function normalizeBase(u) {
     return String(u || '').trim().replace(/\/+$/, '');
   }
 
   function pickApiBase() {
-    // 1) config oficial do projeto
-    const cfg = (window.APP_CONFIG && window.APP_CONFIG.API_BASE) ? window.APP_CONFIG.API_BASE : '';
-    if (cfg) return normalizeBase(cfg);
+    const cfg = (window.APP_CONFIG && window.APP_CONFIG.API_BASE)
+      ? window.APP_CONFIG.API_BASE
+      : '';
 
-    // 2) legado/compat
+    if (cfg) return normalizeBase(cfg);
     if (window.API_BASE) return normalizeBase(window.API_BASE);
 
-    // 3) fallback explícito (se nada existir, melhor apontar pro backend certo)
-    // ⚠️ Ajuste aqui se um dia você trocar o domínio
     return normalizeBase('https://lumen-backend-api.onrender.com/api');
   }
 
   const API_PRIMARY = pickApiBase();
 
   // --------------------------------------------------
-  // Rotas tentadas (base já inclui /api)
+  // ROTAS
   // --------------------------------------------------
-  const PDF_PATHS = [
-  '/jornada/essencial/pdf'
-];
+  const PDF_PATHS = ['/jornada/essencial/pdf'];
 
   // --------------------------------------------------
-  // Util
+  // UTIL
   // --------------------------------------------------
   function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -53,248 +49,132 @@
     setTimeout(() => URL.revokeObjectURL(url), 2000);
   }
 
-  function triggerDownloadUrl(url, filename) {
-    // tenta baixar via <a>, e se o browser abrir em aba, ainda assim funciona pra PDF
-    const a = document.createElement('a');
-    a.href = url;
-    if (filename) a.download = filename;
-    a.rel = 'noopener';
-    a.target = '_blank';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  }
-
-  function guessPdfFromHeaders(res) {
+  function isPdf(res) {
     const ct = (res.headers.get('content-type') || '').toLowerCase();
-    const cd = (res.headers.get('content-disposition') || '').toLowerCase();
-    if (ct.includes('application/pdf')) return true;
-    if (cd.includes('.pdf')) return true; // ex.: attachment; filename="xxx.pdf"
-    if (ct.includes('application/octet-stream') && cd.includes('attachment')) return true;
-    return false;
+    return ct.includes('application/pdf');
   }
 
-  async function postJSON(base, path, body, opts = {}) {
-  const timeout = Number(opts.timeout || 45000);
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort('timeout'), timeout);
+  async function postJSON(base, path, body, timeout = 60000) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeout);
 
-  const url = base + path;
+    try {
+      const res = await fetch(base + path, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body || {}),
+        signal: controller.signal
+      });
 
-  try {
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body || {}),
-      signal: controller.signal
-    });
+      clearTimeout(timer);
 
-    clearTimeout(timer);
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
 
-    if (!res.ok) {
-      // tenta extrair mensagem (sem quebrar)
-      let extra = '';
-      try {
-        extra = await res.text();
-      } catch {}
+      if (isPdf(res)) {
+        return { data: await res.blob() };
+      }
 
-      const err = new Error(`HTTP ${res.status}`);
-      err.status = res.status;
-      err.url = url;
-      err.body = extra;
-      throw err;
+      return { data: await res.json() };
+
+    } catch (e) {
+      clearTimeout(timer);
+      throw e;
     }
-
-    const contentType = ((res.headers.get('content-type') || '').toLowerCase());
-
-    // JSON
-    if (contentType.includes('application/json')) {
-      const json = await res.json();
-      return { data: json };
-    }
-
-    // PDF (ou octet-stream que pareça PDF)
-    if (guessPdfFromHeaders(res)) {
-      const blob = await res.blob();
-      return { data: blob, filename: opts.filename };
-    }
-
-    // texto/outros
-    const text = await res.text();
-    return { data: text };
-
-  } catch (e) {
-    clearTimeout(timer);
-
-    if (e?.name === 'AbortError') {
-      const err = new Error(`Timeout após ${timeout}ms`);
-      err.name = 'AbortError';
-      err.status = 408;
-      err.url = url;
-      throw err;
-    }
-
-    throw e;
   }
-}
 
   // --------------------------------------------------
-  // API pública
+  // PDF + HQ
   // --------------------------------------------------
   async function gerarPDFEHQ(payload) {
-    const base = API_PRIMARY;
-    let lastErr = null;
 
-    // payload esperado:
-    // { nome, guia, respostas, selfieCard }
-    const safePayload = payload || {};
+    const safePayload = {
+      ...(payload || {}),
 
-    const fileNameBase =
-      (safePayload.nome ? String(safePayload.nome).trim() : 'jornada')
+      // 🔥 GARANTE ENVIO DA SELFIE
+      selfieCard:
+        payload?.selfieCard ||
+        localStorage.getItem('selfieBase64') ||
+        null
+    };
+
+    const fileName =
+      (safePayload.nome || 'jornada')
+        .toString()
         .replace(/[^\p{L}\p{N}_-]+/gu, '_')
-        .slice(0, 40) || 'jornada';
+        .slice(0, 40);
 
-    const fname = `${fileNameBase}-${new Date().toISOString().slice(0,10)}.pdf`;
+    const fname = `${fileName}-${new Date().toISOString().slice(0,10)}.pdf`;
 
     for (const path of PDF_PATHS) {
       try {
-        const { data } = await postJSON(base, path, safePayload, {
-          timeout: 60000,     // 💎 mais seguro no Render
-          filename: fname
-        });
+        const { data } = await postJSON(API_PRIMARY, path, safePayload, 60000);
 
-        // backend devolveu { url: "..." }
-        if (data && typeof data === 'object' && typeof data.url === 'string') {
-          // tenta baixar via fetch->blob (mais garantido), senão abre link
-          try {
-            const r = await fetch(data.url, { cache: 'no-store' });
-            if (!r.ok) throw new Error(`Download URL falhou: HTTP ${r.status}`);
-            const blob = await r.blob();
-            triggerDownload(blob, fname);
-            return { ok: true, downloaded: true, via: 'url+blob', path, base };
-          } catch (e) {
-            triggerDownloadUrl(data.url, fname);
-            return { ok: true, downloaded: true, via: 'url', path, base, warn: String(e?.message || e) };
-          }
-        }
-
-        // backend devolveu PDF (Blob)
+        // PDF direto
         if (data instanceof Blob) {
           triggerDownload(data, fname);
-          return { ok: true, downloaded: true, via: 'blob', path, base, filename: fname };
+          return { ok: true, via: 'blob' };
         }
 
-        // devolveu texto/qualquer coisa (debug)
-        return { ok: true, downloaded: false, via: 'text', path, base, data };
+        // URL retornada pelo backend
+        if (data && data.url) {
+          window.open(data.url, '_blank');
+          return { ok: true, via: 'url' };
+        }
+
       } catch (e) {
-        lastErr = e;
-        await sleep(150);
+        console.warn('[API] tentativa falhou', e);
+        await sleep(200);
       }
     }
 
-    return {
-      ok: false,
-      base,
-      error: String((lastErr && lastErr.message) || lastErr || 'unknown'),
-      details: (lastErr && (lastErr.url || lastErr.body))
-        ? { url: lastErr.url, body: lastErr.body }
-        : undefined
-    };
+    return { ok: false };
   }
-  
-// --------------------------------------------------
-// Devolutiva do Guia (Lumen / Zion / Arion)
-// --------------------------------------------------
 
-async function gerarDevolutiva(payload) {
-  const base = API_PRIMARY;
+  // --------------------------------------------------
+  // DEVOLUTIVA (UNIFICADA)
+  // --------------------------------------------------
+  async function gerarDevolutivaBase(payload, path) {
+    try {
+      const { data } = await postJSON(API_PRIMARY, path, payload, 120000);
 
-  try {
-    const { data } = await postJSON(
-      base,
-      '/jornada/devolutiva',
-      payload,
-      { timeout: 120000 }
-    );
-
-    if (data && data.devolutiva) {
       return {
         ok: true,
-        texto: data.devolutiva,
-        guia: data.guia || payload?.guia || 'lumen'
+        texto: data?.devolutiva || data?.devolutivaBloco || '',
+        guia: data?.guia || payload?.guia || 'lumen'
       };
-    }
 
-    return {
-      ok: false,
-      error: 'Resposta sem devolutiva',
-      raw: data
-    };
+    } catch (e) {
+      console.warn('[API] erro devolutiva', {
+        message: e?.message,
+        status: e?.status,
+        body: e?.body
+      });
 
-  } catch (e) {
-    console.warn('[API] devolutiva falhou', {
-      message: e?.message,
-      status: e?.status,
-      body: e?.body,
-      url: e?.url,
-      raw: e
-    });
-
-    return {
-      ok: false,
-      error: String(e?.body || e?.message || e || 'Erro desconhecido')
-    };
-  }
-}
-
-async function gerarDevolutivaBloco(payload) {
-  const base = API_PRIMARY;
-
-  try {
-    const { data } = await postJSON(
-      base,
-      '/jornada/devolutiva-bloco',
-      payload,
-      { timeout: 120000 }
-    );
-
-    if (data && data.devolutivaBloco) {
       return {
-        ok: true,
-        texto: data.devolutivaBloco,
-        guia: data.guia || payload?.guia || 'lumen'
+        ok: false,
+        error: String(e?.message || 'Erro desconhecido')
       };
     }
-
-    return {
-      ok: false,
-      error: 'Resposta sem devolutiva de bloco',
-      raw: data
-    };
-
-  } catch (e) {
-    console.warn('[API] devolutiva do bloco falhou', {
-      message: e?.message,
-      status: e?.status,
-      body: e?.body,
-      url: e?.url,
-      raw: e
-    });
-
-    return {
-      ok: false,
-      error: String(e?.body || e?.message || e || 'Erro desconhecido')
-    };
   }
-}
-  
-window.API = window.API || {};
-window.API.gerarPDFEHQ = gerarPDFEHQ;
-window.API.gerarDevolutiva = gerarDevolutiva;
-window.API.gerarDevolutivaBloco = gerarDevolutivaBloco;
-  // Log de sanidade
-  try {
-    console.log('[API] pronto · PRIMARY=', API_PRIMARY, '· PDF_PATHS=', PDF_PATHS);
-  } catch {}
+
+  // --------------------------------------------------
+  // EXPORT GLOBAL
+  // --------------------------------------------------
+  window.API = window.API || {};
+
+  window.API.gerarPDFEHQ = gerarPDFEHQ;
+
+  window.API.gerarDevolutiva = (payload) =>
+    gerarDevolutivaBase(payload, '/jornada/devolutiva');
+
+  window.API.gerarDevolutivaBloco = (payload) =>
+    gerarDevolutivaBase(payload, '/jornada/devolutiva-bloco');
+
+  // --------------------------------------------------
+  // LOG
+  // --------------------------------------------------
+  console.log('[API] BLINDADO OK →', API_PRIMARY);
 
 })();
