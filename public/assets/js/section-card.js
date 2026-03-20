@@ -4,7 +4,7 @@
 
   const MOD = 'section-card.js';
   const SECTION_IDS = ['section-card', 'section-eu-na-irmandade'];
-  const NEXT_SECTION_ID = 'section-perguntas-raizes';
+  const NEXT_SECTION_ID = 'section-dados-pessoais';
   const VIDEO_SRC = '/assets/videos/filme-0-ao-encontro-da-jornada.mp4';
 
   const CARD_BG = {
@@ -64,7 +64,7 @@
         canonGuia(localStorage.getItem('JORNADA_GUIA')) ||
         canonGuia(localStorage.getItem('jc.guiaSelecionado')) ||
         canonGuia(localStorage.getItem('jc.guia')) ||
-        canonGuia(sessionStorage.getItem('jornada.guia')) || // compat legado (se existir)
+        canonGuia(sessionStorage.getItem('jornada.guia')) ||
         '';
     } catch {}
 
@@ -82,7 +82,6 @@
 
       sessionStorage.setItem('JORNADA_GUIA', guiaCanon);
       localStorage.setItem('JORNADA_GUIA', guiaCanon);
-      // compat legado
       sessionStorage.setItem('jornada.guia', guiaCanon);
     } catch {}
   }
@@ -93,7 +92,6 @@
   function applyThemeFromStorage() {
     const guia = getGuiaCanon();
 
-    // fallback dourado
     let main = '#ffd700', g1 = 'rgba(255,230,180,0.85)', g2 = 'rgba(255,210,120,0.75)';
 
     if (guia === 'lumen') { main = '#00ff9d'; g1 = 'rgba(0,255,157,0.90)'; g2 = 'rgba(120,255,200,0.70)'; }
@@ -110,7 +108,7 @@
   }
 
   // -----------------------------
-  // Markup do Card (cria uma vez)
+  // Markup do Card
   // -----------------------------
   function buildMarkup(section) {
     if (!section) return;
@@ -155,7 +153,7 @@
   }
 
   // -----------------------------
-  // Render do Card (bg + selfie + nome)
+  // Render do Card
   // -----------------------------
   function renderCard(section) {
     if (!section) return;
@@ -181,7 +179,6 @@
           '';
       } catch {}
 
-      // evita reciclar a selfieCard como se fosse selfie
       try {
         const sc1 = sessionStorage.getItem('JORNADA_SELFIECARD') || '';
         const sc2 = sessionStorage.getItem('SELFIE_CARD') || '';
@@ -196,7 +193,6 @@
 
     console.log('%c[CARD] Render ok!', 'color: gold', { nome, guia });
 
-    // gera SELFIECARD sem travar
     selfieCardSafeMode(section, { nome, guia });
   }
 
@@ -297,7 +293,7 @@
   }
 
   // -----------------------------
-  // Gera SELFIECARD (não trava)
+  // Gera SELFIECARD
   // -----------------------------
   function selfieCardSafeMode(section, ctxData) {
     const nome = String(ctxData?.nome || getNome() || 'PARTICIPANTE').trim();
@@ -337,17 +333,16 @@
 
       const W = 512, H = 720;
       const canvas = document.createElement('canvas');
-      canvas.width = W; canvas.height = H;
+      canvas.width = W;
+      canvas.height = H;
       const c = canvas.getContext('2d', { alpha: true });
 
-      // fundo sólido (evita checker)
       c.fillStyle = '#0b0f16';
       c.fillRect(0, 0, W, H);
 
       const P = 34;
       const ix = P, iy = P, iw = W - 2 * P, ih = H - 2 * P;
 
-      // BG do guia (cover) dentro
       if (bgImg && (bgImg.naturalWidth || bgImg.width)) {
         const bw = bgImg.naturalWidth || bgImg.width;
         const bh = bgImg.naturalHeight || bgImg.height;
@@ -371,7 +366,6 @@
         ctx.closePath();
       }
 
-      // selfie 2x2 (quadrado arredondado no “peito”)
       const cx = ix + iw / 2;
       const cy = iy + ih * 0.72;
       const box = iw * 0.42;
@@ -391,10 +385,8 @@
       c.drawImage(selfieImg, cx - dw / 2, cy - dh / 2, dw, dh);
       c.restore();
 
-      // moldura dourada
       drawGoldFrame(c, W, H, { pad: 28, radius: 28, glow: true });
 
-      // textos
       const guiaNome = prettyGuia(guia);
 
       c.textAlign = 'center';
@@ -406,7 +398,6 @@
       c.font = '22px Cardo, serif';
       c.fillText(`Guia: ${guiaNome || '—'}`, cx, iy + ih * 0.95);
 
-      // export
       const dataUrl = canvas.toDataURL('image/png');
 
       sessionStorage.setItem('JORNADA_SELFIECARD', dataUrl);
@@ -422,7 +413,6 @@
       console.log('[CARD][SELFIECARD] ✅ salva!', signature);
     };
 
-    // promise global pra outras partes (PDF) poderem aguardar
     try {
       window.__SELFIECARD_PROMISE__ = new Promise((resolve) => {
         setTimeout(() => {
@@ -453,6 +443,12 @@
         window.playTransitionVideo(VIDEO_SRC, NEXT_SECTION_ID);
         return;
       }
+
+      if (window.JornadaController?.show) {
+        window.JornadaController.show(NEXT_SECTION_ID);
+        return;
+      }
+
       if (window.JC && typeof window.JC.show === 'function') {
         window.JC.show(NEXT_SECTION_ID, { force: true });
       }
@@ -514,14 +510,9 @@
     buildMarkup(section);
     renderCard(section);
     bind(section);
-
-    // typing (não bloqueia navegação se algo der errado)
     runTypingInSection(section).catch(() => {});
   }
 
-  // -----------------------------
-  // Hook do controller
-  // -----------------------------
   document.addEventListener('DOMContentLoaded', () => {
     applyThemeFromStorage();
   });
