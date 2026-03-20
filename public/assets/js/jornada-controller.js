@@ -13,6 +13,7 @@
   'section-guia',
   'section-selfie',
   'section-card',
+  'section-dados-pessoais', 
   'section-perguntas-raizes',
   'section-perguntas-reflexoes',
   'section-perguntas-crescimento',
