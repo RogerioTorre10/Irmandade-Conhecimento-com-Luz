@@ -4,14 +4,18 @@
 
   const MOD = 'section-dados-pessoais.js';
   const SECTION_ID = 'section-dados-pessoais';
+  const STORAGE_KEY = 'JORNADA_DADOS_PESSOAIS';
+
+  const VIDEO_BACK = '/assets/videos/filme-0-ao-encontro-da-jornada.mp4';
+  const VIDEO_NEXT = '/assets/videos/filme-0-ao-encontro-da-jornada.mp4';
+  const PREV_SECTION_ID = 'section-card';
+  const NEXT_SECTION_ID = 'section-perguntas-raizes';
 
   if (window.__DADOS_PESSOAIS_BOUND__) {
     console.log(`[${MOD}] já inicializado, ignorando.`);
     return;
   }
   window.__DADOS_PESSOAIS_BOUND__ = true;
-
-  const STORAGE_KEY = 'JORNADA_DADOS_PESSOAIS';
 
   function log(...args) {
     console.log(`[${MOD}]`, ...args);
@@ -33,6 +37,8 @@
     try {
       sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data || {}));
       window.__JORNADA_DADOS_PESSOAIS__ = data || {};
+      window.JORNADA_STATE = window.JORNADA_STATE || {};
+      window.JORNADA_STATE.dadosPessoais = data || {};
     } catch (e) {
       console.warn(`[${MOD}] falha ao salvar`, e);
     }
@@ -54,6 +60,7 @@
 
   function hydrate(root, data) {
     if (!data) return;
+
     const map = {
       '#dp-nome': data.nomeCompleto,
       '#dp-idade-faixa': data.idadeFaixa,
@@ -84,29 +91,46 @@
     if (!el) return;
     el.textContent = msg || '';
     el.dataset.kind = type;
-    el.style.display = msg ? 'block' : 'none';
+    el.style.display = msg ? 'block' : 'block';
+  }
+
+  function navigateTo(sectionId, videoSrc) {
+    if (typeof window.playTransitionVideo === 'function' && videoSrc) {
+      window.playTransitionVideo(videoSrc, sectionId);
+      return;
+    }
+
+    if (window.JornadaController?.show) {
+      window.JornadaController.show(sectionId);
+      return;
+    }
+
+    if (window.JC && typeof window.JC.show === 'function') {
+      window.JC.show(sectionId, { force: true });
+      return;
+    }
+
+    console.warn(`[${MOD}] nenhum controller disponível para navegar até ${sectionId}`);
   }
 
   function bind(root) {
+    if (root.__DADOS_PESSOAIS_BINDED__) return;
+    root.__DADOS_PESSOAIS_BINDED__ = true;
+
     const btnNext = $('#btn-dp-continuar', root);
     const btnBack = $('#btn-dp-voltar', root);
 
     root.addEventListener('input', () => {
       saveData(collect(root));
+      setStatus(root, '');
     });
 
     if (btnBack) {
       btnBack.addEventListener('click', (ev) => {
         ev.preventDefault();
         ev.stopPropagation();
-
         saveData(collect(root));
-
-        if (window.JornadaController?.show) {
-          window.JornadaController.show('section-card');
-        } else {
-          console.warn(`[${MOD}] JornadaController.show indisponível`);
-        }
+        navigateTo(PREV_SECTION_ID, VIDEO_BACK);
       });
     }
 
@@ -125,20 +149,14 @@
 
         saveData(data);
         setStatus(root, '✅ Dados salvos com sucesso.', 'ok');
-
-        if (window.JornadaController?.show) {
-          window.JornadaController.show('section-perguntas-raizes');
-        } else {
-          console.warn(`[${MOD}] JornadaController.show indisponível`);
-        }
+        navigateTo(NEXT_SECTION_ID, VIDEO_NEXT);
       });
     }
   }
 
   function init(root) {
     if (!root) return;
-    const data = loadData();
-    hydrate(root, data);
+    hydrate(root, loadData());
     bind(root);
     log('inicializado com sucesso');
   }
@@ -146,6 +164,12 @@
   document.addEventListener('sectionLoaded', (e) => {
     const section = e?.detail?.section;
     if (section?.id === SECTION_ID) init(section);
+  });
+
+  document.addEventListener('section:shown', (e) => {
+    const id = e?.detail?.sectionId;
+    const node = e?.detail?.node;
+    if (id === SECTION_ID && node) init(node);
   });
 
   document.addEventListener('DOMContentLoaded', () => {
