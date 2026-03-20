@@ -2,19 +2,22 @@
   'use strict';
   console.log('[BOOT] Iniciando micro-boot…');
 
-  async function waitForJC(timeout = 10000) {
-    console.log('[BOOT] Waiting for JC...');
-    const start = Date.now();
-    while (!window.JC && Date.now() - start < timeout) {
-      await new Promise(resolve => setTimeout(resolve, 100));
-    }
-    if (!window.JC) {
-      console.error('[BOOT] JC not available after timeout');
-      return false;
-    }
-    console.log('[BOOT] JC available');
-    return true;
+ async function waitForCarregarEtapa(timeout = 10000) {
+  console.log('[BOOT] Waiting for carregarEtapa...');
+  const start = Date.now();
+
+  while (typeof window.carregarEtapa !== 'function' && Date.now() - start < timeout) {
+    await new Promise(resolve => setTimeout(resolve, 100));
   }
+
+  if (typeof window.carregarEtapa !== 'function') {
+    console.error('[BOOT] carregarEtapa não disponível após timeout');
+    return false;
+  }
+
+  console.log('[BOOT] carregarEtapa disponível');
+  return true;
+}
 
   let lastSection = null;
   async function init() {
