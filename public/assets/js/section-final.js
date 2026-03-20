@@ -500,6 +500,14 @@ function buildFinalPdfPayload() {
     return [...new Set(bag)];
   }
 
+  function getDadosPessoaisPayload() {
+  try {
+    return JSON.parse(sessionStorage.getItem('JORNADA_DADOS_PESSOAIS') || '{}');
+  } catch {
+    return {};
+  }
+}
+
   // ================================
   // PAYLOAD FINAL
   // ================================
@@ -521,6 +529,7 @@ function buildFinalPayloadDiamante() {
 
   const selfieCard = readSelfieCardFromEverywhere(s);
   const devolutivaFinal = getStoredFinalFeedback();
+  const dadosPessoais = getDadosPessoaisPayload();
 
   const payload = {
     nome,
@@ -528,7 +537,8 @@ function buildFinalPayloadDiamante() {
     respostas,
     blocos: buildPdfBlocksFromSession(),
     selfieCard,
-    devolutivaFinal
+    devolutivaFinal,
+    dadosPessoais
   };
 
   console.log('[FINAL][PAYLOAD NORMALIZED]', payload, '[GUIA]', guiaNorm);
