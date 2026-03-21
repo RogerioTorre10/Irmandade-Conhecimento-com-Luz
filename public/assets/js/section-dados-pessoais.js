@@ -21,8 +21,9 @@
     console.log(`[${MOD}]`, ...args);
   }
 
-  function $(root, sel) {
-    return root.querySelector(sel);
+  function $(sel, root = document) {
+  if (!root || typeof root.querySelector !== 'function') return null;
+  return root.querySelector(sel);
   }
 
   function loadData() {
