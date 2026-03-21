@@ -29,13 +29,14 @@
     }
     console.log('[BOOT] i18n pronto');
 
-    const jcAvailable = await waitForJC();
-    if (!jcAvailable) {
-      console.error('[BOOT] Aborting: JC not available');
-      return;
-    }
-   console.log('[BOOT] JC disponível, iniciando...');
+    const loaderReady = await waitForCarregarEtapa();
+if (!loaderReady) {
+  console.error('[BOOT] Abortando: loader não disponível');
+  return;
+}
 
+const jcAvailable = await waitForJC();
+    
 // BOOT = iniciador oficial
 if (window.__JC_INITED__) {
   console.log('[BOOT] __JC_INITED__ já true, não chamando JC.init novamente');
@@ -57,7 +58,12 @@ window.JC.setOrder([
   'section-guia',
   'section-selfie',
   'section-card',
-  'section-perguntas',
+  'section-dados-pessoais',
+  'section-perguntas-raizes',
+  'section-perguntas-reflexoes',
+  'section-perguntas-crescimento',
+  'section-perguntas-integracao',
+  'section-perguntas-sintese',
   'section-final'
 ]);
 
