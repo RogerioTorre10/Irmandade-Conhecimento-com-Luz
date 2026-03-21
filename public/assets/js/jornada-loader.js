@@ -15,7 +15,7 @@
     filme5: '/assets/videos/filme-card-dourado.mp4',
     card: '/html/section-card.html',    
     filme6: '/assets/videos/filme-0-ao-encontro-da-jornada.mp4',
-    dados-pessoais: '/html/section-dados-pessoais.html',    
+    'dados-pessoais': '/html/section-dados-pessoais.html',    
     filme7: '/assets/videos/filme-0-ao-encontro-da-jornada.mp4',
     'perguntas-raizes': '/html/section-perguntas-raizes.html',   
     filme8: '/assets/videos/filme-1-entrando-na-jornada.mp4',
