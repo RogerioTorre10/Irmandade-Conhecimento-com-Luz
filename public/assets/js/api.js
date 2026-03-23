@@ -8,9 +8,6 @@
 (function () {
   'use strict';
 
-  // --------------------------------------------------
-  // BASE API
-  // --------------------------------------------------
   function normalizeBase(u) {
     return String(u || '').trim().replace(/\/+$/, '');
   }
@@ -27,15 +24,8 @@
   }
 
   const API_PRIMARY = pickApiBase();
-
-  // --------------------------------------------------
-  // ROTAS
-  // --------------------------------------------------
   const PDF_PATHS = ['/jornada/essencial/pdf'];
 
-  // --------------------------------------------------
-  // UTIL
-  // --------------------------------------------------
   function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
@@ -101,9 +91,6 @@
     }
   }
 
-  // --------------------------------------------------
-  // RESET COMPLETO DA JORNADA
-  // --------------------------------------------------
   function resetJornadaCompleta() {
     try {
       const keysDiretas = [
@@ -155,7 +142,6 @@
         }
       });
 
-      // limpa objetos globais usuais
       window.__JORNADA_STATE__ = null;
       window.JornadaState = null;
       window.__BLOCK_FEEDBACKS__ = {};
@@ -165,7 +151,6 @@
       window.__LAST_DEVOLUTIVA_PAYLOAD__ = null;
       window.__LAST_BLOCK_PAYLOAD__ = null;
 
-      // cancela fala
       if ('speechSynthesis' in window) {
         try { window.speechSynthesis.cancel(); } catch (_) {}
       }
@@ -183,9 +168,6 @@
     window.location.href = destino;
   }
 
-  // --------------------------------------------------
-  // NORMALIZAÇÃO DOS PAYLOADS
-  // --------------------------------------------------
   function sanitizePdfPayload(payload) {
     return {
       ...(payload || {}),
@@ -199,7 +181,6 @@
   function sanitizePerguntaPayload(payload) {
     const p = { ...(payload || {}) };
 
-    // PRIORIDADE TOTAL para a resposta atual singular
     let respostaAtual = '';
     if (typeof p.resposta === 'string' && p.resposta.trim()) {
       respostaAtual = p.resposta.trim();
@@ -209,7 +190,6 @@
       respostaAtual = p.respostaAtual.trim();
     }
 
-    // fallback opcional: draft atual em storage
     if (!respostaAtual) {
       const draftStorage =
         sessionStorage.getItem('jornada_resposta_atual') ||
@@ -221,7 +201,6 @@
       }
     }
 
-    // remove listas antigas para não contaminar a devolutiva por pergunta
     delete p.respostas;
     delete p.answers;
     delete p.respostasAnteriores;
@@ -246,7 +225,6 @@
   function sanitizeBlocoPayload(payload) {
     const p = { ...(payload || {}) };
 
-    // para bloco/final, lista de respostas é válida
     if (!Array.isArray(p.respostas)) {
       const respostasStorage =
         safeGetJSON('jornada_respostas', null) ||
@@ -261,9 +239,6 @@
     return p;
   }
 
-  // --------------------------------------------------
-  // PDF + HQ
-  // --------------------------------------------------
   async function gerarPDFEHQ(payload) {
     const safePayload = sanitizePdfPayload(payload);
 
@@ -279,13 +254,11 @@
       try {
         const { data } = await postJSON(API_PRIMARY, path, safePayload, 60000);
 
-        // PDF direto
         if (data instanceof Blob) {
           triggerDownload(data, fname);
           return { ok: true, via: 'blob' };
         }
 
-        // URL retornada pelo backend
         if (data && data.url) {
           window.open(data.url, '_blank');
           return { ok: true, via: 'url' };
@@ -300,9 +273,6 @@
     return { ok: false };
   }
 
-  // --------------------------------------------------
-  // DEVOLUTIVA (UNIFICADA)
-  // --------------------------------------------------
   async function gerarDevolutivaBase(payload, path) {
     try {
       const sanitized =
@@ -333,9 +303,6 @@
     }
   }
 
-  // --------------------------------------------------
-  // BIND OPCIONAL DO BOTÃO VOLTAR
-  // --------------------------------------------------
   function bindResetButton(selector = '[data-reset-jornada], #btn-voltar-portal, #btnVoltarPortal, #btn-voltar') {
     try {
       const btn = document.querySelector(selector);
@@ -356,9 +323,6 @@
     }
   }
 
-  // --------------------------------------------------
-  // EXPORT GLOBAL
-  // --------------------------------------------------
   window.API = window.API || {};
 
   window.API.gerarPDFEHQ = gerarPDFEHQ;
@@ -374,9 +338,6 @@
   window.API.gerarDevolutivaBloco = (payload) =>
     gerarDevolutivaBase(payload, '/jornada/devolutiva-bloco');
 
-  // --------------------------------------------------
-  // LOG
-  // --------------------------------------------------
   console.log('[API] BLINDADO OK →', API_PRIMARY);
 
 })();
