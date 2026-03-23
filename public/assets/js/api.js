@@ -1,6 +1,8 @@
 /* ============================================
 /* API.js — Irmandade Conhecimento com Luz (BLINDADO)
 /* Geração de PDF com SelfieCard + Respostas
+/* + Reset completo da jornada
+/* + Blindagem da devolutiva por pergunta
 /* ============================================ */
 
 (function () {
@@ -54,6 +56,21 @@
     return ct.includes('application/pdf');
   }
 
+  function safeGetJSON(key, fallback = null) {
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) return fallback;
+      return JSON.parse(raw);
+    } catch (_) {
+      return fallback;
+    }
+  }
+
+  function safeRemove(key) {
+    try { localStorage.removeItem(key); } catch (_) {}
+    try { sessionStorage.removeItem(key); } catch (_) {}
+  }
+
   async function postJSON(base, path, body, timeout = 60000) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeout);
@@ -85,19 +102,170 @@
   }
 
   // --------------------------------------------------
-  // PDF + HQ
+  // RESET COMPLETO DA JORNADA
   // --------------------------------------------------
-  async function gerarPDFEHQ(payload) {
+  function resetJornadaCompleta() {
+    try {
+      const keysDiretas = [
+        'jornada_respostas',
+        'jornada_resposta_atual',
+        'jornada_dados_pessoais',
+        'jornada_guia',
+        'jornada_nome',
+        'jornada_progresso',
+        'jornada_bloco_atual',
+        'jornada_pergunta_atual',
+        'jornada_devolutivas',
+        'jornada_block_feedbacks',
+        'jornada_final_feedback',
+        'jornada_card',
+        'jornada_selfie',
+        'jornada_started_at',
+        'selectedGuide',
+        'guideName',
+        'userName',
+        'currentQuestion',
+        'currentBlock',
+        'answers',
+        'answerDraft',
+        'feedbackAtual',
+        'selfieBase64',
+        'JORNADA_SELFIECARD',
+        'JORNADA_SELFIE',
+        'JORNADA_RESPOSTAS',
+        'JORNADA_DADOS',
+        'JORNADA_GUIA',
+        'JORNADA_FINAL',
+        'JORNADA_BLOCOS'
+      ];
 
-    const safePayload = {
+      keysDiretas.forEach(safeRemove);
+
+      const prefixes = ['jornada_', 'jc_', 'lumen_', 'lumem_', 'JORNADA_'];
+
+      Object.keys(localStorage).forEach((key) => {
+        if (prefixes.some((p) => key.startsWith(p))) {
+          try { localStorage.removeItem(key); } catch (_) {}
+        }
+      });
+
+      Object.keys(sessionStorage).forEach((key) => {
+        if (prefixes.some((p) => key.startsWith(p))) {
+          try { sessionStorage.removeItem(key); } catch (_) {}
+        }
+      });
+
+      // limpa objetos globais usuais
+      window.__JORNADA_STATE__ = null;
+      window.JornadaState = null;
+      window.__BLOCK_FEEDBACKS__ = {};
+      window.__FINAL_FEEDBACK__ = null;
+      window.__RESPOSTA_ATUAL__ = null;
+      window.__DEVOLUTIVA_ATUAL__ = null;
+      window.__LAST_DEVOLUTIVA_PAYLOAD__ = null;
+      window.__LAST_BLOCK_PAYLOAD__ = null;
+
+      // cancela fala
+      if ('speechSynthesis' in window) {
+        try { window.speechSynthesis.cancel(); } catch (_) {}
+      }
+
+      console.log('[API][RESET] Jornada limpa com sucesso.');
+      return true;
+    } catch (err) {
+      console.error('[API][RESET] Falha ao limpar jornada:', err);
+      return false;
+    }
+  }
+
+  function voltarELimpar(destino = '/jornadas.html') {
+    resetJornadaCompleta();
+    window.location.href = destino;
+  }
+
+  // --------------------------------------------------
+  // NORMALIZAÇÃO DOS PAYLOADS
+  // --------------------------------------------------
+  function sanitizePdfPayload(payload) {
+    return {
       ...(payload || {}),
-
-      // 🔥 GARANTE ENVIO DA SELFIE
       selfieCard:
         payload?.selfieCard ||
         localStorage.getItem('selfieBase64') ||
         null
     };
+  }
+
+  function sanitizePerguntaPayload(payload) {
+    const p = { ...(payload || {}) };
+
+    // PRIORIDADE TOTAL para a resposta atual singular
+    let respostaAtual = '';
+    if (typeof p.resposta === 'string' && p.resposta.trim()) {
+      respostaAtual = p.resposta.trim();
+    } else if (typeof p.answer === 'string' && p.answer.trim()) {
+      respostaAtual = p.answer.trim();
+    } else if (typeof p.respostaAtual === 'string' && p.respostaAtual.trim()) {
+      respostaAtual = p.respostaAtual.trim();
+    }
+
+    // fallback opcional: draft atual em storage
+    if (!respostaAtual) {
+      const draftStorage =
+        sessionStorage.getItem('jornada_resposta_atual') ||
+        localStorage.getItem('jornada_resposta_atual') ||
+        '';
+
+      if (draftStorage && draftStorage.trim()) {
+        respostaAtual = draftStorage.trim();
+      }
+    }
+
+    // remove listas antigas para não contaminar a devolutiva por pergunta
+    delete p.respostas;
+    delete p.answers;
+    delete p.respostasAnteriores;
+    delete p.respostas_bloco;
+    delete p.allAnswers;
+    delete p.historicoRespostas;
+
+    p.resposta = respostaAtual;
+
+    console.log('[API][DEVOLUTIVA][PAYLOAD_SANITIZADO]', {
+      pergunta: p.pergunta || '',
+      resposta: p.resposta || '',
+      bloco: p.bloco || p.blocoId || '',
+      guia: p.guia || '',
+      nome: p.nome || ''
+    });
+
+    window.__LAST_DEVOLUTIVA_PAYLOAD__ = p;
+    return p;
+  }
+
+  function sanitizeBlocoPayload(payload) {
+    const p = { ...(payload || {}) };
+
+    // para bloco/final, lista de respostas é válida
+    if (!Array.isArray(p.respostas)) {
+      const respostasStorage =
+        safeGetJSON('jornada_respostas', null) ||
+        safeGetJSON('JORNADA_RESPOSTAS', null);
+
+      if (Array.isArray(respostasStorage) && respostasStorage.length) {
+        p.respostas = respostasStorage;
+      }
+    }
+
+    window.__LAST_BLOCK_PAYLOAD__ = p;
+    return p;
+  }
+
+  // --------------------------------------------------
+  // PDF + HQ
+  // --------------------------------------------------
+  async function gerarPDFEHQ(payload) {
+    const safePayload = sanitizePdfPayload(payload);
 
     const fileName =
       (safePayload.nome || 'jornada')
@@ -105,7 +273,7 @@
         .replace(/[^\p{L}\p{N}_-]+/gu, '_')
         .slice(0, 40);
 
-    const fname = `${fileName}-${new Date().toISOString().slice(0,10)}.pdf`;
+    const fname = `${fileName}-${new Date().toISOString().slice(0, 10)}.pdf`;
 
     for (const path of PDF_PATHS) {
       try {
@@ -137,16 +305,22 @@
   // --------------------------------------------------
   async function gerarDevolutivaBase(payload, path) {
     try {
-      const { data } = await postJSON(API_PRIMARY, path, payload, 120000);
+      const sanitized =
+        path === '/jornada/devolutiva'
+          ? sanitizePerguntaPayload(payload)
+          : sanitizeBlocoPayload(payload);
+
+      const { data } = await postJSON(API_PRIMARY, path, sanitized, 120000);
 
       return {
         ok: true,
         texto: data?.devolutiva || data?.devolutivaBloco || '',
-        guia: data?.guia || payload?.guia || 'lumen'
+        guia: data?.guia || sanitized?.guia || 'lumen'
       };
 
     } catch (e) {
       console.warn('[API] erro devolutiva', {
+        path,
         message: e?.message,
         status: e?.status,
         body: e?.body
@@ -160,11 +334,39 @@
   }
 
   // --------------------------------------------------
+  // BIND OPCIONAL DO BOTÃO VOLTAR
+  // --------------------------------------------------
+  function bindResetButton(selector = '[data-reset-jornada], #btn-voltar-portal, #btnVoltarPortal, #btn-voltar') {
+    try {
+      const btn = document.querySelector(selector);
+      if (!btn) return false;
+
+      if (btn.__resetJornadaBound__) return true;
+      btn.__resetJornadaBound__ = true;
+
+      btn.addEventListener('click', function () {
+        console.log('[API][RESET] Clique no botão voltar detectado.');
+        resetJornadaCompleta();
+      });
+
+      return true;
+    } catch (err) {
+      console.warn('[API][RESET] Não foi possível bindar botão de reset:', err);
+      return false;
+    }
+  }
+
+  // --------------------------------------------------
   // EXPORT GLOBAL
   // --------------------------------------------------
   window.API = window.API || {};
 
   window.API.gerarPDFEHQ = gerarPDFEHQ;
+  window.API.resetJornadaCompleta = resetJornadaCompleta;
+  window.API.voltarELimpar = voltarELimpar;
+  window.API.bindResetButton = bindResetButton;
+  window.API._sanitizePerguntaPayload = sanitizePerguntaPayload;
+  window.API._sanitizeBlocoPayload = sanitizeBlocoPayload;
 
   window.API.gerarDevolutiva = (payload) =>
     gerarDevolutivaBase(payload, '/jornada/devolutiva');
