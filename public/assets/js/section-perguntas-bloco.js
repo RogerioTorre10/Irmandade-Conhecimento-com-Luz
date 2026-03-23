@@ -963,14 +963,14 @@ async function maybeHandleBlockClosure(section, bloco) {
             'Participante';
 
           const result = await requestGuideFeedbackWithFallback({
-            nome,
-            guia,
-            blocoNome: bloco?.title || bloco?.id || 'Bloco',
-            respostas: [val],
-            idioma: document.documentElement.lang || getLang() || 'pt-BR',
-            pergunta: perguntaText,
-            resposta: val
-          });
+          nome,
+          guia,
+          blocoNome: bloco?.title || bloco?.id || 'Bloco',
+          respostas: [], // força modo PERGUNTA
+          idioma: document.documentElement.lang || getLang() || 'pt-BR',
+          pergunta: perguntaText,
+          resposta: val
+        });
 
           if (result?.ok && result.texto) {
             await setGuideResponse(result.texto, result.fallbackUsed ? 'warn' : 'success');
