@@ -189,3 +189,10 @@
   }
 
 }
+@media (max-width: 768px) {
+  #section-dados-pessoais {
+    overflow-y: auto;
+    padding-bottom: 140px;
+    min-height: 100dvh;
+  }
+}
