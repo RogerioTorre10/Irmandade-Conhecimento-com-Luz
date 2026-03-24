@@ -6,11 +6,12 @@
 /* ====== WRAPPER GERAL ====== */
 .section-dados-pessoais {
   display: flex;
-  align-items: flex-start; /* 🔥 ESSENCIAL */
+  align-items: flex-start;
   justify-content: center;
-  padding: 20px 16px 120px; /* espaço para botões */
-  min-height: 100dvh;
+  padding: 20px 16px 180px;
+  min-height: 100svh;
   overflow-y: auto;
+  box-sizing: border-box;
 }
 
 /* ====== PAINEL CENTRAL ====== */
@@ -192,29 +193,58 @@
 
 }
 @media (max-width: 768px) {
-
+  #section-dados-pessoais,
   .section-dados-pessoais {
+    min-height: 100svh !important;
+    height: auto !important;
+    overflow-y: auto !important;
     align-items: flex-start !important;
-    padding-bottom: 160px !important;
-    overflow-y: auto;
+    padding: 16px 12px 190px !important;
+    box-sizing: border-box;
+    -webkit-overflow-scrolling: touch;
   }
 
   .dados-painel {
-    margin-top: 10px;
-    margin-bottom: 40px;
+    width: 100%;
+    max-width: 100%;
+    padding: 10px !important;
+    margin: 0 auto 32px !important;
   }
 
   .dados-pergaminho {
-    padding-bottom: 120px;
+    padding: 18px 12px 170px !important;
   }
 
   .dados-form {
-    padding-bottom: 120px;
+    gap: 12px !important;
+    padding-bottom: 170px !important;
+  }
+
+  .dados-input,
+  .dados-select,
+  .dados-textarea {
+    min-height: 46px;
+    font-size: 16px !important;
+  }
+
+  .dados-textarea {
+    min-height: 110px;
   }
 
   .dados-btn {
     position: sticky;
-    bottom: 10px;
-    z-index: 50;
+    bottom: calc(10px + env(safe-area-inset-bottom));
+    z-index: 60;
+    margin-top: 20px;
+    min-height: 48px;
   }
-}
+   }
+
+   html, body {
+   min-height: 100%;
+  }
+
+   body {
+   overflow-x: hidden;
+}     
+  
