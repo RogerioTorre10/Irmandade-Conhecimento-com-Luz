@@ -1466,3 +1466,11 @@ body[data-guia="arion"]{
     overflow-y: auto !important;
   }
      }
+
+   html, body {
+   min-height: 100%;
+}  
+
+   body {
+   overflow-x: hidden;
+}
