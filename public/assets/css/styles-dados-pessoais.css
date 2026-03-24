@@ -6,9 +6,11 @@
 /* ====== WRAPPER GERAL ====== */
 .section-dados-pessoais {
   display: flex;
-  align-items: center;
+  align-items: flex-start; /* 🔥 ESSENCIAL */
   justify-content: center;
-  padding: 40px 16px;
+  padding: 20px 16px 120px; /* espaço para botões */
+  min-height: 100dvh;
+  overflow-y: auto;
 }
 
 /* ====== PAINEL CENTRAL ====== */
@@ -190,9 +192,29 @@
 
 }
 @media (max-width: 768px) {
-  #section-dados-pessoais {
+
+  .section-dados-pessoais {
+    align-items: flex-start !important;
+    padding-bottom: 160px !important;
     overflow-y: auto;
-    padding-bottom: 140px;
-    min-height: 100dvh;
+  }
+
+  .dados-painel {
+    margin-top: 10px;
+    margin-bottom: 40px;
+  }
+
+  .dados-pergaminho {
+    padding-bottom: 120px;
+  }
+
+  .dados-form {
+    padding-bottom: 120px;
+  }
+
+  .dados-btn {
+    position: sticky;
+    bottom: 10px;
+    z-index: 50;
   }
 }
