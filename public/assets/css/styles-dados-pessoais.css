@@ -249,6 +249,42 @@
     /* Sombra forte para separar do conteúdo */
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.6) !important;
   }
+
+  /* LIBERA TODOS OS CONTAINERS PAI */
+  #section-dados-pessoais,
+  #section-dados-pessoais .j-panel-glow,
+  #section-dados-pessoais .j-perg-v-inner,
+  #section-dados-pessoais .j-arcane-card,
+  #section-dados-pessoais .dados-painel,
+  #section-dados-pessoais .dados-pergaminho {
+    
+    height: auto !important;
+    min-height: unset !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  /* AQUI É O PONTO CRÍTICO */
+  #section-dados-pessoais {
+    min-height: 100svh !important;
+    overflow-y: auto !important;
+    padding: 16px 12px 220px !important; /* 🔥 MAIS ESPAÇO */
+    box-sizing: border-box;
+  }
+
+  /* FORM NÃO PODE TRAVAR */
+  #section-dados-pessoais .dados-form {
+    padding-bottom: 200px !important;
+  }
+
+  /* BOTÃO FORÇADO */
+  #section-dados-pessoais .dados-btn {
+    display: block !important;
+    width: 100%;
+    min-height: 52px !important;
+    margin-top: 20px;
+  }
+
 }
 
 html, body {
