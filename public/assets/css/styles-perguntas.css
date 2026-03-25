@@ -1347,102 +1347,136 @@ body[data-guia="arion"]{
 }
 
 /* =====================================================
-   📱 MOBILE — CORREÇÃO v3: position:fixed nos botões
-   O sticky NÃO funciona quando o pai tem overflow:auto.
-   Usar fixed garante visibilidade mesmo com devolutiva.
-   ===================================================== */
+   📱 MOBILE — CORREÇÃO v4: botões fixos + devolutiva com scroll
+   FIX A10: botões sumiam (overflow cortava o conteúdo)
+   FIX A32: devolutiva longa empurrava botões para fora da tela
+   Solução: section scrollável + devolutiva max-height + botões fixed
+===================================================== */
 @media (max-width: 768px) {
-  section[id^="section-perguntas-"] {
-    min-height: 100svh !important;
-    height: auto !important;
-    overflow-y: auto !important;
-    /* padding-bottom dá espaço para o conteúdo não ficar sob os botões fixos */
-    padding: 8px 0 120px !important;
-    box-sizing: border-box;
-    -webkit-overflow-scrolling: touch;
-  }
 
-  section[id^="section-perguntas-"] .perguntas-pergaminho-wrapper,
-  section[id^="section-perguntas-"] .perguntas-panel,
-  section[id^="section-perguntas-"] .perguntas-wrap,
-  section[id^="section-perguntas-"] .parchment-rough,
-  section[id^="section-perguntas-"] .parchment-inner-rough,
-  section[id^="section-perguntas-"] .pergaminho-content,
-  section[id^="section-perguntas-"] .j-panel-glow,
-  section[id^="section-perguntas-"] .j-perg-v-inner,
-  section[id^="section-perguntas-"] .j-arcane-card {
-    min-height: unset !important;
-    height: auto !important;
-    max-height: none !important;
-    overflow: visible !important;
-  }
+section[id^="section-perguntas-"] {
+  min-height: 100svh !important;
+  height: auto !important;
+  overflow-y: auto !important;
+  /* padding-bottom = altura dos botões fixos + folga */
+  padding: 8px 0 100px !important;
+  box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
+}
 
-  section[id^="section-perguntas-"] .pergaminho-content {
-    padding-bottom: 20px !important;
-  }
+section[id^="section-perguntas-"] .perguntas-pergaminho-wrapper,
+section[id^="section-perguntas-"] .perguntas-panel,
+section[id^="section-perguntas-"] .perguntas-wrap,
+section[id^="section-perguntas-"] .parchment-rough,
+section[id^="section-perguntas-"] .parchment-inner-rough,
+section[id^="section-perguntas-"] .pergaminho-content,
+section[id^="section-perguntas-"] .j-panel-glow,
+section[id^="section-perguntas-"] .j-perg-v-inner,
+section[id^="section-perguntas-"] .j-arcane-card {
+  min-height: unset !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
 
-  section[id^="section-perguntas-"] .jp-answer-input {
-    min-height: 80px !important;
-    max-height: 120px !important;
-  }
+section[id^="section-perguntas-"] .pergaminho-content {
+  padding-bottom: 20px !important;
+}
 
-  section[id^="section-perguntas-"] .jp-ai-response-wrap {
-    margin-bottom: 10px !important;
-  }
+/* Textarea: tamanho fixo, sem crescer indefinidamente */
+section[id^="section-perguntas-"] .jp-answer-input {
+  min-height: 72px !important;
+  max-height: 110px !important;
+  resize: none !important;
+}
 
-  section[id^="section-perguntas-"] .jp-ai-response,
-  section[id^="section-perguntas-"] #jp-ai-response {
-    max-height: 150px !important;
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch;
-  }
+/* ===== FIX A32: DEVOLUTIVA com scroll interno =====
+   O texto rola DENTRO da caixa — não empurra os botões.
+*/
+section[id^="section-perguntas-"] .jp-ai-response-wrap {
+  max-height: 180px !important;
+  overflow: hidden !important;
+  margin-bottom: 8px !important;
+}
 
-  section[id^="section-perguntas-"] .jp-progress-inline {
-    margin-bottom: 10px !important;
-  }
+section[id^="section-perguntas-"] .jp-ai-response,
+section[id^="section-perguntas-"] #jp-ai-response {
+  max-height: 160px !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 215, 80, 0.5) rgba(0, 0, 0, 0.3);
+}
 
-  /* ===== BOTÕES FIXOS NO VIEWPORT ===== */
-  section[id^="section-perguntas-"] .perguntas-controls,
-  section[id^="section-perguntas-"] .jp-controls,
-  section[id^="section-perguntas-"] .jp-buttons,
-  section[id^="section-perguntas-"] .jp-actions,
-  section[id^="section-perguntas-"] .perguntas-actions {
-    position: fixed !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    z-index: 9999 !important;
-    display: grid !important;
-    grid-template-columns: repeat(4, 1fr) !important;
-    gap: 6px !important;
-    flex-wrap: nowrap !important;
-    padding: 10px 8px calc(10px + env(safe-area-inset-bottom)) !important;
-    margin: 0 !important;
-    max-width: 100% !important;
-    width: 100% !important;
-    background: linear-gradient(to top,
-      rgba(5, 8, 18, 0.98) 60%,
-      rgba(5, 8, 18, 0.85) 80%,
-      transparent 100%) !important;
-    box-sizing: border-box !important;
-  }
+section[id^="section-perguntas-"] .jp-ai-response::-webkit-scrollbar,
+section[id^="section-perguntas-"] #jp-ai-response::-webkit-scrollbar {
+  width: 4px;
+}
 
-  section[id^="section-perguntas-"] .perguntas-controls .btn-perguntas,
-  section[id^="section-perguntas-"] .jp-controls button,
-  section[id^="section-perguntas-"] .jp-buttons button,
-  section[id^="section-perguntas-"] .jp-actions button,
-  section[id^="section-perguntas-"] .perguntas-actions button,
-  section[id^="section-perguntas-"] #jp-btn-falar,
-  section[id^="section-perguntas-"] #jp-btn-mic,
-  section[id^="section-perguntas-"] #jp-btn-apagar,
-  section[id^="section-perguntas-"] #jp-btn-confirmar {
-    min-height: 44px !important;
-    height: 44px !important;
-    font-size: 11px !important;
-    padding: 4px 2px !important;
-    flex: unset !important;
-    width: 100% !important;
-  }
+section[id^="section-perguntas-"] .jp-ai-response::-webkit-scrollbar-track,
+section[id^="section-perguntas-"] #jp-ai-response::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 999px;
+}
+
+section[id^="section-perguntas-"] .jp-ai-response::-webkit-scrollbar-thumb,
+section[id^="section-perguntas-"] #jp-ai-response::-webkit-scrollbar-thumb {
+  background: rgba(255, 215, 80, 0.5);
+  border-radius: 999px;
+}
+
+section[id^="section-perguntas-"] .jp-progress-inline {
+  margin-bottom: 8px !important;
+}
+
+/* ===== BOTÕES FIXOS NO VIEWPORT =====
+   position:fixed garante visibilidade independente
+   do tamanho da devolutiva ou do scroll da página.
+*/
+section[id^="section-perguntas-"] .perguntas-controls,
+section[id^="section-perguntas-"] .jp-controls,
+section[id^="section-perguntas-"] .jp-buttons,
+section[id^="section-perguntas-"] .jp-actions,
+section[id^="section-perguntas-"] .perguntas-actions {
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 9999 !important;
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 6px !important;
+  flex-wrap: nowrap !important;
+  padding: 10px 8px calc(10px + env(safe-area-inset-bottom)) !important;
+  margin: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  background: linear-gradient(to top,
+    rgba(5, 8, 18, 0.98) 60%,
+    rgba(5, 8, 18, 0.85) 80%,
+    transparent 100%) !important;
+  box-sizing: border-box !important;
+  /* GPU layer — evita glitch no WebView Samsung */
+  transform: translateZ(0) !important;
+  -webkit-transform: translateZ(0) !important;
+}
+
+section[id^="section-perguntas-"] .perguntas-controls .btn-perguntas,
+section[id^="section-perguntas-"] .jp-controls button,
+section[id^="section-perguntas-"] .jp-buttons button,
+section[id^="section-perguntas-"] .jp-actions button,
+section[id^="section-perguntas-"] .perguntas-actions button,
+section[id^="section-perguntas-"] #jp-btn-falar,
+section[id^="section-perguntas-"] #jp-btn-mic,
+section[id^="section-perguntas-"] #jp-btn-apagar,
+section[id^="section-perguntas-"] #jp-btn-confirmar {
+  min-height: 46px !important;
+  height: 46px !important;
+  font-size: 11px !important;
+  padding: 4px 2px !important;
+  flex: unset !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 html, body {
@@ -1451,4 +1485,6 @@ html, body {
 
 body {
   overflow-x: hidden;
+}
+
 }
