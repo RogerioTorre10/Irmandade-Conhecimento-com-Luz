@@ -1410,48 +1410,62 @@ body[data-guia="arion"]{
     min-height: 100svh !important;
     height: auto !important;
     overflow-y: auto !important;
-    padding-bottom: 170px !important;
+    padding: 8px 0 160px !important;
     box-sizing: border-box;
     -webkit-overflow-scrolling: touch;
   }
 
+  section[id^="section-perguntas-"] .perguntas-pergaminho-wrapper,
+  section[id^="section-perguntas-"] .perguntas-panel,
+  section[id^="section-perguntas-"] .perguntas-wrap,
+  section[id^="section-perguntas-"] .parchment-rough,
+  section[id^="section-perguntas-"] .parchment-inner-rough,
+  section[id^="section-perguntas-"] .pergaminho-content,
   section[id^="section-perguntas-"] .j-panel-glow,
   section[id^="section-perguntas-"] .j-perg-v-inner,
-  section[id^="section-perguntas-"] .jp-wrap,
-  section[id^="section-perguntas-"] .jp-panel,
-  section[id^="section-perguntas-"] .jp-card,
-  section[id^="section-perguntas-"] .perguntas-wrap {
+  section[id^="section-perguntas-"] .j-arcane-card {
     min-height: unset !important;
     height: auto !important;
     max-height: none !important;
     overflow: visible !important;
   }
 
-  section[id^="section-perguntas-"] #jp-ai-response-wrap,
-  section[id^="section-perguntas-"] .jp-ai-response-wrap {
-    max-height: none !important;
-    overflow: visible !important;
+  section[id^="section-perguntas-"] .pergaminho-content {
+    padding-bottom: 150px !important;
   }
 
-  section[id^="section-perguntas-"] .jp-controls,
-  section[id^="section-perguntas-"] .jp-buttons,
-  section[id^="section-perguntas-"] .jp-actions,
-  section[id^="section-perguntas-"] .perguntas-actions {
+  section[id^="section-perguntas-"] .jp-answer-input {
+    min-height: 110px !important;
+    max-height: 140px !important;
+  }
+
+  section[id^="section-perguntas-"] .jp-ai-response-wrap {
+    margin-bottom: 10px !important;
+  }
+
+  section[id^="section-perguntas-"] .jp-ai-response {
+    max-height: 170px !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  section[id^="section-perguntas-"] .jp-progress-inline {
+    margin-bottom: 10px !important;
+  }
+
+  section[id^="section-perguntas-"] .perguntas-controls {
     position: sticky !important;
-    bottom: calc(8px + env(safe-area-inset-bottom));
-    z-index: 80;
+    bottom: calc(8px + env(safe-area-inset-bottom)) !important;
+    z-index: 100 !important;
     display: flex !important;
-    flex-wrap: nowrap !important;
     justify-content: center !important;
     gap: 8px !important;
+    flex-wrap: nowrap !important;
     padding: 10px 6px 12px !important;
-    background: linear-gradient(to top, rgba(5, 8, 18, 0.96), rgba(5, 8, 18, 0.45), transparent) !important;
+    background: linear-gradient(to top, rgba(5, 8, 18, 0.96), rgba(5, 8, 18, 0.55), transparent) !important;
   }
 
-  section[id^="section-perguntas-"] .jp-controls button,
-  section[id^="section-perguntas-"] .jp-buttons button,
-  section[id^="section-perguntas-"] .jp-actions button,
-  section[id^="section-perguntas-"] .perguntas-actions button,
+  section[id^="section-perguntas-"] .perguntas-controls .btn-perguntas,
   section[id^="section-perguntas-"] #jp-btn-falar,
   section[id^="section-perguntas-"] #jp-btn-mic,
   section[id^="section-perguntas-"] #jp-btn-apagar,
@@ -1459,13 +1473,7 @@ body[data-guia="arion"]{
     min-height: 46px !important;
     flex: 0 0 auto !important;
   }
-
-  section[id^="section-perguntas-"] #jp-ai-response,
-  section[id^="section-perguntas-"] .jp-ai-response {
-    max-height: 250px !important;
-    overflow-y: auto !important;
-  }
-     }
+}
 
    html, body {
    min-height: 100%;
