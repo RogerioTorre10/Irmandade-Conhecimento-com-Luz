@@ -1344,12 +1344,16 @@ body[data-guia="arion"]{
   border-radius: 999px;
   border: 1px solid rgba(0,0,0,0.18);
 }
+
+/* =====================================================
+   📱 MOBILE 768px — CORRIGIDO: position fixed nos botões
+   ===================================================== */
 @media (max-width: 768px) {
   section[id^="section-perguntas-"] {
     min-height: 100svh !important;
     height: auto !important;
     overflow-y: auto !important;
-    padding-bottom: 170px !important;
+    padding: 8px 0 100px !important;
     box-sizing: border-box;
     -webkit-overflow-scrolling: touch;
   }
@@ -1359,70 +1363,12 @@ body[data-guia="arion"]{
   section[id^="section-perguntas-"] .jp-wrap,
   section[id^="section-perguntas-"] .jp-panel,
   section[id^="section-perguntas-"] .jp-card,
-  section[id^="section-perguntas-"] .perguntas-wrap {
-    min-height: unset !important;
-    height: auto !important;
-    max-height: none !important;
-    overflow: visible !important;
-  }
-
-  section[id^="section-perguntas-"] #jp-ai-response-wrap,
-  section[id^="section-perguntas-"] .jp-ai-response-wrap {
-    max-height: none !important;
-    overflow: visible !important;
-  }
-
-  section[id^="section-perguntas-"] .jp-controls,
-  section[id^="section-perguntas-"] .jp-buttons,
-  section[id^="section-perguntas-"] .jp-actions,
-  section[id^="section-perguntas-"] .perguntas-actions {
-    position: sticky !important;
-    bottom: calc(8px + env(safe-area-inset-bottom));
-    z-index: 80;
-    display: flex !important;
-    flex-wrap: nowrap !important;
-    justify-content: center !important;
-    gap: 8px !important;
-    padding: 10px 6px 12px !important;
-    background: linear-gradient(to top, rgba(5, 8, 18, 0.96), rgba(5, 8, 18, 0.45), transparent) !important;
-  }
-
-  section[id^="section-perguntas-"] .jp-controls button,
-  section[id^="section-perguntas-"] .jp-buttons button,
-  section[id^="section-perguntas-"] .jp-actions button,
-  section[id^="section-perguntas-"] .perguntas-actions button,
-  section[id^="section-perguntas-"] #jp-btn-falar,
-  section[id^="section-perguntas-"] #jp-btn-mic,
-  section[id^="section-perguntas-"] #jp-btn-apagar,
-  section[id^="section-perguntas-"] #jp-btn-confirmar {
-    min-height: 46px !important;
-    flex: 0 0 auto !important;
-  }
-
-  section[id^="section-perguntas-"] #jp-ai-response,
-  section[id^="section-perguntas-"] .jp-ai-response {
-    max-height: 170px !important;
-    overflow-y: auto !important;
-  }
-} 
-@media (max-width: 768px) {
-  section[id^="section-perguntas-"] {
-    min-height: 100svh !important;
-    height: auto !important;
-    overflow-y: auto !important;
-    padding: 8px 0 160px !important;
-    box-sizing: border-box;
-    -webkit-overflow-scrolling: touch;
-  }
-
+  section[id^="section-perguntas-"] .perguntas-wrap,
   section[id^="section-perguntas-"] .perguntas-pergaminho-wrapper,
   section[id^="section-perguntas-"] .perguntas-panel,
-  section[id^="section-perguntas-"] .perguntas-wrap,
   section[id^="section-perguntas-"] .parchment-rough,
   section[id^="section-perguntas-"] .parchment-inner-rough,
   section[id^="section-perguntas-"] .pergaminho-content,
-  section[id^="section-perguntas-"] .j-panel-glow,
-  section[id^="section-perguntas-"] .j-perg-v-inner,
   section[id^="section-perguntas-"] .j-arcane-card {
     min-height: unset !important;
     height: auto !important;
@@ -1431,7 +1377,7 @@ body[data-guia="arion"]{
   }
 
   section[id^="section-perguntas-"] .pergaminho-content {
-    padding-bottom: 130px !important;
+    padding-bottom: 20px !important;
   }
 
   section[id^="section-perguntas-"] .jp-answer-input {
@@ -1443,7 +1389,8 @@ body[data-guia="arion"]{
     margin-bottom: 10px !important;
   }
 
-  section[id^="section-perguntas-"] .jp-ai-response {
+  section[id^="section-perguntas-"] .jp-ai-response,
+  section[id^="section-perguntas-"] #jp-ai-response {
     max-height: 170px !important;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch;
@@ -1453,32 +1400,59 @@ body[data-guia="arion"]{
     margin-bottom: 10px !important;
   }
 
+  /* CORRIGIDO: sticky → fixed (sticky nao funciona com overflow-y:auto no pai) */
   section[id^="section-perguntas-"] .perguntas-controls {
-    position: sticky !important;
-    bottom: calc(8px + env(safe-area-inset-bottom)) !important;
-    z-index: 100 !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 9999 !important;
     display: flex !important;
     justify-content: center !important;
     gap: 8px !important;
     flex-wrap: nowrap !important;
-    padding: 10px 6px 12px !important;
-    background: linear-gradient(to top, rgba(5, 8, 18, 0.96), rgba(5, 8, 18, 0.55), transparent) !important;
+    padding: 10px 6px calc(12px + env(safe-area-inset-bottom)) !important;
+    background: linear-gradient(to top, rgba(5, 8, 18, 0.98), rgba(5, 8, 18, 0.85), transparent) !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+  }
+
+  section[id^="section-perguntas-"] .jp-controls,
+  section[id^="section-perguntas-"] .jp-buttons,
+  section[id^="section-perguntas-"] .jp-actions,
+  section[id^="section-perguntas-"] .perguntas-actions {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 9999 !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    padding: 10px 6px calc(12px + env(safe-area-inset-bottom)) !important;
+    background: linear-gradient(to top, rgba(5, 8, 18, 0.98), rgba(5, 8, 18, 0.85), transparent) !important;
+    margin: 0 !important;
   }
 
   section[id^="section-perguntas-"] .perguntas-controls .btn-perguntas,
   section[id^="section-perguntas-"] #jp-btn-falar,
   section[id^="section-perguntas-"] #jp-btn-mic,
   section[id^="section-perguntas-"] #jp-btn-apagar,
-  section[id^="section-perguntas-"] #jp-btn-confirmar {
+  section[id^="section-perguntas-"] #jp-btn-confirmar,
+  section[id^="section-perguntas-"] .jp-controls button,
+  section[id^="section-perguntas-"] .jp-buttons button,
+  section[id^="section-perguntas-"] .jp-actions button,
+  section[id^="section-perguntas-"] .perguntas-actions button {
     min-height: 46px !important;
     flex: 0 0 auto !important;
   }
 }
 
-   html, body {
-   min-height: 100%;
-}  
+html, body {
+  min-height: 100%;
+}
 
-   body {
-   overflow-x: hidden;
+body {
+  overflow-x: hidden;
 }
