@@ -132,7 +132,6 @@
 
 /* =====================================================
    🎨 CORES DINÂMICAS POR GUIA
-   (herda do seu sistema de tema)
    ===================================================== */
 
 /* LUMEN */
@@ -170,7 +169,7 @@
 }
 
 /* =====================================================
-   📱 MOBILE
+   📱 MOBILE — CORRIGIDO: position: fixed no botão
    ===================================================== */
 @media (max-width: 600px) {
 
@@ -192,6 +191,7 @@
   }
 
 }
+
 @media (max-width: 768px) {
   #section-dados-pessoais,
   .section-dados-pessoais {
@@ -199,7 +199,8 @@
     height: auto !important;
     overflow-y: auto !important;
     align-items: flex-start !important;
-    padding: 16px 12px 190px !important;
+    /* ⚠️ CORRIGIDO: padding-bottom suficiente para o botão fixo não cobrir conteúdo */
+    padding: 16px 12px 100px !important;
     box-sizing: border-box;
     -webkit-overflow-scrolling: touch;
   }
@@ -212,12 +213,14 @@
   }
 
   .dados-pergaminho {
-    padding: 18px 12px 170px !important;
+    /* ⚠️ CORRIGIDO: removido padding-bottom excessivo de 170px */
+    padding: 18px 12px 24px !important;
   }
 
   .dados-form {
     gap: 12px !important;
-    padding-bottom: 170px !important;
+    /* ⚠️ CORRIGIDO: removido padding-bottom excessivo de 170px */
+    padding-bottom: 20px !important;
   }
 
   .dados-input,
@@ -231,20 +234,45 @@
     min-height: 110px;
   }
 
+  /* ⚠️ CORRIGIDO: trocado de sticky → fixed para funcionar com overflow-y: auto */
   .dados-btn {
-    position: sticky;
-    bottom: calc(10px + env(safe-area-inset-bottom));
-    z-index: 60;
-    margin-top: 20px;
-    min-height: 48px;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 9999 !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    min-height: 56px;
+    padding: 14px 20px !important;
+    /* fundo sólido para não mostrar conteúdo embaixo */
+    background: linear-gradient(135deg, #00ff9c, #00c97a) !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.6) !important;
+    /* safe-area para iPhones com notch */
+    padding-bottom: calc(14px + env(safe-area-inset-bottom)) !important;
   }
-   }
 
-   html, body {
-   min-height: 100%;
+  /* Herda cor do tema mesmo com fixed */
+  .theme-lumen .dados-btn {
+    background: linear-gradient(135deg, #00ff9c, #00c97a) !important;
+    color: #002a1a !important;
   }
 
-   body {
-   overflow-x: hidden;
-}     
-  
+  .theme-zion .dados-btn {
+    background: linear-gradient(135deg, #00cfff, #0077ff) !important;
+    color: #001b2a !important;
+  }
+
+  .theme-arion .dados-btn {
+    background: linear-gradient(135deg, #ff4fd8, #c000ff) !important;
+    color: #2a0022 !important;
+  }
+}
+
+html, body {
+  min-height: 100%;
+}
+
+body {
+  overflow-x: hidden;
+}
