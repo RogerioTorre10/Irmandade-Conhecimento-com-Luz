@@ -1456,3 +1456,93 @@ html, body {
 body {
   overflow-x: hidden;
 }
+
+
+/* =====================================================
+   MOBILE HOTFIX v2 — 4 botões visíveis e clicáveis
+   ===================================================== */
+@media (max-width: 768px) {
+  section[id^="section-perguntas-"] {
+    padding: 8px 0 calc(126px + env(safe-area-inset-bottom)) !important;
+    overflow-y: auto !important;
+    overflow-x: clip !important;
+  }
+
+  section[id^="section-perguntas-"] .pergaminho-content,
+  section[id^="section-perguntas-"] .jp-wrap,
+  section[id^="section-perguntas-"] .jp-panel,
+  section[id^="section-perguntas-"] .perguntas-wrap,
+  section[id^="section-perguntas-"] .j-arcane-card {
+    padding-bottom: 20px !important;
+  }
+
+  section[id^="section-perguntas-"] .perguntas-controls,
+  section[id^="section-perguntas-"] .jp-controls,
+  section[id^="section-perguntas-"] .jp-buttons,
+  section[id^="section-perguntas-"] .jp-actions,
+  section[id^="section-perguntas-"] .perguntas-actions {
+    position: fixed !important;
+    left: 6px !important;
+    right: 6px !important;
+    bottom: calc(8px + env(safe-area-inset-bottom)) !important;
+    width: auto !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 8px !important;
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+    align-items: stretch !important;
+    justify-content: stretch !important;
+    z-index: 9999 !important;
+    border-radius: 18px !important;
+    background: linear-gradient(to top, rgba(5, 8, 18, 0.98), rgba(5, 8, 18, 0.88)) !important;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55) !important;
+    box-sizing: border-box !important;
+  }
+
+  section[id^="section-perguntas-"] .perguntas-controls .btn-perguntas,
+  section[id^="section-perguntas-"] #jp-btn-falar,
+  section[id^="section-perguntas-"] #jp-btn-mic,
+  section[id^="section-perguntas-"] #jp-btn-apagar,
+  section[id^="section-perguntas-"] #jp-btn-confirmar,
+  section[id^="section-perguntas-"] .jp-controls button,
+  section[id^="section-perguntas-"] .jp-buttons button,
+  section[id^="section-perguntas-"] .jp-actions button,
+  section[id^="section-perguntas-"] .perguntas-actions button {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    min-height: 48px !important;
+    height: 48px !important;
+    padding: 6px 4px !important;
+    margin: 0 !important;
+    border-radius: 999px !important;
+    font-size: 11px !important;
+    line-height: 1.05 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    flex: none !important;
+    touch-action: manipulation !important;
+    box-sizing: border-box !important;
+  }
+
+  section[id^="section-perguntas-"] #jp-btn-confirmar {
+    font-size: 12px !important;
+    font-weight: 700 !important;
+  }
+
+  section[id^="section-perguntas-"] .perguntas-controls .btn-perguntas *,
+  section[id^="section-perguntas-"] .jp-controls button *,
+  section[id^="section-perguntas-"] .jp-buttons button *,
+  section[id^="section-perguntas-"] .jp-actions button *,
+  section[id^="section-perguntas-"] .perguntas-actions button * {
+    max-width: 100% !important;
+    pointer-events: none !important;
+  }
+}
