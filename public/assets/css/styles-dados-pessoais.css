@@ -276,3 +276,55 @@ html, body {
 body {
   overflow-x: hidden;
 }
+
+
+/* =====================================================
+   MOBILE HOTFIX v2 — botão acima da barra do navegador
+   ===================================================== */
+@media (max-width: 768px) {
+  #section-dados-pessoais,
+  .section-dados-pessoais {
+    padding: 16px 12px calc(118px + env(safe-area-inset-bottom)) !important;
+    overflow-y: auto !important;
+    overflow-x: clip !important;
+    align-items: flex-start !important;
+  }
+
+  #section-dados-pessoais .dados-painel,
+  .section-dados-pessoais .dados-painel {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 8px !important;
+    margin: 0 auto !important;
+  }
+
+  #section-dados-pessoais .dados-pergaminho,
+  .section-dados-pessoais .dados-pergaminho {
+    padding: 18px 12px 24px !important;
+  }
+
+  #section-dados-pessoais .dados-form,
+  .section-dados-pessoais .dados-form {
+    padding-bottom: 0 !important;
+    gap: 12px !important;
+  }
+
+  #section-dados-pessoais .dados-btn,
+  .section-dados-pessoais .dados-btn {
+    position: fixed !important;
+    left: 12px !important;
+    right: 12px !important;
+    bottom: calc(12px + env(safe-area-inset-bottom)) !important;
+    width: auto !important;
+    min-height: 58px !important;
+    margin: 0 !important;
+    padding: 16px 18px !important;
+    border-radius: 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 9999 !important;
+    touch-action: manipulation !important;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55) !important;
+  }
+}
