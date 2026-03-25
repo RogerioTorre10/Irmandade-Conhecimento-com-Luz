@@ -1401,7 +1401,7 @@ body[data-guia="arion"]{
 
   section[id^="section-perguntas-"] #jp-ai-response,
   section[id^="section-perguntas-"] .jp-ai-response {
-    max-height: 250px !important;
+    max-height: 170px !important;
     overflow-y: auto !important;
   }
 } 
