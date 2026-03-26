@@ -83,48 +83,61 @@
 }
 
 /* =====================================================
-   BOTÃO DADOS — PEDRA + AURA DO GUIA
+   BOTÃO CONTINUAR — PEDRA + AURA DO GUIA
+   força o visual no botão real da section dados
    ===================================================== */
 
-.dados-btn {
-  position: relative;
-  margin-top: 18px;
-  padding: 14px;
-  border-radius: 999px;
-  border: 1.5px solid rgba(255, 230, 160, 0.70);
-  font-size: 15px;
-  cursor: pointer;
-  font-weight: bold;
-  letter-spacing: 0.3px;
-  color: #f7f1df;
+.section-dados-pessoais .dados-btn,
+.section-dados-pessoais button.dados-btn,
+#section-dados-pessoais .dados-btn,
+#section-dados-pessoais button.dados-btn {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  min-height: 52px !important;
+  margin-top: 18px !important;
+  padding: 14px 18px !important;
+  border-radius: 999px !important;
+  border: 1.5px solid rgba(255, 230, 160, 0.72) !important;
+  color: #f7f1df !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.3px !important;
+  cursor: pointer !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
 
   background:
     linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
-    url('/assets/img/textura-de-pedra.jpg') center/cover no-repeat,
+    url('/assets/img/textura-pedra-botao.jpg') center/cover no-repeat,
     radial-gradient(circle at 30% 25%, rgba(255,255,255,0.10), transparent 45%),
-    linear-gradient(180deg, #4b4338 0%, #2b251f 52%, #171311 100%);
+    linear-gradient(180deg, #4b4338 0%, #2b251f 52%, #171311 100%) !important;
 
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,0.14),
     inset 0 -2px 6px rgba(0,0,0,0.40),
     0 0 0 1px rgba(0,0,0,0.35),
-    0 4px 12px rgba(0,0,0,0.30);
+    0 4px 12px rgba(0,0,0,0.30) !important;
 
   transition:
     transform 0.15s ease,
-    box-shadow 0.2s ease,
-    filter 0.2s ease,
-    border-color 0.2s ease;
+    box-shadow 0.20s ease,
+    filter 0.20s ease,
+    border-color 0.20s ease !important;
+
+  overflow: hidden !important;
 }
 
-/* textura fallback */
-.dados-btn::before {
+/* fallback de textura */
+.section-dados-pessoais .dados-btn::before,
+#section-dados-pessoais .dados-btn::before {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: inherit;
   pointer-events: none;
-
   background:
     radial-gradient(circle at 22% 20%, rgba(255,255,255,0.12), transparent 30%),
     radial-gradient(circle at 70% 75%, rgba(255,255,255,0.05), transparent 32%),
@@ -133,51 +146,90 @@
       rgba(255,255,255,0.02) 0 3px,
       rgba(0,0,0,0.03) 3px 6px
     );
-
   mix-blend-mode: screen;
   opacity: 0.75;
 }
 
-/* hover */
-.dados-btn:hover {
+.section-dados-pessoais .dados-btn:hover,
+#section-dados-pessoais .dados-btn:hover {
   transform: translateY(-1px);
   filter: brightness(1.08);
 }
 
-/* clique (efeito pressionado) */
-.dados-btn:active,
-.dados-btn.is-pressed {
-  transform: translateY(1px) scale(0.98);
+.section-dados-pessoais .dados-btn:active,
+.section-dados-pessoais .dados-btn.is-pressed,
+#section-dados-pessoais .dados-btn:active,
+#section-dados-pessoais .dados-btn.is-pressed {
+  transform: translateY(1px) scale(0.985);
 }
 
-/* =====================================================
-   🔥 AURA DINÂMICA DO GUIA
-   ===================================================== */
-
-.theme-lumen .dados-btn:active,
-.theme-lumen .dados-btn.is-pressed {
-  border-color: #00ff9c;
+/* AURA PELO GUIA */
+.theme-lumen .section-dados-pessoais .dados-btn,
+.theme-lumen #section-dados-pessoais .dados-btn {
   box-shadow:
-    0 0 10px rgba(0,255,156,0.35),
-    0 0 22px rgba(0,255,156,0.55);
+    inset 0 1px 0 rgba(255,255,255,0.14),
+    inset 0 -2px 6px rgba(0,0,0,0.40),
+    0 0 0 1px rgba(0,0,0,0.35),
+    0 4px 12px rgba(0,0,0,0.30),
+    0 0 12px rgba(0,255,156,0.18) !important;
 }
 
-.theme-zion .dados-btn:active,
-.theme-zion .dados-btn.is-pressed {
-  border-color: #00cfff;
+.theme-zion .section-dados-pessoais .dados-btn,
+.theme-zion #section-dados-pessoais .dados-btn {
   box-shadow:
-    0 0 10px rgba(0,180,255,0.35),
-    0 0 22px rgba(0,180,255,0.55);
+    inset 0 1px 0 rgba(255,255,255,0.14),
+    inset 0 -2px 6px rgba(0,0,0,0.40),
+    0 0 0 1px rgba(0,0,0,0.35),
+    0 4px 12px rgba(0,0,0,0.30),
+    0 0 12px rgba(0,180,255,0.18) !important;
 }
 
-.theme-arion .dados-btn:active,
-.theme-arion .dados-btn.is-pressed {
-  border-color: #ff4fd8;
+.theme-arion .section-dados-pessoais .dados-btn,
+.theme-arion #section-dados-pessoais .dados-btn,
+.theme-arian .section-dados-pessoais .dados-btn,
+.theme-arian #section-dados-pessoais .dados-btn {
   box-shadow:
-    0 0 10px rgba(255,0,200,0.35),
-    0 0 22px rgba(255,0,200,0.55);
+    inset 0 1px 0 rgba(255,255,255,0.14),
+    inset 0 -2px 6px rgba(0,0,0,0.40),
+    0 0 0 1px rgba(0,0,0,0.35),
+    0 4px 12px rgba(0,0,0,0.30),
+    0 0 12px rgba(255,0,200,0.18) !important;
 }
 
+/* ACESO AO CLICAR */
+.theme-lumen .section-dados-pessoais .dados-btn:active,
+.theme-lumen .section-dados-pessoais .dados-btn.is-pressed,
+.theme-lumen #section-dados-pessoais .dados-btn:active,
+.theme-lumen #section-dados-pessoais .dados-btn.is-pressed {
+  border-color: #00ff9c !important;
+  box-shadow:
+    0 0 10px rgba(0,255,156,0.38),
+    0 0 24px rgba(0,255,156,0.58) !important;
+}
+
+.theme-zion .section-dados-pessoais .dados-btn:active,
+.theme-zion .section-dados-pessoais .dados-btn.is-pressed,
+.theme-zion #section-dados-pessoais .dados-btn:active,
+.theme-zion #section-dados-pessoais .dados-btn.is-pressed {
+  border-color: #00cfff !important;
+  box-shadow:
+    0 0 10px rgba(0,180,255,0.38),
+    0 0 24px rgba(0,180,255,0.58) !important;
+}
+
+.theme-arion .section-dados-pessoais .dados-btn:active,
+.theme-arion .section-dados-pessoais .dados-btn.is-pressed,
+.theme-arion #section-dados-pessoais .dados-btn:active,
+.theme-arion #section-dados-pessoais .dados-btn.is-pressed,
+.theme-arian .section-dados-pessoais .dados-btn:active,
+.theme-arian .section-dados-pessoais .dados-btn.is-pressed,
+.theme-arian #section-dados-pessoais .dados-btn:active,
+.theme-arian #section-dados-pessoais .dados-btn.is-pressed {
+  border-color: #ff4fd8 !important;
+  box-shadow:
+    0 0 10px rgba(255,0,200,0.38),
+    0 0 24px rgba(255,0,200,0.58) !important;
+}
 /* =====================================================
    MOBILE
    ===================================================== */
@@ -195,50 +247,61 @@
   filter: brightness(1.08);
 }
 
-
-  .section-dados-pessoais {
-    padding-bottom: 160px !important;   /* espaço extra para botão fixo */
+.section-dados-pessoais {
+ padding-bottom: 160px !important;   /* espaço extra para botão fixo */
   }
-
- .dados-btn {
-  position: relative;
-  margin-top: 18px;
-  padding: 14px;
-  border-radius: 999px;
-  border: 1.5px solid rgba(255, 230, 160, 0.70);
-  font-size: 15px;
-  cursor: pointer;
-  font-weight: bold;
-  letter-spacing: 0.3px;
-  color: #f7f1df;
+ 
+.section-dados-pessoais .dados-btn,
+.section-dados-pessoais button.dados-btn,
+#section-dados-pessoais .dados-btn,
+#section-dados-pessoais button.dados-btn {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  min-height: 52px !important;
+  margin-top: 18px !important;
+  padding: 14px 18px !important;
+  border-radius: 999px !important;
+  border: 1.5px solid rgba(255, 230, 160, 0.72) !important;
+  color: #f7f1df !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.3px !important;
+  cursor: pointer !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
 
   background:
     linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
-    url('/assets/img/textura-de-pedra.jpg') center/cover no-repeat,
+    url('/assets/img/textura-pedra-botao.jpg') center/cover no-repeat,
     radial-gradient(circle at 30% 25%, rgba(255,255,255,0.10), transparent 45%),
-    linear-gradient(180deg, #4b4338 0%, #2b251f 52%, #171311 100%);
+    linear-gradient(180deg, #4b4338 0%, #2b251f 52%, #171311 100%) !important;
 
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,0.14),
     inset 0 -2px 6px rgba(0,0,0,0.40),
     0 0 0 1px rgba(0,0,0,0.35),
-    0 4px 12px rgba(0,0,0,0.30);
+    0 4px 12px rgba(0,0,0,0.30) !important;
 
   transition:
     transform 0.15s ease,
-    box-shadow 0.2s ease,
-    filter 0.2s ease,
-    border-color 0.2s ease;
+    box-shadow 0.20s ease,
+    filter 0.20s ease,
+    border-color 0.20s ease !important;
+
+  overflow: hidden !important;
 }
 
-/* textura fallback */
-.dados-btn::before {
+/* fallback de textura */
+.section-dados-pessoais .dados-btn::before,
+#section-dados-pessoais .dados-btn::before {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: inherit;
   pointer-events: none;
-
   background:
     radial-gradient(circle at 22% 20%, rgba(255,255,255,0.12), transparent 30%),
     radial-gradient(circle at 70% 75%, rgba(255,255,255,0.05), transparent 32%),
@@ -247,49 +310,89 @@
       rgba(255,255,255,0.02) 0 3px,
       rgba(0,0,0,0.03) 3px 6px
     );
-
   mix-blend-mode: screen;
   opacity: 0.75;
 }
 
-/* hover */
-.dados-btn:hover {
+.section-dados-pessoais .dados-btn:hover,
+#section-dados-pessoais .dados-btn:hover {
   transform: translateY(-1px);
   filter: brightness(1.08);
 }
 
-/* clique (efeito pressionado) */
-.dados-btn:active,
-.dados-btn.is-pressed {
-  transform: translateY(1px) scale(0.98);
+.section-dados-pessoais .dados-btn:active,
+.section-dados-pessoais .dados-btn.is-pressed,
+#section-dados-pessoais .dados-btn:active,
+#section-dados-pessoais .dados-btn.is-pressed {
+  transform: translateY(1px) scale(0.985);
 }
 
-/* =====================================================
-   🔥 AURA DINÂMICA DO GUIA
-   ===================================================== */
-
-.theme-lumen .dados-btn:active,
-.theme-lumen .dados-btn.is-pressed {
-  border-color: #00ff9c;
+/* AURA PELO GUIA */
+.theme-lumen .section-dados-pessoais .dados-btn,
+.theme-lumen #section-dados-pessoais .dados-btn {
   box-shadow:
-    0 0 10px rgba(0,255,156,0.35),
-    0 0 22px rgba(0,255,156,0.55);
+    inset 0 1px 0 rgba(255,255,255,0.14),
+    inset 0 -2px 6px rgba(0,0,0,0.40),
+    0 0 0 1px rgba(0,0,0,0.35),
+    0 4px 12px rgba(0,0,0,0.30),
+    0 0 12px rgba(0,255,156,0.18) !important;
 }
 
-.theme-zion .dados-btn:active,
-.theme-zion .dados-btn.is-pressed {
-  border-color: #00cfff;
+.theme-zion .section-dados-pessoais .dados-btn,
+.theme-zion #section-dados-pessoais .dados-btn {
   box-shadow:
-    0 0 10px rgba(0,180,255,0.35),
-    0 0 22px rgba(0,180,255,0.55);
+    inset 0 1px 0 rgba(255,255,255,0.14),
+    inset 0 -2px 6px rgba(0,0,0,0.40),
+    0 0 0 1px rgba(0,0,0,0.35),
+    0 4px 12px rgba(0,0,0,0.30),
+    0 0 12px rgba(0,180,255,0.18) !important;
 }
 
-.theme-arion .dados-btn:active,
-.theme-arion .dados-btn.is-pressed {
-  border-color: #ff4fd8;
+.theme-arion .section-dados-pessoais .dados-btn,
+.theme-arion #section-dados-pessoais .dados-btn,
+.theme-arian .section-dados-pessoais .dados-btn,
+.theme-arian #section-dados-pessoais .dados-btn {
   box-shadow:
-    0 0 10px rgba(255,0,200,0.35),
-    0 0 22px rgba(255,0,200,0.55);
+    inset 0 1px 0 rgba(255,255,255,0.14),
+    inset 0 -2px 6px rgba(0,0,0,0.40),
+    0 0 0 1px rgba(0,0,0,0.35),
+    0 4px 12px rgba(0,0,0,0.30),
+    0 0 12px rgba(255,0,200,0.18) !important;
+}
+
+/* ACESO AO CLICAR */
+.theme-lumen .section-dados-pessoais .dados-btn:active,
+.theme-lumen .section-dados-pessoais .dados-btn.is-pressed,
+.theme-lumen #section-dados-pessoais .dados-btn:active,
+.theme-lumen #section-dados-pessoais .dados-btn.is-pressed {
+  border-color: #00ff9c !important;
+  box-shadow:
+    0 0 10px rgba(0,255,156,0.38),
+    0 0 24px rgba(0,255,156,0.58) !important;
+}
+
+.theme-zion .section-dados-pessoais .dados-btn:active,
+.theme-zion .section-dados-pessoais .dados-btn.is-pressed,
+.theme-zion #section-dados-pessoais .dados-btn:active,
+.theme-zion #section-dados-pessoais .dados-btn.is-pressed {
+  border-color: #00cfff !important;
+  box-shadow:
+    0 0 10px rgba(0,180,255,0.38),
+    0 0 24px rgba(0,180,255,0.58) !important;
+}
+
+.theme-arion .section-dados-pessoais .dados-btn:active,
+.theme-arion .section-dados-pessoais .dados-btn.is-pressed,
+.theme-arion #section-dados-pessoais .dados-btn:active,
+.theme-arion #section-dados-pessoais .dados-btn.is-pressed,
+.theme-arian .section-dados-pessoais .dados-btn:active,
+.theme-arian .section-dados-pessoais .dados-btn.is-pressed,
+.theme-arian #section-dados-pessoais .dados-btn:active,
+.theme-arian #section-dados-pessoais .dados-btn.is-pressed {
+  border-color: #ff4fd8 !important;
+  box-shadow:
+    0 0 10px rgba(255,0,200,0.38),
+    0 0 24px rgba(255,0,200,0.58) !important;
 }
 }
 
@@ -302,6 +405,49 @@
   .dados-input,
   .dados-select {
     font-size: 15px;
+  }
+}
+
+/* =====================================================
+   3 SELECTS NA MESMA LINHA
+   Faixa etária - Estado civil - Filhos
+   ===================================================== */
+
+/* ajuste o seletor do wrapper para pegar o grupo real */
+.section-dados-pessoais .dados-form .dados-linha-tripla,
+#section-dados-pessoais .dados-form .dados-linha-tripla,
+.section-dados-pessoais .dados-form .dados-row-3,
+#section-dados-pessoais .dados-form .dados-row-3 {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr 1fr !important;
+  gap: 8px !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+/* se os selects estiverem soltos no mesmo grupo */
+.section-dados-pessoais .dados-select,
+#section-dados-pessoais .dados-select {
+  width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* MOBILE continua lado a lado */
+@media (max-width: 768px) {
+  .section-dados-pessoais .dados-form .dados-linha-tripla,
+  #section-dados-pessoais .dados-form .dados-linha-tripla,
+  .section-dados-pessoais .dados-form .dados-row-3,
+  #section-dados-pessoais .dados-form .dados-row-3 {
+    grid-template-columns: 1fr 1fr 1fr !important;
+    gap: 6px !important;
+  }
+
+  .section-dados-pessoais .dados-select,
+  #section-dados-pessoais .dados-select {
+    font-size: 13px !important;
+    min-height: 40px !important;
+    padding: 6px 8px !important;
   }
 }
 
