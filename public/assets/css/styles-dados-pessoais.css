@@ -191,13 +191,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: min(100%, 260px);
-  min-height: 54px;
-  padding: 14px 20px;
+  width: min(100%, 180px);
+  min-height: 42px;
+  padding: 10px 16px;
   border-radius: 999px;
   border: 1.5px solid rgba(255, 230, 160, 0.72);
   color: #f7f1df;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.3px;
   cursor: pointer;
@@ -300,12 +300,13 @@
   }
 
   #section-dados-pessoais #btn-dp-continuar {
-    width: 100%;
-    min-height: 52px;
-    position: sticky;
-    bottom: calc(10px + env(safe-area-inset-bottom));
-    z-index: 70;
-  }
+  width: min(100%, 180px);
+  min-height: 42px;
+  position: sticky;
+  bottom: calc(6px + env(safe-area-inset-bottom));
+  z-index: 70;
+  margin: 8px auto 0 !important;
+}
 }
 /* =====================================================
    MOBILE
