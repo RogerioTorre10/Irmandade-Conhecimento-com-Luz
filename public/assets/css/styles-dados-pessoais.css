@@ -269,7 +269,7 @@
   #section-dados-pessoais {
     min-height: 100svh !important;
     overflow-y: auto !important;
-    padding: 16px 12px 220px !important;
+    padding: 10px 10px 90px !important;
     box-sizing: border-box;
     -webkit-overflow-scrolling: touch;
   }
@@ -285,7 +285,7 @@
   }
 
   #section-dados-pessoais .form-grid {
-    padding-bottom: 190px !important;
+    padding-bottom: 70px !important;
   }
 
   #section-dados-pessoais .dados-linha-tripla {
