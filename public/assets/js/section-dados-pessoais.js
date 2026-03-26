@@ -6,9 +6,7 @@
   const SECTION_ID = 'section-dados-pessoais';
   const STORAGE_KEY = 'JORNADA_DADOS_PESSOAIS';
 
-  const VIDEO_BACK = '/assets/videos/filme-0-ao-encontro-da-jornada.mp4';
   const VIDEO_NEXT = '/assets/videos/filme-0-ao-encontro-da-jornada.mp4';
-  const PREV_SECTION_ID = 'section-card';
   const NEXT_SECTION_ID = 'section-perguntas-raizes';
 
   if (window.__DADOS_PESSOAIS_BOUND__) {
@@ -22,8 +20,8 @@
   }
 
   function $(sel, root = document) {
-  if (!root || typeof root.querySelector !== 'function') return null;
-  return root.querySelector(sel);
+    if (!root || typeof root.querySelector !== 'function') return null;
+    return root.querySelector(sel);
   }
 
   function loadData() {
@@ -75,7 +73,7 @@
     };
 
     Object.entries(map).forEach(([sel, val]) => {
-      const el = $(root, sel);
+      const el = $(sel, root);
       if (el && typeof val === 'string') el.value = val;
     });
   }
@@ -92,7 +90,7 @@
     if (!el) return;
     el.textContent = msg || '';
     el.dataset.kind = type;
-    el.style.display = msg ? 'block' : 'block';
+    el.style.display = msg ? 'block' : 'none';
   }
 
   function navigateTo(sectionId, videoSrc) {
@@ -114,27 +112,51 @@
     console.warn(`[${MOD}] nenhum controller disponível para navegar até ${sectionId}`);
   }
 
+  function aplicarEfeitoBotao(root) {
+    const botoes = root.querySelectorAll('.dados-btn');
+
+    botoes.forEach((btn) => {
+      // mobile touch
+      btn.addEventListener('touchstart', () => {
+        btn.classList.add('is-pressed');
+      }, { passive: true });
+
+      btn.addEventListener('touchend', () => {
+        btn.classList.remove('is-pressed');
+      });
+
+      btn.addEventListener('touchcancel', () => {
+        btn.classList.remove('is-pressed');
+      });
+
+      // desktop
+      btn.addEventListener('mousedown', () => {
+        btn.classList.add('is-pressed');
+      });
+
+      btn.addEventListener('mouseup', () => {
+        btn.classList.remove('is-pressed');
+      });
+
+      btn.addEventListener('mouseleave', () => {
+        btn.classList.remove('is-pressed');
+      });
+    });
+  }
+
   function bind(root) {
     if (root.__DADOS_PESSOAIS_BINDED__) return;
     root.__DADOS_PESSOAIS_BINDED__ = true;
 
     const btnNext = $('#btn-dp-continuar', root);
-    const btnBack = $('#btn-dp-voltar', root);
 
+    // auto save
     root.addEventListener('input', () => {
       saveData(collect(root));
       setStatus(root, '');
     });
 
-    if (btnBack) {
-      btnBack.addEventListener('click', (ev) => {
-        ev.preventDefault();
-        ev.stopPropagation();
-        saveData(collect(root));
-        navigateTo(PREV_SECTION_ID, VIDEO_BACK);
-      });
-    }
-
+    // botão continuar
     if (btnNext) {
       btnNext.addEventListener('click', (ev) => {
         ev.preventDefault();
@@ -150,15 +172,21 @@
 
         saveData(data);
         setStatus(root, '✅ Dados salvos com sucesso.', 'ok');
+
         navigateTo(NEXT_SECTION_ID, VIDEO_NEXT);
       });
     }
+
+    // 🔥 aplica efeito visual
+    aplicarEfeitoBotao(root);
   }
 
   function init(root) {
     if (!root) return;
+
     hydrate(root, loadData());
     bind(root);
+
     log('inicializado com sucesso');
   }
 
@@ -177,4 +205,5 @@
     const root = document.getElementById(SECTION_ID);
     if (root) init(root);
   });
+
 })();
