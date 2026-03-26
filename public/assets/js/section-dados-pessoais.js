@@ -113,36 +113,34 @@
   }
 
   function aplicarEfeitoBotao(root) {
-    const botoes = root.querySelectorAll('.dados-btn');
+  const botoes = root.querySelectorAll('#btn-dp-continuar');
 
-    botoes.forEach((btn) => {
-      // mobile touch
-      btn.addEventListener('touchstart', () => {
-        btn.classList.add('is-pressed');
-      }, { passive: true });
+  botoes.forEach((btn) => {
+    btn.addEventListener('touchstart', () => {
+      btn.classList.add('is-pressed');
+    }, { passive: true });
 
-      btn.addEventListener('touchend', () => {
-        btn.classList.remove('is-pressed');
-      });
-
-      btn.addEventListener('touchcancel', () => {
-        btn.classList.remove('is-pressed');
-      });
-
-      // desktop
-      btn.addEventListener('mousedown', () => {
-        btn.classList.add('is-pressed');
-      });
-
-      btn.addEventListener('mouseup', () => {
-        btn.classList.remove('is-pressed');
-      });
-
-      btn.addEventListener('mouseleave', () => {
-        btn.classList.remove('is-pressed');
-      });
+    btn.addEventListener('touchend', () => {
+      btn.classList.remove('is-pressed');
     });
-  }
+
+    btn.addEventListener('touchcancel', () => {
+      btn.classList.remove('is-pressed');
+    });
+
+    btn.addEventListener('mousedown', () => {
+      btn.classList.add('is-pressed');
+    });
+
+    btn.addEventListener('mouseup', () => {
+      btn.classList.remove('is-pressed');
+    });
+
+    btn.addEventListener('mouseleave', () => {
+      btn.classList.remove('is-pressed');
+    });
+  });
+}
 
   function bind(root) {
     if (root.__DADOS_PESSOAIS_BINDED__) return;
