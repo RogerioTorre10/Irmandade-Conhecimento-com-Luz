@@ -1,17 +1,18 @@
 /* =====================================================
    SECTION DADOS PESSOAIS — IRMANDADE COM LUZ
-   Versão Mobile Corrigida - 25/03/2026
+   Versão Corrigida e Otimizada - 26/03/2026
    ===================================================== */
 
 .section-dados-pessoais {
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: 20px 16px 140px;   /* ← Aumentado para dar espaço ao botão fixo */
+  padding: 20px 16px 180px;   /* Mais espaço para botão sticky */
   min-height: 100svh;
   overflow-y: auto;
   box-sizing: border-box;
   -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
 }
 
 /* ====== PAINEL CENTRAL ====== */
@@ -27,7 +28,7 @@
 .dados-pergaminho {
   background: url('/assets/img/pergaminho-rasgado-vert.png') center/cover no-repeat;
   border-radius: 14px;
-  padding: 28px 20px 40px;   /* ← mais padding inferior */
+  padding: 28px 20px 60px;   /* Mais espaço inferior */
   position: relative;
 }
 
@@ -63,12 +64,14 @@
   background: rgba(10, 10, 10, 0.55);
   border: 1px solid rgba(255, 215, 150, 0.25);
   border-radius: 10px;
-  padding: 10px 12px;
+  padding: 12px 14px;
   color: #fff;
-  font-size: 15px;           /* ← importante para mobile */
+  font-size: 15px;
   outline: none;
   transition: all 0.2s ease;
   min-height: 48px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .dados-input:focus,
@@ -83,10 +86,9 @@
 }
 
 /* =====================================================
-   SECTION DADOS PESSOAIS — AJUSTE REAL PELO HTML
+   REGRAS ESPECÍFICAS DO HTML (prioridade alta)
    ===================================================== */
 
-/* painel principal */
 #section-dados-pessoais .j-panel-glow {
   width: 100%;
   max-width: 720px;
@@ -101,8 +103,8 @@
 #section-dados-pessoais .pergaminho-content {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 12px 10px 18px;
+  gap: 12px;
+  padding: 16px 12px 24px;
 }
 
 /* título e texto */
@@ -112,21 +114,21 @@
   text-shadow:
     0 0 10px var(--guia-soft, rgba(0,255,156,0.28)),
     0 0 24px var(--guia-strong, rgba(0,255,156,0.55));
-  margin: 0 0 4px;
+  margin: 0 0 8px;
 }
 
 #section-dados-pessoais .intro-text {
   text-align: center;
   color: #f1ead7;
-  margin: 0 0 8px;
-  line-height: 1.45;
+  margin: 0 0 12px;
+  line-height: 1.5;
 }
 
 /* grid do formulário */
 #section-dados-pessoais .form-grid {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
 /* inputs e textarea */
@@ -139,7 +141,8 @@
   border: 1.5px solid color-mix(in srgb, var(--guia-main, #00ff9c) 45%, rgba(255,255,255,0.18));
   border-radius: 14px;
   color: #f6f2e8;
-  padding: 10px 12px;
+  padding: 12px 14px;
+  font-size: 15px;
   outline: none;
   box-shadow:
     inset 0 0 18px rgba(255,255,255,0.02),
@@ -156,25 +159,28 @@
 #section-dados-pessoais textarea:focus {
   border-color: var(--guia-main, #00ff9c);
   box-shadow:
-    0 0 12px var(--guia-soft, rgba(0,255,156,0.28)),
-    0 0 26px color-mix(in srgb, var(--guia-main, #00ff9c) 22%, transparent);
+    0 0 14px var(--guia-soft, rgba(0,255,156,0.35)),
+    0 0 28px color-mix(in srgb, var(--guia-main, #00ff9c) 25%, transparent);
 }
 
-/* linha tripla */
-#section-dados-pessoais .dados-linha-tripla {
+/* linha tripla (faixa etária - estado civil - filhos) */
+#section-dados-pessoais .dados-linha-tripla,
+#section-dados-pessoais .dados-row-3 {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 8px;
+  gap: 10px;
   width: 100%;
 }
 
-#section-dados-pessoais .dados-linha-tripla select {
+#section-dados-pessoais .dados-linha-tripla select,
+#section-dados-pessoais .dados-row-3 select {
   min-width: 0;
+  font-size: 14px;
 }
 
-/* textarea */
+/* textarea observações */
 #section-dados-pessoais #dp-observacoes {
-  min-height: 82px;
+  min-height: 90px;
   resize: vertical;
 }
 
@@ -182,47 +188,42 @@
 #section-dados-pessoais .final-acoes {
   display: flex;
   justify-content: center;
-  margin-top: 8px;
+  margin-top: 16px;
+  padding-bottom: 20px;
 }
 
-/* BOTÃO CONTINUAR REAL */
+/* BOTÃO CONTINUAR - STICKY MELHORADO */
 #section-dados-pessoais #btn-dp-continuar {
-  position: relative;
+  position: sticky;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  z-index: 100;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: min(100%, 180px);
-  min-height: 42px;
-  padding: 10px 16px;
+  width: min(100%, 220px);
+  min-height: 48px;
+  margin: 12px auto 0;
+  padding: 12px 20px;
   border-radius: 999px;
   border: 1.5px solid rgba(255, 230, 160, 0.72);
   color: #f7f1df;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.4px;
   cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
-  overflow: hidden;
-
   background:
     linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
     url('/assets/img/textura-de-pedra.jpg') center/cover no-repeat,
     radial-gradient(circle at 30% 25%, rgba(255,255,255,0.10), transparent 45%),
     linear-gradient(180deg, #4b4338 0%, #2b251f 52%, #171311 100%);
-
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,0.14),
-    inset 0 -2px 6px rgba(0,0,0,0.40),
+    inset 0 -2px 8px rgba(0,0,0,0.45),
     0 0 0 1px rgba(0,0,0,0.35),
-    0 4px 12px rgba(0,0,0,0.30),
-    0 0 12px color-mix(in srgb, var(--guia-main, #00ff9c) 18%, transparent);
-
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.20s ease,
-    filter 0.20s ease,
-    border-color 0.20s ease;
+    0 5px 15px rgba(0,0,0,0.35),
+    0 0 14px color-mix(in srgb, var(--guia-main, #00ff9c) 20%, transparent);
+  transition: all 0.2s ease;
+  overflow: hidden;
 }
 
 #section-dados-pessoais #btn-dp-continuar::before {
@@ -230,309 +231,98 @@
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  pointer-events: none;
   background:
-    radial-gradient(circle at 22% 20%, rgba(255,255,255,0.12), transparent 30%),
-    radial-gradient(circle at 70% 75%, rgba(255,255,255,0.05), transparent 32%),
-    repeating-linear-gradient(
-      135deg,
-      rgba(255,255,255,0.02) 0 3px,
-      rgba(0,0,0,0.03) 3px 6px
-    );
+    radial-gradient(circle at 22% 20%, rgba(255,255,255,0.14), transparent 35%),
+    radial-gradient(circle at 70% 75%, rgba(255,255,255,0.06), transparent 40%),
+    repeating-linear-gradient(135deg, rgba(255,255,255,0.03) 0 3px, rgba(0,0,0,0.04) 3px 6px);
   mix-blend-mode: screen;
-  opacity: 0.75;
+  opacity: 0.8;
+  pointer-events: none;
 }
 
 #section-dados-pessoais #btn-dp-continuar:hover {
-  transform: translateY(-1px);
-  filter: brightness(1.08);
+  transform: translateY(-2px);
+  filter: brightness(1.1);
 }
 
 #section-dados-pessoais #btn-dp-continuar:active,
 #section-dados-pessoais #btn-dp-continuar.is-pressed {
-  transform: translateY(1px) scale(0.985);
+  transform: translateY(2px) scale(0.97);
   border-color: var(--guia-main, #00ff9c);
-  box-shadow:
-    0 0 10px var(--guia-soft, rgba(0,255,156,0.35)),
-    0 0 24px var(--guia-strong, rgba(0,255,156,0.58));
+  box-shadow: 0 0 12px var(--guia-soft, rgba(0,255,156,0.4)), 0 0 26px var(--guia-strong, rgba(0,255,156,0.65));
 }
 
 /* status */
 #section-dados-pessoais .status-box {
-  margin-top: 10px;
+  margin-top: 12px;
   text-align: center;
   color: #f3ead7;
+  font-size: 14px;
 }
 
-/* mobile */
-@media (max-width: 768px) {
-  #section-dados-pessoais {
-    min-height: 100svh !important;
-    overflow-y: auto !important;
-    padding: 10px 10px 90px !important;
-    box-sizing: border-box;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  #section-dados-pessoais .j-panel-glow,
-  #section-dados-pessoais .j-perg-v-inner,
-  #section-dados-pessoais .j-arcane-card,
-  #section-dados-pessoais .pergaminho-content {
-    height: auto !important;
-    min-height: unset !important;
-    max-height: none !important;
-    overflow: visible !important;
-  }
-
-  #section-dados-pessoais .form-grid {
-    padding-bottom: 70px !important;
-  }
-
-  #section-dados-pessoais .dados-linha-tripla {
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 5px;
-  }
-
-  #section-dados-pessoais .dados-linha-tripla select {
-    font-size: 12px;
-    min-height: 36px;
-    padding: 4px 6px;
-  }
-
-  #section-dados-pessoais #btn-dp-continuar {
-  width: min(100%, 180px);
-  min-height: 42px;
-  position: sticky;
-  bottom: calc(6px + env(safe-area-inset-bottom));
-  z-index: 70;
-  margin: 8px auto 0 !important;
-}
-}
 /* =====================================================
-   MOBILE
+   MOBILE — AJUSTES FORTES
    ===================================================== */
 
 @media (max-width: 768px) {
-  .dados-btn {
-    width: 100%;
-    min-height: 52px;
-    font-size: 16px;
+  #section-dados-pessoais {
+    padding: 12px 12px 160px !important;
+    min-height: 100svh !important;
   }
 
-/* Hover no desktop */
-.dados-btn:hover {
-  transform: translateY(-2px);
-  filter: brightness(1.08);
-}
-
-.section-dados-pessoais {
- padding-bottom: 160px !important;   /* espaço extra para botão fixo */
+  #section-dados-pessoais .form-grid,
+  #section-dados-pessoais .pergaminho-content {
+    padding-bottom: 80px !important;
   }
- 
-.section-dados-pessoais .dados-btn,
-.section-dados-pessoais button.dados-btn,
-#section-dados-pessoais .dados-btn,
-#section-dados-pessoais button.dados-btn {
-  position: relative !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 100% !important;
-  min-height: 52px !important;
-  margin-top: 18px !important;
-  padding: 14px 18px !important;
-  border-radius: 999px !important;
-  border: 1.5px solid rgba(255, 230, 160, 0.72) !important;
-  color: #f7f1df !important;
-  font-size: 16px !important;
-  font-weight: 700 !important;
-  letter-spacing: 0.3px !important;
-  cursor: pointer !important;
-  appearance: none !important;
-  -webkit-appearance: none !important;
 
-  background:
-    linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
-    url('/assets/img/textura-de-pedra.jpg') center/cover no-repeat,
-    radial-gradient(circle at 30% 25%, rgba(255,255,255,0.10), transparent 45%),
-    linear-gradient(180deg, #4b4338 0%, #2b251f 52%, #171311 100%) !important;
+  #section-dados-pessoais .dados-linha-tripla,
+  #section-dados-pessoais .dados-row-3 {
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
 
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.14),
-    inset 0 -2px 6px rgba(0,0,0,0.40),
-    0 0 0 1px rgba(0,0,0,0.35),
-    0 4px 12px rgba(0,0,0,0.30) !important;
+  #section-dados-pessoais .dados-linha-tripla select,
+  #section-dados-pessoais .dados-row-3 select {
+    font-size: 13px;
+    min-height: 42px;
+    padding: 8px 10px;
+  }
 
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.20s ease,
-    filter 0.20s ease,
-    border-color 0.20s ease !important;
-
-  overflow: hidden !important;
+  /* Botão sticky reforçado */
+  #section-dados-pessoais #btn-dp-continuar {
+    bottom: calc(8px + env(safe-area-inset-bottom));
+    width: min(92%, 200px);
+    min-height: 50px;
+    font-size: 15.5px;
+    margin: 16px auto 0;
+  }
 }
 
-/* fallback de textura */
-.section-dados-pessoais .dados-btn::before,
-#section-dados-pessoais .dados-btn::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at 22% 20%, rgba(255,255,255,0.12), transparent 30%),
-    radial-gradient(circle at 70% 75%, rgba(255,255,255,0.05), transparent 32%),
-    repeating-linear-gradient(
-      135deg,
-      rgba(255,255,255,0.02) 0 3px,
-      rgba(0,0,0,0.03) 3px 6px
-    );
-  mix-blend-mode: screen;
-  opacity: 0.75;
-}
-
-.section-dados-pessoais .dados-btn:hover,
-#section-dados-pessoais .dados-btn:hover {
-  transform: translateY(-1px);
-  filter: brightness(1.08);
-}
-
-.section-dados-pessoais .dados-btn:active,
-.section-dados-pessoais .dados-btn.is-pressed,
-#section-dados-pessoais .dados-btn:active,
-#section-dados-pessoais .dados-btn.is-pressed {
-  transform: translateY(1px) scale(0.985);
-}
-
-/* AURA PELO GUIA */
-.theme-lumen .section-dados-pessoais .dados-btn,
-.theme-lumen #section-dados-pessoais .dados-btn {
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.14),
-    inset 0 -2px 6px rgba(0,0,0,0.40),
-    0 0 0 1px rgba(0,0,0,0.35),
-    0 4px 12px rgba(0,0,0,0.30),
-    0 0 12px rgba(0,255,156,0.18) !important;
-}
-
-.theme-zion .section-dados-pessoais .dados-btn,
-.theme-zion #section-dados-pessoais .dados-btn {
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.14),
-    inset 0 -2px 6px rgba(0,0,0,0.40),
-    0 0 0 1px rgba(0,0,0,0.35),
-    0 4px 12px rgba(0,0,0,0.30),
-    0 0 12px rgba(0,180,255,0.18) !important;
-}
-
-.theme-arion .section-dados-pessoais .dados-btn,
-.theme-arion #section-dados-pessoais .dados-btn,
-.theme-arian .section-dados-pessoais .dados-btn,
-.theme-arian #section-dados-pessoais .dados-btn {
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.14),
-    inset 0 -2px 6px rgba(0,0,0,0.40),
-    0 0 0 1px rgba(0,0,0,0.35),
-    0 4px 12px rgba(0,0,0,0.30),
-    0 0 12px rgba(255,0,200,0.18) !important;
-}
-
-/* ACESO AO CLICAR */
-.theme-lumen .section-dados-pessoais .dados-btn:active,
-.theme-lumen .section-dados-pessoais .dados-btn.is-pressed,
-.theme-lumen #section-dados-pessoais .dados-btn:active,
-.theme-lumen #section-dados-pessoais .dados-btn.is-pressed {
-  border-color: #00ff9c !important;
-  box-shadow:
-    0 0 10px rgba(0,255,156,0.38),
-    0 0 24px rgba(0,255,156,0.58) !important;
-}
-
-.theme-zion .section-dados-pessoais .dados-btn:active,
-.theme-zion .section-dados-pessoais .dados-btn.is-pressed,
-.theme-zion #section-dados-pessoais .dados-btn:active,
-.theme-zion #section-dados-pessoais .dados-btn.is-pressed {
-  border-color: #00cfff !important;
-  box-shadow:
-    0 0 10px rgba(0,180,255,0.38),
-    0 0 24px rgba(0,180,255,0.58) !important;
-}
-
-.theme-arion .section-dados-pessoais .dados-btn:active,
-.theme-arion .section-dados-pessoais .dados-btn.is-pressed,
-.theme-arion #section-dados-pessoais .dados-btn:active,
-.theme-arion #section-dados-pessoais .dados-btn.is-pressed,
-.theme-arian .section-dados-pessoais .dados-btn:active,
-.theme-arian .section-dados-pessoais .dados-btn.is-pressed,
-.theme-arian #section-dados-pessoais .dados-btn:active,
-.theme-arian #section-dados-pessoais .dados-btn.is-pressed {
-  border-color: #ff4fd8 !important;
-  box-shadow:
-    0 0 10px rgba(255,0,200,0.38),
-    0 0 24px rgba(255,0,200,0.58) !important;
-}
-}
-
-/* Ajustes finos para telas muito pequenas */
+/* Ajustes para telas muito pequenas */
 @media (max-width: 360px) {
   .dados-titulo {
     font-size: 24px;
   }
   
-  .dados-input,
-  .dados-select {
-    font-size: 15px;
+  #section-dados-pessoais input,
+  #section-dados-pessoais select,
+  #section-dados-pessoais textarea {
+    font-size: 14.5px;
+    padding: 10px 12px;
   }
 }
 
-/* =====================================================
-   3 SELECTS NA MESMA LINHA
-   Faixa etária - Estado civil - Filhos
-   ===================================================== */
-
-/* ajuste o seletor do wrapper para pegar o grupo real */
-.section-dados-pessoais .dados-form .dados-linha-tripla,
-#section-dados-pessoais .dados-form .dados-linha-tripla,
-.section-dados-pessoais .dados-form .dados-row-3,
-#section-dados-pessoais .dados-form .dados-row-3 {
-  display: grid !important;
-  grid-template-columns: 1fr 1fr 1fr !important;
-  gap: 8px !important;
-  align-items: center !important;
+/* Botões genéricos da seção (caso use .dados-btn) */
+.section-dados-pessoais .dados-btn,
+#section-dados-pessoais .dados-btn {
   width: 100% !important;
+  min-height: 52px !important;
+  font-size: 16px !important;
+  margin-top: 20px !important;
 }
 
-/* se os selects estiverem soltos no mesmo grupo */
-.section-dados-pessoais .dados-select,
-#section-dados-pessoais .dados-select {
-  width: 100% !important;
-  min-width: 0 !important;
-  box-sizing: border-box !important;
-}
-
-/* MOBILE continua lado a lado */
-@media (max-width: 768px) {
-  .section-dados-pessoais .dados-form .dados-linha-tripla,
-  #section-dados-pessoais .dados-form .dados-linha-tripla,
-  .section-dados-pessoais .dados-form .dados-row-3,
-  #section-dados-pessoais .dados-form .dados-row-3 {
-    grid-template-columns: 1fr 1fr 1fr !important;
-    gap: 6px !important;
-  }
-
-  .section-dados-pessoais .dados-select,
-  #section-dados-pessoais .dados-select {
-    font-size: 13px !important;
-    min-height: 40px !important;
-    padding: 6px 8px !important;
-  }
-}
-
+/* Evita overflow horizontal global */
 html, body {
   min-height: 100%;
-}
-
-body {
   overflow-x: hidden;
 }
