@@ -1,327 +1,159 @@
 /* =====================================================
    SECTION DADOS PESSOAIS — IRMANDADE COM LUZ
-   Versão Corrigida e Otimizada - 26/03/2026
+   Versão Otimizada para Android Antigo (A10) - 26/03/2026
    ===================================================== */
 
 .section-dados-pessoais {
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: 20px 16px 180px;   /* Mais espaço para botão sticky */
+  padding: 20px 16px 220px !important;   /* Muito mais espaço embaixo */
   min-height: 100svh;
-  overflow-y: auto;
+  overflow-y: auto !important;
   box-sizing: border-box;
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
 }
 
-/* ====== PAINEL CENTRAL ====== */
-.dados-painel {
-  width: 100%;
-  max-width: 720px;
-  border-radius: 18px;
-  padding: 24px 16px;
-  position: relative;
-}
-
-/* ====== PERGAMINHO INTERNO ====== */
-.dados-pergaminho {
-  background: url('/assets/img/pergaminho-rasgado-vert.png') center/cover no-repeat;
-  border-radius: 14px;
-  padding: 28px 20px 60px;   /* Mais espaço inferior */
-  position: relative;
-}
-
-/* ====== TÍTULO E SUBTÍTULO ====== */
-.dados-titulo {
-  font-family: 'Berkshire Swash', cursive;
-  font-size: 28px;
-  text-align: center;
-  margin-bottom: 10px;
-  color: #f5e6c8;
-  text-shadow: 0 0 8px rgba(255, 215, 150, 0.4);
-}
-
-.dados-subtitulo {
-  text-align: center;
-  font-size: 15px;
-  color: #e0d2b0;
-  margin-bottom: 24px;
-  opacity: 0.9;
-}
-
-/* ====== FORM ====== */
-.dados-form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-/* ====== INPUTS E SELECTS ====== */
-.dados-input,
-.dados-select,
-.dados-textarea {
-  background: rgba(10, 10, 10, 0.55);
-  border: 1px solid rgba(255, 215, 150, 0.25);
-  border-radius: 10px;
-  padding: 12px 14px;
-  color: #fff;
-  font-size: 15px;
-  outline: none;
-  transition: all 0.2s ease;
-  min-height: 48px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.dados-input:focus,
-.dados-select:focus {
-  border-color: rgba(255, 215, 150, 0.6);
-  box-shadow: 0 0 12px rgba(255, 215, 150, 0.35);
-}
-
-.dados-textarea {
-  min-height: 110px;
-  resize: vertical;
-}
-
-/* =====================================================
-   REGRAS ESPECÍFICAS DO HTML (prioridade alta)
-   ===================================================== */
-
+/* Painel e pergaminho */
+.dados-painel,
 #section-dados-pessoais .j-panel-glow {
   width: 100%;
   max-width: 720px;
   margin: 0 auto;
 }
 
-#section-dados-pessoais .j-arcane-card {
-  border-radius: 28px;
-  padding: 18px;
-}
-
-#section-dados-pessoais .pergaminho-content {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 16px 12px 24px;
-}
-
-/* título e texto */
-#section-dados-pessoais h1.typing-text {
-  text-align: center;
-  color: var(--guia-main, #00ff9c);
-  text-shadow:
-    0 0 10px var(--guia-soft, rgba(0,255,156,0.28)),
-    0 0 24px var(--guia-strong, rgba(0,255,156,0.55));
-  margin: 0 0 8px;
-}
-
-#section-dados-pessoais .intro-text {
-  text-align: center;
-  color: #f1ead7;
-  margin: 0 0 12px;
-  line-height: 1.5;
-}
-
-/* grid do formulário */
+#section-dados-pessoais .pergaminho-content,
 #section-dados-pessoais .form-grid {
   display: flex;
   flex-direction: column;
   gap: 14px;
+  padding-bottom: 100px !important;   /* espaço extra para o formulário */
 }
 
-/* inputs e textarea */
+/* Inputs e Textarea - mais visíveis */
 #section-dados-pessoais input,
 #section-dados-pessoais select,
 #section-dados-pessoais textarea {
-  width: 100%;
+  width: 100% !important;
   box-sizing: border-box;
-  background: rgba(5, 8, 18, 0.82);
-  border: 1.5px solid color-mix(in srgb, var(--guia-main, #00ff9c) 45%, rgba(255,255,255,0.18));
+  background: rgba(5, 8, 18, 0.85);
+  border: 1.8px solid color-mix(in srgb, var(--guia-main, #00ff9c) 50%, rgba(255,255,255,0.2));
   border-radius: 14px;
   color: #f6f2e8;
-  padding: 12px 14px;
+  padding: 13px 14px;
   font-size: 15px;
-  outline: none;
-  box-shadow:
-    inset 0 0 18px rgba(255,255,255,0.02),
-    0 0 10px color-mix(in srgb, var(--guia-main, #00ff9c) 14%, transparent);
+  min-height: 48px;
+  margin-bottom: 4px;
 }
 
-#section-dados-pessoais input::placeholder,
-#section-dados-pessoais textarea::placeholder {
-  color: rgba(246, 242, 232, 0.68);
+#section-dados-pessoais #dp-observacoes {
+  min-height: 110px !important;     /* maior textarea */
+  resize: vertical;
 }
 
-#section-dados-pessoais input:focus,
-#section-dados-pessoais select:focus,
-#section-dados-pessoais textarea:focus {
-  border-color: var(--guia-main, #00ff9c);
-  box-shadow:
-    0 0 14px var(--guia-soft, rgba(0,255,156,0.35)),
-    0 0 28px color-mix(in srgb, var(--guia-main, #00ff9c) 25%, transparent);
-}
-
-/* linha tripla (faixa etária - estado civil - filhos) */
+/* Linha tripla */
 #section-dados-pessoais .dados-linha-tripla,
 #section-dados-pessoais .dados-row-3 {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 10px;
-  width: 100%;
+  gap: 8px;
 }
 
-#section-dados-pessoais .dados-linha-tripla select,
-#section-dados-pessoais .dados-row-3 select {
-  min-width: 0;
-  font-size: 14px;
-}
+/* ==================== BOTÃO CONTINUAR ==================== */
+/* Solução robusta para Android antigo: usamos position: fixed como fallback */
 
-/* textarea observações */
-#section-dados-pessoais #dp-observacoes {
-  min-height: 90px;
-  resize: vertical;
-}
-
-/* ações */
-#section-dados-pessoais .final-acoes {
-  display: flex;
-  justify-content: center;
-  margin-top: 16px;
-  padding-bottom: 20px;
-}
-
-/* BOTÃO CONTINUAR - STICKY MELHORADO */
 #section-dados-pessoais #btn-dp-continuar {
-  position: sticky;
-  bottom: calc(12px + env(safe-area-inset-bottom));
-  z-index: 100;
+  position: fixed !important;           /* fixed é mais confiável no A10 */
+  bottom: 12px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  z-index: 9999 !important;
+  
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: min(100%, 220px);
-  min-height: 48px;
-  margin: 12px auto 0;
+  width: min(92%, 220px);
+  min-height: 52px;
   padding: 12px 20px;
   border-radius: 999px;
-  border: 1.5px solid rgba(255, 230, 160, 0.72);
+  border: 1.8px solid rgba(255, 230, 160, 0.8);
   color: #f7f1df;
-  font-size: 15px;
+  font-size: 15.5px;
   font-weight: 700;
   letter-spacing: 0.4px;
   cursor: pointer;
+  text-align: center;
+
   background:
-    linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
-    url('/assets/img/textura-de-pedra.jpg') center/cover no-repeat,
-    radial-gradient(circle at 30% 25%, rgba(255,255,255,0.10), transparent 45%),
-    linear-gradient(180deg, #4b4338 0%, #2b251f 52%, #171311 100%);
+    linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.03)),
+    url('/assets/img/textura-de-pedra.jpg') center/cover,
+    linear-gradient(180deg, #4b4338 0%, #2b251f 50%, #171311 100%);
+
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.14),
-    inset 0 -2px 8px rgba(0,0,0,0.45),
-    0 0 0 1px rgba(0,0,0,0.35),
-    0 5px 15px rgba(0,0,0,0.35),
-    0 0 14px color-mix(in srgb, var(--guia-main, #00ff9c) 20%, transparent);
+    0 4px 15px rgba(0,0,0,0.5),
+    0 0 15px color-mix(in srgb, var(--guia-main, #00ff9c) 30%, transparent) !important;
+
   transition: all 0.2s ease;
-  overflow: hidden;
-}
-
-#section-dados-pessoais #btn-dp-continuar::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background:
-    radial-gradient(circle at 22% 20%, rgba(255,255,255,0.14), transparent 35%),
-    radial-gradient(circle at 70% 75%, rgba(255,255,255,0.06), transparent 40%),
-    repeating-linear-gradient(135deg, rgba(255,255,255,0.03) 0 3px, rgba(0,0,0,0.04) 3px 6px);
-  mix-blend-mode: screen;
-  opacity: 0.8;
-  pointer-events: none;
-}
-
-#section-dados-pessoais #btn-dp-continuar:hover {
-  transform: translateY(-2px);
-  filter: brightness(1.1);
 }
 
 #section-dados-pessoais #btn-dp-continuar:active,
 #section-dados-pessoais #btn-dp-continuar.is-pressed {
-  transform: translateY(2px) scale(0.97);
-  border-color: var(--guia-main, #00ff9c);
-  box-shadow: 0 0 12px var(--guia-soft, rgba(0,255,156,0.4)), 0 0 26px var(--guia-strong, rgba(0,255,156,0.65));
+  transform: translateX(-50%) translateY(3px) scale(0.96) !important;
+  box-shadow: 0 0 20px rgba(0,255,156,0.6) !important;
 }
 
-/* status */
+/* Hover só no desktop */
+@media (hover: hover) {
+  #section-dados-pessoais #btn-dp-continuar:hover {
+    filter: brightness(1.12);
+    transform: translateX(-50%) translateY(-2px) !important;
+  }
+}
+
+/* Status e outros */
 #section-dados-pessoais .status-box {
-  margin-top: 12px;
+  margin-top: 16px;
   text-align: center;
   color: #f3ead7;
-  font-size: 14px;
 }
 
 /* =====================================================
-   MOBILE — AJUSTES FORTES
+   MOBILE - Reforço para Androids antigos
    ===================================================== */
 
 @media (max-width: 768px) {
-  #section-dados-pessoais {
-    padding: 12px 12px 160px !important;
-    min-height: 100svh !important;
+  .section-dados-pessoais {
+    padding-bottom: 240px !important;
   }
 
-  #section-dados-pessoais .form-grid,
-  #section-dados-pessoais .pergaminho-content {
-    padding-bottom: 80px !important;
+  #section-dados-pessoais .pergaminho-content,
+  #section-dados-pessoais .form-grid {
+    padding-bottom: 140px !important;
   }
 
-  #section-dados-pessoais .dados-linha-tripla,
-  #section-dados-pessoais .dados-row-3 {
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 8px;
-  }
-
-  #section-dados-pessoais .dados-linha-tripla select,
-  #section-dados-pessoais .dados-row-3 select {
-    font-size: 13px;
-    min-height: 42px;
-    padding: 8px 10px;
-  }
-
-  /* Botão sticky reforçado */
-  #section-dados-pessoais #btn-dp-continuar {
-    bottom: calc(8px + env(safe-area-inset-bottom));
-    width: min(92%, 200px);
-    min-height: 50px;
-    font-size: 15.5px;
-    margin: 16px auto 0;
+  #section-dados-pessoais .dados-linha-tripla select {
+    font-size: 13.5px;
+    padding: 9px 8px;
   }
 }
 
-/* Ajustes para telas muito pequenas */
+/* Telas muito pequenas */
 @media (max-width: 360px) {
-  .dados-titulo {
-    font-size: 24px;
-  }
-  
   #section-dados-pessoais input,
   #section-dados-pessoais select,
   #section-dados-pessoais textarea {
     font-size: 14.5px;
-    padding: 10px 12px;
+    padding: 11px 12px;
+  }
+  
+  #section-dados-pessoais #btn-dp-continuar {
+    min-height: 50px;
+    font-size: 15px;
   }
 }
 
-/* Botões genéricos da seção (caso use .dados-btn) */
-.section-dados-pessoais .dados-btn,
-#section-dados-pessoais .dados-btn {
-  width: 100% !important;
-  min-height: 52px !important;
-  font-size: 16px !important;
-  margin-top: 20px !important;
-}
-
-/* Evita overflow horizontal global */
+/* Evita problemas globais */
 html, body {
   min-height: 100%;
   overflow-x: hidden;
