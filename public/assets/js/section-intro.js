@@ -144,7 +144,7 @@
       console.warn('[SyncText] Erro:', e);
     }
   }
- function buildLangModal(root) {
+function buildLangModal(root) {
   const modal = document.createElement('div');
   modal.id = 'intro-lang-modal';
 
@@ -152,7 +152,6 @@
     <div class="intro-lang-backdrop"></div>
     <div class="intro-lang-card" role="dialog" aria-modal="true" aria-labelledby="intro-lang-title">
       <h3 id="intro-lang-title" class="intro-lang-title">Escolha seu idioma</h3>
-
       <p class="intro-lang-sub">
         Selecione o idioma para navegar. Após confirmar, não será possível alterar.
       </p>
@@ -175,66 +174,52 @@
     </div>
   `;
 
-  root.appendChild(modal);
-}
-
-  // CSS atualizado e otimizado para desktop + mobile
   const style = document.createElement('style');
   style.textContent = `
     #intro-lang-modal {
       position: fixed;
       inset: 0;
-      z-index: 10000;
+      z-index: 99999;
       display: flex;
       align-items: center;
       justify-content: center;
-      pointer-events: auto;
     }
 
     #intro-lang-modal .intro-lang-backdrop {
       position: absolute;
       inset: 0;
-      background: rgba(0,0,0,0.75);
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
+      background: rgba(0, 0, 0, 0.68);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
     }
 
     #intro-lang-modal .intro-lang-card {
       position: relative;
-      width: min(92vw, 480px);
-      max-height: 90vh;
-      overflow-y: auto;
-      border-radius: 20px;
-      padding: 24px 20px 20px;
-      border: 1px solid rgba(212,175,55,0.6);
-      background: rgba(10,10,18,0.85);
-      box-shadow: 0 0 40px rgba(212,175,55,0.4), inset 0 0 20px rgba(255,230,150,0.15);
-      color: #f6e7c6;
+      z-index: 1;
+      width: min(92vw, 420px);
+      padding: 18px 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(212,175,55,.65);
+      background:
+        linear-gradient(180deg, rgba(8,10,18,.92), rgba(12,16,26,.94));
+      box-shadow:
+        0 0 22px rgba(212,175,55,.18),
+        inset 0 0 0 1px rgba(255,255,255,.04);
+      color: #f5e7b0;
       text-align: center;
-      font-family: "Cardo", serif;
-      transform: scale(1);
-      transition: transform 0.3s ease;
-    }
-
-    @media (max-width: 480px) {
-      #intro-lang-modal .intro-lang-card {
-        width: 94vw;
-        padding: 20px 16px 16px;
-        border-radius: 16px;
-      }
     }
 
     #intro-lang-modal .intro-lang-title {
       margin: 0 0 8px;
       font-size: 1.3rem;
-      letter-spacing: 0.08em;
+      letter-spacing: .03em;
       font-family: "ManufacturingConsent-Regular", "Cardo", serif;
     }
 
     #intro-lang-modal .intro-lang-sub {
       margin: 0 0 16px;
-      font-size: 0.95rem;
-      opacity: 0.95;
+      font-size: .95rem;
+      opacity: .95;
       line-height: 1.4;
     }
 
@@ -246,13 +231,15 @@
       width: 100%;
       padding: 12px 16px;
       border-radius: 12px;
-      border: 1px solid rgba(212,175,55,0.6);
-      background: rgba(0,0,0,0.45);
-      color: #f6e7c6;
+      border: 1px solid rgba(212,175,55,.6);
+      background: rgba(0,0,0,.45);
+      color: #f5e7b0;
       font-size: 1rem;
       outline: none;
       appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23d4af37' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 4 4-4' stroke='%23d4af37' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
       background-repeat: no-repeat;
       background-position: right 12px center;
       background-size: 12px;
@@ -268,14 +255,53 @@
       font-size: 1.1rem;
     }
 
-    /* Trava scroll do fundo enquanto modal aberto */
     body:has(#intro-lang-modal) {
       overflow: hidden;
     }
   `;
-  modal.appendChild(style);
 
+  modal.appendChild(style);
   return modal;
+}
+
+async function requireLanguageChoice(root) {
+  if (isLangLocked()) {
+    console.log('[IntroLang] Idioma já travado, prosseguindo.');
+    return getCurrentLang();
+  }
+
+  let modal = document.getElementById('intro-lang-modal');
+  if (!modal) {
+    modal = buildLangModal(root || document.body);
+    (root || document.body).appendChild(modal);
+  }
+
+  const select = modal.querySelector('#intro-lang-select');
+  const confirm = modal.querySelector('#intro-lang-confirm');
+
+  return new Promise((resolve) => {
+    confirm.onclick = async () => {
+      const chosen = select?.value || 'pt-BR';
+
+      try {
+        if (window.i18n?.setLang) {
+          await window.i18n.setLang(chosen, true);
+        } else {
+          localStorage.setItem('i18n_lang', chosen);
+          localStorage.setItem('i18n_locked', '1');
+          sessionStorage.setItem('jornada.lang', chosen);
+          sessionStorage.setItem('i18n.lang', chosen);
+          document.documentElement.setAttribute('lang', chosen);
+          document.documentElement.setAttribute('data-lang', chosen);
+        }
+      } catch (e) {
+        console.warn('[IntroLang] Falha ao definir idioma:', e);
+      }
+
+      modal.remove();
+      resolve(chosen);
+    };
+  });
 }
   async function requireLanguageChoice(root) {
     if (isLangLocked()) {
