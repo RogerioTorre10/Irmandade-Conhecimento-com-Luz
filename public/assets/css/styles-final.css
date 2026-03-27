@@ -809,3 +809,50 @@ body[data-guia="arion"] #section-final{
     font-size: 11px !important;
   }
 }
+/* ==========================================
+   FINAL — CORRIGE DESALINHAMENTO À DIREITA
+   ========================================== */
+
+#section-final {
+  overflow-x: hidden !important;
+}
+
+/* centraliza TODOS os containers internos */
+#section-final .j-panel-glow,
+#section-final .j-perg-v-inner,
+#section-final .j-arcane-card,
+#section-final .final-panel,
+#section-final .final-wrap,
+#section-final .pergaminho-content {
+  box-sizing: border-box !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  transform: none !important;
+}
+
+/* controla largura do painel */
+#section-final .j-panel-glow {
+  width: min(92vw, 680px) !important;
+  max-width: 92vw !important;
+}
+
+/* garante que nada estoure horizontal */
+#section-final .pergaminho-content {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* ajuste mobile fino */
+@media (max-width: 768px) {
+
+  #section-final {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  #section-final .j-panel-glow {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+}
