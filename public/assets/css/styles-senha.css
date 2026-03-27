@@ -368,3 +368,49 @@
     gap: 8px !important;
   }
 }
+/* ==========================================
+   SECTION SENHA — CORRIGE DESLOCAMENTO À DIREITA
+   ========================================== */
+
+#section-senha,
+#section-senha .j-panel-glow,
+#section-senha .j-perg-v-inner,
+#section-senha .j-arcane-card,
+#section-senha .pergaminho-content {
+  box-sizing: border-box !important;
+}
+
+#section-senha {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+#section-senha .j-panel-glow {
+  width: min(92vw, 680px) !important;
+  max-width: 92vw !important;
+  margin: 0 auto !important;
+  transform: none !important;
+}
+
+#section-senha .j-perg-v-inner,
+#section-senha .j-arcane-card {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  transform: none !important;
+}
+
+@media (max-width: 768px) {
+  #section-senha {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+
+  #section-senha .j-panel-glow {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+  }
+}
