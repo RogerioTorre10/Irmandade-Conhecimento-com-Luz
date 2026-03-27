@@ -375,37 +375,37 @@ async function requireLanguageChoice(root) {
 let __I18N_APPLY_LOCK__ = 0;
 
 async function applyGlobalI18n(node) {
-  const now = Date.now();
-  if (now - __I18N_APPLY_LOCK__ < 250) return;
-  __I18N_APPLY_LOCK__ = now;
+    const now = Date.now();
+    if (now - __I18N_APPLY_LOCK__ < 250) return;
+    __I18N_APPLY_LOCK__ = now;
 
-  if (isLangLocked() && window.i18n?.apply) {
-    try {
-      const lang = localStorage.getItem('i18n_lang');
-      if (lang && window.i18n?.forceLang) {
-        await window.i18n.forceLang(lang, true);
-      }
+    if (isLangLocked() && window.i18n?.apply) {
+        try {
+            const lang = localStorage.getItem('i18n_lang');
+            if (lang && window.i18n?.forceLang) {
+                await window.i18n.forceLang(lang, true);
+            }
+        } catch (e) {
+            // silently ignore
+        }
+    }
 
-      window.i18n.apply(node || document);
+    window.i18n.apply(node || document);
 
-      const targetName =
+    const targetName =
         (node && node.nodeType === 9)
-          ? 'document'
-          : (node?.id || node?.tagName || 'unknown');
+            ? 'document'
+            : (node?.id || node?.tagName || 'unknown');
 
-      if (targetName !== 'unknown') {
+    if (targetName !== 'unknown') {
         window.__GLOBAL_I18N_LOG_ONCE__ = window.__GLOBAL_I18N_LOG_ONCE__ || {};
-        const logKey = `${lang || 'na'}::${targetName}`;
+        const logKey = `${lang || 'na'}:${targetName}`;
 
         if (!window.__GLOBAL_I18N_LOG_ONCE__[logKey]) {
-          window.__GLOBAL_I18N_LOG_ONCE__[logKey] = true;
-          console.log('[GlobalI18n] Aplicado em', targetName);
+            window.__GLOBAL_I18N_LOG_ONCE__[logKey] = true;
+            console.log('[GlobalI18n] Aplicado em', targetName);
         }
-      }
-    } catch (e) {
-      console.warn('[GlobalI18n] Erro:', e);
     }
-  }
 }
   async function init(root) {
     if (!root || window.JCIntro.state.initialized) return;
