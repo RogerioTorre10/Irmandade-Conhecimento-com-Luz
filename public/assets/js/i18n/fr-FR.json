@@ -1,0 +1,45 @@
+{
+  "intro.title": "Journée Essentielle",
+  "intro.start": "Commencer",
+  "intro.language": "Choisissez votre langue",
+
+  "termos.title": "Termes et Conditions",
+  "termos.accept": "J'accepte",
+
+  "senha.title": "Accès sécurisé",
+  "senha.placeholder": "Entrez votre mot de passe",
+  "senha.button": "Continuer",
+
+  "dados.title": "Données personnelles",
+  "dados.subtitle": "Partagez quelques informations pour enrichir votre retour",
+  "dados.nome": "Nom complet",
+  "dados.cidade": "Ville",
+  "dados.estado": "État",
+  "dados.profissao": "Profession",
+  "dados.religiao": "Religion",
+  "dados.continuar": "Continuer",
+
+  "selfie.title": "Prenez votre photo",
+  "selfie.instrucao": "{nome}, éloignez le téléphone et positionnez votre visage. {guia} vous guidera.",
+  "selfie.preview": "Aperçu",
+  "selfie.capture": "Capturer",
+  "selfie.iniciar": "Démarrer",
+  "selfie.confirmar": "Confirmer",
+  "selfie.pular": "Passer",
+
+  "perguntas.placeholder": "Tapez votre réponse ici...",
+  "perguntas.devolutiva": "Retour du Guide",
+  "perguntas.continuar": "Continuer",
+
+  "final.titulo": "Merci d'avoir parcouru le chemin avec la Lumière",
+  "final.mensagem1": "Vos réponses ont été reçues avec honneur par la Fraternité.",
+  "final.mensagem2": "Vous avez semé des graines de confiance, de courage et de lumière.",
+  "final.mensagem3": "Continuez à avancer. Le chemin ne finit jamais.",
+  "final.mensagem4": "Revenez quand vous aurez besoin de raviver la flamme.",
+  "final.mensagem5": "Vous êtes la lumière. Vous êtes le changement.",
+
+  "final.pdf": "PDF",
+  "final.selfie": "Selfie Card",
+  "final.voltar": "Retour",
+  "final.enviar": "Envoyer à nouveau"
+}
