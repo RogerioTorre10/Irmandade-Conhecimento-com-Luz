@@ -770,7 +770,40 @@ body[data-guia="arion"] .perguntas-controls .btn-perguntas {
   0%   { box-shadow: 0 0 15px var(--progress-main), 0 0 30px var(--progress-glow-1), 0 0 50px var(--progress-glow-2); }
   100% { box-shadow: 0 0 25px var(--progress-main), 0 0 50px var(--progress-glow-1), 0 0 80px var(--progress-glow-2); }
 }
+/* ==========================================
+   PERGUNTAS — SCROLL GLOBAL (SEM SCROLL INTERNO)
+   ========================================== */
 
+@media (max-width: 900px) {
+
+  section[id^="section-perguntas-"] {
+    min-height: 100vh !important;
+    height: auto !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding-bottom: 30px !important;
+  }
+
+  /* REMOVE scroll da devolutiva */
+  section[id^="section-perguntas-"] .jp-ai-response,
+  section[id^="section-perguntas-"] #jp-ai-response {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  /* remove limite da caixa */
+  section[id^="section-perguntas-"] .jp-ai-response-wrap,
+  section[id^="section-perguntas-"] .box-devolutiva {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  /* espaço final para não cortar botão */
+  section[id^="section-perguntas-"] .pergaminho-content {
+    padding-bottom: 40px !important;
+  }
+
+}
 
 /* ============================
    MOBILE (≤ 700px)
@@ -1423,4 +1456,38 @@ html, body{
 
 body{
   overflow-x: hidden;
+}
+/* ==========================================
+   PERGUNTAS — SCROLL GLOBAL (SEM SCROLL INTERNO)
+   ========================================== */
+
+@media (max-width: 768px) {
+
+  section[id^="section-perguntas-"] {
+    min-height: 100vh !important;
+    height: auto !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding-bottom: 30px !important;
+  }
+
+  /* REMOVE scroll da devolutiva */
+  section[id^="section-perguntas-"] .jp-ai-response,
+  section[id^="section-perguntas-"] #jp-ai-response {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  /* remove limite da caixa */
+  section[id^="section-perguntas-"] .jp-ai-response-wrap,
+  section[id^="section-perguntas-"] .box-devolutiva {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  /* espaço final para não cortar botão */
+  section[id^="section-perguntas-"] .pergaminho-content {
+    padding-bottom: 40px !important;
+  }
+
 }
