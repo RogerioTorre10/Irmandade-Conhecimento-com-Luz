@@ -126,21 +126,38 @@
     if (videoEl) videoEl.srcObject = null;
   }
 
-  function capture() {
+    function capture() {
     const canvas = canvasEl;
     const video = videoEl;
     const ctx = canvas.getContext('2d');
-    const w = canvas.parentElement.clientWidth;
-    const h = canvas.parentElement.clientHeight;
 
-    canvas.width = w; canvas.height = h;
+    const frame = canvas.parentElement;
+    const w = frame.clientWidth;
+    const h = frame.clientHeight;
 
-    const scale = FINAL_ZOOM;
-    const sw = w / scale, sh = h / scale;
-    const sx = (video.videoWidth - sw) / 2;
-    const sy = (video.videoHeight - sh) / 2;
+    canvas.width = w;
+    canvas.height = h;
 
-    ctx.drawImage(video, sx, sy, sw, sh, 0, 0, w, h);
+    const all = zoomState.all || FINAL_ZOOM;
+    const zx = zoomState.x || 1;
+    const zy = zoomState.y || 1;
+
+    const scaleX = all * zx;
+    const scaleY = all * zy;
+
+    const sourceW = video.videoWidth / scaleX;
+    const sourceH = video.videoHeight / scaleY;
+
+    const sx = Math.max(0, (video.videoWidth - sourceW) / 2);
+    const sy = Math.max(0, (video.videoHeight - sourceH) / 2);
+
+    ctx.clearRect(0, 0, w, h);
+    ctx.drawImage(
+      video,
+      sx, sy, sourceW, sourceH,
+      0, 0, w, h
+    );
+
     lastCapture = canvas.toDataURL('image/jpeg', 0.92);
 
     videoEl.style.display = 'none';
