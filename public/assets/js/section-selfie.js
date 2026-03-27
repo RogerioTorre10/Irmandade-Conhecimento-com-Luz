@@ -9,6 +9,8 @@
   const NEXT_SECTION_ID = 'section-card';
   const VIDEO_SRC = '/assets/videos/filme-card-dourado.mp4';
   const FINAL_ZOOM = 0.65;
+    let zoomState = {all: FINAL_ZOOM, x: 1, y: 1
+  };
 
   let stream = null, videoEl, canvasEl, previewImg;
   let lastCapture = null;
