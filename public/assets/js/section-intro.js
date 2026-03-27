@@ -407,7 +407,6 @@ async function applyGlobalI18n(node) {
     }
   }
 }
-
   async function init(root) {
     if (!root || window.JCIntro.state.initialized) return;
     window.JCIntro.state.initialized = true;
