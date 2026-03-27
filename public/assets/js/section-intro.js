@@ -265,32 +265,37 @@ function buildLangModal(root) {
 }
 
 async function requireLanguageChoice(root) {
-  if (isLangLocked()) {
-    console.log('[IntroLang] Idioma já travado, prosseguindo.');
-    return getCurrentLang();
-  }
-
   let modal = document.getElementById('intro-lang-modal');
+
   if (!modal) {
-    modal = buildLangModal(root || document.body);
-    (root || document.body).appendChild(modal);
+    modal = buildLangModal(document.body);
+    document.body.appendChild(modal);
   }
 
   const select = modal.querySelector('#intro-lang-select');
   const confirm = modal.querySelector('#intro-lang-confirm');
+
+  const saved =
+    sessionStorage.getItem('jornada.lang') ||
+    sessionStorage.getItem('i18n.lang') ||
+    localStorage.getItem('i18n_lang') ||
+    'pt-BR';
+
+  if (select) select.value = saved;
 
   return new Promise((resolve) => {
     confirm.onclick = async () => {
       const chosen = select?.value || 'pt-BR';
 
       try {
+        localStorage.setItem('i18n_lang', chosen);
+        localStorage.setItem('i18n_locked', '1');
+        sessionStorage.setItem('jornada.lang', chosen);
+        sessionStorage.setItem('i18n.lang', chosen);
+
         if (window.i18n?.setLang) {
           await window.i18n.setLang(chosen, true);
         } else {
-          localStorage.setItem('i18n_lang', chosen);
-          localStorage.setItem('i18n_locked', '1');
-          sessionStorage.setItem('jornada.lang', chosen);
-          sessionStorage.setItem('i18n.lang', chosen);
           document.documentElement.setAttribute('lang', chosen);
           document.documentElement.setAttribute('data-lang', chosen);
         }
