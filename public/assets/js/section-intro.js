@@ -100,12 +100,8 @@
   // ===========================================================
   // i18n LOCK — Escolha de idioma apenas na Intro
   // ===========================================================
- function isLangLocked() {
-  // ativa modo teste via URL ?langtest=1
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('langtest') === '1') return false;
-
-  return localStorage.getItem('i18n_locked') === '1';
+function isLangLocked() {
+  return false; // 🔥 força sempre abrir o modal
 }
   async function setLangAndLock(lang) {
     if (!lang) {
