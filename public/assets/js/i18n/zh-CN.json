@@ -1,0 +1,45 @@
+{
+  "intro.title": "核心之旅",
+  "intro.start": "开始",
+  "intro.language": "选择你的语言",
+
+  "termos.title": "条款与条件",
+  "termos.accept": "我同意",
+
+  "senha.title": "安全访问",
+  "senha.placeholder": "输入密码",
+  "senha.button": "继续",
+
+  "dados.title": "个人信息",
+  "dados.subtitle": "填写一些信息以丰富您的反馈",
+  "dados.nome": "姓名",
+  "dados.cidade": "城市",
+  "dados.estado": "州/地区",
+  "dados.profissao": "职业",
+  "dados.religiao": "信仰",
+  "dados.continuar": "继续",
+
+  "selfie.title": "拍摄你的照片",
+  "selfie.instrucao": "{nome}，请稍微远离手机并对准脸部。{guia}将引导你。",
+  "selfie.preview": "预览",
+  "selfie.capture": "拍摄",
+  "selfie.iniciar": "开始",
+  "selfie.confirmar": "确认",
+  "selfie.pular": "跳过",
+
+  "perguntas.placeholder": "在这里输入你的回答...",
+  "perguntas.devolutiva": "引导者反馈",
+  "perguntas.continuar": "继续",
+
+  "final.titulo": "感谢你走完这段光之旅程",
+  "final.mensagem1": "你的回答已被光之兄弟会庄重接收。",
+  "final.mensagem2": "你播下了信任、勇气与光明的种子。",
+  "final.mensagem3": "继续前行，这段旅程没有终点。",
+  "final.mensagem4": "当你需要重新点燃内心之光时，请回来。",
+  "final.mensagem5": "你就是光。你就是改变。",
+
+  "final.pdf": "PDF",
+  "final.selfie": "自拍卡",
+  "final.voltar": "返回",
+  "final.enviar": "重新发送"
+}
