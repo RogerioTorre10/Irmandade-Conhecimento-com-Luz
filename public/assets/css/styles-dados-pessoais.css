@@ -208,3 +208,57 @@ body {
     font-size: 14.5px;
   }
 }
+/* ==========================================
+   AJUSTE FINAL — DADOS PESSOAIS MOBILE
+   libera altura interna e garante rolagem
+   ========================================== */
+
+#section-dados-pessoais .j-panel-glow,
+#section-dados-pessoais .j-perg-v-inner,
+#section-dados-pessoais .j-arcane-card,
+#section-dados-pessoais .dados-painel {
+  height: auto !important;
+  min-height: unset !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+#section-dados-pessoais .pergaminho-content {
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+@media (max-width: 768px) {
+  #section-dados-pessoais {
+    display: block !important;
+    padding: 16px 12px 40px !important;
+  }
+
+  #section-dados-pessoais .j-panel-glow {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+  }
+
+  #section-dados-pessoais .j-perg-v-inner,
+  #section-dados-pessoais .j-arcane-card {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  #section-dados-pessoais .pergaminho-content {
+    padding-bottom: 28px !important;
+  }
+
+  #section-dados-pessoais input,
+  #section-dados-pessoais select,
+  #section-dados-pessoais textarea {
+    font-size: 16px !important; /* evita zoom estranho no Android */
+  }
+
+  #section-dados-pessoais #btn-dp-continuar {
+    position: relative !important;
+    width: 100% !important;
+    margin: 18px 0 24px !important;
+  }
+}
