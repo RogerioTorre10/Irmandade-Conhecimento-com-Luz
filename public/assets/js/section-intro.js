@@ -1,147 +1,42 @@
 (function () {
   'use strict';
+
   const SECTION_ID = 'section-intro';
   const NEXT_SECTION_ID = 'section-termos1';
   const HIDE_CLASS = 'hidden';
-  const TYPING_SPEED = 34;
-  const TTS_LATCH_MS = 600;
-  if (window.JCIntro?.__bound) { return; }
+
+  if (window.JCIntro?.__bound) return;
   window.JCIntro = window.JCIntro || {};
   window.JCIntro.__bound = true;
   window.JCIntro.state = { initialized: false, listenerOn: false };
-  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-  function waitForNode(selector, { root = document, timeout = 10000 } = {}) {
-    const existing = root.querySelector(selector);
-    if (existing) return Promise.resolve(existing);
-    return new Promise((resolve, reject) => {
-      const t = setTimeout(() => { obs.disconnect(); reject(new Error(`Timeout esperando ${selector}`)); }, timeout);
-      const obs = new MutationObserver(() => {
-        const el = root.querySelector(selector);
-        if (el) { clearTimeout(t); obs.disconnect(); resolve(el); }
-      });
-      obs.observe(root === document ? document.documentElement : root, { childList: true, subtree: true });
-    });
-  }
-  function ensureVisible(el) {
-    if (!el) return;
-    el.classList.remove(HIDE_CLASS);
-    el.setAttribute('aria-hidden', 'false');
-    el.style.removeProperty('display');
-    el.style.removeProperty('opacity');
-    el.style.removeProperty('visibility');
-  }
-  async function localType(el, text, speed = TYPING_SPEED) {
-    return new Promise(resolve => {
-      let i = 0; el.textContent = '';
-      (function tick() { if (i < text.length) { el.textContent += text.charAt(i++); setTimeout(tick, speed); } else resolve(); })();
-    });
-  }
-  async function typeOnce(el, { speed = TYPING_SPEED, speak = true } = {}) {
-    if (!el) return;
-    const text = (el.dataset?.text || el.textContent || '').trim();
-    if (!text) return;
-    el.classList.add('typing-active');
-    el.classList.remove('typing-done');
-    let usedFallback = false;
-    if (typeof window.runTyping === 'function') {
-      await new Promise((res) => {
-        try {
-          window.runTyping(el, text, () => res(), { speed, cursor: true });
-        } catch {
-          usedFallback = true;
-          res();
-        }
-      });
-    } else {
-      usedFallback = true;
-    }
-    if (usedFallback) {
-      await localType(el, text, speed);
-    }
-    el.classList.remove('typing-active');
-    el.classList.add('typing-done');
-    if (speak && text && !el.dataset.spoken) {
-      try {
-        const langNow = localStorage.getItem('i18n_lang') || window.i18n?.lang || 'pt-BR';
-        window.speechSynthesis?.cancel?.();
-        if (window.EffectCoordinator?.speak) {
-          await window.EffectCoordinator.speak(text, {
-            lang: langNow,
-            rate: 1.05,
-            pitch: 1.0
-          });
-          await sleep(TTS_LATCH_MS);
-          el.dataset.spoken = 'true';
-        }
-      } catch (e) {
-        console.warn('[TTS] Erro ao falar:', e);
-      }
-    }
-    await sleep(60);
-  }
-  function findOrCreateAdvanceButton(root) {
-    let btn = root.querySelector('[data-action="avancar"]') || root.querySelector('#btn-avancar');
-    if (btn) return btn;
-    const actions = root.querySelector('.parchment-actions-rough') || root;
-    btn = document.createElement('button');
-    btn.id = 'btn-avancar'; btn.type = 'button';
-    btn.className = 'btn btn-primary btn-stone';
-    btn.setAttribute('data-action', 'avancar');
-    btn.textContent = 'Iniciar';
-    btn.classList.add('is-hidden');
-    actions.appendChild(btn);
-    return btn;
-  }
-  function getTransitionSrc(root, btn) {
-    return (btn?.dataset?.transitionSrc) || (root?.dataset?.transitionSrc) || '/assets/videos/filme-pergaminho-ao-vento.mp4';
-  }
 
-  // ===========================================================
-  // i18n LOCK — Escolha de idioma apenas na Intro
-  // ===========================================================
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
   function isLangLocked() {
-    return false;
+    return localStorage.getItem('i18n_locked') === '1';
   }
 
   async function setLangAndLock(lang) {
-    if (!lang) {
-      console.warn('[IntroLang] Idioma inválido:', lang);
-      return;
+    if (!lang) return;
+
+    try {
+      if (window.i18n?.forceLang) {
+        await window.i18n.forceLang(lang, true);
+      } else if (window.i18n?.setLang) {
+        await window.i18n.setLang(lang);
+      }
+    } catch (e) {
+      console.warn('[IntroLang] Erro ao definir idioma:', e);
     }
-    if (window.i18n?.waitForReady) await window.i18n.waitForReady(10000);
-    if (window.i18n?.forceLang) {
-      await window.i18n.forceLang(lang, true);
-    } else if (window.i18n?.setLang) {
-      await window.i18n.setLang(lang);
-    } else {
-      console.warn('[IntroLang] i18n não disponível.');
-      return;
-    }
+
     localStorage.setItem('i18n_lang', lang);
     localStorage.setItem('i18n_locked', '1');
     document.documentElement.lang = lang.split('-')[0] || 'pt';
-    document.querySelectorAll('#language-select, [data-i18n-selector]').forEach(sel => {
-      sel.value = lang;
-      sel.disabled = true;
-      sel.style.pointerEvents = 'none';
-      sel.style.opacity = '0.65';
-    });
-    document.dispatchEvent(new CustomEvent('i18n:changed', { detail: { lang } }));
-    console.log('[IntroLang] Idioma travado:', lang);
+
+    console.log('[IntroLang] Idioma travado permanentemente:', lang);
   }
 
-  function syncTypingDataText(root) {
-    try {
-      root.querySelectorAll('[data-typing="true"]').forEach(el => {
-        const tc = (el.textContent || '').trim();
-        if (tc) el.dataset.text = tc;
-      });
-    } catch (e) {
-      console.warn('[SyncText] Erro:', e);
-    }
-  }
-
-  function buildLangModal(root) {
+  function buildLangModal() {
     const modal = document.createElement('div');
     modal.id = 'intro-lang-modal';
 
@@ -171,6 +66,7 @@
       </div>
     `;
 
+    // CSS inline para garantir que apareça
     const style = document.createElement('style');
     style.textContent = `
       #intro-lang-modal {
@@ -180,213 +76,116 @@
         display: flex;
         align-items: center;
         justify-content: center;
-      }
-
-      #intro-lang-modal .intro-lang-backdrop {
-        position: absolute;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.68);
-        backdrop-filter: blur(6px);
-        -webkit-backdrop-filter: blur(6px);
+        background: rgba(0,0,0,0.75);
       }
 
       #intro-lang-modal .intro-lang-card {
-        position: relative;
-        z-index: 1;
         width: min(92vw, 420px);
-        padding: 18px 16px;
+        padding: 24px 20px;
         border-radius: 18px;
-        border: 1px solid rgba(212,175,55,.65);
-        background:
-          linear-gradient(180deg, rgba(8,10,18,.92), rgba(12,16,26,.94));
-        box-shadow:
-          0 0 22px rgba(212,175,55,.18),
-          inset 0 0 0 1px rgba(255,255,255,.04);
+        background: rgba(15,15,25,0.98);
+        border: 1px solid rgba(212,175,55,0.6);
         color: #f5e7b0;
         text-align: center;
+        box-shadow: 0 0 30px rgba(212,175,55,0.3);
       }
 
       #intro-lang-modal .intro-lang-title {
-        margin: 0 0 8px;
-        font-size: 1.3rem;
-        letter-spacing: .03em;
-        font-family: "ManufacturingConsent-Regular", "Cardo", serif;
+        margin: 0 0 12px 0;
+        font-size: 1.45rem;
+        font-family: "ManufacturingConsent-Regular", serif;
       }
 
       #intro-lang-modal .intro-lang-sub {
-        margin: 0 0 16px;
-        font-size: .95rem;
-        opacity: .95;
-        line-height: 1.4;
-      }
-
-      #intro-lang-modal .intro-lang-row {
-        margin: 12px 0 16px;
+        margin: 0 0 20px 0;
+        font-size: 0.95rem;
+        opacity: 0.9;
       }
 
       #intro-lang-modal .intro-lang-select {
         width: 100%;
         padding: 12px 16px;
-        border-radius: 12px;
-        border: 1px solid rgba(212,175,55,.6);
-        background: rgba(0,0,0,.45);
+        border-radius: 10px;
+        background: rgba(0,0,0,0.6);
+        border: 1px solid rgba(212,175,55,0.5);
         color: #f5e7b0;
-        font-size: 1rem;
-        outline: none;
-        appearance: none;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 4 4-4' stroke='%23d4af37' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 12px center;
-        background-size: 12px;
+        font-size: 1.05rem;
+        margin-bottom: 16px;
       }
 
-      #intro-lang-modal .intro-lang-actions {
-        margin-top: 12px;
-      }
-
-      #intro-lang-modal .intro-lang-actions .btn {
+      #intro-lang-modal .intro-lang-actions button {
         width: 100%;
-        padding: 12px;
+        padding: 14px;
         font-size: 1.1rem;
-      }
-
-      body:has(#intro-lang-modal) {
-        overflow: hidden;
+        background: linear-gradient(135deg, #d4af37, #b38b2e);
+        color: #111;
+        border: none;
+        border-radius: 10px;
+        font-weight: bold;
       }
     `;
     modal.appendChild(style);
+
+    // Garante que o modal seja visível
     modal.style.display = 'flex';
     modal.style.visibility = 'visible';
     modal.style.opacity = '1';
-    modal.hidden = false;
+
     return modal;
   }
 
-  async function requireLanguageChoice(root) {
+  async function requireLanguageChoice() {
     if (isLangLocked()) {
-      console.log('[IntroLang] Idioma já travado, prosseguindo.');
+      console.log('[IntroLang] Idioma já travado, prosseguindo...');
       return;
     }
-    const modal = buildLangModal(root);
-    const last = localStorage.getItem('i18n_lang') || window.i18n?.lang || 'pt-BR';
-    const sel = modal.querySelector('#intro-lang-select');
-    if (sel) sel.value = last;
+
+    const modal = buildLangModal();
+    document.body.appendChild(modal);
+
     return new Promise((resolve) => {
       const btn = modal.querySelector('#intro-lang-confirm');
+      const sel = modal.querySelector('#intro-lang-select');
+
       btn.addEventListener('click', async () => {
-        const chosen = sel?.value || 'pt-BR';
-        await setLangAndLock(chosen);
-        try {
-          if (window.i18n?.apply) window.i18n.apply(root);
-        } catch (e) {
-          console.warn('[i18nApply] Erro ao aplicar na intro:', e);
-        }
-        syncTypingDataText(root);
-        modal.remove();
+        const chosenLang = sel.value;
+        await setLangAndLock(chosenLang);
+
+        // Remove o modal
+        modal.style.opacity = '0';
+        setTimeout(() => modal.remove(), 400);
+
         resolve();
       }, { once: true });
     });
   }
 
-  async function runTyping(root) {
-    if (!isLangLocked()) {
-      console.warn('[Intro] Idioma não confirmado — bloqueando runTyping.');
-      return;
-    }
-    const elements = Array.from(root.querySelectorAll('[data-typing="true"]'));
-    const btn = findOrCreateAdvanceButton(root);
-    btn.setAttribute('disabled', 'true'); btn.classList.add('is-hidden');
-    for (const el of elements) {
-      const spd = Number(el.dataset.speed) || TYPING_SPEED;
-      await typeOnce(el, { speed: spd, speak: true });
-    }
-    btn.removeAttribute('disabled'); btn.classList.remove('is-hidden');
-    btn.classList.add('btn-ready-pulse'); setTimeout(() => btn.classList.remove('btn-ready-pulse'), 700);
-    btn.focus?.();
-    btn.addEventListener('click', () => {
-      window.speechSynthesis?.cancel?.();
-      const src = getTransitionSrc(root, btn);
-      if (typeof window.playTransitionVideo === 'function') {
-        window.playTransitionVideo(src, NEXT_SECTION_ID);
-      } else {
-        window.JC?.show?.(NEXT_SECTION_ID) ?? (location.hash = '#' + NEXT_SECTION_ID);
-      }
-    }, { once: true });
-  }
-
-  let __I18N_APPLY_LOCK__ = 0;
-
-  async function applyGlobalI18n(node) {
-    const now = Date.now();
-    if (now - __I18N_APPLY_LOCK__ < 250) return;
-    __I18N_APPLY_LOCK__ = now;
-
-    let lang = null;
-
-    if (isLangLocked() && window.i18n?.apply) {
-      try {
-        lang = localStorage.getItem('i18n_lang');
-        if (lang && window.i18n?.forceLang) {
-          await window.i18n.forceLang(lang, true);
-        }
-      } catch (e) {
-        // silently ignore
-      }
-    }
-
-    if (window.i18n?.apply) {
-      window.i18n.apply(node || document);
-    }
-
-    const targetName =
-      (node && node.nodeType === 9)
-        ? 'document'
-        : (node?.id || node?.tagName || 'unknown');
-
-    if (targetName !== 'unknown') {
-      window.__GLOBAL_I18N_LOG_ONCE__ = window.__GLOBAL_I18N_LOG_ONCE__ || {};
-      const logKey = (lang || 'na') + ':' + targetName;
-
-      if (!window.__GLOBAL_I18N_LOG_ONCE__[logKey]) {
-        window.__GLOBAL_I18N_LOG_ONCE__[logKey] = true;
-        console.log('[GlobalI18n] Aplicado em', targetName);
-      }
-    }
-  }
-
   async function init(root) {
-    if (!root || window.JCIntro.state.initialized) return;
+    if (window.JCIntro.state.initialized) return;
     window.JCIntro.state.initialized = true;
-    ensureVisible(root);
-    await requireLanguageChoice(document.body);
-    await runTyping(root);
+
+    await requireLanguageChoice();
+
+    // Aqui você pode chamar o typing, etc.
+    console.log('[Intro] Inicialização completa após escolha de idioma.');
   }
 
-  function onSectionShown(evt) {
-    const { sectionId, node } = evt?.detail || {};
-    applyGlobalI18n(node);
-    if (sectionId !== SECTION_ID) return;
-    init(node || document.getElementById(SECTION_ID));
-  }
-
+  // Bind
   function bind() {
-    if (!window.JCIntro.state.listenerOn) {
-      document.addEventListener('section:shown', onSectionShown, { passive: true });
-      document.addEventListener('i18n:changed', (e) => applyGlobalI18n(document));
-      window.JCIntro.state.listenerOn = true;
-    }
     const existing = document.getElementById(SECTION_ID);
-    if (existing && !existing.classList.contains(HIDE_CLASS)) { init(existing); return; }
-    waitForNode('#' + SECTION_ID, { root: document, timeout: 15000 })
-      .then((el) => init(el))
-      .catch((e) => console.warn('[JCIntro] seção não apareceu a tempo:', e.message));
+    if (existing) init(existing);
+
+    document.addEventListener('section:shown', (e) => {
+      if (e?.detail?.sectionId === SECTION_ID) {
+        init(e.detail.node || document.getElementById(SECTION_ID));
+      }
+    });
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind, { once: true });
-  else bind();
-
-  applyGlobalI18n(document);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bind, { once: true });
+  } else {
+    bind();
+  }
 
 })();
