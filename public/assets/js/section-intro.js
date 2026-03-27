@@ -265,11 +265,14 @@ function buildLangModal(root) {
 }
 
 async function requireLanguageChoice(root) {
+  console.log('[IntroLang] requireLanguageChoice chamada');
+
   let modal = document.getElementById('intro-lang-modal');
 
   if (!modal) {
     modal = buildLangModal(document.body);
     document.body.appendChild(modal);
+    console.log('[IntroLang] modal criado e anexado ao body');
   }
 
   const select = modal.querySelector('#intro-lang-select');
@@ -283,9 +286,15 @@ async function requireLanguageChoice(root) {
 
   if (select) select.value = saved;
 
+  modal.style.display = 'flex';
+  modal.style.visibility = 'visible';
+  modal.style.opacity = '1';
+  modal.hidden = false;
+
   return new Promise((resolve) => {
     confirm.onclick = async () => {
       const chosen = select?.value || 'pt-BR';
+      console.log('[IntroLang] idioma confirmado:', chosen);
 
       try {
         localStorage.setItem('i18n_lang', chosen);
