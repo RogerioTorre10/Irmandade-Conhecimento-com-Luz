@@ -292,3 +292,20 @@ html, body {
     overflow-y: auto !important;
   }
 }
+/* SCROLL INTERNO NO PAINEL */
+
+#section-dados-pessoais .j-panel-glow {
+  max-height: 90vh !important;
+  overflow-y: auto !important;
+  padding-right: 6px;
+}
+
+/* estilo da barra (opcional bonito) */
+#section-dados-pessoais .j-panel-glow::-webkit-scrollbar {
+  width: 6px;
+}
+
+#section-dados-pessoais .j-panel-glow::-webkit-scrollbar-thumb {
+  background: rgba(0,255,150,0.6);
+  border-radius: 6px;
+}
