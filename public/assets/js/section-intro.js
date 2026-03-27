@@ -372,23 +372,7 @@ async function requireLanguageChoice(root) {
       }
     }, { once: true });
   }
- let __I18N_APPLY_LOCK__ = 0;
-
-async function applyGlobalI18n(node) {
-  const now = Date.now();
-  if (now - __I18N_APPLY_LOCK__ < 250) return;
-  __I18N_APPLY_LOCK__ = now;
-
-  if (isLangLocked && window.i18n?.apply) {
-    try {
-  const lang = localStorage.getItem('i18n_lang');
-  if (lang) await window.i18n.forceLang(lang, true);
-  window.i18n.apply(node || document);
-
-  const targetName =
-    (node && node.nodeType === 9) ? 'document' : (node?.id || node?.tagName || 'unknown');
-
-  let __I18N_APPLY_LOCK__ = 0;
+let __I18N_APPLY_LOCK__ = 0;
 
 async function applyGlobalI18n(node) {
   const now = Date.now();
@@ -398,7 +382,10 @@ async function applyGlobalI18n(node) {
   if (isLangLocked() && window.i18n?.apply) {
     try {
       const lang = localStorage.getItem('i18n_lang');
-      if (lang) await window.i18n.forceLang(lang, true);
+      if (lang && window.i18n?.forceLang) {
+        await window.i18n.forceLang(lang, true);
+      }
+
       window.i18n.apply(node || document);
 
       const targetName =
@@ -407,7 +394,6 @@ async function applyGlobalI18n(node) {
           : (node?.id || node?.tagName || 'unknown');
 
       if (targetName !== 'unknown') {
-        // log só uma vez por alvo + idioma
         window.__GLOBAL_I18N_LOG_ONCE__ = window.__GLOBAL_I18N_LOG_ONCE__ || {};
         const logKey = `${lang || 'na'}::${targetName}`;
 
