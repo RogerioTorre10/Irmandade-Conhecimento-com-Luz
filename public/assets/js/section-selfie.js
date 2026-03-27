@@ -76,10 +76,14 @@
     }
   }
 
-  function updateZoom() {
-    const all = +document.getElementById('zoomAll').value;
-    const x = +document.getElementById('zoomX').value;
-    const y = +document.getElementById('zoomY').value;
+    function updateZoom() {
+    const all = +document.getElementById('zoomAll').value || FINAL_ZOOM;
+    const x = +document.getElementById('zoomX').value || 1;
+    const y = +document.getElementById('zoomY').value || 1;
+
+    zoomState.all = all;
+    zoomState.x = x;
+    zoomState.y = y;
 
     document.getElementById('zoomAllVal').textContent = all.toFixed(2) + '×';
     document.getElementById('zoomXVal').textContent = x.toFixed(2) + '×';
@@ -89,12 +93,14 @@
     const scaleY = all * y;
 
     [videoEl, canvasEl].forEach(el => {
-      if (el) {
-        el.style.transform = `translate(-50%, -50%) scaleX(${scaleX}) scaleY(${scaleY})`;
-      }
+      if (!el) return;
+      el.style.position = 'absolute';
+      el.style.top = '0';
+      el.style.left = '0';
+      el.style.transformOrigin = 'center center';
+      el.style.transform = `scale(${Math.min(scaleX, scaleY)})`;
     });
   }
-
   async function startCamera() {
     stopCamera();
     try {
