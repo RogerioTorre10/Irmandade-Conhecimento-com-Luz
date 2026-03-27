@@ -259,9 +259,13 @@ function buildLangModal(root) {
       overflow: hidden;
     }
   `;
-
-  modal.appendChild(style);
-  return modal;
+ `;
+ modal.appendChild(style);
+ modal.style.display = 'flex';
+ modal.style.visibility = 'visible';
+ modal.style.opacity = '1';
+ modal.hidden = false;
+ return modal;
 }
 
 async function requireLanguageChoice(root) {
