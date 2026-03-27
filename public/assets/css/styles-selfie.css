@@ -501,18 +501,22 @@
     overflow-x: hidden !important;
     padding-left: 8px !important;
     padding-right: 8px !important;
+    box-sizing: border-box !important; 
   }
 
   #section-selfie .j-panel-glow {
-    width: 100% !important;
-    max-width: 100% !important;
+    width: min(92vw, 680px) !important;
+    max-width: 92vw !important;
     margin: 0 auto !important;
-    transform: translateX(-4px) !important;
-  }
-
+    transform: translateX(-2px) !important;
+   }
+   
+   
+  #section-selfie .j-panel-glow,
   #section-selfie .j-perg-v-inner,
   #section-selfie .j-arcane-card,
-  #section-selfie .pergaminho-content {
+  #section-selfie .pergaminho-content{
+    box-sizing: border-box !important;       
     width: 100% !important;
     max-width: 100% !important;
     margin-left: auto !important;
@@ -526,9 +530,11 @@
   #section-selfie .preview-shell,
   #section-selfie .preview-box,
   #section-selfie .camera-stage {
-    position: relative !important;
     width: min(100%, 320px) !important;
     max-width: 320px !important;
+    margin-left: auto !important;
+    margin-right: auto !important; 
+    position: relative !important;
     margin: 8px auto 0 !important;
     overflow: hidden !important;
   }
@@ -557,6 +563,8 @@
     max-width: 320px !important;
     margin: 8px auto 0 !important;
     padding-bottom: 14px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;  
   }
 
   #section-selfie .selfie-sliders input[type="range"],
