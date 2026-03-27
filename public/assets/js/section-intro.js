@@ -404,9 +404,9 @@ async function applyGlobalI18n(node) {
     if (!root || window.JCIntro.state.initialized) return;
     window.JCIntro.state.initialized = true;
     ensureVisible(root);
-    await requireLanguageChoice(root);
+    await requireLanguageChoice(document.body);
     await runTyping(root);   
-  }  
+  }    
   function onSectionShown(evt) {
     const { sectionId, node } = evt?.detail || {};
     applyGlobalI18n(node); // Aplica i18n em TODAS as seções
