@@ -353,90 +353,131 @@
   }
 }
 /* ==========================================
-   SECTION SELFIE — CENTRALIZA PREVIEW E CONTROLES
+   SELFIE — AJUSTE CIRÚRGICO REAL
+   baseado no HTML verdadeiro da seção
    ========================================== */
 
-#section-selfie .camera-wrap,
-#section-selfie .selfie-frame,
-#section-selfie .camera-preview-wrap,
-#section-selfie .preview-shell {
-  width: 100% !important;
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-  box-sizing: border-box !important;
-}
-
-#section-selfie video,
-#section-selfie canvas,
-#section-selfie img,
-#section-selfie .camera-preview {
-  display: block !important;
-  margin: 0 auto !important;
-  object-fit: cover !important;
-  object-position: center center !important;
-}
-
-/* quadro do preview */
-#section-selfie .camera-preview-wrap,
-#section-selfie .selfie-frame {
-  max-width: 320px !important;
-  width: 100% !important;
-}
-
-/* área dos botões principais */
-#section-selfie .selfie-actions,
-#section-selfie .camera-actions {
-  position: relative !important;
-  z-index: 5 !important;
-  margin-top: 10px !important;
-  margin-bottom: 10px !important;
-}
-
-/* sliders / ajustes finos */
-#section-selfie .selfie-sliders,
-#section-selfie .camera-sliders,
-#section-selfie .ajustes-camera {
-  position: relative !important;
-  z-index: 6 !important;
-  width: 100% !important;
-  max-width: 320px !important;
-  margin: 10px auto 0 !important;
-  padding: 8px 0 0 !important;
-}
-
-/* cada controle deslizante */
-#section-selfie .selfie-sliders input[type="range"],
-#section-selfie .camera-sliders input[type="range"],
-#section-selfie .ajustes-camera input[type="range"] {
-  width: 100% !important;
-  display: block !important;
-  margin: 8px 0 !important;
-  pointer-events: auto !important;
-}
-
-/* evita corte do rodapé da área de selfie */
-#section-selfie .j-arcane-card,
-#section-selfie .pergaminho-content {
+#section-selfie .conteudo-pergaminho{
+  width: 100%;
+  max-width: 100%;
   overflow: visible !important;
-  padding-bottom: 18px !important;
 }
 
-@media (max-width: 768px) {
-  #section-selfie .camera-preview-wrap,
-  #section-selfie .selfie-frame,
-  #section-selfie .selfie-sliders,
-  #section-selfie .camera-sliders,
-  #section-selfie .ajustes-camera {
-    max-width: 280px !important;
+#section-selfie .selfie-preview-wrap{
+  width: 100%;
+  max-width: 340px;
+  margin: 0 auto 8px !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#section-selfie .preview-frame{
+  position: relative;
+  width: 100%;
+  max-width: 340px;
+  aspect-ratio: 3 / 4;
+  padding-bottom: 0 !important;
+  margin: 0 auto;
+  background: #000;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+#selfiePreview,
+#selfieVideo,
+#selfieCanvas{
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  margin: 0 auto;
+  object-fit: cover;
+  object-position: center center;
+  border-radius: inherit;
+}
+
+/* placeholder visível antes da câmera */
+#selfiePreview{
+  z-index: 1;
+}
+
+/* vídeo e canvas acima quando ativados */
+#selfieVideo,
+#selfieCanvas{
+  z-index: 2;
+}
+
+/* botões da selfie */
+#section-selfie .btn-row{
+  width: 100%;
+  max-width: 520px;
+  margin: 8px auto 12px !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: nowrap !important;
+}
+
+/* painel dos sliders */
+#section-selfie .ranges-panel{
+  width: 100%;
+  max-width: 340px;
+  margin: 10px auto 8px !important;
+  position: relative;
+  z-index: 5;
+}
+
+@media (max-width: 600px){
+
+  #section-selfie .j-panel-glow.selfie-panel{
+    width: min(96vw, 430px) !important;
+    max-width: 430px !important;
   }
 
-  #section-selfie .selfie-actions,
-  #section-selfie .camera-actions {
+  #section-selfie .selfie-wrap{
+    padding: 14px 12px 16px !important;
+    overflow: visible !important;
+  }
+
+  #section-selfie .conteudo-pergaminho{
+    overflow: visible !important;
+  }
+
+  #section-selfie .selfie-preview-wrap{
+    max-width: 260px !important;
+    margin: 0 auto 10px !important;
+  }
+
+  #section-selfie .preview-frame{
+    max-width: 260px !important;
+    border-radius: 14px !important;
+  }
+
+  #section-selfie .ranges-panel{
+    max-width: 260px !important;
+    margin: 10px auto 0 !important;
+    padding: 10px !important;
+  }
+
+  #section-selfie .range-row{
+    grid-template-columns: 72px 1fr 36px !important;
+    gap: 6px !important;
+  }
+
+  #section-selfie .btn-row{
+    max-width: 100% !important;
     gap: 8px !important;
-    flex-wrap: wrap !important;
-    justify-content: center !important;
+    margin: 6px auto 10px !important;
+  }
+
+  #section-selfie .btn-stone-espinhos{
+    min-width: 84px !important;
+    max-width: 126px !important;
+    height: 34px !important;
+    line-height: 34px !important;
+    font-size: 12px !important;
   }
 }
