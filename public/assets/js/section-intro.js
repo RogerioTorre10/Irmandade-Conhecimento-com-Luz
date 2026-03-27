@@ -147,25 +147,36 @@
  function buildLangModal(root) {
   const modal = document.createElement('div');
   modal.id = 'intro-lang-modal';
+
   modal.innerHTML = `
     <div class="intro-lang-backdrop"></div>
     <div class="intro-lang-card" role="dialog" aria-modal="true" aria-labelledby="intro-lang-title">
       <h3 id="intro-lang-title" class="intro-lang-title">Escolha seu idioma</h3>
-      <p class="intro-lang-sub">Selecione o idioma para navegar. Após confirmar, não será possível alterar.</p>
+
+      <p class="intro-lang-sub">
+        Selecione o idioma para navegar. Após confirmar, não será possível alterar.
+      </p>
+
       <div class="intro-lang-row">
         <select id="intro-lang-select" class="intro-lang-select" aria-label="Selecione o idioma">
           <option value="pt-BR">Português (BR)</option>
           <option value="en-US">English (US)</option>
           <option value="es-ES">Español (ES)</option>
-          <!-- Adicione mais opções aqui se precisar -->
+          <option value="fr-FR">Français (FR)</option>
+          <option value="zh-CN">中文（简体）</option>
         </select>
       </div>
+
       <div class="intro-lang-actions">
-        <button id="intro-lang-confirm" type="button" class="btn btn-primary btn-stone">Confirmar</button>
+        <button id="intro-lang-confirm" type="button" class="btn btn-primary btn-stone">
+          Confirmar
+        </button>
       </div>
     </div>
   `;
+
   root.appendChild(modal);
+}
 
   // CSS atualizado e otimizado para desktop + mobile
   const style = document.createElement('style');
