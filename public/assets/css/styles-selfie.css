@@ -482,7 +482,7 @@
   }
 }
 /* ==========================================
-   SELFIE — CENTRALIZA CONTAINER E PREVIEW
+   SELFIE — CORREÇÃO DE ENQUADRAMENTO MOBILE
    ========================================== */
 
 #section-selfie {
@@ -496,103 +496,74 @@
   box-sizing: border-box !important;
 }
 
-#section-selfie .j-panel-glow {
-  width: min(92vw, 680px) !important;
-  max-width: 92vw !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-  transform: none !important;
-}
-
-#section-selfie .j-perg-v-inner,
-#section-selfie .j-arcane-card,
-#section-selfie .pergaminho-content {
-  width: 100% !important;
-  max-width: 100% !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-  transform: none !important;
-}
-
-/* quadro da prévia */
-#section-selfie .camera-preview-wrap,
-#section-selfie .selfie-frame,
-#section-selfie .preview-shell,
-#section-selfie .preview-box {
-  position: relative !important;
-  width: min(100%, 320px) !important;
-  max-width: 320px !important;
-  margin: 10px auto 0 !important;
-  overflow: hidden !important;
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-}
-
-/* vídeo / canvas / imagem da prévia */
-#section-selfie video,
-#section-selfie canvas,
-#section-selfie img,
-#section-selfie .camera-preview {
-  display: block !important;
-  position: absolute !important;
-  top: 50% !important;
-  left: 50% !important;
-  width: 100% !important;
-  height: 100% !important;
-  max-width: none !important;
-  max-height: none !important;
-  object-fit: cover !important;
-  object-position: center center !important;
-  transform: translate(-50%, -50%) !important;
-  transform-origin: center center !important;
-}
-
-/* título da prévia */
-#section-selfie .preview-title,
-#section-selfie .camera-preview-title {
-  text-align: center !important;
-  margin-bottom: 8px !important;
-}
-
-/* sliders */
-#section-selfie .selfie-sliders,
-#section-selfie .camera-sliders,
-#section-selfie .ajustes-camera {
-  width: min(100%, 320px) !important;
-  max-width: 320px !important;
-  margin: 10px auto 0 !important;
-  padding-bottom: 10px !important;
-  position: relative !important;
-  z-index: 3 !important;
-}
-
-#section-selfie .selfie-sliders input[type="range"],
-#section-selfie .camera-sliders input[type="range"],
-#section-selfie .ajustes-camera input[type="range"] {
-  width: 100% !important;
-  display: block !important;
-  margin: 6px 0 !important;
-}
-
 @media (max-width: 768px) {
   #section-selfie {
-    padding-left: 8px !important;
-    padding-right: 8px !important;
+    padding-left: 6px !important;
+    padding-right: 6px !important;
   }
 
   #section-selfie .j-panel-glow {
     width: 100% !important;
     max-width: 100% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    transform: translateX(-3px) !important;
   }
 
+  #section-selfie .j-perg-v-inner,
+  #section-selfie .j-arcane-card,
+  #section-selfie .pergaminho-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    transform: none !important;
+  }
+
+  /* quadro da prévia */
   #section-selfie .camera-preview-wrap,
   #section-selfie .selfie-frame,
   #section-selfie .preview-shell,
   #section-selfie .preview-box,
+  #section-selfie .camera-stage {
+    position: relative !important;
+    width: min(100%, 320px) !important;
+    max-width: 320px !important;
+    margin: 8px auto 0 !important;
+    overflow: hidden !important;
+  }
+
+  /* MUITO IMPORTANTE:
+     não forçar vídeo/canvas a ocupar 100% com translate central */
+  #section-selfie video,
+  #section-selfie canvas,
+  #section-selfie img,
+  #section-selfie .camera-preview {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    max-width: none !important;
+    max-height: none !important;
+    transform-origin: top left !important;
+    object-fit: contain !important;
+  }
+
   #section-selfie .selfie-sliders,
   #section-selfie .camera-sliders,
   #section-selfie .ajustes-camera {
-    max-width: 290px !important;
+    width: min(100%, 320px) !important;
+    max-width: 320px !important;
+    margin: 8px auto 0 !important;
+    padding-bottom: 14px !important;
+  }
+
+  #section-selfie .selfie-sliders input[type="range"],
+  #section-selfie .camera-sliders input[type="range"],
+  #section-selfie .ajustes-camera input[type="range"] {
+    width: 100% !important;
+    display: block !important;
+    margin: 6px 0 !important;
   }
 }
