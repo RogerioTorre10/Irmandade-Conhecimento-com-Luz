@@ -43,7 +43,6 @@
     el.classList.add('typing-active');
     el.classList.remove('typing-done');
     let usedFallback = false;
-    // --- DATILOGRAFIA ---
     if (typeof window.runTyping === 'function') {
       await new Promise((res) => {
         try {
@@ -61,7 +60,6 @@
     }
     el.classList.remove('typing-active');
     el.classList.add('typing-done');
-    // --- TTS (voz) ---
     if (speak && text && !el.dataset.spoken) {
       try {
         const langNow = localStorage.getItem('i18n_lang') || window.i18n?.lang || 'pt-BR';
@@ -97,18 +95,19 @@
   function getTransitionSrc(root, btn) {
     return (btn?.dataset?.transitionSrc) || (root?.dataset?.transitionSrc) || '/assets/videos/filme-pergaminho-ao-vento.mp4';
   }
+
   // ===========================================================
   // i18n LOCK — Escolha de idioma apenas na Intro
   // ===========================================================
-function isLangLocked() {
-  return false; // 🔥 força sempre abrir o modal
-}
+  function isLangLocked() {
+    return false;
+  }
+
   async function setLangAndLock(lang) {
     if (!lang) {
       console.warn('[IntroLang] Idioma inválido:', lang);
       return;
     }
-    // Aplica idioma
     if (window.i18n?.waitForReady) await window.i18n.waitForReady(10000);
     if (window.i18n?.forceLang) {
       await window.i18n.forceLang(lang, true);
@@ -118,22 +117,19 @@ function isLangLocked() {
       console.warn('[IntroLang] i18n não disponível.');
       return;
     }
-    // Trava
     localStorage.setItem('i18n_lang', lang);
     localStorage.setItem('i18n_locked', '1');
-    // HTML lang
     document.documentElement.lang = lang.split('-')[0] || 'pt';
-    // Desabilita seletores globais
     document.querySelectorAll('#language-select, [data-i18n-selector]').forEach(sel => {
       sel.value = lang;
       sel.disabled = true;
       sel.style.pointerEvents = 'none';
       sel.style.opacity = '0.65';
     });
-    // Broadcast pra outras partes do app (se suportado, e.g., via CustomEvent)
     document.dispatchEvent(new CustomEvent('i18n:changed', { detail: { lang } }));
     console.log('[IntroLang] Idioma travado:', lang);
   }
+
   function syncTypingDataText(root) {
     try {
       root.querySelectorAll('[data-typing="true"]').forEach(el => {
@@ -144,183 +140,130 @@ function isLangLocked() {
       console.warn('[SyncText] Erro:', e);
     }
   }
-function buildLangModal(root) {
-  const modal = document.createElement('div');
-  modal.id = 'intro-lang-modal';
 
-  modal.innerHTML = `
-    <div class="intro-lang-backdrop"></div>
-    <div class="intro-lang-card" role="dialog" aria-modal="true" aria-labelledby="intro-lang-title">
-      <h3 id="intro-lang-title" class="intro-lang-title">Escolha seu idioma</h3>
-      <p class="intro-lang-sub">
-        Selecione o idioma para navegar. Após confirmar, não será possível alterar.
-      </p>
+  function buildLangModal(root) {
+    const modal = document.createElement('div');
+    modal.id = 'intro-lang-modal';
 
-      <div class="intro-lang-row">
-        <select id="intro-lang-select" class="intro-lang-select" aria-label="Selecione o idioma">
-          <option value="pt-BR">Português (BR)</option>
-          <option value="en-US">English (US)</option>
-          <option value="es-ES">Español (ES)</option>
-          <option value="fr-FR">Français (FR)</option>
-          <option value="zh-CN">中文（简体）</option>
-        </select>
+    modal.innerHTML = `
+      <div class="intro-lang-backdrop"></div>
+      <div class="intro-lang-card" role="dialog" aria-modal="true" aria-labelledby="intro-lang-title">
+        <h3 id="intro-lang-title" class="intro-lang-title">Escolha seu idioma</h3>
+        <p class="intro-lang-sub">
+          Selecione o idioma para navegar. Após confirmar, não será possível alterar.
+        </p>
+
+        <div class="intro-lang-row">
+          <select id="intro-lang-select" class="intro-lang-select" aria-label="Selecione o idioma">
+            <option value="pt-BR">Português (BR)</option>
+            <option value="en-US">English (US)</option>
+            <option value="es-ES">Español (ES)</option>
+            <option value="fr-FR">Français (FR)</option>
+            <option value="zh-CN">中文（简体）</option>
+          </select>
+        </div>
+
+        <div class="intro-lang-actions">
+          <button id="intro-lang-confirm" type="button" class="btn btn-primary btn-stone">
+            Confirmar
+          </button>
+        </div>
       </div>
+    `;
 
-      <div class="intro-lang-actions">
-        <button id="intro-lang-confirm" type="button" class="btn btn-primary btn-stone">
-          Confirmar
-        </button>
-      </div>
-    </div>
-  `;
-
-  const style = document.createElement('style');
-  style.textContent = `
-    #intro-lang-modal {
-      position: fixed;
-      inset: 0;
-      z-index: 99999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    #intro-lang-modal .intro-lang-backdrop {
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.68);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-    }
-
-    #intro-lang-modal .intro-lang-card {
-      position: relative;
-      z-index: 1;
-      width: min(92vw, 420px);
-      padding: 18px 16px;
-      border-radius: 18px;
-      border: 1px solid rgba(212,175,55,.65);
-      background:
-        linear-gradient(180deg, rgba(8,10,18,.92), rgba(12,16,26,.94));
-      box-shadow:
-        0 0 22px rgba(212,175,55,.18),
-        inset 0 0 0 1px rgba(255,255,255,.04);
-      color: #f5e7b0;
-      text-align: center;
-    }
-
-    #intro-lang-modal .intro-lang-title {
-      margin: 0 0 8px;
-      font-size: 1.3rem;
-      letter-spacing: .03em;
-      font-family: "ManufacturingConsent-Regular", "Cardo", serif;
-    }
-
-    #intro-lang-modal .intro-lang-sub {
-      margin: 0 0 16px;
-      font-size: .95rem;
-      opacity: .95;
-      line-height: 1.4;
-    }
-
-    #intro-lang-modal .intro-lang-row {
-      margin: 12px 0 16px;
-    }
-
-    #intro-lang-modal .intro-lang-select {
-      width: 100%;
-      padding: 12px 16px;
-      border-radius: 12px;
-      border: 1px solid rgba(212,175,55,.6);
-      background: rgba(0,0,0,.45);
-      color: #f5e7b0;
-      font-size: 1rem;
-      outline: none;
-      appearance: none;
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 4 4-4' stroke='%23d4af37' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 12px center;
-      background-size: 12px;
-    }
-
-    #intro-lang-modal .intro-lang-actions {
-      margin-top: 12px;
-    }
-
-    #intro-lang-modal .intro-lang-actions .btn {
-      width: 100%;
-      padding: 12px;
-      font-size: 1.1rem;
-    }
-
-    body:has(#intro-lang-modal) {
-      overflow: hidden;
-    }
-  `;
- `;
- modal.appendChild(style);
- modal.style.display = 'flex';
- modal.style.visibility = 'visible';
- modal.style.opacity = '1';
- modal.hidden = false;
- return modal;
-}
-
-async function requireLanguageChoice(root) {
-  console.log('[IntroLang] requireLanguageChoice chamada');
-
-  let modal = document.getElementById('intro-lang-modal');
-
-  if (!modal) {
-    modal = buildLangModal(document.body);
-    document.body.appendChild(modal);
-    console.log('[IntroLang] modal criado e anexado ao body');
-  }
-
-  const select = modal.querySelector('#intro-lang-select');
-  const confirm = modal.querySelector('#intro-lang-confirm');
-
-  const saved =
-    sessionStorage.getItem('jornada.lang') ||
-    sessionStorage.getItem('i18n.lang') ||
-    localStorage.getItem('i18n_lang') ||
-    'pt-BR';
-
-  if (select) select.value = saved;
-
-  modal.style.display = 'flex';
-  modal.style.visibility = 'visible';
-  modal.style.opacity = '1';
-  modal.hidden = false;
-
-  return new Promise((resolve) => {
-    confirm.onclick = async () => {
-      const chosen = select?.value || 'pt-BR';
-      console.log('[IntroLang] idioma confirmado:', chosen);
-
-      try {
-        localStorage.setItem('i18n_lang', chosen);
-        localStorage.setItem('i18n_locked', '1');
-        sessionStorage.setItem('jornada.lang', chosen);
-        sessionStorage.setItem('i18n.lang', chosen);
-
-        if (window.i18n?.setLang) {
-          await window.i18n.setLang(chosen, true);
-        } else {
-          document.documentElement.setAttribute('lang', chosen);
-          document.documentElement.setAttribute('data-lang', chosen);
-        }
-      } catch (e) {
-        console.warn('[IntroLang] Falha ao definir idioma:', e);
+    const style = document.createElement('style');
+    style.textContent = `
+      #intro-lang-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
-      modal.remove();
-      resolve(chosen);
-    };
-  });
-}
+      #intro-lang-modal .intro-lang-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.68);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+      }
+
+      #intro-lang-modal .intro-lang-card {
+        position: relative;
+        z-index: 1;
+        width: min(92vw, 420px);
+        padding: 18px 16px;
+        border-radius: 18px;
+        border: 1px solid rgba(212,175,55,.65);
+        background:
+          linear-gradient(180deg, rgba(8,10,18,.92), rgba(12,16,26,.94));
+        box-shadow:
+          0 0 22px rgba(212,175,55,.18),
+          inset 0 0 0 1px rgba(255,255,255,.04);
+        color: #f5e7b0;
+        text-align: center;
+      }
+
+      #intro-lang-modal .intro-lang-title {
+        margin: 0 0 8px;
+        font-size: 1.3rem;
+        letter-spacing: .03em;
+        font-family: "ManufacturingConsent-Regular", "Cardo", serif;
+      }
+
+      #intro-lang-modal .intro-lang-sub {
+        margin: 0 0 16px;
+        font-size: .95rem;
+        opacity: .95;
+        line-height: 1.4;
+      }
+
+      #intro-lang-modal .intro-lang-row {
+        margin: 12px 0 16px;
+      }
+
+      #intro-lang-modal .intro-lang-select {
+        width: 100%;
+        padding: 12px 16px;
+        border-radius: 12px;
+        border: 1px solid rgba(212,175,55,.6);
+        background: rgba(0,0,0,.45);
+        color: #f5e7b0;
+        font-size: 1rem;
+        outline: none;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 4 4-4' stroke='%23d4af37' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 12px;
+      }
+
+      #intro-lang-modal .intro-lang-actions {
+        margin-top: 12px;
+      }
+
+      #intro-lang-modal .intro-lang-actions .btn {
+        width: 100%;
+        padding: 12px;
+        font-size: 1.1rem;
+      }
+
+      body:has(#intro-lang-modal) {
+        overflow: hidden;
+      }
+    `;
+    modal.appendChild(style);
+    modal.style.display = 'flex';
+    modal.style.visibility = 'visible';
+    modal.style.opacity = '1';
+    modal.hidden = false;
+    return modal;
+  }
+
   async function requireLanguageChoice(root) {
     if (isLangLocked()) {
       console.log('[IntroLang] Idioma já travado, prosseguindo.');
@@ -330,12 +273,11 @@ async function requireLanguageChoice(root) {
     const last = localStorage.getItem('i18n_lang') || window.i18n?.lang || 'pt-BR';
     const sel = modal.querySelector('#intro-lang-select');
     if (sel) sel.value = last;
-    await new Promise((resolve) => {
+    return new Promise((resolve) => {
       const btn = modal.querySelector('#intro-lang-confirm');
       btn.addEventListener('click', async () => {
         const chosen = sel?.value || 'pt-BR';
         await setLangAndLock(chosen);
-        // Aplica i18n na intro
         try {
           if (window.i18n?.apply) window.i18n.apply(root);
         } catch (e) {
@@ -347,6 +289,7 @@ async function requireLanguageChoice(root) {
       }, { once: true });
     });
   }
+
   async function runTyping(root) {
     if (!isLangLocked()) {
       console.warn('[Intro] Idioma não confirmado — bloqueando runTyping.');
@@ -368,62 +311,69 @@ async function requireLanguageChoice(root) {
       if (typeof window.playTransitionVideo === 'function') {
         window.playTransitionVideo(src, NEXT_SECTION_ID);
       } else {
-      window.JC?.show?.(NEXT_SECTION_ID) ?? (location.hash = '#' + NEXT_SECTION_ID);
+        window.JC?.show?.(NEXT_SECTION_ID) ?? (location.hash = '#' + NEXT_SECTION_ID);
       }
     }, { once: true });
   }
-let __I18N_APPLY_LOCK__ = 0;
 
-async function applyGlobalI18n(node) {
+  let __I18N_APPLY_LOCK__ = 0;
+
+  async function applyGlobalI18n(node) {
     const now = Date.now();
     if (now - __I18N_APPLY_LOCK__ < 250) return;
     __I18N_APPLY_LOCK__ = now;
 
+    let lang = null;
+
     if (isLangLocked() && window.i18n?.apply) {
-        try {
-            const lang = localStorage.getItem('i18n_lang');
-            if (lang && window.i18n?.forceLang) {
-                await window.i18n.forceLang(lang, true);
-            }
-        } catch (e) {
-            // silently ignore
+      try {
+        lang = localStorage.getItem('i18n_lang');
+        if (lang && window.i18n?.forceLang) {
+          await window.i18n.forceLang(lang, true);
         }
+      } catch (e) {
+        // silently ignore
+      }
     }
 
-    window.i18n.apply(node || document);
+    if (window.i18n?.apply) {
+      window.i18n.apply(node || document);
+    }
 
     const targetName =
-        (node && node.nodeType === 9)
-            ? 'document'
-            : (node?.id || node?.tagName || 'unknown');
+      (node && node.nodeType === 9)
+        ? 'document'
+        : (node?.id || node?.tagName || 'unknown');
 
     if (targetName !== 'unknown') {
-        window.__GLOBAL_I18N_LOG_ONCE__ = window.__GLOBAL_I18N_LOG_ONCE__ || {};
-        const logKey = `${lang || 'na'}:${targetName}`;
+      window.__GLOBAL_I18N_LOG_ONCE__ = window.__GLOBAL_I18N_LOG_ONCE__ || {};
+      const logKey = (lang || 'na') + ':' + targetName;
 
-        if (!window.__GLOBAL_I18N_LOG_ONCE__[logKey]) {
-            window.__GLOBAL_I18N_LOG_ONCE__[logKey] = true;
-            console.log('[GlobalI18n] Aplicado em', targetName);
-        }
+      if (!window.__GLOBAL_I18N_LOG_ONCE__[logKey]) {
+        window.__GLOBAL_I18N_LOG_ONCE__[logKey] = true;
+        console.log('[GlobalI18n] Aplicado em', targetName);
+      }
     }
-}
+  }
+
   async function init(root) {
     if (!root || window.JCIntro.state.initialized) return;
     window.JCIntro.state.initialized = true;
     ensureVisible(root);
     await requireLanguageChoice(document.body);
-    await runTyping(root);   
-  }    
+    await runTyping(root);
+  }
+
   function onSectionShown(evt) {
     const { sectionId, node } = evt?.detail || {};
-    applyGlobalI18n(node); // Aplica i18n em TODAS as seções
+    applyGlobalI18n(node);
     if (sectionId !== SECTION_ID) return;
     init(node || document.getElementById(SECTION_ID));
   }
+
   function bind() {
     if (!window.JCIntro.state.listenerOn) {
       document.addEventListener('section:shown', onSectionShown, { passive: true });
-      // Listener pra mudança de i18n global
       document.addEventListener('i18n:changed', (e) => applyGlobalI18n(document));
       window.JCIntro.state.listenerOn = true;
     }
@@ -433,9 +383,10 @@ async function applyGlobalI18n(node) {
       .then((el) => init(el))
       .catch((e) => console.warn('[JCIntro] seção não apareceu a tempo:', e.message));
   }
+
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind, { once: true });
   else bind();
-  // Init global i18n no load
+
   applyGlobalI18n(document);
-  
+
 })();
