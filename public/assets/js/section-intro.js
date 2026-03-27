@@ -368,7 +368,7 @@ async function requireLanguageChoice(root) {
       if (typeof window.playTransitionVideo === 'function') {
         window.playTransitionVideo(src, NEXT_SECTION_ID);
       } else {
-        window.JC?.show?.(NEXT_SECTION_ID) ?? (location.hash = `#${NEXT_SECTION_ID}`);
+      window.JC?.show?.(NEXT_SECTION_ID) ?? (location.hash = '#' + NEXT_SECTION_ID);
       }
     }, { once: true });
   }
