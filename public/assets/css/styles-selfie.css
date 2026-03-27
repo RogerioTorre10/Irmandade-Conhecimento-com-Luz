@@ -498,16 +498,16 @@
 
 @media (max-width: 768px) {
   #section-selfie {
-    padding-left: 6px !important;
-    padding-right: 6px !important;
+    overflow-x: hidden !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
   }
 
   #section-selfie .j-panel-glow {
     width: 100% !important;
     max-width: 100% !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    transform: translateX(-3px) !important;
+    margin: 0 auto !important;
+    transform: translateX(-4px) !important;
   }
 
   #section-selfie .j-perg-v-inner,
