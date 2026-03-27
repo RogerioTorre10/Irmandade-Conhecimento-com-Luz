@@ -216,6 +216,26 @@
     canvasEl = document.getElementById('selfieCanvas');
     previewImg = document.getElementById('selfiePreview');
 
+        if (videoEl) {
+      videoEl.style.position = 'absolute';
+      videoEl.style.top = '0';
+      videoEl.style.left = '0';
+      videoEl.style.width = '100%';
+      videoEl.style.height = '100%';
+      videoEl.style.objectFit = 'cover';
+      videoEl.style.transformOrigin = 'center center';
+    }
+
+    if (canvasEl) {
+      canvasEl.style.position = 'absolute';
+      canvasEl.style.top = '0';
+      canvasEl.style.left = '0';
+      canvasEl.style.width = '100%';
+      canvasEl.style.height = '100%';
+      canvasEl.style.objectFit = 'cover';
+      canvasEl.style.transformOrigin = 'center center';
+    }
+
     const title = document.getElementById('selfie-title');
     const texto = document.getElementById('selfieTexto');
     const { nome, guia } = getUserData();
