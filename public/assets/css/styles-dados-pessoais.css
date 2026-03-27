@@ -262,3 +262,33 @@ body {
     margin: 18px 0 24px !important;
   }
 }
+
+/* ==========================================
+   FORÇA SCROLL GLOBAL DA PÁGINA
+   ========================================== */
+
+html, body {
+  height: auto !important;
+  min-height: 100% !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+/* seção deve permitir crescer */
+#section-dados-pessoais {
+  height: auto !important;
+  min-height: 100vh !important;
+  overflow: visible !important;
+}
+
+/* remove qualquer trava interna */
+#section-dados-pessoais * {
+  max-height: none !important;
+}
+
+/* garante scroll no mobile */
+@media (max-width: 768px) {
+  body {
+    overflow-y: auto !important;
+  }
+}
