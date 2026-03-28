@@ -167,75 +167,76 @@
     if (confirmBtn) confirmBtn.disabled = true;
   }
 
-  function fixSelfieLayout() {
-    const section = getById('section-selfie');
-    if (!section) return;
+ function fixSelfieLayout() {
+  const section = getById('section-selfie');
+  if (!section) return;
 
-    const panel = section.querySelector('.j-panel-glow');
-    const nodes = section.querySelectorAll(
-      '.j-panel-glow, .j-perg-v-inner, .j-arcane-card, .pergaminho-content'
-    );
+  const panel = section.querySelector('.j-panel-glow');
+  const inner = section.querySelector('.j-perg-v-inner');
+  const card = section.querySelector('.j-arcane-card');
+  const content = section.querySelector('.pergaminho-content');
 
-    section.style.overflowX = 'hidden';
-    section.style.boxSizing = 'border-box';
+  section.style.overflowX = 'hidden';
+  section.style.boxSizing = 'border-box';
+  section.style.paddingLeft = '6px';
+  section.style.paddingRight = '6px';
 
-    if (window.innerWidth <= 768) {
-      section.style.paddingLeft = '8px';
-      section.style.paddingRight = '8px';
-    }
+  [panel, inner, card, content].forEach((el) => {
+    if (!el) return;
+    el.style.boxSizing = 'border-box';
+    el.style.marginLeft = 'auto';
+    el.style.marginRight = 'auto';
+    el.style.maxWidth = '100%';
+  });
 
-    nodes.forEach((el) => {
-      el.style.boxSizing = 'border-box';
-      el.style.marginLeft = 'auto';
-      el.style.marginRight = 'auto';
-      el.style.maxWidth = '100%';
-      if (!el.classList.contains('j-panel-glow')) {
-        el.style.transform = 'none';
-      }
-    });
-
-    if (panel && window.innerWidth <= 768) {
-      panel.style.width = 'calc(100vw - 16px)';
-      panel.style.maxWidth = 'calc(100vw - 16px)';
-      panel.style.marginLeft = 'auto';
-      panel.style.marginRight = 'auto';
-      panel.style.transform = 'translateX(-2px)';
-    }
-
-    const frame = getFrameEl();
-    if (frame) {
-      frame.style.position = 'relative';
-      frame.style.overflow = 'hidden';
-      frame.style.marginLeft = 'auto';
-      frame.style.marginRight = 'auto';
-      frame.style.marginBottom = '10px';
-      frame.style.width = 'min(100%, 320px)';
-      frame.style.maxWidth = '320px';
-      frame.style.zIndex = '10';
-      frame.style.background = '#000';
-    }
-
-    const slidersWrap =
-      section.querySelector('.selfie-sliders') ||
-      section.querySelector('.camera-sliders') ||
-      section.querySelector('.ajustes-camera');
-
-    if (slidersWrap) {
-      slidersWrap.style.width = 'min(100%, 320px)';
-      slidersWrap.style.maxWidth = '320px';
-      slidersWrap.style.marginLeft = 'auto';
-      slidersWrap.style.marginRight = 'auto';
-      slidersWrap.style.position = 'relative';
-      slidersWrap.style.zIndex = '30';
-      slidersWrap.style.pointerEvents = 'auto';
-    }
-
-    section.querySelectorAll('input[type="range"]').forEach((el) => {
-      el.style.position = 'relative';
-      el.style.zIndex = '35';
-      el.style.pointerEvents = 'auto';
-    });
+  if (panel && window.innerWidth <= 768) {
+    panel.style.width = 'calc(100% - 4px)';
+    panel.style.maxWidth = 'calc(100% - 4px)';
+    panel.style.marginLeft = 'auto';
+    panel.style.marginRight = 'auto';
+    panel.style.transform = 'translateX(-3px)';
   }
+
+  const frame = getFrameEl();
+  if (frame) {
+    frame.style.position = 'relative';
+    frame.style.overflow = 'hidden';
+    frame.style.marginLeft = 'auto';
+    frame.style.marginRight = 'auto';
+    frame.style.marginBottom = '12px';
+    frame.style.width = 'min(100%, 320px)';
+    frame.style.maxWidth = '320px';
+    frame.style.height = '420px';
+    frame.style.maxHeight = '420px';
+    frame.style.background = '#000';
+    frame.style.zIndex = '10';
+  }
+
+  const slidersWrap =
+    section.querySelector('.selfie-sliders') ||
+    section.querySelector('.camera-sliders') ||
+    section.querySelector('.ajustes-camera');
+
+  if (slidersWrap) {
+    slidersWrap.style.width = 'min(100%, 320px)';
+    slidersWrap.style.maxWidth = '320px';
+    slidersWrap.style.marginLeft = 'auto';
+    slidersWrap.style.marginRight = 'auto';
+    slidersWrap.style.marginTop = '8px';
+    slidersWrap.style.paddingBottom = '18px';
+    slidersWrap.style.position = 'relative';
+    slidersWrap.style.zIndex = '40';
+    slidersWrap.style.pointerEvents = 'auto';
+  }
+
+  section.querySelectorAll('input[type="range"]').forEach((el) => {
+    el.style.width = '100%';
+    el.style.position = 'relative';
+    el.style.zIndex = '50';
+    el.style.pointerEvents = 'auto';
+    el.style.touchAction = 'pan-x';
+  });
+}
 
   function renderLivePreviewScale() {
   const allInput = getById('zoomAll');
