@@ -185,15 +185,14 @@
       // se já está pronto e já é esse idioma, sai
       if (state.ready && state.lang === lang) return;
 
-      localStorage.setItem(STORAGE_KEY, lang);
-      sessionStorage.setItem('jornada.lang', lang);
-      sessionStorage.setItem('i18n.lang', lang);
+     sessionStorage.setItem(STORAGE_KEY, lang);
+     sessionStorage.setItem('jornada.lang', lang);
+     sessionStorage.setItem('i18n.lang', lang);
 
-      if (lock) {
-        localStorage.setItem(LOCK_KEY, '1');
-        console.log('[i18n] Idioma travado permanentemente:', lang);
-      }
-
+     if (lock) {
+     sessionStorage.setItem(LOCK_KEY, '1');
+     console.log('[i18n] Idioma travado nesta jornada:', lang);
+    }
       state.ready = false;
       await init(lang);
       apply(document.body);
@@ -233,7 +232,7 @@
 
   // Desabilita qualquer seletor de idioma que exista no DOM
   function disableAllLangSelectors() {
-    const isLocked = localStorage.getItem(LOCK_KEY) === '1';
+    const isLocked = sessionStorage.getItem(LOCK_KEY) === '1';
     if (!isLocked) return;
 
     document.querySelectorAll('select').forEach((sel) => {
