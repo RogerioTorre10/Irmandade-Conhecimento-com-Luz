@@ -122,21 +122,19 @@
     el.style.background = '#000';
   }
 
-  function applyCapturedCanvasStyle(el) {
-    if (!el) return;
-    el.style.position = 'absolute';
-    el.style.inset = '0';
-    el.style.width = '100%';
-    el.style.height = '100%';
-    el.style.display = 'block';
-    el.style.margin = 'auto';
-    el.style.objectFit = 'cover';
-    el.style.objectPosition = 'center center';
-    el.style.transformOrigin = 'center center';
-    el.style.transform = 'none';
-    el.style.background = '#000';
-  }
-
+ function applyCapturedCanvasStyle(el) {
+  if (!el) return;
+  el.style.position = 'absolute';
+  el.style.top = '0';
+  el.style.left = '0';
+  el.style.width = '100%';
+  el.style.height = '100%';
+  el.style.display = 'block';
+  el.style.margin = 'auto';
+  el.style.transform = 'none';
+  el.style.background = '#000';
+  el.style.zIndex = '12';
+}
   function clearPreviewState() {
     lastCapture = null;
 
