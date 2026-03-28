@@ -139,6 +139,12 @@ async function setLangAndLock(lang) {
     return modal;
   }
 
+ function getTransitionSrc(root, btn) {
+    return (btn?.dataset?.transitionSrc)
+        || (root?.dataset?.transitionSrc)
+        || '/assets/videos/filme-pergaminho-ao-vento.mp4';
+  }
+  
  async function requireLanguageChoice() {
   // limpa trava e idioma da jornada anterior
   sessionStorage.removeItem('i18n_locked');
