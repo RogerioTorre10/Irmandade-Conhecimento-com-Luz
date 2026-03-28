@@ -174,15 +174,18 @@ async function setLangAndLock(lang) {
   });
 }
   
-  async function init(root) {
-    if (window.JCIntro.state.initialized) return;
-    window.JCIntro.state.initialized = true;
+async function init(root) {
+  if (window.JCIntro.state.initialized) return;
+  window.JCIntro.state.initialized = true;
 
-    await requireLanguageChoice();
+  sessionStorage.removeItem('i18n_locked');
+  sessionStorage.removeItem('jornada.lang');
+  sessionStorage.removeItem('i18n.lang');
 
-    // Aqui você pode chamar o typing, etc.
-    console.log('[Intro] Inicialização completa após escolha de idioma.');
-  }
+  await requireLanguageChoice();
+
+  console.log('[Intro] Inicialização completa após escolha de idioma.');
+}
 
   // Bind
   function bind() {
