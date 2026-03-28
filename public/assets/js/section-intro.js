@@ -12,30 +12,35 @@
 
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
-  function isLangLocked() {
-    return localStorage.getItem('i18n_locked') === '1';
-  }
+ function isLangLocked() {
+  return sessionStorage.getItem('i18n_locked') === '1';
+}
 
   async function setLangAndLock(lang) {
-    if (!lang) return;
+  if (!lang) return;
 
-    try {
-      if (window.i18n?.forceLang) {
-        await window.i18n.forceLang(lang, true);
-      } else if (window.i18n?.setLang) {
-        await window.i18n.setLang(lang);
-      }
-    } catch (e) {
-      console.warn('[IntroLang] Erro ao definir idioma:', e);
+  try {
+    if (window.i18n?.forceLang) {
+      await window.i18n.forceLang(lang, true);
+    } else if (window.i18n?.setLang) {
+      await window.i18n.setLang(lang);
     }
-
-    localStorage.setItem('i18n_lang', lang);
-    localStorage.setItem('i18n_locked', '1');
-    document.documentElement.lang = lang.split('-')[0] || 'pt';
-
-    console.log('[IntroLang] Idioma travado permanentemente:', lang);
+  } catch (e) {
+    console.warn('[IntroLang] Erro ao definir idioma:', e);
   }
 
+  // mantém idioma salvo globalmente como preferência
+  localStorage.setItem('i18n_lang', lang);
+
+  // trava apenas na jornada atual
+  sessionStorage.setItem('i18n_locked', '1');
+  sessionStorage.setItem('jornada.lang', lang);
+  sessionStorage.setItem('i18n.lang', lang);
+
+  document.documentElement.lang = lang.split('-')[0] || 'pt';
+
+  console.log('[IntroLang] Idioma travado nesta jornada:', lang);
+}
   function buildLangModal() {
     const modal = document.createElement('div');
     modal.id = 'intro-lang-modal';
@@ -137,30 +142,38 @@
   }
 
   async function requireLanguageChoice() {
-    if (isLangLocked()) {
-      console.log('[IntroLang] Idioma já travado, prosseguindo...');
-      return;
-    }
-
-    const modal = buildLangModal();
-    document.body.appendChild(modal);
-
-    return new Promise((resolve) => {
-      const btn = modal.querySelector('#intro-lang-confirm');
-      const sel = modal.querySelector('#intro-lang-select');
-
-      btn.addEventListener('click', async () => {
-        const chosenLang = sel.value;
-        await setLangAndLock(chosenLang);
-
-        // Remove o modal
-        modal.style.opacity = '0';
-        setTimeout(() => modal.remove(), 400);
-
-        resolve();
-      }, { once: true });
-    });
+  if (isLangLocked()) {
+    console.log('[IntroLang] Idioma já travado nesta jornada, prosseguindo...');
+    return;
   }
+
+  const modal = buildLangModal();
+  document.body.appendChild(modal);
+
+  // pré-seleciona último idioma usado, mas sem pular o modal
+  const sel = modal.querySelector('#intro-lang-select');
+  const savedLang =
+    sessionStorage.getItem('jornada.lang') ||
+    sessionStorage.getItem('i18n.lang') ||
+    localStorage.getItem('i18n_lang') ||
+    'pt-BR';
+
+  if (sel) sel.value = savedLang;
+
+  return new Promise((resolve) => {
+    const btn = modal.querySelector('#intro-lang-confirm');
+
+    btn.addEventListener('click', async () => {
+      const chosenLang = sel.value;
+      await setLangAndLock(chosenLang);
+
+      modal.style.opacity = '0';
+      setTimeout(() => modal.remove(), 400);
+
+      resolve();
+    }, { once: true });
+  });
+}
 
   async function init(root) {
     if (window.JCIntro.state.initialized) return;
