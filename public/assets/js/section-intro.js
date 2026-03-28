@@ -3,20 +3,17 @@
 
   const SECTION_ID = 'section-intro';
   const NEXT_SECTION_ID = 'section-termos1';
-  const HIDE_CLASS = 'hidden';
 
   if (window.JCIntro?.__bound) return;
   window.JCIntro = window.JCIntro || {};
   window.JCIntro.__bound = true;
-  window.JCIntro.state = { initialized: false, listenerOn: false };
+  window.JCIntro.state = { initialized: false };
 
-  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-
-  function isLangLocked() {
-    return localStorage.getItem('i18n_locked') === '1';
+  function isLangLockedThisSession() {
+    return sessionStorage.getItem('i18n_locked_this_session') === '1';
   }
 
-  async function setLangAndLock(lang) {
+  async function setLangAndLockThisSession(lang) {
     if (!lang) return;
 
     try {
@@ -30,10 +27,10 @@
     }
 
     localStorage.setItem('i18n_lang', lang);
-    localStorage.setItem('i18n_locked', '1');
+    sessionStorage.setItem('i18n_locked_this_session', '1');
     document.documentElement.lang = lang.split('-')[0] || 'pt';
 
-    console.log('[IntroLang] Idioma travado permanentemente:', lang);
+    console.log('[IntroLang] Idioma definido para esta sessão:', lang);
   }
 
   function buildLangModal() {
@@ -45,7 +42,7 @@
       <div class="intro-lang-card" role="dialog" aria-modal="true" aria-labelledby="intro-lang-title">
         <h3 id="intro-lang-title" class="intro-lang-title">Escolha seu idioma</h3>
         <p class="intro-lang-sub">
-          Selecione o idioma para navegar. Após confirmar, não será possível alterar.
+          Selecione o idioma para esta jornada.
         </p>
 
         <div class="intro-lang-row">
@@ -66,7 +63,6 @@
       </div>
     `;
 
-    // CSS inline para garantir que apareça
     const style = document.createElement('style');
     style.textContent = `
       #intro-lang-modal {
@@ -125,18 +121,13 @@
       }
     `;
     modal.appendChild(style);
-
-    // Garante que o modal seja visível
-    modal.style.display = 'flex';
-    modal.style.visibility = 'visible';
-    modal.style.opacity = '1';
-
     return modal;
   }
 
   async function requireLanguageChoice() {
-    if (isLangLocked()) {
-      console.log('[IntroLang] Idioma já travado, prosseguindo...');
+    // Se já escolheu nesta sessão, não mostra novamente
+    if (isLangLockedThisSession()) {
+      console.log('[IntroLang] Idioma já escolhido nesta sessão, prosseguindo...');
       return;
     }
 
@@ -149,9 +140,8 @@
 
       btn.addEventListener('click', async () => {
         const chosenLang = sel.value;
-        await setLangAndLock(chosenLang);
+        await setLangAndLockThisSession(chosenLang);
 
-        // Remove o modal
         modal.style.opacity = '0';
         setTimeout(() => modal.remove(), 400);
 
@@ -166,11 +156,10 @@
 
     await requireLanguageChoice();
 
-    // Aqui você pode chamar o typing, etc.
     console.log('[Intro] Inicialização completa após escolha de idioma.');
+    // Aqui você pode chamar typing, etc.
   }
 
-  // Bind
   function bind() {
     const existing = document.getElementById(SECTION_ID);
     if (existing) init(existing);
