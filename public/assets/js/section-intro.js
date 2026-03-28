@@ -9,30 +9,9 @@
   window.JCIntro.__bound = true;
   window.JCIntro.state = { initialized: false };
 
-  function isLangLockedThisSession() {
-    return sessionStorage.getItem('i18n_locked_this_session') === '1';
-  }
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
-  async function setLangAndLockThisSession(lang) {
-    if (!lang) return;
-
-    try {
-      if (window.i18n?.forceLang) {
-        await window.i18n.forceLang(lang, true);
-      } else if (window.i18n?.setLang) {
-        await window.i18n.setLang(lang);
-      }
-    } catch (e) {
-      console.warn('[IntroLang] Erro ao definir idioma:', e);
-    }
-
-    localStorage.setItem('i18n_lang', lang);
-    sessionStorage.setItem('i18n_locked_this_session', '1');
-    document.documentElement.lang = lang.split('-')[0] || 'pt';
-
-    console.log('[IntroLang] Idioma definido para esta sessão:', lang);
-  }
-
+  // ==================== MODAL DE IDIOMA ====================
   function buildLangModal() {
     const modal = document.createElement('div');
     modal.id = 'intro-lang-modal';
@@ -63,6 +42,7 @@
       </div>
     `;
 
+    // CSS inline forte + textura de pedra no botão
     const style = document.createElement('style');
     style.textContent = `
       #intro-lang-modal {
@@ -72,52 +52,60 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: rgba(0,0,0,0.75);
+        background: rgba(0,0,0,0.78);
       }
 
       #intro-lang-modal .intro-lang-card {
         width: min(92vw, 420px);
-        padding: 24px 20px;
+        padding: 28px 24px;
         border-radius: 18px;
-        background: rgba(15,15,25,0.98);
-        border: 1px solid rgba(212,175,55,0.6);
+        background: rgba(15,15,25,0.96);
+        border: 1px solid rgba(212,175,55,0.7);
         color: #f5e7b0;
         text-align: center;
-        box-shadow: 0 0 30px rgba(212,175,55,0.3);
+        box-shadow: 0 0 40px rgba(212,175,55,0.35);
       }
 
       #intro-lang-modal .intro-lang-title {
         margin: 0 0 12px 0;
-        font-size: 1.45rem;
+        font-size: 1.5rem;
         font-family: "ManufacturingConsent-Regular", serif;
+        color: #ffd700;
       }
 
       #intro-lang-modal .intro-lang-sub {
         margin: 0 0 20px 0;
-        font-size: 0.95rem;
+        font-size: 0.96rem;
         opacity: 0.9;
       }
 
       #intro-lang-modal .intro-lang-select {
         width: 100%;
-        padding: 12px 16px;
+        padding: 14px 16px;
         border-radius: 10px;
-        background: rgba(0,0,0,0.6);
-        border: 1px solid rgba(212,175,55,0.5);
+        background: rgba(0,0,0,0.65);
+        border: 1px solid rgba(212,175,55,0.6);
         color: #f5e7b0;
         font-size: 1.05rem;
-        margin-bottom: 16px;
+        margin-bottom: 20px;
       }
 
       #intro-lang-modal .intro-lang-actions button {
         width: 100%;
-        padding: 14px;
-        font-size: 1.1rem;
-        background: linear-gradient(135deg, #d4af37, #b38b2e);
-        color: #111;
-        border: none;
-        border-radius: 10px;
+        padding: 16px 20px;
+        font-size: 1.15rem;
         font-weight: bold;
+        border: none;
+        border-radius: 12px;
+        background: url('/assets/img/textura-de-pedra.jpg') center/cover;
+        color: #111;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+        transition: all 0.25s ease;
+      }
+
+      #intro-lang-modal .intro-lang-actions button:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.1);
       }
     `;
     modal.appendChild(style);
@@ -125,11 +113,9 @@
   }
 
   async function requireLanguageChoice() {
-    // Se já escolheu nesta sessão, não mostra novamente
-    if (isLangLockedThisSession()) {
-      console.log('[IntroLang] Idioma já escolhido nesta sessão, prosseguindo...');
-      return;
-    }
+    // Remove qualquer modal antigo
+    const oldModal = document.getElementById('intro-lang-modal');
+    if (oldModal) oldModal.remove();
 
     const modal = buildLangModal();
     document.body.appendChild(modal);
@@ -140,11 +126,24 @@
 
       btn.addEventListener('click', async () => {
         const chosenLang = sel.value;
-        await setLangAndLockThisSession(chosenLang);
+
+        try {
+          if (window.i18n?.forceLang) {
+            await window.i18n.forceLang(chosenLang, true);
+          } else if (window.i18n?.setLang) {
+            await window.i18n.setLang(chosenLang);
+          }
+        } catch (e) {
+          console.warn('[IntroLang] Erro ao definir idioma:', e);
+        }
+
+        localStorage.setItem('i18n_lang', chosenLang);
+        document.documentElement.lang = chosenLang.split('-')[0] || 'pt';
 
         modal.style.opacity = '0';
         setTimeout(() => modal.remove(), 400);
 
+        console.log('[IntroLang] Idioma escolhido:', chosenLang);
         resolve();
       }, { once: true });
     });
@@ -154,10 +153,11 @@
     if (window.JCIntro.state.initialized) return;
     window.JCIntro.state.initialized = true;
 
+    console.log('[Intro] Iniciando com escolha de idioma...');
     await requireLanguageChoice();
 
+    // Aqui você pode chamar o typing se necessário
     console.log('[Intro] Inicialização completa após escolha de idioma.');
-    // Aqui você pode chamar typing, etc.
   }
 
   function bind() {
