@@ -138,12 +138,6 @@ async function setLangAndLock(lang) {
 
     return modal;
   }
-
- function getTransitionSrc(root, btn) {
-    return (btn?.dataset?.transitionSrc)
-        || (root?.dataset?.transitionSrc)
-        || '/assets/videos/filme-pergaminho-ao-vento.mp4';
-  }
   
  async function requireLanguageChoice() {
   // limpa trava e idioma da jornada anterior
@@ -179,6 +173,42 @@ async function setLangAndLock(lang) {
     }, { once: true });
   });
 }
+
+  async function runTyping(root) {
+  if (!root) return;
+
+  const btn =
+    root.querySelector('#btn-intro') ||
+    root.querySelector('[data-next]') ||
+    root.querySelector('.btn-stone') ||
+    root.querySelector('button');
+
+  if (!btn) {
+    console.warn('[JCIntro] Botão da intro não encontrado.');
+    return;
+  }
+
+  btn.removeAttribute('disabled');
+  btn.classList.remove('is-hidden');
+
+  btn.onclick = () => {
+    try { window.speechSynthesis?.cancel?.(); } catch {}
+
+    if (typeof window.playTransitionVideo === 'function') {
+      window.playTransitionVideo(
+        '/assets/videos/filme-pergaminho-ao-vento.mp4',
+        NEXT_SECTION_ID
+      );
+      return;
+    }
+
+    if (window.JC?.show) {
+      window.JC.show(NEXT_SECTION_ID, { force: true });
+    } else {
+      location.hash = '#' + NEXT_SECTION_ID;
+    }
+  };
+}
   
 async function init(root) {
   if (window.JCIntro.state.initialized) return;
@@ -189,10 +219,11 @@ async function init(root) {
   sessionStorage.removeItem('i18n.lang');
 
   await requireLanguageChoice();
+  await runTyping(root);
 
   console.log('[Intro] Inicialização completa após escolha de idioma.');
 }
-
+  
   // Bind
   function bind() {
     const existing = document.getElementById(SECTION_ID);
