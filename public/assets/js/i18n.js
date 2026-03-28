@@ -75,7 +75,7 @@
     const forced = normalizeLang(FORCE_LANG);
     if (forced && SUPPORTED.includes(forced)) return forced;
 
-    const stored = normalizeLang(localStorage.getItem(STORAGE_KEY));
+    const stored = normalizeLang(sessionStorage.getItem(STORAGE_KEY));
     if (stored && SUPPORTED.includes(stored)) return stored;
 
     const nav = normalizeLang(navigator.language || navigator.userLanguage || DEFAULT);
