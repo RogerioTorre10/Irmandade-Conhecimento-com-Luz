@@ -66,10 +66,10 @@
 
   function detectLang() {
     // Se já está travado, ignora tudo e usa o armazenado
-    const locked = localStorage.getItem(LOCK_KEY) === '1';
+    const locked = sessionStorage.getItem(LOCK_KEY) === '1';
     if (locked) {
-      const stored = normalizeLang(localStorage.getItem(STORAGE_KEY));
-      if (stored && SUPPORTED.includes(stored)) return stored;
+    const stored = normalizeLang(sessionStorage.getItem(STORAGE_KEY));
+    if (stored && SUPPORTED.includes(stored)) return stored;
     }
 
     const forced = normalizeLang(FORCE_LANG);
