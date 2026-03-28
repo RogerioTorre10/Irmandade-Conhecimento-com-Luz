@@ -16,7 +16,7 @@
   return sessionStorage.getItem('i18n_locked') === '1';
 }
 
-  async function setLangAndLock(lang) {
+ async function setLangAndLock(lang) {
   if (!lang) return;
 
   try {
@@ -29,18 +29,16 @@
     console.warn('[IntroLang] Erro ao definir idioma:', e);
   }
 
-  // mantém idioma salvo globalmente como preferência
-  localStorage.setItem('i18n_lang', lang);
-
-  // trava apenas na jornada atual
-  sessionStorage.setItem('i18n_locked', '1');
+  // 🔥 só salva na sessão (não global)
   sessionStorage.setItem('jornada.lang', lang);
   sessionStorage.setItem('i18n.lang', lang);
+  sessionStorage.setItem('i18n_locked', '1');
 
   document.documentElement.lang = lang.split('-')[0] || 'pt';
 
-  console.log('[IntroLang] Idioma travado nesta jornada:', lang);
+  console.log('[IntroLang] Idioma definido nesta jornada:', lang);
 }
+  
   function buildLangModal() {
     const modal = document.createElement('div');
     modal.id = 'intro-lang-modal';
