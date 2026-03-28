@@ -9,8 +9,6 @@
   window.JCIntro.__bound = true;
   window.JCIntro.state = { initialized: false };
 
-  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-
   // ==================== MODAL DE IDIOMA ====================
   function buildLangModal() {
     const modal = document.createElement('div');
@@ -42,7 +40,6 @@
       </div>
     `;
 
-    // CSS inline forte + textura de pedra no botão
     const style = document.createElement('style');
     style.textContent = `
       #intro-lang-modal {
@@ -114,8 +111,8 @@
 
   async function requireLanguageChoice() {
     // Remove qualquer modal antigo
-    const oldModal = document.getElementById('intro-lang-modal');
-    if (oldModal) oldModal.remove();
+    const old = document.getElementById('intro-lang-modal');
+    if (old) old.remove();
 
     const modal = buildLangModal();
     document.body.appendChild(modal);
@@ -156,7 +153,6 @@
     console.log('[Intro] Iniciando com escolha de idioma...');
     await requireLanguageChoice();
 
-    // Aqui você pode chamar o typing se necessário
     console.log('[Intro] Inicialização completa após escolha de idioma.');
   }
 
