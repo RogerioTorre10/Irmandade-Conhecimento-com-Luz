@@ -1,4 +1,4 @@
-/* section-selfie.js — VERSÃO FINAL CORRIGIDA */
+/* section-selfie.js — VERSÃO ESTÁVEL */
 (function (window) {
   'use strict';
 
@@ -15,7 +15,7 @@
   let stream = null;
   let videoEl = null;
   let canvasEl = null;
-  let previewImg = null;
+  let previewImg = null; // mantido apenas por compatibilidade, não será o preview principal
   let lastCapture = null;
 
   const toast = (msg) => window.toast?.(msg) || alert(msg);
@@ -42,6 +42,129 @@
 
   function clamp(n, min, max) {
     return Math.max(min, Math.min(max, n));
+  }
+
+  function getUserData() {
+    let nome = 'AMOR';
+    let guia = 'zion';
+
+    const ssNome = sessionStorage.getItem('jornada.nome');
+    const ssGuia = sessionStorage.getItem('jornada.guia');
+
+    if (ssNome && ssNome.trim()) nome = ssNome.trim();
+    if (ssGuia && ssGuia.trim()) guia = ssGuia.trim().toLowerCase();
+
+    if (!ssNome || !ssGuia) {
+      const lsNome = localStorage.getItem('jc.nome');
+      const lsGuia = localStorage.getItem('jc.guia');
+      if (lsNome) nome = lsNome;
+      if (lsGuia) guia = lsGuia;
+    }
+
+    nome = nome.toUpperCase().trim();
+    guia = guia.toLowerCase().trim();
+
+    window.JC = window.JC || {};
+    window.JC.data = window.JC.data || {};
+    window.JC.data.nome = nome;
+    window.JC.data.guia = guia;
+
+    try {
+      sessionStorage.setItem('jornada.nome', nome);
+      sessionStorage.setItem('jornada.guia', guia);
+    } catch (e) {
+      console.warn('[SELFIE] Não foi possível persistir nome/guia.', e);
+    }
+
+    return { nome, guia };
+  }
+
+  function typeWriter(el, text, speed = 35) {
+    if (!el) return;
+    el.textContent = '';
+    el.style.opacity = '1';
+
+    let i = 0;
+    const timer = setInterval(() => {
+      if (i < text.length) {
+        el.textContent += text[i++];
+      } else {
+        clearInterval(timer);
+      }
+    }, speed);
+  }
+
+  function speak(text) {
+    if (window.speak) {
+      window.speak(text);
+      return;
+    }
+
+    if ('speechSynthesis' in window) {
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'pt-BR';
+      u.rate = 0.9;
+      speechSynthesis.speak(u);
+    }
+  }
+
+  function applyLiveStyle(el) {
+    if (!el) return;
+    el.style.position = 'absolute';
+    el.style.inset = '0';
+    el.style.width = '100%';
+    el.style.height = '100%';
+    el.style.display = 'block';
+    el.style.margin = 'auto';
+    el.style.objectFit = 'cover';
+    el.style.objectPosition = 'center center';
+    el.style.transformOrigin = 'center center';
+    el.style.background = '#000';
+  }
+
+  function applyCapturedCanvasStyle(el) {
+    if (!el) return;
+    el.style.position = 'absolute';
+    el.style.inset = '0';
+    el.style.width = '100%';
+    el.style.height = '100%';
+    el.style.display = 'block';
+    el.style.margin = 'auto';
+    el.style.objectFit = 'cover';
+    el.style.objectPosition = 'center center';
+    el.style.transformOrigin = 'center center';
+    el.style.transform = 'none';
+    el.style.background = '#000';
+  }
+
+  function clearPreviewState() {
+    lastCapture = null;
+
+    if (previewImg) {
+      previewImg.onload = null;
+      previewImg.style.display = 'none';
+      previewImg.removeAttribute('src');
+      previewImg.src = '';
+    }
+
+    if (canvasEl) {
+      const ctx = canvasEl.getContext('2d');
+      try {
+        ctx.clearRect(0, 0, canvasEl.width || 1, canvasEl.height || 1);
+      } catch {}
+      canvasEl.width = 1;
+      canvasEl.height = 1;
+      canvasEl.style.display = 'none';
+      canvasEl.style.transform = 'none';
+    }
+
+    if (videoEl) {
+      videoEl.style.display = 'block';
+      videoEl.style.transform = 'scale(1)';
+    }
+
+    const confirmBtn = getById('btn-selfie-confirm');
+    if (confirmBtn) confirmBtn.disabled = true;
   }
 
   function fixSelfieLayout() {
@@ -89,6 +212,7 @@
       frame.style.width = 'min(100%, 320px)';
       frame.style.maxWidth = '320px';
       frame.style.zIndex = '10';
+      frame.style.background = '#000';
     }
 
     const slidersWrap =
@@ -102,100 +226,15 @@
       slidersWrap.style.marginLeft = 'auto';
       slidersWrap.style.marginRight = 'auto';
       slidersWrap.style.position = 'relative';
-      slidersWrap.style.zIndex = '20';
+      slidersWrap.style.zIndex = '30';
       slidersWrap.style.pointerEvents = 'auto';
     }
 
     section.querySelectorAll('input[type="range"]').forEach((el) => {
       el.style.position = 'relative';
-      el.style.zIndex = '25';
+      el.style.zIndex = '35';
       el.style.pointerEvents = 'auto';
     });
-  }
-
-  function getUserData() {
-    let nome = 'AMOR';
-    let guia = 'zion';
-
-    const ssNome = sessionStorage.getItem('jornada.nome');
-    const ssGuia = sessionStorage.getItem('jornada.guia');
-
-    if (ssNome && ssNome.trim()) nome = ssNome.trim();
-    if (ssGuia && ssGuia.trim()) guia = ssGuia.trim().toLowerCase();
-
-    if (!ssNome || !ssGuia) {
-      const lsNome = localStorage.getItem('jc.nome');
-      const lsGuia = localStorage.getItem('jc.guia');
-      if (lsNome) nome = lsNome;
-      if (lsGuia) guia = lsGuia;
-    }
-
-    nome = nome.toUpperCase().trim();
-    guia = guia.toLowerCase().trim();
-
-    window.JC = window.JC || {};
-    window.JC.data = window.JC.data || {};
-    window.JC.data.nome = nome;
-    window.JC.data.guia = guia;
-
-    try {
-      sessionStorage.setItem('jornada.nome', nome);
-      sessionStorage.setItem('jornada.guia', guia);
-    } catch (e) {
-      console.warn('[SELFIE] Não foi possível persistir nome/guia.', e);
-    }
-
-    console.log(
-      `%c[SELFIE] Dados finais → Nome: ${nome}, Guia: ${guia}`,
-      'color: cyan; font-weight: bold'
-    );
-
-    return { nome, guia };
-  }
-
-  function typeWriter(el, text, speed = 35) {
-    if (!el) return;
-    el.textContent = '';
-    el.style.opacity = '1';
-
-    let i = 0;
-    const timer = setInterval(() => {
-      if (i < text.length) {
-        el.textContent += text[i++];
-      } else {
-        clearInterval(timer);
-      }
-    }, speed);
-  }
-
-  function speak(text) {
-    if (window.speak) {
-      window.speak(text);
-      return;
-    }
-
-    if ('speechSynthesis' in window) {
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = 'pt-BR';
-      u.rate = 0.9;
-      speechSynthesis.speak(u);
-    }
-  }
-
-  function applyMediaElementBaseStyle(el) {
-    if (!el) return;
-
-    el.style.position = 'absolute';
-    el.style.inset = '0';
-    el.style.width = '100%';
-    el.style.height = '100%';
-    el.style.display = 'block';
-    el.style.margin = 'auto';
-    el.style.objectFit = 'cover';
-    el.style.objectPosition = 'center center';
-    el.style.transformOrigin = 'center center';
-    el.style.transform = 'scale(1)';
-    el.style.background = '#000';
   }
 
   function renderLivePreviewScale() {
@@ -222,19 +261,8 @@
     const liveScale = clamp(all * Math.min(x, y), 0.2, 3);
 
     if (videoEl && videoEl.style.display !== 'none') {
-      applyMediaElementBaseStyle(videoEl);
+      applyLiveStyle(videoEl);
       videoEl.style.transform = `scale(${liveScale})`;
-    }
-
-    if (previewImg && previewImg.style.display !== 'none') {
-      applyMediaElementBaseStyle(previewImg);
-      previewImg.style.objectFit = 'contain';
-      previewImg.style.transform = 'scale(1)';
-    }
-
-    if (canvasEl) {
-      applyMediaElementBaseStyle(canvasEl);
-      canvasEl.style.transform = 'scale(1)';
     }
   }
 
@@ -244,28 +272,9 @@
 
   async function startCamera() {
     stopCamera();
+    clearPreviewState();
 
     try {
-      lastCapture = null;
-
-      if (previewImg) {
-        previewImg.onload = null;
-        previewImg.style.display = 'none';
-        previewImg.removeAttribute('src');
-        previewImg.src = '';
-      }
-
-      if (canvasEl) {
-        const ctx = canvasEl.getContext('2d');
-        ctx.clearRect(0, 0, canvasEl.width || 1, canvasEl.height || 1);
-        canvasEl.style.display = 'none';
-      }
-
-      if (videoEl) {
-        videoEl.style.display = 'block';
-        videoEl.style.transform = 'scale(1)';
-      }
-
       stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: 'user',
@@ -288,7 +297,6 @@
       if (errorEl) errorEl.style.display = 'none';
 
       await videoEl.play().catch(() => {});
-
       renderLivePreviewScale();
     } catch (e) {
       console.error('[SELFIE] Erro ao iniciar câmera:', e);
@@ -310,17 +318,22 @@
     }
   }
 
-  function computePreviewContain(sourceW, sourceH, targetW, targetH, zoomFactor) {
-    const baseScale = Math.min(targetW / sourceW, targetH / sourceH);
+  function computeCoverCrop(sourceW, sourceH, targetW, targetH, zoomFactor) {
+    const baseScale = Math.max(targetW / sourceW, targetH / sourceH);
     const finalScale = baseScale * zoomFactor;
 
-    const drawW = sourceW * finalScale;
-    const drawH = sourceH * finalScale;
+    const cropW = targetW / finalScale;
+    const cropH = targetH / finalScale;
 
-    const dx = (targetW - drawW) / 2;
-    const dy = (targetH - drawH) / 2;
+    const sx = (sourceW - cropW) / 2;
+    const sy = (sourceH - cropH) / 2;
 
-    return { dx, dy, drawW, drawH };
+    return {
+      sx: Math.max(0, sx),
+      sy: Math.max(0, sy),
+      sWidth: Math.min(sourceW, cropW),
+      sHeight: Math.min(sourceH, cropH)
+    };
   }
 
   function capture() {
@@ -349,7 +362,7 @@
 
     const zoomFactor = clamp(zoomState.all * Math.min(zoomState.x, zoomState.y), 0.2, 3);
 
-    const preview = computePreviewContain(
+    const crop = computeCoverCrop(
       videoEl.videoWidth,
       videoEl.videoHeight,
       w,
@@ -363,36 +376,22 @@
 
     ctx.drawImage(
       videoEl,
-      preview.dx,
-      preview.dy,
-      preview.drawW,
-      preview.drawH
+      crop.sx,
+      crop.sy,
+      crop.sWidth,
+      crop.sHeight,
+      0,
+      0,
+      w,
+      h
     );
 
     lastCapture = canvasEl.toDataURL('image/jpeg', 0.92);
 
-    if (previewImg) {
-      previewImg.onload = () => {
-        if (videoEl) videoEl.style.display = 'none';
-        if (canvasEl) canvasEl.style.display = 'none';
+    if (videoEl) videoEl.style.display = 'none';
 
-        applyMediaElementBaseStyle(previewImg);
-        previewImg.style.display = 'block';
-        previewImg.style.objectFit = 'contain';
-        previewImg.style.objectPosition = 'center center';
-        previewImg.style.transform = 'scale(1)';
-        previewImg.style.background = '#000';
-      };
-
-      previewImg.src = lastCapture;
-      previewImg.style.display = 'block';
-    } else {
-      if (videoEl) videoEl.style.display = 'none';
-      canvasEl.style.display = 'block';
-      applyMediaElementBaseStyle(canvasEl);
-      canvasEl.style.objectFit = 'contain';
-      canvasEl.style.transform = 'scale(1)';
-    }
+    applyCapturedCanvasStyle(canvasEl);
+    canvasEl.style.display = 'block';
 
     const confirmBtn = getById('btn-selfie-confirm');
     if (confirmBtn) confirmBtn.disabled = false;
@@ -499,15 +498,17 @@
 
     fixSelfieLayout();
 
-    if (videoEl) applyMediaElementBaseStyle(videoEl);
-    if (canvasEl) applyMediaElementBaseStyle(canvasEl);
-    if (previewImg) {
-      applyMediaElementBaseStyle(previewImg);
-      previewImg.style.objectFit = 'contain';
-      previewImg.style.display = 'none';
+    if (videoEl) applyLiveStyle(videoEl);
+
+    if (canvasEl) {
+      applyCapturedCanvasStyle(canvasEl);
+      canvasEl.style.display = 'none';
     }
 
-    if (canvasEl) canvasEl.style.display = 'none';
+    if (previewImg) {
+      previewImg.style.display = 'none';
+      previewImg.removeAttribute('src');
+    }
 
     const title = getById('selfie-title');
     const texto = getById('selfieTexto');
