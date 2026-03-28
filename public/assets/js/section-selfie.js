@@ -32,11 +32,11 @@
 
   function getFrameEl() {
     return (
+      getById('selfieFrame') ||
+      getById('selfiePreviewWrap') ||
       videoEl?.parentElement ||
       canvasEl?.parentElement ||
-      previewImg?.parentElement ||
-      getById('selfieFrame') ||
-      getById('selfiePreviewWrap')
+      previewImg?.parentElement
     );
   }
 
@@ -48,6 +48,7 @@
     const section = getById('section-selfie');
     if (!section) return;
 
+    const panel = section.querySelector('.j-panel-glow');
     const nodes = section.querySelectorAll(
       '.j-panel-glow, .j-perg-v-inner, .j-arcane-card, .pergaminho-content'
     );
@@ -64,40 +65,52 @@
       el.style.boxSizing = 'border-box';
       el.style.marginLeft = 'auto';
       el.style.marginRight = 'auto';
-      el.style.transform = 'none';
       el.style.maxWidth = '100%';
+      if (!el.classList.contains('j-panel-glow')) {
+        el.style.transform = 'none';
+      }
     });
 
     if (panel && window.innerWidth <= 768) {
-     panel.style.width = 'calc(100vw - 16px)';
-     panel.style.maxWidth = 'calc(100vw - 16px)';
-     panel.style.marginLeft = 'auto';
-     panel.style.marginRight = 'auto';
-     panel.style.transform = 'translateX(-2px)';
-   }
-    
+      panel.style.width = 'calc(100vw - 16px)';
+      panel.style.maxWidth = 'calc(100vw - 16px)';
+      panel.style.marginLeft = 'auto';
+      panel.style.marginRight = 'auto';
+      panel.style.transform = 'translateX(-2px)';
+    }
+
     const frame = getFrameEl();
     if (frame) {
       frame.style.position = 'relative';
       frame.style.overflow = 'hidden';
       frame.style.marginLeft = 'auto';
-      frame.style.marginRight = 'auto';      
+      frame.style.marginRight = 'auto';
+      frame.style.marginBottom = '10px';
+      frame.style.width = 'min(100%, 320px)';
+      frame.style.maxWidth = '320px';
+      frame.style.zIndex = '10';
     }
-    
-   const slidersWrap =
-   document.querySelector('.selfie-sliders') ||
-   document.querySelector('.camera-sliders') ||
-   document.querySelector('.ajustes-camera');
 
-  if (slidersWrap) {
-   slidersWrap.style.width = 'min(100%, 320px)';
-   slidersWrap.style.maxWidth = '320px';
-   slidersWrap.style.marginLeft = 'auto';
-   slidersWrap.style.marginRight = 'auto';
-   slidersWrap.style.position = 'relative';
-   slidersWrap.style.zIndex = '20';
-   slidersWrap.style.pointerEvents = 'auto';
- }
+    const slidersWrap =
+      section.querySelector('.selfie-sliders') ||
+      section.querySelector('.camera-sliders') ||
+      section.querySelector('.ajustes-camera');
+
+    if (slidersWrap) {
+      slidersWrap.style.width = 'min(100%, 320px)';
+      slidersWrap.style.maxWidth = '320px';
+      slidersWrap.style.marginLeft = 'auto';
+      slidersWrap.style.marginRight = 'auto';
+      slidersWrap.style.position = 'relative';
+      slidersWrap.style.zIndex = '20';
+      slidersWrap.style.pointerEvents = 'auto';
+    }
+
+    section.querySelectorAll('input[type="range"]').forEach((el) => {
+      el.style.position = 'relative';
+      el.style.zIndex = '25';
+      el.style.pointerEvents = 'auto';
+    });
   }
 
   function getUserData() {
@@ -182,6 +195,7 @@
     el.style.objectPosition = 'center center';
     el.style.transformOrigin = 'center center';
     el.style.transform = 'scale(1)';
+    el.style.background = '#000';
   }
 
   function renderLivePreviewScale() {
@@ -214,7 +228,8 @@
 
     if (previewImg && previewImg.style.display !== 'none') {
       applyMediaElementBaseStyle(previewImg);
-      previewImg.style.transform = `scale(${liveScale})`;
+      previewImg.style.objectFit = 'contain';
+      previewImg.style.transform = 'scale(1)';
     }
 
     if (canvasEl) {
@@ -231,6 +246,26 @@
     stopCamera();
 
     try {
+      lastCapture = null;
+
+      if (previewImg) {
+        previewImg.onload = null;
+        previewImg.style.display = 'none';
+        previewImg.removeAttribute('src');
+        previewImg.src = '';
+      }
+
+      if (canvasEl) {
+        const ctx = canvasEl.getContext('2d');
+        ctx.clearRect(0, 0, canvasEl.width || 1, canvasEl.height || 1);
+        canvasEl.style.display = 'none';
+      }
+
+      if (videoEl) {
+        videoEl.style.display = 'block';
+        videoEl.style.transform = 'scale(1)';
+      }
+
       stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: 'user',
@@ -243,12 +278,6 @@
 
       videoEl.srcObject = stream;
       videoEl.style.display = 'block';
-
-      if (canvasEl) canvasEl.style.display = 'none';
-      if (previewImg) {
-        previewImg.style.display = 'none';
-        previewImg.removeAttribute('src');
-      }
 
       const captureBtn = getById('btn-selfie-capture');
       const confirmBtn = getById('btn-selfie-confirm');
@@ -281,22 +310,17 @@
     }
   }
 
-  function computeCoverCrop(sourceW, sourceH, targetW, targetH, zoomFactor) {
-    const baseScale = Math.max(targetW / sourceW, targetH / sourceH);
+  function computePreviewContain(sourceW, sourceH, targetW, targetH, zoomFactor) {
+    const baseScale = Math.min(targetW / sourceW, targetH / sourceH);
     const finalScale = baseScale * zoomFactor;
 
-    const cropW = targetW / finalScale;
-    const cropH = targetH / finalScale;
+    const drawW = sourceW * finalScale;
+    const drawH = sourceH * finalScale;
 
-    const sx = (sourceW - cropW) / 2;
-    const sy = (sourceH - cropH) / 2;
+    const dx = (targetW - drawW) / 2;
+    const dy = (targetH - drawH) / 2;
 
-    return {
-      sx: Math.max(0, sx),
-      sy: Math.max(0, sy),
-      sWidth: Math.min(sourceW, cropW),
-      sHeight: Math.min(sourceH, cropH)
-    };
+    return { dx, dy, drawW, drawH };
   }
 
   function capture() {
@@ -325,7 +349,7 @@
 
     const zoomFactor = clamp(zoomState.all * Math.min(zoomState.x, zoomState.y), 0.2, 3);
 
-    const crop = computeCoverCrop(
+    const preview = computePreviewContain(
       videoEl.videoWidth,
       videoEl.videoHeight,
       w,
@@ -334,16 +358,15 @@
     );
 
     ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, w, h);
+
     ctx.drawImage(
       videoEl,
-      crop.sx,
-      crop.sy,
-      crop.sWidth,
-      crop.sHeight,
-      0,
-      0,
-      w,
-      h
+      preview.dx,
+      preview.dy,
+      preview.drawW,
+      preview.drawH
     );
 
     lastCapture = canvasEl.toDataURL('image/jpeg', 0.92);
@@ -355,7 +378,10 @@
 
         applyMediaElementBaseStyle(previewImg);
         previewImg.style.display = 'block';
+        previewImg.style.objectFit = 'contain';
+        previewImg.style.objectPosition = 'center center';
         previewImg.style.transform = 'scale(1)';
+        previewImg.style.background = '#000';
       };
 
       previewImg.src = lastCapture;
@@ -364,6 +390,7 @@
       if (videoEl) videoEl.style.display = 'none';
       canvasEl.style.display = 'block';
       applyMediaElementBaseStyle(canvasEl);
+      canvasEl.style.objectFit = 'contain';
       canvasEl.style.transform = 'scale(1)';
     }
 
@@ -476,6 +503,7 @@
     if (canvasEl) applyMediaElementBaseStyle(canvasEl);
     if (previewImg) {
       applyMediaElementBaseStyle(previewImg);
+      previewImg.style.objectFit = 'contain';
       previewImg.style.display = 'none';
     }
 
