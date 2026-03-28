@@ -29,10 +29,10 @@
     console.warn('[IntroLang] Erro ao definir idioma:', e);
   }
 
-  // 🔥 só salva na sessão (não global)
+  // 🔥 trava apenas na sessão atual
+  sessionStorage.setItem('i18n_locked', '1');
   sessionStorage.setItem('jornada.lang', lang);
   sessionStorage.setItem('i18n.lang', lang);
-  sessionStorage.setItem('i18n_locked', '1');
 
   document.documentElement.lang = lang.split('-')[0] || 'pt';
 
@@ -151,10 +151,8 @@
   // pré-seleciona último idioma usado, mas sem pular o modal
   const sel = modal.querySelector('#intro-lang-select');
   const savedLang =
-    sessionStorage.getItem('jornada.lang') ||
-    sessionStorage.getItem('i18n.lang') ||
-    localStorage.getItem('i18n_lang') ||
-    'pt-BR';
+  sessionStorage.getItem('jornada.lang') ||
+  'pt-BR';
 
   if (sel) sel.value = savedLang;
 
