@@ -16,7 +16,7 @@
   return sessionStorage.getItem('i18n_locked') === '1';
 }
 
- async function setLangAndLock(lang) {
+async function setLangAndLock(lang) {
   if (!lang) return;
 
   try {
@@ -29,7 +29,7 @@
     console.warn('[IntroLang] Erro ao definir idioma:', e);
   }
 
-  // 🔥 trava apenas na sessão atual
+  // trava só nesta jornada
   sessionStorage.setItem('i18n_locked', '1');
   sessionStorage.setItem('jornada.lang', lang);
   sessionStorage.setItem('i18n.lang', lang);
@@ -139,38 +139,41 @@
     return modal;
   }
 
-  async function requireLanguageChoice() {
-  if (isLangLocked()) {
-    console.log('[IntroLang] Idioma já travado nesta jornada, prosseguindo...');
-    return;
-  }
+ async function requireLanguageChoice() {
+  // limpa trava e idioma da jornada anterior
+  sessionStorage.removeItem('i18n_locked');
+  sessionStorage.removeItem('jornada.lang');
+  sessionStorage.removeItem('i18n.lang');
+
+  const oldModal = document.getElementById('intro-lang-modal');
+  if (oldModal) oldModal.remove();
 
   const modal = buildLangModal();
   document.body.appendChild(modal);
 
-  // pré-seleciona último idioma usado, mas sem pular o modal
+  const btn = modal.querySelector('#intro-lang-confirm');
   const sel = modal.querySelector('#intro-lang-select');
-  const savedLang =
-  sessionStorage.getItem('jornada.lang') ||
-  'pt-BR';
 
-  if (sel) sel.value = savedLang;
+  // sempre começa destravado e com idioma padrão de teste
+  if (sel) {
+    sel.disabled = false;
+    sel.value = 'pt-BR';
+  }
 
   return new Promise((resolve) => {
-    const btn = modal.querySelector('#intro-lang-confirm');
-
     btn.addEventListener('click', async () => {
-      const chosenLang = sel.value;
+      const chosenLang = sel?.value || 'pt-BR';
+
       await setLangAndLock(chosenLang);
 
       modal.style.opacity = '0';
-      setTimeout(() => modal.remove(), 400);
+      setTimeout(() => modal.remove(), 300);
 
-      resolve();
+      resolve(chosenLang);
     }, { once: true });
   });
 }
-
+  
   async function init(root) {
     if (window.JCIntro.state.initialized) return;
     window.JCIntro.state.initialized = true;
