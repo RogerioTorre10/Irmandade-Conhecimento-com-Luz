@@ -68,19 +68,36 @@
       el.style.maxWidth = '100%';
     });
 
-    const panel = section.querySelector('.j-panel-glow');
     if (panel && window.innerWidth <= 768) {
-      panel.style.width = 'min(92vw, 680px)';
-      panel.style.maxWidth = '92vw';
-    }
-
+     panel.style.width = 'calc(100vw - 16px)';
+     panel.style.maxWidth = 'calc(100vw - 16px)';
+     panel.style.marginLeft = 'auto';
+     panel.style.marginRight = 'auto';
+     panel.style.transform = 'translateX(-2px)';
+   }
+    
     const frame = getFrameEl();
     if (frame) {
       frame.style.position = 'relative';
       frame.style.overflow = 'hidden';
       frame.style.marginLeft = 'auto';
-      frame.style.marginRight = 'auto';
+      frame.style.marginRight = 'auto';      
     }
+    
+   const slidersWrap =
+   document.querySelector('.selfie-sliders') ||
+   document.querySelector('.camera-sliders') ||
+   document.querySelector('.ajustes-camera');
+
+  if (slidersWrap) {
+   slidersWrap.style.width = 'min(100%, 320px)';
+   slidersWrap.style.maxWidth = '320px';
+   slidersWrap.style.marginLeft = 'auto';
+   slidersWrap.style.marginRight = 'auto';
+   slidersWrap.style.position = 'relative';
+   slidersWrap.style.zIndex = '20';
+   slidersWrap.style.pointerEvents = 'auto';
+ }
   }
 
   function getUserData() {
