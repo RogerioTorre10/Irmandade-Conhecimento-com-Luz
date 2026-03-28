@@ -1,5 +1,5 @@
 /* =======================================================
-   SELFIE — BASE ESTRUTURAL CORRIGIDA
+   SELFIE — CSS LIMPO E CONSOLIDADO
    ======================================================= */
 
 #section-selfie {
@@ -11,54 +11,36 @@
   width: 100%;
   min-height: 100vh;
   background: transparent !important;
-  padding: 10px 0 24px;
+  padding: 8px 0 20px !important;
   box-sizing: border-box;
-  overflow-x: clip !important;
+  overflow-x: hidden !important;
   overflow-y: visible !important;
 }
 
-#section-selfie .j-perg-v-inner{
+#section-selfie .j-perg-v-inner {
   position: relative;
   width: 100%;
   max-width: 980px;
   margin: 0 auto;
-  padding-top: 10px;
+  padding-top: 6px;
   overflow: visible !important;
   z-index: 2;
 }
 
-#section-selfie .j-panel-glow.selfie-panel{
+#section-selfie .j-panel-glow.selfie-panel,
+#section-selfie .j-panel-glow {
   position: relative !important;
-  width: min(92vw, 620px) !important;
+  width: min(94vw, 620px) !important;
   max-width: 620px !important;
   margin: 0 auto !important;
   padding: 10px !important;
   border-radius: 28px !important;
   box-sizing: border-box !important;
-  overflow: hidden !important;
+  overflow: visible !important;
   isolation: isolate !important;
   z-index: 3 !important;
   padding-bottom: max(20px, env(safe-area-inset-bottom)) !important;
-}
-
-#section-selfie .selfie-wrap{
-  position: relative;
-  z-index: 2;
-  width: 100% !important;
-  min-height: auto !important;
-  margin: 0 auto !important;
-  padding: 20px 18px 18px !important;
-  border-radius: 24px !important;
-  box-sizing: border-box !important;
-  overflow: hidden !important;
-  padding-bottom: 20px !important;
-}
-
-/* =======================================================
-   SELFIE — AURA REAL DO GUIA
-   ======================================================= */
-
-#section-selfie .j-panel-glow.selfie-panel{
+  transform: translateX(-4px) !important;
   border: 1px solid color-mix(in srgb, var(--progress-main, #ffd700) 78%, transparent) !important;
   box-shadow:
     0 0 16px color-mix(in srgb, var(--progress-main, #ffd700) 42%, transparent),
@@ -66,16 +48,15 @@
     inset 0 0 22px rgba(255,255,255,0.05) !important;
 }
 
-#section-selfie .j-panel-glow.selfie-panel::before{
+#section-selfie .j-panel-glow.selfie-panel::before,
+#section-selfie .j-panel-glow::before {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: inherit;
   pointer-events: none;
   z-index: 1;
-
   border: 2px solid color-mix(in srgb, var(--progress-main, #ffd700) 68%, transparent);
-
   background:
     radial-gradient(
       circle at 50% 18%,
@@ -88,14 +69,23 @@
       transparent 28%,
       transparent 100%
     );
-
   box-shadow:
     inset 0 0 16px color-mix(in srgb, var(--progress-main, #ffd700) 18%, transparent),
     inset 0 0 40px color-mix(in srgb, var(--progress-glow-2, rgba(255,210,120,.40)) 18%, transparent),
     0 0 10px color-mix(in srgb, var(--progress-main, #ffd700) 20%, transparent);
 }
 
-#section-selfie .selfie-wrap{
+#section-selfie .selfie-wrap {
+  position: relative;
+  z-index: 2;
+  width: 100% !important;
+  min-height: auto !important;
+  margin: 0 auto !important;
+  padding: 18px 14px 18px !important;
+  border-radius: 24px !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+  padding-bottom: 20px !important;
   background:
     linear-gradient(
       to bottom,
@@ -109,21 +99,14 @@
     0 0 14px color-mix(in srgb, var(--progress-main, #ffd700) 28%, transparent) !important;
 }
 
-#section-selfie .preview-frame,
-#section-selfie .ranges-panel{
-  border: 1px solid color-mix(in srgb, var(--progress-main, #ffd700) 82%, transparent) !important;
-  box-shadow:
-    0 0 12px color-mix(in srgb, var(--progress-main, #ffd700) 42%, transparent),
-    inset 0 0 10px rgba(255,255,255,0.04) !important;
+#section-selfie .conteudo-pergaminho,
+#section-selfie .pergaminho-content {
+  width: 100%;
+  max-width: 100%;
+  overflow: visible !important;
+  box-sizing: border-box !important;
 }
 
-#section-selfie .selfie-header h2,
-#section-selfie #selfieTexto,
-#section-selfie .ranges-panel{
-  color: var(--progress-main, var(--theme-main-color, #ffd700)) !important;
-}
-
-/* ================= HEADER ================= */
 .selfie-header {
   width: 100%;
   max-width: 520px;
@@ -165,58 +148,24 @@
   word-wrap: break-word;
 }
 
-.selfie-preview-wrap {
-  width: 100%;
-  max-width: 340px;
-  margin: 0 auto 8px;
-  position: relative;
-}
-
-.preview-frame {
-  position: relative;
-  width: 100%;
-  padding-bottom: 112%;
-  background: #000;
-  border-radius: 16px;
-  overflow: hidden;
-}
-
-.ranges-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  width: 100%;
-  max-width: 340px;
-  padding: 12px 12px;
-  border-radius: 14px;
-  background: rgba(0,0,0,.34);
-  margin: 10px auto 8px;
-  font-family: 'Cardo', serif;
-  font-size: 14px;
-}
-
-.range-row {
-  display: grid;
-  grid-template-columns: 92px 1fr 42px;
-  align-items: center;
-  gap: 8px;
-}
-
-/* ================= BOTÕES ================= */
-.btn-row {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin: 8px auto 12px;
+#section-selfie .btn-row {
   width: 100%;
   max-width: 520px;
+  margin: 8px auto 12px !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: nowrap !important;
   overflow-x: auto;
   padding: 0 2px;
   -ms-overflow-style: none;
   scrollbar-width: none;
-  flex-wrap: nowrap !important;
 }
-.btn-row::-webkit-scrollbar { display: none; }
+
+#section-selfie .btn-row::-webkit-scrollbar {
+  display: none;
+}
 
 .btn-stone-espinhos {
   flex: 1 1 0;
@@ -229,16 +178,13 @@
   font-family: 'Cardo', serif;
   font-weight: 700;
   letter-spacing: .2px;
-
   background: transparent !important;
   background-image: url('/assets/img/moldura-medieval-espinhos.png') !important;
   background-size: 100% 100% !important;
   background-repeat: no-repeat !important;
-
   border: none !important;
   color: #f9e7c2 !important;
   text-shadow: 0 1px 1px rgba(0,0,0,.75);
-
   position: relative;
   overflow: hidden;
   cursor: pointer;
@@ -256,322 +202,173 @@
   pointer-events: none;
 }
 
-/* =======================================================
-   SELFIE — MOBILE CIRÚRGICO
-   ======================================================= */
-
-@media (max-width: 600px) {
-
-  #section-selfie {
-    padding: 6px 0 18px !important;
-    min-height: auto !important;
-    justify-content: flex-start !important;
-  }
-
-  #section-selfie .j-perg-v-inner{
-    padding-top: 4px !important;
-  }
-
-  #section-selfie .j-panel-glow.selfie-panel{
-    width: min(96vw, 430px) !important;
-    max-width: 430px !important;
-    padding: 8px !important;
-    border-radius: 22px !important;
-  }
-
-  #section-selfie .selfie-wrap{
-    padding: 14px 12px 14px !important;
-    border-radius: 18px !important;
-  }
-
-  .selfie-header{
-    max-width: 100% !important;
-    margin: 0 auto 8px !important;
-    gap: 8px !important;
-  }
-
-  .selfie-header h2{
-    font-size: 18px !important;
-    line-height: 1.15 !important;
-  }
-
-  #selfieOrientWrap{
-    max-width: 100% !important;
-    margin: 8px auto 10px !important;
-    padding: 0 2px !important;
-  }
-
-  #selfieTexto{
-    font-size: 13px !important;
-    line-height: 1.38 !important;
-  }
-
-  .btn-row{
-    gap: 8px !important;
-    margin: 6px auto 10px !important;
-    max-width: 100% !important;
-    padding: 0 !important;
-  }
-
-  .btn-stone-espinhos{
-    min-width: 84px !important;
-    max-width: 130px !important;
-    height: 34px !important;
-    line-height: 34px !important;
-    font-size: 12px !important;
-    padding: 0 8px !important;
-  }
-
-  .selfie-preview-wrap{
-    max-width: 100% !important;
-    width: 100% !important;
-  }
-
-  .preview-frame{
-    padding-bottom: 104% !important;
-    border-radius: 14px !important;
-  }
-
-  .ranges-panel{
-    max-width: 100% !important;
-    padding: 10px 10px !important;
-    border-radius: 12px !important;
-    font-size: 12px !important;
-    gap: 8px !important;
-  }
-
-  .range-row{
-    grid-template-columns: 78px 1fr 38px !important;
-    gap: 6px !important;
-  }
-
-  #section-selfie::before{
-    bottom: -42px !important;
-    height: 96px !important;
-    filter: blur(14px) !important;
-    opacity: 0.55 !important;
-  }
-}
-/* ==========================================
-   SELFIE — AJUSTE CIRÚRGICO REAL
-   baseado no HTML verdadeiro da seção
-   ========================================== */
-
-#section-selfie .conteudo-pergaminho{
+#section-selfie .selfie-preview-wrap {
   width: 100%;
-  max-width: 100%;
-  overflow: visible !important;
-}
-
-#section-selfie .selfie-preview-wrap{
-  width: 100%;
-  max-width: 340px;
-  margin: 0 auto 8px !important;
+  max-width: 320px;
+  margin: 0 auto 10px !important;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-#section-selfie .preview-frame{
+#section-selfie .preview-frame {
   position: relative;
   width: 100%;
-  max-width: 340px;
+  max-width: 320px;
   aspect-ratio: 3 / 4;
-  padding-bottom: 0 !important;
   margin: 0 auto;
   background: #000;
   border-radius: 16px;
   overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--progress-main, #ffd700) 82%, transparent) !important;
+  box-shadow:
+    0 0 12px color-mix(in srgb, var(--progress-main, #ffd700) 42%, transparent),
+    inset 0 0 10px rgba(255,255,255,0.04) !important;
 }
 
 #selfiePreview,
 #selfieVideo,
-#selfieCanvas{
+#selfieCanvas {
   position: absolute;
   inset: 0;
   width: 100% !important;
   height: 100% !important;
   display: block;
   margin: 0 auto;
-  object-fit: cover;
-  object-position: center center;
+  object-fit: cover !important;
+  object-position: center center !important;
   border-radius: inherit;
 }
 
-/* placeholder visível antes da câmera */
-#selfiePreview{
+#selfiePreview {
   z-index: 1;
 }
 
-/* vídeo e canvas acima quando ativados */
 #selfieVideo,
-#selfieCanvas{
+#selfieCanvas {
   z-index: 2;
 }
 
-/* botões da selfie */
-#section-selfie .btn-row{
-  width: 100%;
-  max-width: 520px;
-  margin: 8px auto 12px !important;
+#section-selfie .ranges-panel {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-direction: column;
   gap: 10px;
-  flex-wrap: nowrap !important;
-}
-
-/* painel dos sliders */
-#section-selfie .ranges-panel{
   width: 100%;
-  max-width: 340px;
-  margin: 10px auto 8px !important;
+  max-width: 320px;
+  padding: 12px 12px;
+  border-radius: 14px;
+  background: rgba(0,0,0,.34);
+  margin: 12px auto 0 !important;
+  font-family: 'Cardo', serif;
+  font-size: 14px;
   position: relative;
-  z-index: 5;
+  z-index: 50;
+  pointer-events: auto !important;
+  overflow: visible !important;
+  border: 1px solid color-mix(in srgb, var(--progress-main, #ffd700) 82%, transparent) !important;
+  box-shadow:
+    0 0 12px color-mix(in srgb, var(--progress-main, #ffd700) 42%, transparent),
+    inset 0 0 10px rgba(255,255,255,0.04) !important;
+  color: var(--progress-main, var(--theme-main-color, #ffd700)) !important;
 }
 
-@media (max-width: 600px){
+#section-selfie .range-row {
+  display: grid;
+  grid-template-columns: 92px 1fr 42px;
+  align-items: center;
+  gap: 8px;
+}
 
-  #section-selfie .j-panel-glow.selfie-panel{
-    width: min(96vw, 430px) !important;
+#section-selfie .ranges-panel input[type="range"] {
+  width: 100% !important;
+  position: relative !important;
+  z-index: 60 !important;
+  pointer-events: auto !important;
+  touch-action: pan-x !important;
+}
+
+@media (max-width: 600px) {
+  #section-selfie {
+    padding: 6px 0 18px !important;
+    min-height: auto !important;
+    justify-content: flex-start !important;
+  }
+
+  #section-selfie .j-perg-v-inner {
+    padding-top: 4px !important;
+  }
+
+  #section-selfie .j-panel-glow.selfie-panel,
+  #section-selfie .j-panel-glow {
+    width: min(95vw, 430px) !important;
     max-width: 430px !important;
+    padding: 8px !important;
+    border-radius: 22px !important;
+    transform: translateX(-4px) !important;
   }
 
-  #section-selfie .selfie-wrap{
+  #section-selfie .selfie-wrap {
     padding: 14px 12px 16px !important;
-    overflow: visible !important;
+    border-radius: 18px !important;
   }
 
-  #section-selfie .conteudo-pergaminho{
-    overflow: visible !important;
+  .selfie-header {
+    max-width: 100% !important;
+    margin: 0 auto 8px !important;
+    gap: 8px !important;
   }
 
-  #section-selfie .selfie-preview-wrap{
-    max-width: 260px !important;
-    margin: 0 auto 10px !important;
+  .selfie-header h2 {
+    font-size: 18px !important;
+    line-height: 1.15 !important;
   }
 
-  #section-selfie .preview-frame{
-    max-width: 260px !important;
-    border-radius: 14px !important;
+  #selfieOrientWrap {
+    max-width: 100% !important;
+    margin: 8px auto 10px !important;
+    padding: 0 2px !important;
   }
 
-  #section-selfie .ranges-panel{
-    max-width: 260px !important;
-    margin: 10px auto 0 !important;
-    padding: 10px !important;
+  #selfieTexto {
+    font-size: 13px !important;
+    line-height: 1.38 !important;
   }
 
-  #section-selfie .range-row{
-    grid-template-columns: 72px 1fr 36px !important;
-    gap: 6px !important;
-  }
-
-  #section-selfie .btn-row{
+  #section-selfie .btn-row {
     max-width: 100% !important;
     gap: 8px !important;
     margin: 6px auto 10px !important;
+    padding: 0 !important;
   }
 
-  #section-selfie .btn-stone-espinhos{
+  #section-selfie .btn-stone-espinhos {
     min-width: 84px !important;
     max-width: 126px !important;
     height: 34px !important;
     line-height: 34px !important;
     font-size: 12px !important;
   }
-}
-/* ==========================================
-   SELFIE — CORREÇÃO DE ENQUADRAMENTO MOBILE
-   ========================================== */
 
-#section-selfie {
-  overflow-x: hidden !important;
-}
-
-#section-selfie .j-panel-glow,
-#section-selfie .j-perg-v-inner,
-#section-selfie .j-arcane-card,
-#section-selfie .pergaminho-content {
-  box-sizing: border-box !important;
-}
-
-@media (max-width: 768px) {
-  #section-selfie {
-    overflow-x: hidden !important;
-    padding-left: 8px !important;
-    padding-right: 8px !important;
-    box-sizing: border-box !important; 
+  #section-selfie .selfie-preview-wrap {
+    max-width: 280px !important;
+    margin: 0 auto 10px !important;
   }
 
-  #section-selfie .j-panel-glow {
-    width: min(92vw, 680px) !important;
-    max-width: 92vw !important;
-    margin: 0 auto !important;
-    transform: translateX(-2px) !important;
-   }
-   
-   
-  #section-selfie .j-panel-glow,
-  #section-selfie .j-perg-v-inner,
-  #section-selfie .j-arcane-card,
-  #section-selfie .pergaminho-content{
-    box-sizing: border-box !important;       
-    width: 100% !important;
-    max-width: 100% !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    transform: none !important;
+  #section-selfie .preview-frame {
+    max-width: 280px !important;
+    border-radius: 14px !important;
   }
 
-  /* quadro da prévia */
-  #section-selfie .camera-preview-wrap,
-  #section-selfie .selfie-frame,
-  #section-selfie .preview-shell,
-  #section-selfie .preview-box,
-  #section-selfie .camera-stage {
-    width: min(100%, 320px) !important;
-    max-width: 320px !important;
-    margin-left: auto !important;
-    margin-right: auto !important; 
-    position: relative !important;
-    margin: 8px auto 0 !important;
-    overflow: hidden !important;
+  #section-selfie .ranges-panel {
+    max-width: 280px !important;
+    margin: 10px auto 0 !important;
+    padding: 10px !important;
+    font-size: 12px !important;
+    gap: 8px !important;
   }
 
-  /* MUITO IMPORTANTE:
-     não forçar vídeo/canvas a ocupar 100% com translate central */
-  #section-selfie video,
-  #section-selfie canvas,
-  #section-selfie img,
-  #section-selfie .camera-preview {
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: auto !important;
-    height: auto !important;
-    max-width: none !important;
-    max-height: none !important;
-    transform-origin: top left !important;
-    object-fit: contain !important;
-  }
-
-  #section-selfie .selfie-sliders,
-  #section-selfie .camera-sliders,
-  #section-selfie .ajustes-camera {
-    width: min(100%, 320px) !important;
-    max-width: 320px !important;
-    margin: 8px auto 0 !important;
-    padding-bottom: 14px !important;
-    margin-left: auto !important;
-    margin-right: auto !important;  
-  }
-
-  #section-selfie .selfie-sliders input[type="range"],
-  #section-selfie .camera-sliders input[type="range"],
-  #section-selfie .ajustes-camera input[type="range"] {
-    width: 100% !important;
-    display: block !important;
-    margin: 6px 0 !important;
+  #section-selfie .range-row {
+    grid-template-columns: 72px 1fr 36px !important;
+    gap: 6px !important;
   }
 }
