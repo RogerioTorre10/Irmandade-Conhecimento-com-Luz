@@ -183,6 +183,7 @@
     const content =
       section.querySelector('.conteudo-pergaminho') ||
       section.querySelector('.pergaminho-content');
+    const frame = getFrameEl();
 
     section.style.overflowX = 'hidden';
     section.style.boxSizing = 'border-box';
@@ -212,18 +213,18 @@
     }
 
     if (frame) {
-     frame.style.position = 'relative';
-     frame.style.overflow = 'hidden';
-     frame.style.marginLeft = 'auto';
-     frame.style.marginRight = 'auto';
-     frame.style.marginBottom = '10px';
-     frame.style.width = 'min(100%, 320px)';
-     frame.style.maxWidth = '320px';
-     frame.style.height = '360px';
-     frame.style.maxHeight = '360px';
-     frame.style.background = '#000';
-     frame.style.zIndex = '10';
-   }
+      frame.style.position = 'relative';
+      frame.style.overflow = 'hidden';
+      frame.style.marginLeft = 'auto';
+      frame.style.marginRight = 'auto';
+      frame.style.marginBottom = '10px';
+      frame.style.width = 'min(100%, 320px)';
+      frame.style.maxWidth = '320px';
+      frame.style.height = '360px';
+      frame.style.maxHeight = '360px';
+      frame.style.background = '#000';
+      frame.style.zIndex = '10';
+    }
 
     const slidersWrap =
       section.querySelector('.ranges-panel') ||
@@ -232,17 +233,17 @@
       section.querySelector('.ajustes-camera');
 
     if (slidersWrap) {
-     slidersWrap.style.width = 'min(100%, 320px)';
-     slidersWrap.style.maxWidth = '320px';
-     slidersWrap.style.marginLeft = 'auto';
-     slidersWrap.style.marginRight = 'auto';
-     slidersWrap.style.marginTop = '8px';
-     slidersWrap.style.marginBottom = '24px';
-     slidersWrap.style.paddingBottom = '20px';
-     slidersWrap.style.position = 'relative';
-     slidersWrap.style.zIndex = '40';
-     slidersWrap.style.pointerEvents = 'auto';
-   }
+      slidersWrap.style.width = 'min(100%, 320px)';
+      slidersWrap.style.maxWidth = '320px';
+      slidersWrap.style.marginLeft = 'auto';
+      slidersWrap.style.marginRight = 'auto';
+      slidersWrap.style.marginTop = '8px';
+      slidersWrap.style.marginBottom = '24px';
+      slidersWrap.style.paddingBottom = '20px';
+      slidersWrap.style.position = 'relative';
+      slidersWrap.style.zIndex = '40';
+      slidersWrap.style.pointerEvents = 'auto';
+    }
 
     section.querySelectorAll('input[type="range"]').forEach((el) => {
       el.style.width = '100%';
@@ -252,11 +253,10 @@
       el.style.touchAction = 'pan-x';
     });
 
-  const selfieContent = section.querySelector('.pergaminho-content');
-    if (selfieContent) {
-    selfieContent.style.paddingBottom = '32px';
-    selfieContent.style.overflow = 'visible';
-  }
+    if (content) {
+      content.style.paddingBottom = '32px';
+      content.style.overflow = 'visible';
+    }
   }
 
   function renderLivePreviewScale() {
@@ -296,9 +296,65 @@
   }
 
   async function startCamera() {
-  stopCamera();
+    stopCamera();
 
-  try {
+    try {
+      lastCapture = null;
+
+      if (previewImg) {
+        previewImg.onload = null;
+        previewImg.style.display = 'none';
+        previewImg.removeAttribute('src');
+        previewImg.src = '';
+      }
+
+      if (canvasEl) {
+        const ctx = canvasEl.getContext('2d');
+        try {
+          ctx.clearRect(0, 0, canvasEl.width || 1, canvasEl.height || 1);
+        } catch {}
+        canvasEl.width = 1;
+        canvasEl.height = 1;
+        canvasEl.style.display = 'none';
+        canvasEl.style.opacity = '0';
+        canvasEl.style.visibility = 'hidden';
+      }
+
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: 'user',
+          width: { ideal: 1280 }
+        },
+        audio: false
+      });
+
+      if (!videoEl) return;
+
+      videoEl.srcObject = stream;
+      videoEl.style.display = 'block';
+      videoEl.style.opacity = '1';
+      videoEl.style.visibility = 'visible';
+      videoEl.style.zIndex = '12';
+
+      const captureBtn = getById('btn-selfie-capture');
+      const confirmBtn = getById('btn-selfie-confirm');
+      const errorEl = getById('selfie-error');
+
+      if (captureBtn) captureBtn.disabled = false;
+      if (confirmBtn) confirmBtn.disabled = true;
+      if (errorEl) errorEl.style.display = 'none';
+
+      await videoEl.play().catch(() => {});
+      renderLivePreviewScale();
+    } catch (e) {
+      console.error('[SELFIE] Erro ao iniciar câmera:', e);
+      toast('Câmera bloqueada. Ative as permissões.');
+      const errorEl = getById('selfie-error');
+      if (errorEl) errorEl.style.display = 'block';
+    }
+  }
+
+  async function showLivePreview() {
     lastCapture = null;
 
     if (previewImg) {
@@ -320,76 +376,18 @@
       canvasEl.style.visibility = 'hidden';
     }
 
-    stream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: 'user',
-        width: { ideal: 1280 }
-      },
-      audio: false
-    });
+    if (videoEl) {
+      videoEl.style.display = 'block';
+      videoEl.style.opacity = '1';
+      videoEl.style.visibility = 'visible';
+      videoEl.style.zIndex = '12';
+    }
 
-    if (!videoEl) return;
-
-    videoEl.srcObject = stream;
-    videoEl.style.display = 'block';
-    videoEl.style.opacity = '1';
-    videoEl.style.visibility = 'visible';
-    videoEl.style.zIndex = '12';
-
-    const captureBtn = getById('btn-selfie-capture');
     const confirmBtn = getById('btn-selfie-confirm');
-    const errorEl = getById('selfie-error');
-
-    if (captureBtn) captureBtn.disabled = false;
     if (confirmBtn) confirmBtn.disabled = true;
-    if (errorEl) errorEl.style.display = 'none';
 
-    await videoEl.play().catch(() => {});
-    renderLivePreviewScale();
-  } catch (e) {
-    console.error('[SELFIE] Erro ao iniciar câmera:', e);
-    toast('Câmera bloqueada. Ative as permissões.');
-    const errorEl = getById('selfie-error');
-    if (errorEl) errorEl.style.display = 'block';
+    await startCamera();
   }
-}
-
-  async function showLivePreview() {
-  // limpa captura anterior
-  lastCapture = null;
-
-  if (previewImg) {
-    previewImg.onload = null;
-    previewImg.style.display = 'none';
-    previewImg.removeAttribute('src');
-    previewImg.src = '';
-  }
-
-  if (canvasEl) {
-    const ctx = canvasEl.getContext('2d');
-    try {
-      ctx.clearRect(0, 0, canvasEl.width || 1, canvasEl.height || 1);
-    } catch {}
-    canvasEl.width = 1;
-    canvasEl.height = 1;
-    canvasEl.style.display = 'none';
-    canvasEl.style.opacity = '0';
-    canvasEl.style.visibility = 'hidden';
-  }
-
-  if (videoEl) {
-    videoEl.style.display = 'block';
-    videoEl.style.opacity = '1';
-    videoEl.style.visibility = 'visible';
-    videoEl.style.zIndex = '12';
-  }
-
-  const confirmBtn = getById('btn-selfie-confirm');
-  if (confirmBtn) confirmBtn.disabled = true;
-
-  // sempre volta para câmera ao vivo
-  await startCamera();
-}    
 
   function stopCamera() {
     if (stream) {
@@ -473,21 +471,22 @@
 
     lastCapture = canvasEl.toDataURL('image/jpeg', 0.92);
 
-  if (videoEl) {
-    videoEl.style.display = 'none';
-    videoEl.style.opacity = '0';
-    videoEl.style.visibility = 'hidden';
+    if (videoEl) {
+      videoEl.style.display = 'none';
+      videoEl.style.opacity = '0';
+      videoEl.style.visibility = 'hidden';
+    }
+
+    applyCapturedCanvasStyle(canvasEl);
+    canvasEl.style.display = 'block';
+    canvasEl.style.opacity = '1';
+    canvasEl.style.visibility = 'visible';
+    canvasEl.style.zIndex = '20';
+
+    const confirmBtn = getById('btn-selfie-confirm');
+    if (confirmBtn) confirmBtn.disabled = false;
   }
 
-   applyCapturedCanvasStyle(canvasEl);
-   canvasEl.style.display = 'block';
-   canvasEl.style.opacity = '1';
-   canvasEl.style.visibility = 'visible';
-   canvasEl.style.zIndex = '20';
-
- const confirmBtn = getById('btn-selfie-confirm');
- if (confirmBtn) confirmBtn.disabled = false;
-    
   function playTransitionThenGo() {
     console.log(`[SELFIE] Transição → ${NEXT_SECTION_ID}`);
 
