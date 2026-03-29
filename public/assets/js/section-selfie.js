@@ -186,6 +186,11 @@
 
     section.style.overflowX = 'hidden';
     section.style.boxSizing = 'border-box';
+    section.style.overflowY = 'auto';
+    section.style.minHeight = '100vh';
+    section.style.height = 'auto';
+    section.style.paddingBottom = '40px';
+    section.style.webkitOverflowScrolling = 'touch';
     section.style.paddingLeft = '6px';
     section.style.paddingRight = '6px';
 
@@ -206,20 +211,19 @@
       panel.style.overflow = 'visible';
     }
 
-    const frame = getFrameEl();
     if (frame) {
-      frame.style.position = 'relative';
-      frame.style.overflow = 'hidden';
-      frame.style.marginLeft = 'auto';
-      frame.style.marginRight = 'auto';
-      frame.style.marginBottom = '12px';
-      frame.style.width = 'min(100%, 280px)';
-      frame.style.maxWidth = '280px';
-      frame.style.aspectRatio = '3 / 4';
-      frame.style.height = 'auto';
-      frame.style.background = '#000';
-      frame.style.zIndex = '10';
-    }
+     frame.style.position = 'relative';
+     frame.style.overflow = 'hidden';
+     frame.style.marginLeft = 'auto';
+     frame.style.marginRight = 'auto';
+     frame.style.marginBottom = '10px';
+     frame.style.width = 'min(100%, 320px)';
+     frame.style.maxWidth = '320px';
+     frame.style.height = '360px';
+     frame.style.maxHeight = '360px';
+     frame.style.background = '#000';
+     frame.style.zIndex = '10';
+   }
 
     const slidersWrap =
       section.querySelector('.ranges-panel') ||
@@ -228,17 +232,17 @@
       section.querySelector('.ajustes-camera');
 
     if (slidersWrap) {
-      slidersWrap.style.width = 'min(100%, 280px)';
-      slidersWrap.style.maxWidth = '280px';
-      slidersWrap.style.marginLeft = 'auto';
-      slidersWrap.style.marginRight = 'auto';
-      slidersWrap.style.marginTop = '10px';
-      slidersWrap.style.paddingBottom = '18px';
-      slidersWrap.style.position = 'relative';
-      slidersWrap.style.zIndex = '50';
-      slidersWrap.style.pointerEvents = 'auto';
-      slidersWrap.style.overflow = 'visible';
-    }
+     slidersWrap.style.width = 'min(100%, 320px)';
+     slidersWrap.style.maxWidth = '320px';
+     slidersWrap.style.marginLeft = 'auto';
+     slidersWrap.style.marginRight = 'auto';
+     slidersWrap.style.marginTop = '8px';
+     slidersWrap.style.marginBottom = '24px';
+     slidersWrap.style.paddingBottom = '20px';
+     slidersWrap.style.position = 'relative';
+     slidersWrap.style.zIndex = '40';
+     slidersWrap.style.pointerEvents = 'auto';
+   }
 
     section.querySelectorAll('input[type="range"]').forEach((el) => {
       el.style.width = '100%';
@@ -247,6 +251,12 @@
       el.style.pointerEvents = 'auto';
       el.style.touchAction = 'pan-x';
     });
+
+   const content = section.querySelector('.pergaminho-content');
+     if (content) {
+     content.style.paddingBottom = '32px';
+     content.style.overflow = 'visible';
+  }
   }
 
   function renderLivePreviewScale() {
