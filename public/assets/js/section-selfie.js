@@ -252,10 +252,10 @@
       el.style.touchAction = 'pan-x';
     });
 
-   const content = section.querySelector('.pergaminho-content');
-     if (content) {
-     content.style.paddingBottom = '32px';
-     content.style.overflow = 'visible';
+  const selfieContent = section.querySelector('.pergaminho-content');
+    if (selfieContent) {
+    selfieContent.style.paddingBottom = '32px';
+    selfieContent.style.overflow = 'visible';
   }
   }
 
