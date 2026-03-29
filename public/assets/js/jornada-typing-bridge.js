@@ -510,49 +510,90 @@
   };
 
   window.typeAndSpeak = async function (element, text, speed = 36) {
-    if (!text || !element) return;
+  if (!text || !element) return;
 
-    try {
-      const sig = makeTypingSig(text);
+  try {
+    const sig = makeTypingSig(text);
 
-      if (element.dataset.typingSig === sig && element.classList.contains('typing-done')) return;
+    if (element.dataset.typingSig === sig && element.classList.contains('typing-done')) return;
 
-      if (shouldSkipTyping(sig)) {
-        forceShow(element, text);
-        return;
-      }
-
-      element.dataset.typingSig = sig;
-    } catch {}
-
-    let terminou = false;
-
-    if ('speechSynthesis' in window) {
-      const lang = __normalizeLang(getLangNow());
-      const utt = new SpeechSynthesisUtterance(String(text).trim());
-
-      utt.lang = lang;
-      utt.rate = lang.startsWith('zh') ? 0.9 : 0.95;
-      utt.pitch = 1.0;
-      utt.volume = 1.0;
-
-      utt.onend = () => { terminou = true; };
-      utt.onerror = () => { terminou = true; };
-
-      try { await __applyVoice(utt, lang); } catch {}
-
-      try { speechSynthesis.cancel(); } catch {}
-      try { speechSynthesis.speak(utt); } catch { terminou = true; }
-    } else {
-      terminou = true;
+    if (shouldSkipTyping(sig)) {
+      forceShow(element, text);
+      return;
     }
 
-    await window.runTyping(element, text, null, { speed });
+    element.dataset.typingSig = sig;
+  } catch {}
 
-    while (!terminou) {
-      await new Promise(r => setTimeout(r, 80));
-    }
-  };
+  let terminou = false;
+
+  if ('speechSynthesis' in window) {
+    const lang = getLangNow();
+    const clean = String(text).replace(/\s+/g, ' ').trim();
+    const utt = new SpeechSynthesisUtterance(clean);
+
+    utt.lang = lang;
+    utt.rate = lang.startsWith('zh') ? 0.90 : 0.95;
+    utt.pitch = 1.0;
+    utt.volume = 1.0;
+
+    utt.onstart = () => {
+      typingLog('typeAndSpeak iniciou', {
+        lang: utt.lang,
+        guide: getGuideNow(),
+        voice: utt.voice?.name || '(default)'
+      });
+    };
+
+    utt.onend = () => { terminou = true; };
+    utt.onerror = () => { terminou = true; };
+
+    try { await __applyVoice(utt, lang); } catch {}
+
+    try { speechSynthesis.cancel(); } catch {}
+    try { speechSynthesis.speak(utt); } catch { terminou = true; }
+  } else {
+    terminou = true;
+  }
+
+  await window.runTyping(element, text, null, { speed });
+
+  while (!terminou) {
+    await new Promise(r => setTimeout(r, 80));
+  }
+};
+
+window.__TEST_TTS_JORNADA = async function (sampleText) {
+  const lang = getLangNow();
+  const guide = getGuideNow();
+
+  await __ensureVoicesReady();
+
+  const voice = __pickBestVoice(lang, guide);
+  const text = String(
+    sampleText ||
+    ({
+      'pt-BR': 'Meu coração permanece firme na luz.',
+      'en-US': 'My heart remains steady in the light.',
+      'es-ES': 'Mi corazón permanece firme en la luz.',
+      'fr-FR': 'Mon cœur demeure ferme dans la lumière.',
+      'zh-CN': '我的心在光中保持坚定。'
+    }[lang] || 'Teste de voz da jornada.')
+  );
+
+  console.log('[TEST_TTS_JORNADA]', {
+    lang,
+    guide,
+    voice: voice ? { name: voice.name, lang: voice.lang } : null,
+    text
+  });
+
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = lang;
+  if (voice) utt.voice = voice;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(utt);
+};
 
   typingLog('TypingBridge pronto');
 })(window);
