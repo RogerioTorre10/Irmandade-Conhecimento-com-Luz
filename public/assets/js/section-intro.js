@@ -96,7 +96,7 @@ async function setLangAndLock(lang) {
       #intro-lang-modal .intro-lang-title {
         margin: 0 0 12px 0;
         font-size: 1.45rem;
-        font-family: "ManufacturingConsent-Regular", serif;
+        font-family: 'BerkshireSwash', cursive;
       }
 
       #intro-lang-modal .intro-lang-sub {
