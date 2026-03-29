@@ -129,8 +129,11 @@
 
 /* Badge do nome — translúcido (vidro) em todos os breakpoints */
 #section-card .card-name-badge {
-  display: inline-block !important;
-  padding: 4px 16px 3px !important;
+  position: absolute !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  bottom: 18px !important; /* 🔥 AJUSTE PRINCIPAL */
+  padding: 6px 16px 4px !important;
   border-radius: 999px !important;
   border: 1px solid rgba(255, 255, 255, 0.30) !important;
   background: rgba(255, 255, 255, 0.14) !important;
@@ -141,6 +144,7 @@
     inset 0 0 14px rgba(255, 255, 255, 0.10) !important;
   color: #f6e7c6 !important;
   letter-spacing: 0.08em;
+  z-index: 6 !important;
 }
 
 #section-card #userNameSlot {
