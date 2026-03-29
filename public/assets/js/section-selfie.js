@@ -389,10 +389,7 @@
 
   // sempre volta para câmera ao vivo
   await startCamera();
-}
-
-    renderLivePreviewScale();
-  }
+}    
 
   function stopCamera() {
     if (stream) {
