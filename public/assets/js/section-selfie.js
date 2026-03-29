@@ -296,42 +296,9 @@
   }
 
   async function startCamera() {
-    stopCamera();
-    clearPreviewState();
+  stopCamera();
 
-    try {
-      stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: 'user',
-          width: { ideal: 1280 }
-        },
-        audio: false
-      });
-
-      if (!videoEl) return;
-
-      videoEl.srcObject = stream;
-      videoEl.style.display = 'block';
-
-      const captureBtn = getById('btn-selfie-capture');
-      const confirmBtn = getById('btn-selfie-confirm');
-      const errorEl = getById('selfie-error');
-
-      if (captureBtn) captureBtn.disabled = false;
-      if (confirmBtn) confirmBtn.disabled = true;
-      if (errorEl) errorEl.style.display = 'none';
-
-      await videoEl.play().catch(() => {});
-      renderLivePreviewScale();
-    } catch (e) {
-      console.error('[SELFIE] Erro ao iniciar câmera:', e);
-      toast('Câmera bloqueada. Ative as permissões.');
-      const errorEl = getById('selfie-error');
-      if (errorEl) errorEl.style.display = 'block';
-    }
-  }
-
-  async function showLivePreview() {
+  try {
     lastCapture = null;
 
     if (previewImg) {
@@ -353,19 +320,76 @@
       canvasEl.style.visibility = 'hidden';
     }
 
-    if (videoEl) {
-      videoEl.style.display = 'block';
-      videoEl.style.opacity = '1';
-      videoEl.style.visibility = 'visible';
-    }
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: 'user',
+        width: { ideal: 1280 }
+      },
+      audio: false
+    });
 
+    if (!videoEl) return;
+
+    videoEl.srcObject = stream;
+    videoEl.style.display = 'block';
+    videoEl.style.opacity = '1';
+    videoEl.style.visibility = 'visible';
+    videoEl.style.zIndex = '12';
+
+    const captureBtn = getById('btn-selfie-capture');
     const confirmBtn = getById('btn-selfie-confirm');
-    if (confirmBtn) confirmBtn.disabled = true;
+    const errorEl = getById('selfie-error');
 
-    if (!stream || !videoEl?.srcObject) {
-      await startCamera();
-      return;
-    }
+    if (captureBtn) captureBtn.disabled = false;
+    if (confirmBtn) confirmBtn.disabled = true;
+    if (errorEl) errorEl.style.display = 'none';
+
+    await videoEl.play().catch(() => {});
+    renderLivePreviewScale();
+  } catch (e) {
+    console.error('[SELFIE] Erro ao iniciar câmera:', e);
+    toast('Câmera bloqueada. Ative as permissões.');
+    const errorEl = getById('selfie-error');
+    if (errorEl) errorEl.style.display = 'block';
+  }
+}
+
+  async function showLivePreview() {
+  // limpa captura anterior
+  lastCapture = null;
+
+  if (previewImg) {
+    previewImg.onload = null;
+    previewImg.style.display = 'none';
+    previewImg.removeAttribute('src');
+    previewImg.src = '';
+  }
+
+  if (canvasEl) {
+    const ctx = canvasEl.getContext('2d');
+    try {
+      ctx.clearRect(0, 0, canvasEl.width || 1, canvasEl.height || 1);
+    } catch {}
+    canvasEl.width = 1;
+    canvasEl.height = 1;
+    canvasEl.style.display = 'none';
+    canvasEl.style.opacity = '0';
+    canvasEl.style.visibility = 'hidden';
+  }
+
+  if (videoEl) {
+    videoEl.style.display = 'block';
+    videoEl.style.opacity = '1';
+    videoEl.style.visibility = 'visible';
+    videoEl.style.zIndex = '12';
+  }
+
+  const confirmBtn = getById('btn-selfie-confirm');
+  if (confirmBtn) confirmBtn.disabled = true;
+
+  // sempre volta para câmera ao vivo
+  await startCamera();
+}
 
     renderLivePreviewScale();
   }
