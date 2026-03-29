@@ -539,13 +539,13 @@
 .btn-perguntas[data-action="start-mic"].recording {
   background: linear-gradient(135deg, #ff1744, #d50000) !important;
   border-color: #ff1744 !important;
-  color: white !important;
+  color: #fff !important;
   box-shadow:
     0 0 30px #ff1744,
     0 0 60px #ff4444,
     0 0 90px rgba(255, 23, 68, 0.8) !important;
   animation: pulse-recording 1.4s infinite !important;
-  transform: scale(1.12) !important;
+  transform: scale(1.08) !important;
   z-index: 9999 !important;
 }
 
