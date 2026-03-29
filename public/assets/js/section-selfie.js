@@ -204,11 +204,11 @@
     });
 
     if (panel && window.innerWidth <= 768) {
-     panel.style.width = 'calc(100vw - 18px)';
+     panel.style.width = 'calc(100vw - 14px)';
      panel.style.maxWidth = '420px';
      panel.style.marginLeft = 'auto';
      panel.style.marginRight = 'auto';
-     panel.style.transform = 'translateX(-8px)';
+     panel.style.transform = 'translateX(-12px)';
      panel.style.overflow = 'visible';
    }
 
@@ -283,14 +283,15 @@
   const scaleX = clamp(all * x, 0.2, 3);
   const scaleY = clamp(all * y, 0.2, 3);
 
-  if (videoEl && videoEl.style.display !== 'none') {
-    applyLiveStyle(videoEl);
-    videoEl.style.transformOrigin = 'center center';
-    videoEl.style.transform = `translate(-50%, -50%) scaleX(${scaleX}) scaleY(${scaleY})`;
-    videoEl.style.display = 'block';
-    videoEl.style.opacity = '1';
-    videoEl.style.visibility = 'visible';
-  }
+ if (videoEl && videoEl.style.display !== 'none') {
+  applyLiveStyle(videoEl);
+  videoEl.style.transformOrigin = '50% 50%';
+  videoEl.style.transform = `translate(-50%, -50%) scaleX(${scaleX}) scaleY(${scaleY})`;
+  videoEl.style.objectPosition = '50% 52%';
+  videoEl.style.display = 'block';
+  videoEl.style.opacity = '1';
+  videoEl.style.visibility = 'visible';
+}
 }
 
   function updateZoom() {
