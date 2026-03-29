@@ -84,7 +84,7 @@
       const res = await fetch(base + path, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json; charset=UTF-8'},
-        body: JSON.stringify(body || {}),
+        body: JSON.stringify(ensureUTF8(body || {})),
         signal: controller.signal
       });
 
