@@ -194,41 +194,61 @@
       .sort((a, b) => b.score - a.score);
   }
 
-  function __pickBestVoice(lang, guide) {
-    lang = __normalizeLang(lang);
-    guide = String(guide || 'lumen').toLowerCase();
+ function __pickBestVoice(lang, guide) {
+  lang = __normalizeLang(lang);
+  guide = String(guide || 'lumen').toLowerCase();
 
-    const cacheKey = `${lang}::${guide}`;
-    if (__voiceCache.has(cacheKey)) return __voiceCache.get(cacheKey);
+  const cacheKey = `${lang}::${guide}`;
+  if (__voiceCache.has(cacheKey)) return __voiceCache.get(cacheKey);
 
-    const L = lang.toLowerCase();
-    const prefix = L.split('-')[0];
-    const profile = GUIDE_VOICE_PROFILE[guide] || GUIDE_VOICE_PROFILE.lumen;
+  const L = lang.toLowerCase();
+  const prefix = L.split('-')[0];
+  const profile = GUIDE_VOICE_PROFILE[guide] || GUIDE_VOICE_PROFILE.lumen;
 
-    let candidates = __voices.filter(v => String(v.lang || '').toLowerCase() === L);
+  let exact = __voices.filter(v => String(v.lang || '').toLowerCase() === L);
+  let family = __voices.filter(v => String(v.lang || '').toLowerCase().startsWith(prefix));
 
-    if (!candidates.length) {
-      candidates = __voices.filter(v => String(v.lang || '').toLowerCase().startsWith(prefix));
-    }
+  if (!exact.length && prefix === 'zh') {
+    family = __voices.filter(v =>
+      /zh|cmn|chinese/i.test(String(v.lang || '') + ' ' + String(v.name || ''))
+    );
+  }
 
-    // fallback especial para zh
-    if (!candidates.length && prefix === 'zh') {
-      candidates = __voices.filter(v => /zh|cmn|chinese/i.test(String(v.lang || '') + ' ' + String(v.name || '')));
-    }
+  if (!exact.length && prefix === 'fr') {
+    family = __voices.filter(v =>
+      /fr|french/i.test(String(v.lang || '') + ' ' + String(v.name || ''))
+    );
+  }
 
-    // fallback especial para fr
-    if (!candidates.length && prefix === 'fr') {
-      candidates = __voices.filter(v => /fr|french/i.test(String(v.lang || '') + ' ' + String(v.name || '')));
-    }
+  let candidates = exact.length ? exact : family;
 
-    if (!candidates.length) {
-      candidates = [...__voices];
-    }
+  // só como último recurso absoluto
+  if (!candidates.length) {
+    typingLog('Nenhuma voz compatível com o idioma. Usando fallback global.', {
+      requestedLang: lang,
+      guide
+    });
+    candidates = [...__voices];
+  }
 
-    if (!candidates.length) {
-      __voiceCache.set(cacheKey, null);
-      return null;
-    }
+  if (!candidates.length) {
+    __voiceCache.set(cacheKey, null);
+    return null;
+  }
+
+  const ranked = __rankVoices(candidates, lang, profile);
+  const best = ranked[0]?.v || null;
+
+  typingLog('Voz escolhida', {
+    requestedLang: lang,
+    chosenVoice: best?.name || null,
+    chosenVoiceLang: best?.lang || null,
+    guide
+  });
+
+  __voiceCache.set(cacheKey, best);
+  return best;
+}
 
     const ranked = __rankVoices(candidates, lang, profile);
     const best = ranked[0]?.v || null;
