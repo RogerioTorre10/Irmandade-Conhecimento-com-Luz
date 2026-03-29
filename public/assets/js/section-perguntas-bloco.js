@@ -904,12 +904,60 @@ async function maybeHandleBlockClosure(section, bloco) {
       };
     }
 
-    if (btnMic) {
-      btnMic.onclick = (ev) => {
-        ev.preventDefault();
-        triggerMic(textarea);
-      };
+   if (btnMic) {
+  btnMic.onclick = async (ev) => {
+    ev.preventDefault();
+
+    const isRecording = btnMic.classList.contains('recording');
+
+    if (isRecording) {
+      btnMic.classList.remove('recording');
+
+      try {
+        if (window.__REC__) {
+          window.__REC__.stop();
+        }
+      } catch (e) {
+        console.warn('[MIC] erro ao parar reconhecimento:', e);
+      }
+
+      return;
     }
+
+    btnMic.classList.add('recording');
+
+    try {
+      triggerMic(textarea);
+    } catch (e) {
+      btnMic.classList.remove('recording');
+      console.warn('[MIC] erro ao iniciar:', e);
+    }
+
+    if (window.__REC__) {
+      const rec = window.__REC__;
+
+      rec.onend = (() => {
+        const old = rec.onend;
+        return function (...args) {
+          btnMic.classList.remove('recording');
+          if (typeof old === 'function') {
+            try { old.apply(this, args); } catch {}
+          }
+        };
+      })();
+
+      rec.onerror = (() => {
+        const old = rec.onerror;
+        return function (...args) {
+          btnMic.classList.remove('recording');
+          if (typeof old === 'function') {
+            try { old.apply(this, args); } catch {}
+          }
+        };
+      })();
+    }
+  };
+}
 
     if (btnApagar) {
       btnApagar.onclick = (ev) => {
