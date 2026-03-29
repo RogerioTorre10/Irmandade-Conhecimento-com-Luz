@@ -258,21 +258,30 @@
   }
 
   async function __applyVoice(utt, lang) {
-    if (!utt || !('speechSynthesis' in window)) return;
+  if (!utt || !('speechSynthesis' in window)) return;
 
-    await __ensureVoicesReady();
+  const normalizedLang = __normalizeLang(lang || getLangNow());
 
-    const guide = getGuideNow();
-    const voice = __pickBestVoice(lang, guide);
+  await __ensureVoicesReady();
 
-    if (voice) {
-      utt.voice = voice;
-      utt.lang = voice.lang || __normalizeLang(lang);
-    } else {
-      utt.lang = __normalizeLang(lang);
-    }
+  const guide = getGuideNow();
+  const voice = __pickBestVoice(normalizedLang, guide);
+
+  if (voice) {
+    utt.voice = voice;
+    utt.lang = __normalizeLang(voice.lang || normalizedLang);
+  } else {
+    utt.voice = null;
+    utt.lang = normalizedLang;
   }
 
+  typingLog('Aplicando voz ao utterance', {
+    guide,
+    requestedLang: normalizedLang,
+    finalLang: utt.lang,
+    voice: utt.voice?.name || '(default)'
+  });
+}
   window.TYPING_DEBUG_VOICES = async function () {
     if (!('speechSynthesis' in window)) {
       console.log('speechSynthesis não disponível.');
@@ -431,51 +440,69 @@
     });
   };
 
-  window.EffectCoordinator = window.EffectCoordinator || {};
-
-  let __lastSpeakSig = '';
-  let __lastSpeakAt = 0;
-
   window.EffectCoordinator.speak = (text, options = {}) => {
-    if (!text || !('speechSynthesis' in window)) return;
+  if (!text || !('speechSynthesis' in window)) return;
 
-    const lang = __normalizeLang(getLangNow());
-    const clean = String(text).trim();
-    const sig = `${lang}::${clean}`;
-    const now = Date.now();
+  const lang = getLangNow();
+  const clean = String(text)
+    .replace(/\s+/g, ' ')
+    .trim();
 
-    if (sig === __lastSpeakSig && (now - __lastSpeakAt) < 1600) return;
-    __lastSpeakSig = sig;
-    __lastSpeakAt = now;
+  if (!clean) return;
 
-    try { speechSynthesis.cancel(); } catch {}
+  const sig = `${lang}::${clean}`;
+  const now = Date.now();
 
-    const utt = new SpeechSynthesisUtterance(clean);
-    utt.lang = lang;
-    utt.rate = options.rate ?? (lang.startsWith('zh') ? 0.92 : 1.03);
-    utt.pitch = options.pitch ?? 1.0;
-    utt.volume = options.volume ?? 1.0;
+  if (sig === __lastSpeakSig && (now - __lastSpeakAt) < 1600) return;
+  __lastSpeakSig = sig;
+  __lastSpeakAt = now;
 
-    utt.onboundary = () => {
-      try { window.Luz?.startPulse({ min: 1, max: 1.45, speed: 120 }); } catch {}
-    };
-    utt.onend = () => {
-      try { window.Luz?.stopPulse(); } catch {}
-    };
-    utt.onerror = () => {
-      try { window.Luz?.stopPulse(); } catch {}
-    };
+  try { speechSynthesis.cancel(); } catch {}
 
-    const speakNow = () => {
+  const utt = new SpeechSynthesisUtterance(clean);
+  utt.lang = lang;
+  utt.rate = options.rate ?? (lang.startsWith('zh') ? 0.92 : 1.00);
+  utt.pitch = options.pitch ?? 1.0;
+  utt.volume = options.volume ?? 1.0;
+
+  utt.onstart = () => {
+    typingLog('TTS iniciou', {
+      lang: utt.lang,
+      guide: getGuideNow(),
+      voice: utt.voice?.name || '(default)'
+    });
+  };
+
+  utt.onboundary = () => {
+    try { window.Luz?.startPulse({ min: 1, max: 1.45, speed: 120 }); } catch {}
+  };
+
+  utt.onend = () => {
+    try { window.Luz?.stopPulse(); } catch {}
+  };
+
+  utt.onerror = (ev) => {
+    typingLog('TTS erro', {
+      error: ev?.error || 'unknown',
+      lang: utt.lang,
+      guide: getGuideNow(),
+      voice: utt.voice?.name || '(default)'
+    });
+    try { window.Luz?.stopPulse(); } catch {}
+  };
+
+  Promise.resolve(__applyVoice(utt, lang))
+    .then(() => {
       try {
         speechSynthesis.speak(utt);
-        typingLog('TTS falando…', {
-          lang: utt.lang,
-          guide: getGuideNow(),
-          voice: utt.voice?.name || '(default)'
-        });
       } catch {}
-    };
+    })
+    .catch(() => {
+      try {
+        speechSynthesis.speak(utt);
+      } catch {}
+    });
+};
 
     Promise.resolve(__applyVoice(utt, lang))
       .catch(() => {})
