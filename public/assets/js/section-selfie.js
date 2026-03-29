@@ -476,21 +476,21 @@
 
     lastCapture = canvasEl.toDataURL('image/jpeg', 0.92);
 
-    if (videoEl) {
-      videoEl.style.display = 'none';
-      videoEl.style.opacity = '0';
-      videoEl.style.visibility = 'hidden';
-    }
-
-    applyCapturedCanvasStyle(canvasEl);
-    canvasEl.style.display = 'block';
-    canvasEl.style.opacity = '1';
-    canvasEl.style.visibility = 'visible';
-
-    const confirmBtn = getById('btn-selfie-confirm');
-    if (confirmBtn) confirmBtn.disabled = false;
+  if (videoEl) {
+    videoEl.style.display = 'none';
+    videoEl.style.opacity = '0';
+    videoEl.style.visibility = 'hidden';
   }
 
+   applyCapturedCanvasStyle(canvasEl);
+   canvasEl.style.display = 'block';
+   canvasEl.style.opacity = '1';
+   canvasEl.style.visibility = 'visible';
+   canvasEl.style.zIndex = '20';
+
+ const confirmBtn = getById('btn-selfie-confirm');
+ if (confirmBtn) confirmBtn.disabled = false;
+    
   function playTransitionThenGo() {
     console.log(`[SELFIE] Transição → ${NEXT_SECTION_ID}`);
 
