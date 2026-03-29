@@ -8,6 +8,21 @@
 (function () {
   'use strict';
 
+  function ensureUTF8(obj) {
+  try {
+    return JSON.parse(
+      JSON.stringify(obj, (key, value) => {
+        if (typeof value === 'string') {
+          return value.normalize('NFC');
+        }
+        return value;
+      })
+    );
+  } catch {
+    return obj;
+  }
+}
+
   function normalizeBase(u) {
     return String(u || '').trim().replace(/\/+$/, '');
   }
@@ -68,7 +83,7 @@
     try {
       const res = await fetch(base + path, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json; charset=UTF-8'},
         body: JSON.stringify(body || {}),
         signal: controller.signal
       });
