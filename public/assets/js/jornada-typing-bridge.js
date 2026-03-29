@@ -16,17 +16,18 @@
   };
 
   function getLangNow() {
-    return (
-      window.i18n?.currentLang ||
-      window.i18n?.lang ||
-      sessionStorage.getItem('jornada.lang') ||
-      sessionStorage.getItem('i18n.lang') ||
-      localStorage.getItem('jc.lang') ||
-      localStorage.getItem('i18n_lang') ||
-      document.documentElement?.lang ||
-      'pt-BR'
-    );
-  }
+  const raw =
+    window.i18n?.currentLang ||
+    window.i18n?.lang ||
+    sessionStorage.getItem('jornada.lang') ||
+    sessionStorage.getItem('i18n.lang') ||
+    localStorage.getItem('jc.lang') ||
+    localStorage.getItem('i18n_lang') ||
+    document.documentElement?.lang ||
+    'pt-BR';
+
+  return __normalizeLang(raw);
+}
 
   function getGuideNow() {
     return String(
