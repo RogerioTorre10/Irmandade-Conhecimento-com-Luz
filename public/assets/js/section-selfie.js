@@ -204,13 +204,13 @@
     });
 
     if (panel && window.innerWidth <= 768) {
-      panel.style.width = 'calc(95vw - 4px)';
-      panel.style.maxWidth = '430px';
-      panel.style.marginLeft = 'auto';
-      panel.style.marginRight = 'auto';
-      panel.style.transform = 'translateX(-4px)';
-      panel.style.overflow = 'visible';
-    }
+     panel.style.width = 'calc(100vw - 18px)';
+     panel.style.maxWidth = '420px';
+     panel.style.marginLeft = 'auto';
+     panel.style.marginRight = 'auto';
+     panel.style.transform = 'translateX(-8px)';
+     panel.style.overflow = 'visible';
+   }
 
     if (frame) {
       frame.style.position = 'relative';
@@ -260,36 +260,38 @@
   }
 
   function renderLivePreviewScale() {
-    const allInput = getById('zoomAll');
-    const xInput = getById('zoomX');
-    const yInput = getById('zoomY');
+  const allInput = getById('zoomAll');
+  const xInput = getById('zoomX');
+  const yInput = getById('zoomY');
 
-    const all = clamp(parseFloat(allInput?.value || FINAL_ZOOM), 0.2, 3);
-    const x = clamp(parseFloat(xInput?.value || 1), 0.2, 3);
-    const y = clamp(parseFloat(yInput?.value || 1), 0.2, 3);
+  const all = clamp(parseFloat(allInput?.value || FINAL_ZOOM), 0.2, 3);
+  const x = clamp(parseFloat(xInput?.value || 1), 0.2, 3);
+  const y = clamp(parseFloat(yInput?.value || 1), 0.2, 3);
 
-    zoomState.all = all;
-    zoomState.x = x;
-    zoomState.y = y;
+  zoomState.all = all;
+  zoomState.x = x;
+  zoomState.y = y;
 
-    const zoomAllVal = getById('zoomAllVal');
-    const zoomXVal = getById('zoomXVal');
-    const zoomYVal = getById('zoomYVal');
+  const zoomAllVal = getById('zoomAllVal');
+  const zoomXVal = getById('zoomXVal');
+  const zoomYVal = getById('zoomYVal');
 
-    if (zoomAllVal) zoomAllVal.textContent = `${all.toFixed(2)}×`;
-    if (zoomXVal) zoomXVal.textContent = `${x.toFixed(2)}×`;
-    if (zoomYVal) zoomYVal.textContent = `${y.toFixed(2)}×`;
+  if (zoomAllVal) zoomAllVal.textContent = `${all.toFixed(2)}×`;
+  if (zoomXVal) zoomXVal.textContent = `${x.toFixed(2)}×`;
+  if (zoomYVal) zoomYVal.textContent = `${y.toFixed(2)}×`;
 
-    const liveScale = clamp(all * Math.min(x, y), 0.2, 3);
+  const scaleX = clamp(all * x, 0.2, 3);
+  const scaleY = clamp(all * y, 0.2, 3);
 
-    if (videoEl && videoEl.style.display !== 'none') {
-      applyLiveStyle(videoEl);
-      videoEl.style.transform = `translate(-50%, -50%) scale(${liveScale})`;
-      videoEl.style.display = 'block';
-      videoEl.style.opacity = '1';
-      videoEl.style.visibility = 'visible';
-    }
+  if (videoEl && videoEl.style.display !== 'none') {
+    applyLiveStyle(videoEl);
+    videoEl.style.transformOrigin = 'center center';
+    videoEl.style.transform = `translate(-50%, -50%) scaleX(${scaleX}) scaleY(${scaleY})`;
+    videoEl.style.display = 'block';
+    videoEl.style.opacity = '1';
+    videoEl.style.visibility = 'visible';
   }
+}
 
   function updateZoom() {
     renderLivePreviewScale();
