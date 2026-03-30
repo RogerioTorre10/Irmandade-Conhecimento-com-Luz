@@ -219,7 +219,8 @@ return new Promise((resolve) => {
     }
   });
 });
-
+} 
+  
   async function runTyping(root) {
   if (!root) return;
 
