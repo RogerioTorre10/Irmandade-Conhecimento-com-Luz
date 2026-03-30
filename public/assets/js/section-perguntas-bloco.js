@@ -182,10 +182,17 @@
   }
 
   function getQuestionText(bloco, qIndex = 0) {
-    const pergunta = bloco?.questions?.[qIndex];
-    if (!pergunta) return '';
-    return String(pergunta.label || '').trim();
+  const pergunta = bloco?.questions?.[qIndex];
+  if (!pergunta) return '';
+
+  // 🔥 PRIORIDADE: i18n global
+  if (pergunta.data_i18n && window.i18n?.t) {
+    return window.i18n.t(`questions.${pergunta.data_i18n.replace('pergunta_', '')}`, pergunta.label);
   }
+
+  // fallback
+  return String(pergunta.label || '').trim();
+}
 
   function getQuestionId(bloco, qIndex = 0) {
     const pergunta = bloco?.questions?.[qIndex];
