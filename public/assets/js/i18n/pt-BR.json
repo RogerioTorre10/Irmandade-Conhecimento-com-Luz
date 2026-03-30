@@ -18,11 +18,9 @@
     "title": "Jornada • Irmandade Conhecimento com Luz"
   },
   "intro": {
-    "title": "Jornada Essencial",
-    "start": "Começar",
-    "language": "Escolha seu idioma"
-  },
-  "intro": {
+  "title": "Jornada Essencial",
+  "start": "Começar",
+  "language": "Escolha seu idioma",
   "title": "Jornada do Conhecimento",
   "start": "Iniciar",
   "p1": "Bom dia.",
