@@ -18,9 +18,17 @@
     "title": "Journey • Brotherhood Knowledge with Light"
   },
   "intro": {
-    "title": "Essential Journey",
-    "start": "Start",
-    "language": "Choose your language"
+   "title": "Essential Journey",
+  "start": "Start",
+  "language": "Choose your language",
+   "title": "Journey of Knowledge",
+  "start": "Start",
+  "p1": "Good morning.",
+  "p2": "Respect and love.",
+  "p3": "Let us go in peace.",
+  "p4": "Love and life.",
+  "p5": "Praise be to God."
+}
   },
   "terms": {
     "title": "Terms and Conditions",
