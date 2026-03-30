@@ -1,45 +1,115 @@
 {
-  "intro.title": "核心之旅",
-  "intro.start": "开始",
-  "intro.language": "选择你的语言",
-
-  "termos.title": "条款与条件",
-  "termos.accept": "我同意",
-
-  "senha.title": "安全访问",
-  "senha.placeholder": "输入密码",
-  "senha.button": "继续",
-
-  "dados.title": "个人信息",
-  "dados.subtitle": "填写一些信息以丰富您的反馈",
-  "dados.nome": "姓名",
-  "dados.cidade": "城市",
-  "dados.estado": "州/地区",
-  "dados.profissao": "职业",
-  "dados.religiao": "信仰",
-  "dados.continuar": "继续",
-
-  "selfie.title": "拍摄你的照片",
-  "selfie.instrucao": "{nome}，请稍微远离手机并对准脸部。{guia}将引导你。",
-  "selfie.preview": "预览",
-  "selfie.capture": "拍摄",
-  "selfie.iniciar": "开始",
-  "selfie.confirmar": "确认",
-  "selfie.pular": "跳过",
-
-  "perguntas.placeholder": "在这里输入你的回答...",
-  "perguntas.devolutiva": "引导者反馈",
-  "perguntas.continuar": "继续",
-
-  "final.titulo": "感谢你走完这段光之旅程",
-  "final.mensagem1": "你的回答已被光之兄弟会庄重接收。",
-  "final.mensagem2": "你播下了信任、勇气与光明的种子。",
-  "final.mensagem3": "继续前行，这段旅程没有终点。",
-  "final.mensagem4": "当你需要重新点燃内心之光时，请回来。",
-  "final.mensagem5": "你就是光。你就是改变。",
-
-  "final.pdf": "PDF",
-  "final.selfie": "自拍卡",
-  "final.voltar": "返回",
-  "final.enviar": "重新发送"
+  "meta": {
+    "lang": "zh-CN",
+    "label": "简体中文"
+  },
+  "common": {
+    "welcome": "欢迎！",
+    "description": "这是一个很棒的网站。",
+    "search": "搜索...",
+    "continue": "继续",
+    "next": "下一步",
+    "back": "返回",
+    "speak": "朗读",
+    "stop": "停止",
+    "loading": "加载中..."
+  },
+  "site": {
+    "title": "旅程 • 光之知识兄弟会"
+  },
+  "intro": {
+    "title": "核心旅程",
+    "start": "开始",
+    "language": "选择你的语言"
+  },
+  "terms": {
+    "title": "条款与条件",
+    "accept": "我同意"
+  },
+  "password": {
+    "title": "安全访问",
+    "placeholder": "请输入密码",
+    "button": "继续"
+  },
+  "guide": {
+    "title": "选择你的向导",
+    "subtitle": "选择谁将陪伴你完成这段旅程。"
+  },
+  "data": {
+    "title": "个人信息",
+    "subtitle": "分享一些信息，以丰富你的反馈。",
+    "name": "姓名",
+    "city": "城市",
+    "state": "州/地区",
+    "profession": "职业",
+    "religion": "宗教",
+    "continue": "继续"
+  },
+  "selfie": {
+    "title": "拍摄你的照片",
+    "instruction": "将手机稍微拿远一些并对准你的脸。你的向导会陪伴你。",
+    "preview": "预览",
+    "capture": "拍摄",
+    "start": "开始",
+    "confirm": "确认",
+    "skip": "跳过"
+  },
+  "card": {
+    "title": "我在兄弟会中",
+    "name_placeholder": "请输入你的名字",
+    "button": "继续"
+  },
+  "feedback": {
+    "title": "向导反馈"
+  },
+  "progress": {
+    "path": "模块：道路",
+    "question": "问题",
+    "total": "总计"
+  },
+  "blocks": {
+    "roots": "第1模块 — 根源",
+    "reflections": "第2模块 — 反思",
+    "growth": "第3模块 — 成长",
+    "integration": "第4模块 — 整合",
+    "synthesis": "第5模块 — 综合与交付"
+  },
+  "questions": {
+    "who_are_you_today": "今天的你是谁？",
+    "what_brought_you_here": "是什么带你来到这段旅程？",
+    "greatest_spiritual_dream": "你最大的灵性梦想是什么？",
+    "current_challenges": "你当前最大的挑战是什么？",
+    "fear_or_doubt": "你如何面对恐惧或怀疑？",
+    "meaning_of_light": "光对你意味着什么？",
+    "what_to_change": "你想改变生活中的什么？",
+    "who_inspires_you": "谁激励着你，为什么？",
+    "practice_gratitude": "你如何每天实践感恩？",
+    "journey_lesson": "你从这段旅程中获得了什么教训？",
+    "future_application": "你将如何把这应用到未来？",
+    "message_to_future_self": "给未来自己的话。",
+    "essence_today": "请用一句真实的话描述今天的你是谁。",
+    "next_step": "你的下一个信念与勇气之步是什么？"
+  },
+  "answers": {
+    "placeholder": "请输入你的回答..."
+  },
+  "final": {
+    "title": "感谢你与光一同走过这段道路",
+    "message1": "你的回答已被兄弟会庄重接收。",
+    "message2": "你播下了信任、勇气与光明的种子。",
+    "message3": "继续前行。这段道路并未在此结束。",
+    "message4": "当你需要重新点燃内在火焰时，请再回来。",
+    "message5": "你就是光。你就是转变。",
+    "pdf": "PDF",
+    "selfie_card": "自拍卡",
+    "back": "返回",
+    "restart": "再次提交"
+  },
+  "page": {
+    "title": "核心旅程"
+  },
+  "footer": {
+    "copyright": "© 2025 光之知识兄弟会",
+    "tagline": "光之知识兄弟会"
+  }
 }
