@@ -12,33 +12,33 @@
 
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
- function isLangLocked() {
-  return sessionStorage.getItem('i18n_locked') === '1';
-}
-
-async function setLangAndLock(lang) {
-  if (!lang) return;
-
-  try {
-    if (window.i18n?.forceLang) {
-      await window.i18n.forceLang(lang, true);
-    } else if (window.i18n?.setLang) {
-      await window.i18n.setLang(lang);
-    }
-  } catch (e) {
-    console.warn('[IntroLang] Erro ao definir idioma:', e);
+  function isLangLocked() {
+    return sessionStorage.getItem('i18n_locked') === '1';
   }
 
-  // trava só nesta jornada
-  sessionStorage.setItem('i18n_locked', '1');
-  sessionStorage.setItem('jornada.lang', lang);
-  sessionStorage.setItem('i18n.lang', lang);
+  async function setLangAndLock(lang) {
+    if (!lang) return;
 
-  document.documentElement.lang = lang.split('-')[0] || 'pt';
+    try {
+      if (window.i18n?.forceLang) {
+        await window.i18n.forceLang(lang, true);
+      } else if (window.i18n?.setLang) {
+        await window.i18n.setLang(lang);
+      }
+    } catch (e) {
+      console.warn('[IntroLang] Erro ao definir idioma:', e);
+    }
 
-  console.log('[IntroLang] Idioma definido nesta jornada:', lang);
-}
-  
+    sessionStorage.setItem('i18n_locked', '1');
+    sessionStorage.setItem('jornada.lang', lang);
+    sessionStorage.setItem('i18n.lang', lang);
+    localStorage.setItem('i18n_lang', lang);
+
+    document.documentElement.lang = lang;
+
+    console.log('[IntroLang] Idioma definido nesta jornada:', lang);
+  }
+
   function buildLangModal() {
     const modal = document.createElement('div');
     modal.id = 'intro-lang-modal';
@@ -69,7 +69,6 @@ async function setLangAndLock(lang) {
       </div>
     `;
 
-    // CSS inline para garantir que apareça
     const style = document.createElement('style');
     style.textContent = `
       #intro-lang-modal {
@@ -127,151 +126,142 @@ async function setLangAndLock(lang) {
         color: #111;
         box-shadow: 0 4px 15px rgba(0,0,0,0.6);
         transition: all 0.25s ease;
+        cursor: pointer;
       }
     `;
     modal.appendChild(style);
 
-    // Garante que o modal seja visível
     modal.style.display = 'flex';
     modal.style.visibility = 'visible';
     modal.style.opacity = '1';
 
     return modal;
   }
-  
- async function requireLanguageChoice() {
-  // limpa trava e idioma da jornada anterior
-  sessionStorage.removeItem('i18n_locked');
-  sessionStorage.removeItem('jornada.lang');
-  sessionStorage.removeItem('i18n.lang');
 
-  const oldModal = document.getElementById('intro-lang-modal');
-  if (oldModal) oldModal.remove();
+  async function requireLanguageChoice() {
+    sessionStorage.removeItem('i18n_locked');
+    sessionStorage.removeItem('jornada.lang');
+    sessionStorage.removeItem('i18n.lang');
 
- const modal = buildLangModal();
- document.body.appendChild(modal);
+    const oldModal = document.getElementById('intro-lang-modal');
+    if (oldModal) oldModal.remove();
 
-  // 🔥 ADICIONA ISSO AQUI
- window.__LANG_MODAL_OPEN__ = true;
- window.__INTRO_LANG_CONFIRMED__ = false;
- window.speechSynthesis?.cancel?.();
+    const modal = buildLangModal();
+    document.body.appendChild(modal);
 
- const btn = modal.querySelector('#intro-lang-confirm');
-const sel = modal.querySelector('#intro-lang-select');
+    window.__LANG_MODAL_OPEN__ = true;
+    window.__INTRO_LANG_CONFIRMED__ = false;
+    window.speechSynthesis?.cancel?.();
 
-// garante elementos
-if (!btn || !sel) {
-  console.error('[LANG_MODAL] Botão ou select não encontrados.', { btn: !!btn, sel: !!sel });
-  return Promise.resolve('pt-BR');
-}
+    const btn = modal.querySelector('#intro-lang-confirm');
+    const sel = modal.querySelector('#intro-lang-select');
 
-// sempre começa destravado
-sel.disabled = false;
-
-// mantém valor atual, ou usa fallback
-sel.value =
-  sel.value ||
-  sessionStorage.getItem('jornada.lang') ||
-  localStorage.getItem('i18n_lang') ||
-  'pt-BR';
-
-// garante botão clicável
-btn.disabled = false;
-btn.removeAttribute('disabled');
-btn.style.pointerEvents = 'auto';
-btn.style.opacity = '1';
-btn.setAttribute('aria-disabled', 'false');
-
-function getChosenLang() {
-  return (sel.value || 'pt-BR').trim();
-}
-
-return new Promise((resolve) => {
-  const confirmChoice = async () => {
-    const chosenLang = getChosenLang();
-
-    try {
-      await setLangAndLock(chosenLang);
-
-      modal.style.opacity = '0';
-      setTimeout(() => modal.remove(), 300);
-
-      window.__INTRO_LANG_CONFIRMED__ = true;
-      window.__LANG_MODAL_OPEN__ = false;
-
-      document.dispatchEvent(new CustomEvent('intro:language-confirmed', {
-        detail: { lang: chosenLang }
-      }));
-
-      resolve(chosenLang);
-    } catch (err) {
-      console.error('[Global Lang Change] Erro:', err);
-      resolve(chosenLang);
+    if (!btn || !sel) {
+      console.error('[LANG_MODAL] Botão ou select não encontrados.', {
+        btn: !!btn,
+        sel: !!sel
+      });
+      throw new Error('Modal de idioma inválida.');
     }
-  };
 
-  btn.addEventListener('click', confirmChoice);
+    sel.disabled = false;
+    sel.value =
+      sel.value ||
+      sessionStorage.getItem('jornada.lang') ||
+      localStorage.getItem('i18n_lang') ||
+      'pt-BR';
 
-  sel.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      confirmChoice();
+    btn.disabled = false;
+    btn.removeAttribute('disabled');
+    btn.style.pointerEvents = 'auto';
+    btn.style.opacity = '1';
+    btn.setAttribute('aria-disabled', 'false');
+
+    function getChosenLang() {
+      return (sel.value || 'pt-BR').trim();
     }
-  });
-});
-} 
-  
-  async function runTyping(root) {
-  if (!root) return;
 
-  const btn =
-    root.querySelector('#btn-intro') ||
-    root.querySelector('[data-next]') ||
-    root.querySelector('.btn-stone') ||
-    root.querySelector('button');
+    return new Promise((resolve) => {
+      const confirmChoice = async () => {
+        const chosenLang = getChosenLang();
 
-  if (!btn) {
-    console.warn('[JCIntro] Botão da intro não encontrado.');
-    return;
+        try {
+          await setLangAndLock(chosenLang);
+
+          modal.style.opacity = '0';
+          setTimeout(() => modal.remove(), 300);
+
+          window.__INTRO_LANG_CONFIRMED__ = true;
+          window.__LANG_MODAL_OPEN__ = false;
+
+          document.dispatchEvent(new CustomEvent('intro:language-confirmed', {
+            detail: { lang: chosenLang }
+          }));
+
+          resolve(chosenLang);
+        } catch (err) {
+          console.error('[Global Lang Change] Erro:', err);
+          resolve(chosenLang);
+        }
+      };
+
+      btn.addEventListener('click', confirmChoice);
+
+      sel.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          confirmChoice();
+        }
+      });
+    });
   }
 
-  btn.removeAttribute('disabled');
-  btn.classList.remove('is-hidden');
+  async function runTyping(root) {
+    if (!root) return;
 
-  btn.onclick = () => {
-    try { window.speechSynthesis?.cancel?.(); } catch {}
+    const btn =
+      root.querySelector('#btn-intro') ||
+      root.querySelector('[data-next]') ||
+      root.querySelector('.btn-stone') ||
+      root.querySelector('button');
 
-    if (typeof window.playTransitionVideo === 'function') {
-      window.playTransitionVideo(
-        '/assets/videos/filme-pergaminho-ao-vento.mp4',
-        NEXT_SECTION_ID
-      );
+    if (!btn) {
+      console.warn('[JCIntro] Botão da intro não encontrado.');
       return;
     }
 
-    if (window.JC?.show) {
-      window.JC.show(NEXT_SECTION_ID, { force: true });
-    } else {
-      location.hash = '#' + NEXT_SECTION_ID;
-    }
-  };
-}
-  
-async function init(root) {
-  if (window.JCIntro.state.initialized) return;
-  window.JCIntro.state.initialized = true;
+    btn.removeAttribute('disabled');
+    btn.classList.remove('is-hidden');
 
-  sessionStorage.removeItem('i18n_locked');
-  sessionStorage.removeItem('jornada.lang');
-  sessionStorage.removeItem('i18n.lang');
+    btn.onclick = () => {
+      try { window.speechSynthesis?.cancel?.(); } catch {}
 
-  await requireLanguageChoice();
-  await runTyping(root);
+      if (typeof window.playTransitionVideo === 'function') {
+        window.playTransitionVideo(
+          '/assets/videos/filme-pergaminho-ao-vento.mp4',
+          NEXT_SECTION_ID
+        );
+        return;
+      }
 
-  console.log('[Intro] Inicialização completa após escolha de idioma.');
-}
-  
-  // Bind
+      if (window.JC?.show) {
+        window.JC.show(NEXT_SECTION_ID, { force: true });
+      } else {
+        location.hash = '#' + NEXT_SECTION_ID;
+      }
+    };
+  }
+
+  async function init(root) {
+    if (window.JCIntro.state.initialized) return;
+    window.JCIntro.state.initialized = true;
+
+    await requireLanguageChoice();
+    await runTyping(root);
+
+    console.log('[Intro] Inicialização completa após escolha de idioma.');
+  }
+
   function bind() {
     const existing = document.getElementById(SECTION_ID);
     if (existing) init(existing);
@@ -288,4 +278,4 @@ async function init(root) {
   } else {
     bind();
   }
- })();
+})();
