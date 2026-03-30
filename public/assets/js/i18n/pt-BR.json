@@ -17,10 +17,7 @@
   "site": {
     "title": "Jornada • Irmandade Conhecimento com Luz"
   },
-  "intro": {
-  "title": "Jornada Essencial",
-  "start": "Começar",
-  "language": "Escolha seu idioma",
+  "intro": {  
   "title": "Jornada do Conhecimento",
   "start": "Iniciar",
   "p1": "Bom dia.",
@@ -28,7 +25,7 @@
   "p3": "Vamos em paz.",
   "p4": "Amor e vida.",
   "p5": "Deus seja louvado."
-}
+  },
   "terms": {
     "title": "Termos e Condições",
     "accept": "Eu aceito"
