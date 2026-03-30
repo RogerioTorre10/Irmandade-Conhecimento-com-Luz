@@ -433,9 +433,12 @@
     });
   };
 
- window.EffectCoordinator = window.EffectCoordinator || {};
+   window.EffectCoordinator = window.EffectCoordinator || {};
 
-window.EffectCoordinator.speak = (text, options = {}) => {
+   let __lastSpeakSig = '';
+   let __lastSpeakAt = 0;
+
+  window.EffectCoordinator.speak = (text, options = {}) => {
   if (!text || !('speechSynthesis' in window)) return;
 
   const lang = getLangNow();
