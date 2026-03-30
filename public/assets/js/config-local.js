@@ -36,7 +36,10 @@
   window.JORNADA = Object.assign({
     fullTypingMode: true,
     typing: { charDelay: 18, caret: false },
-    tts: { enabled: true, lang: 'pt-BR', rate: 1.06, pitch: 1.0, voiceName: '', readingMode: 'after' }
+    tts: { enabled: true,
+  lang: document.documentElement.lang || localStorage.getItem('i18n_lang') || 'pt-BR',
+  rate: 1.06, pitch: 1.0, voiceName: '', readingMode: 'after'
+}
   }, window.JORNADA || {});
 
   // Se o módulo API já existir, força PRIMARY/FALLBACK pro local
