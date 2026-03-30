@@ -1,30 +1,115 @@
 {
-  "welcome": "Welcome!",
-  "description": "This is an awesome website.",
-  "site.title": "Journey • Brotherhood Knowledge with Light",
-  "search": "Search...",
-  "btn-avancar": "Next",
-  "bloco_raizes_title": "Block 1 — Roots",
-  "pergunta_quem_voce_hoje": "Who are you today?",
-  "pergunta_o_que_te_trouxe": "What brought you to this journey?",
-  "pergunta_sonho_espiritual": "What is your greatest spiritual dream?",
-  "bloco_reflexoes_title": "Block 2 — Reflections",
-  "pergunta_desafios_atuais": "What are your biggest current challenges?",
-  "pergunta_medo_duvida": "How do you deal with fear or doubt?",
-  "pergunta_significado_luz": "What does light mean to you?",
-  "bloco_crescimento_title": "Block 3 — Growth",
-  "pergunta_mudar_vida": "What do you want to change in your life?",
-  "pergunta_quem_inspira": "Who inspires you and why?",
-  "pergunta_pratica_gratidao": "How do you practice gratitude daily?",
-  "bloco_integracao_title": "Block 4 — Integration",
-  "pergunta_licao_jornada": "What lesson do you take from this journey?",
-  "pergunta_aplicar_futuro": "How will you apply this in the future?",
-  "pergunta_mensagem_futuro": "A message for your future self.",
-  "bloco_sintese_title": "Block 5 — Synthesis and Delivery",
-  "pergunta_essencia_hoje": "Who are you today, in one true sentence?",
-  "pergunta_passo_fe": "What will be your next step of faith and courage?",
-  "resposta_placeholder": "Type your answer...",
-  "page.title": "Essential Journey",
-  "footer.copyright": "© 2025 Brotherhood Knowledge with Light",
-  "footer.tagline": "Brotherhood Knowledge with Light"
+  "meta": {
+    "lang": "en-US",
+    "label": "English (US)"
+  },
+  "common": {
+    "welcome": "Welcome!",
+    "description": "This is an amazing website.",
+    "search": "Search...",
+    "continue": "Continue",
+    "next": "Next",
+    "back": "Back",
+    "speak": "Speak",
+    "stop": "Stop",
+    "loading": "Loading..."
+  },
+  "site": {
+    "title": "Journey • Brotherhood Knowledge with Light"
+  },
+  "intro": {
+    "title": "Essential Journey",
+    "start": "Start",
+    "language": "Choose your language"
+  },
+  "terms": {
+    "title": "Terms and Conditions",
+    "accept": "I accept"
+  },
+  "password": {
+    "title": "Secure access",
+    "placeholder": "Enter your password",
+    "button": "Continue"
+  },
+  "guide": {
+    "title": "Choose your guide",
+    "subtitle": "Select who will accompany you on this journey."
+  },
+  "data": {
+    "title": "Personal data",
+    "subtitle": "Share some information to enrich your feedback.",
+    "name": "Full name",
+    "city": "City",
+    "state": "State",
+    "profession": "Profession",
+    "religion": "Religion",
+    "continue": "Continue"
+  },
+  "selfie": {
+    "title": "Take your photo",
+    "instruction": "Move the phone slightly away and position your face. Your guide will lead you.",
+    "preview": "Preview",
+    "capture": "Capture",
+    "start": "Start",
+    "confirm": "Confirm",
+    "skip": "Skip"
+  },
+  "card": {
+    "title": "Me in the Brotherhood",
+    "name_placeholder": "Enter your name",
+    "button": "Continue"
+  },
+  "feedback": {
+    "title": "Guide Feedback"
+  },
+  "progress": {
+    "path": "Blocks: The Path",
+    "question": "Question",
+    "total": "Total"
+  },
+  "blocks": {
+    "roots": "Block 1 — Roots",
+    "reflections": "Block 2 — Reflections",
+    "growth": "Block 3 — Growth",
+    "integration": "Block 4 — Integration",
+    "synthesis": "Block 5 — Synthesis and Delivery"
+  },
+  "questions": {
+    "who_are_you_today": "Who are you today?",
+    "what_brought_you_here": "What brought you to this journey?",
+    "greatest_spiritual_dream": "What is your greatest spiritual dream?",
+    "current_challenges": "What are your biggest current challenges?",
+    "fear_or_doubt": "How do you deal with fear or doubt?",
+    "meaning_of_light": "What does light mean to you?",
+    "what_to_change": "What do you want to change in your life?",
+    "who_inspires_you": "Who inspires you and why?",
+    "practice_gratitude": "How do you practice gratitude daily?",
+    "journey_lesson": "What lesson do you take from this journey?",
+    "future_application": "How will you apply this in your future?",
+    "message_to_future_self": "A message for your future self.",
+    "essence_today": "Who are you today, in one true sentence?",
+    "next_step": "What will be your next step of faith and courage?"
+  },
+  "answers": {
+    "placeholder": "Type your answer..."
+  },
+  "final": {
+    "title": "Thank you for walking this path with the Light",
+    "message1": "Your answers were received with honor by the Brotherhood.",
+    "message2": "You planted seeds of trust, courage, and light.",
+    "message3": "Keep walking. The journey does not end here.",
+    "message4": "Return whenever you need to rekindle your flame.",
+    "message5": "You are light. You are transformation.",
+    "pdf": "PDF",
+    "selfie_card": "Selfie Card",
+    "back": "Back",
+    "restart": "Submit again"
+  },
+  "page": {
+    "title": "Essential Journey"
+  },
+  "footer": {
+    "copyright": "© 2025 Brotherhood Knowledge with Light",
+    "tagline": "Brotherhood Knowledge with Light"
+  }
 }
