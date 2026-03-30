@@ -62,9 +62,9 @@
         </div>
 
         <div class="intro-lang-actions">
-          <button id="intro-lang-confirm" type="button" class="btn btn-primary btn-stone">
-            Confirmar
-          </button>
+          <button id="intro-lang-confirm" type="button" class="intro-lang-confirm-btn">
+          Confirmar
+         </button>
         </div>
       </div>
     `;
