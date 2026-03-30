@@ -72,66 +72,66 @@
   const style = document.createElement('style');
   style.textContent = `
   #intro-lang-modal {
-    position: fixed;
-    inset: 0;
-    z-index: 999999 !important;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0,0,0,0.75);
-    pointer-events: auto !important;
-  }
+  position: fixed;
+  inset: 0;
+  z-index: 999999 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.75);
+  pointer-events: auto !important;
+}
 
-  #intro-lang-modal .intro-lang-backdrop {
-    position: absolute;
-    inset: 0;
-    pointer-events: auto;
-  }
+#intro-lang-modal .intro-lang-backdrop {
+  position: absolute;
+  inset: 0;
+  pointer-events: auto;
+}
 
-  #intro-lang-modal .intro-lang-card {
-    position: relative;
-    z-index: 2;
-    pointer-events: auto !important;
-    width: min(92vw, 420px);
-    padding: 24px 20px;
-    border-radius: 18px;
-    background: rgba(15,15,25,0.98);
-    border: 1px solid rgba(212,175,55,0.6);
-    color: #f5e7b0;
-    text-align: center;
-    box-shadow: 0 0 30px rgba(212,175,55,0.3);
-  }
+#intro-lang-modal .intro-lang-card {
+  position: relative;
+  z-index: 2;
+  pointer-events: auto !important;
+  width: min(92vw, 420px);
+  padding: 24px 20px;
+  border-radius: 18px;
+  background: rgba(15,15,25,0.98);
+  border: 1px solid rgba(212,175,55,0.6);
+  color: #f5e7b0;
+  text-align: center;
+  box-shadow: 0 0 30px rgba(212,175,55,0.3);
+}
 
-  #intro-lang-modal .intro-lang-select {
-    width: 100%;
-    padding: 12px 16px;
-    border-radius: 10px;
-    background: rgba(0,0,0,0.6);
-    border: 1px solid rgba(212,175,55,0.5);
-    color: #f5e7b0;
-    font-size: 1.05rem;
-    margin-bottom: 16px;
-    pointer-events: auto !important;
-  }
+#intro-lang-modal .intro-lang-select {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: rgba(0,0,0,0.6);
+  border: 1px solid rgba(212,175,55,0.5);
+  color: #f5e7b0;
+  font-size: 1.05rem;
+  margin-bottom: 16px;
+  pointer-events: auto !important;
+}
 
-  #intro-lang-modal .intro-lang-actions button,
-  #intro-lang-confirm {
-    position: relative;
-    z-index: 3;
-    width: 100%;
-    padding: 16px 20px;
-    font-size: 1.15rem;
-    font-weight: bold;
-    border: none;
-    border-radius: 12px;
-    background: url('/assets/img/textura-de-pedra.jpg') center/cover;
-    color: #111;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.6);
-    transition: all 0.25s ease;
-    cursor: pointer !important;
-    pointer-events: auto !important;
-  }
-`;
+#intro-lang-modal .intro-lang-confirm-btn,
+#intro-lang-confirm {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  padding: 16px 20px;
+  font-size: 1.15rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 12px;
+  background: url('/assets/img/textura-de-pedra.jpg') center/cover;
+  color: #111;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+  transition: all 0.25s ease;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+}
+
     modal.appendChild(style);
 
     modal.style.display = 'flex';
@@ -142,82 +142,130 @@
   }
 
   async function requireLanguageChoice() {
-    sessionStorage.removeItem('i18n_locked');
-    sessionStorage.removeItem('jornada.lang');
-    sessionStorage.removeItem('i18n.lang');
+  sessionStorage.removeItem('i18n_locked');
+  sessionStorage.removeItem('jornada.lang');
+  sessionStorage.removeItem('i18n.lang');
 
-    const oldModal = document.getElementById('intro-lang-modal');
-    if (oldModal) oldModal.remove();
+  const oldModal = document.getElementById('intro-lang-modal');
+  if (oldModal) oldModal.remove();
 
-    const modal = buildLangModal();
-    document.body.appendChild(modal);
+  const modal = buildLangModal();
+  document.body.appendChild(modal);
 
-    window.__LANG_MODAL_OPEN__ = true;
-    window.__INTRO_LANG_CONFIRMED__ = false;
-    window.speechSynthesis?.cancel?.();
+  window.__LANG_MODAL_OPEN__ = true;
+  window.__INTRO_LANG_CONFIRMED__ = false;
+  window.speechSynthesis?.cancel?.();
 
-    const btn = modal.querySelector('#intro-lang-confirm');
-    const sel = modal.querySelector('#intro-lang-select');
+  const btn = modal.querySelector('#intro-lang-confirm');
+  const sel = modal.querySelector('#intro-lang-select');
 
-    if (!btn || !sel) {
-      console.error('[LANG_MODAL] Botão ou select não encontrados.', {
-        btn: !!btn,
-        sel: !!sel
-      });
-      throw new Error('Modal de idioma inválida.');
-    }
-
-    sel.disabled = false;
-    sel.value =
-      sel.value ||
-      sessionStorage.getItem('jornada.lang') ||
-      localStorage.getItem('i18n_lang') ||
-      'pt-BR';
-
-    btn.disabled = false;
-    btn.removeAttribute('disabled');
-    btn.style.pointerEvents = 'auto';
-    btn.style.opacity = '1';
-    btn.setAttribute('aria-disabled', 'false');
-
-    function getChosenLang() {
-      return (sel.value || 'pt-BR').trim();
-    }
-
-    return new Promise((resolve) => {
-      const confirmChoice = async () => {
-        const chosenLang = getChosenLang();
-
-        try {
-          await setLangAndLock(chosenLang);
-
-          modal.style.opacity = '0';
-          setTimeout(() => modal.remove(), 300);
-
-          window.__INTRO_LANG_CONFIRMED__ = true;
-          window.__LANG_MODAL_OPEN__ = false;
-
-          document.dispatchEvent(new CustomEvent('intro:language-confirmed', {
-            detail: { lang: chosenLang }
-          }));
-
-          resolve(chosenLang);
-        } catch (err) {
-          console.error('[Global Lang Change] Erro:', err);
-          resolve(chosenLang);
-        }
-      };
-
-      btn.addEventListener('click', confirmChoice);
-
-      sel.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          confirmChoice();
-        }
-      });
+  if (!btn || !sel) {
+    console.error('[LANG_MODAL] Botão ou select não encontrados.', {
+      btn: !!btn,
+      sel: !!sel
     });
+    throw new Error('Modal de idioma inválida.');
   }
+
+  const introRoot = document.getElementById(SECTION_ID);
+  const introBtn =
+    introRoot?.querySelector('#btn-intro') ||
+    introRoot?.querySelector('[data-next]') ||
+    introRoot?.querySelector('.btn-stone') ||
+    introRoot?.querySelector('button');
+
+  if (introBtn) {
+    introBtn.disabled = true;
+    introBtn.style.pointerEvents = 'none';
+    introBtn.setAttribute('aria-disabled', 'true');
+  }
+
+  sel.disabled = false;
+  sel.value =
+    sel.value ||
+    sessionStorage.getItem('jornada.lang') ||
+    localStorage.getItem('i18n_lang') ||
+    'pt-BR';
+
+  btn.disabled = false;
+  btn.removeAttribute('disabled');
+  btn.style.pointerEvents = 'auto';
+  btn.style.opacity = '1';
+  btn.style.cursor = 'pointer';
+  btn.setAttribute('aria-disabled', 'false');
+
+  function getChosenLang() {
+    return (sel.value || 'pt-BR').trim();
+  }
+
+  return new Promise((resolve) => {
+    let confirmed = false;
+
+    const confirmChoice = async (ev) => {
+      ev?.preventDefault?.();
+      ev?.stopPropagation?.();
+      ev?.stopImmediatePropagation?.();
+
+      if (confirmed) return;
+      confirmed = true;
+
+      const chosenLang = getChosenLang();
+      console.log('[LANG_MODAL] Confirmar clicado:', chosenLang);
+
+      try {
+        btn.disabled = true;
+        sel.disabled = true;
+
+        await setLangAndLock(chosenLang);
+
+        window.__INTRO_LANG_CONFIRMED__ = true;
+        window.__LANG_MODAL_OPEN__ = false;
+
+        if (introBtn) {
+          introBtn.disabled = false;
+          introBtn.style.pointerEvents = 'auto';
+          introBtn.setAttribute('aria-disabled', 'false');
+        }
+
+        modal.style.opacity = '0';
+        setTimeout(() => modal.remove(), 300);
+
+        document.dispatchEvent(new CustomEvent('intro:language-confirmed', {
+          detail: { lang: chosenLang }
+        }));
+
+        resolve(chosenLang);
+      } catch (err) {
+        console.error('[Global Lang Change] Erro:', err);
+        btn.disabled = false;
+        sel.disabled = false;
+        confirmed = false;
+        resolve(chosenLang);
+      }
+    };
+
+    btn.onclick = confirmChoice;
+    btn.addEventListener('click', confirmChoice, true);
+    btn.addEventListener('pointerdown', confirmChoice, true);
+    btn.addEventListener('touchstart', confirmChoice, true);
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === btn) {
+        confirmChoice(e);
+      }
+    }, true);
+
+    sel.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        confirmChoice(e);
+      }
+    });
+
+    setTimeout(() => {
+      try { btn.focus(); } catch {}
+    }, 80);
+  });
+}
 
   async function runTyping(root) {
     if (!root) return;
