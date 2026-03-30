@@ -871,21 +871,21 @@ async function maybeHandleBlockClosure(section, bloco) {
 
     if (state === 'loading') {
       btn.disabled = true;
-      btn.textContent = 'Guia refletindo...';
+      btn.textContent = window.i18n?.t('feedback.loading', 'Guia refletindo...');
       btn.classList.add('is-loading');
       return;
     }
 
     if (state === 'ready') {
       btn.disabled = false;
-      btn.textContent = 'Continuar';
+      btn.textContent = window.i18n?.t('common.continue', 'Continuar');
       btn.classList.add('is-ready');
       return;
     }
 
     if (state === 'error') {
       btn.disabled = false;
-      btn.textContent = 'Tentar novamente';
+      btn.textContent = window.i18n?.t('common.retry', 'Tentar novamente');
       btn.classList.add('is-error');
       return;
     }
@@ -1075,9 +1075,13 @@ async function maybeHandleBlockClosure(section, bloco) {
       $('.perguntas-title', section);
 
     if (titleEl) {
-      titleEl.textContent = bloco.title || `Bloco ${(bloco.index ?? 0) + 1}`;
-    }
-
+    if (bloco.data_i18n && window.i18n?.t) {
+    titleEl.textContent = window.i18n.t(`blocks.${bloco.id}`, bloco.title);
+  } else {
+    titleEl.textContent = bloco.title || `Bloco ${(bloco.index ?? 0) + 1}`;
+  }
+ }
+    
     const questionEl =
       $('#question-display', section) ||
       $('#jp-question-typed', section) ||
