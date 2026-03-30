@@ -68,7 +68,6 @@
         </div>
       </div>
     `;
-
   const style = document.createElement('style');
   style.textContent = `
   #intro-lang-modal {
@@ -131,7 +130,7 @@
   cursor: pointer !important;
   pointer-events: auto !important;
 }
-
+ `;
     modal.appendChild(style);
 
     modal.style.display = 'flex';
