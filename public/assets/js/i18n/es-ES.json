@@ -1,30 +1,115 @@
 {
-  "welcome": "¡Bienvenido!",
-  "description": "Este es un sitio web increíble.",
-  "site.title": "Jornada • Hermandad Conocimiento con Luz",
-  "search": "Buscar...",
-  "btn-avancar": "Siguiente",
-  "bloco_raizes_title": "Bloque 1 — Raíces",
-  "pergunta_quem_voce_hoje": "¿Quién eres hoy?",
-  "pergunta_o_que_te_trouxe": "¿Qué te trajo a este viaje?",
-  "pergunta_sonho_espiritual": "¿Cuál es tu mayor sueño espiritual?",
-  "bloco_reflexoes_title": "Bloque 2 — Reflexiones",
-  "pergunta_desafios_atuais": "¿Cuáles son tus mayores desafíos actuales?",
-  "pergunta_medo_duvida": "¿Cómo lidias con el miedo o la duda?",
-  "pergunta_significado_luz": "¿Qué significa la luz para ti?",
-  "bloco_crescimento_title": "Bloque 3 — Crecimiento",
-  "pergunta_mudar_vida": "¿Qué quieres cambiar en tu vida?",
-  "pergunta_quem_inspira": "¿Quién te inspira y por qué?",
-  "pergunta_pratica_gratidao": "¿Cómo practicas la gratitud a diario?",
-  "bloco_integracao_title": "Bloque 4 — Integración",
-  "pergunta_licao_jornada": "¿Qué lección te llevas de este viaje?",
-  "pergunta_aplicar_futuro": "¿Cómo aplicarás esto en el futuro?",
-  "pergunta_mensagem_futuro": "Un mensaje para tu yo futuro.",
-  "bloco_sintese_title": "Bloque 5 — Síntesis y Entrega",
-  "pergunta_essencia_hoje": "¿Quién eres hoy, en una frase verdadera?",
-  "pergunta_passo_fe": "¿Cuál será tu próximo paso de fe y coraje?",
-  "resposta_placeholder": "Escribe tu respuesta...",
-  "page.title": "Jornada Esencial",
-  "footer.copyright": "© 2025 Hermandad Conocimiento con Luz",
-  "footer.tagline": "Hermandad Conocimiento con Luz"
+  "meta": {
+    "lang": "es-ES",
+    "label": "Español"
+  },
+  "common": {
+    "welcome": "¡Bienvenido!",
+    "description": "Este es un sitio web increíble.",
+    "search": "Buscar...",
+    "continue": "Continuar",
+    "next": "Siguiente",
+    "back": "Volver",
+    "speak": "Hablar",
+    "stop": "Detener",
+    "loading": "Cargando..."
+  },
+  "site": {
+    "title": "Jornada • Hermandad Conocimiento con Luz"
+  },
+  "intro": {
+    "title": "Jornada Esencial",
+    "start": "Comenzar",
+    "language": "Elige tu idioma"
+  },
+  "terms": {
+    "title": "Términos y Condiciones",
+    "accept": "Acepto"
+  },
+  "password": {
+    "title": "Acceso seguro",
+    "placeholder": "Introduce tu contraseña",
+    "button": "Continuar"
+  },
+  "guide": {
+    "title": "Elige tu guía",
+    "subtitle": "Selecciona quién te acompañará en esta jornada."
+  },
+  "data": {
+    "title": "Datos personales",
+    "subtitle": "Comparte alguna información para enriquecer tu devolución.",
+    "name": "Nombre completo",
+    "city": "Ciudad",
+    "state": "Estado",
+    "profession": "Profesión",
+    "religion": "Religión",
+    "continue": "Continuar"
+  },
+  "selfie": {
+    "title": "Toma tu foto",
+    "instruction": "Aleja un poco el teléfono y coloca tu rostro. Tu guía te acompañará.",
+    "preview": "Vista previa",
+    "capture": "Capturar",
+    "start": "Iniciar",
+    "confirm": "Confirmar",
+    "skip": "Omitir"
+  },
+  "card": {
+    "title": "Yo en la Hermandad",
+    "name_placeholder": "Escribe tu nombre",
+    "button": "Continuar"
+  },
+  "feedback": {
+    "title": "Devolución del Guía"
+  },
+  "progress": {
+    "path": "Bloques: El Camino",
+    "question": "Pregunta",
+    "total": "Total"
+  },
+  "blocks": {
+    "roots": "Bloque 1 — Raíces",
+    "reflections": "Bloque 2 — Reflexiones",
+    "growth": "Bloque 3 — Crecimiento",
+    "integration": "Bloque 4 — Integración",
+    "synthesis": "Bloque 5 — Síntesis y Entrega"
+  },
+  "questions": {
+    "who_are_you_today": "¿Quién eres hoy?",
+    "what_brought_you_here": "¿Qué te trajo a esta jornada?",
+    "greatest_spiritual_dream": "¿Cuál es tu mayor sueño espiritual?",
+    "current_challenges": "¿Cuáles son tus mayores desafíos actuales?",
+    "fear_or_doubt": "¿Cómo lidias con el miedo o la duda?",
+    "meaning_of_light": "¿Qué significa la luz para ti?",
+    "what_to_change": "¿Qué quieres cambiar en tu vida?",
+    "who_inspires_you": "¿Quién te inspira y por qué?",
+    "practice_gratitude": "¿Cómo practicas la gratitud a diario?",
+    "journey_lesson": "¿Qué lección te llevas de esta jornada?",
+    "future_application": "¿Cómo aplicarás esto en tu futuro?",
+    "message_to_future_self": "Un mensaje para tu yo futuro.",
+    "essence_today": "¿Quién eres hoy, en una frase verdadera?",
+    "next_step": "¿Cuál será tu próximo paso de fe y valentía?"
+  },
+  "answers": {
+    "placeholder": "Escribe tu respuesta..."
+  },
+  "final": {
+    "title": "Gracias por recorrer este camino con la Luz",
+    "message1": "Tus respuestas fueron recibidas con honor por la Hermandad.",
+    "message2": "Has sembrado semillas de confianza, valentía y luz.",
+    "message3": "Sigue caminando. El camino no termina aquí.",
+    "message4": "Vuelve cuando necesites reavivar tu llama.",
+    "message5": "Eres luz. Eres transformación.",
+    "pdf": "PDF",
+    "selfie_card": "Selfie Card",
+    "back": "Volver",
+    "restart": "Enviar de nuevo"
+  },
+  "page": {
+    "title": "Jornada Esencial"
+  },
+  "footer": {
+    "copyright": "© 2025 Hermandad Conocimiento con Luz",
+    "tagline": "Hermandad Conocimiento con Luz"
+  }
 }
