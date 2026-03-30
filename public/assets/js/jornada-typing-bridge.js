@@ -250,13 +250,6 @@
   return best;
 }
 
-    const ranked = __rankVoices(candidates, lang, profile);
-    const best = ranked[0]?.v || null;
-
-    __voiceCache.set(cacheKey, best);
-    return best;
-  }
-
   async function __applyVoice(utt, lang) {
   if (!utt || !('speechSynthesis' in window)) return;
 
