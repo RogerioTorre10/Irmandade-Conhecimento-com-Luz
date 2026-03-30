@@ -1,8 +1,11 @@
-/* i18n.js — cabeça + detecção forçada + trava na intro + suporte fr-FR / zh-CN */
+/* i18n.js — blindado global 5 idiomas + trava na intro + cache + fallback */
 (function (window) {
   'use strict';
+
   if (window.__i18nReadyShim) return; // evita dupla carga
   window.__i18nReadyShim = true;
+
+  const MOD = 'i18n.js';
 
   const STORAGE_KEY = 'i18n_lang';
   const LOCK_KEY = 'i18n_locked';
@@ -28,12 +31,25 @@
 
   // Cache GLOBAL (compartilhado mesmo se o script for carregado 2x por engano)
   window.__I18N_DICT_CACHE__ = window.__I18N_DICT_CACHE__ || {};
-
-  // Cache em memória para evitar recarregar o mesmo JSON várias vezes
   const DICT_CACHE = window.__I18N_DICT_CACHE__;
 
+  // Latch de logs por idioma
+  window.__I18N_READY_LOGGED__ = window.__I18N_READY_LOGGED__ || {};
+
+  function log() {
+    console.log(`[${MOD}]`, ...arguments);
+  }
+
+  function warn() {
+    console.warn(`[${MOD}]`, ...arguments);
+  }
+
+  function err() {
+    console.error(`[${MOD}]`, ...arguments);
+  }
+
   function normalizeLang(lang) {
-    const raw = String(lang || '').trim().replace('_', '-');
+    const raw = String(lang || '').trim().replace(/_/g, '-');
     const lower = raw.toLowerCase();
 
     const map = {
@@ -61,39 +77,99 @@
       'cmn-hans-cn': 'zh-CN'
     };
 
-    return map[lower] || raw;
+    const normalized = map[lower] || raw;
+
+    if (SUPPORTED.includes(normalized)) return normalized;
+
+    if (lower.startsWith('pt')) return 'pt-BR';
+    if (lower.startsWith('en')) return 'en-US';
+    if (lower.startsWith('es')) return 'es-ES';
+    if (lower.startsWith('fr')) return 'fr-FR';
+    if (lower.startsWith('zh')) return 'zh-CN';
+
+    return DEFAULT;
+  }
+
+  function getStoredLang() {
+    try {
+      const s1 = normalizeLang(sessionStorage.getItem(STORAGE_KEY));
+      if (SUPPORTED.includes(s1)) return s1;
+    } catch (_) {}
+
+    try {
+      const s2 = normalizeLang(localStorage.getItem(STORAGE_KEY));
+      if (SUPPORTED.includes(s2)) return s2;
+    } catch (_) {}
+
+    return null;
+  }
+
+  function setStoredLang(lang) {
+    const safe = normalizeLang(lang);
+
+    try { sessionStorage.setItem(STORAGE_KEY, safe); } catch (_) {}
+    try { localStorage.setItem(STORAGE_KEY, safe); } catch (_) {}
+
+    try { sessionStorage.setItem('jornada.lang', safe); } catch (_) {}
+    try { sessionStorage.setItem('i18n.lang', safe); } catch (_) {}
+
+    try { localStorage.setItem('jornada.lang', safe); } catch (_) {}
+    try { localStorage.setItem('i18n.lang', safe); } catch (_) {}
+  }
+
+  function isLocked() {
+    try {
+      if (sessionStorage.getItem(LOCK_KEY) === '1') return true;
+    } catch (_) {}
+
+    try {
+      if (localStorage.getItem(LOCK_KEY) === '1') return true;
+    } catch (_) {}
+
+    return false;
+  }
+
+  function setLocked(flag) {
+    const value = flag ? '1' : '0';
+    try { sessionStorage.setItem(LOCK_KEY, value); } catch (_) {}
+    try { localStorage.setItem(LOCK_KEY, value); } catch (_) {}
   }
 
   function detectLang() {
     // Se já está travado, ignora tudo e usa o armazenado
-    const locked = sessionStorage.getItem(LOCK_KEY) === '1';
-    if (locked) {
-    const stored = normalizeLang(sessionStorage.getItem(STORAGE_KEY));
-    if (stored && SUPPORTED.includes(stored)) return stored;
+    if (isLocked()) {
+      const lockedStored = getStoredLang();
+      if (lockedStored && SUPPORTED.includes(lockedStored)) return lockedStored;
     }
 
     const forced = normalizeLang(FORCE_LANG);
     if (forced && SUPPORTED.includes(forced)) return forced;
 
-    const stored = normalizeLang(sessionStorage.getItem(STORAGE_KEY));
+    const stored = getStoredLang();
     if (stored && SUPPORTED.includes(stored)) return stored;
 
     const nav = normalizeLang(navigator.language || navigator.userLanguage || DEFAULT);
     if (SUPPORTED.includes(nav)) return nav;
 
-    if (String(nav).startsWith('pt')) return 'pt-BR';
-    if (String(nav).startsWith('en')) return 'en-US';
-    if (String(nav).startsWith('es')) return 'es-ES';
-    if (String(nav).startsWith('fr')) return 'fr-FR';
-    if (String(nav).startsWith('zh')) return 'zh-CN';
-
     return DEFAULT;
+  }
+
+  function getByPath(obj, path) {
+    if (!obj || !path) return undefined;
+
+    return String(path)
+      .split('.')
+      .reduce((acc, part) => {
+        if (acc && Object.prototype.hasOwnProperty.call(acc, part)) {
+          return acc[part];
+        }
+        return undefined;
+      }, obj);
   }
 
   async function loadDict(lang) {
     lang = normalizeLang(lang);
 
-    // Cache global pode guardar Promise (in-flight) ou objeto final
     if (DICT_CACHE[lang]) {
       return await DICT_CACHE[lang];
     }
@@ -104,19 +180,19 @@
       `/i18n/${lang}.json`
     ];
 
-    // guarda a promise já no começo (anti-concorrência)
     DICT_CACHE[lang] = (async () => {
       for (const url of candidates) {
         try {
           const res = await fetch(url, { cache: 'no-cache' });
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           const json = await res.json();
-          console.log('[i18n] Carregado:', url);
-          return json;
+          log('Carregado:', url);
+          return json || {};
         } catch (e) {
-          console.warn('[i18n] Falha ao carregar', url, e);
+          warn('Falha ao carregar', url, e);
         }
       }
+
       throw new Error('Nenhum dicionário encontrado para ' + lang);
     })();
 
@@ -134,37 +210,72 @@
       state.dict = await loadDict(state.lang);
       state.ready = true;
 
-      // Latch para log "Pronto para" (1x por idioma)
-      window.__I18N_READY_LOGGED__ = window.__I18N_READY_LOGGED__ || {};
-      const readyKey = state.lang || lang || DEFAULT;
-
+      const readyKey = state.lang || DEFAULT;
       if (!window.__I18N_READY_LOGGED__[readyKey]) {
         window.__I18N_READY_LOGGED__[readyKey] = true;
-        console.log('[i18n] Pronto para:', readyKey);
+        log('Pronto para:', readyKey);
       }
+
+      setHtmlLangAttrs();
+      emit('i18n:ready', { lang: state.lang });
     } catch (e) {
-      console.error('[i18n] Erro no init:', e);
+      err('Erro no init:', e);
       state.dict = {};
       state.ready = true; // continua rodando mesmo sem dict
+      setHtmlLangAttrs();
+      emit('i18n:ready', { lang: state.lang, degraded: true });
     }
   }
 
   function t(key, fallbackOrOpts) {
     if (!key) return '';
-    const val = state.dict[key];
-    if (typeof val === 'string') return val;
-    if (typeof fallbackOrOpts === 'string') return fallbackOrOpts;
+
+    // Tenta no idioma atual, com suporte a caminho profundo: common.continue
+    let val = getByPath(state.dict, key);
+
+    // fallback opcional se existir bloco "translations" ou "messages"
+    if (val == null && state.dict && typeof state.dict === 'object') {
+      val = getByPath(state.dict.translations, key);
+    }
+    if (val == null && state.dict && typeof state.dict === 'object') {
+      val = getByPath(state.dict.messages, key);
+    }
+
+    if (typeof val === 'string' || typeof val === 'number') {
+      return String(val);
+    }
+
+    if (typeof fallbackOrOpts === 'string') {
+      return fallbackOrOpts;
+    }
+
     return key;
   }
 
-  function apply(root) {
-    const ctx = root || document;
+  function setHtmlLangAttrs() {
+    document.documentElement.setAttribute('lang', state.lang);
+    document.documentElement.setAttribute('data-lang', state.lang);
+
+    if (document.body) {
+      document.body.setAttribute('data-lang', state.lang);
+    }
+  }
+
+  function emit(name, detail) {
+    try {
+      document.dispatchEvent(new CustomEvent(name, { detail: detail || {} }));
+    } catch (_) {}
+  }
+
+  function applyTextContent(ctx) {
     ctx.querySelectorAll('[data-i18n]').forEach((el) => {
       const key = el.getAttribute('data-i18n');
       if (!key) return;
       el.textContent = t(key, el.textContent || key);
     });
+  }
 
+  function applyPlaceholders(ctx) {
     ctx.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
       const key = el.getAttribute('data-i18n-placeholder');
       if (!key) return;
@@ -173,33 +284,98 @@
     });
   }
 
+  function applyTitles(ctx) {
+    ctx.querySelectorAll('[data-i18n-title]').forEach((el) => {
+      const key = el.getAttribute('data-i18n-title');
+      if (!key) return;
+      const val = t(key, el.getAttribute('title') || key);
+      el.setAttribute('title', val);
+    });
+  }
+
+  function applyValues(ctx) {
+    ctx.querySelectorAll('[data-i18n-value]').forEach((el) => {
+      const key = el.getAttribute('data-i18n-value');
+      if (!key) return;
+      const val = t(key, el.value || key);
+      el.value = val;
+    });
+  }
+
+  function applyHtml(ctx) {
+    ctx.querySelectorAll('[data-i18n-html]').forEach((el) => {
+      const key = el.getAttribute('data-i18n-html');
+      if (!key) return;
+      el.innerHTML = t(key, el.innerHTML || key);
+    });
+  }
+
+  function apply(root) {
+    const ctx = root || document;
+    if (!ctx || !ctx.querySelectorAll) return;
+
+    applyTextContent(ctx);
+    applyPlaceholders(ctx);
+    applyTitles(ctx);
+    applyValues(ctx);
+    applyHtml(ctx);
+
+    setHtmlLangAttrs();
+    emit('i18n:applied', { lang: state.lang, root: ctx });
+  }
+
   async function setLang(lang, lock = false) {
     lang = normalizeLang((lang || '').trim());
-    if (!lang) lang = DEFAULT;
-    if (!SUPPORTED.includes(lang)) lang = DEFAULT;
+    if (!lang || !SUPPORTED.includes(lang)) lang = DEFAULT;
 
-    // se já existe uma troca de idioma em andamento, reaproveita a mesma Promise
+    // Se existe uma troca em andamento, reaproveita
     if (state._langPromise) return state._langPromise;
 
     state._langPromise = (async () => {
-      // se já está pronto e já é esse idioma, sai
-      if (state.ready && state.lang === lang) return;
+      // Se já está travado e tentaram trocar sem ser o mesmo idioma, ignora
+      if (isLocked()) {
+        const lockedLang = getStoredLang() || state.lang || DEFAULT;
+        if (lockedLang !== lang) {
+          log('Idioma travado permanentemente:', lockedLang);
+          state.lang = lockedLang;
+          setHtmlLangAttrs();
+          return lockedLang;
+        }
+      }
 
-     sessionStorage.setItem(STORAGE_KEY, lang);
-     sessionStorage.setItem('jornada.lang', lang);
-     sessionStorage.setItem('i18n.lang', lang);
+      // Se já está pronto e é o mesmo idioma, apenas reforça attrs
+      if (state.ready && state.lang === lang) {
+        setStoredLang(lang);
 
-     if (lock) {
-     sessionStorage.setItem(LOCK_KEY, '1');
-     console.log('[i18n] Idioma travado nesta jornada:', lang);
-    }
+        if (lock) {
+          setLocked(true);
+          log('Idioma travado nesta jornada:', lang);
+        }
+
+        setHtmlLangAttrs();
+        apply(document.body || document);
+        emit('i18n:changed', { lang: state.lang, locked: isLocked() });
+        return state.lang;
+      }
+
+      setStoredLang(lang);
+
+      if (lock) {
+        setLocked(true);
+        log('Idioma travado nesta jornada:', lang);
+      }
+
       state.ready = false;
       await init(lang);
-      apply(document.body);
+      apply(document.body || document);
+      setHtmlLangAttrs();
 
-      // reforça atributos no html
-      document.documentElement.setAttribute('lang', state.lang);
-      document.documentElement.setAttribute('data-lang', state.lang);
+      emit('i18n:changed', {
+        lang: state.lang,
+        locked: isLocked()
+      });
+
+      return state.lang;
     })();
 
     try {
@@ -210,7 +386,7 @@
   }
 
   async function forceLang(lang, persist = true) {
-    return setLang(lang, persist);
+    return setLang(lang, !!persist);
   }
 
   async function waitForReady(timeoutMs = 10000) {
@@ -230,27 +406,57 @@
     });
   }
 
+  function unlockLang() {
+    setLocked(false);
+    log('Idioma destravado.');
+    emit('i18n:unlocked', { lang: state.lang });
+  }
+
   // Desabilita qualquer seletor de idioma que exista no DOM
   function disableAllLangSelectors() {
-    const isLocked = sessionStorage.getItem(LOCK_KEY) === '1';
-    if (!isLocked) return;
+    if (!isLocked()) return;
 
-    document.querySelectorAll('select').forEach((sel) => {
-      const id = (sel.id || '').toLowerCase();
-      const cls = (sel.className || '').toLowerCase();
-      const name = (sel.name || '').toLowerCase();
+    document.querySelectorAll('select, button, input[type="radio"], input[type="button"]').forEach((el) => {
+      const id = String(el.id || '').toLowerCase();
+      const cls = String(el.className || '').toLowerCase();
+      const name = String(el.name || '').toLowerCase();
+      const txt = String(el.textContent || el.value || '').toLowerCase();
 
-      if (
+      const looksLikeLangSelector =
         id.includes('lang') || id.includes('idioma') ||
         cls.includes('lang') || cls.includes('idioma') ||
-        name.includes('lang') || name.includes('idioma')
-      ) {
-        sel.disabled = true;
-        sel.style.pointerEvents = 'none';
-        sel.style.opacity = '0.6';
-        sel.title = 'Idioma travado na introdução';
+        name.includes('lang') || name.includes('idioma') ||
+        txt.includes('portugu') || txt.includes('english') ||
+        txt.includes('españ') || txt.includes('franç') || txt.includes('中文');
+
+      if (!looksLikeLangSelector) return;
+
+      // Não desabilita elemento explicitamente liberado
+      if (el.hasAttribute('data-i18n-allow-locked')) return;
+
+      if (el.tagName === 'SELECT' || el.type === 'button' || el.type === 'radio') {
+        el.disabled = true;
       }
+
+      el.style.pointerEvents = 'none';
+      el.style.opacity = '0.6';
+      el.setAttribute('title', 'Idioma travado na introdução');
     });
+  }
+
+  function observeDynamicDom() {
+    const observer = new MutationObserver(() => {
+      try {
+        disableAllLangSelectors();
+      } catch (_) {}
+    });
+
+    observer.observe(document.documentElement, {
+      childList: true,
+      subtree: true
+    });
+
+    return observer;
   }
 
   const api = {
@@ -258,13 +464,16 @@
     get currentLang() { return state.lang; },
     get ready() { return state.ready; },
     get supported() { return [...SUPPORTED]; },
+    get isLocked() { return isLocked(); },
+
     init,
     t,
     apply,
     setLang,
     forceLang,
     waitForReady,
-    normalizeLang
+    normalizeLang,
+    unlockLang
   };
 
   window.i18n = api;
@@ -274,10 +483,9 @@
     try {
       if (!window.i18n) return;
       await window.i18n.setLang(lang, lock);
-      document.documentElement.setAttribute('lang', window.i18n.lang);
-      document.documentElement.setAttribute('data-lang', window.i18n.lang);
+      setHtmlLangAttrs();
     } catch (e) {
-      console.warn('[i18n] JORNADA_setLang falhou:', e);
+      warn('JORNADA_setLang falhou:', e);
     }
   };
 
@@ -285,23 +493,15 @@
   document.addEventListener('DOMContentLoaded', async () => {
     try {
       await init(FORCE_LANG || undefined);
-      apply(document.body);
+      apply(document.body || document);
+      setHtmlLangAttrs();
 
-      document.documentElement.setAttribute('lang', state.lang);
-      document.documentElement.setAttribute('data-lang', state.lang);
-
-      // Desabilita seletores se já travado
       disableAllLangSelectors();
+      observeDynamicDom();
 
-      // Observa inserções dinâmicas
-      const observer = new MutationObserver(() => {
-        disableAllLangSelectors();
-      });
-      observer.observe(document.documentElement, { childList: true, subtree: true });
-
-      console.log('[i18n] Traduções aplicadas (' + state.lang + ')');
+      log('Traduções aplicadas (' + state.lang + ')');
     } catch (e) {
-      console.error('[i18n] Erro no autoinit/apply:', e);
+      err('Erro no autoinit/apply:', e);
     }
   }, { once: true });
 
