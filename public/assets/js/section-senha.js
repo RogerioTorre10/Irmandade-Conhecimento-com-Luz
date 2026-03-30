@@ -128,7 +128,7 @@ const HIDE_CLASS       = 'hidden';
       try {
         if (window.EffectCoordinator?.speak) {
           speechSynthesis.cancel();
-          await window.EffectCoordinator.speak(text, { lang: 'pt-BR', rate: 1.08, pitch: 1.0 });
+          await window.EffectCoordinator.speak(text, { rate: 1.02, pitch: 1.0 });
           await sleep(TTS_LATCH_MS);
           el.dataset.spoken = 'true';
         }
