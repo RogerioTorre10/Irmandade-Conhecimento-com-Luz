@@ -287,6 +287,15 @@ if (section && window.i18n?.apply) {
     }
   }
 
+  document.addEventListener('intro:language-confirmed', () => {
+   const intro = document.getElementById('section-intro');
+   if (!intro) return;
+
+   setTimeout(() => {
+    applyTypingAndTTS('section-intro', intro);
+   }, 120);
+  });
+  
   function goNext() {
     if (isTransitioning) return;
     const current = window.JC.currentSection || 'section-intro';
