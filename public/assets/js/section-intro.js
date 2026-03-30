@@ -161,17 +161,33 @@ async function setLangAndLock(lang) {
   }
 
   return new Promise((resolve) => {
-    btn.addEventListener('click', async () => {
-      const chosenLang = sel?.value || 'pt-BR';
+  btn.addEventListener('click', async () => {
+  const chosenLang = sel?.value || 'pt-BR';
 
-      await setLangAndLock(chosenLang);
+  try {
+    // 🔥 aplica idioma
+    await setLangAndLock(chosenLang);
 
-      modal.style.opacity = '0';
-      setTimeout(() => modal.remove(), 300);
+    // 🔥 fecha modal
+    modal.style.opacity = '0';
+    setTimeout(() => modal.remove(), 300);
 
-      resolve(chosenLang);
-    }, { once: true });
-  });
+    // 🔥 AQUI ENTRA O BLOCO DO PRINT 3
+    window.__INTRO_LANG_CONFIRMED__ = true;
+    window.__LANG_MODAL_OPEN__ = false;
+
+    document.dispatchEvent(new CustomEvent('intro:language-confirmed', {
+      detail: { lang: chosenLang }
+    }));
+
+    resolve(chosenLang);
+
+  } catch (err) {
+    console.error('[IntroLang] erro ao confirmar idioma:', err);
+  }
+
+}, { once: true });
+});
 }
 
   async function runTyping(root) {
