@@ -73,7 +73,7 @@
       try {
         speechSynthesis.cancel?.();
         if (window.EffectCoordinator?.speak) {
-          await window.EffectCoordinator.speak(text, { lang: 'pt-BR', rate: 1.05, pitch: 1.0 });
+          await window.EffectCoordinator.speak(text, { rate: 1.05, pitch: 1.0 });
           await sleep(TTS_LATCH_MS);
           el.dataset.spoken = 'true';
         }
