@@ -310,19 +310,30 @@
     });
   }
 
-  function apply(root) {
-    const ctx = root || document;
-    if (!ctx || !ctx.querySelectorAll) return;
+ function apply(root) {
+  const ctx = root || document;
+  if (!ctx || !ctx.querySelectorAll) return;
 
-    applyTextContent(ctx);
-    applyPlaceholders(ctx);
-    applyTitles(ctx);
-    applyValues(ctx);
-    applyHtml(ctx);
+  applyTextContent(ctx);
+  applyPlaceholders(ctx);
+  applyTitles(ctx);
+  applyValues(ctx);
+  applyHtml(ctx);
 
-    setHtmlLangAttrs();
-    emit('i18n:applied', { lang: state.lang, root: ctx });
-  }
+  ctx.querySelectorAll('[data-i18n-text]').forEach((el) => {
+    const key = el.getAttribute('data-i18n-text');
+    if (!key) return;
+    const val = t(key, el.getAttribute('data-text') || key);
+    el.setAttribute('data-text', val);
+
+    if (!el.textContent || !el.textContent.trim()) {
+      el.textContent = val;
+    }
+  });
+
+  setHtmlLangAttrs();
+  emit('i18n:applied', { lang: state.lang, root: ctx });
+}
 
   async function setLang(lang, lock = false) {
     lang = normalizeLang((lang || '').trim());
