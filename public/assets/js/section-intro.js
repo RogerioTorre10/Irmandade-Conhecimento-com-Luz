@@ -156,44 +156,69 @@ async function setLangAndLock(lang) {
  window.__INTRO_LANG_CONFIRMED__ = false;
  window.speechSynthesis?.cancel?.();
 
-  const btn = modal.querySelector('#intro-lang-confirm');
-  const sel = modal.querySelector('#intro-lang-select');
+ const btn = modal.querySelector('#intro-lang-confirm');
+const sel = modal.querySelector('#intro-lang-select');
 
-  // sempre começa destravado e com idioma padrão de teste
-  if (sel) {
-    sel.disabled = false;
-    sel.value = 'pt-BR';
-  }
-
-  return new Promise((resolve) => {
-  btn.addEventListener('click', async () => {
-  const chosenLang = sel?.value || 'pt-BR';
-
-  try {
-    // 🔥 aplica idioma
-    await setLangAndLock(chosenLang);
-
-    // 🔥 fecha modal
-    modal.style.opacity = '0';
-    setTimeout(() => modal.remove(), 300);
-
-    // 🔥 AQUI ENTRA O BLOCO DO PRINT 3
-    window.__INTRO_LANG_CONFIRMED__ = true;
-    window.__LANG_MODAL_OPEN__ = false;
-
-    document.dispatchEvent(new CustomEvent('intro:language-confirmed', {
-      detail: { lang: chosenLang }
-    }));
-
-    resolve(chosenLang);
-
-  } catch (err) {
-    console.error('[IntroLang] erro ao confirmar idioma:', err);
-  }
-
-}, { once: true });
-});
+// garante elementos
+if (!btn || !sel) {
+  console.error('[LANG_MODAL] Botão ou select não encontrados.', { btn: !!btn, sel: !!sel });
+  return Promise.resolve('pt-BR');
 }
+
+// sempre começa destravado
+sel.disabled = false;
+
+// mantém valor atual, ou usa fallback
+sel.value =
+  sel.value ||
+  sessionStorage.getItem('jornada.lang') ||
+  localStorage.getItem('i18n_lang') ||
+  'pt-BR';
+
+// garante botão clicável
+btn.disabled = false;
+btn.removeAttribute('disabled');
+btn.style.pointerEvents = 'auto';
+btn.style.opacity = '1';
+btn.setAttribute('aria-disabled', 'false');
+
+function getChosenLang() {
+  return (sel.value || 'pt-BR').trim();
+}
+
+return new Promise((resolve) => {
+  const confirmChoice = async () => {
+    const chosenLang = getChosenLang();
+
+    try {
+      await setLangAndLock(chosenLang);
+
+      modal.style.opacity = '0';
+      setTimeout(() => modal.remove(), 300);
+
+      window.__INTRO_LANG_CONFIRMED__ = true;
+      window.__LANG_MODAL_OPEN__ = false;
+
+      document.dispatchEvent(new CustomEvent('intro:language-confirmed', {
+        detail: { lang: chosenLang }
+      }));
+
+      resolve(chosenLang);
+    } catch (err) {
+      console.error('[Global Lang Change] Erro:', err);
+      resolve(chosenLang);
+    }
+  };
+
+  btn.addEventListener('click', confirmChoice);
+
+  sel.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      confirmChoice();
+    }
+  });
+});
 
   async function runTyping(root) {
   if (!root) return;
