@@ -287,5 +287,5 @@ async function init(root) {
   } else {
     bind();
   }
-
+ }
 })();
