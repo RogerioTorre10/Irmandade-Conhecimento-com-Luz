@@ -1,30 +1,115 @@
 {
-  "welcome": "Bem-vindo!",
-  "description": "Este é um site incrível.",
-  "site.title": "Jornada • Irmandade Conhecimento com Luz",
-  "search": "Pesquisar...",
-  "btn-avancar": "Avançar",
-  "bloco_raizes_title": "Bloco 1 — Raízes",
-  "pergunta_quem_voce_hoje": "Quem é você hoje?",
-  "pergunta_o_que_te_trouxe": "O que te trouxe até esta jornada?",
-  "pergunta_sonho_espiritual": "Qual é o seu maior sonho espiritual?",
-  "bloco_reflexoes_title": "Bloco 2 — Reflexões",
-  "pergunta_desafios_atuais": "Quais são seus maiores desafios atuais?",
-  "pergunta_medo_duvida": "Como você lida com o medo ou a dúvida?",
-  "pergunta_significado_luz": "O que a luz significa para você?",
-  "bloco_crescimento_title": "Bloco 3 — Crescimento",
-  "pergunta_mudar_vida": "O que você quer mudar na sua vida?",
-  "pergunta_quem_inspira": "Quem inspira você e por quê?",
-  "pergunta_pratica_gratidao": "Como você pratica gratidão no dia a dia?",
-  "bloco_integracao_title": "Bloco 4 — Integração",
-  "pergunta_licao_jornada": "Qual lição você leva dessa jornada?",
-  "pergunta_aplicar_futuro": "Como vai aplicar isso no futuro?",
-  "pergunta_mensagem_futuro": "Uma mensagem para seu eu futuro.",
-  "bloco_sintese_title": "Bloco 5 — Síntese e Entrega",
-  "pergunta_essencia_hoje": "Quem é você hoje, em uma frase de verdade?",
-  "pergunta_passo_fe": "Qual será seu próximo passo de fé e coragem?",
-  "resposta_placeholder": "Digite sua resposta...",
-  "page.title": "Jornada Essencial",
-  "footer.copyright": "© 2025 Irmandade Conhecimento com Luz",
-  "footer.tagline": "Irmandade Conhecimento com Luz"
+  "meta": {
+    "lang": "pt-BR",
+    "label": "Português (Brasil)"
+  },
+  "common": {
+    "welcome": "Bem-vindo!",
+    "description": "Este é um site incrível.",
+    "search": "Pesquisar...",
+    "continue": "Continuar",
+    "next": "Avançar",
+    "back": "Voltar",
+    "speak": "Falar",
+    "stop": "Parar",
+    "loading": "Carregando..."
+  },
+  "site": {
+    "title": "Jornada • Irmandade Conhecimento com Luz"
+  },
+  "intro": {
+    "title": "Jornada Essencial",
+    "start": "Começar",
+    "language": "Escolha seu idioma"
+  },
+  "terms": {
+    "title": "Termos e Condições",
+    "accept": "Eu aceito"
+  },
+  "password": {
+    "title": "Acesso seguro",
+    "placeholder": "Digite sua senha",
+    "button": "Continuar"
+  },
+  "guide": {
+    "title": "Escolha seu guia",
+    "subtitle": "Selecione quem irá acompanhar você nesta jornada."
+  },
+  "data": {
+    "title": "Dados pessoais",
+    "subtitle": "Compartilhe algumas informações para enriquecer sua devolutiva.",
+    "name": "Nome completo",
+    "city": "Cidade",
+    "state": "Estado",
+    "profession": "Profissão",
+    "religion": "Religião",
+    "continue": "Continuar"
+  },
+  "selfie": {
+    "title": "Tire sua foto",
+    "instruction": "Afaste um pouco o celular e posicione seu rosto. Sua guia ou guia vai conduzir você.",
+    "preview": "Prévia",
+    "capture": "Capturar",
+    "start": "Iniciar",
+    "confirm": "Confirmar",
+    "skip": "Pular"
+  },
+  "card": {
+    "title": "Eu na Irmandade",
+    "name_placeholder": "Digite seu nome",
+    "button": "Continuar"
+  },
+  "feedback": {
+    "title": "Devolutiva do Guia"
+  },
+  "progress": {
+    "path": "Blocos: O Caminho",
+    "question": "Pergunta",
+    "total": "Total"
+  },
+  "blocks": {
+    "roots": "Bloco 1 — Raízes",
+    "reflections": "Bloco 2 — Reflexões",
+    "growth": "Bloco 3 — Crescimento",
+    "integration": "Bloco 4 — Integração",
+    "synthesis": "Bloco 5 — Síntese e Entrega"
+  },
+  "questions": {
+    "who_are_you_today": "Quem é você hoje?",
+    "what_brought_you_here": "O que trouxe você até esta jornada?",
+    "greatest_spiritual_dream": "Qual é o seu maior sonho espiritual?",
+    "current_challenges": "Quais são seus maiores desafios atuais?",
+    "fear_or_doubt": "Como você lida com o medo ou a dúvida?",
+    "meaning_of_light": "O que a luz significa para você?",
+    "what_to_change": "O que você quer mudar na sua vida?",
+    "who_inspires_you": "Quem inspira você e por quê?",
+    "practice_gratitude": "Como você pratica gratidão no dia a dia?",
+    "journey_lesson": "Qual lição você leva desta jornada?",
+    "future_application": "Como vai aplicar isso no seu futuro?",
+    "message_to_future_self": "Uma mensagem para seu eu do futuro.",
+    "essence_today": "Quem é você hoje, em uma frase de verdade?",
+    "next_step": "Qual será seu próximo passo de fé e coragem?"
+  },
+  "answers": {
+    "placeholder": "Digite sua resposta..."
+  },
+  "final": {
+    "title": "Obrigado por percorrer este caminho com a Luz",
+    "message1": "Suas respostas foram recebidas com honra pela Irmandade.",
+    "message2": "Você plantou sementes de confiança, coragem e luz.",
+    "message3": "Continue caminhando. O caminho não termina aqui.",
+    "message4": "Volte quando precisar reacender sua chama.",
+    "message5": "Você é luz. Você é transformação.",
+    "pdf": "PDF",
+    "selfie_card": "Selfie Card",
+    "back": "Voltar",
+    "restart": "Enviar novamente"
+  },
+  "page": {
+    "title": "Jornada Essencial"
+  },
+  "footer": {
+    "copyright": "© 2025 Irmandade Conhecimento com Luz",
+    "tagline": "Irmandade Conhecimento com Luz"
+  }
 }
