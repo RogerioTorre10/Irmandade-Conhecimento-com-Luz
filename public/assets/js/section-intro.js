@@ -148,8 +148,13 @@ async function setLangAndLock(lang) {
   const oldModal = document.getElementById('intro-lang-modal');
   if (oldModal) oldModal.remove();
 
-  const modal = buildLangModal();
-  document.body.appendChild(modal);
+ const modal = buildLangModal();
+ document.body.appendChild(modal);
+
+  // 🔥 ADICIONA ISSO AQUI
+ window.__LANG_MODAL_OPEN__ = true;
+ window.__INTRO_LANG_CONFIRMED__ = false;
+ window.speechSynthesis?.cancel?.();
 
   const btn = modal.querySelector('#intro-lang-confirm');
   const sel = modal.querySelector('#intro-lang-select');
