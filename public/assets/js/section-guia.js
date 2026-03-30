@@ -359,7 +359,8 @@
     return canonGuia(g) || 'lumen';
   }
 
-  function pickVoiceForGuide(lang = 'pt-BR') {
+ function pickVoiceForGuide(lang) {
+    const resolvedLang = lang || document.documentElement.lang || localStorage.getItem('i18n_lang') || 'pt-BR';
     const voices = window.speechSynthesis?.getVoices?.() || [];
     if (!voices.length) return null;
 
