@@ -101,12 +101,15 @@
       return;
     }
 
-    if ('speechSynthesis' in window) {
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = 'pt-BR';
-      u.rate = 0.9;
-      speechSynthesis.speak(u);
-    }
+   if (window.EffectCoordinator?.speak) {
+  window.EffectCoordinator.speak(text, { rate: 0.9 });
+} else if ('speechSynthesis' in window) {
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = document.documentElement.lang || 'pt-BR';
+  u.rate = 0.9;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
   }
 
   function applyLiveStyle(el) {
