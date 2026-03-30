@@ -496,12 +496,7 @@
       } catch {}
     });
 };
-
-    Promise.resolve(__applyVoice(utt, lang))
-      .catch(() => {})
-      .finally(speakNow);
-  };
-
+   
   window.typeAndSpeak = async function (element, text, speed = 36) {
   if (!text || !element) return;
 
