@@ -46,7 +46,11 @@
     }
   })();
 
-  async function applyTypingAndTTS(sectionId, root) {
+  async function applyTypingAndTTS(sectionId, root) {    
+  if (window.__LANG_MODAL_OPEN__ || !window.__INTRO_LANG_CONFIRMED__) {
+  console.log('[JC.applyTypingAndTTS] Aguardando confirmação do idioma.');
+  return;
+ }
   console.log('[JC.applyTypingAndTTS] Iniciando para:', sectionId);
 
   // ✅ garante estrutura
