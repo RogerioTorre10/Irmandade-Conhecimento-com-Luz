@@ -69,66 +69,69 @@
       </div>
     `;
 
-    const style = document.createElement('style');
-    style.textContent = `
-      #intro-lang-modal {
-        position: fixed;
-        inset: 0;
-        z-index: 99999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(0,0,0,0.75);
-      }
+  const style = document.createElement('style');
+  style.textContent = `
+  #intro-lang-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 999999 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.75);
+    pointer-events: auto !important;
+  }
 
-      #intro-lang-modal .intro-lang-card {
-        width: min(92vw, 420px);
-        padding: 24px 20px;
-        border-radius: 18px;
-        background: rgba(15,15,25,0.98);
-        border: 1px solid rgba(212,175,55,0.6);
-        color: #f5e7b0;
-        text-align: center;
-        box-shadow: 0 0 30px rgba(212,175,55,0.3);
-      }
+  #intro-lang-modal .intro-lang-backdrop {
+    position: absolute;
+    inset: 0;
+    pointer-events: auto;
+  }
 
-      #intro-lang-modal .intro-lang-title {
-        margin: 0 0 12px 0;
-        font-size: 1.45rem;
-        font-family: 'BerkshireSwash', cursive;
-      }
+  #intro-lang-modal .intro-lang-card {
+    position: relative;
+    z-index: 2;
+    pointer-events: auto !important;
+    width: min(92vw, 420px);
+    padding: 24px 20px;
+    border-radius: 18px;
+    background: rgba(15,15,25,0.98);
+    border: 1px solid rgba(212,175,55,0.6);
+    color: #f5e7b0;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(212,175,55,0.3);
+  }
 
-      #intro-lang-modal .intro-lang-sub {
-        margin: 0 0 20px 0;
-        font-size: 0.95rem;
-        opacity: 0.9;
-      }
+  #intro-lang-modal .intro-lang-select {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 10px;
+    background: rgba(0,0,0,0.6);
+    border: 1px solid rgba(212,175,55,0.5);
+    color: #f5e7b0;
+    font-size: 1.05rem;
+    margin-bottom: 16px;
+    pointer-events: auto !important;
+  }
 
-      #intro-lang-modal .intro-lang-select {
-        width: 100%;
-        padding: 12px 16px;
-        border-radius: 10px;
-        background: rgba(0,0,0,0.6);
-        border: 1px solid rgba(212,175,55,0.5);
-        color: #f5e7b0;
-        font-size: 1.05rem;
-        margin-bottom: 16px;
-      }
-
-      #intro-lang-modal .intro-lang-actions button {
-        width: 100%;
-        padding: 16px 20px;
-        font-size: 1.15rem;
-        font-weight: bold;
-        border: none;
-        border-radius: 12px;
-        background: url('/assets/img/textura-de-pedra.jpg') center/cover;
-        color: #111;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.6);
-        transition: all 0.25s ease;
-        cursor: pointer;
-      }
-    `;
+  #intro-lang-modal .intro-lang-actions button,
+  #intro-lang-confirm {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    padding: 16px 20px;
+    font-size: 1.15rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 12px;
+    background: url('/assets/img/textura-de-pedra.jpg') center/cover;
+    color: #111;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+    transition: all 0.25s ease;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+  }
+`;
     modal.appendChild(style);
 
     modal.style.display = 'flex';
