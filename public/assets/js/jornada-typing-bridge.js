@@ -433,7 +433,9 @@
     });
   };
 
-  window.EffectCoordinator.speak = (text, options = {}) => {
+ window.EffectCoordinator = window.EffectCoordinator || {};
+
+window.EffectCoordinator.speak = (text, options = {}) => {
   if (!text || !('speechSynthesis' in window)) return;
 
   const lang = getLangNow();
