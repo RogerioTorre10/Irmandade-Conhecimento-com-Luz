@@ -3,113 +3,106 @@
     "lang": "fr-FR",
     "label": "Français"
   },
+
   "common": {
-    "welcome": "Bienvenue !",
-    "description": "Ceci est un site incroyable.",
-    "search": "Rechercher...",
     "continue": "Continuer",
     "next": "Suivant",
     "back": "Retour",
-    "speak": "Lire",
-    "stop": "Arrêter",
     "loading": "Chargement..."
   },
+
   "site": {
     "title": "Journée • Fraternité Connaissance avec Lumière"
   },
+
   "intro": {
-    "title": "Journée Essentielle",
+    "title": "Voyage de la Connaissance",
     "start": "Commencer",
-    "language": "Choisissez votre langue"
+    "p1": "Bonjour.",
+    "p2": "Respect et amour.",
+    "p3": "Marchons en paix.",
+    "p4": "L’amour est la vie.",
+    "p5": "Gloire à Dieu."
   },
-  "terms": {
-    "title": "Termes et Conditions",
-    "accept": "J’accepte"
+
+  "terms1": {
+    "title": "Voyage",
+    "subtitle": "AVERTISSEMENT",
+    "description": "Ce voyage comporte des règles importantes.",
+    "li1": "Vos réponses sont confidentielles.",
+    "li2": "En commençant, vous acceptez les termes.",
+    "li3": "Un PDF sera généré à la fin.",
+    "li4": "Après avoir commencé, aucun remboursement n’est possible.",
+    "li5": "L’accès est limité à la période définie.",
+    "li6": "15 jours pour commencer.",
+    "li7": "24 heures pour terminer après le début.",
+    "li8": "Nous recommandons un environnement calme.",
+    "li9": "Préparez votre esprit avec une intention positive."
   },
+
+  "terms2": {
+    "title": "Conditions de Responsabilité",
+    "li1": "Aucune garantie de résultats.",
+    "li2": "La connaissance de soi est un processus personnel.",
+    "li3": "Vous êtes responsable de vos choix.",
+    "li4": "Un soutien émotionnel peut être nécessaire.",
+    "li5": "Le Guide IA agit comme mentor symbolique.",
+    "li6": "Le guide ne remplace pas les professionnels.",
+    "li7": "Gardez la responsabilité de vos actions.",
+    "li8": "Le voyage est une expérience interprétative.",
+    "li9": "La confidentialité est respectée.",
+    "li10": "Le consentement conscient est requis."
+  },
+
   "password": {
-    "title": "Accès sécurisé",
-    "placeholder": "Entrez votre mot de passe",
-    "button": "Continuer"
+    "title": "Entrez le mot-clé",
+    "p1": "Le mot-clé est le secret qui ouvrira votre voyage.",
+    "p2": "Choisissez-le avec soin, car il reflète votre intention.",
+    "p3": "Prêt ? Saisissez-le maintenant et continuez.",
+    "placeholder": "Entrez votre mot-clé..."
   },
+
+  "dados": {
+    "title": "Données personnelles",
+    "subtitle": "Remplissez les informations pour enrichir votre retour.",
+    "nome": "Nom complet",
+    "cidade": "Ville",
+    "estado": "État",
+    "profissao": "Profession / domaine",
+    "religiao": "Religion / spiritualité",
+    "idade": "Tranche d’âge",
+    "idade1": "Jusqu’à 17",
+    "idade2": "18 à 24",
+    "idade3": "25 à 34",
+    "idade4": "35 à 44",
+    "idade5": "45 à 59",
+    "idade6": "60+",
+    "estado_civil": "État civil",
+    "ec1": "Célibataire",
+    "ec2": "Marié(e)",
+    "ec3": "Divorcé(e)",
+    "ec4": "Veuf/Veuve",
+    "ec5": "Autre",
+    "filhos": "Enfants",
+    "filhos_nao": "Non",
+    "filhos_sim": "Oui",
+    "obs": "Quelque chose d’important que vous souhaitez partager ?"
+  },
+
   "guide": {
     "title": "Choisissez votre guide",
-    "subtitle": "Sélectionnez celui ou celle qui vous accompagnera dans cette journée."
+    "subtitle": "Sélectionnez celui qui vous accompagnera dans ce voyage."
   },
-  "data": {
-    "title": "Données personnelles",
-    "subtitle": "Partagez quelques informations pour enrichir votre retour.",
-    "name": "Nom complet",
-    "city": "Ville",
-    "state": "État",
-    "profession": "Profession",
-    "religion": "Religion",
-    "continue": "Continuer"
-  },
-  "selfie": {
-    "title": "Prenez votre photo",
-    "instruction": "Éloignez légèrement le téléphone et positionnez votre visage. Votre guide vous accompagnera.",
-    "preview": "Aperçu",
-    "capture": "Capturer",
-    "start": "Démarrer",
-    "confirm": "Confirmer",
-    "skip": "Passer"
-  },
-  "card": {
-    "title": "Moi dans la Fraternité",
-    "name_placeholder": "Entrez votre nom",
-    "button": "Continuer"
-  },
-  "feedback": {
-    "title": "Retour du Guide"
-  },
-  "progress": {
-    "path": "Blocs : Le Chemin",
-    "question": "Question",
-    "total": "Total"
-  },
-  "blocks": {
-    "roots": "Bloc 1 — Racines",
-    "reflections": "Bloc 2 — Réflexions",
-    "growth": "Bloc 3 — Croissance",
-    "integration": "Bloc 4 — Intégration",
-    "synthesis": "Bloc 5 — Synthèse et Remise"
-  },
-  "questions": {
-    "who_are_you_today": "Qui êtes-vous aujourd’hui ?",
-    "what_brought_you_here": "Qu’est-ce qui vous a conduit à cette journée ?",
-    "greatest_spiritual_dream": "Quel est votre plus grand rêve spirituel ?",
-    "current_challenges": "Quels sont vos plus grands défis actuels ?",
-    "fear_or_doubt": "Comment faites-vous face à la peur ou au doute ?",
-    "meaning_of_light": "Que signifie la lumière pour vous ?",
-    "what_to_change": "Que voulez-vous changer dans votre vie ?",
-    "who_inspires_you": "Qui vous inspire et pourquoi ?",
-    "practice_gratitude": "Comment pratiquez-vous la gratitude au quotidien ?",
-    "journey_lesson": "Quelle leçon retenez-vous de cette journée ?",
-    "future_application": "Comment allez-vous appliquer cela dans votre avenir ?",
-    "message_to_future_self": "Un message pour votre futur vous.",
-    "essence_today": "Qui êtes-vous aujourd’hui, en une phrase vraie ?",
-    "next_step": "Quel sera votre prochain pas de foi et de courage ?"
-  },
-  "answers": {
-    "placeholder": "Tapez votre réponse..."
-  },
+
   "final": {
-    "title": "Merci d’avoir parcouru ce chemin avec la Lumière",
-    "message1": "Vos réponses ont été reçues avec honneur par la Fraternité.",
-    "message2": "Vous avez semé des graines de confiance, de courage et de lumière.",
-    "message3": "Continuez à avancer. Le chemin ne se termine pas ici.",
-    "message4": "Revenez quand vous aurez besoin de rallumer votre flamme.",
-    "message5": "Vous êtes lumière. Vous êtes transformation.",
-    "pdf": "PDF",
-    "selfie_card": "Selfie Card",
-    "back": "Retour",
-    "restart": "Envoyer à nouveau"
-  },
-  "page": {
-    "title": "Journée Essentielle"
-  },
-  "footer": {
-    "copyright": "© 2025 Fraternité Connaissance avec Lumière",
-    "tagline": "Fraternité Connaissance avec Lumière"
+    "title": "Fin du Voyage",
+    "p1": "Vos réponses ont été reçues avec honneur par la Fraternité.",
+    "p2": "Vous avez semé des graines de confiance, de courage et de lumière.",
+    "p3": "Continuez à avancer. Le voyage ne se termine jamais.",
+    "p4": "Revenez lorsque vous aurez besoin de raviver votre flamme.",
+    "p5": "Vous êtes la lumière. Vous êtes le changement.",
+    "pdf": "Télécharger PDF",
+    "selfie": "Télécharger SelfieCard",
+    "back": "Retour au Portail"
   }
 }
