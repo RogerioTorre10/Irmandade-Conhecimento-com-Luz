@@ -45,11 +45,11 @@
   const __voiceCache = new Map();
 
   const GUIDE_VOICE_PROFILE = {
-    zion:   { gender: 'male',   style: 'firm' },
-    lumen:  { gender: 'female', style: 'warm' },
-    arian:  { gender: 'female', style: 'inspiring' },
-    ariane: { gender: 'female', style: 'inspiring' }
-  };
+  zion:   { gender: 'male',   style: 'imperial' },
+  lumen:  { gender: 'female', style: 'bright' },
+  arian:  { gender: 'female', style: 'counselor' },
+  ariane: { gender: 'female', style: 'counselor' }
+};
 
   function __loadVoicesNow() {
     try {
@@ -133,45 +133,80 @@
   }
 
   function __voiceNameScore(name, profile = {}, lang = '') {
-    const n = String(name || '').toLowerCase();
-    const L = String(lang || '').toLowerCase();
-    let score = 0;
+  const n = String(name || '').toLowerCase();
+  const L = String(lang || '').toLowerCase();
+  let score = 0;
 
-    // gênero
-    if (profile.gender === 'male') {
-      if (/male|man|homem|masculin|masculine/.test(n)) score += 40;
-      if (/daniel|david|alex|jorge|paul|carlos|felipe|ricardo|antonio|bruno/.test(n)) score += 30;
-    }
-
-    if (profile.gender === 'female') {
-      if (/female|woman|mulher|feminin|feminine/.test(n)) score += 40;
-      if (/zira|samantha|helena|luciana|maria|sofia|victoria|ana|paulina|monica/.test(n)) score += 30;
-    }
-
-    // nomes mais compatíveis por idioma
-    if (L.startsWith('fr')) {
-      if (/hortense|thomas|amelie|marie|celine|audrey|denise/.test(n)) score += 18;
-    }
-
-    if (L.startsWith('zh')) {
-      if (/huihui|yaoyao|xiaoxiao|xiaoyi|yunxi|yunyang/.test(n)) score += 18;
-    }
-
-    // estilo
-    if (profile.style === 'warm') {
-      if (/helena|luciana|maria|sofia|samantha|paulina|monica|amelie|celine/.test(n)) score += 12;
-    }
-
-    if (profile.style === 'inspiring') {
-      if (/sofia|victoria|helena|maria|ana|paulina|monica|xiaoxiao|yaoyao/.test(n)) score += 12;
-    }
-
-    if (profile.style === 'firm') {
-      if (/alex|daniel|david|jorge|carlos|paul|ricardo|antonio|bruno|thomas/.test(n)) score += 12;
-    }
-
-    return score;
+  // gênero
+  if (profile.gender === 'male') {
+    if (/male|man|homem|masculin|masculine/.test(n)) score += 40;
+    if (/daniel|david|alex|jorge|paul|carlos|felipe|ricardo|antonio|bruno|thomas/.test(n)) score += 30;
   }
+
+  if (profile.gender === 'female') {
+    if (/female|woman|mulher|feminin|feminine/.test(n)) score += 40;
+    if (/zira|samantha|helena|luciana|maria|sofia|victoria|ana|paulina|monica|marie|amelie|celine|audrey|denise/.test(n)) score += 30;
+  }
+
+  // nomes mais compatíveis por idioma
+  if (L.startsWith('fr')) {
+    if (/hortense|thomas|amelie|marie|celine|audrey|denise/.test(n)) score += 18;
+  }
+
+  if (L.startsWith('zh')) {
+    if (/huihui|yaoyao|xiaoxiao|xiaoyi|yunxi|yunyang/.test(n)) score += 18;
+  }
+
+  if (L.startsWith('ja')) {
+    if (/haruka|ayumi|ichiro|takumi|kyoko|otoya|sayaka/.test(n)) score += 18;
+  }
+
+  if (L.startsWith('es')) {
+    if (/jorge|carlos|maria|sofia|paulina|helena/.test(n)) score += 14;
+  }
+
+  if (L.startsWith('pt')) {
+    if (/luciana|maria|helena|ricardo|antonio|bruno/.test(n)) score += 14;
+  }
+
+  // estilo antigo mantido
+  if (profile.style === 'warm') {
+    if (/helena|luciana|maria|sofia|samantha|paulina|monica|amelie|celine/.test(n)) score += 12;
+  }
+
+  if (profile.style === 'inspiring') {
+    if (/sofia|victoria|helena|maria|ana|paulina|monica|xiaoxiao|yaoyao/.test(n)) score += 12;
+  }
+
+  if (profile.style === 'firm') {
+    if (/alex|daniel|david|jorge|carlos|paul|ricardo|antonio|bruno|thomas/.test(n)) score += 12;
+  }
+
+  // estilos novos
+
+  // Zion: grave, narrador, imperial
+  if (profile.style === 'imperial') {
+    if (/thomas|daniel|david|alex|jorge|carlos|ricardo|antonio|bruno|paul/.test(n)) score += 18;
+    if (/male|man|masculine|masculin/.test(n)) score += 14;
+    if (/neural|natural|microsoft|google/i.test(n)) score += 8;
+  }
+
+  // Lumen: jovem, clara, aguda, viva
+  if (profile.style === 'bright') {
+    if (/samantha|sofia|victoria|luciana|maria|ana|zira|paulina|sayaka/.test(n)) score += 18;
+    if (/female|woman|feminine|feminin/.test(n)) score += 14;
+    if (/neural|natural|google|microsoft/i.test(n)) score += 8;
+  }
+
+  // Arian: suave, contemplativa, conselheira
+  if (profile.style === 'counselor') {
+    if (/helena|monica|paulina|marie|amelie|celine|denise|audrey|kyoko/.test(n)) score += 18;
+    if (/female|woman|feminine|feminin/.test(n)) score += 12;
+    if (/neural|natural|google|microsoft/i.test(n)) score += 8;
+  }
+
+  return score;
+}
 
   function __rankVoices(candidates, lang, profile) {
     const L = String(lang || '').toLowerCase();
