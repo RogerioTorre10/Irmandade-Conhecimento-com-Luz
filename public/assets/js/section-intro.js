@@ -40,120 +40,133 @@
   }
 
   function buildLangModal() {
-    const modal = document.createElement('div');
-    modal.id = 'intro-lang-modal';
+  const modal = document.createElement('div');
+  modal.id = 'intro-lang-modal';
 
-    modal.innerHTML = `
-      <div class="intro-lang-backdrop"></div>
-      <div class="intro-lang-card" role="dialog" aria-modal="true" aria-labelledby="intro-lang-title">
-        <h3 id="intro-lang-title" class="intro-lang-title">Escolha seu idioma</h3>
-        <p class="intro-lang-sub">
-          Selecione o idioma para navegar. Após confirmar, não será possível alterar.
-        </p>
+  modal.innerHTML = `
+    <div class="intro-lang-backdrop"></div>
+    <div class="intro-lang-card" role="dialog" aria-modal="true" aria-labelledby="intro-lang-title">
+      <h3 id="intro-lang-title" class="intro-lang-title">Escolha seu idioma</h3>
+      <p class="intro-lang-sub">
+        Selecione o idioma para navegar. Após confirmar, não será possível alterar.
+      </p>
 
-        <div class="intro-lang-row">
-          <select id="intro-lang-select" class="intro-lang-select" aria-label="Selecione o idioma">
-            <option value="pt-BR">Português (BR)</option>
-            <option value="en-US">English (US)</option>
-            <option value="es-ES">Español (ES)</option>
-            <option value="fr-FR">Français (FR)</option>
-            <option value="zh-CN">中文（简体）</option>
-          </select>
-        </div>
-
-        <div class="intro-lang-actions">
-          <button id="intro-lang-confirm" type="button" class="intro-lang-confirm-btn">
-          Confirmar
-         </button>
-        </div>
+      <div class="intro-lang-grid" id="intro-lang-grid">
+        <button type="button" class="intro-lang-option is-selected" data-lang="pt-BR">Português (BR)</button>
+        <button type="button" class="intro-lang-option" data-lang="en-US">English (US)</button>
+        <button type="button" class="intro-lang-option" data-lang="es-ES">Español (ES)</button>
+        <button type="button" class="intro-lang-option" data-lang="fr-FR">Français (FR)</button>
+        <button type="button" class="intro-lang-option" data-lang="zh-CN">中文（简体）</button>
       </div>
-    `;
+
+      <div class="intro-lang-actions">
+        <button id="intro-lang-confirm" type="button" class="intro-lang-confirm-btn">
+          Confirmar
+        </button>
+      </div>
+    </div>
+  `;
+
   const style = document.createElement('style');
   style.textContent = `
-  #intro-lang-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 999999 !important;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0,0,0,0.75);
-  pointer-events: auto !important;
+    #intro-lang-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 999999 !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.75);
+      pointer-events: auto !important;
+    }
+
+    #intro-lang-modal .intro-lang-backdrop {
+      position: absolute;
+      inset: 0;
+      pointer-events: none !important;
+    }
+
+    #intro-lang-modal .intro-lang-card {
+      position: relative;
+      z-index: 2;
+      width: min(92vw, 420px);
+      padding: 24px 20px;
+      border-radius: 18px;
+      background: rgba(15,15,25,0.98);
+      border: 1px solid rgba(212,175,55,0.6);
+      color: #f5e7b0;
+      text-align: center;
+      box-shadow: 0 0 30px rgba(212,175,55,0.3);
+      pointer-events: auto !important;
+    }
+
+    #intro-lang-modal .intro-lang-title {
+      margin: 0 0 12px 0;
+      font-size: 1.45rem;
+      font-family: 'BerkshireSwash', cursive;
+    }
+
+    #intro-lang-modal .intro-lang-sub {
+      margin: 0 0 20px 0;
+      font-size: 0.95rem;
+      opacity: 0.9;
+    }
+
+    #intro-lang-modal .intro-lang-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    #intro-lang-modal .intro-lang-option {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: rgba(0,0,0,0.6);
+      border: 1px solid rgba(212,175,55,0.35);
+      color: #f5e7b0;
+      font-size: 1rem;
+      text-align: left;
+      cursor: pointer !important;
+      pointer-events: auto !important;
+      transition: all .2s ease;
+    }
+
+    #intro-lang-modal .intro-lang-option.is-selected {
+      border-color: rgba(212,175,55,0.95);
+      box-shadow: 0 0 0 1px rgba(212,175,55,0.55), 0 0 18px rgba(212,175,55,0.18);
+      background: rgba(40,30,10,0.55);
+    }
+
+    #intro-lang-modal .intro-lang-confirm-btn,
+    #intro-lang-confirm {
+      position: relative;
+      z-index: 3;
+      width: 100%;
+      padding: 16px 20px;
+      font-size: 1.15rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 12px;
+      background: url('/assets/img/textura-de-pedra.jpg') center/cover;
+      color: #111;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+      transition: all 0.25s ease;
+      cursor: pointer !important;
+      pointer-events: auto !important;
+    }
+  `;
+  modal.appendChild(style);
+
+  modal.style.display = 'flex';
+  modal.style.visibility = 'visible';
+  modal.style.opacity = '1';
+
+  return modal;
 }
 
-#intro-lang-modal .intro-lang-backdrop {
-  position: absolute;
-  inset: 0;
-  pointer-events: auto;
-}
-
-#intro-lang-modal .intro-lang-card {
-  position: relative;
-  z-index: 2;
-  pointer-events: auto !important;
-  width: min(92vw, 420px);
-  padding: 24px 20px;
-  border-radius: 18px;
-  background: rgba(15,15,25,0.98);
-  border: 1px solid rgba(212,175,55,0.6);
-  color: #f5e7b0;
-  text-align: center;
-  box-shadow: 0 0 30px rgba(212,175,55,0.3);
-}
-
-#intro-lang-modal .intro-lang-row {
-  position: relative;
-  z-index: 4;
-  pointer-events: auto !important;
-}
-
-#intro-lang-modal .intro-lang-select,
-#intro-lang-select {
-  position: relative;
-  z-index: 5;
-  width: 100%;
-  padding: 12px 16px;
-  border-radius: 10px;
-  background: rgba(0,0,0,0.6);
-  border: 1px solid rgba(212,175,55,0.5);
-  color: #f5e7b0;
-  font-size: 1.05rem;
-  margin-bottom: 16px;
-  pointer-events: auto !important;
-  cursor: pointer !important;
-  appearance: auto !important;
-  -webkit-appearance: menulist !important;
-  -moz-appearance: menulist !important;
-}
-
-#intro-lang-modal .intro-lang-confirm-btn,
-#intro-lang-confirm {
-  position: relative;
-  z-index: 3;
-  width: 100%;
-  padding: 16px 20px;
-  font-size: 1.15rem;
-  font-weight: bold;
-  border: none;
-  border-radius: 12px;
-  background: url('/assets/img/textura-de-pedra.jpg') center/cover;
-  color: #111;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.6);
-  transition: all 0.25s ease;
-  cursor: pointer !important;
-  pointer-events: auto !important;
-}
- `;
-    modal.appendChild(style);
-
-    modal.style.display = 'flex';
-    modal.style.visibility = 'visible';
-    modal.style.opacity = '1';
-
-    return modal;
-  }
-
-  async function requireLanguageChoice() {
+ async function requireLanguageChoice() {
   sessionStorage.removeItem('i18n_locked');
   sessionStorage.removeItem('jornada.lang');
   sessionStorage.removeItem('i18n.lang');
@@ -169,18 +182,12 @@
   window.speechSynthesis?.cancel?.();
 
   const btn = modal.querySelector('#intro-lang-confirm');
-  const sel = modal.querySelector('#intro-lang-select');
-  sel.style.pointerEvents = 'auto';
-  sel.style.position = 'relative';
-  sel.style.zIndex = '5';
-  sel.style.cursor = 'pointer';
-  sel.removeAttribute('disabled');
-    
+  const options = Array.from(modal.querySelectorAll('.intro-lang-option'));
 
-  if (!btn || !sel) {
-    console.error('[LANG_MODAL] Botão ou select não encontrados.', {
+  if (!btn || !options.length) {
+    console.error('[LANG_MODAL] Botão ou opções não encontrados.', {
       btn: !!btn,
-      sel: !!sel
+      options: options.length
     });
     throw new Error('Modal de idioma inválida.');
   }
@@ -198,23 +205,33 @@
     introBtn.setAttribute('aria-disabled', 'true');
   }
 
-  sel.disabled = false;
-  sel.value =
-    sel.value ||
-    sessionStorage.getItem('jornada.lang') ||
+  let chosenLang =
     localStorage.getItem('i18n_lang') ||
+    sessionStorage.getItem('jornada.lang') ||
     'pt-BR';
 
-  btn.disabled = false;
-  btn.removeAttribute('disabled');
-  btn.style.pointerEvents = 'auto';
-  btn.style.opacity = '1';
-  btn.style.cursor = 'pointer';
-  btn.setAttribute('aria-disabled', 'false');
-
-  function getChosenLang() {
-    return (sel.value || 'pt-BR').trim();
+  function paintSelection(lang) {
+    chosenLang = lang;
+    options.forEach((el) => {
+      const active = el.dataset.lang === lang;
+      el.classList.toggle('is-selected', active);
+      el.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+    console.log('[LANG_MODAL] idioma selecionado:', chosenLang);
   }
+
+  paintSelection(chosenLang);
+
+  options.forEach((el) => {
+    const handler = (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      paintSelection(el.dataset.lang || 'pt-BR');
+    };
+    el.addEventListener('click', handler, true);
+    el.addEventListener('pointerdown', handler, true);
+    el.addEventListener('touchstart', handler, true);
+  });
 
   return new Promise((resolve) => {
     let confirmed = false;
@@ -227,12 +244,10 @@
       if (confirmed) return;
       confirmed = true;
 
-      const chosenLang = getChosenLang();
       console.log('[LANG_MODAL] Confirmar clicado:', chosenLang);
 
       try {
         btn.disabled = true;
-        sel.disabled = true;
 
         await setLangAndLock(chosenLang);
 
@@ -256,7 +271,6 @@
       } catch (err) {
         console.error('[Global Lang Change] Erro:', err);
         btn.disabled = false;
-        sel.disabled = false;
         confirmed = false;
         resolve(chosenLang);
       }
@@ -266,18 +280,6 @@
     btn.addEventListener('click', confirmChoice, true);
     btn.addEventListener('pointerdown', confirmChoice, true);
     btn.addEventListener('touchstart', confirmChoice, true);
-
-    modal.addEventListener('click', (e) => {
-      if (e.target === btn) {
-        confirmChoice(e);
-      }
-    }, true);
-
-    sel.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        confirmChoice(e);
-      }
-    });
 
     setTimeout(() => {
       try { btn.focus(); } catch {}
