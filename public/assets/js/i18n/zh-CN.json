@@ -3,113 +3,106 @@
     "lang": "zh-CN",
     "label": "简体中文"
   },
+
   "common": {
-    "welcome": "欢迎！",
-    "description": "这是一个很棒的网站。",
-    "search": "搜索...",
     "continue": "继续",
     "next": "下一步",
     "back": "返回",
-    "speak": "朗读",
-    "stop": "停止",
     "loading": "加载中..."
   },
+
   "site": {
     "title": "旅程 • 光之知识兄弟会"
   },
+
   "intro": {
-    "title": "核心旅程",
+    "title": "认知之旅",
     "start": "开始",
-    "language": "选择你的语言"
+    "p1": "早安。",
+    "p2": "尊重与爱。",
+    "p3": "让我们平和前行。",
+    "p4": "爱即生命。",
+    "p5": "愿荣耀归于神。"
   },
-  "terms": {
-    "title": "条款与条件",
-    "accept": "我同意"
+
+  "terms1": {
+    "title": "旅程",
+    "subtitle": "重要提示",
+    "description": "本旅程包含重要规则。",
+    "li1": "您的回答将被严格保密。",
+    "li2": "开始即表示您同意相关条款。",
+    "li3": "结束后将生成PDF报告。",
+    "li4": "一旦开始，不可退款。",
+    "li5": "访问仅限规定时间内。",
+    "li6": "15天内需开始。",
+    "li7": "开始后24小时内完成。",
+    "li8": "建议在安静环境中进行。",
+    "li9": "请以积极的心态进入本旅程。"
   },
+
+  "terms2": {
+    "title": "责任条款",
+    "li1": "不保证结果。",
+    "li2": "自我认知是个人过程。",
+    "li3": "您对自己的选择负责。",
+    "li4": "可能需要情感支持。",
+    "li5": "AI向导作为象征性引导者。",
+    "li6": "向导不能替代专业人士。",
+    "li7": "请对您的行为负责。",
+    "li8": "本旅程为解释性体验。",
+    "li9": "隐私将被尊重。",
+    "li10": "必须具备知情同意。"
+  },
+
   "password": {
-    "title": "安全访问",
-    "placeholder": "请输入密码",
-    "button": "继续"
+    "title": "输入关键词",
+    "p1": "关键词是开启您旅程的秘密。",
+    "p2": "请谨慎选择，因为它代表您的意图。",
+    "p3": "准备好了吗？请输入并继续。",
+    "placeholder": "请输入关键词..."
   },
+
+  "dados": {
+    "title": "个人信息",
+    "subtitle": "填写信息以丰富您的反馈。",
+    "nome": "姓名",
+    "cidade": "城市",
+    "estado": "地区 / 省份",
+    "profissao": "职业 / 领域",
+    "religiao": "宗教 / 精神信仰",
+    "idade": "年龄范围",
+    "idade1": "17岁及以下",
+    "idade2": "18至24岁",
+    "idade3": "25至34岁",
+    "idade4": "35至44岁",
+    "idade5": "45至59岁",
+    "idade6": "60岁以上",
+    "estado_civil": "婚姻状况",
+    "ec1": "单身",
+    "ec2": "已婚",
+    "ec3": "离异",
+    "ec4": "丧偶",
+    "ec5": "其他",
+    "filhos": "子女",
+    "filhos_nao": "没有",
+    "filhos_sim": "有",
+    "obs": "是否有需要补充的重要信息？"
+  },
+
   "guide": {
     "title": "选择你的向导",
     "subtitle": "选择谁将陪伴你完成这段旅程。"
   },
-  "data": {
-    "title": "个人信息",
-    "subtitle": "分享一些信息，以丰富你的反馈。",
-    "name": "姓名",
-    "city": "城市",
-    "state": "州/地区",
-    "profession": "职业",
-    "religion": "宗教",
-    "continue": "继续"
-  },
-  "selfie": {
-    "title": "拍摄你的照片",
-    "instruction": "将手机稍微拿远一些并对准你的脸。你的向导会陪伴你。",
-    "preview": "预览",
-    "capture": "拍摄",
-    "start": "开始",
-    "confirm": "确认",
-    "skip": "跳过"
-  },
-  "card": {
-    "title": "我在兄弟会中",
-    "name_placeholder": "请输入你的名字",
-    "button": "继续"
-  },
-  "feedback": {
-    "title": "向导反馈"
-  },
-  "progress": {
-    "path": "模块：道路",
-    "question": "问题",
-    "total": "总计"
-  },
-  "blocks": {
-    "roots": "第1模块 — 根源",
-    "reflections": "第2模块 — 反思",
-    "growth": "第3模块 — 成长",
-    "integration": "第4模块 — 整合",
-    "synthesis": "第5模块 — 综合与交付"
-  },
-  "questions": {
-    "who_are_you_today": "今天的你是谁？",
-    "what_brought_you_here": "是什么带你来到这段旅程？",
-    "greatest_spiritual_dream": "你最大的灵性梦想是什么？",
-    "current_challenges": "你当前最大的挑战是什么？",
-    "fear_or_doubt": "你如何面对恐惧或怀疑？",
-    "meaning_of_light": "光对你意味着什么？",
-    "what_to_change": "你想改变生活中的什么？",
-    "who_inspires_you": "谁激励着你，为什么？",
-    "practice_gratitude": "你如何每天实践感恩？",
-    "journey_lesson": "你从这段旅程中获得了什么教训？",
-    "future_application": "你将如何把这应用到未来？",
-    "message_to_future_self": "给未来自己的话。",
-    "essence_today": "请用一句真实的话描述今天的你是谁。",
-    "next_step": "你的下一个信念与勇气之步是什么？"
-  },
-  "answers": {
-    "placeholder": "请输入你的回答..."
-  },
+
   "final": {
-    "title": "感谢你与光一同走过这段道路",
-    "message1": "你的回答已被兄弟会庄重接收。",
-    "message2": "你播下了信任、勇气与光明的种子。",
-    "message3": "继续前行。这段道路并未在此结束。",
-    "message4": "当你需要重新点燃内在火焰时，请再回来。",
-    "message5": "你就是光。你就是转变。",
-    "pdf": "PDF",
-    "selfie_card": "自拍卡",
-    "back": "返回",
-    "restart": "再次提交"
-  },
-  "page": {
-    "title": "核心旅程"
-  },
-  "footer": {
-    "copyright": "© 2025 光之知识兄弟会",
-    "tagline": "光之知识兄弟会"
+    "title": "旅程结束",
+    "p1": "您的回答已被兄弟会郑重接收。",
+    "p2": "您已经播下了信任、勇气与光明的种子。",
+    "p3": "继续前行。这段旅程永不终结。",
+    "p4": "当您需要再次点燃内心之光时，请回来。",
+    "p5": "你就是光。你就是改变。",
+    "pdf": "下载PDF",
+    "selfie": "下载SelfieCard",
+    "back": "返回门户"
   }
 }
