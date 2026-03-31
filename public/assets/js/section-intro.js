@@ -48,16 +48,16 @@
       <div class="intro-lang-card" role="dialog" aria-modal="true" aria-labelledby="intro-lang-title">
         <h3 id="intro-lang-title" class="intro-lang-title">Escolha seu idioma</h3>
         <p class="intro-lang-sub">
-          Selecione o idioma para navegar. Após confirmar, não será possível alterar.
+          Selecione o idioma para navegar. ApÃ³s confirmar, nÃ£o serÃ¡ possÃ­vel alterar.
         </p>
 
         <div class="intro-lang-row">
           <select id="intro-lang-select" class="intro-lang-select" aria-label="Selecione o idioma">
-            <option value="pt-BR">Português (BR)</option>
+            <option value="pt-BR">PortuguÃªs (BR)</option>
             <option value="en-US">English (US)</option>
-            <option value="es-ES">Español (ES)</option>
-            <option value="fr-FR">Français (FR)</option>
-            <option value="zh-CN">中文（简体）</option>
+            <option value="es-ES">EspaÃ±ol (ES)</option>
+            <option value="fr-FR">FranÃ§ais (FR)</option>
+            <option value="zh-CN">ä¸­æ–‡ï¼ˆç®€ä½“ï¼‰</option>
           </select>
         </div>
 
@@ -178,11 +178,11 @@
     
 
   if (!btn || !sel) {
-    console.error('[LANG_MODAL] Botão ou select não encontrados.', {
+    console.error('[LANG_MODAL] BotÃ£o ou select nÃ£o encontrados.', {
       btn: !!btn,
       sel: !!sel
     });
-    throw new Error('Modal de idioma inválida.');
+    throw new Error('Modal de idioma invÃ¡lida.');
   }
 
   const introRoot = document.getElementById(SECTION_ID);
@@ -295,7 +295,7 @@
       root.querySelector('button');
 
     if (!btn) {
-      console.warn('[JCIntro] Botão da intro não encontrado.');
+      console.warn('[JCIntro] BotÃ£o da intro nÃ£o encontrado.');
       return;
     }
 
@@ -328,7 +328,7 @@
     await requireLanguageChoice();
     await runTyping(root);
 
-    console.log('[Intro] Inicialização completa após escolha de idioma.');
+    console.log('[Intro] InicializaÃ§Ã£o completa apÃ³s escolha de idioma.');
   }
 
   function bind() {
