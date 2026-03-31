@@ -267,6 +267,49 @@
     } catch (_) {}
   }
 
+function applyTextContent(ctx) {
+  ctx.querySelectorAll('[data-i18n]').forEach((el) => {
+    const key = el.getAttribute('data-i18n');
+    if (!key) return;
+    el.textContent = t(key, el.textContent || key);
+  });
+}
+
+function applyPlaceholders(ctx) {
+  ctx.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    if (!key) return;
+    const val = t(key, el.getAttribute('placeholder') || key);
+    el.setAttribute('placeholder', val);
+  });
+}
+
+function applyTitles(ctx) {
+  ctx.querySelectorAll('[data-i18n-title]').forEach((el) => {
+    const key = el.getAttribute('data-i18n-title');
+    if (!key) return;
+    const val = t(key, el.getAttribute('title') || key);
+    el.setAttribute('title', val);
+  });
+}
+
+function applyValues(ctx) {
+  ctx.querySelectorAll('[data-i18n-value]').forEach((el) => {
+    const key = el.getAttribute('data-i18n-value');
+    if (!key) return;
+    const val = t(key, el.value || key);
+    el.value = val;
+  });
+}
+
+function applyHtml(ctx) {
+  ctx.querySelectorAll('[data-i18n-html]').forEach((el) => {
+    const key = el.getAttribute('data-i18n-html');
+    if (!key) return;
+    el.innerHTML = t(key, el.innerHTML || key);
+  });
+}
+  
   function applyPlaceholders(ctx) {
     ctx.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
       const key = el.getAttribute('data-i18n-placeholder');
@@ -317,11 +360,8 @@
     if (!key) return;
 
     const val = t(key, el.getAttribute('data-text') || key);
-
-    // atualiza a fonte usada por typing/TTS
     el.setAttribute('data-text', val);
 
-    // atualiza o texto visível se não estiver em typing ativo
     if (!el.classList.contains('typing-active')) {
       el.textContent = val;
     }
