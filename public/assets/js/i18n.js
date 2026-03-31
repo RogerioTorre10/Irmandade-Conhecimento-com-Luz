@@ -267,19 +267,6 @@
     } catch (_) {}
   }
 
-  ctx.querySelectorAll('[data-i18n-text]').forEach((el) => {
-  const key = el.getAttribute('data-i18n-text');
-  if (!key) return;
-
-  const val = t(key, el.getAttribute('data-text') || key);
-
-  el.setAttribute('data-text', val);
-
-  if (!el.classList.contains('typing-active')) {
-    el.textContent = val;
-  }
-});
-
   function applyPlaceholders(ctx) {
     ctx.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
       const key = el.getAttribute('data-i18n-placeholder');
