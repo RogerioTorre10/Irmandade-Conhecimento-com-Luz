@@ -267,13 +267,20 @@
     } catch (_) {}
   }
 
-  function applyTextContent(ctx) {
-    ctx.querySelectorAll('[data-i18n]').forEach((el) => {
-      const key = el.getAttribute('data-i18n');
-      if (!key) return;
-      el.textContent = t(key, el.textContent || key);
-    });
+  ctx.querySelectorAll('[data-i18n-text]').forEach((el) => {
+  const key = el.getAttribute('data-i18n-text');
+  if (!key) return;
+
+  const val = t(key, el.getAttribute('data-text') || key);
+
+  // sempre atualiza a fonte usada por typing/TTS
+  el.setAttribute('data-text', val);
+
+  // se não estiver sendo digitado neste instante, sobrescreve o texto visível também
+  if (!el.classList.contains('typing-active')) {
+    el.textContent = val;
   }
+});
 
   function applyPlaceholders(ctx) {
     ctx.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
