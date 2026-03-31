@@ -101,7 +101,16 @@
   box-shadow: 0 0 30px rgba(212,175,55,0.3);
 }
 
-#intro-lang-modal .intro-lang-select {
+#intro-lang-modal .intro-lang-row {
+  position: relative;
+  z-index: 4;
+  pointer-events: auto !important;
+}
+
+#intro-lang-modal .intro-lang-select,
+#intro-lang-select {
+  position: relative;
+  z-index: 5;
   width: 100%;
   padding: 12px 16px;
   border-radius: 10px;
@@ -111,6 +120,10 @@
   font-size: 1.05rem;
   margin-bottom: 16px;
   pointer-events: auto !important;
+  cursor: pointer !important;
+  appearance: auto !important;
+  -webkit-appearance: menulist !important;
+  -moz-appearance: menulist !important;
 }
 
 #intro-lang-modal .intro-lang-confirm-btn,
@@ -157,6 +170,12 @@
 
   const btn = modal.querySelector('#intro-lang-confirm');
   const sel = modal.querySelector('#intro-lang-select');
+  sel.style.pointerEvents = 'auto';
+  sel.style.position = 'relative';
+  sel.style.zIndex = '5';
+  sel.style.cursor = 'pointer';
+  sel.removeAttribute('disabled');
+    
 
   if (!btn || !sel) {
     console.error('[LANG_MODAL] Botão ou select não encontrados.', {
