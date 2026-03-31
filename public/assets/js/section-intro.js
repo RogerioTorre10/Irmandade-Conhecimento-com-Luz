@@ -9,16 +9,13 @@
   window.JCIntro.__bound = true;
   window.JCIntro.state = { initialized: false };
 
-  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-
-  // ==================== MODAL DE IDIOMA ====================
   function buildLangModal() {
     const modal = document.createElement('div');
     modal.id = 'intro-lang-modal';
 
     modal.innerHTML = `
       <div class="intro-lang-backdrop"></div>
-      <div class="intro-lang-card" role="dialog" aria-modal="true">
+      <div class="intro-lang-card">
         <h3 class="intro-lang-title">Escolha seu idioma</h3>
         <p class="intro-lang-sub">
           Selecione o idioma para navegar. Após confirmar, não será possível alterar.
@@ -51,64 +48,60 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: rgba(0,0,0,0.78);
+        background: rgba(0,0,0,0.8);
       }
 
       #intro-lang-modal .intro-lang-card {
         width: min(92vw, 420px);
-        padding: 28px 24px;
+        padding: 30px 24px;
         border-radius: 18px;
-        background: rgba(15,15,25,0.98);
+        background: rgba(15,15,25,0.97);
         border: 1px solid rgba(212,175,55,0.7);
         color: #f5e7b0;
         text-align: center;
-        box-shadow: 0 0 40px rgba(212,175,55,0.35);
+        box-shadow: 0 0 40px rgba(212,175,55,0.4);
       }
 
       #intro-lang-modal .intro-lang-title {
-        margin: 0 0 12px 0;
-        font-size: 1.5rem;
-        font-family: "ManufacturingConsent-Regular", serif;
+        margin: 0 0 12px;
+        font-size: 1.55rem;
         color: #ffd700;
+        font-family: "ManufacturingConsent-Regular", serif;
       }
 
       #intro-lang-modal .intro-lang-sub {
-        margin: 0 0 20px 0;
-        font-size: 0.96rem;
+        margin: 0 0 24px;
+        font-size: 0.97rem;
         opacity: 0.9;
       }
 
       #intro-lang-modal .intro-lang-select {
         width: 100%;
         padding: 14px 16px;
+        margin-bottom: 20px;
         border-radius: 10px;
         background: rgba(0,0,0,0.65);
         border: 1px solid rgba(212,175,55,0.6);
         color: #f5e7b0;
         font-size: 1.05rem;
-        margin-bottom: 20px;
-        pointer-events: auto;
-        cursor: pointer;
       }
 
       #intro-lang-modal .intro-lang-confirm-btn {
         width: 100%;
         padding: 16px 20px;
-        font-size: 1.15rem;
+        font-size: 1.2rem;
         font-weight: bold;
         border: none;
         border-radius: 12px;
         background: url('/assets/img/textura-de-pedra.jpg') center/cover;
         color: #111;
         box-shadow: 0 4px 15px rgba(0,0,0,0.6);
-        transition: all 0.25s ease;
         cursor: pointer;
-        pointer-events: auto;
       }
 
       #intro-lang-modal .intro-lang-confirm-btn:hover {
-        transform: translateY(-2px);
-        filter: brightness(1.1);
+        filter: brightness(1.12);
+        transform: translateY(-1px);
       }
     `;
     modal.appendChild(style);
@@ -116,12 +109,9 @@
   }
 
   async function requireLanguageChoice() {
-    // Limpa locks anteriores
-    sessionStorage.removeItem('i18n_locked');
-    sessionStorage.removeItem('jornada.lang');
-
-    const oldModal = document.getElementById('intro-lang-modal');
-    if (oldModal) oldModal.remove();
+    // Remove modal antigo se existir
+    const old = document.getElementById('intro-lang-modal');
+    if (old) old.remove();
 
     const modal = buildLangModal();
     document.body.appendChild(modal);
@@ -130,33 +120,29 @@
       const select = modal.querySelector('#intro-lang-select');
       const btn = modal.querySelector('#intro-lang-confirm');
 
-      // Garante que o select e botão estejam habilitados
+      // Garante que tudo esteja clicável
       select.disabled = false;
       btn.disabled = false;
 
-      btn.addEventListener('click', async () => {
+      btn.addEventListener('click', async function handler() {
         const chosenLang = select.value;
 
+        // Define o idioma
         try {
-          if (window.i18n?.forceLang) {
-            await window.i18n.forceLang(chosenLang, true);
-          } else if (window.i18n?.setLang) {
-            await window.i18n.setLang(chosenLang);
-          }
+          if (window.i18n?.forceLang) await window.i18n.forceLang(chosenLang, true);
+          else if (window.i18n?.setLang) await window.i18n.setLang(chosenLang);
         } catch (e) {
           console.warn('[IntroLang] Erro ao definir idioma:', e);
         }
 
         localStorage.setItem('i18n_lang', chosenLang);
-        sessionStorage.setItem('i18n_locked', '1');
         document.documentElement.lang = chosenLang.split('-')[0] || 'pt';
 
         console.log('[IntroLang] Idioma confirmado:', chosenLang);
 
-        // Remove modal com fade
-        modal.style.transition = 'opacity 0.4s';
+        // Fecha o modal
         modal.style.opacity = '0';
-        setTimeout(() => modal.remove(), 400);
+        setTimeout(() => modal.remove(), 350);
 
         resolve(chosenLang);
       }, { once: true });
@@ -166,33 +152,29 @@
   async function runTyping(root) {
     if (!root) return;
 
-    const elements = root.querySelectorAll('[data-typing="true"]');
-    const btn = root.querySelector('#btn-intro') || 
-                root.querySelector('[data-action="avancar"]') || 
-                root.querySelector('.btn-stone');
+    console.log('[Typing] Iniciando datilografia...');
 
-    if (btn) {
-      btn.disabled = true;
-      btn.classList.add('is-hidden');
+    const elements = root.querySelectorAll('[data-typing="true"]');
+    const advanceBtn = root.querySelector('#btn-intro, [data-action="avancar"], .btn-stone, button');
+
+    if (advanceBtn) {
+      advanceBtn.disabled = true;
     }
 
     for (const el of elements) {
-      const text = el.dataset.text || el.textContent.trim();
+      const text = (el.dataset.text || el.textContent || '').trim();
       if (text) {
         el.textContent = '';
-        // Aqui você pode chamar sua função de typing existente
         if (typeof window.runTyping === 'function') {
-          await new Promise(res => window.runTyping(el, text, res));
+          await new Promise(r => window.runTyping(el, text, r));
         } else {
-          // fallback simples
           el.textContent = text;
         }
       }
     }
 
-    if (btn) {
-      btn.disabled = false;
-      btn.classList.remove('is-hidden');
+    if (advanceBtn) {
+      advanceBtn.disabled = false;
     }
   }
 
@@ -201,20 +183,18 @@
     window.JCIntro.state.initialized = true;
 
     console.log('[Intro] Aguardando escolha de idioma...');
-    
-    await requireLanguageChoice();   // ← Primeiro escolhe o idioma
-    
-    console.log('[Intro] Idioma confirmado. Iniciando typing...');
-    await runTyping(root);           // ← Só depois faz a datilografia
 
-    console.log('[Intro] Inicialização completa.');
+    await requireLanguageChoice();     // ← Primeiro o idioma
+
+    console.log('[Intro] Idioma confirmado → iniciando typing');
+    await runTyping(root);             // ← Depois a datilografia
+
+    console.log('[Intro] Tudo pronto.');
   }
 
   function bind() {
     const existing = document.getElementById(SECTION_ID);
-    if (existing && !existing.classList.contains('hidden')) {
-      init(existing);
-    }
+    if (existing) init(existing);
 
     document.addEventListener('section:shown', (e) => {
       if (e?.detail?.sectionId === SECTION_ID) {
