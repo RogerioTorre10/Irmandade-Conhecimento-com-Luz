@@ -343,16 +343,23 @@
     if (state._langPromise) return state._langPromise;
 
     state._langPromise = (async () => {
-      // Se já está travado e tentaram trocar sem ser o mesmo idioma, ignora
-      if (isLocked()) {
-        const lockedLang = getStoredLang() || state.lang || DEFAULT;
-        if (lockedLang !== lang) {
-          log('Idioma travado permanentemente:', lockedLang);
-          state.lang = lockedLang;
-          setHtmlLangAttrs();
-          return lockedLang;
-        }
-      }
+      // 🔥 PERMITE TROCA DURANTE INTRO
+    if (isLocked()) {
+    const introOpen = window.__LANG_MODAL_OPEN__ === true;
+
+     if (!introOpen) {
+     const lockedLang = getStoredLang() || state.lang || DEFAULT;
+
+    if (lockedLang !== lang) {
+      log('Idioma travado permanentemente:', lockedLang);
+      state.lang = lockedLang;
+      setHtmlLangAttrs();
+      return lockedLang;
+    }
+  } else {
+    log('Troca permitida durante seleção de idioma:', lang);
+  }
+}
 
       // Se já está pronto e é o mesmo idioma, apenas reforça attrs
       if (state.ready && state.lang === lang) {
