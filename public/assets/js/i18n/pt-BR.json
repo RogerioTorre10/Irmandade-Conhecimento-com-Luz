@@ -3,117 +3,106 @@
     "lang": "pt-BR",
     "label": "Português (Brasil)"
   },
+
   "common": {
-    "welcome": "Bem-vindo!",
-    "description": "Este é um site incrível.",
-    "search": "Pesquisar...",
     "continue": "Continuar",
     "next": "Avançar",
     "back": "Voltar",
-    "speak": "Falar",
-    "stop": "Parar",
     "loading": "Carregando..."
   },
+
   "site": {
     "title": "Jornada • Irmandade Conhecimento com Luz"
   },
-  "intro": {  
-  "title": "Jornada do Conhecimento",
-  "start": "Iniciar",
-  "p1": "Bom dia.",
-  "p2": "Respeito e amor.",
-  "p3": "Vamos em paz.",
-  "p4": "Amor e vida.",
-  "p5": "Deus seja louvado."
+
+  "intro": {
+    "title": "Jornada do Conhecimento",
+    "start": "Iniciar",
+    "p1": "Bom dia.",
+    "p2": "Respeito e amor.",
+    "p3": "Vamos em paz.",
+    "p4": "Amor é vida.",
+    "p5": "Deus seja louvado."
   },
-  "terms": {
-    "title": "Termos e Condições",
-    "accept": "Eu aceito"
+
+  "terms1": {
+    "title": "Jornada",
+    "subtitle": "AVISO",
+    "description": "Esta jornada possui regras importantes.",
+    "li1": "Suas respostas são confidenciais.",
+    "li2": "Ao iniciar, você aceita os termos.",
+    "li3": "O PDF será gerado ao final.",
+    "li4": "Após iniciar, não há reembolso.",
+    "li5": "O acesso é limitado ao período definido.",
+    "li6": "15 dias para iniciar.",
+    "li7": "24 horas para concluir após iniciar.",
+    "li8": "Recomendamos um ambiente tranquilo.",
+    "li9": "Prepare sua mente com intenção positiva."
   },
+
+  "terms2": {
+    "title": "Termo de Responsabilidade",
+    "li1": "Não há garantia de resultados.",
+    "li2": "O autoconhecimento é um processo pessoal.",
+    "li3": "Você é responsável por suas escolhas.",
+    "li4": "O apoio emocional pode ser necessário.",
+    "li5": "O Guia IA atua como orientador simbólico.",
+    "li6": "O guia não substitui profissionais.",
+    "li7": "Mantenha responsabilidade sobre suas ações.",
+    "li8": "A jornada é uma experiência interpretativa.",
+    "li9": "Sua privacidade é respeitada.",
+    "li10": "O consentimento consciente é obrigatório."
+  },
+
   "password": {
-    "title": "Acesso seguro",
-    "placeholder": "Digite sua senha",
-    "button": "Continuar"
+    "title": "Digite a Palavra-Chave",
+    "p1": "A Palavra-Chave é o segredo que abrirá sua jornada.",
+    "p2": "Escolha com cuidado, pois ela reflete sua intenção.",
+    "p3": "Pronto? Digite agora e avance.",
+    "placeholder": "Digite a Palavra-Chave..."
   },
+
+  "dados": {
+    "title": "Dados Pessoais",
+    "subtitle": "Preencha os dados para enriquecer sua devolutiva.",
+    "nome": "Nome completo",
+    "cidade": "Cidade",
+    "estado": "Estado",
+    "profissao": "Profissão / área",
+    "religiao": "Religião / espiritualidade",
+    "idade": "Faixa etária",
+    "idade1": "Até 17",
+    "idade2": "18 a 24",
+    "idade3": "25 a 34",
+    "idade4": "35 a 44",
+    "idade5": "45 a 59",
+    "idade6": "60+",
+    "estado_civil": "Estado civil",
+    "ec1": "Solteiro(a)",
+    "ec2": "Casado(a)",
+    "ec3": "Divorciado(a)",
+    "ec4": "Viúvo(a)",
+    "ec5": "Outro",
+    "filhos": "Filhos",
+    "filhos_nao": "Não",
+    "filhos_sim": "Sim",
+    "obs": "Algo importante que deseja compartilhar?"
+  },
+
   "guide": {
     "title": "Escolha seu guia",
     "subtitle": "Selecione quem irá acompanhar você nesta jornada."
   },
-  "data": {
-    "title": "Dados pessoais",
-    "subtitle": "Compartilhe algumas informações para enriquecer sua devolutiva.",
-    "name": "Nome completo",
-    "city": "Cidade",
-    "state": "Estado",
-    "profession": "Profissão",
-    "religion": "Religião",
-    "continue": "Continuar"
-  },
-  "selfie": {
-    "title": "Tire sua foto",
-    "instruction": "Afaste um pouco o celular e posicione seu rosto. Sua guia ou guia vai conduzir você.",
-    "preview": "Prévia",
-    "capture": "Capturar",
-    "start": "Iniciar",
-    "confirm": "Confirmar",
-    "skip": "Pular"
-  },
-  "card": {
-    "title": "Eu na Irmandade",
-    "name_placeholder": "Digite seu nome",
-    "button": "Continuar"
-  },
-  "feedback": {
-    "title": "Devolutiva do Guia"
-  },
-  "progress": {
-    "path": "Blocos: O Caminho",
-    "question": "Pergunta",
-    "total": "Total"
-  },
-  "blocks": {
-    "roots": "Bloco 1 — Raízes",
-    "reflections": "Bloco 2 — Reflexões",
-    "growth": "Bloco 3 — Crescimento",
-    "integration": "Bloco 4 — Integração",
-    "synthesis": "Bloco 5 — Síntese e Entrega"
-  },
-  "questions": {
-    "who_are_you_today": "Quem é você hoje?",
-    "what_brought_you_here": "O que trouxe você até esta jornada?",
-    "greatest_spiritual_dream": "Qual é o seu maior sonho espiritual?",
-    "current_challenges": "Quais são seus maiores desafios atuais?",
-    "fear_or_doubt": "Como você lida com o medo ou a dúvida?",
-    "meaning_of_light": "O que a luz significa para você?",
-    "what_to_change": "O que você quer mudar na sua vida?",
-    "who_inspires_you": "Quem inspira você e por quê?",
-    "practice_gratitude": "Como você pratica gratidão no dia a dia?",
-    "journey_lesson": "Qual lição você leva desta jornada?",
-    "future_application": "Como vai aplicar isso no seu futuro?",
-    "message_to_future_self": "Uma mensagem para seu eu do futuro.",
-    "essence_today": "Quem é você hoje, em uma frase de verdade?",
-    "next_step": "Qual será seu próximo passo de fé e coragem?"
-  },
-  "answers": {
-    "placeholder": "Digite sua resposta..."
-  },
+
   "final": {
-    "title": "Obrigado por percorrer este caminho com a Luz",
-    "message1": "Suas respostas foram recebidas com honra pela Irmandade.",
-    "message2": "Você plantou sementes de confiança, coragem e luz.",
-    "message3": "Continue caminhando. O caminho não termina aqui.",
-    "message4": "Volte quando precisar reacender sua chama.",
-    "message5": "Você é luz. Você é transformação.",
-    "pdf": "PDF",
-    "selfie_card": "Selfie Card",
-    "back": "Voltar",
-    "restart": "Enviar novamente"
-  },
-  "page": {
-    "title": "Jornada Essencial"
-  },
-  "footer": {
-    "copyright": "© 2025 Irmandade Conhecimento com Luz",
-    "tagline": "Irmandade Conhecimento com Luz"
+    "title": "Fim da Jornada",
+    "p1": "Suas respostas foram recebidas com honra pela Irmandade.",
+    "p2": "Você plantou sementes de confiança, coragem e luz.",
+    "p3": "Continue caminhando. A jornada nunca termina.",
+    "p4": "Volte quando precisar reacender sua chama.",
+    "p5": "Você é a luz. Você é a mudança.",
+    "pdf": "Baixar PDF",
+    "selfie": "Baixar SelfieCard",
+    "back": "Voltar ao Portal"
   }
 }
