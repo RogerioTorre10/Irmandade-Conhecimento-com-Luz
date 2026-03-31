@@ -347,7 +347,9 @@ section.selfie-page {
   60%  { transform: scale(1.05); filter: drop-shadow(0 0 26px var(--aura-gold)); }
   100% { transform: scale(1.00); filter: drop-shadow(0 0 14px var(--aura-gold)); }
 }
-
-  border-radius: 0 !important;
-  background: #000 !important;
+ 
+/* Ativa só para idiomas asiáticos */
+html[lang="ja-JP"],
+html[lang="zh-CN"] {
+  word-break: keep-all;
 }
