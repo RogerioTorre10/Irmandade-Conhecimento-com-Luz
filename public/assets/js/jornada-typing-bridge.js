@@ -473,17 +473,76 @@
    let __lastSpeakSig = '';
    let __lastSpeakAt = 0;
 
-  window.EffectCoordinator.speak = (text, options = {}) => {
+function getGuideSpeechTuning(guide, lang) {
+  const g = String(guide || 'lumen').toLowerCase();
+  const L = String(lang || 'pt-BR');
+
+  let baseRate = 1.0;
+  let basePitch = 1.0;
+
+  if (L.startsWith('zh')) {
+    baseRate = 0.92;
+    basePitch = 1.0;
+  } else if (L.startsWith('ja')) {
+    baseRate = 0.94;
+    basePitch = 1.0;
+  } else if (L.startsWith('fr')) {
+    baseRate = 0.98;
+    basePitch = 1.0;
+  } else if (L.startsWith('es')) {
+    baseRate = 0.99;
+    basePitch = 1.0;
+  } else if (L.startsWith('en')) {
+    baseRate = 1.0;
+    basePitch = 1.0;
+  } else {
+    baseRate = 1.0;
+    basePitch = 1.0;
+  }
+
+  if (g === 'zion') {
+    return {
+      rate: Math.max(0.88, baseRate - 0.06),
+      pitch: 0.82,
+      volume: 1.0
+    };
+  }
+
+  if (g === 'lumen') {
+    return {
+      rate: Math.min(1.08, baseRate + 0.03),
+      pitch: 1.14,
+      volume: 1.0
+    };
+  }
+
+  // arian / ariane
+  return {
+    rate: Math.max(0.90, baseRate - 0.02),
+    pitch: 0.96,
+    volume: 1.0
+  };
+}
+  
+window.EffectCoordinator = window.EffectCoordinator || {};
+
+let __lastSpeakSig = '';
+let __lastSpeakAt = 0;
+
+window.EffectCoordinator.speak = (text, options = {}) => {
   if (!text || !('speechSynthesis' in window)) return;
 
   const lang = getLangNow();
+  const guide = getGuideNow();
+  const tuning = getGuideSpeechTuning(guide, lang);
+
   const clean = String(text)
     .replace(/\s+/g, ' ')
     .trim();
 
   if (!clean) return;
 
-  const sig = `${lang}::${clean}`;
+  const sig = `${lang}::${guide}::${clean}`;
   const now = Date.now();
 
   if (sig === __lastSpeakSig && (now - __lastSpeakAt) < 1600) return;
@@ -494,15 +553,17 @@
 
   const utt = new SpeechSynthesisUtterance(clean);
   utt.lang = lang;
-  utt.rate = options.rate ?? (lang.startsWith('zh') ? 0.92 : 1.00);
-  utt.pitch = options.pitch ?? 1.0;
-  utt.volume = options.volume ?? 1.0;
+  utt.rate = options.rate ?? tuning.rate;
+  utt.pitch = options.pitch ?? tuning.pitch;
+  utt.volume = options.volume ?? tuning.volume;
 
   utt.onstart = () => {
     typingLog('TTS iniciou', {
       lang: utt.lang,
-      guide: getGuideNow(),
-      voice: utt.voice?.name || '(default)'
+      guide,
+      voice: utt.voice?.name || '(default)',
+      rate: utt.rate,
+      pitch: utt.pitch
     });
   };
 
@@ -518,7 +579,7 @@
     typingLog('TTS erro', {
       error: ev?.error || 'unknown',
       lang: utt.lang,
-      guide: getGuideNow(),
+      guide,
       voice: utt.voice?.name || '(default)'
     });
     try { window.Luz?.stopPulse(); } catch {}
