@@ -3,113 +3,106 @@
     "lang": "es-ES",
     "label": "Español"
   },
+
   "common": {
-    "welcome": "¡Bienvenido!",
-    "description": "Este es un sitio web increíble.",
-    "search": "Buscar...",
     "continue": "Continuar",
     "next": "Siguiente",
     "back": "Volver",
-    "speak": "Hablar",
-    "stop": "Detener",
     "loading": "Cargando..."
   },
+
   "site": {
     "title": "Jornada • Hermandad Conocimiento con Luz"
   },
+
   "intro": {
-    "title": "Jornada Esencial",
+    "title": "Jornada del Conocimiento",
     "start": "Comenzar",
-    "language": "Elige tu idioma"
+    "p1": "Buenos días.",
+    "p2": "Respeto y amor.",
+    "p3": "Caminemos en paz.",
+    "p4": "El amor es vida.",
+    "p5": "Alabado sea Dios."
   },
-  "terms": {
-    "title": "Términos y Condiciones",
-    "accept": "Acepto"
+
+  "terms1": {
+    "title": "Jornada",
+    "subtitle": "AVISO",
+    "description": "Esta jornada contiene reglas importantes.",
+    "li1": "Tus respuestas son confidenciales.",
+    "li2": "Al comenzar, aceptas los términos.",
+    "li3": "Se generará un PDF al final.",
+    "li4": "Después de comenzar, no hay reembolso.",
+    "li5": "El acceso está limitado al período definido.",
+    "li6": "15 días para iniciar.",
+    "li7": "24 horas para completar después de comenzar.",
+    "li8": "Recomendamos un ambiente tranquilo.",
+    "li9": "Prepara tu mente con intención positiva."
   },
+
+  "terms2": {
+    "title": "Términos de Responsabilidad",
+    "li1": "No hay garantía de resultados.",
+    "li2": "El autoconocimiento es un proceso personal.",
+    "li3": "Eres responsable de tus decisiones.",
+    "li4": "El apoyo emocional puede ser necesario.",
+    "li5": "El Guía IA actúa como mentor simbólico.",
+    "li6": "El guía no sustituye a profesionales.",
+    "li7": "Mantén responsabilidad sobre tus acciones.",
+    "li8": "La jornada es una experiencia interpretativa.",
+    "li9": "La privacidad es respetada.",
+    "li10": "Se requiere consentimiento consciente."
+  },
+
   "password": {
-    "title": "Acceso seguro",
-    "placeholder": "Introduce tu contraseña",
-    "button": "Continuar"
+    "title": "Introduce la Palabra Clave",
+    "p1": "La palabra clave es el secreto que abrirá tu jornada.",
+    "p2": "Elige con cuidado, ya que refleja tu intención.",
+    "p3": "¿Listo? Escríbela ahora y continúa.",
+    "placeholder": "Introduce tu palabra clave..."
   },
+
+  "dados": {
+    "title": "Datos Personales",
+    "subtitle": "Completa la información para enriquecer tu devolución.",
+    "nome": "Nombre completo",
+    "cidade": "Ciudad",
+    "estado": "Estado",
+    "profissao": "Profesión / área",
+    "religiao": "Religión / espiritualidad",
+    "idade": "Rango de edad",
+    "idade1": "Hasta 17",
+    "idade2": "18 a 24",
+    "idade3": "25 a 34",
+    "idade4": "35 a 44",
+    "idade5": "45 a 59",
+    "idade6": "60+",
+    "estado_civil": "Estado civil",
+    "ec1": "Soltero(a)",
+    "ec2": "Casado(a)",
+    "ec3": "Divorciado(a)",
+    "ec4": "Viudo(a)",
+    "ec5": "Otro",
+    "filhos": "Hijos",
+    "filhos_nao": "No",
+    "filhos_sim": "Sí",
+    "obs": "¿Algo importante que deseas compartir?"
+  },
+
   "guide": {
     "title": "Elige tu guía",
     "subtitle": "Selecciona quién te acompañará en esta jornada."
   },
-  "data": {
-    "title": "Datos personales",
-    "subtitle": "Comparte alguna información para enriquecer tu devolución.",
-    "name": "Nombre completo",
-    "city": "Ciudad",
-    "state": "Estado",
-    "profession": "Profesión",
-    "religion": "Religión",
-    "continue": "Continuar"
-  },
-  "selfie": {
-    "title": "Toma tu foto",
-    "instruction": "Aleja un poco el teléfono y coloca tu rostro. Tu guía te acompañará.",
-    "preview": "Vista previa",
-    "capture": "Capturar",
-    "start": "Iniciar",
-    "confirm": "Confirmar",
-    "skip": "Omitir"
-  },
-  "card": {
-    "title": "Yo en la Hermandad",
-    "name_placeholder": "Escribe tu nombre",
-    "button": "Continuar"
-  },
-  "feedback": {
-    "title": "Devolución del Guía"
-  },
-  "progress": {
-    "path": "Bloques: El Camino",
-    "question": "Pregunta",
-    "total": "Total"
-  },
-  "blocks": {
-    "roots": "Bloque 1 — Raíces",
-    "reflections": "Bloque 2 — Reflexiones",
-    "growth": "Bloque 3 — Crecimiento",
-    "integration": "Bloque 4 — Integración",
-    "synthesis": "Bloque 5 — Síntesis y Entrega"
-  },
-  "questions": {
-    "who_are_you_today": "¿Quién eres hoy?",
-    "what_brought_you_here": "¿Qué te trajo a esta jornada?",
-    "greatest_spiritual_dream": "¿Cuál es tu mayor sueño espiritual?",
-    "current_challenges": "¿Cuáles son tus mayores desafíos actuales?",
-    "fear_or_doubt": "¿Cómo lidias con el miedo o la duda?",
-    "meaning_of_light": "¿Qué significa la luz para ti?",
-    "what_to_change": "¿Qué quieres cambiar en tu vida?",
-    "who_inspires_you": "¿Quién te inspira y por qué?",
-    "practice_gratitude": "¿Cómo practicas la gratitud a diario?",
-    "journey_lesson": "¿Qué lección te llevas de esta jornada?",
-    "future_application": "¿Cómo aplicarás esto en tu futuro?",
-    "message_to_future_self": "Un mensaje para tu yo futuro.",
-    "essence_today": "¿Quién eres hoy, en una frase verdadera?",
-    "next_step": "¿Cuál será tu próximo paso de fe y valentía?"
-  },
-  "answers": {
-    "placeholder": "Escribe tu respuesta..."
-  },
+
   "final": {
-    "title": "Gracias por recorrer este camino con la Luz",
-    "message1": "Tus respuestas fueron recibidas con honor por la Hermandad.",
-    "message2": "Has sembrado semillas de confianza, valentía y luz.",
-    "message3": "Sigue caminando. El camino no termina aquí.",
-    "message4": "Vuelve cuando necesites reavivar tu llama.",
-    "message5": "Eres luz. Eres transformación.",
-    "pdf": "PDF",
-    "selfie_card": "Selfie Card",
-    "back": "Volver",
-    "restart": "Enviar de nuevo"
-  },
-  "page": {
-    "title": "Jornada Esencial"
-  },
-  "footer": {
-    "copyright": "© 2025 Hermandad Conocimiento con Luz",
-    "tagline": "Hermandad Conocimiento con Luz"
+    "title": "Fin de la Jornada",
+    "p1": "Tus respuestas fueron recibidas con honor por la Hermandad.",
+    "p2": "Has sembrado semillas de confianza, valentía y luz.",
+    "p3": "Sigue caminando. La jornada nunca termina.",
+    "p4": "Regresa cuando necesites reavivar tu llama.",
+    "p5": "Eres la luz. Eres el cambio.",
+    "pdf": "Descargar PDF",
+    "selfie": "Descargar SelfieCard",
+    "back": "Volver al Portal"
   }
 }
