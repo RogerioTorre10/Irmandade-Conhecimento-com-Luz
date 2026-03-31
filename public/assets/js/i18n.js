@@ -273,10 +273,8 @@
 
   const val = t(key, el.getAttribute('data-text') || key);
 
-  // sempre atualiza a fonte usada por typing/TTS
   el.setAttribute('data-text', val);
 
-  // se não estiver sendo digitado neste instante, sobrescreve o texto visível também
   if (!el.classList.contains('typing-active')) {
     el.textContent = val;
   }
