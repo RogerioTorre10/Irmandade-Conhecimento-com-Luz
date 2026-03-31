@@ -470,9 +470,6 @@
 
    window.EffectCoordinator = window.EffectCoordinator || {};
 
-   let __lastSpeakSig = '';
-   let __lastSpeakAt = 0;
-
 function getGuideSpeechTuning(guide, lang) {
   const g = String(guide || 'lumen').toLowerCase();
   const L = String(lang || 'pt-BR');
