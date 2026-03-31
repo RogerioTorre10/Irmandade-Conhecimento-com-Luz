@@ -331,8 +331,10 @@
 
     const val = t(key, el.getAttribute('data-text') || key);
 
+    // atualiza a fonte usada por typing/TTS
     el.setAttribute('data-text', val);
 
+    // atualiza o texto visível se não estiver em typing ativo
     if (!el.classList.contains('typing-active')) {
       el.textContent = val;
     }
@@ -341,7 +343,7 @@
   setHtmlLangAttrs();
   emit('i18n:applied', { lang: state.lang, root: ctx });
 }
-
+  
   async function setLang(lang, lock = false) {
     lang = normalizeLang((lang || '').trim());
     if (!lang || !SUPPORTED.includes(lang)) lang = DEFAULT;
