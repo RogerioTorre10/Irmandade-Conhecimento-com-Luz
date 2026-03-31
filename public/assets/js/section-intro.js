@@ -57,6 +57,7 @@
           <option value="en-US">English (US)</option>
           <option value="es-ES">Español (ES)</option>
           <option value="fr-FR">Français (FR)</option>
+          <option value="ja-JP">日本語  (日本)</option>
           <option value="zh-CN">中文（简体）</option>
         </select>
       </div>
