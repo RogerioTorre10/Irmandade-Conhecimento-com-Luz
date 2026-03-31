@@ -618,13 +618,15 @@ window.EffectCoordinator.speak = (text, options = {}) => {
 
   if ('speechSynthesis' in window) {
     const lang = getLangNow();
+    const guide = getGuideNow();
+    const tuning = getGuideSpeechTuning(guide, lang);
     const clean = String(text).replace(/\s+/g, ' ').trim();
     const utt = new SpeechSynthesisUtterance(clean);
 
     utt.lang = lang;
-    utt.rate = lang.startsWith('zh') ? 0.90 : 0.95;
-    utt.pitch = 1.0;
-    utt.volume = 1.0;
+    utt.rate = tuning.rate;
+    utt.pitch = tuning.pitch;
+    utt.volume = tuning.volume;
 
     utt.onstart = () => {
       typingLog('typeAndSpeak iniciou', {
