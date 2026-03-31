@@ -62,20 +62,6 @@
     "placeholder": "Digite a Palavra-Chave..."
   },
 
-  "selfie": {
-   "title": "Tirar sua foto",
-   "instruction": "Afaste um pouco o celular e posicione seu rosto. Sua guia ou guia vai conduzir você.",
-   "preview": "Prévia",
-   "capture": "Capturar",
-   "start": "Iniciar",
-   "confirm": "Confirmar",
-   "skip": "Sem foto",
-   "zoom": "Zoom Geral",
-   "horizontal": "Horizontal",
-   "vertical": "Vertical",
-   "error": "Não foi possível acessar a câmera. Verifique as permissões."
-  }
-
   "dados": {
     "title": "Dados Pessoais",
     "subtitle": "Preencha os dados para enriquecer sua devolutiva.",
@@ -106,6 +92,20 @@
   "guide": {
     "title": "Escolha seu guia",
     "subtitle": "Selecione quem irá acompanhar você nesta jornada."
+  },
+
+  "selfie": {
+    "title": "Tirar sua foto",
+    "instruction": "Afaste um pouco o celular e posicione seu rosto. Sua guia ou guia vai conduzir você.",
+    "preview": "Prévia",
+    "capture": "Capturar",
+    "start": "Iniciar",
+    "confirm": "Confirmar",
+    "skip": "Sem foto",
+    "zoom": "Zoom Geral",
+    "horizontal": "Horizontal",
+    "vertical": "Vertical",
+    "error": "Não foi possível acessar a câmera. Verifique as permissões."
   },
 
   "final": {
