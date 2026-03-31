@@ -3,117 +3,106 @@
     "lang": "en-US",
     "label": "English (US)"
   },
+
   "common": {
-    "welcome": "Welcome!",
-    "description": "This is an amazing website.",
-    "search": "Search...",
     "continue": "Continue",
     "next": "Next",
     "back": "Back",
-    "speak": "Speak",
-    "stop": "Stop",
     "loading": "Loading..."
   },
+
   "site": {
     "title": "Journey • Brotherhood Knowledge with Light"
   },
+
   "intro": {
-  "title": "Journey of Knowledge",
-  "start": "Start",
-  "p1": "Good morning.",
-  "p2": "Respect and love.",
-  "p3": "Let us go in peace.",
-  "p4": "Love and life.",
-  "p5": "Praise be to God."
+    "title": "Journey of Knowledge",
+    "start": "Start",
+    "p1": "Good morning.",
+    "p2": "Respect and love.",
+    "p3": "Let us go in peace.",
+    "p4": "Love is life.",
+    "p5": "Praise be to God."
   },
-  "terms": {
-    "title": "Terms and Conditions",
-    "accept": "I accept"
+
+  "terms1": {
+    "title": "Journey",
+    "subtitle": "NOTICE",
+    "description": "This journey contains important rules.",
+    "li1": "Your answers are confidential.",
+    "li2": "By starting, you accept the terms.",
+    "li3": "A PDF will be generated at the end.",
+    "li4": "After starting, refunds are not available.",
+    "li5": "Access is limited to the defined period.",
+    "li6": "15 days to start.",
+    "li7": "24 hours to complete after starting.",
+    "li8": "We recommend a quiet environment.",
+    "li9": "Prepare your mind with positive intention."
   },
+
+  "terms2": {
+    "title": "Responsibility Terms",
+    "li1": "No guarantee of results.",
+    "li2": "Self-knowledge is a personal process.",
+    "li3": "You are responsible for your choices.",
+    "li4": "Emotional support may be necessary.",
+    "li5": "AI Guide acts as a symbolic mentor.",
+    "li6": "The guide does not replace professionals.",
+    "li7": "Maintain responsibility for your actions.",
+    "li8": "The journey is an interpretative experience.",
+    "li9": "Privacy is respected.",
+    "li10": "Conscious consent is required."
+  },
+
   "password": {
-    "title": "Secure access",
-    "placeholder": "Enter your password",
-    "button": "Continue"
+    "title": "Enter the Keyword",
+    "p1": "The keyword is the secret that will open your journey.",
+    "p2": "Choose carefully, as it reflects your intention.",
+    "p3": "Ready? Type it now and proceed.",
+    "placeholder": "Enter your keyword..."
   },
+
+  "dados": {
+    "title": "Personal Data",
+    "subtitle": "Fill in the information to enrich your feedback.",
+    "nome": "Full name",
+    "cidade": "City",
+    "estado": "State",
+    "profissao": "Profession / field",
+    "religiao": "Religion / spirituality",
+    "idade": "Age range",
+    "idade1": "Up to 17",
+    "idade2": "18 to 24",
+    "idade3": "25 to 34",
+    "idade4": "35 to 44",
+    "idade5": "45 to 59",
+    "idade6": "60+",
+    "estado_civil": "Marital status",
+    "ec1": "Single",
+    "ec2": "Married",
+    "ec3": "Divorced",
+    "ec4": "Widowed",
+    "ec5": "Other",
+    "filhos": "Children",
+    "filhos_nao": "No",
+    "filhos_sim": "Yes",
+    "obs": "Anything important you'd like to share?"
+  },
+
   "guide": {
     "title": "Choose your guide",
     "subtitle": "Select who will accompany you on this journey."
   },
-  "data": {
-    "title": "Personal data",
-    "subtitle": "Share some information to enrich your feedback.",
-    "name": "Full name",
-    "city": "City",
-    "state": "State",
-    "profession": "Profession",
-    "religion": "Religion",
-    "continue": "Continue"
-  },
-  "selfie": {
-    "title": "Take your photo",
-    "instruction": "Move the phone slightly away and position your face. Your guide will lead you.",
-    "preview": "Preview",
-    "capture": "Capture",
-    "start": "Start",
-    "confirm": "Confirm",
-    "skip": "Skip"
-  },
-  "card": {
-    "title": "Me in the Brotherhood",
-    "name_placeholder": "Enter your name",
-    "button": "Continue"
-  },
-  "feedback": {
-    "title": "Guide Feedback"
-  },
-  "progress": {
-    "path": "Blocks: The Path",
-    "question": "Question",
-    "total": "Total"
-  },
-  "blocks": {
-    "roots": "Block 1 — Roots",
-    "reflections": "Block 2 — Reflections",
-    "growth": "Block 3 — Growth",
-    "integration": "Block 4 — Integration",
-    "synthesis": "Block 5 — Synthesis and Delivery"
-  },
-  "questions": {
-    "who_are_you_today": "Who are you today?",
-    "what_brought_you_here": "What brought you to this journey?",
-    "greatest_spiritual_dream": "What is your greatest spiritual dream?",
-    "current_challenges": "What are your biggest current challenges?",
-    "fear_or_doubt": "How do you deal with fear or doubt?",
-    "meaning_of_light": "What does light mean to you?",
-    "what_to_change": "What do you want to change in your life?",
-    "who_inspires_you": "Who inspires you and why?",
-    "practice_gratitude": "How do you practice gratitude daily?",
-    "journey_lesson": "What lesson do you take from this journey?",
-    "future_application": "How will you apply this in your future?",
-    "message_to_future_self": "A message for your future self.",
-    "essence_today": "Who are you today, in one true sentence?",
-    "next_step": "What will be your next step of faith and courage?"
-  },
-  "answers": {
-    "placeholder": "Type your answer..."
-  },
+
   "final": {
-    "title": "Thank you for walking this path with the Light",
-    "message1": "Your answers were received with honor by the Brotherhood.",
-    "message2": "You planted seeds of trust, courage, and light.",
-    "message3": "Keep walking. The journey does not end here.",
-    "message4": "Return whenever you need to rekindle your flame.",
-    "message5": "You are light. You are transformation.",
-    "pdf": "PDF",
-    "selfie_card": "Selfie Card",
-    "back": "Back",
-    "restart": "Submit again"
-  },
-  "page": {
-    "title": "Essential Journey"
-  },
-  "footer": {
-    "copyright": "© 2025 Brotherhood Knowledge with Light",
-    "tagline": "Brotherhood Knowledge with Light"
+    "title": "End of the Journey",
+    "p1": "Your answers were received with honor by the Brotherhood.",
+    "p2": "You have planted seeds of trust, courage, and light.",
+    "p3": "Keep walking. The journey never ends.",
+    "p4": "Return whenever you need to reignite your flame.",
+    "p5": "You are the light. You are the change.",
+    "pdf": "Download PDF",
+    "selfie": "Download SelfieCard",
+    "back": "Back to Portal"
   }
 }
