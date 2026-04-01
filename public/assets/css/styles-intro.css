@@ -86,6 +86,15 @@
   transition: opacity .25s ease;
 }
 
+#section-intro .parchment-text-rough.typing-done,
+#section-intro .parchment-text-rough.type-done,
+#section-intro .intro-title.typing-done,
+#section-intro .intro-title.type-done {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+}
+
 #section-intro .parchment-actions-rough {
   display: flex;
   justify-content: center;
