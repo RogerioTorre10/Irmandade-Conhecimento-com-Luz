@@ -1,8 +1,8 @@
-/* i18n.js — blindado global 5 idiomas + trava na intro + cache + fallback */
+/* i18n.js — blindado global 6 idiomas + trava na intro + cache + fallback */
 (function (window) {
   'use strict';
 
-  if (window.__i18nReadyShim) return; // evita dupla carga
+  if (window.__i18nReadyShim) return;
   window.__i18nReadyShim = true;
 
   const MOD = 'i18n.js';
@@ -10,12 +10,8 @@
   const STORAGE_KEY = 'i18n_lang';
   const LOCK_KEY = 'i18n_locked';
   const DEFAULT = 'pt-BR';
-  const SUPPORTED = ['pt-BR', 'en-US', 'es-ES', 'fr-FR', 'zh-CN'];
+  const SUPPORTED = ['pt-BR', 'en-US', 'es-ES', 'fr-FR', 'ja-JP', 'zh-CN'];
 
-  // Forçar idioma via:
-  // - JORNADA_CFG.LANG
-  // - data-lang no <html>
-  // - __FORCE_LANG
   const FORCE_LANG =
     (window.JORNADA_CFG && window.JORNADA_CFG.LANG) ||
     (document.documentElement && document.documentElement.getAttribute('data-lang')) ||
@@ -29,11 +25,9 @@
     _langPromise: null
   };
 
-  // Cache GLOBAL (compartilhado mesmo se o script for carregado 2x por engano)
   window.__I18N_DICT_CACHE__ = window.__I18N_DICT_CACHE__ || {};
   const DICT_CACHE = window.__I18N_DICT_CACHE__;
 
-  // Latch de logs por idioma
   window.__I18N_READY_LOGGED__ = window.__I18N_READY_LOGGED__ || {};
 
   function log() {
@@ -70,6 +64,9 @@
       'fr-fr': 'fr-FR',
       'fr-ca': 'fr-FR',
 
+      ja: 'ja-JP',
+      'ja-jp': 'ja-JP',
+
       zh: 'zh-CN',
       'zh-cn': 'zh-CN',
       'zh-hans': 'zh-CN',
@@ -85,6 +82,7 @@
     if (lower.startsWith('en')) return 'en-US';
     if (lower.startsWith('es')) return 'es-ES';
     if (lower.startsWith('fr')) return 'fr-FR';
+    if (lower.startsWith('ja')) return 'ja-JP';
     if (lower.startsWith('zh')) return 'zh-CN';
 
     return DEFAULT;
@@ -136,7 +134,6 @@
   }
 
   function detectLang() {
-    // Se já está travado, ignora tudo e usa o armazenado
     if (isLocked()) {
       const lockedStored = getStoredLang();
       if (lockedStored && SUPPORTED.includes(lockedStored)) return lockedStored;
@@ -221,7 +218,7 @@
     } catch (e) {
       err('Erro no init:', e);
       state.dict = {};
-      state.ready = true; // continua rodando mesmo sem dict
+      state.ready = true;
       setHtmlLangAttrs();
       emit('i18n:ready', { lang: state.lang, degraded: true });
     }
@@ -230,10 +227,8 @@
   function t(key, fallbackOrOpts) {
     if (!key) return '';
 
-    // Tenta no idioma atual, com suporte a caminho profundo: common.continue
     let val = getByPath(state.dict, key);
 
-    // fallback opcional se existir bloco "translations" ou "messages"
     if (val == null && state.dict && typeof state.dict === 'object') {
       val = getByPath(state.dict.translations, key);
     }
@@ -267,49 +262,14 @@
     } catch (_) {}
   }
 
-function applyTextContent(ctx) {
-  ctx.querySelectorAll('[data-i18n]').forEach((el) => {
-    const key = el.getAttribute('data-i18n');
-    if (!key) return;
-    el.textContent = t(key, el.textContent || key);
-  });
-}
+  function applyTextContent(ctx) {
+    ctx.querySelectorAll('[data-i18n]').forEach((el) => {
+      const key = el.getAttribute('data-i18n');
+      if (!key) return;
+      el.textContent = t(key, el.textContent || key);
+    });
+  }
 
-function applyPlaceholders(ctx) {
-  ctx.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
-    const key = el.getAttribute('data-i18n-placeholder');
-    if (!key) return;
-    const val = t(key, el.getAttribute('placeholder') || key);
-    el.setAttribute('placeholder', val);
-  });
-}
-
-function applyTitles(ctx) {
-  ctx.querySelectorAll('[data-i18n-title]').forEach((el) => {
-    const key = el.getAttribute('data-i18n-title');
-    if (!key) return;
-    const val = t(key, el.getAttribute('title') || key);
-    el.setAttribute('title', val);
-  });
-}
-
-function applyValues(ctx) {
-  ctx.querySelectorAll('[data-i18n-value]').forEach((el) => {
-    const key = el.getAttribute('data-i18n-value');
-    if (!key) return;
-    const val = t(key, el.value || key);
-    el.value = val;
-  });
-}
-
-function applyHtml(ctx) {
-  ctx.querySelectorAll('[data-i18n-html]').forEach((el) => {
-    const key = el.getAttribute('data-i18n-html');
-    if (!key) return;
-    el.innerHTML = t(key, el.innerHTML || key);
-  });
-}
-  
   function applyPlaceholders(ctx) {
     ctx.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
       const key = el.getAttribute('data-i18n-placeholder');
@@ -345,62 +305,59 @@ function applyHtml(ctx) {
     });
   }
 
- function apply(root) {
-  const ctx = root || document;
-  if (!ctx || !ctx.querySelectorAll) return;
+  function apply(root) {
+    const ctx = root || document;
+    if (!ctx || !ctx.querySelectorAll) return;
 
-  applyTextContent(ctx);
-  applyPlaceholders(ctx);
-  applyTitles(ctx);
-  applyValues(ctx);
-  applyHtml(ctx);
+    applyTextContent(ctx);
+    applyPlaceholders(ctx);
+    applyTitles(ctx);
+    applyValues(ctx);
+    applyHtml(ctx);
 
-  ctx.querySelectorAll('[data-i18n-text]').forEach((el) => {
-    const key = el.getAttribute('data-i18n-text');
-    if (!key) return;
+    ctx.querySelectorAll('[data-i18n-text]').forEach((el) => {
+      const key = el.getAttribute('data-i18n-text');
+      if (!key) return;
 
-    const val = t(key, el.getAttribute('data-text') || key);
-    el.setAttribute('data-text', val);
+      const val = t(key, el.getAttribute('data-text') || key);
+      el.setAttribute('data-text', val);
 
-  if (
-   !el.classList.contains('typing-active') &&
-   !el.hasAttribute('data-typing')
-) {
-   el.textContent = val;
-}
-  });
+      if (
+        !el.classList.contains('typing-active') &&
+        !el.hasAttribute('data-typing')
+      ) {
+        el.textContent = val;
+      }
+    });
 
-  setHtmlLangAttrs();
-  emit('i18n:applied', { lang: state.lang, root: ctx });
-}
-  
+    setHtmlLangAttrs();
+    emit('i18n:applied', { lang: state.lang, root: ctx });
+  }
+
   async function setLang(lang, lock = false) {
     lang = normalizeLang((lang || '').trim());
     if (!lang || !SUPPORTED.includes(lang)) lang = DEFAULT;
 
-    // Se existe uma troca em andamento, reaproveita
     if (state._langPromise) return state._langPromise;
 
     state._langPromise = (async () => {
-      // 🔥 PERMITE TROCA DURANTE INTRO
-    if (isLocked()) {
-    const introOpen = window.__LANG_MODAL_OPEN__ === true;
+      if (isLocked()) {
+        const introOpen = window.__LANG_MODAL_OPEN__ === true;
 
-     if (!introOpen) {
-     const lockedLang = getStoredLang() || state.lang || DEFAULT;
+        if (!introOpen) {
+          const lockedLang = getStoredLang() || state.lang || DEFAULT;
 
-    if (lockedLang !== lang) {
-      log('Idioma travado permanentemente:', lockedLang);
-      state.lang = lockedLang;
-      setHtmlLangAttrs();
-      return lockedLang;
-    }
-  } else {
-    log('Troca permitida durante seleção de idioma:', lang);
-  }
-}
+          if (lockedLang !== lang) {
+            log('Idioma travado permanentemente:', lockedLang);
+            state.lang = lockedLang;
+            setHtmlLangAttrs();
+            return lockedLang;
+          }
+        } else {
+          log('Troca permitida durante seleção de idioma:', lang);
+        }
+      }
 
-      // Se já está pronto e é o mesmo idioma, apenas reforça attrs
       if (state.ready && state.lang === lang) {
         setStoredLang(lang);
 
@@ -469,7 +426,6 @@ function applyHtml(ctx) {
     emit('i18n:unlocked', { lang: state.lang });
   }
 
-  // Desabilita qualquer seletor de idioma que exista no DOM
   function disableAllLangSelectors() {
     if (!isLocked()) return;
 
@@ -484,11 +440,10 @@ function applyHtml(ctx) {
         cls.includes('lang') || cls.includes('idioma') ||
         name.includes('lang') || name.includes('idioma') ||
         txt.includes('portugu') || txt.includes('english') ||
-        txt.includes('españ') || txt.includes('franç') || txt.includes('中文');
+        txt.includes('españ') || txt.includes('franç') ||
+        txt.includes('中文') || txt.includes('日本語');
 
       if (!looksLikeLangSelector) return;
-
-      // Não desabilita elemento explicitamente liberado
       if (el.hasAttribute('data-i18n-allow-locked')) return;
 
       if (el.tagName === 'SELECT' || el.type === 'button' || el.type === 'radio') {
@@ -535,7 +490,6 @@ function applyHtml(ctx) {
 
   window.i18n = api;
 
-  // Helper global para trocar idioma
   window.JORNADA_setLang = async function (lang, lock = false) {
     try {
       if (!window.i18n) return;
@@ -546,7 +500,6 @@ function applyHtml(ctx) {
     }
   };
 
-  // Autoinit
   document.addEventListener('DOMContentLoaded', async () => {
     try {
       await init(FORCE_LANG || undefined);
