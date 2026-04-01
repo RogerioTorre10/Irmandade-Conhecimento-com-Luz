@@ -288,7 +288,7 @@
   });
 }
  
-  async function runTyping(root) {
+ async function runTyping(root) {
   if (!root) return;
 
   const items = Array.from(
@@ -300,36 +300,74 @@
     if (!txt.trim()) continue;
 
     // limpa estado antigo
-    el.classList.remove('typing-done');
-    el.classList.add('typing-active');
+    el.classList.remove('typing-done', 'type-done', 'typing-active');
     el.textContent = '';
+    el.style.opacity = '1';
+    el.style.visibility = 'visible';
+    el.style.display = '';
 
     try {
       delete el.dataset.typingDone;
       delete el.dataset.typingSig;
     } catch {}
 
-    if (typeof window.runTyping === 'function') {
-  await new Promise((resolve) => {
-    try {
-      window.runTyping(el, txt, () => resolve(), {
-        speed: Number(el.dataset.speed || 45),
-        cursor: String(el.dataset.cursor || 'false') === 'true'
+    const speed = Number(el.dataset.speed || 45);
+
+    if (typeof window.typeAndSpeak === 'function') {
+      try {
+        el.classList.add('typing-active');
+        await window.typeAndSpeak(el, txt, speed);
+      } catch (e) {
+        console.warn('[INTRO] typeAndSpeak falhou, fallback para runTyping:', e);
+
+        if (typeof window.runTyping === 'function') {
+          await new Promise((resolve) => {
+            try {
+              window.runTyping(el, txt, () => resolve(), {
+                speed,
+                cursor: String(el.dataset.cursor || 'false') === 'true'
+              });
+            } catch (err) {
+              console.warn('[INTRO] runTyping falhou, fallback local:', err);
+              resolve();
+            }
+          });
+        } else {
+          for (let i = 0; i < txt.length; i++) {
+            el.textContent += txt.charAt(i);
+            await new Promise(r => setTimeout(r, speed));
+          }
+        }
+      }
+    } else if (typeof window.runTyping === 'function') {
+      await new Promise((resolve) => {
+        try {
+          el.classList.add('typing-active');
+          window.runTyping(el, txt, () => resolve(), {
+            speed,
+            cursor: String(el.dataset.cursor || 'false') === 'true'
+          });
+        } catch (e) {
+          console.warn('[INTRO] runTyping falhou, fallback local:', e);
+          resolve();
+        }
       });
-    } catch (e) {
-      console.warn('[INTRO] runTyping falhou, fallback local:', e);
-      resolve();
+    } else {
+      el.classList.add('typing-active');
+      for (let i = 0; i < txt.length; i++) {
+        el.textContent += txt.charAt(i);
+        await new Promise(r => setTimeout(r, speed));
+      }
     }
-  });
-} else {
-  // fallback simples
-  for (let i = 0; i < txt.length; i++) {
-    el.textContent += txt.charAt(i);
-    await new Promise(r => setTimeout(r, Number(el.dataset.speed || 45)));
-  }
-}
+
+    // força permanência visual do texto após digitar/falar
+    el.textContent = txt;
+    el.setAttribute('data-text', txt);
     el.classList.remove('typing-active');
-    el.classList.add('typing-done');
+    el.classList.add('typing-done', 'type-done');
+    el.style.opacity = '1';
+    el.style.visibility = 'visible';
+    el.style.display = 'block';
   }
 
   const btn =
@@ -346,7 +384,7 @@
   btn.removeAttribute('disabled');
   btn.classList.remove('is-hidden');
 
-   btn.onclick = () => {
+  btn.onclick = () => {
     try { window.speechSynthesis?.cancel?.(); } catch {}
 
     if (typeof window.playTransitionVideo === 'function') {
