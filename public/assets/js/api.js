@@ -95,7 +95,7 @@
       signal: controller.signal
     });
 
-    const contentType = res.headers.get('content-type') || '';
+    const contentType = (res.headers.get('content-type') || '').toLowerCase();
 
     if (!res.ok) {
       const txt = await res.text().catch(() => '');
@@ -108,13 +108,16 @@
 
     if (contentType.includes('application/json')) {
       return { data: await res.json(), response: res };
-    } catch (err) {
+    }
+
+    return { data: await res.blob(), response: res };
+  } catch (err) {
     console.error('[API] postJSON erro:', err);
     throw err;
   } finally {
     clearTimeout(timer);
   }
-}   
+}
 
   function resetJornadaCompleta() {
     try {
