@@ -88,7 +88,9 @@
   try {
     const res = await fetch(`${base}${path}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify(payload),
       signal: controller.signal
     });
@@ -100,7 +102,6 @@
       throw new Error(`HTTP ${res.status}${txt ? ` - ${txt.slice(0, 180)}` : ''}`);
     }
 
-    // 🔥 AQUI É O SEGREDO DO PDF FUNCIONAR
     if (contentType.includes('application/pdf')) {
       return { data: await res.blob(), response: res };
     }
@@ -109,9 +110,11 @@
       return { data: await res.json(), response: res };
     }
 
-    // fallback
     return { data: await res.blob(), response: res };
 
+  } catch (err) {
+    console.error('[API] postJSON erro:', err);
+    throw err;
   } finally {
     clearTimeout(timer);
   }
