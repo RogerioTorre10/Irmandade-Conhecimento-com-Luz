@@ -113,7 +113,17 @@
 #section-final .final-wrap,
 #section-final .final-panel,
 #section-final .j-arcane-card {
-  overflow: visible !important;
+  overflow: hidden !important;
+}
+
+.final-message,
+.final-devolutiva-box,
+#finalGuideFeedback,
+#final-message-box {
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 42vh;
+  scrollbar-width: thin;
 }
 
 /* ===== DESKTOP LARGO (≥ 901px) =====
