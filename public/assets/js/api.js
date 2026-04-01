@@ -39,11 +39,21 @@
   }
 
   const API_PRIMARY = pickApiBase();
-  const PDF_PATHS = ['/jornada/essencial/pdf'];
+  const PDF_PATHS = [
+  '/jornada/essencial/pdf',
+  '/jornada-essencial/pdf',
+  '/pdf',
+  '/gerar-pdf'
+ ];
 
   function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
+
+  if (data instanceof Blob && data.size > 1000) {
+  triggerDownload(data, fname);
+  return { ok: true, via: 'blob' };
+ }
 
   function triggerDownload(blob, filename) {
     const url = URL.createObjectURL(blob);
