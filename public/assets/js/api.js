@@ -267,8 +267,8 @@
     return p;
   }
 
-  async function gerarPDFHQ(payload) {
-  const safePayload = sanitizePdfPayload(payload);
+  async function gerarPDFEHQ(payload) {
+  const safePayload = payload || {};
 
   const fileName =
     (safePayload.nome || 'jornada')
@@ -278,22 +278,37 @@
 
   const fname = `${fileName}-${new Date().toISOString().slice(0, 10)}.pdf`;
 
+  const PDF_PATHS = [
+    '/jornada/essencial/pdf',
+    '/jornada-essencial/pdf',
+    '/pdf',
+    '/gerar-pdf'
+  ];
+
   for (const path of PDF_PATHS) {
     try {
       const { data } = await postJSON(API_PRIMARY, path, safePayload, 60000);
 
-      if (data instanceof Blob && data.size > 1000) {
-        triggerDownload(data, fname);
-        return { ok: true, via: 'blob' };
+      if (data instanceof Blob) {
+        const url = URL.createObjectURL(data);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fname;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 2000);
+
+        return { ok: true };
       }
 
       if (data && data.url) {
         window.open(data.url, '_blank');
-        return { ok: true, via: 'url' };
+        return { ok: true };
       }
+
     } catch (e) {
-      console.warn('[API] tentativa falhou', e);
-      await sleep(200);
+      console.warn('[PDF] tentativa falhou:', path);
     }
   }
 
