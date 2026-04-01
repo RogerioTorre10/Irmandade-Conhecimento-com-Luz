@@ -151,7 +151,7 @@
       border: none;
       border-radius: 12px;
       background: url('/assets/img/textura-de-pedra.jpg') center/cover;
-      color: #111;
+      color: #FFFFFF;
       box-shadow: 0 4px 15px rgba(0,0,0,0.6);
       transition: all 0.25s ease;
       cursor: pointer !important;
