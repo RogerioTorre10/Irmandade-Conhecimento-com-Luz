@@ -397,7 +397,6 @@
         location.hash = '#' + NEXT_SECTION_ID;
       }
     };
-  }
 
   async function init(root) {
     if (window.JCIntro.state.initialized) return;
