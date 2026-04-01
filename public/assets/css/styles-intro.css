@@ -172,15 +172,21 @@
   outline-offset: 6px;
   box-shadow:
     0 0 0 2px rgba(255, 204, 102, 0.15) inset,
-    0 0 22px rgba(255, 204, 102, 0.40),
-    0 0 40px rgba(255, 153, 0, 0.25);
-  animation: parchmentGlow 1.8s ease-in-out infinite;
+    0 0 22px rgba(255, 204, 102, 0.45),
+    0 0 48px rgba(255, 153, 0, 0.35);  
+  animation: parchmentGlow 1.6s ease-in-out infinite;
 }
 
 #section-intro:not(:has(.typing-active)) .parchment-inner-rough {
   transition: box-shadow .35s ease, outline-color .35s ease;
 }
 
+#section-intro .typing-active {
+  text-shadow:
+    0 0 6px rgba(255, 230, 120, 0.85),
+    0 0 14px rgba(120, 255, 210, 0.45),
+    0 0 24px rgba(120, 255, 210, 0.25);
+}
 
 /* ============================
    UTILITÁRIOS (usados pelo JS)
