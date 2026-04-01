@@ -108,33 +108,13 @@
 
     if (contentType.includes('application/json')) {
       return { data: await res.json(), response: res };
-    }
-
-    return { data: await res.blob(), response: res };
-
-  } catch (err) {
+    } catch (err) {
     console.error('[API] postJSON erro:', err);
     throw err;
   } finally {
     clearTimeout(timer);
   }
-}
-
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
-      }
-
-      if (isPdf(res)) {
-        return { data: await res.blob() };
-      }
-
-      return { data: await res.json() };
-
-    } catch (e) {
-      clearTimeout(timer);
-      throw e;
-    }
-  }
+}   
 
   function resetJornadaCompleta() {
     try {
@@ -384,4 +364,5 @@
 
   console.log('[API] BLINDADO OK →', API_PRIMARY);
 
+  
 })();
