@@ -311,7 +311,7 @@
       delete el.dataset.typingSig;
     } catch {}
 
-    const speed = Number(el.dataset.speed || 45);
+    const speed = Number(el.dataset.speed || 60);
 
     if (typeof window.typeAndSpeak === 'function') {
       try {
