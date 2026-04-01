@@ -48,12 +48,7 @@
 
   function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
-  if (data instanceof Blob && data.size > 1000) {
-  triggerDownload(data, fname);
-  return { ok: true, via: 'blob' };
- }
+  }  
 
   function triggerDownload(blob, filename) {
     const url = URL.createObjectURL(blob);
@@ -264,39 +259,38 @@
     return p;
   }
 
-  async function gerarPDFEHQ(payload) {
-    const safePayload = sanitizePdfPayload(payload);
+  async function gerarPDFHQ(payload) {
+  const safePayload = sanitizePdfPayload(payload);
 
-    const fileName =
-      (safePayload.nome || 'jornada')
-        .toString()
-        .replace(/[^\p{L}\p{N}_-]+/gu, '_')
-        .slice(0, 40);
+  const fileName =
+    (safePayload.nome || 'jornada')
+      .toString()
+      .replace(/[^\p{L}\p{N}_-]+/gu, '_')
+      .slice(0, 40);
 
-    const fname = `${fileName}-${new Date().toISOString().slice(0, 10)}.pdf`;
+  const fname = `${fileName}-${new Date().toISOString().slice(0, 10)}.pdf`;
 
-    for (const path of PDF_PATHS) {
-      try {
-        const { data } = await postJSON(API_PRIMARY, path, safePayload, 60000);
+  for (const path of PDF_PATHS) {
+    try {
+      const { data } = await postJSON(API_PRIMARY, path, safePayload, 60000);
 
-        if (data instanceof Blob) {
-          triggerDownload(data, fname);
-          return { ok: true, via: 'blob' };
-        }
-
-        if (data && data.url) {
-          window.open(data.url, '_blank');
-          return { ok: true, via: 'url' };
-        }
-
-      } catch (e) {
-        console.warn('[API] tentativa falhou', e);
-        await sleep(200);
+      if (data instanceof Blob && data.size > 1000) {
+        triggerDownload(data, fname);
+        return { ok: true, via: 'blob' };
       }
-    }
 
-    return { ok: false };
+      if (data && data.url) {
+        window.open(data.url, '_blank');
+        return { ok: true, via: 'url' };
+      }
+    } catch (e) {
+      console.warn('[API] tentativa falhou', e);
+      await sleep(200);
+    }
   }
+
+  return { ok: false };
+}
 
   async function gerarDevolutivaBase(payload, path) {
     try {
