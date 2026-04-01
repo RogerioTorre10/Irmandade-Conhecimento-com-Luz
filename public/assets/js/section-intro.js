@@ -310,25 +310,24 @@
     } catch {}
 
     if (typeof window.runTyping === 'function') {
-      await new Promise((resolve) => {
-        try {
-          window.runTyping(el, txt, () => resolve(), {
-            speed: Number(el.dataset.speed || 20),
-            cursor: String(el.dataset.cursor || 'false') === 'true'
-          });
-        } catch (e) {
-          console.warn('[INTRO] runTyping falhou, fallback local:', e);
-          resolve();
-        }
+  await new Promise((resolve) => {
+    try {
+      window.runTyping(el, txt, () => resolve(), {
+        speed: Number(el.dataset.speed || 45),
+        cursor: String(el.dataset.cursor || 'false') === 'true'
       });
-    } else {
-      // fallback simples
-      for (let i = 0; i < txt.length; i++) {
-        el.textContent += txt.charAt(i);
-        await new Promise(r => setTimeout(r, Number(el.dataset.speed || 20)));
-      }
+    } catch (e) {
+      console.warn('[INTRO] runTyping falhou, fallback local:', e);
+      resolve();
     }
-
+  });
+} else {
+  // fallback simples
+  for (let i = 0; i < txt.length; i++) {
+    el.textContent += txt.charAt(i);
+    await new Promise(r => setTimeout(r, Number(el.dataset.speed || 45)));
+  }
+}
     el.classList.remove('typing-active');
     el.classList.add('typing-done');
   }
