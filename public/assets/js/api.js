@@ -81,19 +81,41 @@
     try { sessionStorage.removeItem(key); } catch (_) {}
   }
 
-  async function postJSON(base, path, body, timeout = 60000) {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeout);
+  async function postJSON(base, path, payload, timeout = 30000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeout);
 
-    try {
-      const res = await fetch(base + path, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json; charset=UTF-8'},
-        body: JSON.stringify(ensureUTF8(body || {})),
-        signal: controller.signal
-      });
+  try {
+    const res = await fetch(`${base}${path}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: controller.signal
+    });
 
-      clearTimeout(timer);
+    const contentType = res.headers.get('content-type') || '';
+
+    if (!res.ok) {
+      const txt = await res.text().catch(() => '');
+      throw new Error(`HTTP ${res.status}${txt ? ` - ${txt.slice(0, 180)}` : ''}`);
+    }
+
+    // 🔥 AQUI É O SEGREDO DO PDF FUNCIONAR
+    if (contentType.includes('application/pdf')) {
+      return { data: await res.blob(), response: res };
+    }
+
+    if (contentType.includes('application/json')) {
+      return { data: await res.json(), response: res };
+    }
+
+    // fallback
+    return { data: await res.blob(), response: res };
+
+  } finally {
+    clearTimeout(timer);
+  }
+}
 
       if (!res.ok) {
         throw new Error(`HTTP ${res.status}`);
