@@ -287,9 +287,84 @@
     }, 80);
   });
 }
-
+ 
   async function runTyping(root) {
-    if (!root) return;
+  if (!root) return;
+
+  const items = Array.from(
+    root.querySelectorAll('[data-typing="true"]')
+  );
+
+  for (const el of items) {
+    const txt = el.getAttribute('data-text') || el.textContent || '';
+    if (!txt.trim()) continue;
+
+    // limpa estado antigo
+    el.classList.remove('typing-done');
+    el.classList.add('typing-active');
+    el.textContent = '';
+
+    try {
+      delete el.dataset.typingDone;
+      delete el.dataset.typingSig;
+    } catch {}
+
+    if (typeof window.runTyping === 'function') {
+      await new Promise((resolve) => {
+        try {
+          window.runTyping(el, txt, () => resolve(), {
+            speed: Number(el.dataset.speed || 20),
+            cursor: String(el.dataset.cursor || 'false') === 'true'
+          });
+        } catch (e) {
+          console.warn('[INTRO] runTyping falhou, fallback local:', e);
+          resolve();
+        }
+      });
+    } else {
+      // fallback simples
+      for (let i = 0; i < txt.length; i++) {
+        el.textContent += txt.charAt(i);
+        await new Promise(r => setTimeout(r, Number(el.dataset.speed || 20)));
+      }
+    }
+
+    el.classList.remove('typing-active');
+    el.classList.add('typing-done');
+  }
+
+  const btn =
+    root.querySelector('#btn-avancar') ||
+    root.querySelector('#btn-intro') ||
+    root.querySelector('[data-action="avancar"]') ||
+    root.querySelector('button');
+
+  if (!btn) {
+    console.warn('[JCIntro] Botão da intro não encontrado.');
+    return;
+  }
+
+  btn.removeAttribute('disabled');
+  btn.classList.remove('is-hidden');
+
+  btn.onclick = () => {
+    try { window.speechSynthesis?.cancel?.(); } catch {}
+
+    if (typeof window.playTransitionVideo === 'function') {
+      window.playTransitionVideo(
+        '/assets/videos/filme-pergaminho-ao-vento.mp4',
+        'section-termos1'
+      );
+      return;
+    }
+
+    if (window.JC?.show) {
+      window.JC.show('section-termos1', { force: true });
+    } else {
+      location.hash = '#section-termos1';
+    }
+  };
+}
 
     const btn =
       root.querySelector('#btn-intro') ||
