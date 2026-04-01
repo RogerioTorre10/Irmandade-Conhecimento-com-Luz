@@ -380,6 +380,18 @@
   box-sizing: border-box !important;
 }
 
+#section-senha .senha-panel,
+#section-senha .senha-wrap,
+#section-senha .j-arcane-card,
+#section-senha .j-perg-v-inner {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#section-senha .senha-wrap {
+  width: min(92vw, 760px);
+}
+
 #section-senha {
   width: 100% !important;
   max-width: 100% !important;
