@@ -362,9 +362,12 @@ function applyHtml(ctx) {
     const val = t(key, el.getAttribute('data-text') || key);
     el.setAttribute('data-text', val);
 
-    if (!el.classList.contains('typing-active')) {
-      el.textContent = val;
-    }
+  if (
+   !el.classList.contains('typing-active') &&
+   !el.hasAttribute('data-typing')
+) {
+   el.textContent = val;
+}
   });
 
   setHtmlLangAttrs();
