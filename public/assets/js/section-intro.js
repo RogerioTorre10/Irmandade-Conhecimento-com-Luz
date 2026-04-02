@@ -7,11 +7,8 @@
   if (window.JCIntro?.__bound) return;
   window.JCIntro = window.JCIntro || {};
   window.JCIntro.__bound = true;
-  window.JCIntro.state = {
-    initialized: false,
-    listenerOn: false,
-    lastLang: null
-  };
+  window.JCIntro.state = { initialized: false, listenerOn: false, lastLang: null};
+  window.JCIntro.state.typingExecuted = false;
 
   function isLangLocked() {
     return sessionStorage.getItem('i18n_locked') === '1';
