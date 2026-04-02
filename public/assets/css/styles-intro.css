@@ -27,7 +27,7 @@
 
 .intro-wrap {
   width: 100% !important;
-  overflow: hidden !important;
+  overflow: visible !important;
   text-align: left !important;
 }
 
