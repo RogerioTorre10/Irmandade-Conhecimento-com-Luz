@@ -324,14 +324,13 @@
     const elements = Array.from(root.querySelectorAll('[data-typing="true"]'));
 
     for (const el of elements) {
-     const txt = (
-     el.getAttribute('data-text') ||
-     (el.dataset.i18nKey ? window.i18n?.t?.(el.dataset.i18nKey) : '') ||
-     el.textContent ||
-     ''
+    const txt = (
+    el.getAttribute('data-text') ||
+    el.textContent ||
+    ''
    ).trim();
 
-    if (!txt) continue;
+   if (!txt) continue;
 
     // limpa estado anterior
     el.textContent = '';
