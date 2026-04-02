@@ -22,6 +22,7 @@
   animation: introPan 9s ease-in-out 1;
   position: relative;
   z-index: 2;
+  padding-top: 6px; /* controla melhor o “encaixe” geral */ 
 }
 
 .intro-wrap {
@@ -48,18 +49,20 @@
   display: block;
   width: 100%;
   max-width: 100%;
-  min-height: 2.4em;
+  min-height: 1.6em;
   box-sizing: border-box;
 
   font-family: 'ManufacturingConsent', sans-serif;
   font-size: clamp(28px, 4vw, 36px);
-  line-height: 1.2;
+  line-height: 1.05;
   text-align: center;
   color: var(--theme-main-color, #ffd700);
 
-  margin-top: 40px;
-  margin-bottom: 20px;
+  margin-top: 12px;
+  margin-bottom: 12px;
   padding: 0 12px;
+  padding-top: 0;
+  padding-bottom: 0;
 
   white-space: normal;
   overflow: visible;
@@ -70,8 +73,10 @@
   opacity: 0;
   transform: translateY(6px);
   animation: introTitleIn 600ms ease forwards;
+  
+  font-size: clamp(24px, 3.2vw, 30px); /* leve redução */
 }
-
+   
 #section-intro [data-typing="true"] {
   overflow: visible;
   white-space: normal;
@@ -417,8 +422,8 @@
   }
 
   #section-intro .intro-title {
-    font-size: clamp(24px, 6vw, 32px) !important;
-    min-height: 3.6em !important;
-    margin-top: 10px !important;
+    font-size: clamp(20px, 5vw, 26px) !important;
+    min-height: 1.8em !important;
+    margin-top: 8px !important;
   }
 }
