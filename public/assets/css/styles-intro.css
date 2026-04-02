@@ -422,8 +422,8 @@
   }
 
   #section-intro .intro-title {
-    font-size: clamp(20px, 5vw, 26px) !important;
-    min-height: 1.8em !important;
-    margin-top: 8px !important;
+    font-size: clamp(24px, 6vw, 32px) !important;
+    min-height: 3.6em !important;
+    margin-top: 10px !important;
   }
 }
