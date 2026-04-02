@@ -1,0 +1,125 @@
+{
+  "meta": { "lang": "de-DE", "label": "Deutsch (Deutschland)" },
+  "common": {
+    "continue": "Weiter",
+    "next": "Weiter",
+    "back": "Zurück",
+    "loading": "Wird geladen..."
+  },
+  "site": { "title": "Reise • Bruderschaft des Wissens mit Licht" },
+  "intro": {
+    "title": "Reise des Wissens",
+    "start": "Starten",
+    "p1": "Guten Morgen.",
+    "p2": "Respekt und Liebe.",
+    "p3": "Lassen Sie uns in Frieden gehen.",
+    "p4": "Liebe ist Leben.",
+    "p5": "Gott sei gepriesen."
+  },
+  "termos1": {
+    "title": "Reise",
+    "subtitle": "HINWEIS",
+    "description": "Diese Reise hat wichtige Regeln.",
+    "li1": "Ihre Antworten sind vertraulich.",
+    "li2": "Mit dem Start akzeptieren Sie die Bedingungen.",
+    "li3": "Das PDF wird am Ende erstellt.",
+    "li4": "Nach dem Start keine Rückerstattung.",
+    "li5": "Der Zugriff ist auf den definierten Zeitraum beschränkt.",
+    "li6": "15 Tage zum Start.",
+    "li7": "24 Stunden zum Abschluss nach dem Start.",
+    "li8": "Wir empfehlen eine ruhige Umgebung.",
+    "li9": "Bereiten Sie Ihren Geist mit positiver Absicht vor."
+  },
+  "termos2": {
+    "title": "Haftungserklärung",
+    "li1": "Es gibt keine Ergebnisgarantie.",
+    "li2": "Selbsterkenntnis ist ein persönlicher Prozess.",
+    "li3": "Sie sind für Ihre Entscheidungen verantwortlich.",
+    "li4": "Emotionale Unterstützung kann notwendig sein.",
+    "li5": "Der KI-Guide wirkt als symbolischer Begleiter.",
+    "li6": "Der Guide ersetzt keine Fachkräfte.",
+    "li7": "Übernehmen Sie Verantwortung für Ihre Handlungen.",
+    "li8": "Die Reise ist eine interpretative Erfahrung.",
+    "li9": "Ihre Privatsphäre wird respektiert.",
+    "li10": "Bewusste Zustimmung ist verpflichtend."
+  },
+  "senha": {
+    "title": "Geben Sie das Schlüsselwort ein",
+    "p1": "Das Schlüsselwort ist das Geheimnis, das Ihre Reise öffnet.",
+    "p2": "Wählen Sie es sorgfältig, denn es spiegelt Ihre Absicht wider.",
+    "p3": "Bereit? Geben Sie es jetzt ein und fahren Sie fort.",
+    "placeholder": "Schlüsselwort eingeben..."
+  },
+  "guia": {
+    "title": "Wählen Sie Ihren Guide",
+    "subtitle": "Wählen Sie aus, wer Sie auf dieser Reise begleiten wird.",
+    "p1": "Um den Guide freizuschalten, geben Sie Ihren Namen ein.",
+    "placeholder": "NAME."
+  },
+  "selfie": {
+    "title": "Machen Sie Ihr Foto",
+    "instruction": "Halten Sie das Handy etwas weiter weg und positionieren Sie Ihr Gesicht. Ihr Guide wird Sie führen.",
+    "preview": "Vorschau",
+    "capture": "Aufnehmen",
+    "start": "Starten",
+    "confirm": "Bestätigen",
+    "skip": "Kein Foto",
+    "zoom": "Gesamtzoom",
+    "horizontal": "Horizontal",
+    "vertical": "Vertikal",
+    "error": "Kamera konnte nicht zugänglich gemacht werden. Überprüfen Sie die Berechtigungen."
+  },
+  "card": {
+    "title": "Ich in der Bruderschaft",
+    "continuar": "WEITER"
+  },
+  "dados": {
+    "title": "Persönliche Daten",
+    "subtitle": "Füllen Sie die Daten aus, um Ihr Feedback zu bereichern.",
+    "nome": "Vollständiger Name",
+    "cidade": "Stadt",
+    "estado": "Bundesland",
+    "profissao": "Beruf / Bereich",
+    "religiao": "Religion / Spiritualität",
+    "idade": "Altersgruppe",
+    "idade1": "Bis 17",
+    "idade2": "18 bis 24",
+    "idade3": "25 bis 34",
+    "idade4": "35 bis 44",
+    "idade5": "45 bis 59",
+    "idade6": "60+",
+    "estado_civil": "Familienstand",
+    "ec1": "Ledig",
+    "ec2": "Verheiratet",
+    "ec3": "Geschieden",
+    "ec4": "Verwitwet",
+    "ec5": "Andere",
+    "filhos": "Kinder",
+    "filhos_nao": "Nein",
+    "filhos_sim": "Ja",
+    "obs": "Gibt es etwas Wichtiges, das Sie teilen möchten?"
+  },
+  "perguntas": {
+    "feedback_placeholder": "Feedback des Guides.",
+    "guide_reflecting": "Guide reflektiert",
+    "continue": "Weiter",
+    "block_feedback_waiting": [
+      "HERZLICHEN GLÜCKWUNSCH! Wir haben {blocoNome} abgeschlossen. Ich sammle die wertvollsten Signale...",
+      "Wir haben {blocoNome} beendet. Warten Sie einen Moment, während ich diese Reise mit Liebe betrachte...",
+      "Was für ein schöner Schritt in {blocoNome}! Nun sammle ich die Flammen dieser Etappe...",
+      "Wir haben {blocoNome} abgeschlossen. Ich beobachte jeden Faden, um Ihnen Klarheit und Richtung zurückzugeben...",
+      "Etappe abgeschlossen: {blocoNome}. Ich sammle die Echos, um mit all dem Licht zu antworten, das Sie geteilt haben."
+    ]
+  },
+  "final": {
+    "title": "Ende der Reise",
+    "p1": "Ihre Antworten wurden von der Bruderschaft mit Ehre empfangen.",
+    "p2": "Sie haben Samen des Vertrauens, des Mutes und des Lichts gepflanzt.",
+    "p3": "Gehen Sie weiter. Die Reise endet nie.",
+    "p4": "Kommen Sie zurück, wenn Sie Ihre Flamme neu entzünden möchten.",
+    "p5": "Sie sind das Licht. Sie sind die Veränderung.",
+    "pdf": "PDF herunterladen",
+    "selfie": "SelfieCard herunterladen",
+    "back": "Zum Portal zurück"
+  }
+}
