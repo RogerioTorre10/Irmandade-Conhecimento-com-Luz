@@ -381,8 +381,8 @@
       el.classList.add('typing-done', 'type-done');
       el.style.opacity = '1';
       el.style.visibility = 'visible';
-      el.style.display = 'block';
-    }
+      el.style.removeProperty('display');
+     }
 
     const btn =
       root.querySelector('#btn-avancar') ||
