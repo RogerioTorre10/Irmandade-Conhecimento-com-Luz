@@ -72,6 +72,11 @@
       'zh-hans': 'zh-CN',
       'zh-sg': 'zh-CN',
       'cmn-hans-cn': 'zh-CN'
+
+      de: 'de-DE',
+      'de-de': 'de-DE',
+      'de-at': 'de-DE',
+      'de-ch': 'de-DE',
     };
 
     const normalized = map[lower] || raw;
@@ -84,6 +89,7 @@
     if (lower.startsWith('fr')) return 'fr-FR';
     if (lower.startsWith('ja')) return 'ja-JP';
     if (lower.startsWith('zh')) return 'zh-CN';
+    if (lower.startsWith('de')) return 'de-DE';
 
     return DEFAULT;
   }
