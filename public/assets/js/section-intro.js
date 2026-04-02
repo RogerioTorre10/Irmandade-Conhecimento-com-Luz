@@ -60,6 +60,7 @@
             <option value="fr-FR">Français (FR)</option>
             <option value="ja-JP">日本語 (日本)</option>
             <option value="zh-CN">中文（简体）</option>
+            <option value="de-DE">Deutsch（DE）</option>
           </select>
         </div>
 
