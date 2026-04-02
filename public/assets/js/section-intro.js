@@ -318,7 +318,11 @@
     const elements = Array.from(root.querySelectorAll('[data-typing="true"]'));
 
     for (const el of elements) {
-      const text = (el.getAttribute('data-text') || el.textContent || '').trim();
+      const txt =
+      el.getAttribute('data-text') ||
+      el.dataset.i18nKey && window.i18n?.t?.(el.dataset.i18nKey) ||
+      el.textContent ||
+      '';
       if (!text) continue;
 
       // Limpa estado anterior
