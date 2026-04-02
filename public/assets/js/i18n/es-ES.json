@@ -1,36 +1,31 @@
 {
-  "meta": {
-    "lang": "es-ES",
-    "label": "Español (ES)"
-  },
+  "meta": { "lang": "es-ES", "label": "Español (España)" },
   "common": {
     "continue": "Continuar",
     "next": "Avanzar",
     "back": "Volver",
     "loading": "Cargando..."
   },
-  "site": {
-    "title": "Viaje • Hermandad Conocimiento con Luz"
-  },
+  "site": { "title": "Viaje • Hermandad Conocimiento con Luz" },
   "intro": {
     "title": "Viaje del Conocimiento",
     "start": "Iniciar",
     "p1": "Buenos días.",
     "p2": "Respeto y amor.",
-    "p3": "Caminemos en paz.",
+    "p3": "Vamos en paz.",
     "p4": "El amor es vida.",
-    "p5": "Alabado sea Dios."
+    "p5": "Dios sea alabado."
   },
   "termos1": {
     "title": "Viaje",
     "subtitle": "AVISO",
     "description": "Este viaje tiene reglas importantes.",
     "li1": "Tus respuestas son confidenciales.",
-    "li2": "Al comenzar, aceptas los términos.",
+    "li2": "Al iniciar, aceptas los términos.",
     "li3": "El PDF se generará al final.",
-    "li4": "Después de comenzar, no hay reembolso.",
+    "li4": "No hay reembolso después de iniciar.",
     "li5": "El acceso está limitado al período definido.",
-    "li6": "15 días para iniciar.",
+    "li6": "15 días para comenzar.",
     "li7": "24 horas para completar después de iniciar.",
     "li8": "Recomendamos un ambiente tranquilo.",
     "li9": "Prepara tu mente con intención positiva."
@@ -39,40 +34,40 @@
     "title": "Término de Responsabilidad",
     "li1": "No hay garantía de resultados.",
     "li2": "El autoconocimiento es un proceso personal.",
-    "li3": "Eres responsable de tus decisiones.",
+    "li3": "Tú eres responsable de tus elecciones.",
     "li4": "El apoyo emocional puede ser necesario.",
-    "li5": "El Guía IA actúa como orientador simbólico.",
-    "li6": "El guía no sustituye profesionales.",
+    "li5": "La Guía IA actúa como orientadora simbólica.",
+    "li6": "La guía no sustituye a profesionales.",
     "li7": "Mantén responsabilidad sobre tus acciones.",
     "li8": "El viaje es una experiencia interpretativa.",
     "li9": "Tu privacidad es respetada.",
     "li10": "El consentimiento consciente es obligatorio."
   },
   "senha": {
-    "title": "Introduce la Palabra Clave",
-    "p1": "La palabra clave es el secreto que abrirá tu viaje.",
-    "p2": "Elige con cuidado, refleja tu intención.",
-    "p3": "¿Listo? Escríbela y continúa.",
-    "placeholder": "Introduce la palabra clave..."
+    "title": "Ingresa la Palabra Clave",
+    "p1": "La Palabra Clave es el secreto que abrirá tu viaje.",
+    "p2": "Elige con cuidado, pues refleja tu intención.",
+    "p3": "¿Listo? Escribe ahora y avanza.",
+    "placeholder": "Escribe la Palabra Clave..."
   },
   "guia": {
     "title": "Elige tu Guía",
     "subtitle": "Selecciona quién te acompañará en este viaje.",
-    "p1": "Para desbloquear el Guía, introduce tu nombre.",
+    "p1": "Para desbloquear la Guía, ingresa tu nombre.",
     "placeholder": "NOMBRE."
   },
   "selfie": {
-    "title": "Tomar tu foto",
-    "instruction": "Aleja un poco el dispositivo y posiciona tu rostro.",
+    "title": "Toma tu foto",
+    "instruction": "Aleja un poco el celular y posiciona tu rostro. Tu guía te conducirá.",
     "preview": "Vista previa",
     "capture": "Capturar",
     "start": "Iniciar",
     "confirm": "Confirmar",
     "skip": "Sin foto",
-    "zoom": "Zoom general",
+    "zoom": "Zoom General",
     "horizontal": "Horizontal",
     "vertical": "Vertical",
-    "error": "No se pudo acceder a la cámara."
+    "error": "No se pudo acceder a la cámara. Verifica los permisos."
   },
   "card": {
     "title": "Yo en la Hermandad",
@@ -80,38 +75,51 @@
   },
   "dados": {
     "title": "Datos Personales",
-    "subtitle": "Completa los datos para enriquecer tu devolución.",
+    "subtitle": "Completa los datos para enriquecer tu devolutiva.",
     "nome": "Nombre completo",
     "cidade": "Ciudad",
     "estado": "Estado",
-    "profissao": "Profesión",
-    "religiao": "Religión",
-    "idade": "Edad",
+    "profissao": "Profesión / área",
+    "religiao": "Religión / espiritualidad",
+    "idade": "Rango de edad",
+    "idade1": "Hasta 17",
+    "idade2": "18 a 24",
+    "idade3": "25 a 34",
+    "idade4": "35 a 44",
+    "idade5": "45 a 59",
+    "idade6": "60+",
     "estado_civil": "Estado civil",
+    "ec1": "Soltero(a)",
+    "ec2": "Casado(a)",
+    "ec3": "Divorciado(a)",
+    "ec4": "Viudo(a)",
+    "ec5": "Otro",
     "filhos": "Hijos",
-    "obs": "¿Algo que deseas compartir?"
+    "filhos_nao": "No",
+    "filhos_sim": "Sí",
+    "obs": "¿Algo importante que deseas compartir?"
   },
   "perguntas": {
-    "feedback_placeholder": "Devolución del Guía.",
+    "feedback_placeholder": "Devolutiva del Guía.",
     "guide_reflecting": "Guía reflexionando",
     "continue": "Continuar",
     "block_feedback_waiting": [
-      "¡FELICIDADES! Finalizamos {blocoNome}...",
-      "Hemos terminado {blocoNome}...",
-      "Gran paso en {blocoNome}...",
-      "Etapa завершada: {blocoNome}...",
-      "Etapa finalizada: {blocoNome}..."
+      "¡FELICIDADES! Terminamos el {blocoNome}. Estoy reuniendo las señales más preciosas...",
+      "Hemos finalizado el {blocoNome}. Espera un momento mientras contemplo este cruce con cariño...",
+      "¡Qué hermoso paso dimos en el {blocoNome}! Ahora reúno las llamas de esta etapa...",
+      "Concluimos el {blocoNome}. Estoy observando cada hilo para devolverte claridad y dirección...",
+      "Etapa completada: {blocoNome}. Recojo los ecos para responderte con toda la luz que compartiste."
     ]
   },
   "final": {
     "title": "Fin del Viaje",
-    "p1": "Tus respuestas fueron recibidas con honor.",
-    "p2": "Has plantado semillas de luz.",
-    "p3": "Sigue caminando.",
-    "p4": "Regresa cuando lo necesites.",
-    "p5": "Eres la luz.",
+    "p1": "Tus respuestas fueron recibidas con honor por la Hermandad.",
+    "p2": "Plantaste semillas de confianza, coraje y luz.",
+    "p3": "Sigue caminando. El viaje nunca termina.",
+    "p4": "Vuelve cuando necesites reavivar tu llama.",
+    "p5": "Tú eres la luz. Tú eres el cambio.",
     "pdf": "Descargar PDF",
     "selfie": "Descargar SelfieCard",
-    "back": "Volver"
+    "back": "Volver al Portal"
   }
 }
