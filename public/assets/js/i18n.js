@@ -71,12 +71,13 @@
       'zh-cn': 'zh-CN',
       'zh-hans': 'zh-CN',
       'zh-sg': 'zh-CN',
-      'cmn-hans-cn': 'zh-CN'
+      'cmn-hans-cn': 'zh-CN',
 
       de: 'de-DE',
       'de-de': 'de-DE',
       'de-at': 'de-DE',
-      'de-ch': 'de-DE',
+      'de-ch': 'de-DE'
+      
     };
 
     const normalized = map[lower] || raw;
