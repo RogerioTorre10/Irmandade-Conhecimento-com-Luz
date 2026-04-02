@@ -1,70 +1,81 @@
 {
-  "meta": {
-    "lang": "en-US",
-    "label": "English (US)"
-  },
-
+  "meta": { "lang": "en-US", "label": "English (US)" },
   "common": {
     "continue": "Continue",
     "next": "Next",
     "back": "Back",
     "loading": "Loading..."
   },
-
-  "site": {
-    "title": "Journey • Brotherhood Knowledge with Light"
-  },
-
+  "site": { "title": "Journey • Brotherhood of Knowledge with Light" },
   "intro": {
     "title": "Journey of Knowledge",
     "start": "Start",
     "p1": "Good morning.",
     "p2": "Respect and love.",
-    "p3": "Let us go in peace.",
+    "p3": "Let's go in peace.",
     "p4": "Love is life.",
     "p5": "Praise be to God."
   },
-
-  "terms1": {
+  "termos1": {
     "title": "Journey",
     "subtitle": "NOTICE",
-    "description": "This journey contains important rules.",
+    "description": "This journey has important rules.",
     "li1": "Your answers are confidential.",
     "li2": "By starting, you accept the terms.",
-    "li3": "A PDF will be generated at the end.",
-    "li4": "After starting, refunds are not available.",
+    "li3": "The PDF will be generated at the end.",
+    "li4": "No refund after starting.",
     "li5": "Access is limited to the defined period.",
     "li6": "15 days to start.",
     "li7": "24 hours to complete after starting.",
     "li8": "We recommend a quiet environment.",
     "li9": "Prepare your mind with positive intention."
   },
-
-  "terms2": {
-    "title": "Responsibility Terms",
-    "li1": "No guarantee of results.",
+  "termos2": {
+    "title": "Liability Term",
+    "li1": "There is no guarantee of results.",
     "li2": "Self-knowledge is a personal process.",
     "li3": "You are responsible for your choices.",
     "li4": "Emotional support may be necessary.",
-    "li5": "AI Guide acts as a symbolic mentor.",
+    "li5": "The AI Guide acts as a symbolic mentor.",
     "li6": "The guide does not replace professionals.",
     "li7": "Maintain responsibility for your actions.",
-    "li8": "The journey is an interpretative experience.",
-    "li9": "Privacy is respected.",
-    "li10": "Conscious consent is required."
+    "li8": "The journey is an interpretive experience.",
+    "li9": "Your privacy is respected.",
+    "li10": "Conscious consent is mandatory."
   },
-
-  "password": {
+  "senha": {
     "title": "Enter the Keyword",
-    "p1": "The keyword is the secret that will open your journey.",
+    "p1": "The Keyword is the secret that will open your journey.",
     "p2": "Choose carefully, as it reflects your intention.",
-    "p3": "Ready? Type it now and proceed.",
-    "placeholder": "Enter your keyword..."
+    "p3": "Ready? Type now and proceed.",
+    "placeholder": "Type the Keyword..."
   },
-
+  "guia": {
+    "title": "Choose Your Guide",
+    "subtitle": "Select who will accompany you on this journey.",
+    "p1": "To unlock the Guide, enter your name.",
+    "placeholder": "NAME."
+  },
+  "selfie": {
+    "title": "Take Your Photo",
+    "instruction": "Hold the phone a bit away and position your face. Your guide will lead you.",
+    "preview": "Preview",
+    "capture": "Capture",
+    "start": "Start",
+    "confirm": "Confirm",
+    "skip": "No photo",
+    "zoom": "General Zoom",
+    "horizontal": "Horizontal",
+    "vertical": "Vertical",
+    "error": "Could not access the camera. Check permissions."
+  },
+  "card": {
+    "title": "Me in the Brotherhood",
+    "continuar": "CONTINUE"
+  },
   "dados": {
     "title": "Personal Data",
-    "subtitle": "Fill in the information to enrich your feedback.",
+    "subtitle": "Fill in the data to enrich your feedback.",
     "nome": "Full name",
     "cidade": "City",
     "estado": "State",
@@ -86,20 +97,26 @@
     "filhos": "Children",
     "filhos_nao": "No",
     "filhos_sim": "Yes",
-    "obs": "Anything important you'd like to share?"
+    "obs": "Anything important you wish to share?"
   },
-
-  "guide": {
-    "title": "Choose your guide",
-    "subtitle": "Select who will accompany you on this journey."
+  "perguntas": {
+    "feedback_placeholder": "Guide's Feedback.",
+    "guide_reflecting": "Guide reflecting",
+    "continue": "Continue",
+    "block_feedback_waiting": [
+      "CONGRATULATIONS!!! We have completed {blocoNome}. I am gathering the most precious signals...",
+      "We have finished {blocoNome}. Wait a moment while I contemplate this crossing with care...",
+      "What a beautiful step we took in {blocoNome}! Now I gather the flames of this stage...",
+      "We concluded {blocoNome}. I am observing every thread to return clarity and direction...",
+      "Stage completed: {blocoNome}. I now collect the echoes to respond with all the light you shared."
+    ]
   },
-
   "final": {
     "title": "End of the Journey",
     "p1": "Your answers were received with honor by the Brotherhood.",
-    "p2": "You have planted seeds of trust, courage, and light.",
+    "p2": "You planted seeds of trust, courage and light.",
     "p3": "Keep walking. The journey never ends.",
-    "p4": "Return whenever you need to reignite your flame.",
+    "p4": "Come back whenever you need to rekindle your flame.",
     "p5": "You are the light. You are the change.",
     "pdf": "Download PDF",
     "selfie": "Download SelfieCard",
