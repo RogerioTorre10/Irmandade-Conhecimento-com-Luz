@@ -1,5 +1,6 @@
 /* =============================================================================
-TÍTULO: ESTILOS GLOBAIS DO JORNADA DO CONHECIMENTO
+TÍTULO: ESTILOS GLOBAIS DO JORNADA DO CONHECIMENTO — BLINDADO
+Escopo global compatível com a intro e demais sections
 ============================================================================= */
 
 /* ========== JORNADA ESPECÍFICA ========== */
@@ -18,7 +19,9 @@ TÍTULO: ESTILOS GLOBAIS DO JORNADA DO CONHECIMENTO
   opacity: 1;
 }
 
-#section-termos, #section-senha, #sec-final {
+#section-termos,
+#section-senha,
+#sec-final {
   background: transparent;
   padding: 24px;
   border-radius: 12px;
@@ -50,8 +53,12 @@ TÍTULO: ESTILOS GLOBAIS DO JORNADA DO CONHECIMENTO
   min-height: 80vh;
 }
 
-#termos-pg1, #termos-pg2, #section-senha h2, #section-senha p,
-#sec-wizard #q-text, #sec-final p {
+#termos-pg1,
+#termos-pg2,
+#section-senha h2,
+#section-senha p,
+#sec-wizard #q-text,
+#sec-final p {
   font-size: 13px;
   margin-bottom: 8px;
   color: #fff;
@@ -64,7 +71,11 @@ TÍTULO: ESTILOS GLOBAIS DO JORNADA DO CONHECIMENTO
   line-height: 1.4;
 }
 
-#termos-pg1 h2, #termos-pg2 h3, #section-senha h2, #sec-wizard h2, #sec-final h2 {
+#termos-pg1 h2,
+#termos-pg2 h3,
+#section-senha h2,
+#sec-wizard h2,
+#sec-final h2 {
   font-size: 18px;
   margin-bottom: 10px;
   color: #fff;
@@ -79,13 +90,63 @@ TÍTULO: ESTILOS GLOBAIS DO JORNADA DO CONHECIMENTO
   width: 100%;
 }
 
+/* ===== BASE COMPARTILHADA, SEM INVADIR A INTRO ===== */
 .parchment-inner-rough {
   background: transparent;
   box-shadow: none;
-  overflow: hidden;
-  height: 100%;
+  overflow: visible;
   width: 100%;
   box-sizing: border-box;
+}
+
+/* títulos e textos base: não esconder globalmente */
+.parchment-title-rough,
+.parchment-text-rough {
+  color: #fff;
+  text-align: left;
+  visibility: visible;
+}
+
+/* tipografia base */
+.parchment-title-rough {
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+
+.parchment-text-rough {
+  font-size: 13px;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+/* só as seções antigas controlam hidden/display */
+.section-termos .parchment-title-rough,
+.section-termos .parchment-text-rough,
+#section-senha .parchment-title-rough,
+#section-senha .parchment-text-rough,
+#sec-final .parchment-title-rough,
+#sec-final .parchment-text-rough {
+  opacity: 0;
+  display: none;
+  visibility: hidden;
+}
+
+.section-termos .parchment-title-rough.typing-active,
+.section-termos .parchment-title-rough.typing-done,
+.section-termos .parchment-text-rough.typing-active,
+.section-termos .parchment-text-rough.typing-done,
+#section-senha .parchment-title-rough.typing-active,
+#section-senha .parchment-title-rough.typing-done,
+#section-senha .parchment-text-rough.typing-active,
+#section-senha .parchment-text-rough.typing-done,
+#sec-final .parchment-title-rough.typing-active,
+#sec-final .parchment-title-rough.typing-done,
+#sec-final .parchment-text-rough.typing-active,
+#sec-final .parchment-text-rough.typing-done {
+  opacity: 1;
+  display: block;
+  visibility: visible;
+  text-align: left;
 }
 
 .section-termos .parchment-inner-rough {
@@ -95,53 +156,31 @@ TÍTULO: ESTILOS GLOBAIS DO JORNADA DO CONHECIMENTO
   height: 100%;
 }
 
-.parchment-title-rough {
-  color: #fff;
-  font-size: 20px;
-  margin-bottom: 12px;
-  opacity: 0;
-  display: none;
-  visibility: hidden;
-  text-align: left;
-}
-
-.section-termos .parchment-title-rough,
-.section-termos .parchment-text-rough {
-  opacity: 0;
-  display: none;
-  visibility: hidden;
-  text-align: left;
-}
-
-.parchment-title-rough.typing-active,
-.parchment-title-rough.typing-done,
-.section-termos .parchment-title-rough.typing-active,
-.section-termos .parchment-title-rough.typing-done,
-.section-termos .parchment-text-rough.typing-active,
-.section-termos .parchment-text-rough.typing-done {
+/* actions sem sticky global */
+.parchment-actions-rough {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+  background: transparent;
   opacity: 1;
-  display: block;
   visibility: visible;
-  text-align: left;
+  position: relative;
+  bottom: auto;
 }
 
-.parchment-text-rough {
-  color: #fff;
-  font-size: 13px;
-  margin-bottom: 8px;
-  line-height: 1.4;
-  opacity: 0;
-  display: none;
-  visibility: hidden;
-  text-align: left;
+/* sticky só onde realmente fizer sentido */
+.section-termos .parchment-actions-rough,
+#section-senha .parchment-actions-rough,
+#sec-final .parchment-actions-rough {
+  position: sticky;
+  bottom: 0;
 }
 
-.parchment-text-rough.typing-active,
-.parchment-text-rough.typing-done {
+.section-termos .parchment-actions-rough {
   opacity: 1;
-  display: block;
   visibility: visible;
-  text-align: left;
+  display: flex;
 }
 
 .parchment-input-rough {
@@ -152,24 +191,6 @@ TÍTULO: ESTILOS GLOBAIS DO JORNADA DO CONHECIMENTO
   background: #0c1330;
   color: #fff;
   font-family: 'Cardo', serif;
-}
-
-.parchment-actions-rough {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 12px;
-  position: sticky;
-  bottom: 0;
-  background: transparent;
-  opacity: 1;
-  visibility: visible;
-}
-
-.section-termos .parchment-actions-rough {
-  opacity: 1;
-  visibility: visible;
-  display: flex;
 }
 
 /* ========== SEÇÃO GUIA – LAYOUT E ESTILOS ========== */
@@ -298,7 +319,7 @@ TÍTULO: ESTILOS GLOBAIS DO JORNADA DO CONHECIMENTO
 /* ========== FOOTER ========== */
 .site-footer {
   position: fixed;
-  margin-top:2px;
+  margin-top: 2px;
   bottom: 0;
   left: 0;
   right: 0;
@@ -309,45 +330,40 @@ TÍTULO: ESTILOS GLOBAIS DO JORNADA DO CONHECIMENTO
   z-index: 1000;
   border-top: 1px solid rgba(255,255,255,.1);
   display: block;
-  opacity:.55;
+  opacity: .55;
   color: #fff;
   font-size: 12px;
-  
 }
+
 /* ===== Correção global para evitar fundo duplo ===== */
-
-/* Evita fundo duplicado nas seções com vídeo (como a selfie) */
 section.selfie-page {
-  background: none ;
-  box-shadow: none ;
+  background: none;
+  box-shadow: none;
 }
 
-/* Garante contraste e hierarquia correta */
 .selfie-page .parchment-inner-rough {
   background: transparent;
   box-shadow: none;
   z-index: 2;
 }
 
-/* Remove texturas ou overlays que possam interferir na câmera */
 .selfie-page::before,
 .selfie-page::after {
   display: none;
   content: none;
 }
-/* === Complementos globais usados pelos .js === */
 
-/* classe que o JS usa para esconder nós */
+/* === Complementos globais usados pelos .js === */
 .hidden { display: none; }
 
-/* pulso padrão para qualquer botão “liberado” por efeito */
 .btn-ready-pulse { animation: btnReadyPulse .8s ease-out 1; }
-@keyframes btnReadyPulse{
+
+@keyframes btnReadyPulse {
   0%   { transform: scale(.97); filter: drop-shadow(0 0 10px var(--aura-gold)); }
   60%  { transform: scale(1.05); filter: drop-shadow(0 0 26px var(--aura-gold)); }
   100% { transform: scale(1.00); filter: drop-shadow(0 0 14px var(--aura-gold)); }
 }
- 
+
 /* Ativa só para idiomas asiáticos */
 html[lang="ja-JP"],
 html[lang="zh-CN"] {
