@@ -23,24 +23,26 @@
     if (window.i18n?.forceLang) {
       await window.i18n.forceLang(normalized, true);
     } else if (window.i18n?.setLang) {
-      await window.i18n.setLang(normalized);
+      await window.i18n.setLang(normalized, true);
     }
   } catch (e) {
-    console.warn('[IntroLang] erro:', e);
+    console.warn('[IntroLang] Erro ao definir idioma:', e);
   }
 
-  // 🔒 TRAVA FORTE
   sessionStorage.setItem('i18n_locked', '1');
   sessionStorage.setItem('jornada.lang', normalized);
-  localStorage.setItem('i18n_lang', normalized);
+  sessionStorage.setItem('i18n.lang', normalized);
 
-  // 🔥 FORÇA GLOBAL
-  window.i18n.lang = normalized;
-  window.i18n.currentLang = normalized;
+  localStorage.setItem('i18n_locked', '1');
+  localStorage.setItem('i18n_lang', normalized);
+  localStorage.setItem('jornada.lang', normalized);
+  localStorage.setItem('i18n.lang', normalized);
 
   document.documentElement.lang = normalized;
+  document.documentElement.setAttribute('data-lang', normalized);
+  if (document.body) document.body.setAttribute('data-lang', normalized);
 
-  console.log('[LANG FIXADO]', normalized);
+  console.log('[IntroLang] Idioma definido nesta jornada:', normalized);
 }
 
   function buildLangModal() {
