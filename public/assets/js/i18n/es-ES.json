@@ -1,108 +1,117 @@
 {
   "meta": {
     "lang": "es-ES",
-    "label": "Español"
+    "label": "Español (ES)"
   },
-
   "common": {
     "continue": "Continuar",
-    "next": "Siguiente",
+    "next": "Avanzar",
     "back": "Volver",
     "loading": "Cargando..."
   },
-
   "site": {
-    "title": "Jornada • Hermandad Conocimiento con Luz"
+    "title": "Viaje • Hermandad Conocimiento con Luz"
   },
-
   "intro": {
-    "title": "Jornada del Conocimiento",
-    "start": "Comenzar",
+    "title": "Viaje del Conocimiento",
+    "start": "Iniciar",
     "p1": "Buenos días.",
     "p2": "Respeto y amor.",
     "p3": "Caminemos en paz.",
     "p4": "El amor es vida.",
     "p5": "Alabado sea Dios."
   },
-
-  "terms1": {
-    "title": "Jornada",
+  "termos1": {
+    "title": "Viaje",
     "subtitle": "AVISO",
-    "description": "Esta jornada contiene reglas importantes.",
+    "description": "Este viaje tiene reglas importantes.",
     "li1": "Tus respuestas son confidenciales.",
     "li2": "Al comenzar, aceptas los términos.",
-    "li3": "Se generará un PDF al final.",
+    "li3": "El PDF se generará al final.",
     "li4": "Después de comenzar, no hay reembolso.",
     "li5": "El acceso está limitado al período definido.",
     "li6": "15 días para iniciar.",
-    "li7": "24 horas para completar después de comenzar.",
+    "li7": "24 horas para completar después de iniciar.",
     "li8": "Recomendamos un ambiente tranquilo.",
     "li9": "Prepara tu mente con intención positiva."
   },
-
-  "terms2": {
-    "title": "Términos de Responsabilidad",
+  "termos2": {
+    "title": "Término de Responsabilidad",
     "li1": "No hay garantía de resultados.",
     "li2": "El autoconocimiento es un proceso personal.",
     "li3": "Eres responsable de tus decisiones.",
     "li4": "El apoyo emocional puede ser necesario.",
-    "li5": "El Guía IA actúa como mentor simbólico.",
-    "li6": "El guía no sustituye a profesionales.",
+    "li5": "El Guía IA actúa como orientador simbólico.",
+    "li6": "El guía no sustituye profesionales.",
     "li7": "Mantén responsabilidad sobre tus acciones.",
-    "li8": "La jornada es una experiencia interpretativa.",
-    "li9": "La privacidad es respetada.",
-    "li10": "Se requiere consentimiento consciente."
+    "li8": "El viaje es una experiencia interpretativa.",
+    "li9": "Tu privacidad es respetada.",
+    "li10": "El consentimiento consciente es obligatorio."
   },
-
-  "password": {
+  "senha": {
     "title": "Introduce la Palabra Clave",
-    "p1": "La palabra clave es el secreto que abrirá tu jornada.",
-    "p2": "Elige con cuidado, ya que refleja tu intención.",
-    "p3": "¿Listo? Escríbela ahora y continúa.",
-    "placeholder": "Introduce tu palabra clave..."
+    "p1": "La palabra clave es el secreto que abrirá tu viaje.",
+    "p2": "Elige con cuidado, refleja tu intención.",
+    "p3": "¿Listo? Escríbela y continúa.",
+    "placeholder": "Introduce la palabra clave..."
   },
-
+  "guia": {
+    "title": "Elige tu Guía",
+    "subtitle": "Selecciona quién te acompañará en este viaje.",
+    "p1": "Para desbloquear el Guía, introduce tu nombre.",
+    "placeholder": "NOMBRE."
+  },
+  "selfie": {
+    "title": "Tomar tu foto",
+    "instruction": "Aleja un poco el dispositivo y posiciona tu rostro.",
+    "preview": "Vista previa",
+    "capture": "Capturar",
+    "start": "Iniciar",
+    "confirm": "Confirmar",
+    "skip": "Sin foto",
+    "zoom": "Zoom general",
+    "horizontal": "Horizontal",
+    "vertical": "Vertical",
+    "error": "No se pudo acceder a la cámara."
+  },
+  "card": {
+    "title": "Yo en la Hermandad",
+    "continuar": "CONTINUAR"
+  },
   "dados": {
     "title": "Datos Personales",
-    "subtitle": "Completa la información para enriquecer tu devolución.",
+    "subtitle": "Completa los datos para enriquecer tu devolución.",
     "nome": "Nombre completo",
     "cidade": "Ciudad",
     "estado": "Estado",
-    "profissao": "Profesión / área",
-    "religiao": "Religión / espiritualidad",
-    "idade": "Rango de edad",
-    "idade1": "Hasta 17",
-    "idade2": "18 a 24",
-    "idade3": "25 a 34",
-    "idade4": "35 a 44",
-    "idade5": "45 a 59",
-    "idade6": "60+",
+    "profissao": "Profesión",
+    "religiao": "Religión",
+    "idade": "Edad",
     "estado_civil": "Estado civil",
-    "ec1": "Soltero(a)",
-    "ec2": "Casado(a)",
-    "ec3": "Divorciado(a)",
-    "ec4": "Viudo(a)",
-    "ec5": "Otro",
     "filhos": "Hijos",
-    "filhos_nao": "No",
-    "filhos_sim": "Sí",
-    "obs": "¿Algo importante que deseas compartir?"
+    "obs": "¿Algo que deseas compartir?"
   },
-
-  "guide": {
-    "title": "Elige tu guía",
-    "subtitle": "Selecciona quién te acompañará en esta jornada."
+  "perguntas": {
+    "feedback_placeholder": "Devolución del Guía.",
+    "guide_reflecting": "Guía reflexionando",
+    "continue": "Continuar",
+    "block_feedback_waiting": [
+      "¡FELICIDADES! Finalizamos {blocoNome}...",
+      "Hemos terminado {blocoNome}...",
+      "Gran paso en {blocoNome}...",
+      "Etapa завершada: {blocoNome}...",
+      "Etapa finalizada: {blocoNome}..."
+    ]
   },
-
   "final": {
-    "title": "Fin de la Jornada",
-    "p1": "Tus respuestas fueron recibidas con honor por la Hermandad.",
-    "p2": "Has sembrado semillas de confianza, valentía y luz.",
-    "p3": "Sigue caminando. La jornada nunca termina.",
-    "p4": "Regresa cuando necesites reavivar tu llama.",
-    "p5": "Eres la luz. Eres el cambio.",
+    "title": "Fin del Viaje",
+    "p1": "Tus respuestas fueron recibidas con honor.",
+    "p2": "Has plantado semillas de luz.",
+    "p3": "Sigue caminando.",
+    "p4": "Regresa cuando lo necesites.",
+    "p5": "Eres la luz.",
     "pdf": "Descargar PDF",
     "selfie": "Descargar SelfieCard",
-    "back": "Volver al Portal"
+    "back": "Volver"
   }
 }
