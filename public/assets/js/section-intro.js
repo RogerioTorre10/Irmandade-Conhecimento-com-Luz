@@ -324,35 +324,34 @@
     const elements = Array.from(root.querySelectorAll('[data-typing="true"]'));
 
     for (const el of elements) {
-    const txt = (
+  const txt = (
     el.getAttribute('data-text') ||
     el.textContent ||
     ''
-   ).trim();
+  ).trim();
 
-   if (!txt) continue;
+  if (!txt) continue;
 
-    // limpa estado anterior
-    el.textContent = '';
-    el.classList.remove('typing-done', 'type-done');
-    el.classList.add('typing-active');
+  el.textContent = '';
+  el.classList.remove('typing-done', 'type-done');
+  el.classList.add('typing-active');
 
-   const speed = Number(el.dataset.speed) || 42;
+  const speed = Number(el.dataset.speed) || 42;
 
-   if (typeof window.typeAndSpeak === 'function') {
-     await new Promise((r) => window.typeAndSpeak(el, txt, speed, { forceReplay: true }) || r());
-   } else if (typeof window.runTyping === 'function') {
-     await new Promise((r) => window.runTyping(el, txt, r, { speed, forceReplay: true }));
-   } else {
+  if (typeof window.typeAndSpeak === 'function') {
+    await new Promise((r) => window.typeAndSpeak(el, txt, speed, { forceReplay: true }) || r());
+  } else if (typeof window.runTyping === 'function') {
+    await new Promise((r) => window.runTyping(el, txt, r, { speed, forceReplay: true }));
+  } else {
     for (let i = 0; i < txt.length; i++) {
       el.textContent += txt.charAt(i);
       await new Promise(res => setTimeout(res, speed));
     }
   }
 
-    el.classList.remove('typing-active');
-    el.classList.add('typing-done');
-  }
+  el.classList.remove('typing-active');
+  el.classList.add('typing-done');
+}
 
     console.log('[Typing] Datilografia concluída.');
   }
