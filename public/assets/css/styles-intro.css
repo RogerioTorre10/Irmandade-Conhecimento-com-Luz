@@ -47,16 +47,44 @@
    ============================ */
 
 .intro-title {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-height: 2.4em;
+  box-sizing: border-box;
+
   font-family: 'ManufacturingConsent', sans-serif;
-  font-size: 36px;
+  font-size: clamp(28px, 4vw, 36px);
+  line-height: 1.2;
   text-align: center;
   color: var(--theme-main-color, #ffd700);
+
   margin-top: 40px;
   margin-bottom: 20px;
+  padding: 0 12px;
+
+  white-space: normal;
+  overflow: visible;
+  word-break: normal;
+  overflow-wrap: break-word;
+
   text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
   opacity: 0;
   transform: translateY(6px);
   animation: introTitleIn 600ms ease forwards;
+}
+
+#section-intro [data-typing="true"] {
+  overflow: visible;
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+#section-intro .intro-wrap,
+#section-intro .parchment-inner-rough,
+#section-intro .j-arcane-card {
+  overflow: visible;
 }
 
 .parchment-text-rough {
