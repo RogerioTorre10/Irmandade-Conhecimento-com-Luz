@@ -3,14 +3,15 @@
 
   const SECTION_ID = 'section-intro';
   const NEXT_SECTION_ID = 'section-termos1';
-  const HIDE_CLASS = 'hidden';
 
   if (window.JCIntro?.__bound) return;
   window.JCIntro = window.JCIntro || {};
   window.JCIntro.__bound = true;
-  window.JCIntro.state = { initialized: false, listenerOn: false };
-
-  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+  window.JCIntro.state = {
+    initialized: false,
+    listenerOn: false,
+    lastLang: null
+  };
 
   function isLangLocked() {
     return sessionStorage.getItem('i18n_locked') === '1';
@@ -39,267 +40,259 @@
     console.log('[IntroLang] Idioma definido nesta jornada:', lang);
   }
 
- function buildLangModal() {
-  const modal = document.createElement('div');
-  modal.id = 'intro-lang-modal';
+  function buildLangModal() {
+    const modal = document.createElement('div');
+    modal.id = 'intro-lang-modal';
 
-  modal.innerHTML = `
-    <div class="intro-lang-backdrop"></div>
-    <div class="intro-lang-card" role="dialog" aria-modal="true" aria-labelledby="intro-lang-title">
-      <h3 id="intro-lang-title" class="intro-lang-title">Escolha seu idioma</h3>
-      <p class="intro-lang-sub">
-        Selecione o idioma para navegar. Após confirmar, não será possível alterar.
-      </p>
+    modal.innerHTML = `
+      <div class="intro-lang-backdrop"></div>
+      <div class="intro-lang-card" role="dialog" aria-modal="true" aria-labelledby="intro-lang-title">
+        <h3 id="intro-lang-title" class="intro-lang-title">Escolha seu idioma</h3>
+        <p class="intro-lang-sub">
+          Selecione o idioma para navegar. Após confirmar, não será possível alterar.
+        </p>
 
-      <div class="intro-lang-row">
-        <select id="intro-lang-select" class="intro-lang-select" aria-label="Selecione o idioma">
-          <option value="pt-BR">Português (BR)</option>
-          <option value="en-US">English (US)</option>
-          <option value="es-ES">Español (ES)</option>
-          <option value="fr-FR">Français (FR)</option>
-          <option value="ja-JP">日本語  (日本)</option>
-          <option value="zh-CN">中文（简体）</option>
-        </select>
+        <div class="intro-lang-row">
+          <select id="intro-lang-select" class="intro-lang-select" aria-label="Selecione o idioma">
+            <option value="pt-BR">Português (BR)</option>
+            <option value="en-US">English (US)</option>
+            <option value="es-ES">Español (ES)</option>
+            <option value="fr-FR">Français (FR)</option>
+            <option value="ja-JP">日本語 (日本)</option>
+            <option value="zh-CN">中文（简体）</option>
+          </select>
+        </div>
+
+        <div class="intro-lang-actions">
+          <button id="intro-lang-confirm" type="button" class="intro-lang-confirm-btn">
+            Confirmar
+          </button>
+        </div>
       </div>
+    `;
 
-      <div class="intro-lang-actions">
-        <button id="intro-lang-confirm" type="button" class="intro-lang-confirm-btn">
-          Confirmar
-        </button>
-      </div>
-    </div>
-  `;
+    const style = document.createElement('style');
+    style.textContent = `
+      #intro-lang-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 999999 !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0,0,0,0.75);
+        pointer-events: auto !important;
+      }
 
-  const style = document.createElement('style');
-  style.textContent = `
-    #intro-lang-modal {
-      position: fixed;
-      inset: 0;
-      z-index: 999999 !important;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0,0,0,0.75);
-      pointer-events: auto !important;
+      #intro-lang-modal .intro-lang-backdrop {
+        position: absolute;
+        inset: 0;
+        pointer-events: none !important;
+      }
+
+      #intro-lang-modal .intro-lang-card {
+        position: relative;
+        z-index: 2;
+        width: min(92vw, 420px);
+        padding: 24px 20px;
+        border-radius: 18px;
+        background: rgba(15,15,25,0.98);
+        border: 1px solid rgba(212,175,55,0.6);
+        color: #f5e7b0;
+        text-align: center;
+        box-shadow: 0 0 30px rgba(212,175,55,0.3);
+        pointer-events: auto !important;
+      }
+
+      #intro-lang-modal .intro-lang-title {
+        margin: 0 0 12px 0;
+        font-size: 1.45rem;
+        font-family: 'BerkshireSwash', cursive;
+      }
+
+      #intro-lang-modal .intro-lang-sub {
+        margin: 0 0 20px 0;
+        font-size: 0.95rem;
+        opacity: 0.9;
+      }
+
+      #intro-lang-modal .intro-lang-row {
+        position: relative;
+        z-index: 4;
+        pointer-events: auto !important;
+        margin-bottom: 16px;
+      }
+
+      #intro-lang-modal .intro-lang-select,
+      #intro-lang-select {
+        position: relative;
+        z-index: 5;
+        width: 100%;
+        padding: 12px 16px;
+        border-radius: 10px;
+        background: rgba(0,0,0,0.6);
+        border: 1px solid rgba(212,175,55,0.5);
+        color: #f5e7b0;
+        font-size: 1.05rem;
+        pointer-events: auto !important;
+        cursor: pointer !important;
+        appearance: auto !important;
+        -webkit-appearance: menulist !important;
+        -moz-appearance: menulist !important;
+      }
+
+      #intro-lang-modal .intro-lang-confirm-btn,
+      #intro-lang-confirm {
+        position: relative;
+        z-index: 6;
+        width: 100%;
+        padding: 16px 20px;
+        font-size: 1.15rem;
+        font-weight: bold;
+        border: none;
+        border-radius: 12px;
+        background: url('/assets/img/textura-de-pedra.jpg') center/cover;
+        color: #FFFFFF;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+        transition: all 0.25s ease;
+        cursor: pointer !important;
+        pointer-events: auto !important;
+      }
+    `;
+    modal.appendChild(style);
+
+    modal.style.display = 'flex';
+    modal.style.visibility = 'visible';
+    modal.style.opacity = '1';
+
+    return modal;
+  }
+
+  async function requireLanguageChoice() {
+    sessionStorage.removeItem('i18n_locked');
+    sessionStorage.removeItem('jornada.lang');
+    sessionStorage.removeItem('i18n.lang');
+    localStorage.removeItem('i18n_locked');
+    localStorage.removeItem('i18n_lang');
+
+    const oldModal = document.getElementById('intro-lang-modal');
+    if (oldModal) oldModal.remove();
+
+    const modal = buildLangModal();
+    document.body.appendChild(modal);
+
+    window.__LANG_MODAL_OPEN__ = true;
+    window.__INTRO_LANG_CONFIRMED__ = false;
+    window.speechSynthesis?.cancel?.();
+
+    const btn = modal.querySelector('#intro-lang-confirm');
+    const sel = modal.querySelector('#intro-lang-select');
+
+    if (!btn || !sel) {
+      console.error('[LANG_MODAL] Botão ou select não encontrados.', {
+        btn: !!btn,
+        sel: !!sel
+      });
+      throw new Error('Modal de idioma inválida.');
     }
 
-    #intro-lang-modal .intro-lang-backdrop {
-      position: absolute;
-      inset: 0;
-      pointer-events: none !important;
+    const introRoot = document.getElementById(SECTION_ID);
+    const introBtn =
+      introRoot?.querySelector('#btn-intro') ||
+      introRoot?.querySelector('[data-next]') ||
+      introRoot?.querySelector('.btn-stone') ||
+      introRoot?.querySelector('button');
+
+    if (introBtn) {
+      introBtn.disabled = true;
+      introBtn.style.pointerEvents = 'none';
+      introBtn.setAttribute('aria-disabled', 'true');
     }
 
-    #intro-lang-modal .intro-lang-card {
-      position: relative;
-      z-index: 2;
-      width: min(92vw, 420px);
-      padding: 24px 20px;
-      border-radius: 18px;
-      background: rgba(15,15,25,0.98);
-      border: 1px solid rgba(212,175,55,0.6);
-      color: #f5e7b0;
-      text-align: center;
-      box-shadow: 0 0 30px rgba(212,175,55,0.3);
-      pointer-events: auto !important;
+    sel.disabled = false;
+    sel.style.pointerEvents = 'auto';
+    sel.style.position = 'relative';
+    sel.style.zIndex = '5';
+    sel.style.cursor = 'pointer';
+
+    sel.value =
+      localStorage.getItem('i18n_lang') ||
+      sessionStorage.getItem('jornada.lang') ||
+      'pt-BR';
+
+    function getChosenLang() {
+      return (sel.value || 'pt-BR').trim();
     }
 
-    #intro-lang-modal .intro-lang-title {
-      margin: 0 0 12px 0;
-      font-size: 1.45rem;
-      font-family: 'BerkshireSwash', cursive;
-    }
-
-    #intro-lang-modal .intro-lang-sub {
-      margin: 0 0 20px 0;
-      font-size: 0.95rem;
-      opacity: 0.9;
-    }
-
-    #intro-lang-modal .intro-lang-row {
-      position: relative;
-      z-index: 4;
-      pointer-events: auto !important;
-      margin-bottom: 16px;
-    }
-
-    #intro-lang-modal .intro-lang-select,
-    #intro-lang-select {
-      position: relative;
-      z-index: 5;
-      width: 100%;
-      padding: 12px 16px;
-      border-radius: 10px;
-      background: rgba(0,0,0,0.6);
-      border: 1px solid rgba(212,175,55,0.5);
-      color: #f5e7b0;
-      font-size: 1.05rem;
-      pointer-events: auto !important;
-      cursor: pointer !important;
-      appearance: auto !important;
-      -webkit-appearance: menulist !important;
-      -moz-appearance: menulist !important;
-    }
-
-    #intro-lang-modal .intro-lang-confirm-btn,
-    #intro-lang-confirm {
-      position: relative;
-      z-index: 6;
-      width: 100%;
-      padding: 16px 20px;
-      font-size: 1.15rem;
-      font-weight: bold;
-      border: none;
-      border-radius: 12px;
-      background: url('/assets/img/textura-de-pedra.jpg') center/cover;
-      color: #FFFFFF;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.6);
-      transition: all 0.25s ease;
-      cursor: pointer !important;
-      pointer-events: auto !important;
-    }
-  `;
-  modal.appendChild(style);
-
-  modal.style.display = 'flex';
-  modal.style.visibility = 'visible';
-  modal.style.opacity = '1';
-
-  return modal;
-}
-  
- async function requireLanguageChoice() {
-  sessionStorage.removeItem('i18n_locked');
-  sessionStorage.removeItem('jornada.lang');
-  sessionStorage.removeItem('i18n.lang');
-  localStorage.removeItem('i18n_locked');
-  localStorage.removeItem('i18n_lang');
-
-  const oldModal = document.getElementById('intro-lang-modal');
-  if (oldModal) oldModal.remove();
-
-  const modal = buildLangModal();
-  document.body.appendChild(modal);
-
-  window.__LANG_MODAL_OPEN__ = true;
-  window.__INTRO_LANG_CONFIRMED__ = false;
-  window.speechSynthesis?.cancel?.();
-
-  const btn = modal.querySelector('#intro-lang-confirm');
-  const sel = modal.querySelector('#intro-lang-select');
-
-  if (!btn || !sel) {
-    console.error('[LANG_MODAL] Botão ou select não encontrados.', {
-      btn: !!btn,
-      sel: !!sel
+    sel.addEventListener('change', () => {
+      console.log('[LANG_MODAL] idioma selecionado:', getChosenLang());
     });
-    throw new Error('Modal de idioma inválida.');
-  }
 
-  const introRoot = document.getElementById(SECTION_ID);
-  const introBtn =
-    introRoot?.querySelector('#btn-intro') ||
-    introRoot?.querySelector('[data-next]') ||
-    introRoot?.querySelector('.btn-stone') ||
-    introRoot?.querySelector('button');
+    return new Promise((resolve) => {
+      let confirmed = false;
 
-  if (introBtn) {
-    introBtn.disabled = true;
-    introBtn.style.pointerEvents = 'none';
-    introBtn.setAttribute('aria-disabled', 'true');
-  }
+      const confirmChoice = async (ev) => {
+        ev?.preventDefault?.();
+        ev?.stopPropagation?.();
+        ev?.stopImmediatePropagation?.();
 
-  sel.disabled = false;
-  sel.style.pointerEvents = 'auto';
-  sel.style.position = 'relative';
-  sel.style.zIndex = '5';
-  sel.style.cursor = 'pointer';
+        if (confirmed) return;
+        confirmed = true;
 
-  sel.value =
-    localStorage.getItem('i18n_lang') ||
-    sessionStorage.getItem('jornada.lang') ||
-    'pt-BR';
+        const chosenLang = getChosenLang();
+        console.log('[LANG_MODAL] Confirmar clicado:', chosenLang);
 
-  function getChosenLang() {
-    return (sel.value || 'pt-BR').trim();
-  }
+        try {
+          btn.disabled = true;
+          sel.disabled = true;
 
-  sel.addEventListener('change', () => {
-    console.log('[LANG_MODAL] idioma selecionado:', getChosenLang());
-  });
+          await setLangAndLock(chosenLang);
 
-  return new Promise((resolve) => {
-    let confirmed = false;
+          window.__INTRO_LANG_CONFIRMED__ = true;
+          window.__LANG_MODAL_OPEN__ = false;
+          window.JCIntro.state.lastLang = chosenLang;
 
-    const confirmChoice = async (ev) => {
-      ev?.preventDefault?.();
-      ev?.stopPropagation?.();
-      ev?.stopImmediatePropagation?.();
+          if (introBtn) {
+            introBtn.disabled = false;
+            introBtn.style.pointerEvents = 'auto';
+            introBtn.setAttribute('aria-disabled', 'false');
+          }
 
-      if (confirmed) return;
-      confirmed = true;
+          modal.style.opacity = '0';
+          setTimeout(() => modal.remove(), 300);
 
-      const chosenLang = getChosenLang();
-      console.log('[LANG_MODAL] Confirmar clicado:', chosenLang);
+          document.dispatchEvent(new CustomEvent('intro:language-confirmed', {
+            detail: { lang: chosenLang }
+          }));
 
-      try {
-        btn.disabled = true;
-        sel.disabled = true;
-
-        await setLangAndLock(chosenLang);
-
-        window.__INTRO_LANG_CONFIRMED__ = true;
-        window.__LANG_MODAL_OPEN__ = false;
-
-        if (introBtn) {
-          introBtn.disabled = false;
-          introBtn.style.pointerEvents = 'auto';
-          introBtn.setAttribute('aria-disabled', 'false');
+          resolve(chosenLang);
+        } catch (err) {
+          console.error('[Global Lang Change] Erro:', err);
+          btn.disabled = false;
+          sel.disabled = false;
+          confirmed = false;
+          resolve(chosenLang);
         }
+      };
 
-        modal.style.opacity = '0';
-        setTimeout(() => modal.remove(), 300);
+      btn.onclick = confirmChoice;
+      btn.addEventListener('click', confirmChoice, true);
 
-        document.dispatchEvent(new CustomEvent('intro:language-confirmed', {
-          detail: { lang: chosenLang }
-        }));
+      sel.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          confirmChoice(e);
+        }
+      });
 
-        resolve(chosenLang);
-      } catch (err) {
-        console.error('[Global Lang Change] Erro:', err);
-        btn.disabled = false;
-        sel.disabled = false;
-        confirmed = false;
-        resolve(chosenLang);
-      }
-    };
-
-    btn.onclick = confirmChoice;
-    btn.addEventListener('click', confirmChoice, true);
-
-    sel.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        confirmChoice(e);
-      }
+      setTimeout(() => {
+        try { sel.focus(); } catch {}
+      }, 80);
     });
+  }
 
-    setTimeout(() => {
-      try { sel.focus(); } catch {}
-    }, 80);
-  });
-}
- 
- async function runTyping(root) {
-  if (!root) return;
+  function clearTypingState(el) {
+    if (!el) return;
 
-  const items = Array.from(
-    root.querySelectorAll('[data-typing="true"]')
-  );
-
-  for (const el of items) {
-    const txt = el.getAttribute('data-text') || el.textContent || '';
-    if (!txt.trim()) continue;
-
-    // limpa estado antigo
     el.classList.remove('typing-done', 'type-done', 'typing-active');
     el.textContent = '';
     el.style.opacity = '1';
@@ -309,105 +302,136 @@
     try {
       delete el.dataset.typingDone;
       delete el.dataset.typingSig;
+      delete el.dataset.typingLastSig;
+      delete el.dataset.typingLastAt;
     } catch {}
+  }
 
-    const speed = Number(el.dataset.speed || 60);
+  async function runTyping(root) {
+    if (!root) return;
 
-    if (typeof window.typeAndSpeak === 'function') {
-      try {
-        el.classList.add('typing-active');
-        await window.typeAndSpeak(el, txt, speed);
-      } catch (e) {
-        console.warn('[INTRO] typeAndSpeak falhou, fallback para runTyping:', e);
+    root.setAttribute('data-use-typing-bridge', 'true');
 
-        if (typeof window.runTyping === 'function') {
-          await new Promise((resolve) => {
-            try {
-              window.runTyping(el, txt, () => resolve(), {
-                speed,
-                cursor: String(el.dataset.cursor || 'false') === 'true'
-              });
-            } catch (err) {
-              console.warn('[INTRO] runTyping falhou, fallback local:', err);
-              resolve();
-            }
-          });
-        } else {
-          for (let i = 0; i < txt.length; i++) {
-            el.textContent += txt.charAt(i);
-            await new Promise(r => setTimeout(r, speed));
-          }
-        }
-      }
-    } else if (typeof window.runTyping === 'function') {
-      await new Promise((resolve) => {
+    const items = Array.from(root.querySelectorAll('[data-typing="true"]'));
+
+    for (const el of items) {
+      const txt = el.getAttribute('data-text') || el.textContent || '';
+      if (!txt.trim()) continue;
+
+      clearTypingState(el);
+
+      const speed = Number(el.dataset.speed || 42);
+      const cursor = String(el.dataset.cursor || 'false') === 'true';
+
+      if (typeof window.typeAndSpeak === 'function') {
         try {
           el.classList.add('typing-active');
-          window.runTyping(el, txt, () => resolve(), {
-            speed,
-            cursor: String(el.dataset.cursor || 'false') === 'true'
+          await window.typeAndSpeak(el, txt, speed, {
+            forceReplay: true,
+            cursor
           });
         } catch (e) {
-          console.warn('[INTRO] runTyping falhou, fallback local:', e);
-          resolve();
+          console.warn('[INTRO] typeAndSpeak falhou, fallback para runTyping:', e);
+
+          if (typeof window.runTyping === 'function') {
+            await new Promise((resolve) => {
+              try {
+                window.runTyping(el, txt, () => resolve(), {
+                  speed,
+                  cursor,
+                  forceReplay: true
+                });
+              } catch (err) {
+                console.warn('[INTRO] runTyping falhou, fallback local:', err);
+                resolve();
+              }
+            });
+          } else {
+            for (let i = 0; i < txt.length; i++) {
+              el.textContent += txt.charAt(i);
+              await new Promise(r => setTimeout(r, speed));
+            }
+          }
         }
-      });
-    } else {
-      el.classList.add('typing-active');
-      for (let i = 0; i < txt.length; i++) {
-        el.textContent += txt.charAt(i);
-        await new Promise(r => setTimeout(r, speed));
+      } else if (typeof window.runTyping === 'function') {
+        await new Promise((resolve) => {
+          try {
+            el.classList.add('typing-active');
+            window.runTyping(el, txt, () => resolve(), {
+              speed,
+              cursor,
+              forceReplay: true
+            });
+          } catch (e) {
+            console.warn('[INTRO] runTyping falhou, fallback local:', e);
+            resolve();
+          }
+        });
+      } else {
+        el.classList.add('typing-active');
+        for (let i = 0; i < txt.length; i++) {
+          el.textContent += txt.charAt(i);
+          await new Promise(r => setTimeout(r, speed));
+        }
       }
+
+      el.textContent = txt;
+      el.setAttribute('data-text', txt);
+      el.classList.remove('typing-active');
+      el.classList.add('typing-done', 'type-done');
+      el.style.opacity = '1';
+      el.style.visibility = 'visible';
+      el.style.display = 'block';
     }
 
-    // força permanência visual do texto após digitar/falar
-    el.textContent = txt;
-    el.setAttribute('data-text', txt);
-    el.classList.remove('typing-active');
-    el.classList.add('typing-done', 'type-done');
-    el.style.opacity = '1';
-    el.style.visibility = 'visible';
-    el.style.display = 'block';
-  }
+    const btn =
+      root.querySelector('#btn-avancar') ||
+      root.querySelector('#btn-intro') ||
+      root.querySelector('[data-action="avancar"]') ||
+      root.querySelector('button');
 
-  const btn =
-    root.querySelector('#btn-avancar') ||
-    root.querySelector('#btn-intro') ||
-    root.querySelector('[data-action="avancar"]') ||
-    root.querySelector('button');
-
-  if (!btn) {
-    console.warn('[JCIntro] Botão da intro não encontrado.');
-    return;
-  }
-
-  btn.removeAttribute('disabled');
-  btn.classList.remove('is-hidden');
-
-  btn.onclick = () => {
-    try { window.speechSynthesis?.cancel?.(); } catch {}
-
-    if (typeof window.playTransitionVideo === 'function') {
-      window.playTransitionVideo(
-        '/assets/videos/filme-pergaminho-ao-vento.mp4',
-        'section-termos1'
-      );
+    if (!btn) {
+      console.warn('[JCIntro] Botão da intro não encontrado.');
       return;
     }
 
-    if (window.JC?.show) {
-      window.JC.show('section-termos1', { force: true });
-    } else {
-      location.hash = '#section-termos1';
-    }
-  };
-}
+    btn.removeAttribute('disabled');
+    btn.classList.remove('is-hidden');
 
-  async function init(root) {  
+    btn.onclick = () => {
+      try { window.speechSynthesis?.cancel?.(); } catch {}
+
+      if (typeof window.playTransitionVideo === 'function') {
+        window.playTransitionVideo(
+          '/assets/videos/filme-pergaminho-ao-vento.mp4',
+          NEXT_SECTION_ID
+        );
+        return;
+      }
+
+      if (window.JC?.show) {
+        window.JC.show(NEXT_SECTION_ID, { force: true });
+      } else {
+        location.hash = `#${NEXT_SECTION_ID}`;
+      }
+    };
+  }
+
+  async function init(root) {
+    if (!root) return;
     if (window.JCIntro.state.initialized) return;
     window.JCIntro.state.initialized = true;
 
     await requireLanguageChoice();
+
+    if (window.i18n?.applyTo) {
+      try {
+        await window.i18n.applyTo(root);
+      } catch (e) {
+        console.warn('[INTRO] Falha ao reaplicar i18n antes da digitação:', e);
+      }
+    }
+
     await runTyping(root);
 
     console.log('[Intro] Inicialização completa após escolha de idioma.');
@@ -417,9 +441,13 @@
     const existing = document.getElementById(SECTION_ID);
     if (existing) init(existing);
 
+    if (window.JCIntro.state.listenerOn) return;
+    window.JCIntro.state.listenerOn = true;
+
     document.addEventListener('section:shown', (e) => {
       if (e?.detail?.sectionId === SECTION_ID) {
-        init(e.detail.node || document.getElementById(SECTION_ID));
+        const root = e.detail.node || document.getElementById(SECTION_ID);
+        init(root);
       }
     });
   }
