@@ -1,205 +1,353 @@
 /* =========================================================
-   STYLES-INTRO v2.2 — CORRIGIDO (TÍTULO + ÁUREA)
-   Ajustes finos para título não cortar + áurea mais forte
+   STYLES-INTRO v2.1 — CORRIGIDO
+   Tipografia, efeitos, cursor, halo, ajustes desktop/mobile
    ========================================================= */
+
+/* ============================
+   SECTION BASE
+   ============================ */
 
 #section-intro {
   background: transparent !important;
   box-shadow: none;
   border: none;
+  text-align: left !important;
 }
 
-/* ============================
-   CONTAINER PRINCIPAL
-   ============================ */
+#section-intro .parchment-inner-rough {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  text-align: left !important;
+  animation: introPan 9s ease-in-out 1;
+  position: relative;
+  z-index: 2;
+}
+
+.intro-wrap {
+  width: 100% !important;
+  /* CORRIGIDO: era overflow: hidden !important — cortava o título */
+  overflow: visible !important;
+  text-align: left !important;
+}
 
 .pergaminho {
   width: 100%;
-  max-width: 920px;
+  max-width: 900px;
   margin: 0 auto;
   background-size: 100% auto !important;
   background-repeat: no-repeat;
   background-position: top center;
-  padding: 20px 0;
 }
 
 /* ============================
-   TÍTULO — CORRIGIDO (não corta mais)
+   TIPOGRAFIA
    ============================ */
 
 .intro-title {
   display: block;
   width: 100%;
   max-width: 100%;
-  min-height: 2.6em;
+  min-height: 2.4em;
   box-sizing: border-box;
 
   font-family: 'ManufacturingConsent', sans-serif;
-  font-size: clamp(26px, 5.2vw, 38px);
-  line-height: 1.15;
+  font-size: clamp(28px, 4vw, 36px);
+  line-height: 1.2;
   text-align: center;
-  color: #ffd700;
+  color: var(--theme-main-color, #ffd700);
 
-  margin: 30px auto 24px;
-  padding: 0 20px;
+  margin-top: 40px;
+  margin-bottom: 20px;
+  padding: 0 12px;
 
   white-space: normal;
-  word-break: break-word;
-  overflow-wrap: break-word;
   overflow: visible;
+  word-break: normal;
+  overflow-wrap: break-word;
 
-  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
   opacity: 0;
-  transform: translateY(10px);
-  animation: introTitleIn 700ms ease forwards;
+  transform: translateY(6px);
+  animation: introTitleIn 600ms ease forwards;
 }
 
-/* ============================
-   TEXTOS DA DATILOGRAFIA
-   ============================ */
-
 #section-intro [data-typing="true"] {
-  overflow: visible !important;
-  white-space: normal !important;
-  word-break: break-word !important;
-  overflow-wrap: break-word !important;
-  display: block !important;
+  overflow: visible;
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+#section-intro .intro-wrap,
+#section-intro .parchment-inner-rough,
+#section-intro .j-arcane-card {
+  overflow: visible;
 }
 
 .parchment-text-rough {
   font-family: 'BerkshireSwash', cursive;
-  font-size: 14px;
-  line-height: 1.45;
-  color: #ffd700;
-  margin-bottom: 10px;
-  text-align: left;
-  background: transparent;
+  font-size: 13px;
+  margin-bottom: 8px;
+  color: var(--theme-main-color, #ffd700);
   opacity: 0;
-  transition: opacity 0.3s ease;
+  visibility: visible;
+  display: block;
+  text-align: left !important;
+  background: transparent;
+  line-height: 1.4;
 }
 
-/* Estado ativo e concluído */
+.parchment-text-rough.lumen-typing {
+  text-align: left !important;
+  direction: ltr !important;
+}
+
 .parchment-text-rough.typing-active,
-.parchment-text-rough.typing-done,
-.parchment-text-rough.type-done {
+.parchment-text-rough.typing-done {
+  opacity: 1 !important;
+  display: block !important;
+  visibility: visible !important;
+  text-align: left !important;
+  transition: opacity .25s ease;
+}
+
+#section-intro .parchment-text-rough.typing-done,
+#section-intro .parchment-text-rough.type-done,
+#section-intro .intro-title.typing-done,
+#section-intro .intro-title.type-done {
   opacity: 1 !important;
   visibility: visible !important;
   display: block !important;
 }
 
+#section-intro .parchment-actions-rough {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 18px;
+}
+
 /* ============================
-   ÁUREA DOURADA — CORRIGIDA E MAIS FORTE
+   VIDRO / CARD (j-panel-glow)
+   — compartilhado desktop+mobile
    ============================ */
 
-#section-intro:has(.typing-active) .j-panel-glow,
-#section-intro:has(.typing-active) .parchment-inner-rough {
-  position: relative;
-  outline: 3px solid rgba(255, 204, 102, 0.45);
-  outline-offset: 8px;
+#section-intro .j-panel-glow {
+  padding: 10px !important;
+  width: 90% !important;
+  max-width: 470px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+#section-intro .j-panel-glow::before {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid rgba(212, 175, 55, 0.55);
   box-shadow:
-    0 0 0 3px rgba(255, 204, 102, 0.25) inset,
-    0 0 35px rgba(255, 204, 102, 0.65),
-    0 0 60px rgba(255, 180, 60, 0.45) !important;
-  animation: parchmentGlow 1.8s ease-in-out infinite alternate;
-  transition: all 0.4s ease;
-}
-
-#section-intro .j-panel-glow,
-#section-intro .parchment-inner-rough {
-  transition: box-shadow 0.6s ease, outline 0.6s ease;
-}
-
-/* Áurea mais sutil quando não está digitando */
-#section-intro:not(:has(.typing-active)) .j-panel-glow,
-#section-intro:not(:has(.typing-active)) .parchment-inner-rough {
-  outline: 2px solid rgba(255, 204, 102, 0.18);
-  box-shadow: 0 0 25px rgba(255, 204, 102, 0.25);
+    0 0 28px rgba(212, 175, 55, 0.55),
+    inset 0 0 18px rgba(255, 230, 150, 0.25);
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.16),
+    transparent 45%
+  ) !important;
 }
 
 /* ============================
    CURSOR DE DATILOGRAFIA
    ============================ */
 
+/* CORRIGIDO: .intro-title usa display:block — cursor só inline em parágrafos */
+#section-intro .intro-title[data-typing="true"][data-cursor="true"] {
+  position: relative;
+  display: block;
+  padding-right: 0;
+}
+
+#section-intro .parchment-text-rough[data-typing="true"][data-cursor="true"] {
+  position: relative;
+  display: inline-block;
+  padding-right: 0.35em;
+}
+
 #section-intro [data-typing="true"][data-cursor="true"].typing-active::after {
   content: '';
   position: absolute;
-  right: 0.1em;
-  bottom: 0.15em;
-  width: 3px;
-  height: 1.15em;
-  background: #ffd700;
+  right: 0.05em;
+  bottom: 0.12em;
+  width: 0.5ch;
+  height: 1.1em;
+  background: linear-gradient(180deg, #ffd36b 0%, #ffbf3b 80%, #b27a1a 100%);
   border-radius: 2px;
-  animation: caretBlink 0.9s steps(1, end) infinite;
-  box-shadow: 0 0 8px #ffcc66;
+  opacity: 0.95;
+  animation: caretBlink 1s steps(1, end) infinite;
+  box-shadow: 0 0 6px rgba(255, 200, 80, 0.9);
 }
 
-@keyframes caretBlink {
-  0%, 45% { opacity: 1; }
-  50%, 100% { opacity: 0; }
+#section-intro [data-typing="true"][data-cursor="true"].typing-done::after {
+  content: none;
+}
+
+/* Cursor slim nos parágrafos */
+#section-intro .parchment-text-rough[data-cursor="true"].typing-active::after {
+  width: 2px;
+  height: 1em;
+  border-radius: 1px;
+  right: 0;
 }
 
 /* ============================
-   BOTÃO INICIAR
+   ÁUREA DOURADA (digitando)
+   CORRIGIDO: aplicado em .j-panel-glow (card visível)
+              além do .parchment-inner-rough
    ============================ */
 
-#section-intro .parchment-actions-rough {
-  display: flex;
-  justify-content: center;
-  margin-top: 28px;
+/* Áurea no card visível (j-panel-glow) — principal */
+#section-intro:has(.typing-active) .j-panel-glow {
+  outline: 2px solid rgba(255, 204, 102, 0.25);
+  outline-offset: 6px;
+  box-shadow:
+    0 0 0 2px rgba(255, 204, 102, 0.15) inset,
+    0 0 22px rgba(255, 204, 102, 0.45),
+    0 0 48px rgba(255, 153, 0, 0.35);
+  animation: parchmentGlow 1.6s ease-in-out infinite;
 }
+
+/* Áurea no container interno — mantida para compatibilidade */
+#section-intro:has(.typing-active) .parchment-inner-rough {
+  outline: 2px solid rgba(255, 204, 102, 0.25);
+  outline-offset: 6px;
+  box-shadow:
+    0 0 0 2px rgba(255, 204, 102, 0.15) inset,
+    0 0 22px rgba(255, 204, 102, 0.45),
+    0 0 48px rgba(255, 153, 0, 0.35);
+  animation: parchmentGlow 1.6s ease-in-out infinite;
+}
+
+#section-intro:not(:has(.typing-active)) .j-panel-glow,
+#section-intro:not(:has(.typing-active)) .parchment-inner-rough {
+  transition: box-shadow .35s ease, outline-color .35s ease;
+}
+
+#section-intro .typing-active {
+  text-shadow:
+    0 0 6px rgba(255, 230, 120, 0.85),
+    0 0 14px rgba(120, 255, 210, 0.45),
+    0 0 24px rgba(120, 255, 210, 0.25);
+}
+
+/* ============================
+   UTILITÁRIOS (usados pelo JS)
+   ============================ */
+
+.is-hidden    { opacity: 0; pointer-events: none; transition: opacity .25s ease; }
+.is-disabled  { opacity: .6; pointer-events: none; }
+.btn-ready-pulse { animation: btnReady .6s ease-out 1; }
 
 /* ============================
    ANIMAÇÕES
    ============================ */
 
+@keyframes btnReady {
+  0%   { transform: scale(0.98); filter: brightness(0.9); }
+  60%  { transform: scale(1.02); filter: brightness(1.1); }
+  100% { transform: scale(1);    filter: none; }
+}
+
 @keyframes introTitleIn {
-  to { 
-    opacity: 1; 
-    transform: translateY(0); 
-  }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes introPan {
+  0%   { transform: translateY(4px); }
+  50%  { transform: translateY(-4px); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes caretBlink {
+  0%,  45%  { opacity: 0.95; }
+  50%, 100% { opacity: 0; }
 }
 
 @keyframes parchmentGlow {
-  from {
-    box-shadow: 
-      0 0 0 3px rgba(255,204,102,0.25) inset,
-      0 0 30px rgba(255,204,102,0.55),
-      0 0 55px rgba(255,180,60,0.35);
+  0% {
+    box-shadow:
+      0 0 0 2px rgba(255, 204, 102, 0.15) inset,
+      0 0 18px rgba(255, 204, 102, 0.35),
+      0 0 32px rgba(255, 153, 0, 0.18);
   }
-  to {
-    box-shadow: 
-      0 0 0 3px rgba(255,204,102,0.35) inset,
-      0 0 45px rgba(255,204,102,0.75),
-      0 0 70px rgba(255,180,60,0.55);
+  50% {
+    box-shadow:
+      0 0 0 2px rgba(255, 204, 102, 0.18) inset,
+      0 0 26px rgba(255, 204, 102, 0.50),
+      0 0 52px rgba(255, 153, 0, 0.30);
+  }
+  100% {
+    box-shadow:
+      0 0 0 2px rgba(255, 204, 102, 0.15) inset,
+      0 0 18px rgba(255, 204, 102, 0.35),
+      0 0 32px rgba(255, 153, 0, 0.18);
   }
 }
 
 /* ============================
-   MOBILE (ajustes finos)
+   DESKTOP (≥ 900px)
    ============================ */
 
-@media (max-width: 600px) {
-  .intro-title {
-    font-size: clamp(24px, 6.5vw, 32px);
-    margin-top: 25px;
-    margin-bottom: 18px;
-    padding: 0 15px;
-  }
+@media (min-width: 900px) {
 
-  .parchment-text-rough {
-    font-size: 13.5px;
-    line-height: 1.5;
+  #section-intro .j-perg-v-inner {
+    position: relative !important;
+    transform: translateY(40px) !important;
+    top: 40px !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    overflow: visible !important;
+    z-index: 5 !important;
   }
 
   #section-intro .j-panel-glow {
-    padding: 12px !important;
-    margin: 0 auto;
+    position: relative !important;
+    transform: translate(-16px, -70px) !important;
+    top: 10px !important;
+    z-index: 6 !important;
+  }
+
+  #section-intro .j-arcane-card {
+    margin-top: -18px !important;
+    margin-bottom: 24px !important;
   }
 }
 
-/* Desktop maior */
-@media (min-width: 900px) {
-  .intro-title {
-    font-size: 38px;
+/* ============================
+   MOBILE (≤ 600px)
+   ============================ */
+
+@media (max-width: 600px) {
+
+  #section-intro .j-perg-v-inner {
+    position: relative;
+    transform: translateY(40px);
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 850px;
+    width: 100%;
+    overflow: visible;
+  }
+
+  #section-intro .j-panel-glow {
+    transform: translate(-6px, -26px);
+  }
+
+  #section-intro .j-arcane-card {
+    max-height: 72vh;
+    margin-top: -18px !important;
+    margin-bottom: 24px !important;
   }
 }
