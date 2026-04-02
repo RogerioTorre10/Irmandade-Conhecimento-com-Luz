@@ -324,35 +324,36 @@
     const elements = Array.from(root.querySelectorAll('[data-typing="true"]'));
 
     for (const el of elements) {
-      const txt =
-      el.getAttribute('data-text') ||
-      el.dataset.i18nKey && window.i18n?.t?.(el.dataset.i18nKey) ||
-      el.textContent ||
-      '';
-      if (!text) continue;
+     const txt = (
+     el.getAttribute('data-text') ||
+     (el.dataset.i18nKey ? window.i18n?.t?.(el.dataset.i18nKey) : '') ||
+     el.textContent ||
+     ''
+   ).trim();
 
-      // Limpa estado anterior
-      el.textContent = '';
-      el.classList.remove('typing-done', 'type-done');
-      el.classList.add('typing-active');
+    if (!txt) continue;
 
-      const speed = Number(el.dataset.speed) || 42;
+    // limpa estado anterior
+    el.textContent = '';
+    el.classList.remove('typing-done', 'type-done');
+    el.classList.add('typing-active');
 
-      if (typeof window.typeAndSpeak === 'function') {
-        await new Promise(r => window.typeAndSpeak(el, text, speed, { forceReplay: true }));
-      } else if (typeof window.runTyping === 'function') {
-        await new Promise(r => window.runTyping(el, text, r, { speed, forceReplay: true }));
-      } else {
-        // Fallback simples
-        for (let i = 0; i < text.length; i++) {
-          el.textContent += text.charAt(i);
-          await new Promise(res => setTimeout(res, speed));
-        }
-      }
+   const speed = Number(el.dataset.speed) || 42;
 
-      el.classList.remove('typing-active');
-      el.classList.add('typing-done');
+   if (typeof window.typeAndSpeak === 'function') {
+     await new Promise((r) => window.typeAndSpeak(el, txt, speed, { forceReplay: true }) || r());
+   } else if (typeof window.runTyping === 'function') {
+     await new Promise((r) => window.runTyping(el, txt, r, { speed, forceReplay: true }));
+   } else {
+    for (let i = 0; i < txt.length; i++) {
+      el.textContent += txt.charAt(i);
+      await new Promise(res => setTimeout(res, speed));
     }
+  }
+
+    el.classList.remove('typing-active');
+    el.classList.add('typing-done');
+  }
 
     console.log('[Typing] Datilografia concluída.');
   }
