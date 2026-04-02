@@ -3,18 +3,15 @@
     "lang": "pt-BR",
     "label": "Português (Brasil)"
   },
-
   "common": {
     "continue": "Continuar",
     "next": "Avançar",
     "back": "Voltar",
     "loading": "Carregando..."
   },
-
   "site": {
     "title": "Jornada • Irmandade Conhecimento com Luz"
   },
-
   "intro": {
     "title": "Jornada do Conhecimento",
     "start": "Iniciar",
@@ -24,7 +21,6 @@
     "p4": "Amor é vida.",
     "p5": "Deus seja louvado."
   },
-
   "termos1": {
     "title": "Jornada",
     "subtitle": "AVISO",
@@ -39,7 +35,6 @@
     "li8": "Recomendamos um ambiente tranquilo.",
     "li9": "Prepare sua mente com intenção positiva."
   },
-
   "termos2": {
     "title": "Termo de Responsabilidade",
     "li1": "Não há garantia de resultados.",
@@ -53,7 +48,6 @@
     "li9": "Sua privacidade é respeitada.",
     "li10": "O consentimento consciente é obrigatório."
   },
-
   "senha": {
     "title": "Digite a Palavra-Chave",
     "p1": "A Palavra-Chave é o segredo que abrirá sua jornada.",
@@ -61,14 +55,12 @@
     "p3": "Pronto? Digite agora e avance.",
     "placeholder": "Digite a Palavra-Chave..."
   },
-  
   "guia": {
     "title": "Escolha seu Guia",
-    "subtitle": "Selecione quem irá acompanhar você nesta jornada."
-    "p1": "Para liberar o Guia, Insira seu nome.",
+    "subtitle": "Selecione quem irá acompanhar você nesta jornada.",
+    "p1": "Para liberar o Guia, insira seu nome.",
     "placeholder": "NOME."
   },
-  
   "selfie": {
     "title": "Tirar sua foto",
     "instruction": "Afaste um pouco o celular e posicione seu rosto. Sua guia ou guia vai conduzir você.",
@@ -82,12 +74,10 @@
     "vertical": "Vertical",
     "error": "Não foi possível acessar a câmera. Verifique as permissões."
   },
-  
   "card": {
     "title": "Eu na Irmandade",
-    "continuar": "CONTINUAR."    
+    "continuar": "CONTINUAR"
   },
-  
   "dados": {
     "title": "Dados Pessoais",
     "subtitle": "Preencha os dados para enriquecer sua devolutiva.",
@@ -114,17 +104,18 @@
     "filhos_sim": "Sim",
     "obs": "Algo importante que deseja compartilhar?"
   },
-  
   "perguntas": {
-    "placeholder": "Devolutiva do Guia.",
-    "placeholder": "PARABÉNS!!! Finalizamos o ${blocoNome}. Estou recolhendo os sinais mais preciosos que você deixou nesta etapa...",
-    "placeholder": "Encerramos o ${blocoNome}. Aguarde um instante: estou contemplando com carinho o sentido desta nossa travessia...",
-    "placeholder": "Que belo passo demos no ${blocoNome}! Agora, reúno as chamas deste trecho para te devolver uma síntese viva e inspiradora...",
-    "placeholder": "Concluímos o ${blocoNome}. Estou observando cada fio desta etapa para transformar suas respostas em direção e clareza...",
-    "placeholder": "Etapa concluída: ${blocoNome}. Recolho agora os ecos deste bloco para te responder com toda a luz que você compartilhou..."
-    "continuar": "continuar"
+    "feedback_placeholder": "Devolutiva do Guia.",
+    "guide_reflecting": "Guia refletindo",
+    "continue": "Continuar",
+    "block_feedback_waiting": [
+      "PARABÉNS!!! Finalizamos o {blocoNome}. Estou recolhendo os sinais mais preciosos que você deixou nesta etapa...",
+      "Encerramos o {blocoNome}. Aguarde um instante: estou contemplando com carinho o sentido desta nossa travessia...",
+      "Que belo passo demos no {blocoNome}! Agora, reúno as chamas deste trecho para te devolver uma síntese viva e inspiradora...",
+      "Concluímos o {blocoNome}. Estou observando cada fio desta etapa para transformar suas respostas em direção e clareza...",
+      "Etapa concluída: {blocoNome}. Recolho agora os ecos deste bloco para te responder com toda a luz que você compartilhou..."
+    ]
   },
-  
   "final": {
     "title": "Fim da Jornada",
     "p1": "Suas respostas foram recebidas com honra pela Irmandade.",
