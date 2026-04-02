@@ -63,7 +63,7 @@
   },
   "selfie": {
     "title": "Tirar sua foto",
-    "instruction": "Afaste um pouco o celular e posicione seu rosto. Sua guia ou guia vai conduzir você.",
+    "instruction": "Afaste um pouco o celular e posicione seu rosto. Sua guia vai conduzir você.",
     "preview": "Prévia",
     "capture": "Capturar",
     "start": "Iniciar",
@@ -109,11 +109,11 @@
     "guide_reflecting": "Guia refletindo",
     "continue": "Continuar",
     "block_feedback_waiting": [
-      "PARABÉNS!!! Finalizamos o {blocoNome}. Estou recolhendo os sinais mais preciosos que você deixou nesta etapa...",
-      "Encerramos o {blocoNome}. Aguarde um instante: estou contemplando com carinho o sentido desta nossa travessia...",
-      "Que belo passo demos no {blocoNome}! Agora, reúno as chamas deste trecho para te devolver uma síntese viva e inspiradora...",
-      "Concluímos o {blocoNome}. Estou observando cada fio desta etapa para transformar suas respostas em direção e clareza...",
-      "Etapa concluída: {blocoNome}. Recolho agora os ecos deste bloco para te responder com toda a luz que você compartilhou..."
+      "PARABÉNS!!! Finalizamos o {blocoNome}. Estou recolhendo os sinais mais preciosos...",
+      "Encerramos o {blocoNome}. Aguarde um instante: estou contemplando com carinho...",
+      "Que belo passo demos no {blocoNome}! Agora reúno as chamas desta etapa...",
+      "Concluímos o {blocoNome}. Estou observando cada fio para te devolver luz...",
+      "Etapa concluída: {blocoNome}. Recolho os ecos para te responder com toda a luz."
     ]
   },
   "final": {
