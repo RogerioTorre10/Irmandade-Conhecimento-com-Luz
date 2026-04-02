@@ -10,7 +10,7 @@
   const STORAGE_KEY = 'i18n_lang';
   const LOCK_KEY = 'i18n_locked';
   const DEFAULT = 'pt-BR';
-  const SUPPORTED = ['pt-BR', 'en-US', 'es-ES', 'fr-FR', 'ja-JP', 'zh-CN'];
+  const SUPPORTED = ['pt-BR', 'en-US', 'es-ES', 'fr-FR', 'ja-JP', 'zh-CN', 'de-DE'];
 
   const FORCE_LANG =
     (window.JORNADA_CFG && window.JORNADA_CFG.LANG) ||
