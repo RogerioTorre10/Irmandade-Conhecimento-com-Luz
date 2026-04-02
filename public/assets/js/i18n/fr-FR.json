@@ -1,30 +1,125 @@
 {
-  "meta": {
-    "lang": "fr-FR",
-    "label": "Français (FR)"
-  },
+  "meta": { "lang": "fr-FR", "label": "Français (France)" },
   "common": {
     "continue": "Continuer",
-    "next": "Avancer",
+    "next": "Suivant",
     "back": "Retour",
     "loading": "Chargement..."
   },
-  "site": {
-    "title": "Voyage • Connaissance avec Lumière"
-  },
+  "site": { "title": "Voyage • Fraternité Connaissance avec Lumière" },
   "intro": {
     "title": "Voyage de la Connaissance",
     "start": "Commencer",
     "p1": "Bonjour.",
     "p2": "Respect et amour.",
-    "p3": "Marchons en paix.",
-    "p4": "L’amour est la vie.",
-    "p5": "Dieu soit loué."
+    "p3": "Allons en paix.",
+    "p4": "L'amour est vie.",
+    "p5": "Que Dieu soit loué."
+  },
+  "termos1": {
+    "title": "Voyage",
+    "subtitle": "AVIS",
+    "description": "Ce voyage a des règles importantes.",
+    "li1": "Vos réponses sont confidentielles.",
+    "li2": "En commençant, vous acceptez les conditions.",
+    "li3": "Le PDF sera généré à la fin.",
+    "li4": "Aucun remboursement après le début.",
+    "li5": "L'accès est limité à la période définie.",
+    "li6": "15 jours pour commencer.",
+    "li7": "24 heures pour terminer après le début.",
+    "li8": "Nous recommandons un environnement calme.",
+    "li9": "Préparez votre esprit avec une intention positive."
+  },
+  "termos2": {
+    "title": "Terme de Responsabilité",
+    "li1": "Il n'y a aucune garantie de résultats.",
+    "li2": "La connaissance de soi est un processus personnel.",
+    "li3": "Vous êtes responsable de vos choix.",
+    "li4": "Un soutien émotionnel peut être nécessaire.",
+    "li5": "Le Guide IA agit comme un guide symbolique.",
+    "li6": "Le guide ne remplace pas les professionnels.",
+    "li7": "Maintenez la responsabilité de vos actions.",
+    "li8": "Le voyage est une expérience interprétative.",
+    "li9": "Votre vie privée est respectée.",
+    "li10": "Le consentement conscient est obligatoire."
+  },
+  "senha": {
+    "title": "Entrez le Mot-Clé",
+    "p1": "Le Mot-Clé est le secret qui ouvrira votre voyage.",
+    "p2": "Choisissez-le avec soin, car il reflète votre intention.",
+    "p3": "Prêt ? Tapez maintenant et avancez.",
+    "placeholder": "Tapez le Mot-Clé..."
+  },
+  "guia": {
+    "title": "Choisissez votre Guide",
+    "subtitle": "Sélectionnez qui vous accompagnera dans ce voyage.",
+    "p1": "Pour débloquer le Guide, entrez votre nom.",
+    "placeholder": "NOM."
+  },
+  "selfie": {
+    "title": "Prenez votre photo",
+    "instruction": "Éloignez un peu le téléphone et positionnez votre visage. Votre guide vous accompagnera.",
+    "preview": "Aperçu",
+    "capture": "Capturer",
+    "start": "Commencer",
+    "confirm": "Confirmer",
+    "skip": "Sans photo",
+    "zoom": "Zoom Général",
+    "horizontal": "Horizontal",
+    "vertical": "Vertical",
+    "error": "Impossible d'accéder à la caméra. Vérifiez les permissions."
+  },
+  "card": {
+    "title": "Moi dans la Fraternité",
+    "continuar": "CONTINUER"
+  },
+  "dados": {
+    "title": "Données Personnelles",
+    "subtitle": "Remplissez les données pour enrichir votre retour.",
+    "nome": "Nom complet",
+    "cidade": "Ville",
+    "estado": "État",
+    "profissao": "Profession / domaine",
+    "religiao": "Religion / spiritualité",
+    "idade": "Tranche d'âge",
+    "idade1": "Jusqu'à 17",
+    "idade2": "18 à 24",
+    "idade3": "25 à 34",
+    "idade4": "35 à 44",
+    "idade5": "45 à 59",
+    "idade6": "60+",
+    "estado_civil": "État civil",
+    "ec1": "Célibataire",
+    "ec2": "Marié(e)",
+    "ec3": "Divorcé(e)",
+    "ec4": "Veuf(ve)",
+    "ec5": "Autre",
+    "filhos": "Enfants",
+    "filhos_nao": "Non",
+    "filhos_sim": "Oui",
+    "obs": "Quelque chose d'important que vous souhaitez partager ?"
+  },
+  "perguntas": {
+    "feedback_placeholder": "Retour du Guide.",
+    "guide_reflecting": "Guide en réflexion",
+    "continue": "Continuer",
+    "block_feedback_waiting": [
+      "FÉLICITATIONS ! Nous avons terminé le {blocoNome}. Je rassemble les signaux les plus précieux...",
+      "Nous avons terminé le {blocoNome}. Attendez un instant pendant que je contemple cette traversée...",
+      "Quel beau pas nous avons fait dans le {blocoNome} ! Maintenant je réunis les flammes de cette étape...",
+      "Nous avons conclu le {blocoNome}. J'observe chaque fil pour vous rendre clarté et direction...",
+      "Étape terminée : {blocoNome}. Je recueille les échos pour vous répondre avec toute la lumière que vous avez partagée."
+    ]
   },
   "final": {
     "title": "Fin du Voyage",
-    "pdf": "Télécharger PDF",
+    "p1": "Vos réponses ont été reçues avec honneur par la Fraternité.",
+    "p2": "Vous avez planté des graines de confiance, de courage et de lumière.",
+    "p3": "Continuez à marcher. Le voyage ne se termine jamais.",
+    "p4": "Revenez quand vous avez besoin de raviver votre flamme.",
+    "p5": "Vous êtes la lumière. Vous êtes le changement.",
+    "pdf": "Télécharger le PDF",
     "selfie": "Télécharger SelfieCard",
-    "back": "Retour"
+    "back": "Retour au Portail"
   }
 }
