@@ -25,7 +25,7 @@
     "p5": "Deus seja louvado."
   },
 
-  "terms1": {
+  "termos1": {
     "title": "Jornada",
     "subtitle": "AVISO",
     "description": "Esta jornada possui regras importantes.",
@@ -40,7 +40,7 @@
     "li9": "Prepare sua mente com intenção positiva."
   },
 
-  "terms2": {
+  "termos2": {
     "title": "Termo de Responsabilidade",
     "li1": "Não há garantia de resultados.",
     "li2": "O autoconhecimento é um processo pessoal.",
@@ -54,14 +54,40 @@
     "li10": "O consentimento consciente é obrigatório."
   },
 
-  "password": {
+  "senha": {
     "title": "Digite a Palavra-Chave",
     "p1": "A Palavra-Chave é o segredo que abrirá sua jornada.",
     "p2": "Escolha com cuidado, pois ela reflete sua intenção.",
     "p3": "Pronto? Digite agora e avance.",
     "placeholder": "Digite a Palavra-Chave..."
   },
-
+  
+  "guia": {
+    "title": "Escolha seu Guia",
+    "subtitle": "Selecione quem irá acompanhar você nesta jornada."
+    "p1": "Para liberar o Guia, Insira seu nome.",
+    "placeholder": "NOME."
+  },
+  
+  "selfie": {
+    "title": "Tirar sua foto",
+    "instruction": "Afaste um pouco o celular e posicione seu rosto. Sua guia ou guia vai conduzir você.",
+    "preview": "Prévia",
+    "capture": "Capturar",
+    "start": "Iniciar",
+    "confirm": "Confirmar",
+    "skip": "Sem foto",
+    "zoom": "Zoom Geral",
+    "horizontal": "Horizontal",
+    "vertical": "Vertical",
+    "error": "Não foi possível acessar a câmera. Verifique as permissões."
+  },
+  
+  "card": {
+    "title": "Eu na Irmandade",
+    "continuar": "CONTINUAR."    
+  },
+  
   "dados": {
     "title": "Dados Pessoais",
     "subtitle": "Preencha os dados para enriquecer sua devolutiva.",
@@ -88,26 +114,17 @@
     "filhos_sim": "Sim",
     "obs": "Algo importante que deseja compartilhar?"
   },
-
-  "guide": {
-    "title": "Escolha seu guia",
-    "subtitle": "Selecione quem irá acompanhar você nesta jornada."
+  
+  "perguntas": {
+    "placeholder": "Devolutiva do Guia.",
+    "placeholder": "PARABÉNS!!! Finalizamos o ${blocoNome}. Estou recolhendo os sinais mais preciosos que você deixou nesta etapa...",
+    "placeholder": "Encerramos o ${blocoNome}. Aguarde um instante: estou contemplando com carinho o sentido desta nossa travessia...",
+    "placeholder": "Que belo passo demos no ${blocoNome}! Agora, reúno as chamas deste trecho para te devolver uma síntese viva e inspiradora...",
+    "placeholder": "Concluímos o ${blocoNome}. Estou observando cada fio desta etapa para transformar suas respostas em direção e clareza...",
+    "placeholder": "Etapa concluída: ${blocoNome}. Recolho agora os ecos deste bloco para te responder com toda a luz que você compartilhou..."
+    "continuar": "continuar"
   },
-
-  "selfie": {
-    "title": "Tirar sua foto",
-    "instruction": "Afaste um pouco o celular e posicione seu rosto. Sua guia ou guia vai conduzir você.",
-    "preview": "Prévia",
-    "capture": "Capturar",
-    "start": "Iniciar",
-    "confirm": "Confirmar",
-    "skip": "Sem foto",
-    "zoom": "Zoom Geral",
-    "horizontal": "Horizontal",
-    "vertical": "Vertical",
-    "error": "Não foi possível acessar a câmera. Verifique as permissões."
-  },
-
+  
   "final": {
     "title": "Fim da Jornada",
     "p1": "Suas respostas foram recebidas com honra pela Irmandade.",
