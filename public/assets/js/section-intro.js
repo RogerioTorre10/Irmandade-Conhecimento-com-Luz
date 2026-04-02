@@ -15,27 +15,33 @@
   }
 
   async function setLangAndLock(lang) {
-    if (!lang) return;
+  if (!lang) return;
 
-    try {
-      if (window.i18n?.forceLang) {
-        await window.i18n.forceLang(lang, true);
-      } else if (window.i18n?.setLang) {
-        await window.i18n.setLang(lang);
-      }
-    } catch (e) {
-      console.warn('[IntroLang] Erro ao definir idioma:', e);
+  const normalized = String(lang).trim();
+
+  try {
+    if (window.i18n?.forceLang) {
+      await window.i18n.forceLang(normalized, true);
+    } else if (window.i18n?.setLang) {
+      await window.i18n.setLang(normalized);
     }
-
-    sessionStorage.setItem('i18n_locked', '1');
-    sessionStorage.setItem('jornada.lang', lang);
-    sessionStorage.setItem('i18n.lang', lang);
-    localStorage.setItem('i18n_lang', lang);
-
-    document.documentElement.lang = lang;
-
-    console.log('[IntroLang] Idioma definido nesta jornada:', lang);
+  } catch (e) {
+    console.warn('[IntroLang] erro:', e);
   }
+
+  // 🔒 TRAVA FORTE
+  sessionStorage.setItem('i18n_locked', '1');
+  sessionStorage.setItem('jornada.lang', normalized);
+  localStorage.setItem('i18n_lang', normalized);
+
+  // 🔥 FORÇA GLOBAL
+  window.i18n.lang = normalized;
+  window.i18n.currentLang = normalized;
+
+  document.documentElement.lang = normalized;
+
+  console.log('[LANG FIXADO]', normalized);
+}
 
   function buildLangModal() {
     const modal = document.createElement('div');
