@@ -306,8 +306,12 @@
   }
 
   async function runTyping(root) {
-    if (!root || typingExecuted) return;
-    typingExecuted = true;
+    if (!window.__INTRO_LANG_CONFIRMED__) {
+    console.warn('[INTRO] Bloqueado: idioma ainda não confirmado');
+    return;
+  }
+    if (window.JCIntro.state.typingExecuted) return;
+    window.JCIntro.state.typingExecuted = true;
 
     console.log('[Typing] Iniciando datilografia após confirmação do idioma...');
 
