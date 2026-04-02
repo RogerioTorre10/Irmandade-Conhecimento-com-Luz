@@ -1,8 +1,7 @@
 /* =========================================================
-   STYLES-INTRO v2.0 â€” LIMPO
+   STYLES-INTRO v2.1 — CORRIGIDO
    Tipografia, efeitos, cursor, halo, ajustes desktop/mobile
    ========================================================= */
-
 
 /* ============================
    SECTION BASE
@@ -22,11 +21,12 @@
   text-align: left !important;
   animation: introPan 9s ease-in-out 1;
   position: relative;
-  z-index: 2; 
+  z-index: 2;
 }
 
 .intro-wrap {
   width: 100% !important;
+  /* CORRIGIDO: era overflow: hidden !important — cortava o título */
   overflow: visible !important;
   text-align: left !important;
 }
@@ -39,7 +39,6 @@
   background-repeat: no-repeat;
   background-position: top center;
 }
-
 
 /* ============================
    TIPOGRAFIA
@@ -129,10 +128,9 @@
   margin-top: 18px;
 }
 
-
 /* ============================
    VIDRO / CARD (j-panel-glow)
-   â€” compartilhado desktop+mobile
+   — compartilhado desktop+mobile
    ============================ */
 
 #section-intro .j-panel-glow {
@@ -161,12 +159,18 @@
   ) !important;
 }
 
-
 /* ============================
    CURSOR DE DATILOGRAFIA
    ============================ */
 
-#section-intro [data-typing="true"][data-cursor="true"] {
+/* CORRIGIDO: .intro-title usa display:block — cursor só inline em parágrafos */
+#section-intro .intro-title[data-typing="true"][data-cursor="true"] {
+  position: relative;
+  display: block;
+  padding-right: 0;
+}
+
+#section-intro .parchment-text-rough[data-typing="true"][data-cursor="true"] {
   position: relative;
   display: inline-block;
   padding-right: 0.35em;
@@ -190,7 +194,7 @@
   content: none;
 }
 
-/* Cursor slim nos parÃ¡grafos */
+/* Cursor slim nos parágrafos */
 #section-intro .parchment-text-rough[data-cursor="true"].typing-active::after {
   width: 2px;
   height: 1em;
@@ -198,21 +202,35 @@
   right: 0;
 }
 
-
 /* ============================
-   HALO DOURADO (digitando)
+   ÁUREA DOURADA (digitando)
+   CORRIGIDO: aplicado em .j-panel-glow (card visível)
+              além do .parchment-inner-rough
    ============================ */
 
+/* Áurea no card visível (j-panel-glow) — principal */
+#section-intro:has(.typing-active) .j-panel-glow {
+  outline: 2px solid rgba(255, 204, 102, 0.25);
+  outline-offset: 6px;
+  box-shadow:
+    0 0 0 2px rgba(255, 204, 102, 0.15) inset,
+    0 0 22px rgba(255, 204, 102, 0.45),
+    0 0 48px rgba(255, 153, 0, 0.35);
+  animation: parchmentGlow 1.6s ease-in-out infinite;
+}
+
+/* Áurea no container interno — mantida para compatibilidade */
 #section-intro:has(.typing-active) .parchment-inner-rough {
   outline: 2px solid rgba(255, 204, 102, 0.25);
   outline-offset: 6px;
   box-shadow:
     0 0 0 2px rgba(255, 204, 102, 0.15) inset,
     0 0 22px rgba(255, 204, 102, 0.45),
-    0 0 48px rgba(255, 153, 0, 0.35);  
+    0 0 48px rgba(255, 153, 0, 0.35);
   animation: parchmentGlow 1.6s ease-in-out infinite;
 }
 
+#section-intro:not(:has(.typing-active)) .j-panel-glow,
 #section-intro:not(:has(.typing-active)) .parchment-inner-rough {
   transition: box-shadow .35s ease, outline-color .35s ease;
 }
@@ -225,16 +243,15 @@
 }
 
 /* ============================
-   UTILITÃRIOS (usados pelo JS)
+   UTILITÁRIOS (usados pelo JS)
    ============================ */
 
-.is-hidden   { opacity: 0; pointer-events: none; transition: opacity .25s ease; }
-.is-disabled { opacity: .6; pointer-events: none; }
+.is-hidden    { opacity: 0; pointer-events: none; transition: opacity .25s ease; }
+.is-disabled  { opacity: .6; pointer-events: none; }
 .btn-ready-pulse { animation: btnReady .6s ease-out 1; }
 
-
 /* ============================
-   ANIMAÃ‡Ã•ES
+   ANIMAÇÕES
    ============================ */
 
 @keyframes btnReady {
@@ -248,24 +265,24 @@
 }
 
 @keyframes introPan {
-  0%   { transform: translateY(4px);  }
+  0%   { transform: translateY(4px); }
   50%  { transform: translateY(-4px); }
-  100% { transform: translateY(0);    }
+  100% { transform: translateY(0); }
 }
 
 @keyframes caretBlink {
-  0%, 45%  { opacity: 0.95; }
-  50%, 100% { opacity: 0;   }
+  0%,  45%  { opacity: 0.95; }
+  50%, 100% { opacity: 0; }
 }
 
 @keyframes parchmentGlow {
-  0%   {
+  0% {
     box-shadow:
       0 0 0 2px rgba(255, 204, 102, 0.15) inset,
       0 0 18px rgba(255, 204, 102, 0.35),
       0 0 32px rgba(255, 153, 0, 0.18);
   }
-  50%  {
+  50% {
     box-shadow:
       0 0 0 2px rgba(255, 204, 102, 0.18) inset,
       0 0 26px rgba(255, 204, 102, 0.50),
@@ -279,9 +296,8 @@
   }
 }
 
-
 /* ============================
-   DESKTOP (â‰¥ 900px)
+   DESKTOP (≥ 900px)
    ============================ */
 
 @media (min-width: 900px) {
@@ -309,9 +325,8 @@
   }
 }
 
-
 /* ============================
-   MOBILE (â‰¤ 600px)
+   MOBILE (≤ 600px)
    ============================ */
 
 @media (max-width: 600px) {
