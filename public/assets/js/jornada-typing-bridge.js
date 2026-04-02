@@ -1,9 +1,10 @@
 // /assets/js/jornada-typing-bridge.js — FINAL (Voice Manager + anti-eco seguro + latch)
 // - Voz correta por idioma + guia
-// - Suporte: pt-BR, en-US, es-ES, fr-FR, zh-CN
+// - Suporte: pt-BR, en-US, es-ES, fr-FR, zh-CN, ja-JP
 // - Aguarda voices carregarem
 // - Anti-eco NÃO deixa texto sumir (forceShow)
 // - getLangNow alinhado: i18n.currentLang + sessionStorage jornada.lang + etc.
+// - Sincronização aprimorada entre datilografia e TTS
 
 (function (window) {
   'use strict';
@@ -14,51 +15,6 @@
   const typingLog = (...args) => {
     if (window.DEBUG_TYPING) console.log('[TypingBridge]', ...args);
   };
-
-  function getLangNow() {
-  const raw =
-    window.i18n?.currentLang ||
-    window.i18n?.lang ||
-    sessionStorage.getItem('jornada.lang') ||
-    sessionStorage.getItem('i18n.lang') ||
-    localStorage.getItem('jc.lang') ||
-    localStorage.getItem('i18n_lang') ||
-    document.documentElement?.lang ||
-    'pt-BR';
-
-  return __normalizeLang(raw);
-}
-
-  function getGuideNow() {
-    return String(
-      sessionStorage.getItem('jornada.guide') ||
-      sessionStorage.getItem('guiaEscolhido') ||
-      localStorage.getItem('jornada.guide') ||
-      localStorage.getItem('guiaEscolhido') ||
-      window.currentGuide ||
-      'lumen'
-    ).trim().toLowerCase();
-  }
-
-  let __voices = [];
-  let __voicesPromise = null;
-  const __voiceCache = new Map();
-
-  const GUIDE_VOICE_PROFILE = {
-  zion:   { gender: 'male',   style: 'imperial' },
-  lumen:  { gender: 'female', style: 'bright' },
-  arian:  { gender: 'female', style: 'counselor' },
-  ariane: { gender: 'female', style: 'counselor' }
-};
-
-  function __loadVoicesNow() {
-    try {
-      __voices = speechSynthesis.getVoices?.() || [];
-    } catch {
-      __voices = [];
-    }
-    return __voices;
-  }
 
   function __normalizeLang(lang) {
     const raw = String(lang || 'pt-BR').trim().replace('_', '-');
@@ -82,6 +38,9 @@
       'fr-fr': 'fr-FR',
       'fr-ca': 'fr-FR',
 
+      ja: 'ja-JP',
+      'ja-jp': 'ja-JP',
+
       zh: 'zh-CN',
       'zh-cn': 'zh-CN',
       'zh-hans': 'zh-CN',
@@ -90,6 +49,51 @@
     };
 
     return map[lower] || raw;
+  }
+
+  function getLangNow() {
+    const raw =
+      window.i18n?.currentLang ||
+      window.i18n?.lang ||
+      sessionStorage.getItem('jornada.lang') ||
+      sessionStorage.getItem('i18n.lang') ||
+      localStorage.getItem('jc.lang') ||
+      localStorage.getItem('i18n_lang') ||
+      document.documentElement?.lang ||
+      'pt-BR';
+
+    return __normalizeLang(raw);
+  }
+
+  function getGuideNow() {
+    return String(
+      sessionStorage.getItem('jornada.guide') ||
+      sessionStorage.getItem('guiaEscolhido') ||
+      localStorage.getItem('jornada.guide') ||
+      localStorage.getItem('guiaEscolhido') ||
+      window.currentGuide ||
+      'lumen'
+    ).trim().toLowerCase();
+  }
+
+  let __voices = [];
+  let __voicesPromise = null;
+  const __voiceCache = new Map();
+
+  const GUIDE_VOICE_PROFILE = {
+    zion:   { gender: 'male',   style: 'imperial' },
+    lumen:  { gender: 'female', style: 'bright' },
+    arian:  { gender: 'female', style: 'counselor' },
+    ariane: { gender: 'female', style: 'counselor' }
+  };
+
+  function __loadVoicesNow() {
+    try {
+      __voices = speechSynthesis.getVoices?.() || [];
+    } catch {
+      __voices = [];
+    }
+    return __voices;
   }
 
   function __ensureVoicesReady(timeoutMs = 1600) {
@@ -133,80 +137,72 @@
   }
 
   function __voiceNameScore(name, profile = {}, lang = '') {
-  const n = String(name || '').toLowerCase();
-  const L = String(lang || '').toLowerCase();
-  let score = 0;
+    const n = String(name || '').toLowerCase();
+    const L = String(lang || '').toLowerCase();
+    let score = 0;
 
-  // gênero
-  if (profile.gender === 'male') {
-    if (/male|man|homem|masculin|masculine/.test(n)) score += 40;
-    if (/daniel|david|alex|jorge|paul|carlos|felipe|ricardo|antonio|bruno|thomas/.test(n)) score += 30;
+    if (profile.gender === 'male') {
+      if (/male|man|homem|masculin|masculine/.test(n)) score += 40;
+      if (/daniel|david|alex|jorge|paul|carlos|felipe|ricardo|antonio|bruno|thomas/.test(n)) score += 30;
+    }
+
+    if (profile.gender === 'female') {
+      if (/female|woman|mulher|feminin|feminine/.test(n)) score += 40;
+      if (/zira|samantha|helena|luciana|maria|sofia|victoria|ana|paulina|monica|marie|amelie|celine|audrey|denise/.test(n)) score += 30;
+    }
+
+    if (L.startsWith('fr')) {
+      if (/hortense|thomas|amelie|marie|celine|audrey|denise/.test(n)) score += 18;
+    }
+
+    if (L.startsWith('zh')) {
+      if (/huihui|yaoyao|xiaoxiao|xiaoyi|yunxi|yunyang/.test(n)) score += 18;
+    }
+
+    if (L.startsWith('ja')) {
+      if (/haruka|ayumi|ichiro|takumi|kyoko|otoya|sayaka/.test(n)) score += 18;
+    }
+
+    if (L.startsWith('es')) {
+      if (/jorge|carlos|maria|sofia|paulina|helena/.test(n)) score += 14;
+    }
+
+    if (L.startsWith('pt')) {
+      if (/luciana|maria|helena|ricardo|antonio|bruno/.test(n)) score += 14;
+    }
+
+    if (profile.style === 'warm') {
+      if (/helena|luciana|maria|sofia|samantha|paulina|monica|amelie|celine/.test(n)) score += 12;
+    }
+
+    if (profile.style === 'inspiring') {
+      if (/sofia|victoria|helena|maria|ana|paulina|monica|xiaoxiao|yaoyao/.test(n)) score += 12;
+    }
+
+    if (profile.style === 'firm') {
+      if (/alex|daniel|david|jorge|carlos|paul|ricardo|antonio|bruno|thomas/.test(n)) score += 12;
+    }
+
+    if (profile.style === 'imperial') {
+      if (/thomas|daniel|david|alex|jorge|carlos|ricardo|antonio|bruno|paul/.test(n)) score += 18;
+      if (/male|man|masculine|masculin/.test(n)) score += 14;
+      if (/neural|natural|microsoft|google/i.test(n)) score += 8;
+    }
+
+    if (profile.style === 'bright') {
+      if (/samantha|sofia|victoria|luciana|maria|ana|zira|paulina|sayaka/.test(n)) score += 18;
+      if (/female|woman|feminine|feminin/.test(n)) score += 14;
+      if (/neural|natural|google|microsoft/i.test(n)) score += 8;
+    }
+
+    if (profile.style === 'counselor') {
+      if (/helena|monica|paulina|marie|amelie|celine|denise|audrey|kyoko/.test(n)) score += 18;
+      if (/female|woman|feminine|feminin/.test(n)) score += 12;
+      if (/neural|natural|google|microsoft/i.test(n)) score += 8;
+    }
+
+    return score;
   }
-
-  if (profile.gender === 'female') {
-    if (/female|woman|mulher|feminin|feminine/.test(n)) score += 40;
-    if (/zira|samantha|helena|luciana|maria|sofia|victoria|ana|paulina|monica|marie|amelie|celine|audrey|denise/.test(n)) score += 30;
-  }
-
-  // nomes mais compatíveis por idioma
-  if (L.startsWith('fr')) {
-    if (/hortense|thomas|amelie|marie|celine|audrey|denise/.test(n)) score += 18;
-  }
-
-  if (L.startsWith('zh')) {
-    if (/huihui|yaoyao|xiaoxiao|xiaoyi|yunxi|yunyang/.test(n)) score += 18;
-  }
-
-  if (L.startsWith('ja')) {
-    if (/haruka|ayumi|ichiro|takumi|kyoko|otoya|sayaka/.test(n)) score += 18;
-  }
-
-  if (L.startsWith('es')) {
-    if (/jorge|carlos|maria|sofia|paulina|helena/.test(n)) score += 14;
-  }
-
-  if (L.startsWith('pt')) {
-    if (/luciana|maria|helena|ricardo|antonio|bruno/.test(n)) score += 14;
-  }
-
-  // estilo antigo mantido
-  if (profile.style === 'warm') {
-    if (/helena|luciana|maria|sofia|samantha|paulina|monica|amelie|celine/.test(n)) score += 12;
-  }
-
-  if (profile.style === 'inspiring') {
-    if (/sofia|victoria|helena|maria|ana|paulina|monica|xiaoxiao|yaoyao/.test(n)) score += 12;
-  }
-
-  if (profile.style === 'firm') {
-    if (/alex|daniel|david|jorge|carlos|paul|ricardo|antonio|bruno|thomas/.test(n)) score += 12;
-  }
-
-  // estilos novos
-
-  // Zion: grave, narrador, imperial
-  if (profile.style === 'imperial') {
-    if (/thomas|daniel|david|alex|jorge|carlos|ricardo|antonio|bruno|paul/.test(n)) score += 18;
-    if (/male|man|masculine|masculin/.test(n)) score += 14;
-    if (/neural|natural|microsoft|google/i.test(n)) score += 8;
-  }
-
-  // Lumen: jovem, clara, aguda, viva
-  if (profile.style === 'bright') {
-    if (/samantha|sofia|victoria|luciana|maria|ana|zira|paulina|sayaka/.test(n)) score += 18;
-    if (/female|woman|feminine|feminin/.test(n)) score += 14;
-    if (/neural|natural|google|microsoft/i.test(n)) score += 8;
-  }
-
-  // Arian: suave, contemplativa, conselheira
-  if (profile.style === 'counselor') {
-    if (/helena|monica|paulina|marie|amelie|celine|denise|audrey|kyoko/.test(n)) score += 18;
-    if (/female|woman|feminine|feminin/.test(n)) score += 12;
-    if (/neural|natural|google|microsoft/i.test(n)) score += 8;
-  }
-
-  return score;
-}
 
   function __rankVoices(candidates, lang, profile) {
     const L = String(lang || '').toLowerCase();
@@ -221,7 +217,6 @@
         else if (vLang.startsWith(prefix)) score += 14;
 
         if (typeof v.localService === 'boolean' && v.localService) score += 8;
-
         if (/google|microsoft|natural|neural/i.test(String(v.name || ''))) score += 6;
 
         return { v, score };
@@ -229,87 +224,93 @@
       .sort((a, b) => b.score - a.score);
   }
 
- function __pickBestVoice(lang, guide) {
-  lang = __normalizeLang(lang);
-  guide = String(guide || 'lumen').toLowerCase();
+  function __pickBestVoice(lang, guide) {
+    lang = __normalizeLang(lang);
+    guide = String(guide || 'lumen').toLowerCase();
 
-  const cacheKey = `${lang}::${guide}`;
-  if (__voiceCache.has(cacheKey)) return __voiceCache.get(cacheKey);
+    const cacheKey = `${lang}::${guide}`;
+    if (__voiceCache.has(cacheKey)) return __voiceCache.get(cacheKey);
 
-  const L = lang.toLowerCase();
-  const prefix = L.split('-')[0];
-  const profile = GUIDE_VOICE_PROFILE[guide] || GUIDE_VOICE_PROFILE.lumen;
+    const L = lang.toLowerCase();
+    const prefix = L.split('-')[0];
+    const profile = GUIDE_VOICE_PROFILE[guide] || GUIDE_VOICE_PROFILE.lumen;
 
-  let exact = __voices.filter(v => String(v.lang || '').toLowerCase() === L);
-  let family = __voices.filter(v => String(v.lang || '').toLowerCase().startsWith(prefix));
+    let exact = __voices.filter(v => String(v.lang || '').toLowerCase() === L);
+    let family = __voices.filter(v => String(v.lang || '').toLowerCase().startsWith(prefix));
 
-  if (!exact.length && prefix === 'zh') {
-    family = __voices.filter(v =>
-      /zh|cmn|chinese/i.test(String(v.lang || '') + ' ' + String(v.name || ''))
-    );
-  }
+    if (!exact.length && prefix === 'zh') {
+      family = __voices.filter(v =>
+        /zh|cmn|chinese/i.test(String(v.lang || '') + ' ' + String(v.name || ''))
+      );
+    }
 
-  if (!exact.length && prefix === 'fr') {
-    family = __voices.filter(v =>
-      /fr|french/i.test(String(v.lang || '') + ' ' + String(v.name || ''))
-    );
-  }
+    if (!exact.length && prefix === 'fr') {
+      family = __voices.filter(v =>
+        /fr|french/i.test(String(v.lang || '') + ' ' + String(v.name || ''))
+      );
+    }
 
-  let candidates = exact.length ? exact : family;
+    if (!exact.length && prefix === 'ja') {
+      family = __voices.filter(v =>
+        /ja|japanese/i.test(String(v.lang || '') + ' ' + String(v.name || ''))
+      );
+    }
 
-  // só como último recurso absoluto
-  if (!candidates.length) {
-    typingLog('Nenhuma voz compatível com o idioma. Usando fallback global.', {
+    let candidates = exact.length ? exact : family;
+
+    if (!candidates.length) {
+      typingLog('Nenhuma voz compatível com o idioma. Usando fallback global.', {
+        requestedLang: lang,
+        guide
+      });
+      candidates = [...__voices];
+    }
+
+    if (!candidates.length) {
+      __voiceCache.set(cacheKey, null);
+      return null;
+    }
+
+    const ranked = __rankVoices(candidates, lang, profile);
+    const best = ranked[0]?.v || null;
+
+    typingLog('Voz escolhida', {
       requestedLang: lang,
+      chosenVoice: best?.name || null,
+      chosenVoiceLang: best?.lang || null,
       guide
     });
-    candidates = [...__voices];
+
+    __voiceCache.set(cacheKey, best);
+    return best;
   }
-
-  if (!candidates.length) {
-    __voiceCache.set(cacheKey, null);
-    return null;
-  }
-
-  const ranked = __rankVoices(candidates, lang, profile);
-  const best = ranked[0]?.v || null;
-
-  typingLog('Voz escolhida', {
-    requestedLang: lang,
-    chosenVoice: best?.name || null,
-    chosenVoiceLang: best?.lang || null,
-    guide
-  });
-
-  __voiceCache.set(cacheKey, best);
-  return best;
-}
 
   async function __applyVoice(utt, lang) {
-  if (!utt || !('speechSynthesis' in window)) return;
+    if (!utt || !('speechSynthesis' in window)) return;
 
-  const normalizedLang = __normalizeLang(lang || getLangNow());
+    const normalizedLang = __normalizeLang(lang || getLangNow());
 
-  await __ensureVoicesReady();
+    await __ensureVoicesReady();
 
-  const guide = getGuideNow();
-  const voice = __pickBestVoice(normalizedLang, guide);
+    const guide = getGuideNow();
+    const voice = __pickBestVoice(normalizedLang, guide);
 
-  if (voice) {
-    utt.voice = voice;
-    utt.lang = __normalizeLang(voice.lang || normalizedLang);
-  } else {
-    utt.voice = null;
-    utt.lang = normalizedLang;
+    if (voice) {
+      utt.voice = voice;
+      utt.lang = __normalizeLang(voice.lang || normalizedLang);
+    } else {
+      utt.voice = null;
+      utt.lang = normalizedLang;
+    }
+
+    typingLog('Aplicando voz ao utterance', {
+      guide,
+      requestedLang: normalizedLang,
+      finalLang: utt.lang,
+      voice: utt.voice?.name || '(default)'
+    });
   }
 
-  typingLog('Aplicando voz ao utterance', {
-    guide,
-    requestedLang: normalizedLang,
-    finalLang: utt.lang,
-    voice: utt.voice?.name || '(default)'
-  });
-}
   window.TYPING_DEBUG_VOICES = async function () {
     if (!('speechSynthesis' in window)) {
       console.log('speechSynthesis não disponível.');
@@ -360,20 +361,43 @@
   function lock() { window.__typingLock = true; }
   function unlock() { window.__typingLock = false; }
 
-  function makeTypingSig(text) {
-    const lang = getLangNow();
-    const t = String(text || '').trim();
-    return `${lang}::${t}`;
+  function getElementTypingKey(element) {
+    if (!element) return 'no-element';
+
+    return String(
+      element.id ||
+      element.getAttribute?.('data-typing-id') ||
+      element.getAttribute?.('data-i18n-key') ||
+      element.className ||
+      element.tagName ||
+      'anon'
+    ).trim();
   }
 
-  let __lastTypingSig = '';
-  let __lastTypingAt = 0;
+  function makeTypingSig(text, element) {
+    const lang = getLangNow();
+    const t = String(text || '').trim();
+    const elKey = getElementTypingKey(element);
+    return `${lang}::${elKey}::${t}`;
+  }
 
-  function shouldSkipTyping(sig) {
+  function shouldSkipTyping(sig, element, options = {}) {
+    if (options.forceReplay) return false;
+    if (!sig) return false;
+
     const now = Date.now();
-    if (sig === __lastTypingSig && (now - __lastTypingAt) < 1400) return true;
-    __lastTypingSig = sig;
-    __lastTypingAt = now;
+    const lastSig = element?.dataset?.typingLastSig || '';
+    const lastAt = Number(element?.dataset?.typingLastAt || 0);
+
+    if (sig === lastSig && (now - lastAt) < 1200) {
+      return true;
+    }
+
+    if (element?.dataset) {
+      element.dataset.typingLastSig = sig;
+      element.dataset.typingLastAt = String(now);
+    }
+
     return false;
   }
 
@@ -383,7 +407,7 @@
     element.style.opacity = '1';
     element.classList.add('typing-done');
     element.dataset.typingDone = '1';
-    try { element.dataset.typingSig = makeTypingSig(text); } catch {}
+    try { element.dataset.typingSig = makeTypingSig(text, element); } catch {}
   }
 
   async function typeText(element, text, speed = 40, showCursor = true) {
@@ -434,23 +458,28 @@
   }
 
   window.runTyping = (element, text, callback, options = {}) => {
-    const speed = options.speed || 36;
+    const speed = options.speed || 42;
     const showCursor = options.cursor ?? true;
 
     try {
-      const sig = makeTypingSig(text);
+      const sig = makeTypingSig(text, element);
 
-      if (shouldSkipTyping(sig)) {
+      if (shouldSkipTyping(sig, element, options)) {
         forceShow(element, text);
         if (typeof callback === 'function') setTimeout(callback, 0);
-        return;
+        return Promise.resolve();
       }
 
       const prev = element?.dataset?.typingSig;
-      if (element && prev === sig && element.classList.contains('typing-done')) {
+      if (
+        !options.forceReplay &&
+        element &&
+        prev === sig &&
+        element.classList.contains('typing-done')
+      ) {
         forceShow(element, text);
         if (typeof callback === 'function') setTimeout(callback, 0);
-        return;
+        return Promise.resolve();
       }
 
       if (element) element.dataset.typingSig = sig;
@@ -461,227 +490,245 @@
 
     try { window.Luz?.startPulse({ min: 1, max: 1.25, speed: 140 }); } catch {}
 
-    typeText(element, text, speed, showCursor).then(() => {
+    return typeText(element, text, speed, showCursor).then(() => {
       try { window.Luz?.stopPulse(); } catch {}
       unlock();
       if (callback) callback();
     });
   };
 
-   window.EffectCoordinator = window.EffectCoordinator || {};
+  window.EffectCoordinator = window.EffectCoordinator || {};
 
-function getGuideSpeechTuning(guide, lang) {
-  const g = String(guide || 'lumen').toLowerCase();
-  const L = String(lang || 'pt-BR');
+  function getGuideSpeechTuning(guide, lang) {
+    const g = String(guide || 'lumen').toLowerCase();
+    const L = String(lang || 'pt-BR');
 
-  let baseRate = 1.0;
-  let basePitch = 1.0;
+    let baseRate = 1.0;
+    let basePitch = 1.0;
 
-  if (L.startsWith('zh')) {
-    baseRate = 0.92;
-    basePitch = 1.0;
-  } else if (L.startsWith('ja')) {
-    baseRate = 0.94;
-    basePitch = 1.0;
-  } else if (L.startsWith('fr')) {
-    baseRate = 0.98;
-    basePitch = 1.0;
-  } else if (L.startsWith('es')) {
-    baseRate = 0.99;
-    basePitch = 1.0;
-  } else if (L.startsWith('en')) {
-    baseRate = 1.0;
-    basePitch = 1.0;
-  } else {
-    baseRate = 1.0;
-    basePitch = 1.0;
-  }
-
-  if (g === 'zion') {
-    return {
-      rate: Math.max(0.88, baseRate - 0.06),
-      pitch: 0.82,
-      volume: 1.0
-    };
-  }
-
-  if (g === 'lumen') {
-    return {
-      rate: Math.min(1.08, baseRate + 0.03),
-      pitch: 1.14,
-      volume: 1.0
-    };
-  }
-
-  // arian / ariane
-  return {
-    rate: Math.max(0.90, baseRate - 0.02),
-    pitch: 0.96,
-    volume: 1.0
-  };
-}
-  
-window.EffectCoordinator = window.EffectCoordinator || {};
-
-let __lastSpeakSig = '';
-let __lastSpeakAt = 0;
-
-window.EffectCoordinator.speak = (text, options = {}) => {
-  if (!text || !('speechSynthesis' in window)) return;
-
-  const lang = getLangNow();
-  const guide = getGuideNow();
-  const tuning = getGuideSpeechTuning(guide, lang);
-
-  const clean = String(text)
-    .replace(/\s+/g, ' ')
-    .trim();
-
-  if (!clean) return;
-
-  const sig = `${lang}::${guide}::${clean}`;
-  const now = Date.now();
-
-  if (sig === __lastSpeakSig && (now - __lastSpeakAt) < 1600) return;
-  __lastSpeakSig = sig;
-  __lastSpeakAt = now;
-
-  try { speechSynthesis.cancel(); } catch {}
-
-  const utt = new SpeechSynthesisUtterance(clean);
-  utt.lang = lang;
-  utt.rate = options.rate ?? tuning.rate;
-  utt.pitch = options.pitch ?? tuning.pitch;
-  utt.volume = options.volume ?? tuning.volume;
-
-  utt.onstart = () => {
-    typingLog('TTS iniciou', {
-      lang: utt.lang,
-      guide,
-      voice: utt.voice?.name || '(default)',
-      rate: utt.rate,
-      pitch: utt.pitch
-    });
-  };
-
-  utt.onboundary = () => {
-    try { window.Luz?.startPulse({ min: 1, max: 1.45, speed: 120 }); } catch {}
-  };
-
-  utt.onend = () => {
-    try { window.Luz?.stopPulse(); } catch {}
-  };
-
-  utt.onerror = (ev) => {
-    typingLog('TTS erro', {
-      error: ev?.error || 'unknown',
-      lang: utt.lang,
-      guide,
-      voice: utt.voice?.name || '(default)'
-    });
-    try { window.Luz?.stopPulse(); } catch {}
-  };
-
-  Promise.resolve(__applyVoice(utt, lang))
-    .then(() => {
-      try {
-        speechSynthesis.speak(utt);
-      } catch {}
-    })
-    .catch(() => {
-      try {
-        speechSynthesis.speak(utt);
-      } catch {}
-    });
-};
-   
-  window.typeAndSpeak = async function (element, text, speed = 36) {
-  if (!text || !element) return;
-
-  try {
-    const sig = makeTypingSig(text);
-
-    if (element.dataset.typingSig === sig && element.classList.contains('typing-done')) return;
-
-    if (shouldSkipTyping(sig)) {
-      forceShow(element, text);
-      return;
+    if (L.startsWith('zh')) {
+      baseRate = 0.92;
+      basePitch = 1.0;
+    } else if (L.startsWith('ja')) {
+      baseRate = 0.94;
+      basePitch = 1.0;
+    } else if (L.startsWith('fr')) {
+      baseRate = 0.98;
+      basePitch = 1.0;
+    } else if (L.startsWith('es')) {
+      baseRate = 0.99;
+      basePitch = 1.0;
+    } else if (L.startsWith('en')) {
+      baseRate = 1.0;
+      basePitch = 1.0;
+    } else {
+      baseRate = 1.0;
+      basePitch = 1.0;
     }
 
-    element.dataset.typingSig = sig;
-  } catch {}
+    if (g === 'zion') {
+      return {
+        rate: Math.max(0.88, baseRate - 0.06),
+        pitch: 0.82,
+        volume: 1.0
+      };
+    }
 
-  let terminou = false;
+    if (g === 'lumen') {
+      return {
+        rate: Math.min(1.08, baseRate + 0.03),
+        pitch: 1.14,
+        volume: 1.0
+      };
+    }
 
-  if ('speechSynthesis' in window) {
+    return {
+      rate: Math.max(0.90, baseRate - 0.02),
+      pitch: 0.96,
+      volume: 1.0
+    };
+  }
+
+  let __lastSpeakSig = '';
+  let __lastSpeakAt = 0;
+
+  window.EffectCoordinator.speak = (text, options = {}) => {
+    if (!text || !('speechSynthesis' in window)) return;
+
     const lang = getLangNow();
     const guide = getGuideNow();
     const tuning = getGuideSpeechTuning(guide, lang);
-    const clean = String(text).replace(/\s+/g, ' ').trim();
-    const utt = new SpeechSynthesisUtterance(clean);
 
+    const clean = String(text)
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    if (!clean) return;
+
+    const sig = `${lang}::${guide}::${clean}`;
+    const now = Date.now();
+
+    if (sig === __lastSpeakSig && (now - __lastSpeakAt) < 1600) return;
+    __lastSpeakSig = sig;
+    __lastSpeakAt = now;
+
+    try { speechSynthesis.cancel(); } catch {}
+
+    const utt = new SpeechSynthesisUtterance(clean);
     utt.lang = lang;
-    utt.rate = tuning.rate;
-    utt.pitch = tuning.pitch;
-    utt.volume = tuning.volume;
+    utt.rate = options.rate ?? tuning.rate;
+    utt.pitch = options.pitch ?? tuning.pitch;
+    utt.volume = options.volume ?? tuning.volume;
 
     utt.onstart = () => {
-      typingLog('typeAndSpeak iniciou', {
+      typingLog('TTS iniciou', {
         lang: utt.lang,
-        guide: getGuideNow(),
-        voice: utt.voice?.name || '(default)'
+        guide,
+        voice: utt.voice?.name || '(default)',
+        rate: utt.rate,
+        pitch: utt.pitch
       });
     };
 
-    utt.onend = () => { terminou = true; };
-    utt.onerror = () => { terminou = true; };
+    utt.onboundary = () => {
+      try { window.Luz?.startPulse({ min: 1, max: 1.45, speed: 120 }); } catch {}
+    };
 
-    try { await __applyVoice(utt, lang); } catch {}
+    utt.onend = () => {
+      try { window.Luz?.stopPulse(); } catch {}
+    };
 
-    try { speechSynthesis.cancel(); } catch {}
-    try { speechSynthesis.speak(utt); } catch { terminou = true; }
-  } else {
-    terminou = true;
-  }
+    utt.onerror = (ev) => {
+      typingLog('TTS erro', {
+        error: ev?.error || 'unknown',
+        lang: utt.lang,
+        guide,
+        voice: utt.voice?.name || '(default)'
+      });
+      try { window.Luz?.stopPulse(); } catch {}
+    };
 
-  await window.runTyping(element, text, null, { speed });
+    Promise.resolve(__applyVoice(utt, lang))
+      .then(() => {
+        try {
+          speechSynthesis.speak(utt);
+        } catch {}
+      })
+      .catch(() => {
+        try {
+          speechSynthesis.speak(utt);
+        } catch {}
+      });
+  };
 
-  while (!terminou) {
-    await new Promise(r => setTimeout(r, 80));
-  }
-};
+  window.typeAndSpeak = async function (element, text, speed = 42, options = {}) {
+    if (!text || !element) return;
 
-window.__TEST_TTS_JORNADA = async function (sampleText) {
-  const lang = getLangNow();
-  const guide = getGuideNow();
+    const clean = String(text).replace(/\s+/g, ' ').trim();
+    if (!clean) return;
 
-  await __ensureVoicesReady();
+    try {
+      const sig = makeTypingSig(clean, element);
 
-  const voice = __pickBestVoice(lang, guide);
-  const text = String(
-    sampleText ||
-    ({
-      'pt-BR': 'Meu coração permanece firme na luz.',
-      'en-US': 'My heart remains steady in the light.',
-      'es-ES': 'Mi corazón permanece firme en la luz.',
-      'fr-FR': 'Mon cœur demeure ferme dans la lumière.',
-      'zh-CN': '我的心在光中保持坚定。'
-    }[lang] || 'Teste de voz da jornada.')
-  );
+      if (
+        !options.forceReplay &&
+        element.dataset.typingSig === sig &&
+        element.classList.contains('typing-done')
+      ) {
+        return;
+      }
 
-  console.log('[TEST_TTS_JORNADA]', {
-    lang,
-    guide,
-    voice: voice ? { name: voice.name, lang: voice.lang } : null,
-    text
-  });
+      element.dataset.typingSig = sig;
+    } catch {}
 
-  const utt = new SpeechSynthesisUtterance(text);
-  utt.lang = lang;
-  if (voice) utt.voice = voice;
-  speechSynthesis.cancel();
-  speechSynthesis.speak(utt);
-};
+    const lang = getLangNow();
+    const guide = getGuideNow();
+    const tuning = getGuideSpeechTuning(guide, lang);
+
+    let speechDone = !('speechSynthesis' in window);
+    let utt = null;
+
+    const chars = clean.length;
+    const estimatedSpeechMs = Math.max(
+      1800,
+      Math.min(9000, (chars / 14) * 1000 / Math.max(0.72, tuning.rate))
+    );
+
+    const typingSpeed = options.speed
+      ? options.speed
+      : Math.max(20, Math.min(46, Math.round(estimatedSpeechMs / Math.max(chars, 1))));
+
+    if ('speechSynthesis' in window) {
+      utt = new SpeechSynthesisUtterance(clean);
+      utt.lang = lang;
+      utt.rate = options.rate ?? tuning.rate;
+      utt.pitch = options.pitch ?? tuning.pitch;
+      utt.volume = options.volume ?? tuning.volume;
+
+      utt.onstart = () => {
+        typingLog('typeAndSpeak iniciou', {
+          lang: utt.lang,
+          guide,
+          voice: utt.voice?.name || '(default)',
+          typingSpeed
+        });
+      };
+
+      utt.onend = () => { speechDone = true; };
+      utt.onerror = () => { speechDone = true; };
+
+      try { await __applyVoice(utt, lang); } catch {}
+    }
+
+    if (utt) {
+      try { speechSynthesis.cancel(); } catch {}
+      try { speechSynthesis.speak(utt); } catch { speechDone = true; }
+      await new Promise(r => setTimeout(r, 90));
+    }
+
+    await window.runTyping(element, clean, null, {
+      speed: typingSpeed,
+      cursor: options.cursor ?? true,
+      forceReplay: options.forceReplay ?? false
+    });
+
+    while (!speechDone) {
+      await new Promise(r => setTimeout(r, 60));
+    }
+  };
+
+  window.__TEST_TTS_JORNADA = async function (sampleText) {
+    const lang = getLangNow();
+    const guide = getGuideNow();
+
+    await __ensureVoicesReady();
+
+    const voice = __pickBestVoice(lang, guide);
+    const text = String(
+      sampleText ||
+      ({
+        'pt-BR': 'Meu coração permanece firme na luz.',
+        'en-US': 'My heart remains steady in the light.',
+        'es-ES': 'Mi corazón permanece firme en la luz.',
+        'fr-FR': 'Mon cœur demeure ferme dans la lumière.',
+        'ja-JP': '私の心は光の中で揺るがずにいます。',
+        'zh-CN': '我的心在光中保持坚定。'
+      }[lang] || 'Teste de voz da jornada.')
+    );
+
+    console.log('[TEST_TTS_JORNADA]', {
+      lang,
+      guide,
+      voice: voice ? { name: voice.name, lang: voice.lang } : null,
+      text
+    });
+
+    const utt = new SpeechSynthesisUtterance(text);
+    utt.lang = lang;
+    if (voice) utt.voice = voice;
+    speechSynthesis.cancel();
+    speechSynthesis.speak(utt);
+  };
 
   typingLog('TypingBridge pronto');
 })(window);
