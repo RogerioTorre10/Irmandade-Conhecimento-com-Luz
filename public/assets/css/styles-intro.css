@@ -1,6 +1,5 @@
-
 /* =========================================================
-   STYLES-INTRO v2.0 — LIMPO
+   STYLES-INTRO v2.0 â€” LIMPO
    Tipografia, efeitos, cursor, halo, ajustes desktop/mobile
    ========================================================= */
 
@@ -133,7 +132,7 @@
 
 /* ============================
    VIDRO / CARD (j-panel-glow)
-   — compartilhado desktop+mobile
+   â€” compartilhado desktop+mobile
    ============================ */
 
 #section-intro .j-panel-glow {
@@ -191,7 +190,7 @@
   content: none;
 }
 
-/* Cursor slim nos parágrafos */
+/* Cursor slim nos parÃ¡grafos */
 #section-intro .parchment-text-rough[data-cursor="true"].typing-active::after {
   width: 2px;
   height: 1em;
@@ -226,7 +225,7 @@
 }
 
 /* ============================
-   UTILITÁRIOS (usados pelo JS)
+   UTILITÃRIOS (usados pelo JS)
    ============================ */
 
 .is-hidden   { opacity: 0; pointer-events: none; transition: opacity .25s ease; }
@@ -235,7 +234,7 @@
 
 
 /* ============================
-   ANIMAÇÕES
+   ANIMAÃ‡Ã•ES
    ============================ */
 
 @keyframes btnReady {
@@ -282,7 +281,7 @@
 
 
 /* ============================
-   DESKTOP (≥ 900px)
+   DESKTOP (â‰¥ 900px)
    ============================ */
 
 @media (min-width: 900px) {
@@ -312,7 +311,7 @@
 
 
 /* ============================
-   MOBILE (≤ 600px)
+   MOBILE (â‰¤ 600px)
    ============================ */
 
 @media (max-width: 600px) {
