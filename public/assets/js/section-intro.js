@@ -16,7 +16,7 @@
     const modal = document.createElement('div');
     modal.id = 'intro-lang-modal';
 
-    modal.innerHTML = `
+   modal.innerHTML = `
       <div class="intro-lang-backdrop"></div>
       <div class="intro-lang-card" role="dialog" aria-modal="true" aria-labelledby="intro-lang-title">
         <h3 id="intro-lang-title" class="intro-lang-title">Escolha seu idioma</h3>
@@ -32,6 +32,7 @@
             <option value="fr-FR">Français (FR)</option>
             <option value="ja-JP">日本語 (日本)</option>
             <option value="zh-CN">中文（简体）</option>
+            <option value="de-DE">Deutsch (DE)</option>
           </select>
         </div>
 
