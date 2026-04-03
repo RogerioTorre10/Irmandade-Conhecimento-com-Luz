@@ -45,7 +45,12 @@
       'zh-cn': 'zh-CN',
       'zh-hans': 'zh-CN',
       'zh-sg': 'zh-CN',
-      'cmn-hans-cn': 'zh-CN'
+      'cmn-hans-cn': 'zh-CN',
+
+      de: 'de-DE',
+      'de-de': 'de-DE',
+      'de-at': 'de-DE',
+      'de-ch': 'de-DE',   
     };
 
     return map[lower] || raw;
@@ -712,7 +717,8 @@
         'es-ES': 'Mi corazón permanece firme en la luz.',
         'fr-FR': 'Mon cœur demeure ferme dans la lumière.',
         'ja-JP': '私の心は光の中で揺るがずにいます。',
-        'zh-CN': '我的心在光中保持坚定。'
+        'zh-CN': '我的心在光中保持坚定。',
+        'de-DE': 'Mein Herz bleibt standhaft im Licht.',
       }[lang] || 'Teste de voz da jornada.')
     );
 
