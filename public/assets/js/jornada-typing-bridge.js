@@ -1,11 +1,3 @@
-// /assets/js/jornada-typing-bridge.js — FINAL (Voice Manager + anti-eco seguro + latch)
-// - Voz correta por idioma + guia
-// - Suporte: pt-BR, en-US, es-ES, fr-FR, zh-CN, ja-JP
-// - Aguarda voices carregarem
-// - Anti-eco NÃO deixa texto sumir (forceShow)
-// - getLangNow alinhado: i18n.currentLang + sessionStorage jornada.lang + etc.
-// - Sincronização aprimorada entre datilografia e TTS
-
 (function (window) {
   'use strict';
 
@@ -24,33 +16,27 @@
       pt: 'pt-BR',
       'pt-br': 'pt-BR',
       'pt-pt': 'pt-BR',
-
       en: 'en-US',
       'en-us': 'en-US',
       'en-gb': 'en-US',
-
       es: 'es-ES',
       'es-es': 'es-ES',
       'es-mx': 'es-ES',
       'es-ar': 'es-ES',
-
       fr: 'fr-FR',
       'fr-fr': 'fr-FR',
       'fr-ca': 'fr-FR',
-
       ja: 'ja-JP',
       'ja-jp': 'ja-JP',
-
       zh: 'zh-CN',
       'zh-cn': 'zh-CN',
       'zh-hans': 'zh-CN',
       'zh-sg': 'zh-CN',
       'cmn-hans-cn': 'zh-CN',
-
       de: 'de-DE',
       'de-de': 'de-DE',
       'de-at': 'de-DE',
-      'de-ch': 'de-DE',   
+      'de-ch': 'de-DE'
     };
 
     return map[lower] || raw;
@@ -74,8 +60,10 @@
     return String(
       sessionStorage.getItem('jornada.guide') ||
       sessionStorage.getItem('guiaEscolhido') ||
+      sessionStorage.getItem('jornada.guia') ||
       localStorage.getItem('jornada.guide') ||
       localStorage.getItem('guiaEscolhido') ||
+      localStorage.getItem('jornada.guia') ||
       window.currentGuide ||
       'lumen'
     ).trim().toLowerCase();
@@ -86,9 +74,9 @@
   const __voiceCache = new Map();
 
   const GUIDE_VOICE_PROFILE = {
-    zion:   { gender: 'male',   style: 'imperial' },
-    lumen:  { gender: 'female', style: 'bright' },
-    arian:  { gender: 'female', style: 'counselor' },
+    zion: { gender: 'male', style: 'imperial' },
+    lumen: { gender: 'female', style: 'bright' },
+    arian: { gender: 'female', style: 'counselor' },
     ariane: { gender: 'female', style: 'counselor' }
   };
 
@@ -356,7 +344,9 @@
       @keyframes blink { 50% { opacity: 0; } }
 
       [data-typing="true"] { opacity: 0; transition: opacity 0.1s; }
-      .typing-done[data-typing] { opacity: 1 !important; }
+      .typing-done[data-typing],
+      .typing-done { opacity: 1 !important; }
+      .typing-active { opacity: 1 !important; }
     `;
     document.head.appendChild(st);
   })();
@@ -394,9 +384,7 @@
     const lastSig = element?.dataset?.typingLastSig || '';
     const lastAt = Number(element?.dataset?.typingLastAt || 0);
 
-    if (sig === lastSig && (now - lastAt) < 1200) {
-      return true;
-    }
+    if (sig === lastSig && (now - lastAt) < 1200) return true;
 
     if (element?.dataset) {
       element.dataset.typingLastSig = sig;
@@ -410,21 +398,40 @@
     if (!element) return;
     element.textContent = String(text || '');
     element.style.opacity = '1';
+    element.classList.remove('typing-active');
     element.classList.add('typing-done');
     element.dataset.typingDone = '1';
     try { element.dataset.typingSig = makeTypingSig(text, element); } catch {}
   }
 
+  function clearTypingRuntimeState(element) {
+    if (!element) return;
+
+    const caret = element.querySelector?.('.typing-caret');
+    if (caret) caret.remove();
+
+    element.classList.remove('typing-active', 'typing-done', 'type-done');
+    delete element.dataset.typingDone;
+
+    if (element.dataset?.forceReplayNow === '1') {
+      delete element.dataset.typingSig;
+      delete element.dataset.typingLastSig;
+      delete element.dataset.typingLastAt;
+      delete element.dataset.forceReplayNow;
+    }
+  }
+
   async function typeText(element, text, speed = 40, showCursor = true) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       if (!element || !text) return resolve();
 
       if (abortCurrent) abortCurrent();
       let abort = false;
-      abortCurrent = () => (abort = true);
+      abortCurrent = () => { abort = true; };
 
-      element.classList.remove('typing-done');
+      clearTypingRuntimeState(element);
       element.style.opacity = '0';
+      element.textContent = '';
 
       let caret = element.querySelector('.typing-caret');
       if (!caret) {
@@ -433,15 +440,16 @@
         caret.textContent = '|';
       }
 
-      element.textContent = '';
       if (showCursor) element.appendChild(caret);
       element.style.opacity = '1';
+      element.classList.add('typing-active');
 
       let i = 0;
       const interval = setInterval(() => {
         if (abort) {
           clearInterval(interval);
           if (showCursor) caret.remove();
+          element.classList.remove('typing-active');
           return resolve();
         }
 
@@ -454,6 +462,7 @@
         if (i >= text.length) {
           clearInterval(interval);
           if (showCursor) caret.remove();
+          element.classList.remove('typing-active');
           element.classList.add('typing-done');
           element.dataset.typingDone = '1';
           resolve();
@@ -465,12 +474,24 @@
   window.runTyping = (element, text, callback, options = {}) => {
     const speed = options.speed || 42;
     const showCursor = options.cursor ?? true;
+    const clean = String(text || '').replace(/\s+/g, ' ').trim();
+
+    if (!element || !clean) {
+      if (typeof callback === 'function') setTimeout(callback, 0);
+      return Promise.resolve();
+    }
+
+    if (options.forceReplay) {
+      element.dataset.forceReplayNow = '1';
+      clearTypingRuntimeState(element);
+      element.textContent = '';
+    }
 
     try {
-      const sig = makeTypingSig(text, element);
+      const sig = makeTypingSig(clean, element);
 
       if (shouldSkipTyping(sig, element, options)) {
-        forceShow(element, text);
+        forceShow(element, clean);
         if (typeof callback === 'function') setTimeout(callback, 0);
         return Promise.resolve();
       }
@@ -482,7 +503,7 @@
         prev === sig &&
         element.classList.contains('typing-done')
       ) {
-        forceShow(element, text);
+        forceShow(element, clean);
         if (typeof callback === 'function') setTimeout(callback, 0);
         return Promise.resolve();
       }
@@ -495,7 +516,7 @@
 
     try { window.Luz?.startPulse({ min: 1, max: 1.25, speed: 140 }); } catch {}
 
-    return typeText(element, text, speed, showCursor).then(() => {
+    return typeText(element, clean, speed, showCursor).then(() => {
       try { window.Luz?.stopPulse(); } catch {}
       unlock();
       if (callback) callback();
@@ -526,32 +547,17 @@
     } else if (L.startsWith('en')) {
       baseRate = 1.0;
       basePitch = 1.0;
-    } else {
-      baseRate = 1.0;
-      basePitch = 1.0;
     }
 
     if (g === 'zion') {
-      return {
-        rate: Math.max(0.88, baseRate - 0.06),
-        pitch: 0.82,
-        volume: 1.0
-      };
+      return { rate: Math.max(0.88, baseRate - 0.06), pitch: 0.82, volume: 1.0 };
     }
 
     if (g === 'lumen') {
-      return {
-        rate: Math.min(1.08, baseRate + 0.03),
-        pitch: 1.14,
-        volume: 1.0
-      };
+      return { rate: Math.min(1.08, baseRate + 0.03), pitch: 1.14, volume: 1.0 };
     }
 
-    return {
-      rate: Math.max(0.90, baseRate - 0.02),
-      pitch: 0.96,
-      volume: 1.0
-    };
+    return { rate: Math.max(0.90, baseRate - 0.02), pitch: 0.96, volume: 1.0 };
   }
 
   let __lastSpeakSig = '';
@@ -564,10 +570,7 @@
     const guide = getGuideNow();
     const tuning = getGuideSpeechTuning(guide, lang);
 
-    const clean = String(text)
-      .replace(/\s+/g, ' ')
-      .trim();
-
+    const clean = String(text).replace(/\s+/g, ' ').trim();
     if (!clean) return;
 
     const sig = `${lang}::${guide}::${clean}`;
@@ -615,14 +618,10 @@
 
     Promise.resolve(__applyVoice(utt, lang))
       .then(() => {
-        try {
-          speechSynthesis.speak(utt);
-        } catch {}
+        try { speechSynthesis.speak(utt); } catch {}
       })
       .catch(() => {
-        try {
-          speechSynthesis.speak(utt);
-        } catch {}
+        try { speechSynthesis.speak(utt); } catch {}
       });
   };
 
@@ -631,6 +630,12 @@
 
     const clean = String(text).replace(/\s+/g, ' ').trim();
     if (!clean) return;
+
+    if (options.forceReplay) {
+      element.dataset.forceReplayNow = '1';
+      clearTypingRuntimeState(element);
+      element.textContent = '';
+    }
 
     try {
       const sig = makeTypingSig(clean, element);
@@ -718,7 +723,7 @@
         'fr-FR': 'Mon cœur demeure ferme dans la lumière.',
         'ja-JP': '私の心は光の中で揺るがずにいます。',
         'zh-CN': '我的心在光中保持坚定。',
-        'de-DE': 'Mein Herz bleibt standhaft im Licht.',
+        'de-DE': 'Mein Herz bleibt standhaft im Licht.'
       }[lang] || 'Teste de voz da jornada.')
     );
 
