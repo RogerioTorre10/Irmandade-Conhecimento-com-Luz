@@ -126,7 +126,7 @@
 #section-intro .parchment-text-rough.type-done,
 #section-intro .intro-title.typing-done,
 #section-intro .intro-title.type-done {
-  text-align: center !important;
+  text-align: left !important;
   opacity: 1 !important;
   visibility: visible !important;
   display: block !important;
