@@ -57,17 +57,20 @@
             <option value="en-US">English (US)</option>
             <option value="es-ES">Español (ES)</option>
             <option value="fr-FR">Français (FR)</option>
+            <option value="ja-JP">日本語 (日本)</option>
             <option value="zh-CN">中文（简体）</option>
+            <option value="de-DE">Deutsch (DE)</option>
           </select>
         </div>
 
         <div class="intro-lang-actions">
           <button id="intro-lang-confirm" type="button" class="intro-lang-confirm-btn">
-          Confirmar
-         </button>
+            Confirmar
+          </button>
         </div>
       </div>
     `;
+
   const style = document.createElement('style');
   style.textContent = `
   #intro-lang-modal {
@@ -137,7 +140,7 @@
   border: none;
   border-radius: 12px;
   background: url('/assets/img/textura-de-pedra.jpg') center/cover;
-  color: #111;
+  color: #ffffff;
   box-shadow: 0 4px 15px rgba(0,0,0,0.6);
   transition: all 0.25s ease;
   cursor: pointer !important;
