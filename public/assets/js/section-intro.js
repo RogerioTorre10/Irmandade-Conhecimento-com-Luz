@@ -332,6 +332,8 @@
           btn.disabled = true;
           sel.disabled = true;
 
+          clearInterval(unlockWatchdog);
+
           await setLangAndLock(chosenLang);
 
           if (root && window.i18n?.apply) {
