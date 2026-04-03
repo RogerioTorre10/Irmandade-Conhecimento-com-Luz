@@ -46,26 +46,30 @@
    ============================ */
 
 .intro-title {
-  display: block;
-  width: 100%;
-  max-width: 100%;
-  min-height: 2.4em;
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  min-height: auto !important;
+  height: auto !important;
   box-sizing: border-box;
 
   font-family: 'ManufacturingConsent', sans-serif;
-  font-size: clamp(28px, 4vw, 36px);
-  line-height: 1.2;
-  text-align: center;
+  font-size: clamp(26px, 3.6vw, 36px);
+  line-height: 1.32 !important;
+  letter-spacing: 0.02em;
+  text-align: center !important;
   color: var(--theme-main-color, #ffd700);
 
-  margin-top: 40px;
-  margin-bottom: 20px;
-  padding: 0 12px;
+  margin-top: 24px !important;
+  margin-bottom: 16px !important;
+  padding: 0 18px !important;
 
-  white-space: normal;
-  overflow: visible;
-  word-break: normal;
-  overflow-wrap: break-word;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  word-break: keep-all !important;
+  overflow-wrap: anywhere !important;
 
   text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
   opacity: 0;
@@ -74,15 +78,20 @@
 }
 
 #section-intro [data-typing="true"] {
-  overflow: visible;
-  white-space: normal;
-  word-break: normal;
-  overflow-wrap: break-word;
+  overflow: visible !important;
+  white-space: normal !important;
+  word-break: keep-all !important;
+  overflow-wrap: anywhere !important;
+  max-width: 100% !important;
 }
 
 #section-intro .intro-wrap,
 #section-intro .parchment-inner-rough,
-#section-intro .j-arcane-card {
+#section-intro .j-arcane-card,
+#section-intro .j-panel-glow,
+#section-intro .intro-title,
+#section-intro [data-typing],
+#section-intro [data-typing] * {
   overflow: visible !important;
 }
 
@@ -129,6 +138,19 @@
   margin-top: 18px;
 }
 
+#section-intro .intro-title-wrap,
+#section-intro .title-wrap,
+#section-intro .typing-title-wrap,
+#section-intro .title-frame,
+#section-intro .title-line {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
 /* ============================
    VIDRO / CARD (j-panel-glow)
    — CORRIGIDO: max-width ampliado, sem corte
@@ -136,12 +158,11 @@
 
 #section-intro .j-panel-glow {
   padding: 10px !important;
-  width: 92% !important;
-  /* CORRIGIDO: de 470px para 560px — impede corte do título */
-  max-width: 560px !important;
+  width: min(94vw, 640px) !important;
+  max-width: 640px !important;
+  min-width: 0 !important;
   margin-left: auto !important;
   margin-right: auto !important;
-  /* CORRIGIDO: overflow visible para áurea não ser cortada */
   overflow: visible !important;
   position: relative;
 }
@@ -170,8 +191,22 @@
 
 #section-intro .intro-title[data-typing="true"][data-cursor="true"] {
   position: relative;
-  display: block;
+  display: block !important;
+  width: 100% !important;
   padding-right: 0;
+}
+
+#section-intro .intro-title.typing-active,
+#section-intro .intro-title.typing-done,
+#section-intro .intro-title[data-typing="true"] {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  clip-path: none !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
 }
 
 #section-intro .parchment-text-rough[data-typing="true"][data-cursor="true"] {
@@ -219,8 +254,20 @@
     0 0 22px rgba(255, 204, 102, 0.45),
     0 0 48px rgba(255, 153, 0, 0.35);
   animation: parchmentGlow 1.6s ease-in-out infinite;
-  /* CORRIGIDO: garantir que glow não seja cortado */
   overflow: visible !important;
+}
+
+#section-intro .intro-title.typing-active {
+  display: inline-block !important;
+  width: auto !important;
+  max-width: calc(100% - 36px) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding: 6px 18px !important;
+  border-radius: 16px !important;
+  box-shadow:
+    0 0 12px rgba(255, 230, 120, 0.55),
+    0 0 28px rgba(120, 255, 210, 0.22);
 }
 
 /* Áurea no container interno */
@@ -322,9 +369,10 @@
 
   #section-intro .j-panel-glow {
     position: relative !important;
-    /* CORRIGIDO: translate reduzido para não empurrar painel pra fora */
-    transform: translate(-8px, -50px) !important;
+    transform: translateY(-40px) !important;
     top: 10px !important;
+    left: 0 !important;
+    right: 0 !important;
     z-index: 6 !important;
     overflow: visible !important;
   }
@@ -353,10 +401,9 @@
   }
 
   #section-intro .j-panel-glow {
-    /* CORRIGIDO: translate suave, sem deslocamento lateral */
-    transform: translateY(-20px) !important;
-    width: calc(100vw - 16px) !important;
-    max-width: 520px !important;
+    transform: translateY(-18px) !important;
+    width: calc(100vw - 12px) !important;
+    max-width: 94vw !important;
     overflow: visible !important;
   }
 
@@ -368,7 +415,8 @@
   }
 
   .intro-title {
-    font-size: clamp(24px, 5.5vw, 32px) !important;
-    padding: 0 8px !important;
+    font-size: clamp(22px, 5.1vw, 30px) !important;
+    line-height: 1.28 !important;
+    padding: 0 10px !important;
   }
 }
