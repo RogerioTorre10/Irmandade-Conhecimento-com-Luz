@@ -245,6 +245,37 @@
     const btn = modal.querySelector('#intro-lang-confirm');
     const sel = modal.querySelector('#intro-lang-select');
 
+    function hardUnlockLangControls() {
+  if (!sel || !btn) return;
+
+  sel.disabled = false;
+  btn.disabled = false;
+
+  sel.removeAttribute('disabled');
+  btn.removeAttribute('disabled');
+
+  sel.removeAttribute('title');
+  btn.removeAttribute('title');
+
+  sel.setAttribute('aria-disabled', 'false');
+  btn.setAttribute('aria-disabled', 'false');
+
+  sel.style.pointerEvents = 'auto';
+  btn.style.pointerEvents = 'auto';
+
+  sel.style.opacity = '1';
+  btn.style.opacity = '1';
+
+  sel.style.userSelect = 'auto';
+  btn.style.userSelect = 'auto';
+
+  sel.style.position = 'relative';
+  btn.style.position = 'relative';
+
+  sel.style.zIndex = '1000001';
+  btn.style.zIndex = '1000002';
+}
+    
     if (!btn || !sel) {
       console.error('[LANG_MODAL] Botão ou select não encontrados.', {
         btn: !!btn,
@@ -260,12 +291,8 @@
       introBtn.setAttribute('aria-disabled', 'true');
     }
 
-    btn.disabled = false;
-    sel.disabled = false;
-
-    btn.style.pointerEvents = 'auto';
-    sel.style.pointerEvents = 'auto';
-
+   hardUnlockLangControls();
+    
     sel.value =
       localStorage.getItem('i18n_lang') ||
       sessionStorage.getItem('jornada.lang') ||
@@ -274,7 +301,19 @@
     function getChosenLang() {
       return (sel.value || 'pt-BR').trim();
     }
+   const unlockWatchdog = setInterval(() => {
+   if (!document.body.contains(modal)) {
+    clearInterval(unlockWatchdog);
+    return;
+  }
 
+  if (!window.__INTRO_LANG_CONFIRMED__) {
+    hardUnlockLangControls();
+  } else {
+    clearInterval(unlockWatchdog);
+  }
+  }, 120);
+    
     return new Promise((resolve) => {
       let confirmed = false;
 
@@ -346,12 +385,11 @@
       });
 
       setTimeout(() => {
-        try {
-          sel.disabled = false;
-          btn.disabled = false;
-          sel.focus();
-        } catch {}
-      }, 80);
+  try {
+    hardUnlockLangControls();
+    sel.focus();
+  } catch {}
+  }, 80);
     });
   }
 
