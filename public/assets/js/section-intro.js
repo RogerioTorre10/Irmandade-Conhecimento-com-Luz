@@ -2,48 +2,58 @@
   'use strict';
 
   const SECTION_ID = 'section-intro';
-  const NEXT_SECTION_ID = 'section-termos1';
 
   if (window.JCIntro?.__bound) return;
+
   window.JCIntro = window.JCIntro || {};
   window.JCIntro.__bound = true;
-  window.JCIntro.state = { initialized: false, listenerOn: false, lastLang: null};
-  window.JCIntro.state.typingExecuted = false;
+  window.JCIntro.state = {
+    initialized: false,
+    listenerOn: false,
+    modalOpen: false,
+    langConfirmed: false,
+    lastLang: null
+  };
 
   function isLangLocked() {
     return sessionStorage.getItem('i18n_locked') === '1';
   }
 
   async function setLangAndLock(lang) {
-  if (!lang) return;
+    if (!lang) return;
 
-  const normalized = String(lang).trim();
+    const normalized = String(lang).trim();
 
-  try {
-    if (window.i18n?.forceLang) {
-      await window.i18n.forceLang(normalized, true);
-    } else if (window.i18n?.setLang) {
-      await window.i18n.setLang(normalized, true);
+    try {
+      if (window.i18n?.forceLang) {
+        await window.i18n.forceLang(normalized, true);
+      } else if (window.i18n?.setLang) {
+        await window.i18n.setLang(normalized, true);
+      }
+    } catch (e) {
+      console.warn('[IntroLang] Erro ao definir idioma:', e);
     }
-  } catch (e) {
-    console.warn('[IntroLang] Erro ao definir idioma:', e);
+
+    sessionStorage.setItem('i18n_locked', '1');
+    sessionStorage.setItem('jornada.lang', normalized);
+    sessionStorage.setItem('i18n.lang', normalized);
+
+    localStorage.setItem('i18n_locked', '1');
+    localStorage.setItem('i18n_lang', normalized);
+    localStorage.setItem('jornada.lang', normalized);
+    localStorage.setItem('i18n.lang', normalized);
+
+    document.documentElement.lang = normalized;
+    document.documentElement.setAttribute('data-lang', normalized);
+    if (document.body) document.body.setAttribute('data-lang', normalized);
+
+    window.__INTRO_LANG_CONFIRMED__ = true;
+    window.__LANG_MODAL_OPEN__ = false;
+    window.JCIntro.state.langConfirmed = true;
+    window.JCIntro.state.lastLang = normalized;
+
+    console.log('[IntroLang] Idioma definido nesta jornada:', normalized);
   }
-
-  sessionStorage.setItem('i18n_locked', '1');
-  sessionStorage.setItem('jornada.lang', normalized);
-  sessionStorage.setItem('i18n.lang', normalized);
-
-  localStorage.setItem('i18n_locked', '1');
-  localStorage.setItem('i18n_lang', normalized);
-  localStorage.setItem('jornada.lang', normalized);
-  localStorage.setItem('i18n.lang', normalized);
-
-  document.documentElement.lang = normalized;
-  document.documentElement.setAttribute('data-lang', normalized);
-  if (document.body) document.body.setAttribute('data-lang', normalized);
-
-  console.log('[IntroLang] Idioma definido nesta jornada:', normalized);
-}
 
   function buildLangModal() {
     const modal = document.createElement('div');
@@ -65,7 +75,7 @@
             <option value="fr-FR">Français (FR)</option>
             <option value="ja-JP">日本語 (日本)</option>
             <option value="zh-CN">中文（简体）</option>
-            <option value="de-DE">Deutsch（DE）</option>
+            <option value="de-DE">Deutsch (DE)</option>
           </select>
         </div>
 
@@ -174,12 +184,20 @@
     return modal;
   }
 
-  async function requireLanguageChoice() {
-    sessionStorage.removeItem('i18n_locked');
-    sessionStorage.removeItem('jornada.lang');
-    sessionStorage.removeItem('i18n.lang');
-    localStorage.removeItem('i18n_locked');
-    localStorage.removeItem('i18n_lang');
+  async function requireLanguageChoice(root) {
+    if (isLangLocked()) {
+      const locked =
+        sessionStorage.getItem('jornada.lang') ||
+        sessionStorage.getItem('i18n.lang') ||
+        localStorage.getItem('i18n_lang') ||
+        'pt-BR';
+
+      window.__INTRO_LANG_CONFIRMED__ = true;
+      window.__LANG_MODAL_OPEN__ = false;
+      window.JCIntro.state.langConfirmed = true;
+      window.JCIntro.state.lastLang = locked;
+      return locked;
+    }
 
     const oldModal = document.getElementById('intro-lang-modal');
     if (oldModal) oldModal.remove();
@@ -189,7 +207,9 @@
 
     window.__LANG_MODAL_OPEN__ = true;
     window.__INTRO_LANG_CONFIRMED__ = false;
-    window.speechSynthesis?.cancel?.();
+    window.JCIntro.state.modalOpen = true;
+
+    try { window.speechSynthesis?.cancel?.(); } catch {}
 
     const btn = modal.querySelector('#intro-lang-confirm');
     const sel = modal.querySelector('#intro-lang-select');
@@ -202,24 +222,17 @@
       throw new Error('Modal de idioma inválida.');
     }
 
-    const introRoot = document.getElementById(SECTION_ID);
     const introBtn =
-      introRoot?.querySelector('#btn-intro') ||
-      introRoot?.querySelector('[data-next]') ||
-      introRoot?.querySelector('.btn-stone') ||
-      introRoot?.querySelector('button');
+      root?.querySelector('#btn-intro') ||
+      root?.querySelector('[data-next]') ||
+      root?.querySelector('.btn-stone') ||
+      root?.querySelector('button');
 
     if (introBtn) {
       introBtn.disabled = true;
       introBtn.style.pointerEvents = 'none';
       introBtn.setAttribute('aria-disabled', 'true');
     }
-
-    sel.disabled = false;
-    sel.style.pointerEvents = 'auto';
-    sel.style.position = 'relative';
-    sel.style.zIndex = '5';
-    sel.style.cursor = 'pointer';
 
     sel.value =
       localStorage.getItem('i18n_lang') ||
@@ -229,10 +242,6 @@
     function getChosenLang() {
       return (sel.value || 'pt-BR').trim();
     }
-
-    sel.addEventListener('change', () => {
-      console.log('[LANG_MODAL] idioma selecionado:', getChosenLang());
-    });
 
     return new Promise((resolve) => {
       let confirmed = false;
@@ -254,15 +263,30 @@
 
           await setLangAndLock(chosenLang);
 
-          window.__INTRO_LANG_CONFIRMED__ = true;
-          window.__LANG_MODAL_OPEN__ = false;
-          window.JCIntro.state.lastLang = chosenLang;
+          if (root && window.i18n?.apply) {
+            try {
+              window.i18n.apply(root);
+
+              root.querySelectorAll('[data-typing="true"], .intro-title, .typing-text, .parchment-text-rough')
+                .forEach((el) => {
+                  const text = String(el.textContent || '').replace(/\s+/g, ' ').trim();
+                  if (text) {
+                    el.dataset.text = text;
+                    el.dataset.fullText = text;
+                  }
+                });
+            } catch (e) {
+              console.warn('[IntroLang] Falha ao reaplicar i18n na intro:', e);
+            }
+          }
 
           if (introBtn) {
             introBtn.disabled = false;
             introBtn.style.pointerEvents = 'auto';
             introBtn.setAttribute('aria-disabled', 'false');
           }
+
+          window.JCIntro.state.modalOpen = false;
 
           modal.style.opacity = '0';
           setTimeout(() => modal.remove(), 300);
@@ -285,9 +309,7 @@
       btn.addEventListener('click', confirmChoice, true);
 
       sel.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          confirmChoice(e);
-        }
+        if (e.key === 'Enter') confirmChoice(e);
       });
 
       setTimeout(() => {
@@ -296,90 +318,33 @@
     });
   }
 
-  function clearTypingState(el) {
-    if (!el) return;
-
-    el.classList.remove('typing-done', 'type-done', 'typing-active');
-    el.textContent = '';
-    el.style.opacity = '1';
-    el.style.visibility = 'visible';
-    el.style.display = '';
-
-    try {
-      delete el.dataset.typingDone;
-      delete el.dataset.typingSig;
-      delete el.dataset.typingLastSig;
-      delete el.dataset.typingLastAt;
-    } catch {}
-  }
-
-  async function runTyping(root) {
-    if (!window.__INTRO_LANG_CONFIRMED__) {
-    console.warn('[INTRO] Bloqueado: idioma ainda não confirmado');
-    return;
-  }
-    if (window.JCIntro.state.typingExecuted) return;
-    window.JCIntro.state.typingExecuted = true;
-
-    console.log('[Typing] Iniciando datilografia após confirmação do idioma...');
-
-    const elements = Array.from(root.querySelectorAll('[data-typing="true"]'));
-
-    for (const el of elements) {
-  const txt = (
-    el.getAttribute('data-text') ||
-    el.textContent ||
-    ''
-  ).trim();
-
-  if (!txt) continue;
-
-  el.textContent = '';
-  el.classList.remove('typing-done', 'type-done');
-  el.classList.add('typing-active');
-
-  const speed = Number(el.dataset.speed) || 42;
-
-  if (typeof window.typeAndSpeak === 'function') {
-    await new Promise((r) => window.typeAndSpeak(el, txt, speed, { forceReplay: true }) || r());
-  } else if (typeof window.runTyping === 'function') {
-    await new Promise((r) => window.runTyping(el, txt, r, { speed, forceReplay: true }));
-  } else {
-    for (let i = 0; i < txt.length; i++) {
-      el.textContent += txt.charAt(i);
-      await new Promise(res => setTimeout(res, speed));
-    }
-  }
-
-  el.classList.remove('typing-active');
-  el.classList.add('typing-done');
-}
-
-    console.log('[Typing] Datilografia concluída.');
-  }
-
   async function init(root) {
-    if (!root || window.JCIntro.state.initialized) return;
+    if (!root) return;
+
+    if (window.JCIntro.state.initialized && window.JCIntro.state.langConfirmed) {
+      return;
+    }
+
     window.JCIntro.state.initialized = true;
 
     console.log('[Intro] Aguardando escolha de idioma...');
-    await requireLanguageChoice();
+    await requireLanguageChoice(root);
 
-    console.log('[Intro] Idioma confirmado → iniciando typing');
-    await runTyping(root);
-
-    console.log('[Intro] Inicialização completa.');
+    console.log('[Intro] Idioma confirmado. Typing será conduzido pelo controller global.');
   }
 
   function bind() {
     const existing = document.getElementById(SECTION_ID);
     if (existing) init(existing);
 
-    document.addEventListener('section:shown', (e) => {
-      if (e?.detail?.sectionId === SECTION_ID) {
-        init(e.detail.node || document.getElementById(SECTION_ID));
-      }
-    });
+    if (!window.JCIntro.state.listenerOn) {
+      document.addEventListener('section:shown', (e) => {
+        if (e?.detail?.sectionId === SECTION_ID) {
+          init(e.detail.node || document.getElementById(SECTION_ID));
+        }
+      });
+      window.JCIntro.state.listenerOn = true;
+    }
   }
 
   if (document.readyState === 'loading') {
