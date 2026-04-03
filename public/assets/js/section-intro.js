@@ -2,6 +2,11 @@
   'use strict';
 
   const SECTION_ID = 'section-intro';
+  const NEXT_SECTION_ID = 'section-termos1';
+  const INTRO_VIDEO =
+    window.JORNADA_VIDEOS?.introParaTermos1 ||
+    window.APP_CONFIG?.VIDEOS?.introParaTermos1 ||
+    '/assets/videos/filme-1-entrando-na-jornada.mp4';
 
   if (window.JCIntro?.__bound) return;
 
@@ -17,6 +22,20 @@
 
   function isLangLocked() {
     return sessionStorage.getItem('i18n_locked') === '1';
+  }
+
+  function getRoot() {
+    return document.getElementById(SECTION_ID);
+  }
+
+  function getIntroNextButton(root) {
+    return (
+      root?.querySelector('#btn-intro') ||
+      root?.querySelector('[data-action="avancar"]') ||
+      root?.querySelector('[data-next]') ||
+      root?.querySelector('.btn-stone') ||
+      root?.querySelector('button')
+    );
   }
 
   async function setLangAndLock(lang) {
@@ -55,7 +74,16 @@
     console.log('[IntroLang] Idioma definido nesta jornada:', normalized);
   }
 
+  function destroyExistingModal() {
+    const old = document.getElementById('intro-lang-modal');
+    if (old) old.remove();
+    window.JCIntro.state.modalOpen = false;
+    window.__LANG_MODAL_OPEN__ = false;
+  }
+
   function buildLangModal() {
+    destroyExistingModal();
+
     const modal = document.createElement('div');
     modal.id = 'intro-lang-modal';
 
@@ -98,6 +126,7 @@
         justify-content: center;
         background: rgba(0,0,0,0.75);
         pointer-events: auto !important;
+        touch-action: auto !important;
       }
 
       #intro-lang-modal .intro-lang-backdrop {
@@ -118,6 +147,7 @@
         text-align: center;
         box-shadow: 0 0 30px rgba(212,175,55,0.3);
         pointer-events: auto !important;
+        touch-action: manipulation !important;
       }
 
       #intro-lang-modal .intro-lang-title {
@@ -152,6 +182,7 @@
         font-size: 1.05rem;
         pointer-events: auto !important;
         cursor: pointer !important;
+        touch-action: manipulation !important;
         appearance: auto !important;
         -webkit-appearance: menulist !important;
         -moz-appearance: menulist !important;
@@ -173,14 +204,17 @@
         transition: all 0.25s ease;
         cursor: pointer !important;
         pointer-events: auto !important;
+        touch-action: manipulation !important;
+        opacity: 1 !important;
+      }
+
+      #intro-lang-modal .intro-lang-confirm-btn:disabled,
+      #intro-lang-confirm:disabled {
+        opacity: 0.65 !important;
+        cursor: not-allowed !important;
       }
     `;
     modal.appendChild(style);
-
-    modal.style.display = 'flex';
-    modal.style.visibility = 'visible';
-    modal.style.opacity = '1';
-
     return modal;
   }
 
@@ -198,9 +232,6 @@
       window.JCIntro.state.lastLang = locked;
       return locked;
     }
-
-    const oldModal = document.getElementById('intro-lang-modal');
-    if (oldModal) oldModal.remove();
 
     const modal = buildLangModal();
     document.body.appendChild(modal);
@@ -222,17 +253,18 @@
       throw new Error('Modal de idioma inválida.');
     }
 
-    const introBtn =
-      root?.querySelector('#btn-intro') ||
-      root?.querySelector('[data-next]') ||
-      root?.querySelector('.btn-stone') ||
-      root?.querySelector('button');
-
+    const introBtn = getIntroNextButton(root);
     if (introBtn) {
       introBtn.disabled = true;
       introBtn.style.pointerEvents = 'none';
       introBtn.setAttribute('aria-disabled', 'true');
     }
+
+    btn.disabled = false;
+    sel.disabled = false;
+
+    btn.style.pointerEvents = 'auto';
+    sel.style.pointerEvents = 'auto';
 
     sel.value =
       localStorage.getItem('i18n_lang') ||
@@ -287,9 +319,8 @@
           }
 
           window.JCIntro.state.modalOpen = false;
-
           modal.style.opacity = '0';
-          setTimeout(() => modal.remove(), 300);
+          setTimeout(() => modal.remove(), 220);
 
           document.dispatchEvent(new CustomEvent('intro:language-confirmed', {
             detail: { lang: chosenLang }
@@ -307,25 +338,39 @@
 
       btn.onclick = confirmChoice;
       btn.addEventListener('click', confirmChoice, true);
+      btn.addEventListener('pointerup', confirmChoice, true);
+      btn.addEventListener('touchend', confirmChoice, { passive: false, capture: true });
 
       sel.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') confirmChoice(e);
       });
 
       setTimeout(() => {
-        try { sel.focus(); } catch {}
+        try {
+          sel.disabled = false;
+          btn.disabled = false;
+          sel.focus();
+        } catch {}
       }, 80);
     });
   }
 
-  function getIntroNextButton(root) {
-    return (
-      root?.querySelector('#btn-intro') ||
-      root?.querySelector('[data-action="avancar"]') ||
-      root?.querySelector('[data-next]') ||
-      root?.querySelector('.btn-stone') ||
-      root?.querySelector('button')
-    );
+  function playIntroTransitionToTermos1() {
+    const go = () => window.JC?.show?.(NEXT_SECTION_ID);
+
+    if (typeof window.playBlockTransition === 'function') {
+      return window.playBlockTransition(INTRO_VIDEO, go);
+    }
+
+    if (typeof window.playCleanTransition === 'function') {
+      return window.playCleanTransition(INTRO_VIDEO, go);
+    }
+
+    if (typeof window.playVideoWithCallback === 'function') {
+      return window.playVideoWithCallback(INTRO_VIDEO, go);
+    }
+
+    return go();
   }
 
   function bindIntroAdvance(root) {
@@ -344,36 +389,14 @@
       }
 
       try { window.speechSynthesis?.cancel?.(); } catch {}
-
-      const videoSrc =
-        window.JORNADA_VIDEOS?.introParaTermos1 ||
-        window.APP_CONFIG?.VIDEOS?.introParaTermos1 ||
-        '/assets/videos/filme-1-entrando-na-jornada.mp4';
-
-      if (typeof window.playBlockTransition === 'function') {
-        return window.playBlockTransition(videoSrc, () => {
-          window.JC?.show?.('section-termos1');
-        });
-      }
-
-      if (typeof window.playCleanTransition === 'function') {
-        return window.playCleanTransition(videoSrc, () => {
-          window.JC?.show?.('section-termos1');
-        });
-      }
-
-      if (typeof window.playVideoWithCallback === 'function') {
-        return window.playVideoWithCallback(videoSrc, () => {
-          window.JC?.show?.('section-termos1');
-        });
-      }
-
-      window.JC?.show?.('section-termos1');
+      playIntroTransitionToTermos1();
     });
   }
-  
+
   async function init(root) {
     if (!root) return;
+
+    bindIntroAdvance(root);
 
     if (window.JCIntro.state.initialized && window.JCIntro.state.langConfirmed) {
       return;
@@ -383,19 +406,20 @@
 
     console.log('[Intro] Aguardando escolha de idioma...');
     await requireLanguageChoice(root);
-          bindIntroAdvance(root);
+
+    bindIntroAdvance(root);
 
     console.log('[Intro] Idioma confirmado. Typing será conduzido pelo controller global.');
   }
 
   function bind() {
-    const existing = document.getElementById(SECTION_ID);
+    const existing = getRoot();
     if (existing) init(existing);
 
     if (!window.JCIntro.state.listenerOn) {
       document.addEventListener('section:shown', (e) => {
         if (e?.detail?.sectionId === SECTION_ID) {
-          init(e.detail.node || document.getElementById(SECTION_ID));
+          init(e.detail.node || getRoot());
         }
       });
       window.JCIntro.state.listenerOn = true;
