@@ -146,6 +146,10 @@
   cursor: pointer !important;
   pointer-events: auto !important;
 }
+  #intro-lang-modal .intro-lang-confirm-btn:hover {
+    filter: brightness(1.12);
+    transform: translateY(-2px);
+   }
  `;
     modal.appendChild(style);
 
