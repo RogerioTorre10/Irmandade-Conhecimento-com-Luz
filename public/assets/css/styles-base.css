@@ -1,5 +1,6 @@
 @import url("/assets/css/brilho-texturas.css");
 @import url("/assets/css/j-panel-glow.css");
+
 /* ========== VARIÁVEIS GLOBAIS ========== */
 :root {
   --bg: #0b1020;
@@ -15,9 +16,14 @@
 * {
   box-sizing: border-box;
 }
-html, body { min-height: 100%; }
+
+html,
 body {
-  background: #0a0f1a;           /* noite */
+  min-height: 100%;
+}
+
+body {
+  background: #0a0f1a;
   color: #f2efe6;
   height: 100%;
   margin: 0;
@@ -48,14 +54,17 @@ body.epic {
   line-height: 1.55;
 }
 
-.epic h1, .epic h2, .epic h3 {
+.epic h1,
+.epic h2,
+.epic h3 {
   font-family: 'ManufacturingConsent', ui-sans-serif, system-ui, "Segoe UI", Roboto, Arial, sans-serif;
   font-weight: 700;
   letter-spacing: .02em;
   font-variant: small-caps;
 }
 
-p, li {
+p,
+li {
   font-family: 'BerkshireSwash', cursive;
 }
 
@@ -71,16 +80,15 @@ p, li {
 
 /* ========== PERGAMINHO ========== */
 .pergaminho {
-  pposition: relative;
+  position: relative;
   padding: 24px 20px;
   width: 100%;
   max-width: 600px;
   margin: 12px auto;
   min-height: 80vh;
-  height: 80vh;
+  height: auto;
   box-sizing: border-box;
-  overflow: hidden;
-  contain: layout;
+  overflow: visible;
 }
 
 @media (min-width: 768px) {
@@ -117,7 +125,8 @@ p, li {
 }
 
 /* ========== CAMPOS E SENHA ========== */
-.input, textarea {
+.input,
+textarea {
   width: 100%;
   padding: 12px 14px;
   border-radius: 10px;
@@ -143,7 +152,8 @@ p, li {
   margin-bottom: 16px;
 }
 
-.senha-eye, .btn-toggle-senha {
+.senha-eye,
+.btn-toggle-senha {
   position: absolute;
   right: 10px;
   top: 50%;
@@ -160,7 +170,8 @@ p, li {
   font-size: 20px;
 }
 
-.senha-eye:hover, .btn-toggle-senha:hover {
+.senha-eye:hover,
+.btn-toggle-senha:hover {
   color: var(--fg);
 }
 
@@ -183,7 +194,11 @@ p, li {
 }
 
 .btn.btn-primary.btn-stone,
-.nextBtn, .prevBtn, .avancarBtn, #btn-senha-avancar, #btn-avancar {
+.nextBtn,
+.prevBtn,
+.avancarBtn,
+#btn-senha-avancar,
+#btn-avancar {
   padding: 8px 16px;
   background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;
   background-blend-mode: overlay;
@@ -204,12 +219,16 @@ p, li {
 }
 
 .btn.btn-primary.btn-stone:hover,
-.nextBtn:hover, .prevBtn:hover, .avancarBtn:hover, #btn-senha-avancar:hover, #btn-avancar:hover {
+.nextBtn:hover,
+.prevBtn:hover,
+.avancarBtn:hover,
+#btn-senha-avancar:hover,
+#btn-avancar:hover {
   transform: scale(1.05);
   box-shadow: 0 8px 16px rgba(0,0,0,0.7);
 }
 
-/* ========== DATILOGRAFIA ========== */
+/* ========== DATILOGRAFIA GLOBAL ========== */
 .typing-active {
   text-align: left;
   direction: ltr;
@@ -266,13 +285,26 @@ p, li {
   opacity: 1;
 }
 
+/* intro usa cursor e typing próprios */
+#section-intro .typing-active::after,
+#section-intro .lumen-typing::after {
+  content: none !important;
+  animation: none !important;
+}
+
+#section-intro [data-typing="true"] {
+  min-height: 0 !important;
+  opacity: inherit !important;
+  color: inherit !important;
+}
+
 @keyframes lumenBlink {
   0% { opacity: 0.75; }
   50% { opacity: 0; }
   100% { opacity: 0.75; }
 }
 
-/* ========== NAVEGAÇÃO/LINKS E LINGUAGEM ========== */
+/* ========== NAVEGAÇÃO / IDIOMA ========== */
 .language-selector {
   position: absolute;
   top: 10px;
@@ -312,6 +344,7 @@ p, li {
 #toast.show {
   opacity: 1;
 }
+
 /* ===== REMOVER TEXTO/ÍCONE AUTOMÁTICO DO JORNADA_MICRO ===== */
 .microphone,
 [data-microphone],
@@ -327,28 +360,26 @@ span.microphone {
   pointer-events: none !important;
 }
 
-.video-overlay{
+/* ========== OVERLAY DE VÍDEO ========== */
+.video-overlay {
   position: fixed;
   inset: 0;
   width: 100vw;
   height: 100vh;
   z-index: 2147483646;
-
-  /* some sem ocupar layout e sem "placa" */
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-
   background: rgba(0,0,0,0.98);
 }
 
-.video-overlay.is-on{
+.video-overlay.is-on {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
 }
 
-.video-overlay video{
+.video-overlay video {
   position: fixed;
   inset: 0;
   width: 100vw;
@@ -358,7 +389,8 @@ span.microphone {
   display: block;
   background: #000;
 }
-#videoOverlay.video-overlay{
+
+#videoOverlay.video-overlay {
   position: fixed !important;
   inset: 0 !important;
   width: 100vw !important;
@@ -370,13 +402,13 @@ span.microphone {
   background: rgba(0,0,0,0.98);
 }
 
-#videoOverlay.video-overlay.is-on{
+#videoOverlay.video-overlay.is-on {
   display: block !important;
   opacity: 1 !important;
   pointer-events: auto !important;
 }
 
-#videoOverlay video{
+#videoOverlay video {
   position: fixed !important;
   inset: 0 !important;
   width: 100vw !important;
@@ -385,7 +417,8 @@ span.microphone {
   object-position: center !important;
   background: #000 !important;
 }
-#videoTransicao{
+
+#videoTransicao {
   position: fixed !important;
   inset: 0 !important;
   width: 100vw !important;
