@@ -383,6 +383,7 @@
 
     console.log('[Intro] Aguardando escolha de idioma...');
     await requireLanguageChoice(root);
+          bindIntroAdvance(root);
 
     console.log('[Intro] Idioma confirmado. Typing será conduzido pelo controller global.');
   }
