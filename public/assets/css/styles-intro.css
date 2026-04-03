@@ -49,23 +49,23 @@
   display: block;
   width: 100%;
   max-width: 100%;
-  min-height: 2.4em;
+  min-height: 3.2em;
   box-sizing: border-box;
 
   font-family: 'ManufacturingConsent', sans-serif;
-  font-size: clamp(28px, 4vw, 36px);
-  line-height: 1.2;
+  font-size: clamp(24px, 3.2vw, 34px);
+  line-height: 1.28;
   text-align: center;
   color: var(--theme-main-color, #ffd700);
 
-  margin-top: 40px;
-  margin-bottom: 20px;
-  padding: 0 12px;
+  margin-top: 28px;
+  margin-bottom: 16px;
+  padding: 0 18px;
 
-  white-space: normal;
-  overflow: visible;
-  word-break: normal;
-  overflow-wrap: break-word;
+  white-space: normal !important;
+  overflow: visible !important;
+  word-break: keep-all !important;
+  overflow-wrap: anywhere !important;
 
   text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
   opacity: 0;
@@ -136,14 +136,14 @@
 
 #section-intro .j-panel-glow {
   padding: 10px !important;
-  width: 92% !important;
-  /* CORRIGIDO: de 470px para 560px — impede corte do título */
-  max-width: 560px !important;
+  width: min(92%, 680px) !important;
+  max-width: 680px !important;
+  min-height: 640px !important;
   margin-left: auto !important;
   margin-right: auto !important;
-  /* CORRIGIDO: overflow visible para áurea não ser cortada */
   overflow: visible !important;
   position: relative;
+  box-sizing: border-box !important;
 }
 
 #section-intro .j-panel-glow::before {
@@ -312,8 +312,8 @@
 
   #section-intro .j-perg-v-inner {
     position: relative !important;
-    transform: translateY(40px) !important;
-    top: 40px !important;
+    transform: translateY(22px) !important;
+    top: 0 !important;
     margin-top: 0 !important;
     padding-top: 0 !important;
     overflow: visible !important;
@@ -322,15 +322,15 @@
 
   #section-intro .j-panel-glow {
     position: relative !important;
-    /* CORRIGIDO: translate reduzido para não empurrar painel pra fora */
-    transform: translate(-8px, -50px) !important;
-    top: 10px !important;
+    transform: translateY(-14px) !important;
+    top: 0 !important;
     z-index: 6 !important;
     overflow: visible !important;
   }
 
   #section-intro .j-arcane-card {
-    margin-top: -18px !important;
+    min-height: 560px !important;
+    margin-top: -8px !important;
     margin-bottom: 24px !important;
     overflow: visible !important;
   }
@@ -342,33 +342,56 @@
 
 @media (max-width: 600px) {
 
+  #section-intro {
+    overflow-x: hidden !important;
+  }
+
   #section-intro .j-perg-v-inner {
     position: relative;
-    transform: translateY(40px);
+    transform: translateY(18px);
     margin-left: auto;
     margin-right: auto;
-    max-width: 850px;
+    max-width: 100%;
     width: 100%;
     overflow: visible !important;
   }
 
   #section-intro .j-panel-glow {
-    /* CORRIGIDO: translate suave, sem deslocamento lateral */
-    transform: translateY(-20px) !important;
-    width: calc(100vw - 16px) !important;
-    max-width: 520px !important;
+    transform: translateY(-8px) !important;
+    width: calc(100vw - 28px) !important;
+    max-width: 100% !important;
+    min-height: 520px !important;
     overflow: visible !important;
   }
 
   #section-intro .j-arcane-card {
-    max-height: 72vh;
-    margin-top: -18px !important;
-    margin-bottom: 24px !important;
+    min-height: 460px !important;
+    max-height: none !important;
+    margin-top: -8px !important;
+    margin-bottom: 20px !important;
     overflow: visible !important;
   }
 
   .intro-title {
-    font-size: clamp(24px, 5.5vw, 32px) !important;
-    padding: 0 8px !important;
+    min-height: 3.4em !important;
+    font-size: clamp(20px, 6vw, 28px) !important;
+    line-height: 1.25 !important;
+    padding: 0 12px !important;
+    margin-top: 22px !important;
+    margin-bottom: 14px !important;
+  }
+
+  #section-intro:has(.typing-active) .parchment-inner-rough {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  #section-intro:has(.typing-active) .j-panel-glow {
+    outline: 1px solid rgba(255, 204, 102, 0.22) !important;
+    outline-offset: 2px !important;
+    box-shadow:
+      0 0 0 1px rgba(255, 204, 102, 0.12) inset,
+      0 0 14px rgba(255, 204, 102, 0.28),
+      0 0 26px rgba(255, 153, 0, 0.18) !important;
   }
 }
