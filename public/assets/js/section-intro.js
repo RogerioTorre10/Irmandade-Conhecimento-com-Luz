@@ -318,6 +318,60 @@
     });
   }
 
+  function getIntroNextButton(root) {
+    return (
+      root?.querySelector('#btn-intro') ||
+      root?.querySelector('[data-action="avancar"]') ||
+      root?.querySelector('[data-next]') ||
+      root?.querySelector('.btn-stone') ||
+      root?.querySelector('button')
+    );
+  }
+
+  function bindIntroAdvance(root) {
+    const btn = getIntroNextButton(root);
+    if (!btn || btn.dataset.introAdvanceBound === '1') return;
+
+    btn.dataset.introAdvanceBound = '1';
+
+    btn.addEventListener('click', async (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+
+      if (!window.__INTRO_LANG_CONFIRMED__) {
+        console.warn('[Intro] Avanço bloqueado: idioma ainda não confirmado.');
+        return;
+      }
+
+      try { window.speechSynthesis?.cancel?.(); } catch {}
+
+      const videoSrc =
+        window.JORNADA_VIDEOS?.introParaTermos1 ||
+        window.APP_CONFIG?.VIDEOS?.introParaTermos1 ||
+        '/assets/videos/filme-1-entrando-na-jornada.mp4';
+
+      if (typeof window.playBlockTransition === 'function') {
+        return window.playBlockTransition(videoSrc, () => {
+          window.JC?.show?.('section-termos1');
+        });
+      }
+
+      if (typeof window.playCleanTransition === 'function') {
+        return window.playCleanTransition(videoSrc, () => {
+          window.JC?.show?.('section-termos1');
+        });
+      }
+
+      if (typeof window.playVideoWithCallback === 'function') {
+        return window.playVideoWithCallback(videoSrc, () => {
+          window.JC?.show?.('section-termos1');
+        });
+      }
+
+      window.JC?.show?.('section-termos1');
+    });
+  }
+  
   async function init(root) {
     if (!root) return;
 
