@@ -433,36 +433,54 @@
     emit('i18n:unlocked', { lang: state.lang });
   }
 
-  function disableAllLangSelectors() {
-    if (!isLocked()) return;
+ function disableAllLangSelectors() {
+  if (isLocked()) return;
 
-    document.querySelectorAll('select, button, input[type="radio"], input[type="button"]').forEach((el) => {
-      const id = String(el.id || '').toLowerCase();
-      const cls = String(el.className || '').toLowerCase();
-      const name = String(el.name || '').toLowerCase();
-      const txt = String(el.textContent || el.value || '').toLowerCase();
+  document.querySelectorAll('select, button, input[type="radio"], input[type="button"]').forEach((el) => {
+    // EXCEÇÃO ABSOLUTA: nunca travar o modal da intro
+    if (
+      el.id === 'intro-lang-select' ||
+      el.id === 'intro-lang-confirm' ||
+      el.closest('#intro-lang-modal')
+    ) {
+      el.disabled = false;
+      el.removeAttribute('disabled');
+      el.removeAttribute('title');
+      el.setAttribute('aria-disabled', 'false');
+      el.style.pointerEvents = 'auto';
+      el.style.opacity = '1';
+      return;
+    }
 
-      const looksLikeLangSelector =
-        id.includes('lang') || id.includes('idioma') ||
-        cls.includes('lang') || cls.includes('idioma') ||
-        name.includes('lang') || name.includes('idioma') ||
-        txt.includes('portugu') || txt.includes('english') ||
-        txt.includes('españ') || txt.includes('franç') ||
-        txt.includes('中文') || txt.includes('日本語');
+    const id = String(el.id || '').toLowerCase();
+    const cls = String(el.className || '').toLowerCase();
+    const name = String(el.name || '').toLowerCase();
+    const txt = String(el.textContent || el.value || '').toLowerCase();
 
-      if (!looksLikeLangSelector) return;
-      if (el.hasAttribute('data-i18n-allow-locked')) return;
+    const looksLikeLangSelector =
+      id.includes('lang') || id.includes('idioma') ||
+      cls.includes('lang') || cls.includes('idioma') ||
+      name.includes('lang') || name.includes('idioma') ||
+      txt.includes('portugu') || txt.includes('english') ||
+      txt.includes('españ') || txt.includes('franç') ||
+      txt.includes('中文') || txt.includes('日本語') || txt.includes('deutsch');
 
-      if (el.tagName === 'SELECT' || el.type === 'button' || el.type === 'radio') {
-        el.disabled = true;
-      }
+    // se NÃO parecer controle de idioma, ignora
+    if (!looksLikeLangSelector) return;
 
-      el.style.pointerEvents = 'none';
-      el.style.opacity = '0.6';
-      el.setAttribute('title', 'Idioma travado na introdução');
-    });
-  }
+    // se estiver marcado para não travar, ignora
+    if (el.hasAttribute('data-i18n-allow-locked')) return;
 
+    if (el.tagName === 'SELECT' || el.type === 'button' || el.type === 'radio') {
+      el.disabled = true;
+    }
+
+    el.style.pointerEvents = 'none';
+    el.style.opacity = '0.6';
+    el.setAttribute('title', 'Idioma travado na introdução');
+    el.setAttribute('aria-disabled', 'true');
+  });
+}
   function observeDynamicDom() {
     const observer = new MutationObserver(() => {
       try {
