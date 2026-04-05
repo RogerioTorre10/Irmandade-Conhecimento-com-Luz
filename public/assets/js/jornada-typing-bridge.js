@@ -430,19 +430,20 @@
       abortCurrent = () => { abort = true; };
 
       clearTypingRuntimeState(element);
-      element.style.opacity = '0';
+      element.style.opacity = '1';
+      element.style.visibility = 'visible';
       element.textContent = '';
 
-      let caret = element.querySelector('.typing-caret');
-      if (!caret) {
-        caret = document.createElement('span');
-        caret.className = 'typing-caret';
-        caret.textContent = '|';
-      }
+let caret = element.querySelector('.typing-caret');
+  if (!caret) {
+    caret = document.createElement('span');
+    caret.className = 'typing-caret';
+    caret.textContent = '|';
+}
 
-      if (showCursor) element.appendChild(caret);
-      element.style.opacity = '1';
-      element.classList.add('typing-active');
+element.classList.add('typing-active');
+
+if (showCursor) element.appendChild(caret);
 
       let i = 0;
       const interval = setInterval(() => {
@@ -453,8 +454,12 @@
           return resolve();
         }
 
-        element.textContent = text.slice(0, i + 1);
-        if (showCursor) element.appendChild(caret);
+  const partial = text.slice(0, i + 1);
+     element.textContent = partial;
+
+  if (showCursor) {
+    element.appendChild(caret);
+ }
 
         try { window.Luz?.bump({ peak: 1.18, ms: 120 }); } catch {}
 
