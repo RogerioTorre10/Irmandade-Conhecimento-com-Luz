@@ -398,17 +398,57 @@
     }
   }
 
-  document.addEventListener('intro:language-confirmed', () => {
-    const intro = document.getElementById('section-intro');
-    if (!intro) return;
+ document.addEventListener('intro:language-confirmed', async (e) => {
+  const intro = document.getElementById('section-intro');
+  if (!intro) return;
 
-    setTimeout(async () => {
-      await applyI18nToSection('section-intro', intro);
-      await prepareTyping(intro);
-      await applyTypingAndTTS('section-intro', intro, { forceReplay: true });
-    }, 120);
-  });
+  const lang = e?.detail?.lang || window.i18n?.currentLang || 'pt-BR';
+  console.log('[JC] intro:language-confirmed recebido para', lang);
 
+  try {
+    window.__JC_TYPED_ONCE = window.__JC_TYPED_ONCE || {};
+    window.__JC_TYPED_ONCE['section-intro'] = false;
+    window.__JC_IS_TYPING = false;
+
+    if (window.i18n?.waitForReady) {
+      await window.i18n.waitForReady(8000);
+    }
+
+    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+    if (window.i18n?.apply) {
+      window.i18n.apply(intro);
+    }
+
+    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+    intro.querySelectorAll('[data-typing="true"], .intro-title, .typing-text, .parchment-text-rough')
+      .forEach((el) => {
+        const text = String(el.textContent || '').replace(/\s+/g, ' ').trim();
+
+        delete el.dataset.typingDone;
+        delete el.dataset.typingSig;
+        delete el.dataset.typingLastSig;
+        delete el.dataset.typingLastAt;
+        delete el.dataset.fullText;
+        delete el.dataset.text;
+
+        el.classList.remove('typing-active', 'typing-done', 'type-done');
+        el.removeAttribute('data-cursor');
+
+        if (text) {
+          el.dataset.text = text;
+          el.dataset.fullText = text;
+          el.setAttribute('data-typing', 'true');
+        }
+      });
+
+    await prepareTyping(intro);
+    await applyTypingAndTTS('section-intro', intro, { forceReplay: true });
+  } catch (err) {
+    console.warn('[JC] Falha ao reprocessar intro após troca de idioma:', err);
+  }
+});
   function goNext() {
     if (isTransitioning) return;
 
