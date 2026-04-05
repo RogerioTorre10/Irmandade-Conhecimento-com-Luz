@@ -105,12 +105,38 @@
   }
 
   async function prepareTyping(root) {
-    if (!root) return;
-    cacheOriginalTypingText(root);
-    resetTypingState(root);
-    void root.offsetWidth;
-    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-  }
+  if (!root) return;
+
+  cacheOriginalTypingText(root);
+
+  getTypingNodes(root).forEach((el) => {
+    const full =
+      el.dataset?.fullText ||
+      el.dataset?.text ||
+      el.getAttribute?.('data-text') ||
+      '';
+
+    el.classList.remove('typing-active', 'typing-done', 'type-done');
+    el.removeAttribute('data-cursor');
+    el.setAttribute('data-typing', 'true');
+
+    delete el.dataset.typingDone;
+    delete el.dataset.typingSig;
+    delete el.dataset.typingLastSig;
+    delete el.dataset.typingLastAt;
+
+    // IMPORTANTE: esconder antes do início real
+    el.style.opacity = '0';
+    el.style.visibility = 'hidden';
+
+    if (full) {
+      el.textContent = full;
+    }
+  });
+
+  void root.offsetWidth;
+  await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+}
 
   async function waitForI18nReady(timeoutMs = 8000) {
     const start = Date.now();
@@ -211,28 +237,43 @@
 
       await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
-      for (const el of typingElements) {
-        const text = getText(el);
-        if (!text) continue;
+for (const el of typingElements) {
+  const text = getText(el);
+  if (!text) continue;
 
-        el.dataset.text = text;
-        el.dataset.fullText = text;
-        el.textContent = '';
+  el.dataset.text = text;
+  el.dataset.fullText = text;
 
-        if (typeof window.typeAndSpeak === 'function') {
-          await window.typeAndSpeak(el, text, 36, { forceReplay: true, cursor: true });
-        } else if (typeof window.runTyping === 'function') {
-          await window.runTyping(el, text, () => {}, {
-            speed: 36,
-            cursor: true,
-            forceReplay: true
-          });
-        }
+  // esconder completamente até o momento do typing
+  el.textContent = '';
+  el.style.opacity = '0';
+  el.style.visibility = 'hidden';
 
-        el.classList.remove('typing-active');
-        el.classList.add('typing-done');
-        el.removeAttribute('data-typing');
-      }
+  await new Promise((resolve) => requestAnimationFrame(resolve));
+
+  // só agora libera visualmente
+  el.style.opacity = '1';
+  el.style.visibility = 'visible';
+
+  const speed = Number(el.dataset.speed) || (el.classList.contains('intro-title') ? 52 : 38);
+
+  if (typeof window.typeAndSpeak === 'function') {
+    await window.typeAndSpeak(el, text, speed, { forceReplay: true, cursor: true });
+  } else if (typeof window.runTyping === 'function') {
+    await window.runTyping(el, text, () => {}, {
+      speed,
+      cursor: true,
+      forceReplay: true
+    });
+  }
+
+  el.classList.remove('typing-active');
+  el.classList.add('typing-done');
+  el.removeAttribute('data-typing');
+
+  // pequena pausa entre blocos, para não parecer colado
+  await new Promise((resolve) => setTimeout(resolve, el.classList.contains('intro-title') ? 180 : 120));
+}
 
       window.__JC_TYPED_ONCE[sectionId] = true;
       console.log('[JC.applyTypingAndTTS] Concluído para:', sectionId);
