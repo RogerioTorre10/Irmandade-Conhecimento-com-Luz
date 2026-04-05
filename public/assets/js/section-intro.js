@@ -295,41 +295,22 @@
 
           await setLangAndLock(chosenLang);
 
-          if (root && window.i18n?.apply) {
-  try {
-    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+          if (root) {
+  root.querySelectorAll('[data-typing="true"], .intro-title, .typing-text, .parchment-text-rough')
+    .forEach((el) => {
+      delete el.dataset.typingDone;
+      delete el.dataset.typingSig;
+      delete el.dataset.typingLastSig;
+      delete el.dataset.typingLastAt;
+      delete el.dataset.fullText;
+      delete el.dataset.text;
 
-    window.i18n.apply(root);
+      el.classList.remove('typing-active', 'typing-done', 'type-done');
+      el.removeAttribute('data-cursor');
+    });
 
-    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
-
-    root.querySelectorAll('[data-typing="true"], .intro-title, .typing-text, .parchment-text-rough')
-      .forEach((el) => {
-        // limpa qualquer cache antigo do idioma anterior
-        delete el.dataset.typingDone;
-        delete el.dataset.typingSig;
-        delete el.dataset.typingLastSig;
-        delete el.dataset.typingLastAt;
-        delete el.dataset.fullText;
-        delete el.dataset.text;
-
-        el.classList.remove('typing-active', 'typing-done', 'type-done');
-        el.removeAttribute('data-cursor');
-
-        const translatedText = String(el.textContent || '').replace(/\s+/g, ' ').trim();
-
-        if (translatedText) {
-          el.dataset.text = translatedText;
-          el.dataset.fullText = translatedText;
-        }
-      });
-
-    console.log('[IntroLang] Textos da intro recarregados após troca de idioma.');
-  } catch (e) {
-    console.warn('[IntroLang] Falha ao reaplicar i18n na intro:', e);
-  }
+  console.log('[IntroLang] Cache de typing limpo após troca de idioma.');
 }
-
           if (introBtn) {
             introBtn.disabled = false;
             introBtn.style.pointerEvents = 'auto';
@@ -342,10 +323,11 @@
 
           window.__JC_TYPED_ONCE = window.__JC_TYPED_ONCE || {};
           window.__JC_TYPED_ONCE['section-intro'] = false;
+          window.__JC_IS_TYPING = false;
 
-       document.dispatchEvent(new CustomEvent('intro:language-confirmed', {
-      detail: { lang: chosenLang }
-    }));
+   document.dispatchEvent(new CustomEvent('intro:language-confirmed', {
+     detail: { lang: chosenLang }
+  }));
 
           resolve(chosenLang);
         } catch (err) {
