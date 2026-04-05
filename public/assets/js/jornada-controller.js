@@ -484,9 +484,10 @@ for (const el of typingElements) {
         }
       });
 
-    await prepareTyping(intro);
-    await applyTypingAndTTS('section-intro', intro, { forceReplay: true });
-  } catch (err) {
+   await prepareTyping(intro);
+   await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+   await applyTypingAndTTS('section-intro', intro, { forceReplay: true });
+   } catch (err) {
     console.warn('[JC] Falha ao reprocessar intro após troca de idioma:', err);
   }
 });
