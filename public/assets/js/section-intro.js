@@ -6,7 +6,7 @@
   const INTRO_VIDEO =
     window.JORNADA_VIDEOS?.introParaTermos1 ||
     window.APP_CONFIG?.VIDEOS?.introParaTermos1 ||
-    '/assets/videos/filme-1-entrando-na-jornada.mp4';
+    '/assets/videos/filme-pergaminho-ao-vento.mp4';
 
   if (window.JCIntro?.__bound) return;
 
