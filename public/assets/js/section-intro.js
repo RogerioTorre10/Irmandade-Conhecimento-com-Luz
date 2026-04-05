@@ -296,21 +296,39 @@
           await setLangAndLock(chosenLang);
 
           if (root && window.i18n?.apply) {
-            try {
-              window.i18n.apply(root);
+  try {
+    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
 
-              root.querySelectorAll('[data-typing="true"], .intro-title, .typing-text, .parchment-text-rough')
-                .forEach((el) => {
-                  const text = String(el.textContent || '').replace(/\s+/g, ' ').trim();
-                  if (text) {
-                    el.dataset.text = text;
-                    el.dataset.fullText = text;
-                  }
-                });
-            } catch (e) {
-              console.warn('[IntroLang] Falha ao reaplicar i18n na intro:', e);
-            }
-          }
+    window.i18n.apply(root);
+
+    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+    root.querySelectorAll('[data-typing="true"], .intro-title, .typing-text, .parchment-text-rough')
+      .forEach((el) => {
+        // limpa qualquer cache antigo do idioma anterior
+        delete el.dataset.typingDone;
+        delete el.dataset.typingSig;
+        delete el.dataset.typingLastSig;
+        delete el.dataset.typingLastAt;
+        delete el.dataset.fullText;
+        delete el.dataset.text;
+
+        el.classList.remove('typing-active', 'typing-done', 'type-done');
+        el.removeAttribute('data-cursor');
+
+        const translatedText = String(el.textContent || '').replace(/\s+/g, ' ').trim();
+
+        if (translatedText) {
+          el.dataset.text = translatedText;
+          el.dataset.fullText = translatedText;
+        }
+      });
+
+    console.log('[IntroLang] Textos da intro recarregados após troca de idioma.');
+  } catch (e) {
+    console.warn('[IntroLang] Falha ao reaplicar i18n na intro:', e);
+  }
+}
 
           if (introBtn) {
             introBtn.disabled = false;
@@ -322,9 +340,12 @@
           modal.style.opacity = '0';
           setTimeout(() => modal.remove(), 220);
 
-          document.dispatchEvent(new CustomEvent('intro:language-confirmed', {
-            detail: { lang: chosenLang }
-          }));
+          window.__JC_TYPED_ONCE = window.__JC_TYPED_ONCE || {};
+          window.__JC_TYPED_ONCE['section-intro'] = false;
+
+       document.dispatchEvent(new CustomEvent('intro:language-confirmed', {
+      detail: { lang: chosenLang }
+    }));
 
           resolve(chosenLang);
         } catch (err) {
