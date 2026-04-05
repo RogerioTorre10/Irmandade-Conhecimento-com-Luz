@@ -32,22 +32,21 @@
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  function getText(el) {
-    if (!el) return '';
+ function getText(el) {
+  if (!el) return '';
 
-    const fromDataFull =
-      el.dataset?.fullText ||
-      el.dataset?.text ||
-      el.getAttribute?.('data-text') ||
-      el.getAttribute?.('data-i18n-original') ||
-      '';
+  const currentText = String(el.textContent || '').replace(/\s+/g, ' ').trim();
+  if (currentText) return currentText;
 
-    const cleanData = String(fromDataFull || '').replace(/\s+/g, ' ').trim();
-    if (cleanData) return cleanData;
+  const fromData =
+    el.dataset?.fullText ||
+    el.dataset?.text ||
+    el.getAttribute?.('data-text') ||
+    el.getAttribute?.('data-i18n-original') ||
+    '';
 
-    const tc = String(el.textContent || '').replace(/\s+/g, ' ').trim();
-    return tc;
-  }
+  return String(fromData || '').replace(/\s+/g, ' ').trim();
+}
 
   function isIntroLike(sectionId) {
     return ['section-intro', 'section-termos1', 'section-termos2'].includes(sectionId);
