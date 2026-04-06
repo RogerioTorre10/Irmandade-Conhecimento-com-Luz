@@ -199,6 +199,9 @@
 #section-intro .j-arcane-card::after {
   pointer-events: none;
   max-width: 100%;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  transform-origin: center center !important; 
 }
 
 /* ============================
