@@ -51,26 +51,28 @@
   display: block;
   width: 100%;
   max-width: 100%;
-  min-height: 3.2em;
+  min-height: 1.6em;
   box-sizing: border-box;
 
   font-family: 'ManufacturingConsent', sans-serif;
-  font-size: clamp(24px, 3.2vw, 34px);
-  line-height: 1.28;
+  font-size: clamp(20px, 2.4vw, 30px);
+  line-height: 1.15;
   text-align: left !important;
   color: var(--theme-main-color, #ffd700);
 
   margin-top: 28px;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
   padding: 0 22px;
 
-  white-space: normal !important;
-  overflow: visible !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
   word-break: normal !important;
   overflow-wrap: break-word !important;
+  text-overflow: clip !important;
 
   text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
-  opacity: 0;
+  opacity: 1;
+  visibility: visible;
   transform: translateY(6px);
   animation: introTitleIn 600ms ease forwards;
 }
