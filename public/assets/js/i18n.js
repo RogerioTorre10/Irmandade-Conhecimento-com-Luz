@@ -484,7 +484,8 @@
     el.setAttribute('title', 'Idioma travado na introdução');
     el.setAttribute('aria-disabled', 'true');
   });
-}
+ }
+   
   function observeDynamicDom() {
     const observer = new MutationObserver(() => {
       try {
