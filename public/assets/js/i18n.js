@@ -323,19 +323,25 @@
     applyHtml(ctx);
 
     ctx.querySelectorAll('[data-i18n-text]').forEach((el) => {
-      const key = el.getAttribute('data-i18n-text');
-      if (!key) return;
+  const key = el.getAttribute('data-i18n-text');
+  if (!key) return;
 
-      const val = t(key, el.getAttribute('data-text') || key);
-      el.setAttribute('data-text', val);
+  const fallback =
+    el.getAttribute('data-i18n-resolved') ||
+    el.getAttribute('data-text') ||
+    el.textContent ||
+    key;
 
-      if (
-        !el.classList.contains('typing-active') &&
-        !el.hasAttribute('data-typing')
-      ) {
-        el.textContent = val;
-      }
-    });
+  const val = t(key, fallback);
+
+  el.setAttribute('data-text', val);
+  el.setAttribute('data-i18n-resolved', val);
+
+  // Atualiza o texto visível sempre que não estiver digitando naquele exato momento
+  if (!el.classList.contains('typing-active')) {
+    el.textContent = val;
+  }
+});
 
     setHtmlLangAttrs();
     emit('i18n:applied', { lang: state.lang, root: ctx });
