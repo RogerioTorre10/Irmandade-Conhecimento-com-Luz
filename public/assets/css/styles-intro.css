@@ -441,3 +441,45 @@
       0 0 26px rgba(255, 153, 0, 0.18) !important;
   }
 }
+/* FEIXE CENTRALIZADO + ANIMADO */
+#section-intro .j-arcane-card::before,
+#section-intro .j-arcane-card::after,
+#section-intro .parchment-inner-rough::before,
+#section-intro .parchment-inner-rough::after {
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  transform-origin: center top !important;
+  animation: introSignalFloat 4.8s ease-in-out infinite !important;
+}
+
+@keyframes introSignalFloat {
+  0% {
+    transform: translateX(-50%) translateY(0px) scale(1);
+    opacity: 0.82;
+  }
+  50% {
+    transform: translateX(-50%) translateY(8px) scale(1.04);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-50%) translateY(0px) scale(1);
+    opacity: 0.82;
+  }
+}
+@media (max-width: 767px) {
+  #section-intro .intro-title {
+    font-size: clamp(18px, 4.8vw, 24px) !important;
+    line-height: 1.12 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: clip !important;
+    padding: 0 14px !important;
+  }
+
+  #section-intro .j-arcane-card::before,
+  #section-intro .j-arcane-card::after,
+  #section-intro .parchment-inner-rough::before,
+  #section-intro .parchment-inner-rough::after {
+    animation-duration: 4.2s !important;
+  }
+}
