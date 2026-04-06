@@ -434,10 +434,10 @@
   }
 
  function disableAllLangSelectors() {
-  if (isLocked()) return;
+  if (!isLocked()) return;
 
   document.querySelectorAll('select, button, input[type="radio"], input[type="button"]').forEach((el) => {
-    // EXCEÇÃO ABSOLUTA: nunca travar o modal da intro
+    // nunca travar o modal da intro
     if (
       el.id === 'intro-lang-select' ||
       el.id === 'intro-lang-confirm' ||
@@ -463,12 +463,10 @@
       name.includes('lang') || name.includes('idioma') ||
       txt.includes('portugu') || txt.includes('english') ||
       txt.includes('españ') || txt.includes('franç') ||
-      txt.includes('中文') || txt.includes('日本語') || txt.includes('deutsch');
+      txt.includes('中文') || txt.includes('日本語') ||
+      txt.includes('deutsch');
 
-    // se NÃO parecer controle de idioma, ignora
     if (!looksLikeLangSelector) return;
-
-    // se estiver marcado para não travar, ignora
     if (el.hasAttribute('data-i18n-allow-locked')) return;
 
     if (el.tagName === 'SELECT' || el.type === 'button' || el.type === 'radio') {
