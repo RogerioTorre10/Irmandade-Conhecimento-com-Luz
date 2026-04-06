@@ -491,6 +491,7 @@ for (const el of typingElements) {
     console.warn('[JC] Falha ao reprocessar intro após troca de idioma:', err);
   }
 });
+  
   function goNext() {
     if (isTransitioning) return;
 
