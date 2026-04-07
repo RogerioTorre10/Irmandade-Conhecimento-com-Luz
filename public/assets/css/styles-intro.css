@@ -1,12 +1,12 @@
 /* =========================================================
-   STYLES-INTRO — limpo e blindado
-   Meta: título sem corte, typing estável, feixe central vivo
+   STYLES-INTRO v3 — limpo, sem redundâncias
+   Feixe sinalizador varrendo o espaço
    ========================================================= */
 
 /* =========================================================
    BASE
    ========================================================= */
-#section-intro{
+#section-intro {
   background: transparent !important;
   border: none;
   box-shadow: none;
@@ -14,14 +14,14 @@
   overflow-x: hidden !important;
 }
 
-#section-intro .intro-wrap{
+#section-intro .intro-wrap {
   width: 100% !important;
   text-align: left !important;
   overflow: visible !important;
   overflow-x: hidden !important;
 }
 
-#section-intro .parchment-inner-rough{
+#section-intro .parchment-inner-rough {
   position: relative;
   z-index: 2;
   display: flex;
@@ -29,10 +29,11 @@
   justify-content: flex-start;
   text-align: left !important;
   overflow: visible !important;
+  isolation: isolate;
   animation: introPan 9s ease-in-out 1;
 }
 
-#section-intro .pergaminho{
+#section-intro .pergaminho {
   width: 100%;
   max-width: 900px;
   margin: 0 auto;
@@ -42,15 +43,14 @@
 }
 
 #section-intro .intro-wrap,
-#section-intro .parchment-inner-rough,
-#section-intro .j-panel-glow{
+#section-intro .j-panel-glow {
   overflow-x: hidden !important;
 }
 
 /* =========================================================
    TIPOGRAFIA
    ========================================================= */
-#section-intro .intro-title{
+#section-intro .intro-title {
   display: block;
   width: 100%;
   max-width: 100%;
@@ -82,21 +82,20 @@
 #section-intro .intro-title,
 #section-intro .intro-title[data-typing="true"],
 #section-intro .intro-title.typing-active,
-#section-intro .intro-title.typing-done{
+#section-intro .intro-title.typing-done {
   direction: ltr !important;
   unicode-bidi: plaintext !important;
   text-align: left !important;
   transform-origin: left center !important;
 }
 
-#section-intro [data-typing="true"]{
+#section-intro [data-typing="true"] {
   overflow: visible;
   white-space: normal;
-  word-break: normal;
   overflow-wrap: break-word;
 }
 
-#section-intro .parchment-text-rough{
+#section-intro .parchment-text-rough {
   display: block;
   margin-bottom: 8px;
   font-family: 'BerkshireSwash', cursive;
@@ -109,13 +108,13 @@
   visibility: visible;
 }
 
-#section-intro .parchment-text-rough.lumen-typing{
+#section-intro .parchment-text-rough.lumen-typing {
   direction: ltr !important;
   text-align: left !important;
 }
 
 #section-intro .parchment-text-rough.typing-active,
-#section-intro .parchment-text-rough.typing-done{
+#section-intro .parchment-text-rough.typing-done {
   display: block !important;
   opacity: 1 !important;
   visibility: visible !important;
@@ -126,14 +125,14 @@
 #section-intro .parchment-text-rough.typing-done,
 #section-intro .parchment-text-rough.type-done,
 #section-intro .intro-title.typing-done,
-#section-intro .intro-title.type-done{
+#section-intro .intro-title.type-done {
   display: block !important;
   opacity: 1 !important;
   visibility: visible !important;
 }
 
 /* ações */
-#section-intro .parchment-actions-rough{
+#section-intro .parchment-actions-rough {
   display: flex;
   justify-content: center;
   gap: 12px;
@@ -143,7 +142,7 @@
 /* =========================================================
    VIDRO / CARD
    ========================================================= */
-#section-intro .j-panel-glow{
+#section-intro .j-panel-glow {
   position: relative;
   isolation: isolate !important;
   box-sizing: border-box !important;
@@ -156,7 +155,7 @@
   overflow: visible !important;
 }
 
-#section-intro .j-panel-glow::before{
+#section-intro .j-panel-glow::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -174,17 +173,16 @@
   ) !important;
 }
 
-#section-intro .j-arcane-card{
+#section-intro .j-arcane-card {
   position: relative !important;
   min-height: 560px !important;
   margin-top: -8px !important;
   margin-bottom: 24px !important;
-  overflow: hidden !important;
+  overflow: visible !important;
   border-radius: 26px !important;
 }
 
-/* mantém a rotação do brilho do card, sem sobrescrever */
-#section-intro .j-arcane-card::before{
+#section-intro .j-arcane-card::before {
   animation: jArcaneSweep 7s linear infinite !important;
   opacity: .32 !important;
   left: auto !important;
@@ -192,14 +190,14 @@
   transform-origin: center center !important;
 }
 
-#section-intro .j-arcane-card::after{
+#section-intro .j-arcane-card::after {
   pointer-events: none;
 }
 
 /* =========================================================
    CURSOR DE DATILOGRAFIA
    ========================================================= */
-#section-intro .intro-title[data-typing="true"][data-cursor="true"]{
+#section-intro .intro-title[data-typing="true"][data-cursor="true"] {
   position: relative;
   display: inline-block !important;
   width: auto !important;
@@ -208,13 +206,13 @@
   left: 0 !important;
 }
 
-#section-intro .parchment-text-rough[data-typing="true"][data-cursor="true"]{
+#section-intro .parchment-text-rough[data-typing="true"][data-cursor="true"] {
   position: relative;
   display: inline-block;
   padding-right: .35em;
 }
 
-#section-intro [data-typing="true"][data-cursor="true"].typing-active::after{
+#section-intro [data-typing="true"][data-cursor="true"].typing-active::after {
   content: '';
   position: absolute;
   right: .05em;
@@ -228,11 +226,11 @@
   animation: caretBlink 1s steps(1, end) infinite;
 }
 
-#section-intro [data-typing="true"][data-cursor="true"].typing-done::after{
+#section-intro [data-typing="true"][data-cursor="true"].typing-done::after {
   content: none;
 }
 
-#section-intro .parchment-text-rough[data-cursor="true"].typing-active::after{
+#section-intro .parchment-text-rough[data-cursor="true"].typing-active::after {
   width: 2px;
   height: 1em;
   right: 0;
@@ -240,57 +238,88 @@
 }
 
 /* =========================================================
-   FEIXE CENTRAL — fica no pergaminho interno, não no card
+   FEIXE SINALIZADOR — cone de luz varrendo o espaço
+   Origem: centro do container, varre -25° a +25°
    ========================================================= */
-#section-intro .parchment-inner-rough::before{
-  content: '';
-  position: absolute;
-  top: -8%;
-  left: 50%;
-  z-index: 1;
-  width: 72%;
-  height: 42%;
-  pointer-events: none;
-  transform: translateX(-50%);
-  background: radial-gradient(
-    ellipse at center top,
-    rgba(255,220,120,.50) 0%,
-    rgba(255,200, 80,.22) 35%,
-    rgba(255,170, 40,.08) 58%,
-    transparent 78%
-  );
-  filter: blur(10px);
-  mix-blend-mode: screen;
-  animation: introSignalSweep 3.2s ease-in-out infinite;
+
+/* Facho principal — cone triangular */
+#section-intro .parchment-inner-rough::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 80px !important;
+  left: 50% !important;
+  width: 200px !important;
+  height: 220px !important;
+  z-index: 6 !important;
+  pointer-events: none !important;
+  display: block !important;
+
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,240,0.00) 0%,
+    rgba(255,250,210,0.85) 8%,
+    rgba(255,230,140,0.40) 28%,
+    rgba(255,200,80,0.15) 50%,
+    rgba(255,180,50,0.05) 70%,
+    transparent 100%
+  ) !important;
+
+  clip-path: polygon(46% 0%, 54% 0%, 100% 100%, 0% 100%) !important;
+  filter: blur(6px) !important;
+  mix-blend-mode: screen !important;
+  transform-origin: 50% 0% !important;
+  animation: beamSweep 4s ease-in-out infinite !important;
 }
 
-#section-intro .parchment-inner-rough::after{
-  content: '';
-  position: absolute;
-  top: 2%;
-  left: 50%;
-  z-index: 1;
-  width: 34%;
-  height: 12%;
-  pointer-events: none;
-  transform: translateX(-50%);
+/* Núcleo emissor — ponto brilhante na origem do facho */
+#section-intro .parchment-inner-rough::after {
+  content: '' !important;
+  position: absolute !important;
+  top: 72px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 28px !important;
+  height: 28px !important;
+  z-index: 7 !important;
+  pointer-events: none !important;
+  display: block !important;
+  border-radius: 50% !important;
+
   background: radial-gradient(
-    ellipse at center,
-    rgba(255,235,170,.95) 0%,
-    rgba(255,210,110,.45) 45%,
-    transparent 80%
-  );
-  filter: blur(8px);
-  animation: introSignalPulse 1.9s ease-in-out infinite;
+    circle at center,
+    rgba(255,255,255,1) 0%,
+    rgba(255,245,200,0.95) 25%,
+    rgba(255,220,130,0.60) 55%,
+    rgba(255,190,80,0.20) 78%,
+    transparent 100%
+  ) !important;
+
+  box-shadow:
+    0 0 10px rgba(255,250,220,0.95),
+    0 0 22px rgba(255,220,140,0.70),
+    0 0 44px rgba(255,190,90,0.35) !important;
+
+  filter: blur(1px) !important;
+  animation: beamCorePulse 2s ease-in-out infinite !important;
 }
 
-/* aura dourada enquanto digita */
-#section-intro:has(.typing-active) .parchment-inner-rough{
+/* Conteúdo acima do feixe */
+#section-intro .intro-title,
+#section-intro .parchment-text-rough,
+#section-intro .parchment-actions-rough,
+#section-intro .btn,
+#section-intro button {
+  position: relative;
+  z-index: 10;
+}
+
+/* Áurea dourada durante digitação */
+#section-intro:has(.typing-active) .parchment-inner-rough {
   outline: none !important;
   box-shadow: none !important;
 }
 
-#section-intro:has(.typing-active) .j-panel-glow{
+#section-intro:has(.typing-active) .j-panel-glow {
   outline: 1px solid rgba(255,204,102,.22) !important;
   outline-offset: 2px !important;
   box-shadow:
@@ -302,228 +331,59 @@
 /* =========================================================
    ANIMAÇÕES
    ========================================================= */
-@keyframes introTitleIn{
-  from{
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to{
-    opacity: 1;
-    transform: translateY(6px);
-  }
+@keyframes introTitleIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(6px); }
 }
 
-@keyframes introPan{
+@keyframes introPan {
   0%   { transform: translateY(0); }
   50%  { transform: translateY(-1px); }
   100% { transform: translateY(0); }
 }
 
-@keyframes introSignalSweep{
-  0%{
-    transform: translateX(-50%) translateY(0) scale(.96);
-    opacity: .58;
+/* Varredura do facho — oscila de -25° a +25° */
+@keyframes beamSweep {
+  0% {
+    transform: translateX(-50%) rotate(-25deg) scaleY(0.92);
+    opacity: 0.45;
   }
-  50%{
-    transform: translateX(-50%) translateY(8px) scale(1.05);
-    opacity: .95;
+  25% {
+    opacity: 0.85;
   }
-  100%{
-    transform: translateX(-50%) translateY(0) scale(.96);
-    opacity: .58;
+  50% {
+    transform: translateX(-50%) rotate(25deg) scaleY(1.06);
+    opacity: 0.95;
+  }
+  75% {
+    opacity: 0.80;
+  }
+  100% {
+    transform: translateX(-50%) rotate(-25deg) scaleY(0.92);
+    opacity: 0.45;
   }
 }
 
-@keyframes introSignalPulse{
-  0%,100%{
-    opacity: .65;
-    transform: translateX(-50%) scale(.96);
+/* Pulsação do núcleo emissor */
+@keyframes beamCorePulse {
+  0%, 100% {
+    opacity: 0.70;
+    transform: translateX(-50%) scale(0.88);
   }
-  50%{
+  50% {
     opacity: 1;
-    transform: translateX(-50%) scale(1.08);
+    transform: translateX(-50%) scale(1.15);
   }
 }
 
-@keyframes caretBlink{
-  0%,49%   { opacity: 1; }
+@keyframes caretBlink {
+  0%,49%  { opacity: 1; }
   50%,100% { opacity: 0; }
 }
 
 /* =========================================================
-   MOBILE
+   SCROLLBAR CLEANUP
    ========================================================= */
-@media (max-width: 767px){
-  #section-intro .intro-title{
-    font-size: clamp(18px, 4.8vw, 24px) !important;
-    line-height: 1.12 !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: clip !important;
-    padding: 0 14px !important;
-  }
-
-  #section-intro .parchment-inner-rough::before{
-    animation-duration: 4.2s;
-  }
-
-  #section-intro .parchment-inner-rough::after{
-    animation-duration: 2.1s;
-  }
-}
-
-@media (max-width: 600px){
-  #section-intro{
-    overflow-x: hidden !important;
-  }
-
-  #section-intro .j-perg-v-inner{
-    position: relative;
-    width: 100%;
-    max-width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-    transform: translateY(18px);
-    overflow: visible !important;
-  }
-
-  #section-intro .j-panel-glow{
-    width: calc(100vw - 28px) !important;
-    max-width: 100% !important;
-    min-height: 520px !important;
-    transform: translateY(-8px) !important;
-    overflow: visible !important;
-  }
-
-  #section-intro .j-arcane-card{
-    min-height: 460px !important;
-    max-height: none !important;
-    margin-top: -8px !important;
-    margin-bottom: 20px !important;
-    border-radius: 24px !important;
-  }
-
-  #section-intro .intro-title{
-    min-height: 3.4em !important;
-    margin-top: 22px !important;
-    margin-bottom: 14px !important;
-    padding: 0 12px !important;
-    font-size: clamp(20px, 6vw, 28px) !important;
-    line-height: 1.25 !important;
-  }
-}
-/* =========================================================
-   FIX CIRÚRGICO — INTRO
-   corrige sinalizador sem crescer pergaminho
-   remove barras laterais extras
-   centraliza rodapé
-   ========================================================= */
-
-/* 1) trava vazamento horizontal sem mexer na altura do pergaminho */
-html,
-body {
-  overflow-x: hidden !important;
-}
-
-#section-intro,
-#section-intro .intro-wrap,
-#section-intro .j-panel-glow,
-#section-intro .j-arcane-card {
-  overflow-x: hidden !important;
-}
-
-/* 2) NÃO deixar pseudo-elemento aumentar layout */
-#section-intro .parchment-inner-rough {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden !important;
-}
-
-/* 3) sinalizador real, menor e contido */
-#section-intro .parchment-inner-rough::before {
-  content: '';
-  position: absolute;
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 180px;
-  max-width: 58%;
-  height: 70px;
-  pointer-events: none;
-  z-index: 1;
-
-  background: radial-gradient(
-    ellipse at center,
-    rgba(255, 245, 200, 0.95) 0%,
-    rgba(255, 220, 120, 0.55) 35%,
-    rgba(255, 180, 50, 0.18) 65%,
-    transparent 100%
-  );
-
-  filter: blur(10px);
-  opacity: 0.95;
-  mix-blend-mode: screen;
-  animation: introSignalPulseClean 2.2s ease-in-out infinite;
-}
-
-#section-intro .parchment-inner-rough::after {
-  content: '';
-  position: absolute;
-  top: 6px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 92px;
-  max-width: 32%;
-  height: 18px;
-  pointer-events: none;
-  z-index: 2;
-
-  background: radial-gradient(
-    ellipse at center,
-    rgba(255,255,235,1) 0%,
-    rgba(255,225,140,0.95) 45%,
-    rgba(255,190,60,0.25) 75%,
-    transparent 100%
-  );
-
-  filter: blur(4px);
-  opacity: 1;
-  animation: introSignalCoreClean 1.8s ease-in-out infinite;
-}
-
-@keyframes introSignalPulseClean {
-  0%, 100% {
-    opacity: 0.55;
-    transform: translateX(-50%) scaleX(0.94) scaleY(0.92);
-  }
-  50% {
-    opacity: 1;
-    transform: translateX(-50%) scaleX(1.08) scaleY(1.12);
-  }
-}
-
-@keyframes introSignalCoreClean {
-  0%, 100% {
-    opacity: 0.72;
-    transform: translateX(-50%) scale(0.96);
-  }
-  50% {
-    opacity: 1;
-    transform: translateX(-50%) scale(1.10);
-  }
-}
-
-/* 4) conteúdo acima do sinalizador */
-#section-intro .intro-title,
-#section-intro .parchment-text-rough,
-#section-intro .parchment-actions-rough,
-#section-intro .btn,
-#section-intro button {
-  position: relative;
-  z-index: 3;
-}
-
-/* 5) remover barras laterais internas da intro */
 #section-intro .j-panel-glow,
 #section-intro .j-arcane-card,
 #section-intro .j-perg-v-inner,
@@ -540,7 +400,6 @@ body {
   display: none !important;
 }
 
-/* 6) impedir scroll interno artificial */
 #section-intro .j-panel-glow,
 #section-intro .j-arcane-card,
 #section-intro .j-perg-v-inner {
@@ -548,7 +407,9 @@ body {
   max-height: none !important;
 }
 
-/* 7) rodapé centralizado */
+/* =========================================================
+   RODAPÉ CENTRALIZADO
+   ========================================================= */
 .site-footer,
 footer,
 .footer,
@@ -574,189 +435,86 @@ footer *,
   text-align: center !important;
 }
 
-/* 8) mobile */
-@media (max-width: 600px) {
+/* =========================================================
+   MOBILE
+   ========================================================= */
+@media (max-width: 767px) {
+  #section-intro .intro-title {
+    font-size: clamp(18px, 4.8vw, 24px) !important;
+    line-height: 1.12 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: clip !important;
+    padding: 0 14px !important;
+  }
+
   #section-intro .parchment-inner-rough::before {
-    width: 150px;
-    height: 60px;
+    width: 150px !important;
+    height: 170px !important;
+    animation-duration: 4.5s !important;
   }
 
   #section-intro .parchment-inner-rough::after {
-    width: 78px;
-    height: 16px;
-  }
-}
-/* =========================================================
-   FIX CIRÚRGICO — sinalizador em facho/rayo
-   igual ao comportamento do print 2
-   ========================================================= */
-
-#section-intro .parchment-inner-rough::before{
-  content: '' !important;
-  position: absolute !important;
-  top: 122px !important;
-  left: 50% !important;
-  transform: translateX(-50%) rotate(8deg) !important;
-  width: 170px !important;
-  height: 150px !important;
-  z-index: 6 !important;
-  pointer-events: none !important;
-  opacity: .92 !important;
-  display: block !important;
-
-  background: linear-gradient(
-    to bottom right,
-    rgba(255,255,220,0.00) 0%,
-    rgba(255,245,190,0.95) 10%,
-    rgba(255,220,120,0.38) 26%,
-    rgba(255,190,70,0.16) 44%,
-    rgba(255,170,40,0.06) 58%,
-    rgba(255,150,20,0.00) 74%
-  ) !important;
-
-  clip-path: polygon(48% 0%, 56% 0%, 100% 100%, 0% 100%) !important;
-  filter: blur(7px) !important;
-  mix-blend-mode: screen !important;
-  transform-origin: top center !important;
-  animation: introBeamSweep 3.2s ease-in-out infinite !important;
-}
-
-#section-intro .parchment-inner-rough::after{
-  content: '' !important;
-  position: absolute !important;
-  top: 112px !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  width: 24px !important;
-  height: 24px !important;
-  z-index: 7 !important;
-  pointer-events: none !important;
-  opacity: 1 !important;
-  display: block !important;
-
-  background: radial-gradient(
-    circle at center,
-    rgba(255,255,245,1) 0%,
-    rgba(255,235,170,0.95) 38%,
-    rgba(255,210,100,0.40) 68%,
-    transparent 100%
-  ) !important;
-
-  border-radius: 50% !important;
-  filter: blur(3px) !important;
-  animation: introBeamCore 2s ease-in-out infinite !important;
-}
-
-@keyframes introBeamSweep {
-  0%, 100% {
-    transform: translateX(-50%) rotate(5deg) scaleY(0.95);
-    opacity: 0.55;
-  }
-  50% {
-    transform: translateX(-50%) rotate(10deg) scaleY(1.06);
-    opacity: 0.95;
+    width: 22px !important;
+    height: 22px !important;
   }
 }
 
-@keyframes introBeamCore {
-  0%, 100% {
-    transform: translateX(-50%) scale(0.92);
-    opacity: 0.72;
+@media (max-width: 600px) {
+  #section-intro {
+    overflow-x: hidden !important;
   }
-  50% {
-    transform: translateX(-50%) scale(1.08);
-    opacity: 1;
+
+  #section-intro .j-perg-v-inner {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    transform: translateY(18px);
+    overflow: visible !important;
   }
-}
-/* núcleo emissor do sinalizador */
-#section-intro .parchment-inner-rough .intro-signal-core,
-#section-intro .parchment-inner-rough::marker {
-  display: none;
-}
 
-#section-intro .parchment-inner-rough{
-  position: relative;
-}
-
-#section-intro .parchment-inner-rough .signal-core-fake{
-  display: none;
-}
-
-/* núcleo central brilhante */
-#section-intro .parchment-inner-rough > .intro-title::before{
-  content: '' !important;
-  position: absolute !important;
-  top: 78px !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  width: 18px !important;
-  height: 18px !important;
-  z-index: 9 !important;
-  pointer-events: none !important;
-  border-radius: 50% !important;
-
-  background: radial-gradient(
-    circle at center,
-    rgba(255,255,255,1) 0%,
-    rgba(255,247,210,0.98) 20%,
-    rgba(255,230,160,0.92) 42%,
-    rgba(255,205,110,0.55) 68%,
-    rgba(255,185,80,0.18) 84%,
-    transparent 100%
-  ) !important;
-
-  box-shadow:
-    0 0 8px rgba(255,245,210,0.95),
-    0 0 18px rgba(255,220,140,0.75),
-    0 0 34px rgba(255,190,90,0.45) !important;
-
-  filter: blur(0.6px) !important;
-  animation: introSignalCoreEmitter 1.8s ease-in-out infinite !important;
-}
-
-/* aro externo suave do emissor */
-#section-intro .parchment-inner-rough > .intro-title::after{
-  content: '' !important;
-  position: absolute !important;
-  top: 72px !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  width: 34px !important;
-  height: 34px !important;
-  z-index: 8 !important;
-  pointer-events: none !important;
-  border-radius: 50% !important;
-
-  background: radial-gradient(
-    circle at center,
-    rgba(255,240,180,0.24) 0%,
-    rgba(255,210,110,0.16) 45%,
-    rgba(255,180,70,0.08) 68%,
-    transparent 100%
-  ) !important;
-
-  filter: blur(2px) !important;
-  animation: introSignalCoreHalo 2.2s ease-in-out infinite !important;
-}
-
-@keyframes introSignalCoreEmitter {
-  0%, 100% {
-    opacity: 0.78;
-    transform: translateX(-50%) scale(0.94);
+  #section-intro .j-panel-glow {
+    width: calc(100vw - 28px) !important;
+    max-width: 100% !important;
+    min-height: 520px !important;
+    transform: translateY(-8px) !important;
+    overflow: visible !important;
   }
-  50% {
-    opacity: 1;
-    transform: translateX(-50%) scale(1.14);
+
+  #section-intro .j-arcane-card {
+    min-height: 460px !important;
+    max-height: none !important;
+    margin-top: -8px !important;
+    margin-bottom: 20px !important;
+    border-radius: 24px !important;
+  }
+
+  #section-intro .intro-title {
+    min-height: 3.4em !important;
+    margin-top: 22px !important;
+    margin-bottom: 14px !important;
+    padding: 0 12px !important;
+    font-size: clamp(20px, 6vw, 28px) !important;
+    line-height: 1.25 !important;
+  }
+
+  #section-intro .parchment-inner-rough::before {
+    width: 120px !important;
+    height: 140px !important;
+    top: 70px !important;
+  }
+
+  #section-intro .parchment-inner-rough::after {
+    width: 20px !important;
+    height: 20px !important;
+    top: 64px !important;
   }
 }
 
-@keyframes introSignalCoreHalo {
-  0%, 100% {
-    opacity: 0.42;
-    transform: translateX(-50%) scale(0.92);
-  }
-  50% {
-    opacity: 0.82;
-    transform: translateX(-50%) scale(1.08);
-  }
+/* Trava vazamento horizontal global */
+html,
+body {
+  overflow-x: hidden !important;
 }
