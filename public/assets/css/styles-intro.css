@@ -441,31 +441,40 @@
       0 0 26px rgba(255, 153, 0, 0.18) !important;
   }
 }
-/* FEIXE CENTRALIZADO + ANIMADO */
+/* SINALIZADOR CENTRALIZADO E GIRANDO */
 #section-intro .j-arcane-card::before,
 #section-intro .j-arcane-card::after,
 #section-intro .parchment-inner-rough::before,
 #section-intro .parchment-inner-rough::after {
   left: 50% !important;
-  transform: translateX(-50%) !important;
-  transform-origin: center top !important;
-  animation: introSignalFloat 4.8s ease-in-out infinite !important;
+  transform-origin: top center !important;
+  animation: introSignalRotate 5.5s ease-in-out infinite !important;
+  will-change: transform, opacity;
 }
 
-@keyframes introSignalFloat {
+@keyframes introSignalRotate {
   0% {
-    transform: translateX(-50%) translateY(0px) scale(1);
-    opacity: 0.82;
+    transform: translateX(-50%) rotate(-14deg);
+    opacity: 0.78;
+  }
+  25% {
+    transform: translateX(-50%) rotate(-6deg);
+    opacity: 0.92;
   }
   50% {
-    transform: translateX(-50%) translateY(8px) scale(1.04);
+    transform: translateX(-50%) rotate(0deg);
     opacity: 1;
   }
+  75% {
+    transform: translateX(-50%) rotate(6deg);
+    opacity: 0.92;
+  }
   100% {
-    transform: translateX(-50%) translateY(0px) scale(1);
-    opacity: 0.82;
+    transform: translateX(-50%) rotate(14deg);
+    opacity: 0.78;
   }
 }
+
 @media (max-width: 767px) {
   #section-intro .intro-title {
     font-size: clamp(18px, 4.8vw, 24px) !important;
