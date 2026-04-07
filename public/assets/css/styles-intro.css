@@ -413,167 +413,159 @@
   }
 }
 /* =========================================================
-   FIX FINAL — INTRO
-   sinalizador + remoção da barra lateral + rodapé central
-   cole no FINAL do styles-intro.css
+   FIX CIRÚRGICO — INTRO
+   corrige sinalizador sem crescer pergaminho
+   remove barras laterais extras
+   centraliza rodapé
    ========================================================= */
 
-/* 1) trava qualquer vazamento horizontal/scroll lateral */
+/* 1) trava vazamento horizontal sem mexer na altura do pergaminho */
 html,
-body,
-#section-intro,
-#section-intro .intro-wrap,
-#section-intro .j-panel-glow,
-#section-intro .j-arcane-card,
-#section-intro .j-perg-v-inner,
-#section-intro .parchment-inner-rough {
-  max-width: 100%;
+body {
   overflow-x: hidden !important;
 }
 
-body {
-  margin: 0;
-}
-
-/* 2) garante que a intro ocupe a tela e centralize o conteúdo */
-#section-intro {
-  min-height: 100vh;
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  position: relative;
-  padding-bottom: 64px; /* espaço para o rodapé */
-  box-sizing: border-box;
-}
-
-/* 3) elimina a barra lateral interna do container */
+#section-intro,
+#section-intro .intro-wrap,
 #section-intro .j-panel-glow,
-#section-intro .j-arcane-card,
-#section-intro .parchment-inner-rough {
-  overflow-y: visible !important;
+#section-intro .j-arcane-card {
+  overflow-x: hidden !important;
 }
 
-/* caso exista algum wrapper herdando scroll */
-#section-intro [class*="scroll"],
-#section-intro [style*="overflow-y: auto"],
-#section-intro [style*="overflow: auto"] {
-  overflow-y: visible !important;
-}
-
-/* 4) reforço do sinalizador interno */
+/* 2) NÃO deixar pseudo-elemento aumentar layout */
 #section-intro .parchment-inner-rough {
+  position: relative;
   isolation: isolate;
+  overflow: hidden !important;
 }
 
+/* 3) sinalizador real, menor e contido */
 #section-intro .parchment-inner-rough::before {
   content: '';
   position: absolute;
-  top: -2%;
+  top: 10px;
   left: 50%;
   transform: translateX(-50%);
-  width: 78%;
-  height: 52%;
+  width: 180px;
+  max-width: 58%;
+  height: 70px;
   pointer-events: none;
   z-index: 1;
 
   background: radial-gradient(
-    ellipse at center top,
-    rgba(255, 240, 170, 0.78) 0%,
-    rgba(255, 215, 90, 0.46) 26%,
-    rgba(255, 180, 40, 0.20) 48%,
-    rgba(255, 140, 20, 0.08) 64%,
-    transparent 80%
+    ellipse at center,
+    rgba(255, 245, 200, 0.95) 0%,
+    rgba(255, 220, 120, 0.55) 35%,
+    rgba(255, 180, 50, 0.18) 65%,
+    transparent 100%
   );
 
-  filter: blur(12px);
-  mix-blend-mode: screen;
+  filter: blur(10px);
   opacity: 0.95;
-  animation: introSignalSweepStrong 3.4s ease-in-out infinite;
+  mix-blend-mode: screen;
+  animation: introSignalPulseClean 2.2s ease-in-out infinite;
 }
 
 #section-intro .parchment-inner-rough::after {
   content: '';
   position: absolute;
-  top: 1.5%;
+  top: 6px;
   left: 50%;
   transform: translateX(-50%);
-  width: 30%;
-  height: 10%;
+  width: 92px;
+  max-width: 32%;
+  height: 18px;
   pointer-events: none;
   z-index: 2;
 
   background: radial-gradient(
     ellipse at center,
-    rgba(255, 250, 220, 1) 0%,
-    rgba(255, 225, 140, 0.80) 35%,
-    rgba(255, 190, 60, 0.35) 58%,
-    transparent 82%
+    rgba(255,255,235,1) 0%,
+    rgba(255,225,140,0.95) 45%,
+    rgba(255,190,60,0.25) 75%,
+    transparent 100%
   );
 
-  filter: blur(8px);
+  filter: blur(4px);
   opacity: 1;
-  animation: introSignalPulseStrong 1.9s ease-in-out infinite;
+  animation: introSignalCoreClean 1.8s ease-in-out infinite;
 }
 
-@keyframes introSignalSweepStrong {
-  0% {
-    transform: translateX(-50%) translateY(0) scale(0.94);
-    opacity: 0.62;
-  }
-  50% {
-    transform: translateX(-50%) translateY(12px) scale(1.08);
-    opacity: 1;
-  }
-  100% {
-    transform: translateX(-50%) translateY(0) scale(0.94);
-    opacity: 0.62;
-  }
-}
-
-@keyframes introSignalPulseStrong {
+@keyframes introSignalPulseClean {
   0%, 100% {
-    transform: translateX(-50%) scale(0.95);
-    opacity: 0.72;
+    opacity: 0.55;
+    transform: translateX(-50%) scaleX(0.94) scaleY(0.92);
   }
   50% {
-    transform: translateX(-50%) scale(1.12);
     opacity: 1;
+    transform: translateX(-50%) scaleX(1.08) scaleY(1.12);
   }
 }
 
-/* 5) conteúdo acima do sinalizador */
+@keyframes introSignalCoreClean {
+  0%, 100% {
+    opacity: 0.72;
+    transform: translateX(-50%) scale(0.96);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1.10);
+  }
+}
+
+/* 4) conteúdo acima do sinalizador */
 #section-intro .intro-title,
 #section-intro .parchment-text-rough,
 #section-intro .parchment-actions-rough,
-#section-intro button,
 #section-intro .btn,
-#section-intro .btn-stone-espinhos {
+#section-intro button {
   position: relative;
   z-index: 3;
 }
 
-/* 6) centralização do rodapé */
+/* 5) remover barras laterais internas da intro */
+#section-intro .j-panel-glow,
+#section-intro .j-arcane-card,
+#section-intro .j-perg-v-inner,
+#section-intro .parchment-inner-rough {
+  scrollbar-width: none;
+}
+
+#section-intro .j-panel-glow::-webkit-scrollbar,
+#section-intro .j-arcane-card::-webkit-scrollbar,
+#section-intro .j-perg-v-inner::-webkit-scrollbar,
+#section-intro .parchment-inner-rough::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+}
+
+/* 6) impedir scroll interno artificial */
+#section-intro .j-panel-glow,
+#section-intro .j-arcane-card,
+#section-intro .j-perg-v-inner {
+  overflow-y: visible !important;
+  max-height: none !important;
+}
+
+/* 7) rodapé centralizado */
 .site-footer,
 footer,
 .footer,
 #footer,
 .page-footer {
-  width: 100%;
-  max-width: 100%;
-  margin: 18px auto 0 auto !important;
-  padding: 10px 16px 16px !important;
+  width: 100% !important;
+  margin: 14px auto 0 !important;
+  padding: 8px 16px 14px !important;
   text-align: center !important;
   position: relative !important;
   left: auto !important;
   right: auto !important;
   bottom: auto !important;
   transform: none !important;
-  box-sizing: border-box;
+  box-sizing: border-box !important;
 }
 
-/* texto do copyright */
 .site-footer *,
 footer *,
 .footer *,
@@ -582,18 +574,15 @@ footer *,
   text-align: center !important;
 }
 
-/* 7) mobile fino */
+/* 8) mobile */
 @media (max-width: 600px) {
-  #section-intro {
-    padding-bottom: 72px;
-  }
-
   #section-intro .parchment-inner-rough::before {
-    width: 84%;
-    height: 46%;
+    width: 150px;
+    height: 60px;
   }
 
   #section-intro .parchment-inner-rough::after {
-    width: 36%;
+    width: 78px;
+    height: 16px;
   }
 }
