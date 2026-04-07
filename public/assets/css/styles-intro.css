@@ -1,132 +1,525 @@
 /* =========================================================
-   STYLES-INTRO v3.3 — CARD AJUSTADO AO TAMANHO DO PRINT 2
-   Tamanho controlado + feixe elegante
+   STYLES-INTRO — ajustado
+   Objetivo: manter o sinalizador funcional e normalizar
+   o tamanho do vidro/container glow para o padrão das
+   outras sections
    ========================================================= */
 
-#section-intro {
+#section-intro{
   background: transparent !important;
-  padding: 20px 16px;
+  border: none;
+  box-shadow: none;
+  text-align: left !important;
+  overflow-x: hidden !important;
+  padding: 24px 0 !important;
+  margin: 0 auto !important;
+  max-width: 100% !important;
+  min-height: 80vh;
+  display: block;
+  opacity: 1;
+  visibility: visible;
+  z-index: 2;
+}
+
+#section-intro .intro-wrap{
+  width: 100% !important;
+  text-align: left !important;
+  overflow: visible !important;
   overflow-x: hidden !important;
 }
 
-/* ============================
-   CARD CENTRAL — TAMANHO CONTROLADO (igual ao print 2)
-   ============================ */
-#section-intro .j-panel-glow {
-  width: min(92%, 680px) !important;
-  max-width: 680px !important;
-  min-height: 620px !important;
-  margin: 0 auto !important;
-  padding: 14px !important;
-  border-radius: 28px !important;
+#section-intro .pergaminho{
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  background-repeat: no-repeat;
+  background-position: top center;
+  background-size: 100% auto !important;
+}
+
+#section-intro .parchment-inner-rough{
   position: relative;
   z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  text-align: left !important;
+  overflow: visible !important;
+  isolation: isolate;
+  animation: introPan 9s ease-in-out 1;
+}
+
+#section-intro .intro-wrap,
+#section-intro .j-panel-glow{
+  overflow-x: hidden !important;
+}
+
+/* =========================================================
+   TIPOGRAFIA
+   ========================================================= */
+#section-intro .intro-title{
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-height: 1.6em;
+  box-sizing: border-box;
+  margin-top: 28px;
+  margin-bottom: 18px;
+  padding: 0 22px;
+  font-family: 'ManufacturingConsent', sans-serif;
+  font-size: clamp(20px, 2.4vw, 30px);
+  line-height: 1.15;
+  color: var(--theme-main-color, #ffd700);
+  text-align: left !important;
+  text-shadow: 2px 2px 6px rgba(0,0,0,.6);
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+  text-overflow: clip !important;
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(6px);
+  animation: introTitleIn 600ms ease forwards;
+}
+
+#section-intro .intro-title,
+#section-intro .intro-title[data-typing="true"],
+#section-intro .intro-title.typing-active,
+#section-intro .intro-title.typing-done{
+  direction: ltr !important;
+  unicode-bidi: plaintext !important;
+  text-align: left !important;
+  transform-origin: left center !important;
+}
+
+#section-intro [data-typing="true"]{
+  overflow: visible;
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+
+#section-intro .parchment-text-rough{
+  display: block;
+  margin-bottom: 8px;
+  font-family: 'BerkshireSwash', cursive;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--theme-main-color, #ffd700);
+  text-align: left !important;
+  background: transparent;
+  opacity: 0;
+  visibility: visible;
+}
+
+#section-intro .parchment-text-rough.lumen-typing{
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+#section-intro .parchment-text-rough.typing-active,
+#section-intro .parchment-text-rough.typing-done{
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  text-align: left !important;
+  transition: opacity .25s ease;
+}
+
+#section-intro .parchment-text-rough.typing-done,
+#section-intro .parchment-text-rough.type-done,
+#section-intro .intro-title.typing-done,
+#section-intro .intro-title.type-done{
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+#section-intro .parchment-actions-rough{
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+/* =========================================================
+   VIDRO / CARD — normalizado para o padrão das outras pages
+   ========================================================= */
+#section-intro .j-panel-glow{
+  position: relative;
+  isolation: isolate !important;
+  box-sizing: border-box !important;
+  width: min(92vw, 520px) !important;
+  max-width: 520px !important;
+  min-height: 640px !important;
+  margin: 0 auto !important;
+  padding: 18px !important;
   overflow: visible !important;
 }
 
-/* ============================
-   TÍTULO
-   ============================ */
-.intro-title {
-  font-family: 'ManufacturingConsent', sans-serif;
-  font-size: clamp(26px, 4.8vw, 34px);
-  line-height: 1.2;
-  text-align: center;
-  color: #ffd700;
-  margin: 32px auto 26px;
-  padding: 0 20px;
-  text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
-  white-space: normal;
-  word-break: break-word;
-}
-
-/* ============================
-   FEIXE SINALIZADOR (elegante como no termos1)
-   ============================ */
-#section-intro .parchment-inner-rough::before {
+#section-intro .j-panel-glow::before{
   content: '';
   position: absolute;
-  top: 92px;
-  left: 50%;
-  width: 170px;
-  height: 230px;
-  z-index: 5;
+  inset: 0;
+  z-index: 1;
   pointer-events: none;
+  border-radius: inherit;
+  border: 2px solid rgba(212,175,55,.55);
+  box-shadow:
+    0 0 28px rgba(212,175,55,.55),
+    inset 0 0 18px rgba(255,230,150,.25);
   background: linear-gradient(
     to bottom,
-    transparent 0%,
-    rgba(255,250,210,0.78) 14%,
-    rgba(255,230,140,0.48) 38%,
-    rgba(255,200,80,0.20) 65%,
-    transparent 92%
-  );
-  clip-path: polygon(48% 0%, 52% 0%, 100% 100%, 0% 100%);
-  filter: blur(7px);
-  mix-blend-mode: screen;
-  transform-origin: 50% 0%;
-  animation: beamSweep 5.8s ease-in-out infinite;
-  opacity: 0.88;
+    rgba(255,255,255,.16),
+    transparent 45%
+  ) !important;
 }
 
-#section-intro .parchment-inner-rough::after {
+#section-intro .j-arcane-card{
+  position: relative !important;
+  min-height: 560px !important;
+  max-width: 100% !important;
+  margin-top: -4px !important;
+  margin-bottom: 22px !important;
+  overflow: visible !important;
+  border-radius: 26px !important;
+  padding: 18px 18px 22px !important;
+}
+
+#section-intro .j-arcane-card::before{
+  animation: jArcaneSweep 7s linear infinite !important;
+  opacity: .32 !important;
+  left: auto !important;
+  transform: none !important;
+  transform-origin: center center !important;
+}
+
+#section-intro .j-arcane-card::after{
+  pointer-events: none;
+}
+
+/* =========================================================
+   CURSOR DE DATILOGRAFIA
+   ========================================================= */
+#section-intro .intro-title[data-typing="true"][data-cursor="true"]{
+  position: relative;
+  display: inline-block !important;
+  width: auto !important;
+  min-width: calc(100% - 44px);
+  padding-right: .35em;
+  left: 0 !important;
+}
+
+#section-intro .parchment-text-rough[data-typing="true"][data-cursor="true"]{
+  position: relative;
+  display: inline-block;
+  padding-right: .35em;
+}
+
+#section-intro [data-typing="true"][data-cursor="true"].typing-active::after{
   content: '';
   position: absolute;
-  top: 88px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 10px;
-  height: 10px;
-  z-index: 6;
-  border-radius: 50%;
-  background: radial-gradient(circle, #ffffff 30%, #ffe088 70%, transparent);
-  box-shadow: 0 0 14px #ffdd88;
-  animation: beamCorePulse 2.4s ease-in-out infinite;
+  right: .05em;
+  bottom: .12em;
+  width: .5ch;
+  height: 1.1em;
+  border-radius: 2px;
+  opacity: .95;
+  background: linear-gradient(180deg, #ffd36b 0%, #ffbf3b 80%, #b27a1a 100%);
+  box-shadow: 0 0 6px rgba(255,200,80,.9);
+  animation: caretBlink 1s steps(1, end) infinite;
 }
 
-/* ============================
-   TEXTOS
-   ============================ */
-.parchment-text-rough {
-  font-family: 'BerkshireSwash', cursive;
-  font-size: 13.8px;
-  line-height: 1.48;
-  color: #ffd700;
-  margin-bottom: 10px;
-  text-align: left;
+#section-intro [data-typing="true"][data-cursor="true"].typing-done::after{
+  content: none;
 }
 
-/* ============================
+#section-intro .parchment-text-rough[data-cursor="true"].typing-active::after{
+  width: 2px;
+  height: 1em;
+  right: 0;
+  border-radius: 1px;
+}
+
+/* =========================================================
+   FEIXE SINALIZADOR — mantém o comportamento atual
+   ========================================================= */
+#section-intro .parchment-inner-rough::before{
+  content: '' !important;
+  position: absolute !important;
+  top: 88px !important;
+  left: 50% !important;
+  width: 200px !important;
+  height: 220px !important;
+  z-index: 6 !important;
+  pointer-events: none !important;
+  display: block !important;
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,240,0.00) 0%,
+    rgba(255,250,210,0.85) 8%,
+    rgba(255,230,140,0.40) 28%,
+    rgba(255,200,80,0.15) 50%,
+    rgba(255,180,50,0.05) 70%,
+    transparent 100%
+  ) !important;
+  clip-path: polygon(46% 0%, 54% 0%, 100% 100%, 0% 100%) !important;
+  filter: blur(6px) !important;
+  mix-blend-mode: screen !important;
+  transform-origin: 50% 6px !important;
+  animation: beamSweep 4s ease-in-out infinite !important;
+}
+
+#section-intro .parchment-inner-rough::after{
+  content: '' !important;
+  position: absolute !important;
+  top: 88px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 12px !important;
+  height: 12px !important;
+  z-index: 7 !important;
+  pointer-events: none !important;
+  display: block !important;
+  border-radius: 50% !important;
+  background: radial-gradient(
+    circle at center,
+    rgba(255,255,255,1) 0%,
+    rgba(255,245,200,0.90) 30%,
+    rgba(255,220,130,0.45) 60%,
+    transparent 100%
+  ) !important;
+  box-shadow:
+    0 0 6px rgba(255,250,220,0.90),
+    0 0 14px rgba(255,220,140,0.55) !important;
+  filter: blur(1px) !important;
+  animation: beamCorePulse 2s ease-in-out infinite !important;
+}
+
+#section-intro .intro-title,
+#section-intro .parchment-text-rough,
+#section-intro .parchment-actions-rough,
+#section-intro .btn,
+#section-intro button{
+  position: relative;
+  z-index: 10;
+}
+
+#section-intro:has(.typing-active) .parchment-inner-rough{
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+#section-intro:has(.typing-active) .j-panel-glow{
+  outline: 1px solid rgba(255,204,102,.22) !important;
+  outline-offset: 2px !important;
+  box-shadow:
+    0 0 0 1px rgba(255,204,102,.12) inset,
+    0 0 14px rgba(255,204,102,.28),
+    0 0 26px rgba(255,153,0,.18) !important;
+}
+
+/* =========================================================
    ANIMAÇÕES
-   ============================ */
-@keyframes beamSweep {
-  0%   { transform: translateX(-50%) rotate(-20deg) scaleY(0.94); }
-  50%  { transform: translateX(-50%) rotate(20deg)  scaleY(1.06); }
-  100% { transform: translateX(-50%) rotate(-20deg) scaleY(0.94); }
+   ========================================================= */
+@keyframes introTitleIn{
+  from{ opacity: 0; transform: translateY(12px); }
+  to{ opacity: 1; transform: translateY(6px); }
 }
 
-@keyframes beamCorePulse {
-  0%, 100% { transform: translateX(-50%) scale(0.92); opacity: 0.85; }
-  50%      { transform: translateX(-50%) scale(1.22); opacity: 1; }
+@keyframes introPan{
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-1px); }
+  100% { transform: translateY(0); }
 }
 
-/* ============================
-   MOBILE — ajuste fino
-   ============================ */
-@media (max-width: 600px) {
-  #section-intro .j-panel-glow {
-    width: calc(100% - 20px) !important;
-    max-width: 100% !important;
-    min-height: 540px !important;
+@keyframes beamSweep{
+  0%{
+    transform: translateX(-50%) rotate(0deg) scaleY(0.95);
+    opacity: 0.50;
+  }
+  25%{
+    transform: translateX(-50%) rotate(90deg) scaleY(1.05);
+    opacity: 0.90;
+  }
+  50%{
+    transform: translateX(-50%) rotate(180deg) scaleY(0.95);
+    opacity: 0.50;
+  }
+  75%{
+    transform: translateX(-50%) rotate(270deg) scaleY(1.05);
+    opacity: 0.85;
+  }
+  100%{
+    transform: translateX(-50%) rotate(360deg) scaleY(0.95);
+    opacity: 0.50;
+  }
+}
+
+@keyframes beamCorePulse{
+  0%, 100%{
+    opacity: 0.70;
+    transform: translateX(-50%) scale(0.88);
+  }
+  50%{
+    opacity: 1;
+    transform: translateX(-50%) scale(1.15);
+  }
+}
+
+@keyframes caretBlink{
+  0%,49% { opacity: 1; }
+  50%,100% { opacity: 0; }
+}
+
+/* =========================================================
+   SCROLLBAR CLEANUP
+   ========================================================= */
+#section-intro .j-panel-glow,
+#section-intro .j-arcane-card,
+#section-intro .j-perg-v-inner,
+#section-intro .parchment-inner-rough{
+  scrollbar-width: none;
+}
+
+#section-intro .j-panel-glow::-webkit-scrollbar,
+#section-intro .j-arcane-card::-webkit-scrollbar,
+#section-intro .j-perg-v-inner::-webkit-scrollbar,
+#section-intro .parchment-inner-rough::-webkit-scrollbar{
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+}
+
+#section-intro .j-panel-glow,
+#section-intro .j-arcane-card,
+#section-intro .j-perg-v-inner{
+  overflow-y: visible !important;
+  max-height: none !important;
+}
+
+/* =========================================================
+   RODAPÉ CENTRALIZADO
+   ========================================================= */
+.site-footer,
+footer,
+.footer,
+#footer,
+.page-footer{
+  width: 100% !important;
+  margin: 14px auto 0 !important;
+  padding: 8px 16px 14px !important;
+  text-align: center !important;
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  box-sizing: border-box !important;
+}
+
+.site-footer *,
+footer *,
+.footer *,
+#footer *,
+.page-footer *{
+  text-align: center !important;
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+@media (max-width: 767px){
+  #section-intro .intro-title{
+    font-size: clamp(18px, 4.8vw, 24px) !important;
+    line-height: 1.12 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: clip !important;
+    padding: 0 14px !important;
   }
 
-  .intro-title {
-    font-size: clamp(23px, 6.5vw, 30px);
-    margin: 26px auto 20px;
+  #section-intro .j-panel-glow{
+    width: min(92vw, 500px) !important;
+    max-width: 92vw !important;
+    min-height: 600px !important;
+    padding: 16px !important;
   }
 
-  #section-intro .parchment-inner-rough::before {
-    width: 130px;
-    height: 180px;
-    top: 78px;
+  #section-intro .j-arcane-card{
+    min-height: 520px !important;
+    padding: 16px 16px 20px !important;
   }
+
+  #section-intro .parchment-inner-rough::before{
+    width: 150px !important;
+    height: 170px !important;
+    animation-duration: 4.5s !important;
+  }
+
+  #section-intro .parchment-inner-rough::after{
+    width: 10px !important;
+    height: 10px !important;
+  }
+}
+
+@media (max-width: 600px){
+  #section-intro{
+    overflow-x: hidden !important;
+    padding: 16px 0 !important;
+  }
+
+  #section-intro .j-perg-v-inner{
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    transform: translateY(10px);
+    overflow: visible !important;
+  }
+
+  #section-intro .j-panel-glow{
+    width: calc(100vw - 28px) !important;
+    max-width: 520px !important;
+    min-height: 520px !important;
+    transform: none !important;
+    overflow: visible !important;
+    padding: 14px !important;
+  }
+
+  #section-intro .j-arcane-card{
+    min-height: 460px !important;
+    max-height: none !important;
+    margin-top: -2px !important;
+    margin-bottom: 18px !important;
+    border-radius: 24px !important;
+    padding: 14px 14px 18px !important;
+  }
+
+  #section-intro .intro-title{
+    min-height: 3.4em !important;
+    margin-top: 22px !important;
+    margin-bottom: 14px !important;
+    padding: 0 12px !important;
+    font-size: clamp(20px, 6vw, 28px) !important;
+    line-height: 1.25 !important;
+  }
+
+  #section-intro .parchment-inner-rough::before{
+    width: 120px !important;
+    height: 140px !important;
+    top: 82px !important;
+  }
+
+  #section-intro .parchment-inner-rough::after{
+    width: 8px !important;
+    height: 8px !important;
+    top: 82px !important;
+  }
+}
+
+html,
+body{
+  overflow-x: hidden !important;
 }
