@@ -1,63 +1,33 @@
 /* ======================================================
-   1) PAINEL EXTERNO — Glow universal (desktop + mobile)
+   J-PANEL-GLOW — base limpa e blindada
+   Escopo: painel, pergaminhos internos, cartão arcano, portal de vídeo
    ====================================================== */
 
-/* 1) Variável global da luz (se já existir acima, ok) */
 :root{
   --luz-intensity: 1;
+  --portal-gold: #d4af37;
+  --portal-border-color: color-mix(in srgb, var(--portal-gold) 70%, var(--theme-main-color, var(--portal-gold)) 30%);
+  --portal-glow-color: color-mix(in srgb, var(--portal-gold) 55%, var(--theme-main-color, var(--portal-gold)) 45%);
+  --portal-border-gradient: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--portal-gold) 90%, var(--theme-main-color, var(--portal-gold)) 10%) 0%,
+    color-mix(in srgb, var(--portal-gold) 40%, var(--theme-main-color, var(--portal-gold)) 60%) 100%
+  );
 }
 
-/* 2) Painel glow (o “vidro” das páginas) respira com a luz */
-.j-panel-glow::before{
-  opacity: calc(0.18 * var(--luz-intensity)) !important;
-}
-
-/* 3) Portal de vídeo (moldura dourada) respira com a luz */
-.jp-video-frame::before{
-  opacity: calc(0.25 * var(--luz-intensity)) !important;
-}
-
-/* 4) Névoa do painel (seu CSS pode usar outro nome,
-   então deixo 2 opções seguras)
-*/
-.j-panel-glow .glow-fog,
-.j-panel-glow::after{
-   position: absolute;
-  inset: 0;
-  background: url('/assets/img/fog-loop.mp4');
-  mix-blend-mode: screen;
-  pointer-events: none;
-  opacity: calc(0.45 * var(--luz-intensity)) !important;
-}
-
-/* 5) Barras de progresso respiram com a luz */
-.progress-fill{
-  filter: brightness(calc(0.75 * var(--luz-intensity))) !important;
-}
-
-.j-panel-glow {
+/* ======================================================
+   1) PAINEL EXTERNO
+   ====================================================== */
+.j-panel-glow{
   position: relative;
-  width: min(92vw, 520px);           /* mesmo padrão intro */  max-width: 980px;
+  width: min(92vw, 980px);
   margin: 0 auto;
   padding: 32px 26px;
   border-radius: 26px;
   box-sizing: border-box;
-  overflow: hidden;
+  overflow: visible;
   z-index: 5;
-  background: rgba(10,10,20,0.78);   /* vidro black elegante */
-  box-shadow:
-    0 0 22px rgba(255,215,100,0.35),
-    0 0 55px rgba(255,215,130,0.32),
-    inset 0 0 22px rgba(255,240,190,0.18);
 
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-
-  overflow: hidden;
-  transition: all .35s ease;
-}
-
-  /* Fundo épico (mantém o look atual) */
   background: radial-gradient(
     circle at top,
     rgba(255,255,255,0.06) 0%,
@@ -65,41 +35,39 @@
     #05060c 100%
   );
 
-  /* Aura/Glow do guia */
   box-shadow:
     0 0 38px rgba(0,0,0,0.9),
     0 0 72px color-mix(in srgb, var(--theme-main-color, #ffd978) 75%, transparent);
 
-  /* garante presença visual e centralização do conteúdo */
-  min-height: min(84vh, 860px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  transition:
+    box-shadow .35s ease,
+    transform .35s ease,
+    filter .35s ease;
 }
 
-/* Névoa suave no topo */
-.j-panel-glow::before {
+.j-panel-glow::before{
   content: '';
   position: absolute;
+  inset: 0;
   pointer-events: none;
   z-index: 1;
-  inset: 0;
   border-radius: inherit;
-  border: none;
+  opacity: calc(0.18 * var(--luz-intensity));
   box-shadow:
     0 0 22px rgba(212,175,55,0.38),
-    inset 0 0 24px rgba(255,230,150,0.18);    
+    inset 0 0 24px rgba(255,230,150,0.18);
   background: linear-gradient(
     to bottom,
-    rgba(255,255,255,0.16),  /* antes ~0.08/0.10 */
+    rgba(255,255,255,0.16),
     transparent 45%,
     transparent 100%
-  ) !important;
- 
+  );
 }
 
-/* Glow forte vindo de baixo na cor do guia */
-.j-panel-glow::after {
+.j-panel-glow::after{
   content: '';
   position: absolute;
   left: 50%;
@@ -112,102 +80,91 @@
     color-mix(in srgb, var(--theme-main-color, #ffd978) 85%, transparent) 0%,
     transparent 65%
   );
-  opacity: 0.95;
+  opacity: calc(0.85 * var(--luz-intensity));
   pointer-events: none;
   z-index: 0;
 }
 
-/* Conteúdo dentro do painel sempre acima das “peles” */
-.j-panel-glow > * {
+.j-panel-glow > *{
   position: relative;
   z-index: 2;
 }
 
+/* opcional para neblina real via elemento, não pseudo com mp4 */
+.j-panel-glow .glow-fog{
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: calc(0.25 * var(--luz-intensity));
+  mix-blend-mode: screen;
+  background: radial-gradient(
+    circle at 50% 0%,
+    rgba(255,255,255,.10) 0%,
+    rgba(255,220,140,.06) 28%,
+    transparent 65%
+  );
+  filter: blur(18px);
+}
+
 /* ======================================================
-   2) PERGAMINHOS INTERNOS — Vertical e Horizontal
+   2) PERGAMINHOS INTERNOS
    ====================================================== */
-
-/* Pergaminho vertical – padrão único (intro, termos, senha etc.) */
-.j-perg-v-inner {
+.j-perg-v-inner{
   position: relative;
-
-  /* largura limita, mas deixa o pai controlar */
   width: 100%;
   margin: 0 auto;
-
-  /* imagem do pergaminho vertical */
   background: center/contain no-repeat url('/assets/img/pergaminho-rasgado-vert.png');
   background-color: rgba(245, 235, 200, 0.05);
   border-radius: 20px;
-
-  /* 🔐 FIXA A PROPORÇÃO DO PERGAMINHO */
-  aspect-ratio: 3 / 5;            /* altura sempre acompanha a largura */
-  padding: 26px 22px 30px;         /* topo / lados / embaixo */
-
+  aspect-ratio: 3 / 5;
+  padding: 26px 22px 30px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;  /* título+texto em cima / botão mais para baixo */
+  justify-content: space-between;
   align-items: stretch;
-
   overflow: visible;
   box-shadow: 0 0 60px rgba(0,0,0,0.6);
 }
 
-@media (max-width: 600px) {
-  .j-perg-v-inner {
-    width: 88vw;
-    max-width: 360px;
-    padding: 22px 14px;
-    border-radius: 18px;
-  }
-}
-
-
-/* Conteúdo dentro do pergaminho interno */
-.j-perg-v-inner .j-content {
-  color: var(--theme-main-color, #ffd978);
-  font-family: 'BerkshireSwash', cursive;
-}
-
-/* Pergaminho horizontal interno (perguntas) */
-.j-perg-h-inner {
+.j-perg-h-inner{
+  position: relative;
   background: center/contain no-repeat url('/assets/img/pergaminho-rasgado-horiz.png');
   background-color: rgba(245,235,200,0.05);
   border-radius: 18px;
   padding: clamp(20px, 3vh, 28px) clamp(18px, 4vw, 28px);
   box-shadow: 0 0 40px rgba(0,0,0,0.55);
+  overflow: visible;
+}
+
+.j-perg-v-inner .j-content{
+  color: var(--theme-main-color, #ffd978);
+  font-family: 'BerkshireSwash', cursive;
 }
 
 /* ======================================================
-   3) CARTÃO ARCANO — místico + futurista
+   3) CARTÃO ARCANO
    ====================================================== */
-.j-arcane-card {
+.j-arcane-card{
   position: relative;
   max-width: 460px;
   margin: 0 auto clamp(18px, 3vh, 26px);
   padding: clamp(18px, 3vh, 24px) clamp(16px, 4vw, 24px);
   border-radius: 24px;
+  overflow: hidden;
 
   background:
     radial-gradient(circle at top, rgba(255,255,255,0.16), transparent 55%),
     linear-gradient(145deg, #151724, #05060c);
 
-  border: 1px solid color-mix(
-    in srgb,
-    var(--theme-main-color, #ffd978) 75%,
-    #ffffff 10%
-  );
-
+  border: 1px solid color-mix(in srgb, var(--theme-main-color, #ffd978) 75%, #ffffff 10%);
   box-shadow:
     0 0 16px rgba(0,0,0,0.9),
     0 0 40px color-mix(in srgb, var(--theme-main-color, #ffd978) 80%, transparent),
     0 0 90px color-mix(in srgb, var(--theme-main-color, #ffd978) 35%, transparent);
-
-  overflow: hidden;
 }
 
-/* brilho correndo na borda */
-.j-arcane-card::before {
+.j-arcane-card::before{
   content: '';
   position: absolute;
   inset: -40%;
@@ -223,56 +180,54 @@
   pointer-events: none;
 }
 
-/* máscara interna pra deixar só glow nas bordas */
-.j-arcane-card::after {
+.j-arcane-card::after{
   content: '';
   position: absolute;
   inset: 2px;
   border-radius: 22px;
-  background: radial-gradient(circle at top,
-              rgba(255,255,255,0.04),
-              rgba(0,0,0,0.9));
+  background: radial-gradient(
+    circle at top,
+    rgba(255,255,255,0.04),
+    rgba(0,0,0,0.9)
+  );
   box-shadow: inset 0 0 24px rgba(0,0,0,0.85);
   pointer-events: none;
   z-index: 1;
 }
 
-.j-arcane-card > * {
+.j-arcane-card > *{
   position: relative;
   z-index: 2;
 }
 
-/* Títulos dentro do cartão */
 .j-arcane-card h1,
 .j-arcane-card h2,
-.j-arcane-card h3 {
-  font-family: 'ManufacturingConsent', serif;
-  letter-spacing: 1.5px;
-  color: var(--theme-main-color, #ffd978);
+.j-arcane-card h3{
+  margin-bottom: 10px;
   text-align: center;
+  letter-spacing: 1.5px;
+  font-family: 'ManufacturingConsent', serif;
+  color: var(--theme-main-color, #ffd978);
   text-shadow:
     0 0 6px color-mix(in srgb, var(--theme-main-color, #ffd978) 85%, transparent),
     0 0 14px rgba(0,0,0,0.9);
-  margin-bottom: 10px;
 }
 
-/* texto normal */
 .j-arcane-card p,
 .j-arcane-card label,
-.j-arcane-card span {
+.j-arcane-card span{
   color: #f5f1e5;
 }
 
-/* inputs */
 .j-arcane-card input[type="text"],
 .j-arcane-card input[type="password"],
-.j-arcane-card textarea {
+.j-arcane-card textarea{
   width: 100%;
+  padding: 10px 12px;
   border-radius: 12px;
   border: 1px solid rgba(255,255,255,0.4);
   background: rgba(5,5,10,0.85);
   color: #fdf7e5;
-  padding: 10px 12px;
   font-family: 'Cardo', serif;
   box-shadow:
     0 0 10px rgba(0,0,0,0.9),
@@ -280,30 +235,22 @@
 }
 
 .j-arcane-card .btn-primary,
-.j-arcane-card .btn-stone-espinhos {
+.j-arcane-card .btn-stone-espinhos{
   margin-top: 14px;
 }
 
-@keyframes jArcaneSweep {
+@keyframes jArcaneSweep{
   0%   { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
 /* ======================================================
-   4) PAINÉIS AUXILIARES — Outer / Mid / Inner (se usados)
+   4) WRAPPERS AUXILIARES
    ====================================================== */
-.j-panel-outer {
-  width: min(92%, 780px);
-  margin: 0 auto;
-}
+.j-panel-outer{ width: min(92%, 780px); margin: 0 auto; }
+.j-panel-mid{ width: 100%; padding: 28px; border-radius: 26px; }
 
-.j-panel-mid {
-  width: 100%;
-  padding: 28px;
-  border-radius: 26px;
-}
-
-.j-panel-inner {
+.j-panel-inner{
   width: 100%;
   max-width: 660px;
   margin: 0 auto;
@@ -312,202 +259,42 @@
   background-size: cover;
 }
 
-.j-panel-inner.pergaminho-v {
+.j-panel-inner.pergaminho-v{
   background-image: url('/assets/img/pergaminho-rasgado-vert.png');
   background-repeat: no-repeat;
   background-position: center top;
   background-size: 100% auto;
 }
 
-.j-panel-inner > *:first-child { margin-top: 12px; }
-.j-panel-inner > *:last-child  { margin-bottom: 22px; }
+.j-panel-inner > *:first-child{ margin-top: 12px; }
+.j-panel-inner > *:last-child { margin-bottom: 22px; }
 
 /* ======================================================
-   5) PORTAL DOURADO — Frame para vídeos (transições)
+   5) PORTAL DOURADO / VÍDEO
    ====================================================== */
-.jp-video-overlay {
+.jp-video-overlay{
   position: fixed !important;
   inset: 0 !important;
   z-index: 999999 !important;
-  background: rgba(0,0,0,0.92) !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   overflow: hidden !important;
+  background: rgba(0,0,0,0.92) !important;
   padding:
     env(safe-area-inset-top)
     env(safe-area-inset-right)
     env(safe-area-inset-bottom)
     env(safe-area-inset-left) !important;
-
   opacity: 0;
   transition: opacity .35s ease;
+  height: 100dvh !important;
+  min-height: 100dvh !important;
 }
 
-.jp-video-overlay.show { opacity: 1; }
-.jp-video-overlay.hide { opacity: 0; }
+.jp-video-overlay.show{ opacity: 1; }
+.jp-video-overlay.hide{ opacity: 0; }
 
-/* ==========================================================
-   PORTAL DOURADO FULLSCREEN — GRADIENTE ARCANUM
-   ========================================================== */
-.jp-video-frame {
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-
-  /* Borda mágica (ouro → cor do guia) */
-  border: 22px solid transparent !important;
-  border-image: var(--portal-border-gradient) 1 !important;
-
-  /* Glow vivo */
-  box-shadow:
-    0 0 55px color-mix(in srgb, var(--portal-glow-color) 90%, transparent),
-    0 0 160px color-mix(in srgb, var(--portal-glow-color) 55%, transparent),
-    inset 0 0 40px color-mix(in srgb, var(--portal-border-color) 65%, transparent),
-    inset 0 0 90px color-mix(in srgb, var(--portal-glow-color) 55%, transparent) !important;
-
-  background: #000 !important;
-  overflow: hidden !important;
-  z-index: 999999 !important;
-}
-
-
-.jp-video-frame video{
-  position: absolute !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: contain !important;          /* <<< mostra tudo */
-  object-position: center !important;
-  background: #000 !important;
-}
-/* ================================
-   LIMELIGHT — correção final
-   (coloque APÓS .jp-video-frame video)
-   ================================ */
-
-/* 1) vídeo ambiente (limelight) */
-.jp-video-frame .jp-video-ambient{
-  position: absolute !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important; /* pode cortar porque é só luz */
-  filter: blur(22px) brightness(.75) saturate(1.15) !important;
-  opacity: .70 !important;
-  transform: scale(1.06) !important;
-  z-index: 0 !important;
-  pointer-events: none !important;
-}
-
-/* 2) vídeo principal por cima, sem fundo preto */
-.jp-video-frame #vt-video{
-  position: relative !important;
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: contain !important;     /* cenário inteiro */
-  background: transparent !important; /* deixa a limelight aparecer */
-  z-index: 2 !important;
-}
-
-/* GLOBAL-VIDEO dentro do portal cinematográfico */
-.jp-video-frame #global-video{
-  position: relative !important;
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: contain !important;      /* cenário inteiro */
-  background: transparent !important;  /* deixa a limelight aparecer */
-  z-index: 2 !important;
-}
-/* Névoa mística sobre a limelight */
-.jp-video-frame::before{
-  content:'';
-  position:absolute;
-  inset:-10%;
-  pointer-events:none;
-  z-index: 1; /* fica acima da limelight e abaixo do vídeo principal */
-
-  /* camadas de névoa */
-  background:
-    radial-gradient(
-      circle at 30% 20%,
-      color-mix(in srgb, var(--theme-main-color, #d4af37) 35%, transparent) 0%,
-      transparent 55%
-    ),
-    radial-gradient(
-      circle at 70% 80%,
-      rgba(255,255,255,0.20) 0%,
-      transparent 60%
-    ),
-    linear-gradient(
-      160deg,
-      rgba(255,255,255,0.10) 0%,
-      transparent 35%,
-      rgba(255,255,255,0.12) 70%,
-      transparent 100%
-    );
-
-  filter: blur(18px);
-  opacity: 0.32;               /* 🔥 mais intensa */
-  mix-blend-mode: screen;
-
-  animation: jpMistDrift 8s ease-in-out infinite alternate;
-}
-
-/* Movimento suave da névoa */
-@keyframes jpMistDrift{
-  0%   { transform: translateY(0) translateX(0) scale(1); }
-  50%  { transform: translateY(-2.5%) translateX(1.5%) scale(1.03); }
-  100% { transform: translateY(2%) translateX(-1%) scale(1.06); }
-}
-
-
-.jp-video-skip {
-  position: absolute !important;
-  top: 12px !important;
-  right: 12px !important;
-  padding: 8px 12px !important;
-  border-radius: 10px !important;
-  border: 0 !important;
-  font-weight: 700 !important;
-  cursor: pointer !important;
-  background: rgba(255,255,255,0.15) !important;
-  backdrop-filter: blur(6px) !important;
-  color: #fff !important;
-  z-index: 5 !important;
-}
-
-.jp-video-ambient {
-  position: absolute !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-
-  object-fit: cover !important;
-  filter: blur(22px) brightness(.65) saturate(1.15) !important;
-  opacity: .70 !important;
-
-  pointer-events: none !important;
-  z-index: 0 !important;
-}
-
-#vt-video,
-#global-video {
-  position: relative !important;
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: contain !important;
-  background: transparent !important;
-  z-index: 2 !important;
-}
-
-
-/* uma vinheta suave pra dar foco no centro */
 .jp-video-overlay::after{
   content:'';
   position:absolute;
@@ -522,488 +309,146 @@
   pointer-events:none;
 }
 
+.jp-video-frame{
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+  z-index: 999999 !important;
+  background: #000 !important;
+
+  border: 22px solid transparent !important;
+  border-image: var(--portal-border-gradient) 1 !important;
+  box-shadow:
+    0 0 55px color-mix(in srgb, var(--portal-glow-color) 90%, transparent),
+    0 0 160px color-mix(in srgb, var(--portal-glow-color) 55%, transparent),
+    inset 0 0 40px color-mix(in srgb, var(--portal-border-color) 65%, transparent),
+    inset 0 0 90px color-mix(in srgb, var(--portal-glow-color) 55%, transparent) !important;
+}
+
+.jp-video-frame::before{
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: calc(0.25 * var(--luz-intensity));
+  box-shadow:
+    inset 0 0 16px rgba(255,255,255,.10),
+    0 0 40px color-mix(in srgb, var(--portal-glow-color) 65%, transparent);
+  z-index: 1;
+}
+
+.jp-video-frame video,
+#vt-video,
+#global-video{
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  background: #000 !important;
+  z-index: 2 !important;
+}
+
+.jp-video-ambient{
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  filter: blur(22px) brightness(.65) saturate(1.15) !important;
+  opacity: .70 !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+  animation: jpMistDrift 8s ease-in-out infinite alternate;
+}
+
+.jp-video-skip{
+  position: absolute !important;
+  top: 12px !important;
+  right: 12px !important;
+  z-index: 5 !important;
+  padding: 8px 12px !important;
+  border-radius: 10px !important;
+  border: 0 !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  color: #fff !important;
+  background: rgba(255,255,255,0.15) !important;
+  backdrop-filter: blur(6px) !important;
+}
+
+@keyframes jpMistDrift{
+  0%   { transform: translateY(0) translateX(0) scale(1); }
+  50%  { transform: translateY(-2.5%) translateX(1.5%) scale(1.03); }
+  100% { transform: translateY(2%) translateX(-1%) scale(1.06); }
+}
 
 /* ======================================================
-   6) GLAMOUR — Fade suave entre páginas e filmes
+   6) FADES
    ====================================================== */
-#jornada-content-wrapper {
+#jornada-content-wrapper{
   transition: opacity .55s ease, filter .55s ease, transform .55s ease;
   will-change: opacity, filter, transform;
 }
 
-body.vt-fade-out #jornada-content-wrapper {
+body.vt-fade-out #jornada-content-wrapper{
   opacity: 0;
   filter: blur(2px) brightness(.75);
   transform: translateY(6px) scale(0.995);
 }
 
-body.vt-fade-in #jornada-content-wrapper {
+body.vt-fade-in #jornada-content-wrapper{
   opacity: 1;
   filter: none;
   transform: none;
 }
 
-
 /* ======================================================
-   ALTURA REAL DE TELA — CORREÇÃO GLOBAL DE BORDA
-   ====================================================== */
-
-/* Portal de vídeo */
-.jp-video-overlay,
-.jp-video-frame {
-  height: 100dvh !important;
-  min-height: 100dvh !important;
-}
-
-/* Para garantir que as sombras e bordas apareçam sempre */
-.jp-video-frame {
-  box-sizing: border-box !important;
-}
-
-/* Limelight fullscreen */
-.jp-video-ambient {
-  height: 100dvh !important;
-  min-height: 100dvh !important;
-}
-
-/* Vídeo principal também segue a viewport dinâmica */
-#vt-video,
-#global-video {
-  height: 100dvh !important;
-  min-height: 100dvh !important;
-}
-
-/* Evita cortes e garante espaço clean */
-body, html {
-  height: 100dvh !important;
-  min-height: 100dvh !important;
-  overscroll-behavior: contain;
-}
-/* ===========================================================
-   FIX FINAL — BARRAS TOP + BOTTOM VISÍVEIS + GLOW DO GUIA
-   =========================================================== */
-
-/* --- BARRA SUPERIOR (blocos) --- */
-.progress-top{
-  position: absolute !important;
-  top: 14px !important;
-  left: 14px !important;
-  right: 88px !important;  /* afasta da ampulheta */
-  padding-top: 16px !important; /* espaço pro número acima */
-  z-index: 20 !important;
-}
-
-.progress-top .progress-bar{
-  flex: 1 1 auto !important;
-  height: 8px !important;
-  display: block !important;
-  border-radius: 999px !important;
-  background: rgba(0,0,0,0.60) !important;
-  overflow: hidden !important;
-  box-shadow:
-    inset 0 0 10px rgba(0,0,0,0.95),
-    0 0 12px color-mix(in srgb, var(--theme-main-color, #d4af37) 65%, transparent),
-    0 0 26px color-mix(in srgb, var(--theme-main-color, #d4af37) 45%, transparent) !important;
-}
-
-.progress-top .progress-fill{
-  height: 100% !important;
-  width: 0% !important; /* JS controla */
-  display: block !important;
-  background:
-    linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--theme-main-color, #ffd700) 70%, #fff 0%),
-      color-mix(in srgb, var(--theme-main-color, #ffd700) 95%, #000 0%)
-    ) !important;
-  box-shadow:
-    0 0 12px color-mix(in srgb, var(--theme-main-color, #ffd700) 85%, transparent),
-    0 0 30px color-mix(in srgb, var(--theme-main-color, #ffd700) 60%, transparent),
-    inset 0 0 8px rgba(255,255,255,0.35) !important;
-  animation: guiaGlow 1.9s ease-in-out infinite !important;
-}
-
-.progress-top .progress-value{
-  position: absolute !important;
-  top: -2px !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  font-size: 12.5px !important;
-  font-weight: 900 !important;
-  color: #ffe9a6 !important;
-  text-shadow: 0 1px 2px #000 !important;
-  pointer-events: none !important;
-}
-
-/* --- BARRA INFERIOR (perguntas no bloco) --- */
-.progress-middle{
-  position: absolute !important;
-  left: 50% !important;
-  bottom: -6px !important;   /* abaixo dos botões */
-  transform: translateX(-50%) !important;
-  width: min(90%, 560px) !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-  z-index: 20 !important;
-  background: transparent !important;
-}
-
-.progress-middle .progress-bar{
-  flex: 1 1 auto !important;
-  height: 8px !important;
-  display: block !important;
-  border-radius: 999px !important;
-  background: rgba(0,0,0,0.65) !important;
-  overflow: hidden !important;
-  box-shadow:
-    inset 0 0 10px rgba(0,0,0,1),
-    0 0 10px color-mix(in srgb, var(--theme-main-color, #d4af37) 60%, transparent),
-    0 0 22px color-mix(in srgb, var(--theme-main-color, #d4af37) 40%, transparent) !important;
-}
-
-.progress-middle .progress-fill{
-  height: 100% !important;
-  width: 0% !important; /* JS controla */
-  display: block !important;
-  background:
-    linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--theme-main-color, #ffd700) 65%, #fff 0%),
-      color-mix(in srgb, var(--theme-main-color, #ffd700) 90%, #000 0%)
-    ) !important;
-  box-shadow:
-    0 0 12px color-mix(in srgb, var(--theme-main-color, #ffd700) 85%, transparent),
-    0 0 28px color-mix(in srgb, var(--theme-main-color, #ffd700) 55%, transparent),
-    inset 0 0 8px rgba(255,255,255,0.35) !important;
-  animation: guiaGlow 1.9s ease-in-out infinite !important;
-}
-
-.progress-middle .progress-value{
-  font-size: 12.5px !important;
-  font-weight: 900 !important;
-  letter-spacing: .04em !important;
-  color: #ffe9a6 !important;
-  text-shadow: 0 1px 2px #000 !important;
-  white-space: nowrap !important;
-}
-
-/* reserva espaço para HUD inferior */
-.section-perguntas .perguntas-wrap{
-  padding-bottom: 96px !important;
-}
-
-/* ==========================================================
-   PATCH DESKTOP — evita painel deslocado/cortado na direita
-   (não mexe nos efeitos, só conserta enquadre)
-   ========================================================== */
-@media (min-width: 601px){
-  .j-panel-glow{
-    box-sizing: border-box !important;
-    max-width: min(980px, 96vw) !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-
-    /* mata qualquer deslocamento fantasma */
-    left: auto !important;
-    right: auto !important;
-    transform: none !important;
-  }
-
-  /* pais não podem cortar o painel */
-  .pergaminho,
-  .pergaminho-v,
-  .pergaminho-vertical,
-  .final-pergaminho-wrapper,
-  .parchment-inner-rough{
-    overflow: visible !important;
-  }
-}
-
-
-
-/* ======================================================
-   7) MOBILE — ajustes finos
+   7) MOBILE
    ====================================================== */
 @media (max-width: 600px){
-  .progress-top{
-    left: 10px !important;
-    right: 72px !important;
-  }
-  .progress-top .progress-label{ display:none !important; }
-
-  .progress-middle{
-    width: min(92%, 440px) !important;
-    bottom: -4px !important;
-  }
-    
-   .j-panel-glow{
-    width: 92vw !important;
-    max-width: 92vw !important;
-    margin: 10px auto !important;
-    padding: 26px 18px !important;
-    min-height: auto !important;
-    height: auto !important;
-    overflow: visible !important;
-    border-radius: 22px !important;
+  .j-panel-glow{
+    width: 92vw;
+    max-width: 92vw;
+    margin: 10px auto;
+    padding: 26px 18px;
+    min-height: auto;
+    height: auto;
+    border-radius: 22px;
   }
 
-  .section-perguntas .perguntas-wrap{
-    padding-bottom: 92px !important;
-  } 
-      
   .j-perg-v-inner{
-    width: 100% !important;
-    max-width: 100% !important;
-    padding: 22px 16px !important;
-  }
-
-  .j-panel-outer { width: 94%; }
-  .j-panel-inner {
-    max-width: 92% !important;
-    padding: 32px 20px !important;
-  }
-
-  .j-arcane-card {
-    max-width: 100% !important;
-    padding: 16px 14px !important;
-  }
-  .j-arcane-card::before { opacity: 0.30; }
-   
-   body, html{
-    overflow-x: hidden !important;
-  }
-}
-
-:root {
-  --portal-gold: #d4af37;
-
-  /* Cor principal dinâmica (ouro + guia) */
-  --portal-border-color: color-mix(
-    in srgb,
-    var(--portal-gold) 70%,
-    var(--theme-main-color, var(--portal-gold)) 30%
-  );
-
-  /* Brilho principal */
-  --portal-glow-color: color-mix(
-    in srgb,
-    var(--portal-gold) 55%,
-    var(--theme-main-color, var(--portal-gold)) 45%
-  );
-
-  /* Para gradiente elegante */
-  --portal-border-gradient: linear-gradient(
-    to bottom,
-    color-mix(in srgb, var(--portal-gold) 90%, var(--theme-main-color) 10%) 0%,
-    color-mix(in srgb, var(--portal-gold) 40%, var(--theme-main-color) 60%) 100%
-  );
-}
-   
-/* ======================================================
-   LUZ VIVA NO PORTAL DOURADO (frame real)
-   ====================================================== */
-
-.jp-video-frame{
-  /* a moldura inteira “respira” com a voz/typing */
-  filter:
-    brightness(calc(0.85 + (0.25 * var(--luz-intensity))))
-    saturate(calc(0.9 + (0.35 * var(--luz-intensity))))
-    drop-shadow(0 0 calc(10px * var(--luz-intensity))
-      color-mix(in srgb, var(--theme-main-color, #d4af37) 70%, transparent))
-    drop-shadow(0 0 calc(26px * var(--luz-intensity))
-      color-mix(in srgb, var(--theme-main-color, #d4af37) 45%, transparent))
-  !important;
-}
-
-/* reforça o glow do overlay também */
-.jp-video-overlay{
-  background: rgba(0,0,0, calc(0.88 - (0.10 * (var(--luz-intensity) - 1)))) !important;
-}
-/* =========================================
-   CENTRALIZAÇÃO UNIVERSAL DAS SEÇÕES
-   ========================================= */
-.j-panel-glow,
-.j-perg-v-inner,
-.j-arcane-card,
-.conteudo-pergaminho,
-.intro-wrap,
-.termo-wrap,
-.senha-wrap,
-.card-wrap {
-  margin-left: auto !important;
-  margin-right: auto !important;
-}
-
-/* garante que nada fique flutuando para a direita */
-.j-panel-glow {
-  float: none !important;
-  display: block !important;
-  position: relative;
-}
-
-/* largura máxima igual em TODAS as telas */
-.j-panel-glow {
-  max-width: 520px !important;
-  width: 92vw !important;
-}
-/* ======================================================
-   PADRÃO GLOBAL — TELAS COM PERGAMINHO VERTICAL
-   (Intro, Termos 1/2, Senha...)
-   ====================================================== */
-
-/* DESKTOP / TABLET (largura > 600px) */
-@media (min-width: 601px) {
-  .j-screen-vert .j-panel-glow {
-    width: min(520px, 90vw);
-    max-width: 520px;
-    margin: 24px auto;
-    position: relative;
-    float: none;
-    display: block;
-  }
-
-  .j-screen-vert .j-perg-v-inner {
     width: 100%;
     max-width: 100%;
-    margin: 0 auto;   
-    min-height: clamp(420px, 65vh, 720px);
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    padding: 30px 26px;
-    padding-top: 40px;   /* quanto maior, mais desce o card */
-    padding-bottom: 80px;
-    transform: translate(-11px, -35px) !important;
-  }
-
-  .j-screen-vert .j-arcane-card {
-    max-width: 100%;
-    margin: 0 auto;
-    margin-top: 8px;     /* tira aquele grudado no topo do pergaminho */
-    margin-bottom: 0; 
-  }
-   
-.section.j-screen-vert {
-  display: flex;
-  justify-content: center;   /* centro horizontal */
-  align-items: center;       /* centro vertical */
-  min-height: 100vh;
-  padding-top: 40px;   /* sobe/desce o pergaminho aqui */
-  padding-bottom: 56px;
-}
-
-.section.j-screen-vert .j-panel-glow {
-  max-width: 520px !important;          /* mantém o padrão que você já gostou */
-  width: min(520px, 78vw) !important;   /* um pouco menos largo visualmente */
-  margin: -12px auto 40px !important;
-  transform: translate(-16px, -130px) !important; 
-}
-}
-
-/* MOBILE (até 600px) — TUDO IGUAL em todas as telas verticais */
-@media (max-width: 600px) {
-
-  .j-screen-vert .j-panel-glow {
-    width: 84vw !important;
-    max-width: 340px !important;
-    margin: 16px auto 24px !important;
-    padding: 20px 16px !important;
-    min-height: auto !important;
-    height: auto !important;
-    border-radius: 20px !important;
-  }
-
-  .j-screen-vert .j-perg-v-inner {
-    width: 100% !important;
-    max-width: 100% !important;
-    padding: 20px 14px 24px !important;
-    padding-top: 32px;    /* sobe/desce o bloco no mobile */
-    padding-bottom: 64px; 
-    min-height: auto !important;
+    padding: 22px 16px;
     border-radius: 18px;
-    transform: translate(-6px, -10px); 
   }
 
-  .j-screen-vert .j-arcane-card {
-    flex: 1 0 auto;
-    margin: 0 auto;
-    align-self: stretch;
-    max-width: 100% !important;
-    padding: 14px 12px !important;
+  .j-panel-outer{ width: 94%; }
+
+  .j-panel-inner{
+    max-width: 92%;
+    padding: 32px 20px;
   }
 
-  .j-screen-vert .parchment-text-rough {   
-    font-size: 13px !important;
-    line-height: 1.35 !important;
-  }
-  
-  .section.j-screen-vert {
-    min-height: 100vh;
-    padding-top: 28px;   /* desce um pouco no mobile */
-    padding-bottom: 36px;
+  .j-arcane-card{
+    max-width: 100%;
+    padding: 16px 14px;
   }
 
-  .section.j-screen-vert .j-panel-glow {
-    width: min(300px, 80vw) !important; /* menor que os 92vw antigos */
-    max-width: 300px !important;
-    margin: 18px auto 32px !important;
-    }
+  .j-arcane-card::before{
+    opacity: 0.30;
+  }
+
+  html, body{
+    overflow-x: hidden;
+  }
 }
-
-/* ============================
-   BOTÕES FINAIS — TRANSLÚCIDOS
-   ============================ */
-
-#section-final .btn-gold,
-#section-final .btn-light {
-  background: linear-gradient(
-    180deg,
-    rgba(255,255,255,0.18),
-    rgba(0,0,0,0.25)
-  ) !important;
-
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-
-  border: 1px solid rgba(212,175,55,0.55);
-  color: #ffd700;
-}
-#section-perguntas {
-  overflow: visible !important; /* libera o badge do bloco */
-}
-.progress-fill {
-  transition: width 0.6s ease, box-shadow 0.4s ease !important; /* anima luz */
-}
-
-/* FIX 4: Perguntas em cima da barra contador */
-.j-pergunta {
-  margin-top: 0 !important; /* tira espaço antes */
-  padding-top: 0 !important;
-}
-.perguntas-no-bloco { /* a barra em si */
-  margin-top: -8px !important; /* cola na pergunta */
-  background-color: color-mix(in srgb, var(--guide-color, #ffd700) 30%, transparent); /* reflete cor do guia */
-}
-
-/* FIX 5: Áurea nos botões na cor do guia */
-.j-pergunta .btn,
-.btn-continuar,
-.btn-final {
-  box-shadow: 0 0 12px color-mix(in srgb, var(--guide-color, #ffd700) 50%, transparent) !important;
-  border-color: var(--guide-color, #ffd700) !important;
-  transition: box-shadow 0.3s ease;
-}
-.j-pergunta .btn:hover {
-  box-shadow: 0 0 24px color-mix(in srgb, var(--guide-color, #ffd700) 80%, transparent) !important;
-}
-
-document.querySelectorAll('#section-perguntas .btn').forEach((b) => {
-    b.style.boxShadow = glow;
-    b.style.borderColor = color;
-});
-
-
-
-
-
