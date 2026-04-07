@@ -412,3 +412,188 @@
     line-height: 1.25 !important;
   }
 }
+/* =========================================================
+   FIX FINAL — INTRO
+   sinalizador + remoção da barra lateral + rodapé central
+   cole no FINAL do styles-intro.css
+   ========================================================= */
+
+/* 1) trava qualquer vazamento horizontal/scroll lateral */
+html,
+body,
+#section-intro,
+#section-intro .intro-wrap,
+#section-intro .j-panel-glow,
+#section-intro .j-arcane-card,
+#section-intro .j-perg-v-inner,
+#section-intro .parchment-inner-rough {
+  max-width: 100%;
+  overflow-x: hidden !important;
+}
+
+body {
+  margin: 0;
+}
+
+/* 2) garante que a intro ocupe a tela e centralize o conteúdo */
+#section-intro {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+  padding-bottom: 64px; /* espaço para o rodapé */
+  box-sizing: border-box;
+}
+
+/* 3) elimina a barra lateral interna do container */
+#section-intro .j-panel-glow,
+#section-intro .j-arcane-card,
+#section-intro .parchment-inner-rough {
+  overflow-y: visible !important;
+}
+
+/* caso exista algum wrapper herdando scroll */
+#section-intro [class*="scroll"],
+#section-intro [style*="overflow-y: auto"],
+#section-intro [style*="overflow: auto"] {
+  overflow-y: visible !important;
+}
+
+/* 4) reforço do sinalizador interno */
+#section-intro .parchment-inner-rough {
+  isolation: isolate;
+}
+
+#section-intro .parchment-inner-rough::before {
+  content: '';
+  position: absolute;
+  top: -2%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 78%;
+  height: 52%;
+  pointer-events: none;
+  z-index: 1;
+
+  background: radial-gradient(
+    ellipse at center top,
+    rgba(255, 240, 170, 0.78) 0%,
+    rgba(255, 215, 90, 0.46) 26%,
+    rgba(255, 180, 40, 0.20) 48%,
+    rgba(255, 140, 20, 0.08) 64%,
+    transparent 80%
+  );
+
+  filter: blur(12px);
+  mix-blend-mode: screen;
+  opacity: 0.95;
+  animation: introSignalSweepStrong 3.4s ease-in-out infinite;
+}
+
+#section-intro .parchment-inner-rough::after {
+  content: '';
+  position: absolute;
+  top: 1.5%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30%;
+  height: 10%;
+  pointer-events: none;
+  z-index: 2;
+
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 250, 220, 1) 0%,
+    rgba(255, 225, 140, 0.80) 35%,
+    rgba(255, 190, 60, 0.35) 58%,
+    transparent 82%
+  );
+
+  filter: blur(8px);
+  opacity: 1;
+  animation: introSignalPulseStrong 1.9s ease-in-out infinite;
+}
+
+@keyframes introSignalSweepStrong {
+  0% {
+    transform: translateX(-50%) translateY(0) scale(0.94);
+    opacity: 0.62;
+  }
+  50% {
+    transform: translateX(-50%) translateY(12px) scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-50%) translateY(0) scale(0.94);
+    opacity: 0.62;
+  }
+}
+
+@keyframes introSignalPulseStrong {
+  0%, 100% {
+    transform: translateX(-50%) scale(0.95);
+    opacity: 0.72;
+  }
+  50% {
+    transform: translateX(-50%) scale(1.12);
+    opacity: 1;
+  }
+}
+
+/* 5) conteúdo acima do sinalizador */
+#section-intro .intro-title,
+#section-intro .parchment-text-rough,
+#section-intro .parchment-actions-rough,
+#section-intro button,
+#section-intro .btn,
+#section-intro .btn-stone-espinhos {
+  position: relative;
+  z-index: 3;
+}
+
+/* 6) centralização do rodapé */
+.site-footer,
+footer,
+.footer,
+#footer,
+.page-footer {
+  width: 100%;
+  max-width: 100%;
+  margin: 18px auto 0 auto !important;
+  padding: 10px 16px 16px !important;
+  text-align: center !important;
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  box-sizing: border-box;
+}
+
+/* texto do copyright */
+.site-footer *,
+footer *,
+.footer *,
+#footer *,
+.page-footer * {
+  text-align: center !important;
+}
+
+/* 7) mobile fino */
+@media (max-width: 600px) {
+  #section-intro {
+    padding-bottom: 72px;
+  }
+
+  #section-intro .parchment-inner-rough::before {
+    width: 84%;
+    height: 46%;
+  }
+
+  #section-intro .parchment-inner-rough::after {
+    width: 36%;
+  }
+}
