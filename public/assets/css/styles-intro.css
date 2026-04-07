@@ -267,7 +267,7 @@
   clip-path: polygon(46% 0%, 54% 0%, 100% 100%, 0% 100%) !important;
   filter: blur(6px) !important;
   mix-blend-mode: screen !important;
-  transform-origin: 50% 0% !important;
+  transform-origin: 50% 6px !important;
   animation: beamSweep 4s ease-in-out infinite !important;
 }
 
