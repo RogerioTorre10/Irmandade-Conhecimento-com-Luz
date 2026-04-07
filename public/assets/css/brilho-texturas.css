@@ -1,34 +1,27 @@
 /* =======================================================
-   BRILHO + TEXTURAS — módulo universal (v2)
-   Compatível com styles-base.css · Seguro para toda a jornada
+   BRILHO + TEXTURAS — módulo universal (limpo e blindado)
+   Escopo: utilitários visuais, botões e aura compartilhada
    ======================================================= */
 
-/* -------- Variáveis (paths + aura) -------- */
 :root{
-  --espinhos-img: url('/assets/img/moldura-medieval.png');
   --espinhos-img: url('/assets/img/moldura-medieval-espinhos.png');
   --stone-img: url('/assets/img/textura-de-pedra.jpg');
 
-  /* Auras reforçadas */
-  --aura-gold-outer: rgba(255, 215, 120, .85);
-  --aura-gold:       rgba(255, 215, 120, .75);
-  --aura-gold-soft:  rgba(255, 215, 120, .45);
-  --aura-amber:      rgba(255, 160, 60,  .65);
+  --aura-gold-outer: rgba(255, 215, 120, 0.85);
+  --aura-gold:       rgba(255, 215, 120, 0.75);
+  --aura-gold-soft:  rgba(255, 215, 120, 0.45);
+  --aura-amber:      rgba(255, 160,  60, 0.65);
 
-  /* Botões */
   --btn-gold-outer: rgba(255, 230, 120, 0.50);
   --btn-gold-mid:   rgba(255, 220, 120, 0.55);
   --btn-gold-in:    rgba(255, 255, 230, 0.30);
   --btn-gold-line:  rgba(255, 215,   0, 0.32);
   --btn-text:       #f9e7c2;
 
-  --theme-main-color: #ffd978;   /* dourado da fonte final */
-
   --ink: #f5efe0;
-  
 }
 
-/* -------- Animações compartilhadas -------- */
+/* -------- animações compartilhadas -------- */
 @keyframes brilhoDivino {
   0%,100% {
     box-shadow:
@@ -43,21 +36,27 @@
       inset 0 0 5px var(--btn-gold-in);
   }
 }
+
 @keyframes reflexoDourado {
   0%   { opacity: 0; transform: translate(-120%, -120%) rotate(25deg); }
-  45%, 55% { opacity: .95; }
+  45%  { opacity: .95; }
+  55%  { opacity: .95; }
   100% { opacity: 0; transform: translate(120%, 120%) rotate(25deg); }
 }
-@keyframes aura-pop {
+
+@keyframes auraPop {
   0%   { filter: drop-shadow(0 0 12px var(--aura-gold)); }
   60%  { filter: drop-shadow(0 0 32px var(--aura-gold)); }
   100% { filter: drop-shadow(0 0 16px var(--aura-gold)); }
 }
 
 /* =======================================================
-   (0) CHARME GLOBAL — títulos, textos datilografados, molduras
+   CHARME COMPARTILHADO
+   Obs.: sem animar .typing-active globalmente para não invadir a intro
    ======================================================= */
-.charme, .typing-charme, .titulo-pergaminho {
+.charme,
+.typing-charme,
+.titulo-pergaminho {
   color: var(--ink);
   text-shadow:
     0 1px 0 #000,
@@ -66,8 +65,8 @@
     0 0 24px var(--aura-amber);
   filter: drop-shadow(0 0 8px var(--aura-gold-soft));
 }
-.typing-active,
-[data-typing="true"].typing-active,
+
+.typing-charme.typing-active,
 #guia-notice-text.typing-active {
   animation: brilhoDivino 1.4s ease-in-out infinite;
   text-shadow:
@@ -77,7 +76,9 @@
     0 0 36px var(--aura-amber);
   filter: drop-shadow(0 0 18px var(--aura-gold));
 }
-.typing-done{
+
+.typing-charme.typing-done,
+#guia-notice-text.typing-done {
   text-shadow:
     0 1px 0 #000,
     0 2px 4px rgba(0,0,0,.55),
@@ -85,8 +86,11 @@
     0 0 28px var(--aura-amber);
   filter: drop-shadow(0 0 12px var(--aura-gold));
 }
-/* Molduras/caixas “glow” já usadas na jornada */
-.aura, .moldura-grande.glow, .guia-descricao-medieval.glow {
+
+/* caixas compartilhadas */
+.aura,
+.moldura-grande.glow,
+.guia-descricao-medieval.glow {
   box-shadow:
     inset 0 0 14px rgba(0,0,0,.35),
     0 0 24px var(--aura-gold),
@@ -94,17 +98,23 @@
   border: 1px solid rgba(255, 220, 150, .45);
   border-radius: 14px;
 }
+
 @media (prefers-reduced-motion: reduce){
-  .typing-active{ animation:none; }
+  .typing-charme.typing-active,
+  #guia-notice-text.typing-active{
+    animation: none;
+  }
 }
 
 /* =======================================================
-   (A) BOTÃO — MOLDURA MEDIEVAL ESPINHOS
+   BOTÕES — espinhos / pedra
    ======================================================= */
 .btn-stone-espinhos{
   position: relative;
   overflow: hidden;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background: transparent !important;
   background-image: var(--espinhos-img) !important;
   background-size: 100% 100% !important;
@@ -124,46 +134,57 @@
     0 0 26px var(--aura-amber);
   transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
 }
-/* Reflexo animado */
+
 .btn-stone-espinhos::before{
   content:'';
-  position:absolute; top:0; left:0;
-  width:60%; height:200%;
+  position:absolute;
+  top:0;
+  left:0;
+  width:60%;
+  height:200%;
   background: linear-gradient(
     130deg,
     rgba(255,255,200,0) 0%,
-    rgba(255,255,180,.7) 50%,
+    rgba(255,255,180,.70) 50%,
     rgba(255,255,200,0) 100%
   );
   transform: translate(-150%, -150%) rotate(25deg);
-  opacity:0; pointer-events:none;
-}
-/* Aro/realce interno */
-.btn-stone-espinhos::after{
-  content:'';
-  position:absolute; inset:0;
-  border-radius:10px;
-  box-shadow:
-    inset 0 0 0 1px var(--btn-gold-line);
+  opacity:0;
   pointer-events:none;
 }
-/* Estados */
+
+.btn-stone-espinhos::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:10px;
+  box-shadow: inset 0 0 0 1px var(--btn-gold-line);
+  pointer-events:none;
+}
+
 .btn-stone-espinhos:hover:not(:disabled){
   transform: translateY(-1px);
   animation: brilhoDivino 1.6s ease-in-out infinite;
   filter: drop-shadow(0 0 16px var(--aura-gold));
 }
+
 .btn-stone-espinhos:hover:not(:disabled)::before{
   animation: reflexoDourado 2s linear forwards;
 }
+
 .btn-stone-espinhos:active:not(:disabled),
 .btn-stone-espinhos.is-pressed{
   transform: translateY(0);
-  animation: aura-pop .26s ease-out 1;
+  animation: auraPop .26s ease-out 1;
 }
+
 .btn-stone-espinhos:disabled{
-  opacity:.72; filter: grayscale(.1); cursor:not-allowed; animation:none;
+  opacity:.72;
+  filter: grayscale(.1);
+  cursor:not-allowed;
+  animation:none;
 }
+
 .btn-stone-espinhos:focus-visible{
   outline:2px solid rgba(255, 228, 150, .85);
   outline-offset:2px;
@@ -173,19 +194,19 @@
     0 0 40px var(--aura-amber);
 }
 
-/* =======================================================
-   (B) BOTÃO — TEXTURA DE PEDRA (utilitário)
-   ======================================================= */
 .btn-stone{
   position: relative;
   overflow: hidden;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 8px;
-  color:#fff; text-shadow: 1px 1px 3px rgba(0,0,0,.7);
+  color:#fff;
+  text-shadow: 1px 1px 3px rgba(0,0,0,.7);
   cursor: pointer;
   transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
 }
-/* Aplicar textura de pedra quando quiser */
+
 .stone-texture{
   background:
     linear-gradient(to bottom, #a0a0a0, #808080),
@@ -198,196 +219,23 @@
     0 0 12px var(--aura-gold-soft),
     0 0 24px var(--aura-amber);
 }
-/* Aro dourado sutil */
+
 .btn-stone::after{
-  content:''; position:absolute; inset:0; border-radius:8px;
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:8px;
   box-shadow: inset 0 0 0 1px var(--btn-gold-line);
   pointer-events:none;
 }
-/* Brilhos */
-.btn-stone:hover:not(:disabled){
-  transform: translateY(-1px);
-  animation: brilhoDivino 1.6s ease-in-out infinite;
-  filter: drop-shadow(0 0 16px var(--aura-gold));
-}
-.btn-stone:hover:not(:disabled)::before{
-  content:''; position:absolute; top:0; left:0;
-  width:60%; height:200%;
-  background: linear-gradient(
-    130deg,
-    rgba(255,255,200,0) 0%,
-    rgba(255,255,180,.7) 50%,
-    rgba
-/* =======================================================
-   VARIAÇÕES DE AURA POR GUIA (LUMEN · ZION · ARIAN)
-   ======================================================= */
 
-/* ---- LUMEN (verde-esmeralda e dourado suave) ---- */
-[data-guia="lumen"] :root,
-body[data-guia="lumen"] {
-  --aura-gold-outer: rgba(140, 255, 140, .85);
-  --aura-gold:       rgba(120, 255, 160, .75);
-  --aura-gold-soft:  rgba(160, 255, 200, .55);
-  --aura-amber:      rgba(180, 255, 160, .45);
-  --btn-gold-outer:  rgba(180, 255, 180, 0.45);
-  --btn-gold-mid:    rgba(120, 255, 160, 0.45);
-  --btn-gold-line:   rgba(100, 255, 150, 0.3);
-   /* barras de progresso – Lumen neon */
-  --progress-main:   #00ff9d;
-  --progress-glow-1: rgba(0,255,157,.95);
-  --progress-glow-2: rgba(120,255,200,.75);
-  --theme-main-color: #00ff9d;   /* verde Lumen */  
-}
-
-/* ---- ZION (azul-celeste e prata elétrica) ---- */
-[data-guia="zion"] :root,
-body[data-guia="zion"] {
-  --aura-gold-outer: rgba(120, 180, 255, .85);
-  --aura-gold:       rgba(80, 160, 255, .8);
-  --aura-gold-soft:  rgba(140, 200, 255, .55);
-  --aura-amber:      rgba(100, 180, 255, .45);
-  --btn-gold-outer:  rgba(100, 180, 255, 0.45);
-  --btn-gold-mid:    rgba(80, 160, 255, 0.45);
-  --btn-gold-line:   rgba(60, 150, 255, 0.35);
-  /* barras de progresso – azul + dourado */
-  --progress-main:   #00aaff;
-  --progress-glow-1: rgba(255,214,91,.85);
-  --progress-glow-2: rgba(0,170,255,.9); 
-  --theme-main-color: #00aaff;   /* azul Zion */  
-}
-
-/* ---- ARIAN (magenta e violeta cósmico) ---- */
-[data-guia="arian"] :root,
-body[data-guia="arian"] {
-  --aura-gold-outer: rgba(255, 120, 255, .85);
-  --aura-gold:       rgba(255, 140, 255, .75);
-  --aura-gold-soft:  rgba(255, 160, 255, .55);
-  --aura-amber:      rgba(255, 100, 255, .45);
-  --btn-gold-outer:  rgba(255, 140, 255, 0.45);
-  --btn-gold-mid:    rgba(255, 160, 255, 0.45);
-  --btn-gold-line:   rgba(255, 100, 255, 0.3);
-   /* barras de progresso – magenta viva */
-  --progress-main:   #ff00ff;
-  --progress-glow-1: rgba(255,120,255,.95);
-  --progress-glow-2: rgba(255,180,255,.8);
-  --theme-main-color: #ff4dff;   /* magenta Arian */  
-}
-
-/* =======================================================
-   Lógica visual automática
-   Basta aplicar no <body> ou em #section-card:
-   <body data-guia="lumen|zion|arian">
-   ======================================================= */
-
+/* cor dinâmica por guia */
 body[data-guia="lumen"] .btn-stone-espinhos,
-body[data-guia="zion"]  .btn-stone-espinhos,
-body[data-guia="arian"] .btn-stone-espinhos {
-  transition: all .25s ease-in-out;
+body[data-guia="zion"] .btn-stone-espinhos,
+body[data-guia="arian"] .btn-stone-espinhos{
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    filter .18s ease,
+    border-color .18s ease;
 }
-/* =======================================================
-   BRILHO + TEXTURAS — módulo universal (v2)
-   Compatível com styles-base.css · Seguro para toda a jornada
-   ======================================================= */
-
-/* -------- Variáveis (paths + aura) -------- */
-:root{
-  --espinhos-img: url('/assets/img/moldura-medieval-espinhos.png');
-  --stone-img: url('/assets/img/textura-de-pedra.jpg');
-
-  /* Auras reforçadas */
-  --aura-gold-outer: rgba(255, 215, 120, .85);
-  --aura-gold:       rgba(255, 215, 120, .75);
-  --aura-gold-soft:  rgba(255, 215, 120, .45);
-  --aura-amber:      rgba(255, 160, 60,  .65);
-
-  /* Botões */
-  --btn-gold-outer: rgba(255, 230, 120, 0.50);
-  --btn-gold-mid:   rgba(255, 220, 120, 0.55);
-  --btn-gold-in:    rgba(255, 255, 230, 0.30);
-  --btn-gold-line:  rgba(255, 215,   0, 0.32);
-  --btn-text:       #f9e7c2;
-
-  --ink: #f5efe0;
-}
-
-/* -------- Animações compartilhadas -------- */
-@keyframes brilhoDivino {
-  0%,100% {
-    box-shadow:
-      0 0 8px  var(--btn-gold-outer),
-      0 0 16px var(--btn-gold-mid),
-      inset 0 0 3px var(--btn-gold-in);
-  }
-  50% {
-    box-shadow:
-      0 0 14px var(--btn-gold-outer),
-      0 0 24px var(--btn-gold-mid),
-      inset 0 0 5px var(--btn-gold-in);
-  }
-}
-@keyframes reflexoDourado {
-  0%   { opacity: 0; transform: translate(-120%, -120%) rotate(25deg); }
-  45%, 55% { opacity: .95; }
-  100% { opacity: 0; transform: translate(120%, 120%) rotate(25deg); }
-}
-@keyframes aura-pop {
-  0%   { filter: drop-shadow(0 0 12px var(--aura-gold)); }
-  60%  { filter: drop-shadow(0 0 32px var(--aura-gold)); }
-  100% { filter: drop-shadow(0 0 16px var(--aura-gold)); }
-}
-
-/* =======================================================
-   (0) CHARME GLOBAL — títulos, textos datilografados, molduras
-   ======================================================= */
-.charme, .typing-charme, .titulo-pergaminho {
-  color: var(--ink);
-  text-shadow:
-    0 1px 0 #000,
-    0 2px 4px rgba(0,0,0,.55),
-    0 0 12px var(--aura-gold),
-    0 0 24px var(--aura-amber);
-  filter: drop-shadow(0 0 8px var(--aura-gold-soft));
-}
-.typing-active,
-[data-typing="true"].typing-active,
-#guia-notice-text.typing-active {
-  animation: brilhoDivino 1.4s ease-in-out infinite;
-  text-shadow:
-    0 1px 0 #000,
-    0 2px 6px rgba(0,0,0,.55),
-    0 0 16px var(--aura-gold),
-    0 0 36px var(--aura-amber);
-  filter: drop-shadow(0 0 18px var(--aura-gold));
-}
-.typing-done{
-  text-shadow:
-    0 1px 0 #000,
-    0 2px 4px rgba(0,0,0,.55),
-    0 0 14px var(--aura-gold),
-    0 0 28px var(--aura-amber);
-  filter: drop-shadow(0 0 12px var(--aura-gold));
-}
-/* Molduras/caixas “glow” já usadas na jornada */
-.aura, .moldura-grande.glow, .guia-descricao-medieval.glow {
-  box-shadow:
-    inset 0 0 14p...(truncated, mas cole o conteúdo completo que você mandou)
-}
-   /* ======= BARRAS DE PROGRESSO — GUIA DINÂMICO ======= */
-#progress-block-fill,
-#progress-question-fill {
-  background: var(--progress-main) !important;
-  box-shadow:
-    0 0 6px var(--progress-glow-1),
-    0 0 16px var(--progress-glow-2);
-  transition: width .25s ease-out;
-}
-
-#progress-total-value {
-  color: var(--progress-main) !important;
-  text-shadow:
-    0 0 4px rgba(0,0,0,.85),
-    0 0 10px var(--progress-glow-1);
-}
-
-
-
