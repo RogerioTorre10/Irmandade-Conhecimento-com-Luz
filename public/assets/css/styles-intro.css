@@ -246,7 +246,7 @@
 #section-intro .parchment-inner-rough::before {
   content: '' !important;
   position: absolute !important;
-  top: 80px !important;
+  top: 88px !important;
   left: 50% !important;
   width: 200px !important;
   height: 220px !important;
@@ -275,7 +275,7 @@
 #section-intro .parchment-inner-rough::after {
   content: '' !important;
   position: absolute !important;
-  top: 76px !important;
+  top: 88px !important;
   left: 50% !important;
   transform: translateX(-50%) !important;
   width: 12px !important;
