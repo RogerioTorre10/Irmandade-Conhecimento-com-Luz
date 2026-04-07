@@ -271,15 +271,15 @@
   animation: beamSweep 4s ease-in-out infinite !important;
 }
 
-/* Núcleo emissor — ponto brilhante na origem do facho */
+/* Núcleo emissor — ponto pequeno e discreto */
 #section-intro .parchment-inner-rough::after {
   content: '' !important;
   position: absolute !important;
-  top: 72px !important;
+  top: 76px !important;
   left: 50% !important;
   transform: translateX(-50%) !important;
-  width: 28px !important;
-  height: 28px !important;
+  width: 12px !important;
+  height: 12px !important;
   z-index: 7 !important;
   pointer-events: none !important;
   display: block !important;
@@ -288,16 +288,14 @@
   background: radial-gradient(
     circle at center,
     rgba(255,255,255,1) 0%,
-    rgba(255,245,200,0.95) 25%,
-    rgba(255,220,130,0.60) 55%,
-    rgba(255,190,80,0.20) 78%,
+    rgba(255,245,200,0.90) 30%,
+    rgba(255,220,130,0.45) 60%,
     transparent 100%
   ) !important;
 
   box-shadow:
-    0 0 10px rgba(255,250,220,0.95),
-    0 0 22px rgba(255,220,140,0.70),
-    0 0 44px rgba(255,190,90,0.35) !important;
+    0 0 6px rgba(255,250,220,0.90),
+    0 0 14px rgba(255,220,140,0.55) !important;
 
   filter: blur(1px) !important;
   animation: beamCorePulse 2s ease-in-out infinite !important;
@@ -342,25 +340,27 @@
   100% { transform: translateY(0); }
 }
 
-/* Varredura do facho — oscila de -25° a +25° */
+/* Varredura do facho — giro completo 360° */
 @keyframes beamSweep {
   0% {
-    transform: translateX(-50%) rotate(-25deg) scaleY(0.92);
-    opacity: 0.45;
+    transform: translateX(-50%) rotate(0deg) scaleY(0.95);
+    opacity: 0.50;
   }
   25% {
-    opacity: 0.85;
+    transform: translateX(-50%) rotate(90deg) scaleY(1.05);
+    opacity: 0.90;
   }
   50% {
-    transform: translateX(-50%) rotate(25deg) scaleY(1.06);
-    opacity: 0.95;
+    transform: translateX(-50%) rotate(180deg) scaleY(0.95);
+    opacity: 0.50;
   }
   75% {
-    opacity: 0.80;
+    transform: translateX(-50%) rotate(270deg) scaleY(1.05);
+    opacity: 0.85;
   }
   100% {
-    transform: translateX(-50%) rotate(-25deg) scaleY(0.92);
-    opacity: 0.45;
+    transform: translateX(-50%) rotate(360deg) scaleY(0.95);
+    opacity: 0.50;
   }
 }
 
@@ -455,8 +455,8 @@ footer *,
   }
 
   #section-intro .parchment-inner-rough::after {
-    width: 22px !important;
-    height: 22px !important;
+    width: 10px !important;
+    height: 10px !important;
   }
 }
 
@@ -507,9 +507,9 @@ footer *,
   }
 
   #section-intro .parchment-inner-rough::after {
-    width: 20px !important;
-    height: 20px !important;
-    top: 64px !important;
+    width: 8px !important;
+    height: 8px !important;
+    top: 68px !important;
   }
 }
 
