@@ -240,81 +240,114 @@
 }
 
 /* =========================================================
-   FIX CIRÚRGICO — só reforço do sinalizador da intro
+   FEIXE CENTRAL — fica no pergaminho interno, não no card
    ========================================================= */
-
 #section-intro .parchment-inner-rough::before{
-  content: '' !important;
-  position: absolute !important;
-  top: 10px !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  width: 170px !important;
-  height: 44px !important;
-  z-index: 6 !important;
-  pointer-events: none !important;
-  opacity: 1 !important;
-  display: block !important;
-
+  content: '';
+  position: absolute;
+  top: -8%;
+  left: 50%;
+  z-index: 1;
+  width: 72%;
+  height: 42%;
+  pointer-events: none;
+  transform: translateX(-50%);
   background: radial-gradient(
-    ellipse at center,
-    rgba(255,255,235,0.98) 0%,
-    rgba(255,230,150,0.92) 28%,
-    rgba(255,205,90,0.55) 52%,
-    rgba(255,170,40,0.18) 72%,
-    transparent 100%
-  ) !important;
-
-  filter: blur(6px) !important;
-  mix-blend-mode: screen !important;
-  animation: introSignalizerPulse 1.9s ease-in-out infinite !important;
+    ellipse at center top,
+    rgba(255,220,120,.50) 0%,
+    rgba(255,200, 80,.22) 35%,
+    rgba(255,170, 40,.08) 58%,
+    transparent 78%
+  );
+  filter: blur(10px);
+  mix-blend-mode: screen;
+  animation: introSignalSweep 3.2s ease-in-out infinite;
 }
 
 #section-intro .parchment-inner-rough::after{
-  content: '' !important;
-  position: absolute !important;
-  top: 18px !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  width: 72px !important;
-  height: 10px !important;
-  z-index: 7 !important;
-  pointer-events: none !important;
-  opacity: 1 !important;
-  display: block !important;
-
+  content: '';
+  position: absolute;
+  top: 2%;
+  left: 50%;
+  z-index: 1;
+  width: 34%;
+  height: 12%;
+  pointer-events: none;
+  transform: translateX(-50%);
   background: radial-gradient(
     ellipse at center,
-    rgba(255,255,245,1) 0%,
-    rgba(255,240,180,0.95) 45%,
-    rgba(255,210,90,0.35) 75%,
-    transparent 100%
-  ) !important;
-
-  filter: blur(2px) !important;
-  animation: introSignalizerCore 1.4s ease-in-out infinite !important;
+    rgba(255,235,170,.95) 0%,
+    rgba(255,210,110,.45) 45%,
+    transparent 80%
+  );
+  filter: blur(8px);
+  animation: introSignalPulse 1.9s ease-in-out infinite;
 }
 
-@keyframes introSignalizerPulse {
-  0%, 100% {
-    opacity: 0.62;
-    transform: translateX(-50%) scaleX(0.94);
+/* aura dourada enquanto digita */
+#section-intro:has(.typing-active) .parchment-inner-rough{
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+#section-intro:has(.typing-active) .j-panel-glow{
+  outline: 1px solid rgba(255,204,102,.22) !important;
+  outline-offset: 2px !important;
+  box-shadow:
+    0 0 0 1px rgba(255,204,102,.12) inset,
+    0 0 14px rgba(255,204,102,.28),
+    0 0 26px rgba(255,153,0,.18) !important;
+}
+
+/* =========================================================
+   ANIMAÇÕES
+   ========================================================= */
+@keyframes introTitleIn{
+  from{
+    opacity: 0;
+    transform: translateY(12px);
   }
-  50% {
+  to{
     opacity: 1;
-    transform: translateX(-50%) scaleX(1.12);
+    transform: translateY(6px);
   }
 }
 
-@keyframes introSignalizerCore {
-  0%, 100% {
-    opacity: 0.72;
-    transform: translateX(-50%) scale(0.96);
+@keyframes introPan{
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-1px); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes introSignalSweep{
+  0%{
+    transform: translateX(-50%) translateY(0) scale(.96);
+    opacity: .58;
   }
-  50% {
+  50%{
+    transform: translateX(-50%) translateY(8px) scale(1.05);
+    opacity: .95;
+  }
+  100%{
+    transform: translateX(-50%) translateY(0) scale(.96);
+    opacity: .58;
+  }
+}
+
+@keyframes introSignalPulse{
+  0%,100%{
+    opacity: .65;
+    transform: translateX(-50%) scale(.96);
+  }
+  50%{
     opacity: 1;
-    transform: translateX(-50%) scale(1.10);
+    transform: translateX(-50%) scale(1.08);
   }
+}
+
+@keyframes caretBlink{
+  0%,49%   { opacity: 1; }
+  50%,100% { opacity: 0; }
 }
 
 /* =========================================================
@@ -551,5 +584,82 @@ footer *,
   #section-intro .parchment-inner-rough::after {
     width: 78px;
     height: 16px;
+  }
+}
+/* =========================================================
+   FIX CIRÚRGICO — só reforço do sinalizador da intro
+   ========================================================= */
+
+#section-intro .parchment-inner-rough::before{
+  content: '' !important;
+  position: absolute !important;
+  top: 10px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 170px !important;
+  height: 44px !important;
+  z-index: 6 !important;
+  pointer-events: none !important;
+  opacity: 1 !important;
+  display: block !important;
+
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255,255,235,0.98) 0%,
+    rgba(255,230,150,0.92) 28%,
+    rgba(255,205,90,0.55) 52%,
+    rgba(255,170,40,0.18) 72%,
+    transparent 100%
+  ) !important;
+
+  filter: blur(6px) !important;
+  mix-blend-mode: screen !important;
+  animation: introSignalizerPulse 1.9s ease-in-out infinite !important;
+}
+
+#section-intro .parchment-inner-rough::after{
+  content: '' !important;
+  position: absolute !important;
+  top: 18px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 72px !important;
+  height: 10px !important;
+  z-index: 7 !important;
+  pointer-events: none !important;
+  opacity: 1 !important;
+  display: block !important;
+
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255,255,245,1) 0%,
+    rgba(255,240,180,0.95) 45%,
+    rgba(255,210,90,0.35) 75%,
+    transparent 100%
+  ) !important;
+
+  filter: blur(2px) !important;
+  animation: introSignalizerCore 1.4s ease-in-out infinite !important;
+}
+
+@keyframes introSignalizerPulse {
+  0%, 100% {
+    opacity: 0.62;
+    transform: translateX(-50%) scaleX(0.94);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(-50%) scaleX(1.12);
+  }
+}
+
+@keyframes introSignalizerCore {
+  0%, 100% {
+    opacity: 0.72;
+    transform: translateX(-50%) scale(0.96);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1.10);
   }
 }
