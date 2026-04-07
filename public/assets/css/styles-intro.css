@@ -587,79 +587,84 @@ footer *,
   }
 }
 /* =========================================================
-   FIX CIRÚRGICO — só reforço do sinalizador da intro
+   FIX CIRÚRGICO — sinalizador em facho/rayo
+   igual ao comportamento do print 2
    ========================================================= */
 
 #section-intro .parchment-inner-rough::before{
   content: '' !important;
   position: absolute !important;
-  top: 70px !important;
+  top: 122px !important;
   left: 50% !important;
-  transform: translateX(-50%) !important;
-  width: 190px !important;
-  height: 52px !important;
+  transform: translateX(-50%) rotate(8deg) !important;
+  width: 170px !important;
+  height: 150px !important;
   z-index: 6 !important;
   pointer-events: none !important;
-  opacity: 1 !important;
+  opacity: .92 !important;
   display: block !important;
 
-  background: radial-gradient(
-    ellipse at center,
-    rgba(255,255,235,0.98) 0%,
-    rgba(255,230,150,0.92) 28%,
-    rgba(255,205,90,0.55) 52%,
-    rgba(255,170,40,0.18) 72%,
-    transparent 100%
+  background: linear-gradient(
+    to bottom right,
+    rgba(255,255,220,0.00) 0%,
+    rgba(255,245,190,0.95) 10%,
+    rgba(255,220,120,0.38) 26%,
+    rgba(255,190,70,0.16) 44%,
+    rgba(255,170,40,0.06) 58%,
+    rgba(255,150,20,0.00) 74%
   ) !important;
 
-  filter: blur(6px) !important;
+  clip-path: polygon(48% 0%, 56% 0%, 100% 100%, 0% 100%) !important;
+  filter: blur(7px) !important;
   mix-blend-mode: screen !important;
-  animation: introSignalizerPulse 1.9s ease-in-out infinite !important;
+  transform-origin: top center !important;
+  animation: introBeamSweep 3.2s ease-in-out infinite !important;
 }
 
 #section-intro .parchment-inner-rough::after{
   content: '' !important;
   position: absolute !important;
-  top: 94px !important;
+  top: 112px !important;
   left: 50% !important;
   transform: translateX(-50%) !important;
-  width: 86px !important;
-  height: 12px !important;
+  width: 24px !important;
+  height: 24px !important;
   z-index: 7 !important;
   pointer-events: none !important;
   opacity: 1 !important;
   display: block !important;
 
   background: radial-gradient(
-    ellipse at center,
+    circle at center,
     rgba(255,255,245,1) 0%,
-    rgba(255,240,180,0.95) 45%,
-    rgba(255,210,90,0.35) 75%,
+    rgba(255,235,170,0.95) 38%,
+    rgba(255,210,100,0.40) 68%,
     transparent 100%
   ) !important;
 
-  filter: blur(2px) !important;
-  animation: introSignalizerCore 1.4s ease-in-out infinite !important;
+  border-radius: 50% !important;
+  filter: blur(3px) !important;
+  animation: introBeamCore 2s ease-in-out infinite !important;
 }
 
-@keyframes introSignalizerPulse {
+@keyframes introBeamSweep {
   0%, 100% {
-    opacity: 0.62;
-    transform: translateX(-50%) scaleX(0.94);
+    transform: translateX(-50%) rotate(5deg) scaleY(0.95);
+    opacity: 0.55;
   }
   50% {
-    opacity: 1;
-    transform: translateX(-50%) scaleX(1.12);
+    transform: translateX(-50%) rotate(10deg) scaleY(1.06);
+    opacity: 0.95;
   }
 }
 
-@keyframes introSignalizerCore {
+@keyframes introBeamCore {
   0%, 100% {
+    transform: translateX(-50%) scale(0.92);
     opacity: 0.72;
-    transform: translateX(-50%) scale(0.96);
   }
   50% {
+    transform: translateX(-50%) scale(1.08);
     opacity: 1;
-    transform: translateX(-50%) scale(1.10);
   }
 }
