@@ -237,49 +237,68 @@
   border-radius: 1px;
 }
 
-/* ============================
-   FEIXE SINALIZADOR — IGUAL AO TERMOST1 (CIRÚRGICO)
-   ============================ */
+/* =========================================================
+   FEIXE SINALIZADOR — cone de luz varrendo o espaço
+   Origem: centro do container, varre -25° a +25°
+   ========================================================= */
+
+/* Facho principal — cone triangular */
 #section-intro .parchment-inner-rough::before {
-  content: '';
-  position: absolute;
-  top: 85px;
-  left: 50%;
-  width: 180px;
-  height: 240px;
-  z-index: 5;
-  pointer-events: none;
+  content: '' !important;
+  position: absolute !important;
+  top: 80px !important;
+  left: 50% !important;
+  width: 200px !important;
+  height: 220px !important;
+  z-index: 6 !important;
+  pointer-events: none !important;
+  display: block !important;
+
   background: linear-gradient(
     to bottom,
-    transparent 0%,
-    rgba(255, 250, 210, 0.75) 12%,
-    rgba(255, 230, 140, 0.45) 35%,
-    rgba(255, 200, 80, 0.18) 60%,
-    transparent 90%
-  );
-  clip-path: polygon(48% 0%, 52% 0%, 100% 100%, 0% 100%);
-  filter: blur(8px);
-  mix-blend-mode: screen;
-  transform-origin: 50% 0%;
-  animation: beamSweep 5.5s ease-in-out infinite;
-  opacity: 0.85;
+    rgba(255,255,240,0.00) 0%,
+    rgba(255,250,210,0.85) 8%,
+    rgba(255,230,140,0.40) 28%,
+    rgba(255,200,80,0.15) 50%,
+    rgba(255,180,50,0.05) 70%,
+    transparent 100%
+  ) !important;
+
+  clip-path: polygon(46% 0%, 54% 0%, 100% 100%, 0% 100%) !important;
+  filter: blur(6px) !important;
+  mix-blend-mode: screen !important;
+  transform-origin: 50% 0% !important;
+  animation: beamSweep 4s ease-in-out infinite !important;
 }
 
-/* Núcleo emissor (ponto de luz) */
+/* Núcleo emissor — ponto pequeno e discreto */
 #section-intro .parchment-inner-rough::after {
-  content: '';
-  position: absolute;
-  top: 82px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 11px;
-  height: 11px;
-  z-index: 6;
-  pointer-events: none;
-  border-radius: 50%;
-  background: radial-gradient(circle, #fff 30%, #ffdd88 70%, transparent 100%);
-  box-shadow: 0 0 12px #ffdd88;
-  animation: beamCorePulse 2.2s ease-in-out infinite;
+  content: '' !important;
+  position: absolute !important;
+  top: 76px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 12px !important;
+  height: 12px !important;
+  z-index: 7 !important;
+  pointer-events: none !important;
+  display: block !important;
+  border-radius: 50% !important;
+
+  background: radial-gradient(
+    circle at center,
+    rgba(255,255,255,1) 0%,
+    rgba(255,245,200,0.90) 30%,
+    rgba(255,220,130,0.45) 60%,
+    transparent 100%
+  ) !important;
+
+  box-shadow:
+    0 0 6px rgba(255,250,220,0.90),
+    0 0 14px rgba(255,220,140,0.55) !important;
+
+  filter: blur(1px) !important;
+  animation: beamCorePulse 2s ease-in-out infinite !important;
 }
 
 /* Conteúdo acima do feixe */
