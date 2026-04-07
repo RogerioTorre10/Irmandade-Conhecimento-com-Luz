@@ -1,8 +1,11 @@
 @import url("/assets/css/brilho-texturas.css");
 @import url("/assets/css/j-panel-glow.css");
 
-/* ========== VARIÁVEIS GLOBAIS ========== */
-:root {
+/* =========================================================
+   STYLES-BASE — base geral limpa
+   ========================================================= */
+
+:root{
   --bg: #0b1020;
   --fg: #eef2ff;
   --muted: #aab4d4;
@@ -12,27 +15,25 @@
   --radius: 16px;
 }
 
-/* ========== RESET BÁSICO ========== */
-* {
+*{
   box-sizing: border-box;
 }
 
 html,
-body {
+body{
   min-height: 100%;
 }
 
-body {
+body{
+  margin: 0;
+  height: 100%;
   background: #0a0f1a;
   color: #f2efe6;
-  height: 100%;
-  margin: 0;
   line-height: 1.5;
   font-family: 'Cardo', Georgia, 'Times New Roman', serif;
 }
 
-/* ========== FONTES PERSONALIZADAS ========== */
-@font-face {
+@font-face{
   font-family: 'ManufacturingConsent';
   src: url('/assets/fonts/ManufacturingConsent-Regular.ttf') format('truetype');
   font-weight: 400;
@@ -40,7 +41,7 @@ body {
   font-display: swap;
 }
 
-@font-face {
+@font-face{
   font-family: 'BerkshireSwash';
   src: url('/assets/fonts/BerkshireSwash-Regular.ttf') format('truetype');
   font-weight: 400;
@@ -48,15 +49,14 @@ body {
   font-display: swap;
 }
 
-/* ========== TIPOGRAFIA GLOBAL ========== */
-body.epic {
+body.epic{
   font-family: 'Cardo', Georgia, serif;
   line-height: 1.55;
 }
 
 .epic h1,
 .epic h2,
-.epic h3 {
+.epic h3{
   font-family: 'ManufacturingConsent', ui-sans-serif, system-ui, "Segoe UI", Roboto, Arial, sans-serif;
   font-weight: 700;
   letter-spacing: .02em;
@@ -64,12 +64,11 @@ body.epic {
 }
 
 p,
-li {
+li{
   font-family: 'BerkshireSwash', cursive;
 }
 
-/* ========== ESTRUTURA GERAL ========== */
-.container {
+.container{
   max-width: 920px;
   margin: 0 auto;
   padding: 16px;
@@ -78,55 +77,54 @@ li {
   gap: 16px;
 }
 
-/* ========== PERGAMINHO ========== */
-.pergaminho {
+/* pergaminho base */
+.pergaminho{
   position: relative;
-  padding: 24px 20px;
   width: 100%;
   max-width: 600px;
-  margin: 12px auto;
   min-height: 80vh;
   height: auto;
+  margin: 12px auto;
+  padding: 24px 20px;
   box-sizing: border-box;
   overflow: visible;
 }
 
-@media (min-width: 768px) {
-  .pergaminho {
+@media (min-width: 768px){
+  .pergaminho{
     padding: 40px 48px;
   }
 }
 
-.pergaminho::before {
+.pergaminho::before{
   content: "";
   position: absolute;
   inset: 0;
   z-index: 0;
+  border-radius: 16px;
   background-repeat: no-repeat;
   background-position: center;
   background-size: 100% 100%;
-  background-attachment: fixed;
-  border-radius: 16px;
   opacity: .98;
   filter: drop-shadow(0 12px 32px rgba(0,0,0,.45));
 }
 
-.pergaminho > * {
+.pergaminho > *{
   position: relative;
   z-index: 1;
 }
 
-.pergaminho-v::before {
+.pergaminho-v::before{
   background-image: url('/assets/img/pergaminho-rasgado-vert.png') !important;
 }
 
-.pergaminho-h::before {
+.pergaminho-h::before{
   background-image: url('/assets/img/pergaminho-rasgado-horiz.png') !important;
 }
 
-/* ========== CAMPOS E SENHA ========== */
+/* inputs */
 .input,
-textarea {
+textarea{
   width: 100%;
   padding: 12px 14px;
   border-radius: 10px;
@@ -135,17 +133,17 @@ textarea {
   color: var(--fg);
 }
 
-.senha-wrap {
-  position: relative;
+.senha-wrap{
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
   max-width: 400px;
   margin: 16px auto;
+  position: relative;
 }
 
-.senha-input-group {
+.senha-input-group{
   position: relative;
   width: 100%;
   max-width: 400px;
@@ -153,11 +151,10 @@ textarea {
 }
 
 .senha-eye,
-.btn-toggle-senha {
+.btn-toggle-senha{
   position: absolute;
-  right: 10px;
   top: 50%;
-  transform: translateY(-50%);
+  right: 10px;
   width: 28px;
   height: 28px;
   border: 0;
@@ -168,27 +165,28 @@ textarea {
   justify-content: center;
   cursor: pointer;
   font-size: 20px;
+  transform: translateY(-50%);
 }
 
 .senha-eye:hover,
-.btn-toggle-senha:hover {
+.btn-toggle-senha:hover{
   color: var(--fg);
 }
 
-/* ========== BOTÕES COMPARTILHADOS ========== */
-.btn {
+/* botões compartilhados */
+.btn{
+  display: block;
+  min-width: 150px;
+  margin: 8px auto;
   padding: 8px 16px;
   border-radius: 8px;
   font-size: 16px;
   font-family: 'ManufacturingConsent', sans-serif;
-  cursor: pointer;
   text-align: center;
-  display: block;
-  margin: 8px auto;
-  min-width: 150px;
+  cursor: pointer;
 }
 
-.btn:disabled {
+.btn:disabled{
   opacity: 0.5;
   cursor: not-allowed;
 }
@@ -198,230 +196,26 @@ textarea {
 .prevBtn,
 .avancarBtn,
 #btn-senha-avancar,
-#btn-avancar {
+#btn-avancar{
+  display: block;
+  min-width: 150px;
+  margin: 8px auto;
   padding: 8px 16px;
-  background: linear-gradient(to bottom, #a0a0a0, #808080), url('/assets/img/textura-de-pedra.jpg') center/cover;
+  border: 3px solid #4a4a4a;
+  border-radius: 8px;
+  background:
+    linear-gradient(to bottom, #a0a0a0, #808080),
+    url('/assets/img/textura-de-pedra.jpg') center/cover;
   background-blend-mode: overlay;
   color: #fff !important;
-  border-radius: 8px;
   font-size: 16px;
   font-family: 'ManufacturingConsent', sans-serif;
-  border: 3px solid #4a4a4a;
-  box-shadow: inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6);
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
-  opacity: 1;
-  visibility: visible;
-  display: block;
-  cursor: pointer;
-  margin: 8px auto;
-  min-width: 150px;
   text-align: center;
-}
-
-.btn.btn-primary.btn-stone:hover,
-.nextBtn:hover,
-.prevBtn:hover,
-.avancarBtn:hover,
-#btn-senha-avancar:hover,
-#btn-avancar:hover {
-  transform: scale(1.05);
-  box-shadow: 0 8px 16px rgba(0,0,0,0.7);
-}
-
-/* ========== DATILOGRAFIA GLOBAL ========== */
-.typing-active {
-  text-align: left;
-  direction: ltr;
-  display: block;
-  width: 100%;
-  margin-left: 0;
-  margin-right: auto;
-  position: relative;
-}
-
-.typing-active::after {
-  content: "▋";
-  margin-left: 2px;
-  opacity: 0.75;
-  animation: lumenBlink 1s steps(2, end) infinite;
-}
-
-.typing-done::after {
-  content: "";
-  animation: none;
-}
-
-.lumen-typing {
-  white-space: pre-wrap;
-  position: relative;
-  text-align: left;
-  direction: ltr;
-}
-
-.lumen-typing::after {
-  content: "▌";
-  margin-left: 2px;
-  opacity: .75;
-  animation: lumenBlink 1s steps(2,end) infinite;
-}
-
-.lumen-typing.typing-done::after {
-  content: "";
-  animation: none;
-}
-
-[data-typing="true"] {
-  min-height: 20px;
-  display: block;
-  visibility: visible;
-  position: relative;
-  opacity: 0;
-  color: #fff;
-  text-align: left;
-  direction: ltr;
-}
-
-[data-typing="true"].typing-done {
-  opacity: 1;
-}
-
-/* intro usa cursor e typing próprios */
-#section-intro .typing-active::after,
-#section-intro .lumen-typing::after {
-  content: none !important;
-  animation: none !important;
-}
-
-#section-intro [data-typing="true"] {
-  min-height: 0 !important;
-  opacity: inherit !important;
-  color: inherit !important;
-}
-
-@keyframes lumenBlink {
-  0% { opacity: 0.75; }
-  50% { opacity: 0; }
-  100% { opacity: 0.75; }
-}
-
-/* ========== NAVEGAÇÃO / IDIOMA ========== */
-.language-selector {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 1400;
-}
-
-#language-select {
-  padding: 8px 12px;
-  font-size: 16px;
-  border-radius: 6px;
-  background: #1a1a2e;
-  color: #fff;
-  border: 1px solid #333;
-  min-width: 140px;
-  font-family: 'Cardo', serif;
-}
-
-/* ========== TOAST ========== */
-#toast {
-  position: fixed;
-  left: 50%;
-  bottom: 16px;
-  transform: translateX(-50%);
-  background: #111;
-  color: #fff;
-  padding: 10px 14px;
-  border-radius: 10px;
-  box-shadow: 0 6px 18px rgba(0,0,0,.35);
-  font-size: 16px;
-  z-index: 4000;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity .25s ease;
-}
-
-#toast.show {
-  opacity: 1;
-}
-
-/* ===== REMOVER TEXTO/ÍCONE AUTOMÁTICO DO JORNADA_MICRO ===== */
-.microphone,
-[data-microphone],
-[aria-label="microphone"],
-[aria-label="Microphone"],
-button.microphone,
-span.microphone {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  width: 0 !important;
-  height: 0 !important;
-  pointer-events: none !important;
-}
-
-/* ========== OVERLAY DE VÍDEO ========== */
-.video-overlay {
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 2147483646;
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  background: rgba(0,0,0,0.98);
-}
-
-.video-overlay.is-on {
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+  box-shadow:
+    inset 0 3px 6px rgba(0,0,0,0.4),
+    0 6px 12px rgba(0,0,0,0.6);
   opacity: 1;
   visibility: visible;
-  pointer-events: auto;
-}
-
-.video-overlay video {
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
-  object-fit: cover;
-  object-position: center;
-  display: block;
-  background: #000;
-}
-
-#videoOverlay.video-overlay {
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  display: none;
-  opacity: 0;
-  pointer-events: none;
-  z-index: 2147483646 !important;
-  background: rgba(0,0,0,0.98);
-}
-
-#videoOverlay.video-overlay.is-on {
-  display: block !important;
-  opacity: 1 !important;
-  pointer-events: auto !important;
-}
-
-#videoOverlay video {
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  object-fit: cover !important;
-  object-position: center !important;
-  background: #000 !important;
-}
-
-#videoTransicao {
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  object-fit: cover !important;
+  cursor: pointer;
 }
