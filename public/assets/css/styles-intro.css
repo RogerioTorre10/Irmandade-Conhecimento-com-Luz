@@ -247,6 +247,25 @@
 }
 
 /* ============================
+   HALO DOURADO (digitando)
+   ============================ */
+
+#section-intro:has(.typing-active) .parchment-inner-rough {
+  outline: 2px solid rgba(255, 204, 102, 0.25);
+  outline-offset: 6px;
+  box-shadow:
+    0 0 0 2px rgba(255, 204, 102, 0.15) inset,
+    0 0 22px rgba(255, 204, 102, 0.40),
+    0 0 40px rgba(255, 153, 0, 0.25);
+  animation: parchmentGlow 1.8s ease-in-out infinite;
+}
+
+#section-intro:not(:has(.typing-active)) .parchment-inner-rough {
+  transition: box-shadow .35s ease, outline-color .35s ease;
+}
+
+
+/* ============================
    UTILITÁRIOS
    ============================ */
 
@@ -269,24 +288,24 @@
 }
 
 @keyframes introPan {
-  0%   { transform: translateY(4px); }
+  0%   { transform: translateY(4px);  }
   50%  { transform: translateY(-4px); }
-  100% { transform: translateY(0); }
+  100% { transform: translateY(0);    }
 }
 
 @keyframes caretBlink {
-  0%,  45%  { opacity: 0.95; }
-  50%, 100% { opacity: 0; }
+  0%, 45%  { opacity: 0.95; }
+  50%, 100% { opacity: 0;   }
 }
 
 @keyframes parchmentGlow {
-  0% {
+  0%   {
     box-shadow:
       0 0 0 2px rgba(255, 204, 102, 0.15) inset,
       0 0 18px rgba(255, 204, 102, 0.35),
       0 0 32px rgba(255, 153, 0, 0.18);
   }
-  50% {
+  50%  {
     box-shadow:
       0 0 0 2px rgba(255, 204, 102, 0.18) inset,
       0 0 26px rgba(255, 204, 102, 0.50),
