@@ -1,34 +1,37 @@
 /* =========================================================
-   STYLES-INTRO — ajustado
-   Objetivo: manter o sinalizador funcional e normalizar
-   o tamanho do vidro/container glow para o padrão das
-   outras sections
+   STYLES-INTRO v4 — feixe contido no layout, sem scroll lateral
    ========================================================= */
 
-#section-intro{
+/* =========================================================
+   BASE
+   ========================================================= */
+#section-intro {
   background: transparent !important;
   border: none;
   box-shadow: none;
   text-align: left !important;
-  overflow-x: hidden !important;
-  padding: 24px 0 !important;
-  margin: 0 auto !important;
-  max-width: 100% !important;
-  min-height: 80vh;
-  display: block;
-  opacity: 1;
-  visibility: visible;
-  z-index: 2;
+  overflow: hidden !important;
 }
 
-#section-intro .intro-wrap{
+#section-intro .intro-wrap {
   width: 100% !important;
   text-align: left !important;
-  overflow: visible !important;
-  overflow-x: hidden !important;
+  overflow: hidden !important;
 }
 
-#section-intro .pergaminho{
+#section-intro .parchment-inner-rough {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  text-align: left !important;
+  overflow: hidden !important;
+  isolation: isolate;
+  animation: introPan 9s ease-in-out 1;
+}
+
+#section-intro .pergaminho {
   width: 100%;
   max-width: 900px;
   margin: 0 auto;
@@ -37,27 +40,10 @@
   background-size: 100% auto !important;
 }
 
-#section-intro .parchment-inner-rough{
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  text-align: left !important;
-  overflow: visible !important;
-  isolation: isolate;
-  animation: introPan 9s ease-in-out 1;
-}
-
-#section-intro .intro-wrap,
-#section-intro .j-panel-glow{
-  overflow-x: hidden !important;
-}
-
 /* =========================================================
    TIPOGRAFIA
    ========================================================= */
-#section-intro .intro-title{
+#section-intro .intro-title {
   display: block;
   width: 100%;
   max-width: 100%;
@@ -66,17 +52,20 @@
   margin-top: 28px;
   margin-bottom: 18px;
   padding: 0 22px;
+
   font-family: 'ManufacturingConsent', sans-serif;
   font-size: clamp(20px, 2.4vw, 30px);
   line-height: 1.15;
   color: var(--theme-main-color, #ffd700);
   text-align: left !important;
   text-shadow: 2px 2px 6px rgba(0,0,0,.6);
+
   white-space: nowrap !important;
   overflow: hidden !important;
   word-break: normal !important;
   overflow-wrap: normal !important;
   text-overflow: clip !important;
+
   opacity: 1;
   visibility: visible;
   transform: translateY(6px);
@@ -86,20 +75,20 @@
 #section-intro .intro-title,
 #section-intro .intro-title[data-typing="true"],
 #section-intro .intro-title.typing-active,
-#section-intro .intro-title.typing-done{
+#section-intro .intro-title.typing-done {
   direction: ltr !important;
   unicode-bidi: plaintext !important;
   text-align: left !important;
   transform-origin: left center !important;
 }
 
-#section-intro [data-typing="true"]{
+#section-intro [data-typing="true"] {
   overflow: visible;
   white-space: normal;
   overflow-wrap: break-word;
 }
 
-#section-intro .parchment-text-rough{
+#section-intro .parchment-text-rough {
   display: block;
   margin-bottom: 8px;
   font-family: 'BerkshireSwash', cursive;
@@ -112,13 +101,13 @@
   visibility: visible;
 }
 
-#section-intro .parchment-text-rough.lumen-typing{
+#section-intro .parchment-text-rough.lumen-typing {
   direction: ltr !important;
   text-align: left !important;
 }
 
 #section-intro .parchment-text-rough.typing-active,
-#section-intro .parchment-text-rough.typing-done{
+#section-intro .parchment-text-rough.typing-done {
   display: block !important;
   opacity: 1 !important;
   visibility: visible !important;
@@ -129,13 +118,14 @@
 #section-intro .parchment-text-rough.typing-done,
 #section-intro .parchment-text-rough.type-done,
 #section-intro .intro-title.typing-done,
-#section-intro .intro-title.type-done{
+#section-intro .intro-title.type-done {
   display: block !important;
   opacity: 1 !important;
   visibility: visible !important;
 }
 
-#section-intro .parchment-actions-rough{
+/* ações */
+#section-intro .parchment-actions-rough {
   display: flex;
   justify-content: center;
   gap: 12px;
@@ -143,21 +133,22 @@
 }
 
 /* =========================================================
-   VIDRO / CARD — normalizado para o padrão das outras pages
+   VIDRO / CARD
    ========================================================= */
-#section-intro .j-panel-glow{
+#section-intro .j-panel-glow {
   position: relative;
   isolation: isolate !important;
   box-sizing: border-box !important;
-  width: min(92vw, 520px) !important;
-  max-width: 520px !important;
+  width: min(92%, 680px) !important;
+  max-width: 680px !important;
   min-height: 640px !important;
-  margin: 0 auto !important;
-  padding: 18px !important;
-  overflow: visible !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding: 10px !important;
+  overflow: hidden !important;
 }
 
-#section-intro .j-panel-glow::before{
+#section-intro .j-panel-glow::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -175,18 +166,16 @@
   ) !important;
 }
 
-#section-intro .j-arcane-card{
+#section-intro .j-arcane-card {
   position: relative !important;
   min-height: 560px !important;
-  max-width: 100% !important;
-  margin-top: -4px !important;
-  margin-bottom: 22px !important;
-  overflow: visible !important;
+  margin-top: -8px !important;
+  margin-bottom: 24px !important;
+  overflow: hidden !important;
   border-radius: 26px !important;
-  padding: 18px 18px 22px !important;
 }
 
-#section-intro .j-arcane-card::before{
+#section-intro .j-arcane-card::before {
   animation: jArcaneSweep 7s linear infinite !important;
   opacity: .32 !important;
   left: auto !important;
@@ -194,14 +183,14 @@
   transform-origin: center center !important;
 }
 
-#section-intro .j-arcane-card::after{
+#section-intro .j-arcane-card::after {
   pointer-events: none;
 }
 
 /* =========================================================
    CURSOR DE DATILOGRAFIA
    ========================================================= */
-#section-intro .intro-title[data-typing="true"][data-cursor="true"]{
+#section-intro .intro-title[data-typing="true"][data-cursor="true"] {
   position: relative;
   display: inline-block !important;
   width: auto !important;
@@ -210,13 +199,13 @@
   left: 0 !important;
 }
 
-#section-intro .parchment-text-rough[data-typing="true"][data-cursor="true"]{
+#section-intro .parchment-text-rough[data-typing="true"][data-cursor="true"] {
   position: relative;
   display: inline-block;
   padding-right: .35em;
 }
 
-#section-intro [data-typing="true"][data-cursor="true"].typing-active::after{
+#section-intro [data-typing="true"][data-cursor="true"].typing-active::after {
   content: '';
   position: absolute;
   right: .05em;
@@ -230,11 +219,11 @@
   animation: caretBlink 1s steps(1, end) infinite;
 }
 
-#section-intro [data-typing="true"][data-cursor="true"].typing-done::after{
+#section-intro [data-typing="true"][data-cursor="true"].typing-done::after {
   content: none;
 }
 
-#section-intro .parchment-text-rough[data-cursor="true"].typing-active::after{
+#section-intro .parchment-text-rough[data-cursor="true"].typing-active::after {
   width: 2px;
   height: 1em;
   right: 0;
@@ -242,18 +231,22 @@
 }
 
 /* =========================================================
-   FEIXE SINALIZADOR — mantém o comportamento atual
+   FEIXE SINALIZADOR — contido dentro do card
+   Rotação 360° mas clipado pelo container
    ========================================================= */
-#section-intro .parchment-inner-rough::before{
+
+/* Facho principal — cone triangular */
+#section-intro .parchment-inner-rough::before {
   content: '' !important;
   position: absolute !important;
-  top: 88px !important;
+  top: 80px !important;
   left: 50% !important;
-  width: 200px !important;
-  height: 220px !important;
+  width: 160px !important;
+  height: 180px !important;
   z-index: 6 !important;
   pointer-events: none !important;
   display: block !important;
+
   background: linear-gradient(
     to bottom,
     rgba(255,255,240,0.00) 0%,
@@ -263,25 +256,28 @@
     rgba(255,180,50,0.05) 70%,
     transparent 100%
   ) !important;
+
   clip-path: polygon(46% 0%, 54% 0%, 100% 100%, 0% 100%) !important;
   filter: blur(6px) !important;
   mix-blend-mode: screen !important;
-  transform-origin: 50% 6px !important;
+  transform-origin: 50% 0% !important;
   animation: beamSweep 4s ease-in-out infinite !important;
 }
 
-#section-intro .parchment-inner-rough::after{
+/* Núcleo emissor — ponto pequeno */
+#section-intro .parchment-inner-rough::after {
   content: '' !important;
   position: absolute !important;
-  top: 88px !important;
+  top: 76px !important;
   left: 50% !important;
   transform: translateX(-50%) !important;
-  width: 12px !important;
-  height: 12px !important;
+  width: 10px !important;
+  height: 10px !important;
   z-index: 7 !important;
   pointer-events: none !important;
   display: block !important;
   border-radius: 50% !important;
+
   background: radial-gradient(
     circle at center,
     rgba(255,255,255,1) 0%,
@@ -289,28 +285,32 @@
     rgba(255,220,130,0.45) 60%,
     transparent 100%
   ) !important;
+
   box-shadow:
     0 0 6px rgba(255,250,220,0.90),
     0 0 14px rgba(255,220,140,0.55) !important;
+
   filter: blur(1px) !important;
   animation: beamCorePulse 2s ease-in-out infinite !important;
 }
 
+/* Conteúdo acima do feixe */
 #section-intro .intro-title,
 #section-intro .parchment-text-rough,
 #section-intro .parchment-actions-rough,
 #section-intro .btn,
-#section-intro button{
+#section-intro button {
   position: relative;
   z-index: 10;
 }
 
-#section-intro:has(.typing-active) .parchment-inner-rough{
+/* Áurea dourada durante digitação */
+#section-intro:has(.typing-active) .parchment-inner-rough {
   outline: none !important;
   box-shadow: none !important;
 }
 
-#section-intro:has(.typing-active) .j-panel-glow{
+#section-intro:has(.typing-active) .j-panel-glow {
   outline: 1px solid rgba(255,204,102,.22) !important;
   outline-offset: 2px !important;
   box-shadow:
@@ -322,41 +322,77 @@
 /* =========================================================
    ANIMAÇÕES
    ========================================================= */
-@keyframes brilhoDivino {
-  0%,100% {
-    box-shadow:
-      0 0 6px  var(--btn-gold-outer),
-      0 0 12px var(--btn-gold-mid),
-      inset 0 0 2px var(--btn-gold-in);
+@keyframes introTitleIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(6px); }
+}
+
+@keyframes introPan {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-1px); }
+  100% { transform: translateY(0); }
+}
+
+/* Varredura do facho — giro completo 360° */
+@keyframes beamSweep {
+  0% {
+    transform: translateX(-50%) rotate(0deg) scaleY(0.95);
+    opacity: 0.50;
+  }
+  25% {
+    transform: translateX(-50%) rotate(90deg) scaleY(1.05);
+    opacity: 0.90;
   }
   50% {
-    box-shadow:
-      0 0 10px var(--btn-gold-outer),
-      0 0 16px var(--btn-gold-mid),
-      inset 0 0 4px var(--btn-gold-in);
+    transform: translateX(-50%) rotate(180deg) scaleY(0.95);
+    opacity: 0.50;
+  }
+  75% {
+    transform: translateX(-50%) rotate(270deg) scaleY(1.05);
+    opacity: 0.85;
+  }
+  100% {
+    transform: translateX(-50%) rotate(360deg) scaleY(0.95);
+    opacity: 0.50;
   }
 }
 
-@keyframes reflexoDourado {
-  0%   { opacity: 0; transform: translate(-120%, -120%) rotate(25deg); }
-  45%,
-  55%  { opacity: .85; }
-  100% { opacity: 0; transform: translate(120%, 120%) rotate(25deg); }
+/* Pulsação do núcleo emissor */
+@keyframes beamCorePulse {
+  0%, 100% {
+    opacity: 0.70;
+    transform: translateX(-50%) scale(0.88);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1.15);
+  }
 }
+
+@keyframes caretBlink {
+  0%,49%  { opacity: 1; }
+  50%,100% { opacity: 0; }
+}
+
 /* =========================================================
    SCROLLBAR CLEANUP
    ========================================================= */
+#section-intro,
 #section-intro .j-panel-glow,
 #section-intro .j-arcane-card,
 #section-intro .j-perg-v-inner,
-#section-intro .parchment-inner-rough{
+#section-intro .parchment-inner-rough,
+#section-intro .intro-wrap {
   scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
+#section-intro::-webkit-scrollbar,
 #section-intro .j-panel-glow::-webkit-scrollbar,
 #section-intro .j-arcane-card::-webkit-scrollbar,
 #section-intro .j-perg-v-inner::-webkit-scrollbar,
-#section-intro .parchment-inner-rough::-webkit-scrollbar{
+#section-intro .parchment-inner-rough::-webkit-scrollbar,
+#section-intro .intro-wrap::-webkit-scrollbar {
   width: 0 !important;
   height: 0 !important;
   display: none !important;
@@ -364,8 +400,8 @@
 
 #section-intro .j-panel-glow,
 #section-intro .j-arcane-card,
-#section-intro .j-perg-v-inner{
-  overflow-y: visible !important;
+#section-intro .j-perg-v-inner {
+  overflow: hidden !important;
   max-height: none !important;
 }
 
@@ -376,7 +412,7 @@
 footer,
 .footer,
 #footer,
-.page-footer{
+.page-footer {
   width: 100% !important;
   margin: 14px auto 0 !important;
   padding: 8px 16px 14px !important;
@@ -393,15 +429,15 @@ footer,
 footer *,
 .footer *,
 #footer *,
-.page-footer *{
+.page-footer * {
   text-align: center !important;
 }
 
 /* =========================================================
    MOBILE
    ========================================================= */
-@media (max-width: 767px){
-  #section-intro .intro-title{
+@media (max-width: 767px) {
+  #section-intro .intro-title {
     font-size: clamp(18px, 4.8vw, 24px) !important;
     line-height: 1.12 !important;
     white-space: nowrap !important;
@@ -410,65 +446,50 @@ footer *,
     padding: 0 14px !important;
   }
 
-  #section-intro .j-panel-glow{
-    width: min(92vw, 500px) !important;
-    max-width: 92vw !important;
-    min-height: 600px !important;
-    padding: 16px !important;
-  }
-
-  #section-intro .j-arcane-card{
-    min-height: 520px !important;
-    padding: 16px 16px 20px !important;
-  }
-
-  #section-intro .parchment-inner-rough::before{
-    width: 150px !important;
-    height: 170px !important;
+  #section-intro .parchment-inner-rough::before {
+    width: 100px !important;
+    height: 120px !important;
     animation-duration: 4.5s !important;
   }
 
-  #section-intro .parchment-inner-rough::after{
-    width: 10px !important;
-    height: 10px !important;
+  #section-intro .parchment-inner-rough::after {
+    width: 8px !important;
+    height: 8px !important;
   }
 }
 
-@media (max-width: 600px){
-  #section-intro{
-    overflow-x: hidden !important;
-    padding: 16px 0 !important;
+@media (max-width: 600px) {
+  #section-intro {
+    overflow: hidden !important;
   }
 
-  #section-intro .j-perg-v-inner{
+  #section-intro .j-perg-v-inner {
     position: relative;
     width: 100%;
     max-width: 100%;
     margin-left: auto;
     margin-right: auto;
-    transform: translateY(10px);
-    overflow: visible !important;
+    transform: translateY(18px);
+    overflow: hidden !important;
   }
 
-  #section-intro .j-panel-glow{
+  #section-intro .j-panel-glow {
     width: calc(100vw - 28px) !important;
-    max-width: 520px !important;
+    max-width: 100% !important;
     min-height: 520px !important;
-    transform: none !important;
-    overflow: visible !important;
-    padding: 14px !important;
+    transform: translateY(-8px) !important;
+    overflow: hidden !important;
   }
 
-  #section-intro .j-arcane-card{
+  #section-intro .j-arcane-card {
     min-height: 460px !important;
     max-height: none !important;
-    margin-top: -2px !important;
-    margin-bottom: 18px !important;
+    margin-top: -8px !important;
+    margin-bottom: 20px !important;
     border-radius: 24px !important;
-    padding: 14px 14px 18px !important;
   }
 
-  #section-intro .intro-title{
+  #section-intro .intro-title {
     min-height: 3.4em !important;
     margin-top: 22px !important;
     margin-bottom: 14px !important;
@@ -477,20 +498,21 @@ footer *,
     line-height: 1.25 !important;
   }
 
-  #section-intro .parchment-inner-rough::before{
-    width: 120px !important;
-    height: 140px !important;
-    top: 82px !important;
+  #section-intro .parchment-inner-rough::before {
+    width: 90px !important;
+    height: 110px !important;
+    top: 70px !important;
   }
 
-  #section-intro .parchment-inner-rough::after{
-    width: 8px !important;
-    height: 8px !important;
-    top: 82px !important;
+  #section-intro .parchment-inner-rough::after {
+    width: 6px !important;
+    height: 6px !important;
+    top: 68px !important;
   }
 }
 
+/* Trava vazamento horizontal global */
 html,
-body{
+body {
   overflow-x: hidden !important;
 }
