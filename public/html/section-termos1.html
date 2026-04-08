@@ -1,9 +1,9 @@
 <link rel="stylesheet" href="/assets/css/styles-base.css">
 <link rel="stylesheet" href="/assets/css/brilho-texturas.css">
 <link rel="stylesheet" href="/assets/css/j-panel-glow.css">
-<link rel="stylesheet" href="/assets/css/styles-termos1.css">
+<link rel="stylesheet" href="/assets/css/styles-termos2.css">
 
-<section id="section-termos1" class="section j-screen-vert" data-section="termos1">
+<section id="section-termos2" class="section j-screen-vert" data-section="termos2">
   <div class="j-panel-glow termos-panel">
     <div class="j-perg-v-inner">
       <div class="j-arcane-card termos-wrap">
@@ -11,46 +11,32 @@
           <div class="parchment-inner-rough">
             <div class="termos-wrap">
 
-              <div id="termos1">
+              <div id="termos2">
 
-                <h2 class="section-title"
-                    data-typing="true"
+                <h3 data-typing="true"
                     data-cursor="true"
                     data-speed="40"
-                    data-i18n-text="terms1.title"
-                    data-text="">
-                </h2>
-
-                <p data-typing="true"
-                   data-cursor="true"
-                   data-speed="40"
-                   data-i18n-text="terms1.subtitle"
-                   data-text="">
-                </p>
-
-                <p data-typing="true"
-                   data-cursor="true"
-                   data-speed="40"
-                   data-i18n-text="terms1.description"
-                   data-text="">
-                </p>
+                    data-i18n-text="terms2.title"
+                    data-text="Termo de Responsabilidade">
+                </h3>
 
                 <ul>
-                  <li data-typing="true" data-i18n-text="terms1.li1" data-text=""></li>
-                  <li data-typing="true" data-i18n-text="terms1.li2" data-text=""></li>
-                  <li data-typing="true" data-i18n-text="terms1.li3" data-text=""></li>
-                  <li data-typing="true" data-i18n-text="terms1.li4" data-text=""></li>
-                  <li data-typing="true" data-i18n-text="terms1.li5" data-text=""></li>
-                  <li data-typing="true" data-i18n-text="terms1.li6" data-text=""></li>
-                  <li data-typing="true" data-i18n-text="terms1.li7" data-text=""></li>
-                  <li data-typing="true" data-i18n-text="terms1.li8" data-text=""></li>
-                  <li data-typing="true" data-i18n-text="terms1.li9" data-text=""></li>
+                  <li data-typing="true" data-i18n-text="terms2.li1" data-text="Nenhuma garantia de resultado."></li>
+                  <li data-typing="true" data-i18n-text="terms2.li2" data-text="Autoconhecimento é um processo pessoal."></li>
+                  <li data-typing="true" data-i18n-text="terms2.li3" data-text="Você é responsável por suas escolhas."></li>
+                  <li data-typing="true" data-i18n-text="terms2.li4" data-text="Apoio emocional pode ser necessário."></li>
+                  <li data-typing="true" data-i18n-text="terms2.li5" data-text="Guia IA atua como orientador simbólico."></li>
+                  <li data-typing="true" data-i18n-text="terms2.li6" data-text="O guia não substitui profissionais."></li>
+                  <li data-typing="true" data-i18n-text="terms2.li7" data-text="Mantenha responsabilidade sobre suas ações."></li>
+                  <li data-typing="true" data-i18n-text="terms2.li8" data-text="A jornada é uma experiência interpretativa."></li>
+                  <li data-typing="true" data-i18n-text="terms2.li9" data-text="Privacidade é respeitada."></li>
+                  <li data-typing="true" data-i18n-text="terms2.li10" data-text="Consentimento consciente é obrigatório."></li>
                 </ul>
 
               </div>
 
               <div class="footer-actions">
-                <button class="nextBtn btn btn-stone"
+                <button class="avancarBtn btn btn-stone"
                         data-action="avancar"
                         data-i18n="common.next"
                         type="button"
@@ -65,22 +51,7 @@
       </div>
     </div>
   </div>
-</section>
+</section><
 
-<script>
-(function () {
-  const press = (el) => {
-    el.classList.add('is-pressed');
-    setTimeout(() => el.classList.remove('is-pressed'), 260);
-  };
-  document.addEventListener('click', (e) => {
-    const b = e.target.closest('.btn, .btn-stone, .btn-stone-espinhos');
-    if (b) press(b);
-  });
-  document.addEventListener('keydown', (e) => {
-    if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.btn, .btn-stone, .btn-stone-espinhos')) {
-      press(e.target);
-    }
-  });
-})();
-</script>
+
+
