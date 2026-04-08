@@ -140,52 +140,75 @@
     }
   }
 
-  function getSafeTranslation(key, fallback = '') {
-    if (!key) return fallback;
-    const translated = window.i18n?.t?.(key);
-
-    if (
-      translated &&
-      typeof translated === 'string' &&
-      translated.trim() &&
-      translated !== key
-    ) {
-      return translated;
-    }
-
-    return fallback;
+  function isRealTranslatedText(text, key) {
+    if (!text || typeof text !== 'string') return false;
+    const t = text.trim();
+    if (!t) return false;
+    if (key && t === key) return false;
+    if (/^[a-z0-9_.-]+$/i.test(t) && t.includes('.')) return false;
+    return true;
   }
 
-  function syncTranslatedFallbacks(root) {
+  function syncTranslatedFallbacksFromDOM(root) {
     if (!root) return;
 
     root.querySelectorAll('[data-i18n-text]').forEach((el) => {
-      const key = el.dataset.i18nText;
-      const fallback = el.dataset.text || el.textContent || '';
-      const safeText = getSafeTranslation(key, fallback);
+      const key = el.dataset.i18nText || '';
+      const originalFallback = el.getAttribute('data-text') || '';
 
-      if (safeText && typeof safeText === 'string') {
-        el.textContent = safeText;
-        el.dataset.text = safeText;
-        el.setAttribute('data-text', safeText);
+      const domText = (el.textContent || '').trim();
+
+      if (isRealTranslatedText(domText, key)) {
+        el.dataset.text = domText;
+        el.setAttribute('data-text', domText);
+        return;
+      }
+
+      const translated = window.i18n?.t?.(key);
+      if (isRealTranslatedText(translated, key)) {
+        el.textContent = translated;
+        el.dataset.text = translated;
+        el.setAttribute('data-text', translated);
+        return;
+      }
+
+      if (originalFallback) {
+        el.textContent = originalFallback;
+        el.dataset.text = originalFallback;
+        el.setAttribute('data-text', originalFallback);
       }
     });
 
     root.querySelectorAll('[data-i18n]').forEach((el) => {
-      const key = el.dataset.i18n;
-      const fallback = el.dataset.text || el.textContent || '';
-      const safeText = getSafeTranslation(key, fallback);
+      if (el.hasAttribute('data-i18n-text')) return;
 
-      if (!safeText || typeof safeText !== 'string') return;
+      const key = el.dataset.i18n || '';
+      const originalFallback = el.getAttribute('data-text') || '';
+      const domText = (el.textContent || '').trim();
+
+      let finalText = '';
+
+      if (isRealTranslatedText(domText, key)) {
+        finalText = domText;
+      } else {
+        const translated = window.i18n?.t?.(key);
+        if (isRealTranslatedText(translated, key)) {
+          finalText = translated;
+        } else {
+          finalText = originalFallback || domText || '';
+        }
+      }
+
+      if (!finalText) return;
 
       if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
         if (el.hasAttribute('placeholder')) {
-          el.placeholder = safeText;
+          el.placeholder = finalText;
         } else {
-          el.value = safeText;
+          el.value = finalText;
         }
-      } else if (!el.hasAttribute('data-i18n-text')) {
-        el.textContent = safeText;
+      } else {
+        el.textContent = finalText;
       }
     });
   }
@@ -201,6 +224,12 @@
     });
   }
 
+  async function flushFrames(count = 2) {
+    for (let i = 0; i < count; i++) {
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+    }
+  }
+
   async function initOnce(root) {
     if (!root) return;
 
@@ -208,7 +237,9 @@
     ensureVisible(root);
 
     await applySectionI18n(root);
-    syncTranslatedFallbacks(root);
+    await flushFrames(2);
+
+    syncTranslatedFallbacksFromDOM(root);
     prepareTypingNodes(root);
     syncGuideVoiceContext(root);
 
@@ -239,7 +270,7 @@
     root.dataset.termos1Initialized = 'true';
     window.JCTermos1.state.ready = true;
 
-    console.log('[JCTermos1] pronto — i18n aplicado com fallback seguro e typing/TTS delegados ao controller global');
+    console.log('[JCTermos1] pronto — mesma técnica da intro aplicada ao termos1');
   }
 
   function onSectionShown(evt) {
