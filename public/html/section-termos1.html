@@ -19,7 +19,7 @@
                     data-speed="40"
                     data-i18n="terms1.title"
                     data-i18n-text="terms1.title"
-                    data-text="">
+                    data-text="Jornada">
                 </h2>
 
                 <p data-typing="true"
@@ -27,7 +27,7 @@
                    data-speed="40"
                    data-i18n="terms1.subtitle"
                    data-i18n-text="terms1.subtitle"
-                   data-text="">
+                   data-text="AVISO">
                 </p>
 
                 <p data-typing="true"
@@ -35,19 +35,19 @@
                    data-speed="40"
                    data-i18n="terms1.description"
                    data-i18n-text="terms1.description"
-                   data-text="">
+                   data-text="Esta jornada possui regras importantes.">
                 </p>
 
                 <ul>
-                  <li data-typing="true" data-i18n="terms1.li1" data-i18n-text="terms1.li1" data-text=""></li>
-                  <li data-typing="true" data-i18n="terms1.li2" data-i18n-text="terms1.li2" data-text=""></li>
-                  <li data-typing="true" data-i18n="terms1.li3" data-i18n-text="terms1.li3" data-text=""></li>
-                  <li data-typing="true" data-i18n="terms1.li4" data-i18n-text="terms1.li4" data-text=""></li>
-                  <li data-typing="true" data-i18n="terms1.li5" data-i18n-text="terms1.li5" data-text=""></li>
-                  <li data-typing="true" data-i18n="terms1.li6" data-i18n-text="terms1.li6" data-text=""></li>
-                  <li data-typing="true" data-i18n="terms1.li7" data-i18n-text="terms1.li7" data-text=""></li>
-                  <li data-typing="true" data-i18n="terms1.li8" data-i18n-text="terms1.li8" data-text=""></li>
-                  <li data-typing="true" data-i18n="terms1.li9" data-i18n-text="terms1.li9" data-text=""></li>
+                  <li data-typing="true" data-i18n="terms1.li1" data-i18n-text="terms1.li1" data-text="Suas respostas são confidenciais."></li>
+                  <li data-typing="true" data-i18n="terms1.li2" data-i18n-text="terms1.li2" data-text="Ao iniciar, você aceita os termos."></li>
+                  <li data-typing="true" data-i18n="terms1.li3" data-i18n-text="terms1.li3" data-text="O PDF será gerado ao final."></li>
+                  <li data-typing="true" data-i18n="terms1.li4" data-i18n-text="terms1.li4" data-text="Após iniciar, não há reembolso."></li>
+                  <li data-typing="true" data-i18n="terms1.li5" data-i18n-text="terms1.li5" data-text="Acesso limitado ao período definido."></li>
+                  <li data-typing="true" data-i18n="terms1.li6" data-i18n-text="terms1.li6" data-text="15 dias para iniciar."></li>
+                  <li data-typing="true" data-i18n="terms1.li7" data-i18n-text="terms1.li7" data-text="24h para concluir após iniciar."></li>
+                  <li data-typing="true" data-i18n="terms1.li8" data-i18n-text="terms1.li8" data-text="Recomendamos ambiente tranquilo."></li>
+                  <li data-typing="true" data-i18n="terms1.li9" data-i18n-text="terms1.li9" data-text="Carregue sua mente com intenção positiva."></li>
                 </ul>
 
               </div>
@@ -56,8 +56,10 @@
                 <button class="nextBtn btn btn-stone"
                         data-action="avancar"
                         data-i18n="common.next"
+                        data-text="Próxima página"
                         type="button"
                         disabled>
+                  Próxima página
                 </button>
               </div>
 
@@ -75,12 +77,10 @@
     el.classList.add('is-pressed');
     setTimeout(() => el.classList.remove('is-pressed'), 260);
   };
-
   document.addEventListener('click', (e) => {
     const b = e.target.closest('.btn, .btn-stone, .btn-stone-espinhos');
     if (b) press(b);
   });
-
   document.addEventListener('keydown', (e) => {
     if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.btn, .btn-stone, .btn-stone-espinhos')) {
       press(e.target);
