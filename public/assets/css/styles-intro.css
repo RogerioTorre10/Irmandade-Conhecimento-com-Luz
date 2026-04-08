@@ -1,5 +1,5 @@
 /* =========================================================
-   STYLES-INTRO v4.2 — RAIO CONTIDO + MOBILE CORRIGIDO
+   STYLES-INTRO v4.3 — ÁUREA NO TEXTO DURANTE DATILOGRAFIA
    ========================================================= */
 
 /* ============================
@@ -51,7 +51,7 @@
 
 #section-intro .j-arcane-card {
   position: relative !important;
-  overflow: hidden !important;   /* ← contém o raio de varredura */
+  overflow: hidden !important;
   margin-top: -18px !important;
   margin-bottom: 24px !important;
 }
@@ -61,6 +61,7 @@
    ============================ */
 
 .intro-title {
+  position: relative;
   display: block;
   width: 100%;
   max-width: 100%;
@@ -82,6 +83,7 @@
   opacity: 0;
   transform: translateY(6px);
   animation: introTitleIn 600ms ease forwards;
+  z-index: 1;
 }
 
 #section-intro [data-typing="true"] {
@@ -92,6 +94,7 @@
 }
 
 .parchment-text-rough {
+  position: relative;
   font-family: 'BerkshireSwash', cursive;
   font-size: 13px;
   margin-bottom: 8px;
@@ -102,6 +105,7 @@
   text-align: left !important;
   background: transparent;
   line-height: 1.4;
+  z-index: 1;
 }
 
 .parchment-text-rough.lumen-typing {
@@ -143,6 +147,7 @@
    ============================ */
 
 #section-intro .j-panel-glow {
+  position: relative !important;
   padding: 10px !important;
   width: min(520px, 92vw) !important;
   max-width: 470px !important;
@@ -211,59 +216,82 @@
 }
 
 /* ============================
-   ÁUREA DOURADA (digitando)
+   ÁUREA DOURADA NO TEXTO (digitando)
+   ============================ */
+
+/* brilho direto no texto */
+#section-intro .intro-title.typing-active,
+#section-intro .parchment-text-rough.typing-active {
+  text-shadow:
+    0 0 6px rgba(255, 230, 120, 0.95),
+    0 0 12px rgba(255, 210, 90, 0.80),
+    0 0 20px rgba(255, 170, 40, 0.55),
+    0 0 30px rgba(255, 140, 0, 0.28);
+  animation: textAuraPulse 1.45s ease-in-out infinite;
+}
+
+/* moldura luminosa ao redor do texto durante a digitação */
+#section-intro .intro-title.typing-active::before,
+#section-intro .parchment-text-rough.typing-active::before {
+  content: '';
+  position: absolute;
+  inset: -8px -12px;
+  border-radius: 14px;
+  pointer-events: none;
+  z-index: -1;
+  border: 1px solid rgba(255, 220, 120, 0.32);
+  background:
+    radial-gradient(circle at center,
+      rgba(255, 220, 120, 0.16) 0%,
+      rgba(255, 190, 70, 0.10) 38%,
+      rgba(255, 150, 40, 0.04) 65%,
+      transparent 100%);
+  box-shadow:
+    0 0 10px rgba(255, 220, 120, 0.28),
+    0 0 22px rgba(255, 180, 60, 0.24),
+    inset 0 0 10px rgba(255, 240, 180, 0.08);
+  animation: textFramePulse 1.45s ease-in-out infinite;
+}
+
+/* no texto corrido, aura um pouco mais justa */
+#section-intro .parchment-text-rough.typing-active::before {
+  inset: -5px -8px;
+  border-radius: 12px;
+}
+
+/* mantém um leve brilho após terminar */
+#section-intro .intro-title.typing-done,
+#section-intro .intro-title.type-done,
+#section-intro .parchment-text-rough.typing-done,
+#section-intro .parchment-text-rough.type-done {
+  text-shadow:
+    0 0 4px rgba(255, 225, 120, 0.65),
+    0 0 10px rgba(255, 185, 70, 0.30);
+}
+
+/* ============================
+   ÁUREA DO CONTAINER (suave)
    ============================ */
 
 #section-intro:has(.typing-active) .j-panel-glow {
-  outline: 2px solid rgba(255, 204, 102, 0.25);
+  outline: 2px solid rgba(255, 204, 102, 0.14);
   outline-offset: 6px;
   box-shadow:
-    0 0 0 2px rgba(255, 204, 102, 0.15) inset,
-    0 0 22px rgba(255, 204, 102, 0.45),
-    0 0 48px rgba(255, 153, 0, 0.35);
-  animation: parchmentGlow 1.6s ease-in-out infinite;
+    0 0 0 1px rgba(255, 204, 102, 0.10) inset,
+    0 0 16px rgba(255, 204, 102, 0.22),
+    0 0 34px rgba(255, 153, 0, 0.16);
+  animation: parchmentGlow 1.8s ease-in-out infinite;
 }
 
 #section-intro:has(.typing-active) .parchment-inner-rough {
-  outline: 2px solid rgba(255, 204, 102, 0.25);
-  outline-offset: 6px;
-  box-shadow:
-    0 0 0 2px rgba(255, 204, 102, 0.15) inset,
-    0 0 22px rgba(255, 204, 102, 0.45),
-    0 0 48px rgba(255, 153, 0, 0.35);
-  animation: parchmentGlow 1.6s ease-in-out infinite;
+  outline: none;
+  box-shadow: none;
 }
 
 #section-intro:not(:has(.typing-active)) .j-panel-glow,
 #section-intro:not(:has(.typing-active)) .parchment-inner-rough {
   transition: box-shadow .35s ease, outline-color .35s ease;
 }
-
-#section-intro .typing-active {
-  text-shadow:
-    0 0 6px rgba(255, 230, 120, 0.85),
-    0 0 14px rgba(120, 255, 210, 0.45),
-    0 0 24px rgba(120, 255, 210, 0.25);
-}
-
-/* ============================
-   HALO DOURADO (digitando)
-   ============================ */
-
-#section-intro:has(.typing-active) .parchment-inner-rough {
-  outline: 2px solid rgba(255, 204, 102, 0.25);
-  outline-offset: 6px;
-  box-shadow:
-    0 0 0 2px rgba(255, 204, 102, 0.15) inset,
-    0 0 22px rgba(255, 204, 102, 0.40),
-    0 0 40px rgba(255, 153, 0, 0.25);
-  animation: parchmentGlow 1.8s ease-in-out infinite;
-}
-
-#section-intro:not(:has(.typing-active)) .parchment-inner-rough {
-  transition: box-shadow .35s ease, outline-color .35s ease;
-}
-
 
 /* ============================
    UTILITÁRIOS
@@ -288,34 +316,83 @@
 }
 
 @keyframes introPan {
-  0%   { transform: translateY(4px);  }
+  0%   { transform: translateY(4px); }
   50%  { transform: translateY(-4px); }
-  100% { transform: translateY(0);    }
+  100% { transform: translateY(0); }
 }
 
 @keyframes caretBlink {
-  0%, 45%  { opacity: 0.95; }
-  50%, 100% { opacity: 0;   }
+  0%, 45%   { opacity: 0.95; }
+  50%, 100% { opacity: 0; }
 }
 
 @keyframes parchmentGlow {
-  0%   {
+  0% {
     box-shadow:
-      0 0 0 2px rgba(255, 204, 102, 0.15) inset,
-      0 0 18px rgba(255, 204, 102, 0.35),
-      0 0 32px rgba(255, 153, 0, 0.18);
+      0 0 0 1px rgba(255, 204, 102, 0.10) inset,
+      0 0 16px rgba(255, 204, 102, 0.22),
+      0 0 28px rgba(255, 153, 0, 0.14);
   }
-  50%  {
+  50% {
     box-shadow:
-      0 0 0 2px rgba(255, 204, 102, 0.18) inset,
-      0 0 26px rgba(255, 204, 102, 0.50),
-      0 0 52px rgba(255, 153, 0, 0.30);
+      0 0 0 1px rgba(255, 204, 102, 0.14) inset,
+      0 0 20px rgba(255, 204, 102, 0.30),
+      0 0 38px rgba(255, 153, 0, 0.20);
   }
   100% {
     box-shadow:
-      0 0 0 2px rgba(255, 204, 102, 0.15) inset,
-      0 0 18px rgba(255, 204, 102, 0.35),
-      0 0 32px rgba(255, 153, 0, 0.18);
+      0 0 0 1px rgba(255, 204, 102, 0.10) inset,
+      0 0 16px rgba(255, 204, 102, 0.22),
+      0 0 28px rgba(255, 153, 0, 0.14);
+  }
+}
+
+@keyframes textAuraPulse {
+  0% {
+    text-shadow:
+      0 0 5px rgba(255, 230, 120, 0.82),
+      0 0 10px rgba(255, 210, 90, 0.62),
+      0 0 16px rgba(255, 165, 40, 0.35);
+  }
+  50% {
+    text-shadow:
+      0 0 8px rgba(255, 235, 140, 1),
+      0 0 16px rgba(255, 215, 110, 0.90),
+      0 0 24px rgba(255, 170, 50, 0.55),
+      0 0 36px rgba(255, 145, 30, 0.24);
+  }
+  100% {
+    text-shadow:
+      0 0 5px rgba(255, 230, 120, 0.82),
+      0 0 10px rgba(255, 210, 90, 0.62),
+      0 0 16px rgba(255, 165, 40, 0.35);
+  }
+}
+
+@keyframes textFramePulse {
+  0% {
+    opacity: 0.78;
+    transform: scale(0.995);
+    box-shadow:
+      0 0 8px rgba(255, 220, 120, 0.20),
+      0 0 18px rgba(255, 180, 60, 0.16),
+      inset 0 0 8px rgba(255, 240, 180, 0.06);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.01);
+    box-shadow:
+      0 0 12px rgba(255, 225, 130, 0.34),
+      0 0 26px rgba(255, 185, 70, 0.28),
+      inset 0 0 12px rgba(255, 240, 180, 0.10);
+  }
+  100% {
+    opacity: 0.78;
+    transform: scale(0.995);
+    box-shadow:
+      0 0 8px rgba(255, 220, 120, 0.20),
+      0 0 18px rgba(255, 180, 60, 0.16),
+      inset 0 0 8px rgba(255, 240, 180, 0.06);
   }
 }
 
@@ -350,8 +427,6 @@
 
 /* ============================
    MOBILE (≤ 600px)
-   FIX: apenas .j-panel-glow recebe o transform
-        width reduzido para não cortar botão
    ============================ */
 
 @media (max-width: 600px) {
@@ -362,9 +437,8 @@
     min-height: 100vh !important;
   }
 
-  /* FIX: aplica só em .j-panel-glow, sem duplicar em .intro-wrap */
   #section-intro .j-panel-glow {
-    width: calc(100vw - 32px) !important;  /* mais margem que termos1 para não cortar */
+    width: calc(100vw - 32px) !important;
     max-width: 440px !important;
     margin: 0 auto !important;
     padding: 24px 18px 44px !important;
@@ -372,7 +446,7 @@
     box-sizing: border-box !important;
     transform: translateY(-80px) translateZ(0) !important;
     -webkit-transform: translateY(-80px) translateZ(0) !important;
-    overflow: hidden !important;            /* ← contém o raio no mobile também */
+    overflow: hidden !important;
   }
 
   #section-intro .j-perg-v-inner {
@@ -386,6 +460,11 @@
     margin: 4px 0 16px !important;
     line-height: 1.1 !important;
     padding: 0 6px !important;
+  }
+
+  #section-intro .intro-title.typing-active::before {
+    inset: -6px -8px;
+    border-radius: 12px;
   }
 
   #section-intro .parchment-text-rough {
@@ -495,112 +574,4 @@
   opacity: .6;
   pointer-events: none;
   animation: none;
-}
-/* =========================================================
-   FIX FINAL — MIMOS + RODAPÉ + MOBILE
-   ========================================================= */
-
-/* 3) rodapé centralizado de verdade */
-.site-footer,
-footer,
-.footer,
-#footer,
-.page-footer {
-  width: 100% !important;
-  max-width: 100% !important;
-  margin: 10px auto 0 !important;
-  padding: 10px 16px 18px !important;
-  text-align: center !important;
-  position: relative !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  transform: none !important;
-  box-sizing: border-box !important;
-}
-
-.site-footer *,
-footer *,
-.footer *,
-#footer *,
-.page-footer * {
-  text-align: center !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-}
-
-/* se o copyright estiver solto em p/span/div */
-.site-footer p,
-.site-footer span,
-footer p,
-footer span,
-.footer p,
-.footer span,
-#footer p,
-#footer span,
-.page-footer p,
-.page-footer span {
-  display: block !important;
-  width: 100% !important;
-  text-align: center !important;
-}
-
-/* 4) controla o pergaminho/fundo para não sobrar demais */
-#section-intro .j-perg-v-inner {
-  overflow: hidden !important;
-}
-
-/* desktop: segura a proporção visual */
-#section-intro .j-panel-glow {
-  min-height: 620px !important;
-}
-
-#section-intro .j-arcane-card {
-  min-height: 500px !important;
-}
-
-/* =========================================================
-   MOBILE — encurta o pergaminho de fundo e iguala ao desktop
-   ========================================================= */
-@media (max-width: 600px) {
-  #section-intro {
-    padding: 14px 0 8px !important;
-  }
-
-  #section-intro .j-panel-glow {
-    width: calc(100vw - 28px) !important;
-    max-width: 500px !important;
-    min-height: 470px !important;
-    padding: 12px !important;
-  }
-
-  #section-intro .j-arcane-card {
-    min-height: 390px !important;
-    margin-bottom: 14px !important;
-    padding: 12px 12px 16px !important;
-  }
-
-  /* encurta o pergaminho vertical para não passar da base */
-  #section-intro .j-perg-v-inner {
-    aspect-ratio: 3 / 4.35 !important;
-    background-size: 100% 100% !important;
-  }
-
-  #section-intro .intro-title {
-    margin-top: 18px !important;
-    margin-bottom: 12px !important;
-  }
-
-  #section-intro .parchment-text-rough {
-    margin-bottom: 6px !important;
-  }
-
-  .site-footer,
-  footer,
-  .footer,
-  #footer,
-  .page-footer {
-    padding: 8px 10px 14px !important;
-    font-size: 12px !important;
-  }
 }
