@@ -183,3 +183,25 @@
     border-radius: 16px !important;
   }
 }
+.site-footer,
+.app-footer,
+.footer-copy,
+.footer-copyright,
+.copyrodape {
+  position: fixed;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  width: max-content;
+  text-align: center;
+  margin: 0 auto;
+  z-index: 30;
+}
+
+.site-footer *,
+.app-footer *,
+.footer-copy *,
+.footer-copyright *,
+.copyrodape * {
+  text-align: center !important;
+}
