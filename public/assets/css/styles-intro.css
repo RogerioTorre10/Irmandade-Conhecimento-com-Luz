@@ -1,9 +1,9 @@
 /* =========================================================
-   STYLES-INTRO v4.1 — LAYOUT ALINHADO COM SECTION-TERMOS1
+   STYLES-INTRO v4.2 — RAIO CONTIDO + MOBILE CORRIGIDO
    ========================================================= */
 
 /* ============================
-   SECTION BASE — igual ao termos1
+   SECTION BASE — palco flex (igual termos1)
    ============================ */
 
 #section-intro {
@@ -35,15 +35,25 @@
 
 .intro-wrap {
   width: 100% !important;
-  /* CORRIGIDO: overflow visible para não cortar título nem conteúdo */
   overflow: visible !important;
   text-align: left !important;
 }
 
 #section-intro .intro-wrap,
-#section-intro .parchment-inner-rough,
-#section-intro .j-arcane-card {
+#section-intro .parchment-inner-rough {
   overflow: visible;
+}
+
+/* ============================
+   CARD PRETO (j-arcane-card)
+   FIX RAIO: overflow:hidden clipa a animação dentro do card
+   ============================ */
+
+#section-intro .j-arcane-card {
+  position: relative !important;
+  overflow: hidden !important;   /* ← contém o raio de varredura */
+  margin-top: -18px !important;
+  margin-bottom: 24px !important;
 }
 
 /* ============================
@@ -130,7 +140,6 @@
 
 /* ============================
    CARD / BORDA DOURADA (j-panel-glow)
-   Medidas espelhadas do termos1
    ============================ */
 
 #section-intro .j-panel-glow {
@@ -160,23 +169,16 @@
   ) !important;
 }
 
-#section-intro .j-arcane-card {
-  margin-top: -18px !important;
-  margin-bottom: 24px !important;
-}
-
 /* ============================
    CURSOR DE DATILOGRAFIA
    ============================ */
 
-/* Título: display block (não corta o texto) */
 #section-intro .intro-title[data-typing="true"][data-cursor="true"] {
   position: relative;
   display: block;
   padding-right: 0;
 }
 
-/* Parágrafos: inline-block (cursor funciona) */
 #section-intro .parchment-text-rough[data-typing="true"][data-cursor="true"] {
   position: relative;
   display: inline-block;
@@ -201,7 +203,6 @@
   content: none;
 }
 
-/* Cursor slim nos parágrafos */
 #section-intro .parchment-text-rough[data-cursor="true"].typing-active::after {
   width: 2px;
   height: 1em;
@@ -211,7 +212,6 @@
 
 /* ============================
    ÁUREA DOURADA (digitando)
-   Aplicada no j-panel-glow (card visível)
    ============================ */
 
 #section-intro:has(.typing-active) .j-panel-glow {
@@ -247,7 +247,7 @@
 }
 
 /* ============================
-   UTILITÁRIOS (usados pelo JS)
+   UTILITÁRIOS
    ============================ */
 
 .is-hidden    { opacity: 0; pointer-events: none; transition: opacity .25s ease; }
@@ -302,7 +302,6 @@
 
 /* ============================
    DESKTOP (≥ 900px)
-   Espelhado do termos1
    ============================ */
 
 @media (min-width: 900px) {
@@ -328,16 +327,12 @@
     margin-right: auto !important;
     z-index: 6 !important;
   }
-
-  #section-intro .j-arcane-card {
-    margin-top: -18px !important;
-    margin-bottom: 24px !important;
-  }
 }
 
 /* ============================
    MOBILE (≤ 600px)
-   Espelhado do termos1
+   FIX: apenas .j-panel-glow recebe o transform
+        width reduzido para não cortar botão
    ============================ */
 
 @media (max-width: 600px) {
@@ -348,38 +343,40 @@
     min-height: 100vh !important;
   }
 
-  #section-intro .j-panel-glow,
-  #section-intro .intro-wrap {
-    width: calc(100vw - 10px) !important;
-    max-width: 460px !important;
+  /* FIX: aplica só em .j-panel-glow, sem duplicar em .intro-wrap */
+  #section-intro .j-panel-glow {
+    width: calc(100vw - 32px) !important;  /* mais margem que termos1 para não cortar */
+    max-width: 440px !important;
     margin: 0 auto !important;
-    padding: 32px 24px 52px !important;
-    border-radius: 26px !important;
+    padding: 24px 18px 44px !important;
+    border-radius: 20px !important;
     box-sizing: border-box !important;
     transform: translateY(-80px) translateZ(0) !important;
     -webkit-transform: translateY(-80px) translateZ(0) !important;
-    overflow: hidden !important;
+    overflow: hidden !important;            /* ← contém o raio no mobile também */
   }
 
-  #section-intro .j-perg-v-inner,
-  #section-intro .parchment-inner-rough {
+  #section-intro .j-perg-v-inner {
     padding: 0 10px !important;
     box-sizing: border-box !important;
+    overflow: visible !important;
   }
 
   #section-intro .intro-title {
-    font-size: 28px !important;
-    margin: 4px 0 18px !important;
+    font-size: 26px !important;
+    margin: 4px 0 16px !important;
     line-height: 1.1 !important;
+    padding: 0 6px !important;
   }
 
   #section-intro .parchment-text-rough {
-    font-size: 12.5px !important;
+    font-size: 13px !important;
     line-height: 1.6 !important;
   }
 
   #section-intro .parchment-actions-rough {
-    margin-top: 36px !important;
+    margin-top: 28px !important;
+    justify-content: center !important;
   }
 }
 
