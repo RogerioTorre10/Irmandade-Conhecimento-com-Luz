@@ -140,36 +140,52 @@
     }
   }
 
+  function getSafeTranslation(key, fallback = '') {
+    if (!key) return fallback;
+    const translated = window.i18n?.t?.(key);
+
+    if (
+      translated &&
+      typeof translated === 'string' &&
+      translated.trim() &&
+      translated !== key
+    ) {
+      return translated;
+    }
+
+    return fallback;
+  }
+
   function syncTranslatedFallbacks(root) {
     if (!root) return;
 
     root.querySelectorAll('[data-i18n-text]').forEach((el) => {
       const key = el.dataset.i18nText;
-      if (!key) return;
+      const fallback = el.dataset.text || el.textContent || '';
+      const safeText = getSafeTranslation(key, fallback);
 
-      const translated = window.i18n?.t?.(key);
-      if (translated && typeof translated === 'string') {
-        el.textContent = translated;
-        el.dataset.text = translated;
-        el.setAttribute('data-text', translated);
+      if (safeText && typeof safeText === 'string') {
+        el.textContent = safeText;
+        el.dataset.text = safeText;
+        el.setAttribute('data-text', safeText);
       }
     });
 
     root.querySelectorAll('[data-i18n]').forEach((el) => {
       const key = el.dataset.i18n;
-      if (!key) return;
+      const fallback = el.dataset.text || el.textContent || '';
+      const safeText = getSafeTranslation(key, fallback);
 
-      const translated = window.i18n?.t?.(key);
-      if (!translated || typeof translated !== 'string') return;
+      if (!safeText || typeof safeText !== 'string') return;
 
       if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
         if (el.hasAttribute('placeholder')) {
-          el.placeholder = translated;
+          el.placeholder = safeText;
         } else {
-          el.value = translated;
+          el.value = safeText;
         }
-      } else {
-        el.textContent = translated;
+      } else if (!el.hasAttribute('data-i18n-text')) {
+        el.textContent = safeText;
       }
     });
   }
@@ -223,7 +239,7 @@
     root.dataset.termos1Initialized = 'true';
     window.JCTermos1.state.ready = true;
 
-    console.log('[JCTermos1] pronto — i18n aplicado, fallback sincronizado e typing/TTS delegados ao controller global');
+    console.log('[JCTermos1] pronto — i18n aplicado com fallback seguro e typing/TTS delegados ao controller global');
   }
 
   function onSectionShown(evt) {
