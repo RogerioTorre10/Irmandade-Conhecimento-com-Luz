@@ -481,41 +481,6 @@
    FIX FINAL — MIMOS + RODAPÉ + MOBILE
    ========================================================= */
 
-/* 1) ÁUREA DOURADA durante a datilografia */
-#section-intro .intro-title.typing-active,
-#section-intro .parchment-text-rough.typing-active {
-  text-shadow:
-    0 0 6px rgba(255, 220, 120, 0.55),
-    0 0 14px rgba(255, 200, 90, 0.45),
-    0 0 28px rgba(255, 170, 50, 0.25),
-    2px 2px 6px rgba(0,0,0,.55) !important;
-  filter: drop-shadow(0 0 10px rgba(255, 210, 90, 0.32));
-  transition: text-shadow .25s ease, filter .25s ease;
-}
-
-/* halo suave envolvendo o bloco enquanto digita */
-#section-intro:has(.typing-active) .parchment-inner-rough {
-  outline: 1px solid rgba(255, 210, 110, 0.22) !important;
-  outline-offset: 4px !important;
-  box-shadow:
-    0 0 0 1px rgba(255, 210, 110, 0.10) inset,
-    0 0 18px rgba(255, 210, 110, 0.20),
-    0 0 36px rgba(255, 170, 50, 0.12) !important;
-  animation: introTypingAura 1.8s ease-in-out infinite;
-}
-
-/* 2) TEXTO iluminado ao terminar */
-#section-intro .intro-title.typing-done,
-#section-intro .intro-title.type-done,
-#section-intro .parchment-text-rough.typing-done,
-#section-intro .parchment-text-rough.type-done {
-  text-shadow:
-    0 0 4px rgba(255, 225, 140, 0.34),
-    0 0 10px rgba(255, 205, 100, 0.26),
-    2px 2px 6px rgba(0,0,0,.55) !important;
-  filter: drop-shadow(0 0 6px rgba(255, 210, 90, 0.18));
-}
-
 /* 3) rodapé centralizado de verdade */
 .site-footer,
 footer,
@@ -573,28 +538,6 @@ footer span,
 
 #section-intro .j-arcane-card {
   min-height: 500px !important;
-}
-
-/* animação da áurea */
-@keyframes introTypingAura {
-  0% {
-    box-shadow:
-      0 0 0 1px rgba(255, 210, 110, 0.10) inset,
-      0 0 14px rgba(255, 210, 110, 0.16),
-      0 0 28px rgba(255, 170, 50, 0.10);
-  }
-  50% {
-    box-shadow:
-      0 0 0 1px rgba(255, 210, 110, 0.14) inset,
-      0 0 22px rgba(255, 210, 110, 0.24),
-      0 0 42px rgba(255, 170, 50, 0.16);
-  }
-  100% {
-    box-shadow:
-      0 0 0 1px rgba(255, 210, 110, 0.10) inset,
-      0 0 14px rgba(255, 210, 110, 0.16),
-      0 0 28px rgba(255, 170, 50, 0.10);
-  }
 }
 
 /* =========================================================
