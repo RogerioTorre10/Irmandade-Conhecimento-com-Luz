@@ -60,11 +60,141 @@
     };
   }
 
+  function getActiveGuide() {
+    return (
+      window.__GUIA_ATIVO ||
+      window.guiaAtual ||
+      window.JORNADA_GUIA_ATIVO ||
+      localStorage.getItem('guiaSelecionado') ||
+      sessionStorage.getItem('guiaSelecionado') ||
+      document.body?.dataset?.guia ||
+      'lumen'
+    ).toString().toLowerCase();
+  }
+
+  function getActiveLang() {
+    return (
+      window.i18n?.getLanguage?.() ||
+      localStorage.getItem('i18n_lang') ||
+      sessionStorage.getItem('i18n_lang') ||
+      document.documentElement.lang ||
+      'pt-BR'
+    );
+  }
+
+  function buildGuideVoiceContext() {
+    const guide = getActiveGuide();
+    const lang = getActiveLang();
+
+    const presetByGuide = {
+      lumen: { voiceGender: 'female', pitch: 1.08, rate: 1.00, style: 'acolhedora' },
+      zion:  { voiceGender: 'male',   pitch: 0.92, rate: 0.96, style: 'firme' },
+      arian: { voiceGender: 'female', pitch: 1.16, rate: 0.94, style: 'inspiradora' }
+    };
+
+    return {
+      lang,
+      guide,
+      ...(presetByGuide[guide] || presetByGuide.lumen)
+    };
+  }
+
+  function syncGuideVoiceContext(root) {
+    const ctx = buildGuideVoiceContext();
+
+    window.__JC_VOICE_CONTEXT = ctx;
+    window.__GUIDE_VOICE_CONTEXT = ctx;
+    window.__TERMS_VOICE_CONTEXT = ctx;
+
+    if (root) {
+      root.dataset.lang = ctx.lang;
+      root.dataset.guide = ctx.guide;
+      root.dataset.voiceGender = ctx.voiceGender;
+      root.dataset.voicePitch = String(ctx.pitch);
+      root.dataset.voiceRate = String(ctx.rate);
+      root.dataset.voiceStyle = ctx.style;
+    }
+
+    if (window.EffectCoordinator) {
+      window.EffectCoordinator.voiceContext = {
+        ...(window.EffectCoordinator.voiceContext || {}),
+        ...ctx
+      };
+    }
+
+    console.log('[JCTermos1] voice context sincronizado:', ctx);
+    return ctx;
+  }
+
+  async function applySectionI18n(root) {
+    if (!root) return;
+
+    try {
+      if (window.i18n?.apply) {
+        await window.i18n.apply(root);
+      } else if (window.applyI18n) {
+        await window.applyI18n(root);
+      }
+    } catch (err) {
+      console.warn('[JCTermos1] falha ao aplicar i18n:', err);
+    }
+  }
+
+  function syncTranslatedFallbacks(root) {
+    if (!root) return;
+
+    root.querySelectorAll('[data-i18n-text]').forEach((el) => {
+      const key = el.dataset.i18nText;
+      if (!key) return;
+
+      const translated = window.i18n?.t?.(key);
+      if (translated && typeof translated === 'string') {
+        el.textContent = translated;
+        el.dataset.text = translated;
+        el.setAttribute('data-text', translated);
+      }
+    });
+
+    root.querySelectorAll('[data-i18n]').forEach((el) => {
+      const key = el.dataset.i18n;
+      if (!key) return;
+
+      const translated = window.i18n?.t?.(key);
+      if (!translated || typeof translated !== 'string') return;
+
+      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+        if (el.hasAttribute('placeholder')) {
+          el.placeholder = translated;
+        } else {
+          el.value = translated;
+        }
+      } else {
+        el.textContent = translated;
+      }
+    });
+  }
+
+  function prepareTypingNodes(root) {
+    if (!root) return;
+
+    root.querySelectorAll('[data-typing="true"]').forEach((el) => {
+      el.classList.remove('typing-active', 'typing-done', 'type-done');
+      el.removeAttribute('data-spoken');
+      el.removeAttribute('data-typed');
+      el.removeAttribute('aria-busy');
+    });
+  }
+
   async function initOnce(root) {
     if (!root) return;
 
     await waitForTransitionUnlock();
     ensureVisible(root);
+
+    await applySectionI18n(root);
+    syncTranslatedFallbacks(root);
+    prepareTypingNodes(root);
+    syncGuideVoiceContext(root);
 
     const { btnNext, btnPrev } = pick(root);
 
@@ -93,7 +223,7 @@
     root.dataset.termos1Initialized = 'true';
     window.JCTermos1.state.ready = true;
 
-    console.log('[JCTermos1] pronto — typing/TTS delegados ao controller global');
+    console.log('[JCTermos1] pronto — i18n aplicado, fallback sincronizado e typing/TTS delegados ao controller global');
   }
 
   function onSectionShown(evt) {
