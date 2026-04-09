@@ -30,23 +30,44 @@
   }
 
   async function waitForTransitionUnlock(timeoutMs = 10000) {
-    if (!window.__TRANSITION_LOCK) return;
+    const start = Date.now();
 
-    let resolved = false;
+    function transitionStillRunning() {
+      return !!(
+        window.__TRANSITION_LOCK ||
+        document.documentElement.classList.contains('is-transitioning') ||
+        document.body.classList.contains('is-transitioning') ||
+        document.documentElement.classList.contains('vt-force-fixed') ||
+        document.body.classList.contains('vt-force-fixed')
+      );
+    }
 
-    const p = new Promise((resolve) => {
-      const onEnd = () => {
-        if (!resolved) {
-          resolved = true;
-          document.removeEventListener('transition:ended', onEnd);
-          resolve();
-        }
+    if (!transitionStillRunning()) return;
+
+    await new Promise((resolve) => {
+      let done = false;
+
+      const finish = () => {
+        if (done) return;
+        done = true;
+        document.removeEventListener('transition:ended', onEnd);
+        clearInterval(timer);
+        resolve();
       };
-      document.addEventListener('transition:ended', onEnd, { once: true });
-    });
 
-    const t = new Promise((resolve) => setTimeout(resolve, timeoutMs));
-    await Promise.race([p, t]);
+      const onEnd = () => {
+        setTimeout(() => {
+          if (!transitionStillRunning()) finish();
+        }, 60);
+      };
+
+      const timer = setInterval(() => {
+        if (!transitionStillRunning()) finish();
+        if (Date.now() - start >= timeoutMs) finish();
+      }, 120);
+
+      document.addEventListener('transition:ended', onEnd);
+    });
   }
 
   function pick(root) {
@@ -155,7 +176,6 @@
     root.querySelectorAll('[data-i18n-text]').forEach((el) => {
       const key = el.dataset.i18nText || '';
       const originalFallback = el.getAttribute('data-text') || '';
-
       const domText = (el.textContent || '').trim();
 
       if (isRealTranslatedText(domText, key)) {
@@ -233,6 +253,8 @@
   async function initOnce(root) {
     if (!root) return;
 
+    root.dataset.transitionReady = 'false';
+
     await waitForTransitionUnlock();
     ensureVisible(root);
 
@@ -242,6 +264,9 @@
     syncTranslatedFallbacksFromDOM(root);
     prepareTypingNodes(root);
     syncGuideVoiceContext(root);
+
+    await flushFrames(1);
+    root.dataset.transitionReady = 'true';
 
     const { btnNext, btnPrev } = pick(root);
 
