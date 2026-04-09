@@ -60,7 +60,7 @@
    TIPOGRAFIA
    ============================ */
 
-.intro-termos2 {
+.section-termos2 {
   position: relative;
   display: block;
   width: 100%;
@@ -124,8 +124,8 @@
 
 #section-termos2 .parchment-text-rough.typing-done,
 #section-termos2 .parchment-text-rough.type-done,
-#section-termos2 .intro-title.typing-done,
-#section-termos2 .intro-title.type-done {
+#section-termos2 .termos2-title.typing-done,
+#section-termos2 .termos2-title.type-done {
   opacity: 1 !important;
   visibility: visible !important;
   display: block !important;
@@ -220,7 +220,7 @@
    ============================ */
 
 /* brilho direto no texto */
-#section-termos2 .intro-title.typing-active,
+#section-termos2 .termos2-title.typing-active,
 #section-termos2 .parchment-text-rough.typing-active {
   text-shadow:
     0 0 6px rgba(255, 230, 120, 0.95),
@@ -260,8 +260,8 @@
 }
 
 /* mantém um leve brilho após terminar */
-#section-termos2 .intro-title.typing-done,
-#section-termos2 .intro-title.type-done,
+#section-termos2 .termos2-title.typing-done,
+#section-termos2 .termos2-title.type-done,
 #section-termos2 .parchment-text-rough.typing-done,
 #section-termos2 .parchment-text-rough.type-done {
   text-shadow:
@@ -455,7 +455,7 @@
     overflow: visible !important;
   }
 
-  #section-termos2 .intro-title {
+  #section-termos2 .termos2-title {
     font-size: 26px !important;
     margin: 4px 0 16px !important;
     line-height: 1.1 !important;
