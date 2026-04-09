@@ -183,3 +183,165 @@
     border-radius: 16px !important;
   }
 }
+/* =========================================
+   TERMOS 2 — typing da esquerda para direita
+   + áurea igual intro
+   ========================================= */
+
+#section-termos2 #termos2 {
+  position: relative;
+}
+
+/* título pode continuar centralizado */
+#section-termos2 #termos2 .section-title {
+  position: relative;
+  text-align: center !important;
+  display: block;
+  width: 100%;
+  direction: ltr !important;
+  unicode-bidi: plaintext !important;
+  transform-origin: center center;
+}
+
+/* subtítulo, descrição e lista: esquerda -> direita */
+#section-termos2 #termos2 p,
+#section-termos2 #termos2 li {
+  position: relative;
+  display: block;
+  width: 100%;
+  text-align: left !important;
+  direction: ltr !important;
+  unicode-bidi: plaintext !important;
+  transform-origin: left center;
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: break-word;
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+/* centraliza o bloco, mas não o fluxo do texto */
+#section-termos2 #termos2 ul {
+  list-style: none !important;
+  margin: 0;
+  padding: 0;
+}
+
+/* remove bolinhas/pontos padrão */
+#section-termos2 #termos2 li,
+#section-termos2 #termos2 li::marker,
+#section-termos2 #termos2 li::before {
+  list-style: none !important;
+  content: none !important;
+}
+
+/* espaçamento entre linhas */
+#section-termos1 #termos1 li + li {
+  margin-top: 8px;
+}
+
+/* glow do texto enquanto digita */
+#section-termos2 #termos2 .typing-active {
+  text-shadow:
+    0 0 6px rgba(255, 230, 120, 0.95),
+    0 0 12px rgba(255, 210, 90, 0.80),
+    0 0 20px rgba(255, 170, 40, 0.55),
+    0 0 30px rgba(255, 140, 0, 0.24);
+  animation: termosTextAuraPulse 1.45s ease-in-out infinite;
+}
+
+/* moldura de áurea em volta do texto */
+#section-termos2 #termos2 .section-title.typing-active::before,
+#section-termos2 #termos2 p.typing-active::before,
+#section-termos2 #termos2 li.typing-active::before {
+  content: '';
+  position: absolute;
+  inset: -6px -10px;
+  border-radius: 14px;
+  pointer-events: none;
+  z-index: -1;
+  border: 1px solid rgba(255, 220, 120, 0.32);
+  background:
+    radial-gradient(circle at center,
+      rgba(255, 220, 120, 0.16) 0%,
+      rgba(255, 190, 70, 0.10) 38%,
+      rgba(255, 150, 40, 0.04) 65%,
+      transparent 100%);
+  box-shadow:
+    0 0 10px rgba(255, 220, 120, 0.28),
+    0 0 22px rgba(255, 180, 60, 0.24),
+    inset 0 0 10px rgba(255, 240, 180, 0.08);
+  animation: termosTextFramePulse 1.45s ease-in-out infinite;
+}
+
+/* brilho suave após concluir */
+#section-termos2 #termos2 .typing-done,
+#section-termos2 #termos2 .type-done {
+  text-shadow:
+    0 0 4px rgba(255, 225, 120, 0.65),
+    0 0 10px rgba(255, 185, 70, 0.30);
+}
+
+/* durante transição, nada aparece */
+html.is-transitioning #section-termos2 [data-typing="true"],
+body.is-transitioning #section-termos2 [data-typing="true"],
+html.vt-force-fixed #section-termos2 [data-typing="true"],
+body.vt-force-fixed #section-termos2 [data-typing="true"] {
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* quando liberado, volta */
+#section-termos2[data-transition-ready="true"] [data-typing="true"] {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+@keyframes termosTextAuraPulse {
+  0% {
+    text-shadow:
+      0 0 5px rgba(255, 230, 120, 0.82),
+      0 0 10px rgba(255, 210, 90, 0.62),
+      0 0 16px rgba(255, 165, 40, 0.35);
+  }
+  50% {
+    text-shadow:
+      0 0 8px rgba(255, 235, 140, 1),
+      0 0 16px rgba(255, 215, 110, 0.90),
+      0 0 24px rgba(255, 170, 50, 0.55),
+      0 0 36px rgba(255, 145, 30, 0.24);
+  }
+  100% {
+    text-shadow:
+      0 0 5px rgba(255, 230, 120, 0.82),
+      0 0 10px rgba(255, 210, 90, 0.62),
+      0 0 16px rgba(255, 165, 40, 0.35);
+  }
+}
+
+@keyframes termosTextFramePulse {
+  0% {
+    opacity: 0.78;
+    transform: scale(0.995);
+    box-shadow:
+      0 0 8px rgba(255, 220, 120, 0.20),
+      0 0 18px rgba(255, 180, 60, 0.16),
+      inset 0 0 8px rgba(255, 240, 180, 0.06);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.01);
+    box-shadow:
+      0 0 12px rgba(255, 225, 130, 0.34),
+      0 0 26px rgba(255, 185, 70, 0.28),
+      inset 0 0 12px rgba(255, 240, 180, 0.10);
+  }
+  100% {
+    opacity: 0.78;
+    transform: scale(0.995);
+    box-shadow:
+      0 0 8px rgba(255, 220, 120, 0.20),
+      0 0 18px rgba(255, 180, 60, 0.16),
+      inset 0 0 8px rgba(255, 240, 180, 0.06);
+  }
+}
