@@ -1,9 +1,9 @@
 /* =========================================================
-   STYLES-TERMOS 1 v4.3 — ÁUREA NO TEXTO DURANTE DATILOGRAFIA
+   STYLES-TERMOS 2 v4.3 — ÁUREA NO TEXTO DURANTE DATILOGRAFIA
    ========================================================= */
 
 /* ============================
-   SECTION BASE — palco flex (igual termos1)
+   SECTION BASE — palco flex (igual termos2)
    ============================ */
 
 #section-termos2 {
@@ -178,7 +178,7 @@
    CURSOR DE DATILOGRAFIA
    ============================ */
 
-#section-termos2 .termos1-title[data-typing="true"][data-cursor="true"] {
+#section-termos2 .termos2-title[data-typing="true"][data-cursor="true"] {
   position: relative;
   display: block;
   padding-right: 0;
@@ -462,7 +462,7 @@
     padding: 0 6px !important;
   }
 
-  #section-termos2 .termos1-title.typing-active::before {
+  #section-termos2 .termos2-title.typing-active::before {
     inset: -6px -8px;
     border-radius: 12px;
   }
