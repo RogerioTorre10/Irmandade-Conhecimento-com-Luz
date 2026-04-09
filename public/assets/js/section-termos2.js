@@ -103,7 +103,12 @@
       if (!key) return;
 
       const translated = window.i18n?.t?.(key);
-      if (translated && typeof translated === 'string') {
+      if (
+        translated &&
+        typeof translated === 'string' &&
+        translated.trim() &&
+        translated !== key
+      ) {
         el.textContent = translated;
         el.dataset.text = translated;
         el.setAttribute('data-text', translated);
@@ -115,7 +120,12 @@
       if (!key) return;
 
       const translated = window.i18n?.t?.(key);
-      if (!translated || typeof translated !== 'string') return;
+      if (
+        !translated ||
+        typeof translated !== 'string' ||
+        !translated.trim() ||
+        translated === key
+      ) return;
 
       if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
         if (el.hasAttribute('placeholder')) {
@@ -123,7 +133,7 @@
         } else {
           el.value = translated;
         }
-      } else {
+      } else if (!el.hasAttribute('data-i18n-text')) {
         el.textContent = translated;
       }
     });
@@ -137,6 +147,53 @@
       el.removeAttribute('data-spoken');
       el.removeAttribute('data-typed');
       el.removeAttribute('aria-busy');
+    });
+  }
+
+  async function flushFrames(count = 2) {
+    for (let i = 0; i < count; i++) {
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+    }
+  }
+
+  async function waitForTransitionUnlock(timeoutMs = 10000) {
+    const start = Date.now();
+
+    function transitionStillRunning() {
+      return !!(
+        window.__TRANSITION_LOCK ||
+        document.documentElement.classList.contains('is-transitioning') ||
+        document.body.classList.contains('is-transitioning') ||
+        document.documentElement.classList.contains('vt-force-fixed') ||
+        document.body.classList.contains('vt-force-fixed')
+      );
+    }
+
+    if (!transitionStillRunning()) return;
+
+    await new Promise((resolve) => {
+      let done = false;
+
+      const finish = () => {
+        if (done) return;
+        done = true;
+        document.removeEventListener('transition:ended', onEnd);
+        clearInterval(timer);
+        resolve();
+      };
+
+      const onEnd = () => {
+        setTimeout(() => {
+          if (!transitionStillRunning()) finish();
+        }, 60);
+      };
+
+      const timer = setInterval(() => {
+        if (!transitionStillRunning()) finish();
+        if (Date.now() - start >= timeoutMs) finish();
+      }, 120);
+
+      document.addEventListener('transition:ended', onEnd);
     });
   }
 
@@ -248,13 +305,22 @@
     if (!root || root.dataset.termos2Initialized === 'true') return;
     root.dataset.termos2Initialized = 'true';
 
+    root.dataset.transitionReady = 'false';
+
+    await waitForTransitionUnlock();
     ensureVisible(root);
+
     await applySectionI18n(root);
+    await flushFrames(2);
+
     syncTranslatedFallbacks(root);
     prepareTypingNodes(root);
 
     const voiceCtx = syncGuideVoiceContext(root);
     const { scope, btn, back } = pick(root);
+
+    await flushFrames(1);
+    root.dataset.transitionReady = 'true';
 
     btn?.setAttribute('disabled', 'true');
     btn?.classList?.add('is-hidden');
