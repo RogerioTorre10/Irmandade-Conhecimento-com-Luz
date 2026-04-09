@@ -39,7 +39,7 @@
   text-align: left !important;
 }
 
-#section-termos1 .intro-wrap,
+#section-termos1 .termos1-wrap,
 #section-termos1 .parchment-inner-rough {
   overflow: visible;
 }
@@ -60,7 +60,7 @@
    TIPOGRAFIA
    ============================ */
 
-.intro-termos1 {
+.section-termos1 {
   position: relative;
   display: block;
   width: 100%;
@@ -86,7 +86,7 @@
   z-index: 1;
 }
 
-#section-intro [data-typing="true"] {
+#section-termos1 [data-typing="true"] {
   overflow: visible;
   white-space: normal;
   word-break: normal;
@@ -124,8 +124,8 @@
 
 #section-termos1 .parchment-text-rough.typing-done,
 #section-termos1 .parchment-text-rough.type-done,
-#section-termos1 .intro-title.typing-done,
-#section-termos1 .intro-title.type-done {
+#section-termos1 .termos1-title.typing-done,
+#section-termos1 .termos1-title.type-done {
   opacity: 1 !important;
   visibility: visible !important;
   display: block !important;
@@ -155,7 +155,7 @@
   margin-right: auto !important;
 }
 
-#section-intro .j-panel-glow::before {
+#section-termos1 .j-panel-glow::before {
   content: '';
   position: absolute;
   pointer-events: none;
@@ -204,7 +204,7 @@
   box-shadow: 0 0 6px rgba(255, 200, 80, 0.9);
 }
 
-#section-intro [data-typing="true"][data-cursor="true"].typing-done::after {
+#section-termos1 [data-typing="true"][data-cursor="true"].typing-done::after {
   content: none;
 }
 
@@ -220,7 +220,7 @@
    ============================ */
 
 /* brilho direto no texto */
-#section-termos1 .intro-title.typing-active,
+#section-termos1 .termos1-title.typing-active,
 #section-termos1 .parchment-text-rough.typing-active {
   text-shadow:
     0 0 6px rgba(255, 230, 120, 0.95),
@@ -231,7 +231,7 @@
 }
 
 /* moldura luminosa ao redor do texto durante a digitação */
-#section-termos1 .intro-title.typing-active::before,
+#section-termos1 .termos1-title.typing-active::before,
 #section-termos1 .parchment-text-rough.typing-active::before {
   content: '';
   position: absolute;
@@ -260,8 +260,8 @@
 }
 
 /* mantém um leve brilho após terminar */
-#section-termos1 .intro-title.typing-done,
-#section-termos1 .intro-title.type-done,
+#section-termos1 .termos1-title.typing-done,
+#section-termos1 .termos1-title.type-done,
 #section-termos1 .parchment-text-rough.typing-done,
 #section-termos1 .parchment-text-rough.type-done {
   text-shadow:
@@ -455,7 +455,7 @@
     overflow: visible !important;
   }
 
-  #section-termos1 .intro-title {
+  #section-termos1 .termos1-title {
     font-size: 26px !important;
     margin: 4px 0 16px !important;
     line-height: 1.1 !important;
