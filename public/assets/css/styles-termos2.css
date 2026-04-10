@@ -703,3 +703,38 @@
     border-radius: 10px !important;
   }
 }
+/* =========================================
+   REMOÇÃO TOTAL DE BULLETS (FORÇADO)
+   ========================================= */
+
+#section-termos1 li,
+#section-termos2 li {
+  list-style: none !important;
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+
+/* remove qualquer marcador padrão */
+#section-termos1 li::marker,
+#section-termos2 li::marker {
+  content: "" !important;
+}
+
+/* remove pseudo-bullets */
+#section-termos1 li::before,
+#section-termos2 li::before {
+  content: "" !important;
+  display: none !important;
+}
+
+/* remove bullets vindos como texto (•) */
+#section-termos1 .parchment-text-rough,
+#section-termos2 .parchment-text-rough {
+  text-indent: 0 !important;
+}
+
+/* remove qualquer bullet Unicode no início */
+#section-termos1 .parchment-text-rough span:first-child::before,
+#section-termos2 .parchment-text-rough span:first-child::before {
+  content: none !important;
+}
