@@ -1,10 +1,19 @@
 /* =========================================================
-   STYLES-TERMOS 2 v4.3 — ÁUREA NO TEXTO DURANTE DATILOGRAFIA
+   STYLES-TERMOS2 — LIMPO E ESTÁVEL
    ========================================================= */
 
-/* ============================
-   SECTION BASE — palco flex (igual termos2)
-   ============================ */
+:root {
+  --termos-gold: #ffd700;
+  --termos-gold-soft: rgba(255, 215, 0, 0.32);
+  --termos-gold-mid: rgba(255, 215, 0, 0.18);
+  --termos-glow: rgba(255, 220, 120, 0.26);
+  --termos-text: #f8f1dc;
+  --stone-img: url('/assets/img/textura-de-pedra.jpg');
+}
+
+/* =========================================================
+   SECTION BASE
+   ========================================================= */
 
 #section-termos2 {
   background: transparent !important;
@@ -12,839 +21,351 @@
   justify-content: center !important;
   align-items: center !important;
   width: 100% !important;
-  box-shadow: none;
-  border: none;
+  min-height: 100vh !important;
   text-align: left !important;
-  overflow: visible;
+  overflow: hidden !important;
+  box-shadow: none !important;
+  border: none !important;
 }
 
-/* ============================
-   CONTAINER INTERNO
-   ============================ */
-
-#section-termos2 .parchment-inner-rough {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  text-align: left !important;
-  animation: introPan 9s ease-in-out 1;
-  position: relative;
-  z-index: 2;
-  overflow: visible;
-}
-
-.termos2-wrap {
-  width: 100% !important;
+#section-termos2 .j-panel-glow {
+  position: relative !important;
+  width: min(520px, 92vw) !important;
+  max-width: 470px !important;
+  margin: 0 auto !important;
+  padding: 12px !important;
+  border-radius: 24px !important;
   overflow: visible !important;
-  text-align: left !important;
+  z-index: 3 !important;
 }
 
-#section-termos2 .intro-wrap,
-#section-termos2 .parchment-inner-rough {
-  overflow: visible;
+#section-termos2 .j-panel-glow::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  border: 1px solid rgba(212, 175, 55, 0.48);
+  box-shadow:
+    0 0 24px rgba(212, 175, 55, 0.36),
+    inset 0 0 18px rgba(255, 230, 150, 0.12);
 }
 
-/* ============================
-   CARD PRETO (j-arcane-card)
-   FIX RAIO: overflow:hidden clipa a animação dentro do card
-   ============================ */
+#section-termos2 .j-perg-v-inner {
+  position: relative !important;
+  overflow: visible !important;
+  z-index: 4 !important;
+}
 
 #section-termos2 .j-arcane-card {
   position: relative !important;
   overflow: hidden !important;
-  margin-top: -18px !important;
-  margin-bottom: 24px !important;
+  border-radius: 24px !important;
+  margin: 0 !important;
 }
 
-/* ============================
-   TIPOGRAFIA
-   ============================ */
+/* =========================================================
+   MIOLO
+   ========================================================= */
 
-.section-termos2 {
+#section-termos2 .parchment-inner-rough,
+#section-termos2 .termos-wrap,
+#section-termos2 #termos2 {
+  position: relative;
+  text-align: left !important;
+  overflow: visible !important;
+}
+
+#section-termos2 #termos2 {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+/* =========================================================
+   TÍTULO
+   ========================================================= */
+
+#section-termos2 .termos2-title,
+#section-termos2 h3[data-typing="true"] {
   position: relative;
   display: block;
   width: 100%;
-  max-width: 100%;
-  min-height: 2.4em;
-  box-sizing: border-box;
+  margin: 8px 0 12px;
+  padding: 0 8px;
+  text-align: center !important;
   font-family: 'ManufacturingConsent', sans-serif;
-  font-size: clamp(26px, 4vw, 32px);
-  line-height: 1.2;
-  text-align: center;
-  color: var(--theme-main-color, #ffd700);
-  margin-top: clamp(18px, 4vh, 30px);
-  margin-bottom: 12px;
-  padding: 0 12px;
-  white-space: normal;
-  overflow: visible;
-  word-break: normal;
-  overflow-wrap: break-word;
-  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
-  opacity: 0;
-  transform: translateY(6px);
-  animation: introTitleIn 600ms ease forwards;
-  z-index: 1;
-}
-
-#section-termos2 [data-typing="true"] {
-  overflow: visible;
-  white-space: normal;
+  font-size: clamp(24px, 4vw, 32px);
+  line-height: 1.15;
+  color: var(--termos-gold);
+  text-shadow:
+    0 0 6px rgba(255, 215, 0, 0.45),
+    0 0 14px rgba(255, 180, 60, 0.22);
   word-break: normal;
   overflow-wrap: break-word;
 }
 
-.parchment-text-rough {
-  position: relative;
-  font-family: 'BerkshireSwash', cursive;
-  font-size: 13px;
-  margin-bottom: 8px;
-  color: var(--theme-main-color, #ffd700);
-  opacity: 0;
-  visibility: visible;
-  display: block;
-  text-align: left !important;
-  background: transparent;
-  line-height: 1.4;
-  z-index: 1;
-}
+/* =========================================================
+   TEXTOS DIGITÁVEIS
+   ========================================================= */
 
-.parchment-text-rough.lumen-typing {
+#section-termos2 .parchment-text-rough,
+#section-termos2 .termos-lista-rough > li {
+  position: relative !important;
+  display: inline-block !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 3px 8px !important;
+  border-radius: 12px !important;
   text-align: left !important;
   direction: ltr !important;
+  white-space: normal !important;
+  line-height: 1.55 !important;
+  font-family: 'BerkshireSwash', cursive !important;
+  font-size: 13px !important;
+  color: var(--termos-text) !important;
+  background: transparent !important;
+  isolation: isolate !important;
+  z-index: 2 !important;
 }
 
-.parchment-text-rough.typing-active,
-.parchment-text-rough.typing-done {
-  opacity: 1 !important;
-  display: block !important;
-  visibility: visible !important;
-  text-align: left !important;
-  transition: opacity .25s ease;
-}
-
-#section-termos2 .parchment-text-rough.typing-done,
-#section-termos2 .parchment-text-rough.type-done,
-#section-termos2 .termos2-title.typing-done,
-#section-termos2 .termos2-title.type-done {
-  opacity: 1 !important;
-  visibility: visible !important;
-  display: block !important;
-}
-
-/* ============================
-   AÇÕES
-   ============================ */
-
-#section-termos2 .parchment-actions-rough {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-top: 18px;
-}
-
-/* ============================
-   CARD / BORDA DOURADA (j-panel-glow)
-   ============================ */
-
-#section-termos2 .j-panel-glow {
-  position: relative !important;
-  padding: 10px !important;
-  width: min(520px, 92vw) !important;
-  max-width: 470px !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-}
-
-#section-termos2 .j-panel-glow::before {
-  content: '';
-  position: absolute;
-  pointer-events: none;
-  z-index: 1;
-  inset: 0;
-  border-radius: inherit;
-  border: 2px solid rgba(212, 175, 55, 0.55);
-  box-shadow:
-    0 0 28px rgba(212, 175, 55, 0.55),
-    inset 0 0 18px rgba(255, 230, 150, 0.25);
-  background: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0.16),
-    transparent 45%,
-    transparent 100%
-  ) !important;
-}
-
-/* ============================
-   CURSOR DE DATILOGRAFIA
-   ============================ */
-
-#section-termos2 .termos2-title[data-typing="true"][data-cursor="true"] {
-  position: relative;
-  display: block;
-  padding-right: 0;
-}
-
-#section-termos2 .parchment-text-rough[data-typing="true"][data-cursor="true"] {
-  position: relative;
-  display: inline-block;
-  padding-right: 0.35em;
+/* cursor */
+#section-termos2 [data-typing="true"][data-cursor="true"] {
+  padding-right: 0.35em !important;
 }
 
 #section-termos2 [data-typing="true"][data-cursor="true"].typing-active::after {
-  content: '';
+  content: "";
   position: absolute;
   right: 0.05em;
-  bottom: 0.12em;
-  width: 0.5ch;
-  height: 1.1em;
-  background: linear-gradient(180deg, #ffd36b 0%, #ffbf3b 80%, #b27a1a 100%);
+  bottom: 0.18em;
+  width: 2px;
+  height: 1em;
   border-radius: 2px;
-  opacity: 0.95;
-  animation: caretBlink 1s steps(1, end) infinite;
-  box-shadow: 0 0 6px rgba(255, 200, 80, 0.9);
+  background: linear-gradient(180deg, #ffe08a 0%, #ffbf3b 100%);
+  box-shadow: 0 0 6px rgba(255, 210, 100, 0.9);
+  animation: termosCaretBlink 1s steps(1, end) infinite;
 }
 
-#section-termos2 [data-typing="true"][data-cursor="true"].typing-done::after {
+#section-termos2 [data-typing="true"].typing-done::after,
+#section-termos2 [data-typing="true"].type-done::after {
   content: none;
 }
 
-#section-termos2 .parchment-text-rough[data-cursor="true"].typing-active::after {
-  width: 2px;
-  height: 1em;
-  border-radius: 1px;
-  right: 0;
-}
-
-/* ============================
-   ÁUREA DOURADA NO TEXTO (digitando)
-   ============================ */
-
-/* brilho direto no texto */
-#section-termos2 .termos2-title.typing-active,
-#section-termos2 .parchment-text-rough.typing-active {
+/* aura viva */
+#section-termos2 [data-typing="true"].typing-active {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 220, 120, 0.16) 0%,
+    rgba(255, 190, 70, 0.08) 45%,
+    transparent 100%
+  ) !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 220, 120, 0.18),
+    0 0 10px rgba(255, 220, 120, 0.18),
+    0 0 22px rgba(255, 180, 60, 0.14),
+    inset 0 0 10px rgba(255, 240, 180, 0.04) !important;
   text-shadow:
     0 0 6px rgba(255, 230, 120, 0.95),
-    0 0 12px rgba(255, 210, 90, 0.80),
-    0 0 20px rgba(255, 170, 40, 0.55),
-    0 0 30px rgba(255, 140, 0, 0.28);
-  animation: textAuraPulse 1.45s ease-in-out infinite;
+    0 0 12px rgba(255, 210, 90, 0.72),
+    0 0 20px rgba(255, 170, 40, 0.36) !important;
+  animation: termosAuraPulse 1.6s ease-in-out infinite;
 }
 
-/* moldura luminosa ao redor do texto durante a digitação */
-#section-termos2 .termos2-title.typing-active::before,
-#section-termos2 .parchment-text-rough.typing-active::before {
-  content: '';
+#section-termos2 [data-typing="true"].typing-active::before,
+#section-termos2 [data-typing="true"].typing-done::before,
+#section-termos2 [data-typing="true"].type-done::before {
+  content: "";
   position: absolute;
-  inset: -8px -12px;
+  inset: -4px -6px;
   border-radius: 14px;
   pointer-events: none;
   z-index: -1;
-  border: 1px solid rgba(255, 220, 120, 0.32);
-  background:
-    radial-gradient(circle at center,
-      rgba(255, 220, 120, 0.16) 0%,
-      rgba(255, 190, 70, 0.10) 38%,
-      rgba(255, 150, 40, 0.04) 65%,
-      transparent 100%);
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 220, 120, 0.10) 0%,
+    rgba(255, 180, 60, 0.05) 55%,
+    transparent 100%
+  );
+}
+
+#section-termos2 [data-typing="true"].typing-done,
+#section-termos2 [data-typing="true"].type-done {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 220, 120, 0.09) 0%,
+    rgba(255, 190, 70, 0.04) 46%,
+    transparent 100%
+  ) !important;
   box-shadow:
-    0 0 10px rgba(255, 220, 120, 0.28),
-    0 0 22px rgba(255, 180, 60, 0.24),
-    inset 0 0 10px rgba(255, 240, 180, 0.08);
-  animation: textFramePulse 1.45s ease-in-out infinite;
-}
-
-/* no texto corrido, aura um pouco mais justa */
-#section-termos2 .parchment-text-rough.typing-active::before {
-  inset: -5px -8px;
-  border-radius: 12px;
-}
-
-/* mantém um leve brilho após terminar */
-#section-termos2 .termos2-title.typing-done,
-#section-termos2 .termos2-title.type-done,
-#section-termos2 .parchment-text-rough.typing-done,
-#section-termos2 .parchment-text-rough.type-done {
+    0 0 0 1px rgba(255, 220, 120, 0.10),
+    0 0 8px rgba(255, 220, 120, 0.10),
+    0 0 16px rgba(255, 180, 60, 0.08) !important;
   text-shadow:
-    0 0 4px rgba(255, 225, 120, 0.65),
-    0 0 10px rgba(255, 185, 70, 0.30);
+    0 0 4px rgba(255, 225, 120, 0.62),
+    0 0 10px rgba(255, 185, 70, 0.22) !important;
 }
 
-/* ============================
-   ÁUREA DO CONTAINER (suave)
-   ============================ */
+/* =========================================================
+   LISTA SEM BULLET
+   ========================================================= */
 
-#section-termos2:has(.typing-active) .j-panel-glow {
-  outline: 2px solid rgba(255, 204, 102, 0.14);
-  outline-offset: 6px;
+#section-termos2 .termos-lista-rough,
+#section-termos2 ul {
+  list-style: none !important;
+  margin: 2px 0 0 !important;
+  padding: 0 !important;
+}
+
+#section-termos2 .termos-lista-rough > li,
+#section-termos2 ul > li {
+  list-style: none !important;
+  margin: 0 !important;
+  padding-left: 8px !important;
+}
+
+#section-termos2 .termos-lista-rough > li::marker,
+#section-termos2 ul > li::marker,
+#section-termos2 .termos-lista-rough > li::before,
+#section-termos2 ul > li::before {
+  content: none !important;
+  display: none !important;
+}
+
+/* =========================================================
+   AÇÕES
+   ========================================================= */
+
+#section-termos2 .footer-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 22px;
+}
+
+#section-termos2 .btn-stone,
+#section-termos2 .avancarBtn {
+  position: relative;
+  display: inline-block;
+  min-width: 140px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: 2px solid #4a4a4a;
+  color: #fff;
+  cursor: pointer;
+  text-shadow: 1px 1px 3px rgba(0,0,0,.7);
+  background:
+    linear-gradient(to bottom, #a0a0a0, #808080),
+    var(--stone-img) center/cover;
+  background-blend-mode: overlay;
   box-shadow:
-    0 0 0 1px rgba(255, 204, 102, 0.10) inset,
-    0 0 16px rgba(255, 204, 102, 0.22),
-    0 0 34px rgba(255, 153, 0, 0.16);
-  animation: parchmentGlow 1.8s ease-in-out infinite;
+    inset 0 3px 6px rgba(0,0,0,.4),
+    0 6px 12px rgba(0,0,0,.45);
+  transition: transform .2s ease, filter .2s ease, box-shadow .2s ease;
 }
 
-#section-termos2:has(.typing-active) .parchment-inner-rough {
-  outline: none;
-  box-shadow: none;
+#section-termos2 .btn-stone:hover:not(:disabled),
+#section-termos2 .avancarBtn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 3px 6px rgba(0,0,0,.4),
+    0 0 10px rgba(255, 215, 0, 0.22),
+    0 6px 12px rgba(0,0,0,.45);
 }
 
-#section-termos2:not(:has(.typing-active)) .j-panel-glow,
-#section-termos2:not(:has(.typing-active)) .parchment-inner-rough {
-  transition: box-shadow .35s ease, outline-color .35s ease;
+#section-termos2 .btn-stone:disabled,
+#section-termos2 .avancarBtn:disabled {
+  opacity: .6;
+  pointer-events: none;
 }
 
-/* ============================
+/* =========================================================
    UTILITÁRIOS
-   ============================ */
+   ========================================================= */
 
-.is-hidden    { opacity: 0; pointer-events: none; transition: opacity .25s ease; }
-.is-disabled  { opacity: .6; pointer-events: none; }
-.btn-ready-pulse { animation: btnReady .6s ease-out 1; }
+#section-termos2 .is-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s ease;
+}
 
-/* ============================
+#section-termos2 .btn-ready-pulse {
+  animation: btnReady .6s ease-out 1;
+}
+
+/* =========================================================
    ANIMAÇÕES
-   ============================ */
+   ========================================================= */
 
-@keyframes btnReady {
-  0%   { transform: scale(0.98); filter: brightness(0.9); }
-  60%  { transform: scale(1.02); filter: brightness(1.1); }
-  100% { transform: scale(1);    filter: none; }
-}
-
-@keyframes introTitleIn {
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes introPan {
-  0%   { transform: translateY(4px); }
-  50%  { transform: translateY(-4px); }
-  100% { transform: translateY(0); }
-}
-
-@keyframes caretBlink {
-  0%, 45%   { opacity: 0.95; }
+@keyframes termosCaretBlink {
+  0%, 45% { opacity: 0.95; }
   50%, 100% { opacity: 0; }
 }
 
-@keyframes parchmentGlow {
+@keyframes termosAuraPulse {
   0% {
     box-shadow:
-      0 0 0 1px rgba(255, 204, 102, 0.10) inset,
-      0 0 16px rgba(255, 204, 102, 0.22),
-      0 0 28px rgba(255, 153, 0, 0.14);
+      0 0 0 1px rgba(255, 220, 120, 0.16),
+      0 0 8px rgba(255, 220, 120, 0.14),
+      0 0 16px rgba(255, 180, 60, 0.10),
+      inset 0 0 8px rgba(255, 240, 180, 0.03);
   }
   50% {
     box-shadow:
-      0 0 0 1px rgba(255, 204, 102, 0.14) inset,
-      0 0 20px rgba(255, 204, 102, 0.30),
-      0 0 38px rgba(255, 153, 0, 0.20);
+      0 0 0 1px rgba(255, 220, 120, 0.24),
+      0 0 14px rgba(255, 220, 120, 0.24),
+      0 0 26px rgba(255, 180, 60, 0.18),
+      inset 0 0 12px rgba(255, 240, 180, 0.06);
   }
   100% {
     box-shadow:
-      0 0 0 1px rgba(255, 204, 102, 0.10) inset,
-      0 0 16px rgba(255, 204, 102, 0.22),
-      0 0 28px rgba(255, 153, 0, 0.14);
+      0 0 0 1px rgba(255, 220, 120, 0.16),
+      0 0 8px rgba(255, 220, 120, 0.14),
+      0 0 16px rgba(255, 180, 60, 0.10),
+      inset 0 0 8px rgba(255, 240, 180, 0.03);
   }
 }
 
-@keyframes textAuraPulse {
-  0% {
-    text-shadow:
-      0 0 5px rgba(255, 230, 120, 0.82),
-      0 0 10px rgba(255, 210, 90, 0.62),
-      0 0 16px rgba(255, 165, 40, 0.35);
-  }
-  50% {
-    text-shadow:
-      0 0 8px rgba(255, 235, 140, 1),
-      0 0 16px rgba(255, 215, 110, 0.90),
-      0 0 24px rgba(255, 170, 50, 0.55),
-      0 0 36px rgba(255, 145, 30, 0.24);
-  }
-  100% {
-    text-shadow:
-      0 0 5px rgba(255, 230, 120, 0.82),
-      0 0 10px rgba(255, 210, 90, 0.62),
-      0 0 16px rgba(255, 165, 40, 0.35);
-  }
+@keyframes btnReady {
+  0%   { transform: scale(0.98); filter: brightness(0.95); }
+  60%  { transform: scale(1.02); filter: brightness(1.08); }
+  100% { transform: scale(1); filter: none; }
 }
 
-@keyframes textFramePulse {
-  0% {
-    opacity: 0.78;
-    transform: scale(0.995);
-    box-shadow:
-      0 0 8px rgba(255, 220, 120, 0.20),
-      0 0 18px rgba(255, 180, 60, 0.16),
-      inset 0 0 8px rgba(255, 240, 180, 0.06);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.01);
-    box-shadow:
-      0 0 12px rgba(255, 225, 130, 0.34),
-      0 0 26px rgba(255, 185, 70, 0.28),
-      inset 0 0 12px rgba(255, 240, 180, 0.10);
-  }
-  100% {
-    opacity: 0.78;
-    transform: scale(0.995);
-    box-shadow:
-      0 0 8px rgba(255, 220, 120, 0.20),
-      0 0 18px rgba(255, 180, 60, 0.16),
-      inset 0 0 8px rgba(255, 240, 180, 0.06);
-  }
-}
-
-/* ============================
-   DESKTOP (≥ 900px)
-   ============================ */
-
-@media (min-width: 900px) {
-
-  #section-termos2 .j-perg-v-inner {
-    position: relative !important;
-    transform: translateY(40px) !important;
-    top: 40px !important;
-    margin-top: 0 !important;
-    padding-top: 0 !important;
-    overflow: visible !important;
-    z-index: 5 !important;
-  }
-
-  #section-termos2 .j-panel-glow {
-    position: relative !important;
-    transform: translate(-16px, -70px) !important;
-    top: 10px !important;
-    margin-top: 0 !important;
-    width: min(520px, 92vw) !important;
-    max-width: 470px !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    z-index: 6 !important;
-  }
-}
-
-/* ============================
-   MOBILE (≤ 600px)
-   ============================ */
+/* =========================================================
+   RESPONSIVO
+   ========================================================= */
 
 @media (max-width: 600px) {
-
   #section-termos2 {
-    padding: 8px 0 140px !important;
-    overflow: hidden !important;
-    min-height: 100vh !important;
+    padding: 8px 0 120px !important;
   }
 
   #section-termos2 .j-panel-glow {
     width: calc(100vw - 32px) !important;
     max-width: 440px !important;
-    margin: 0 auto !important;
-    padding: 24px 18px 44px !important;
+    padding: 18px 14px 28px !important;
     border-radius: 20px !important;
-    box-sizing: border-box !important;
-    transform: translateY(-80px) translateZ(0) !important;
-    -webkit-transform: translateY(-80px) translateZ(0) !important;
-    overflow: hidden !important;
   }
 
-  #section-termos2 .j-perg-v-inner {
-    padding: 0 10px !important;
-    box-sizing: border-box !important;
-    overflow: visible !important;
+  #section-termos2 .termos2-title,
+  #section-termos2 h3[data-typing="true"] {
+    font-size: 24px !important;
+    margin-bottom: 14px !important;
   }
 
-  #section-termos2 .termos2-title {
-    font-size: 26px !important;
-    margin: 4px 0 16px !important;
-    line-height: 1.1 !important;
-    padding: 0 6px !important;
-  }
-
-  #section-termos2 .termos2-title.typing-active::before {
-    inset: -6px -8px;
-    border-radius: 12px;
-  }
-
-  #section-termos2 .parchment-text-rough {
+  #section-termos2 .parchment-text-rough,
+  #section-termos2 .termos-lista-rough > li {
     font-size: 13px !important;
     line-height: 1.6 !important;
+    padding: 3px 6px !important;
   }
 
-  #section-termos2 .parchment-actions-rough {
-    margin-top: 28px !important;
-    justify-content: center !important;
-  }
-}
-
-/* ============================
-   VARIÁVEIS E BOTÕES (btn-stone)
-   ============================ */
-
-:root {
-  --stone-img: url('/assets/img/textura-de-pedra.jpg');
-  --btn-gold-outer: rgba(255, 230, 120, 0.40);
-  --btn-gold-mid:   rgba(255, 220, 120, 0.45);
-  --btn-gold-in:    rgba(255, 255, 230, 0.25);
-  --btn-gold-line:  rgba(255, 215, 0, 0.25);
-  --btn-text: #f9e7c2;
-}
-
-@keyframes brilhoDivino {
-  0%, 100% {
-    box-shadow:
-      0 0 6px var(--btn-gold-outer),
-      0 0 12px var(--btn-gold-mid),
-      inset 0 0 2px var(--btn-gold-in);
-  }
-  50% {
-    box-shadow:
-      0 0 10px var(--btn-gold-outer),
-      0 0 16px var(--btn-gold-mid),
-      inset 0 0 4px var(--btn-gold-in);
-  }
-}
-
-@keyframes reflexoDourado {
-  0%       { opacity: 0; transform: translate(-120%, -120%) rotate(25deg); }
-  45%, 55% { opacity: .85; }
-  100%     { opacity: 0; transform: translate(120%, 120%) rotate(25deg); }
-}
-
-.btn-stone {
-  position: relative;
-  overflow: hidden;
-  display: inline-block;
-  border-radius: 8px;
-  color: #fff;
-  text-shadow: 1px 1px 3px rgba(0,0,0,.7);
-  cursor: pointer;
-  transition: all .25s ease-in-out;
-}
-
-.stone-texture {
-  background:
-    linear-gradient(to bottom, #a0a0a0, #808080),
-    var(--stone-img) center/cover;
-  background-blend-mode: overlay;
-  border: 3px solid #4a4a4a;
-  box-shadow:
-    inset 0 3px 6px rgba(0,0,0,.4),
-    0 6px 12px rgba(0,0,0,.6);
-}
-
-.btn-stone::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 8px;
-  box-shadow: inset 0 0 0 1px var(--btn-gold-line);
-  pointer-events: none;
-}
-
-.btn-stone:hover:not(:disabled) {
-  transform: translateY(-1px);
-  animation: brilhoDivino 1.8s ease-in-out infinite;
-}
-
-.btn-stone:hover:not(:disabled)::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0;
-  width: 60%; height: 200%;
-  background: linear-gradient(
-    130deg,
-    rgba(255,255,200,0) 0%,
-    rgba(255,255,180,.6) 50%,
-    rgba(255,255,200,0) 100%
-  );
-  transform: translate(-150%, -150%) rotate(25deg);
-  animation: reflexoDourado 2s linear forwards;
-  pointer-events: none;
-}
-
-.btn-stone:active:not(:disabled) {
-  transform: translateY(0);
-  filter: brightness(.98);
-  animation: none;
-}
-
-.btn-stone:disabled {
-  opacity: .6;
-  pointer-events: none;
-  animation: none;
-}
-/* =========================================================
-   PATCH CIRÚRGICO — TERMOS 2
-   Corrige:
-   1) aura em volta do texto durante typing
-   2) remove ponto/marker no início dos parágrafos
-   3) mantém digitação alinhada da esquerda para direita
-   ========================================================= */
-
-/* base do texto */
-#section-termos2 .parchment-text-rough {
-  position: relative !important;
-  display: inline-block !important;
-  width: fit-content !important;
-  max-width: 100% !important;
-  text-align: left !important;
-  direction: ltr !important;
-  white-space: normal !important;
-  list-style: none !important;
-  padding-left: 0 !important;
-  margin-left: 0 !important;
-  z-index: 2 !important;
-  vertical-align: top !important;
-}
-
-/* se houver UL/LI no HTML dos termos */
-#section-termos2 .parchment-text-rough ul,
-#section-termos2 .parchment-text-rough ol {
-  list-style: none !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-#section-termos2 .parchment-text-rough li {
-  list-style: none !important;
-  margin: 0 !important;
-  padding-left: 0 !important;
-}
-
-#section-termos2 .parchment-text-rough li::marker,
-#section-termos2 .parchment-text-rough li::before {
-  content: none !important;
-  display: none !important;
-}
-
-/* estados do typing */
-#section-termos2 .parchment-text-rough.typing-active,
-#section-termos2 .parchment-text-rough.typing-done,
-#section-termos2 .parchment-text-rough.type-done {
-  display: inline-block !important;
-  width: fit-content !important;
-  max-width: 100% !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  text-align: left !important;
-  z-index: 2 !important;
-}
-
-/* cursor continua funcionando sem empurrar a linha toda */
-#section-termos2 .parchment-text-rough[data-typing="true"][data-cursor="true"] {
-  display: inline-block !important;
-  width: fit-content !important;
-  max-width: 100% !important;
-  padding-right: 0.35em !important;
-}
-
-/* aura do texto */
-#section-termos2 .parchment-text-rough.typing-active::before {
-  content: "";
-  position: absolute;
-  inset: -4px -8px !important;
-  border-radius: 12px;
-  pointer-events: none;
-  z-index: -1;
-  background:
-    radial-gradient(circle at center,
-      rgba(255, 220, 120, 0.20) 0%,
-      rgba(255, 190, 70, 0.12) 40%,
-      rgba(255, 150, 40, 0.05) 68%,
-      transparent 100%);
-  box-shadow:
-    0 0 10px rgba(255, 220, 120, 0.30),
-    0 0 22px rgba(255, 180, 60, 0.22),
-    inset 0 0 8px rgba(255, 240, 180, 0.06);
-  animation: textFramePulse 1.45s ease-in-out infinite;
-}
-
-/* brilho direto nas letras */
-#section-termos2 .parchment-text-rough.typing-active {
-  text-shadow:
-    0 0 6px rgba(255, 230, 120, 0.95),
-    0 0 12px rgba(255, 210, 90, 0.80),
-    0 0 20px rgba(255, 170, 40, 0.55),
-    0 0 30px rgba(255, 140, 0, 0.28) !important;
-}
-
-/* brilho suave ao terminar */
-#section-termos2 .parchment-text-rough.typing-done,
-#section-termos2 .parchment-text-rough.type-done {
-  text-shadow:
-    0 0 4px rgba(255, 225, 120, 0.65),
-    0 0 10px rgba(255, 185, 70, 0.30) !important;
-}
-
-/* garante que spans internos do typing não herdem marker estranho */
-#section-termos2 .parchment-text-rough span,
-#section-termos2 .parchment-text-rough p {
-  list-style: none !important;
-  text-indent: 0 !important;
-  margin-left: 0 !important;
-  padding-left: 0 !important;
-}
-
-/* mobile */
-@media (max-width: 600px) {
-  #section-termos2 .parchment-text-rough,
-  #section-termos2 .parchment-text-rough.typing-active,
-  #section-termos2 .parchment-text-rough.typing-done,
-  #section-termos2 .parchment-text-rough.type-done {
-    display: inline-block !important;
-    width: fit-content !important;
-    max-width: 100% !important;
-  }
-
-  #section-termos2 .parchment-text-rough.typing-active::before {
-    inset: -3px -6px !important;
-    border-radius: 10px !important;
-  }
-}
-/* =========================================
-   REMOÇÃO TOTAL DE BULLETS (FORÇADO)
-   ========================================= */
-
-#section-termos2 li {
-  list-style: none !important;
-  margin-left: 0 !important;
-  padding-left: 0 !important;
-}
-
-/* remove qualquer marcador padrão */
-#section-termos2 li::marker {
-  content: "" !important;
-}
-
-/* remove pseudo-bullets */
-#section-termos2 li::before {
-  content: "" !important;
-  display: none !important;
-}
-
-/* remove bullets vindos como texto (•) */
-#section-termos2 .parchment-text-rough {
-  text-indent: 0 !important;
-}
-
-/* remove qualquer bullet Unicode no início */
-#section-termos2 .parchment-text-rough span:first-child::before {
-  content: none !important;
-}
-/* =========================================================
-   AURA ENVOLTA DO TEXTO — PATCH FINAL
-   ========================================================= */
-
-/* garante contexto visual do texto */
-#section-termos2 .parchment-text-rough {
-  position: relative !important;
-  display: inline-block !important;
-  width: fit-content !important;
-  max-width: 100% !important;
-  z-index: 3 !important;
-  isolation: isolate !important;
-}
-
-/* aura viva durante a digitação */
-#section-termos2 .parchment-text-rough.typing-active::before {
-  content: "";
-  position: absolute;
-  inset: -6px -10px !important;
-  border-radius: 14px;
-  pointer-events: none;
-  z-index: -1 !important;
-
-  background:
-    radial-gradient(
-      ellipse at center,
-      rgba(255, 220, 120, 0.22) 0%,
-      rgba(255, 190, 70, 0.12) 38%,
-      rgba(255, 150, 40, 0.05) 65%,
-      transparent 100%
-    );
-
-  border: 1px solid rgba(255, 220, 120, 0.22);
-
-  box-shadow:
-    0 0 10px rgba(255, 220, 120, 0.28),
-    0 0 22px rgba(255, 180, 60, 0.22),
-    inset 0 0 10px rgba(255, 240, 180, 0.06);
-
-  filter: blur(0.2px);
-  animation: auraTextoPulse 1.6s ease-in-out infinite;
-}
-
-/* leve aura residual após terminar */
-#section-termos2 .parchment-text-rough.typing-done::before,
-#section-termos2 .parchment-text-rough.type-done::before {
-  content: "";
-  position: absolute;
-  inset: -4px -8px !important;
-  border-radius: 12px;
-  pointer-events: none;
-  z-index: -1 !important;
-
-  background:
-    radial-gradient(
-      ellipse at center,
-      rgba(255, 220, 120, 0.12) 0%,
-      rgba(255, 190, 70, 0.06) 45%,
-      transparent 100%
-    );
-
-  box-shadow:
-    0 0 8px rgba(255, 210, 110, 0.16),
-    inset 0 0 6px rgba(255, 240, 180, 0.04);
-}
-
-/* reforço do brilho das letras enquanto digita */
-#section-termos2 .parchment-text-rough.typing-active {
-  text-shadow:
-    0 0 6px rgba(255, 230, 120, 0.95),
-    0 0 12px rgba(255, 210, 90, 0.80),
-    0 0 20px rgba(255, 170, 40, 0.50),
-    0 0 28px rgba(255, 140, 0, 0.24) !important;
-}
-
-/* mobile */
-@media (max-width: 600px) {
-    #section-termos2 .parchment-text-rough.typing-active::before {
-    inset: -4px -7px !important;
+  #section-termos2 [data-typing="true"].typing-active::before,
+  #section-termos2 [data-typing="true"].typing-done::before,
+  #section-termos2 [data-typing="true"].type-done::before {
+    inset: -3px -5px;
     border-radius: 12px;
-  }
-
-  #section-termos2 .parchment-text-rough.typing-done::before,
-  #section-termos2 .parchment-text-rough.type-done::before {
-    inset: -3px -6px !important;
-    border-radius: 10px;
-  }
-}
-
-@keyframes auraTextoPulse {
-  0% {
-    opacity: 0.72;
-    transform: scale(0.995);
-    box-shadow:
-      0 0 8px rgba(255, 220, 120, 0.20),
-      0 0 16px rgba(255, 180, 60, 0.14),
-      inset 0 0 8px rgba(255, 240, 180, 0.05);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.01);
-    box-shadow:
-      0 0 12px rgba(255, 225, 130, 0.34),
-      0 0 26px rgba(255, 185, 70, 0.26),
-      inset 0 0 12px rgba(255, 240, 180, 0.10);
-  }
-  100% {
-    opacity: 0.72;
-    transform: scale(0.995);
-    box-shadow:
-      0 0 8px rgba(255, 220, 120, 0.20),
-      0 0 16px rgba(255, 180, 60, 0.14),
-      inset 0 0 8px rgba(255, 240, 180, 0.05);
   }
 }
