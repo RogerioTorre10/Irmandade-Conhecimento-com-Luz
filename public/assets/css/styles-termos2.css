@@ -41,7 +41,7 @@
 
 #section-termos2 .j-panel-glow::before {
   content: "";
-  position: absolute;
+  position: relative !important;
   inset: 0;
   border-radius: inherit;
   pointer-events: none;
@@ -71,7 +71,7 @@
 #section-termos2 .parchment-inner-rough,
 #section-termos2 .termos-wrap,
 #section-termos2 #termos2 {
-  position: relative;
+  position: relative !important;
   text-align: left !important;
   overflow: hidden !important;
 }
@@ -89,7 +89,7 @@
 
 #section-termos2 .termos2-title,
 #section-termos2 h3[data-typing="true"] {
-  position: relative;
+  position: relative !important;
   display: block;
   width: 100%;
   margin: 8px 0 12px;
@@ -138,7 +138,7 @@
 
 #section-termos2 [data-typing="true"][data-cursor="true"].typing-active::after {
   content: "";
-  position: absolute;
+  position: relative !important;
   right: 0.05em;
   bottom: 0.18em;
   width: 2px;
@@ -178,7 +178,7 @@
 #section-termos2 [data-typing="true"].typing-done::before,
 #section-termos2 [data-typing="true"].type-done::before {
   content: "";
-  position: absolute;
+  position: relative !important;
   inset: -4px -6px;
   border-radius: 14px;
   pointer-events: none;
@@ -246,7 +246,7 @@
 
 #section-termos2 .btn-stone,
 #section-termos2 .avancarBtn {
-  position: relative;
+  position: relative !important;
   display: inline-block;
   min-width: 140px;
   padding: 10px 18px;
