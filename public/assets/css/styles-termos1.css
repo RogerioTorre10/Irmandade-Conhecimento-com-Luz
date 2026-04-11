@@ -53,7 +53,7 @@
 
 #section-termos1 .j-perg-v-inner {
   position: relative !important;
-  overflow: visible !important;
+  overflow: hidden !important;
   z-index: 4 !important;
 }
 
