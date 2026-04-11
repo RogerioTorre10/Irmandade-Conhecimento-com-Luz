@@ -449,10 +449,18 @@
     window.JCSenha.state.activeRunToken = triggerToken;
 
     for (const el of seq) {
-      if (triggerToken !== window.JCSenha.state.activeRunToken) return;
-      if (!el.classList.contains('typing-done')) {
-        await typeOnce(el, { speed: TYPING_SPEED, speak: true, voiceCtx, runToken: triggerToken });
-      }
+  if (triggerToken !== window.JCSenha.state.activeRunToken) return;
+
+  await typeOnce(el, {
+    speed: TYPING_SPEED,
+    speak: true,
+    voiceCtx,
+    runToken: triggerToken
+  });
+
+  // 👇 pausa entre blocos (ESSENCIAL)
+  await sleep(520);
+}
     }
 
     if (triggerToken !== window.JCSenha.state.activeRunToken) return;
