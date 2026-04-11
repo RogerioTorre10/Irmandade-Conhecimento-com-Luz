@@ -378,10 +378,21 @@
 
   async function initOnce(root) {
     if (!root || root.dataset.termos1Initialized === 'true') return;
-    root.dataset.termos1Initialized = 'true';
+
     root.dataset.transitionReady = 'false';
 
+    try { window.speechSynthesis?.cancel?.(); } catch {}
+
+    prepareTypingNodes(root);
     await waitForTransitionUnlock();
+    await flushFrames(3);
+
+    if (root.classList.contains(HIDE_CLASS) || root.getAttribute('aria-hidden') === 'true') {
+      return;
+    }
+
+    root.dataset.termos1Initialized = 'true';
+
     ensureVisible(root);
 
     await applySectionI18n(root);
@@ -416,6 +427,7 @@
       btnPrev.dataset.termos1Bound = '1';
       btnPrev.addEventListener('click', () => {
         try { window.speechSynthesis?.cancel?.(); } catch {}
+        root.dataset.termos1Initialized = 'false';
         window.JC?.show?.(PREV_SECTION_ID) ?? history.back();
       });
     }
@@ -424,13 +436,12 @@
       btnNext.dataset.termos1Bound = '1';
       btnNext.addEventListener('click', () => {
         try { window.speechSynthesis?.cancel?.(); } catch {}
+        root.dataset.termos1Initialized = 'false';
         window.JC?.show?.(NEXT_SECTION_ID) ?? (location.hash = `#${NEXT_SECTION_ID}`);
       });
     }
 
-    root.dataset.termos1Initialized = 'true';
     window.JCTermos1.state.ready = true;
-
     console.log('[JCTermos1] pronto — typing, aura, i18n e voz aplicados ao termos1');
   }
 
@@ -446,10 +457,8 @@
       window.JCTermos1.state.listenerOn = true;
     }
 
-    const now = document.getElementById(SECTION_ID);
-    if (now && !now.classList.contains(HIDE_CLASS)) {
-      initOnce(now);
-    }
+    // Não inicializa no DOMContentLoaded.
+    // O termos1 só deve começar quando o controller emitir section:shown.
   }
 
   if (document.readyState === 'loading') {
