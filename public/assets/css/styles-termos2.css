@@ -369,3 +369,32 @@
     border-radius: 12px;
   }
 }
+/* =========================================
+   FORÇA QUEBRA DE LINHA NOS ITENS LONGOS
+   ========================================= */
+
+/* garante que cada item comece em nova linha */
+#section-termos2 .termos-lista-rough > li {
+  display: block !important;
+  width: 100% !important;
+  clear: both !important;
+}
+
+/* força quebra de linha no conteúdo interno */
+#section-termos2 .termos-lista-rough > li[data-typing="true"] {
+  white-space: normal !important;
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+}
+
+/* 👇 evita que o typing tente encaixar na linha anterior */
+#section-termos2 .termos-lista-rough {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+}
+
+/* opcional: pequeno espaçamento entre linhas */
+#section-termos2 .termos-lista-rough > li + li {
+  margin-top: 2px !important;
+}
