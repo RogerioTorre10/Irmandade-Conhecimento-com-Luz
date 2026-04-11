@@ -20,9 +20,10 @@
 }
 
 /* sections antigas — sem invadir a intro */
-#section-termos,
+#section-termos1,
+#section-termos2,
 #section-senha,
-#sec-final{
+#section-final{
   max-width: 600px;
   min-height: 80vh;
   margin: 0 auto;
@@ -39,28 +40,31 @@
   overflow: hidden;
 }
 
-#section-termos.pergaminho-v::before,
+#section-termos1.pergaminho-v::before,
+#section-termos2.pergaminho-v::before,
 #section-senha.pergaminho-v::before,
-#sec-final.pergaminho-v::before{
+#section-final.pergaminho-v::before{
   background-image: url('/assets/img/pergaminho-rasgado-vert.png') !important;
   background-size: cover;
   min-height: 80vh;
 }
 
-#sec-perguntas.pergaminho-h::before,
-#sec-wizard.pergaminho-h::before{
+#section-perguntas.pergaminho-h::before,
+#section-wizard.pergaminho-h::before{
   background-image: url('/assets/img/pergaminho-rasgado-horiz.png') !important;
   background-size: cover;
   min-height: 80vh;
 }
 
 /* texto legado */
-#termos-pg1,
-#termos-pg2,
+#section-termos1-pg1,
+#section-termos1-pg2,
+#section-termos2-pg1,
+#section-termos2-pg2,
 #section-senha h2,
 #section-senha p,
-#sec-wizard #q-text,
-#sec-final p{
+#section-wizard #q-text,
+#section-final p{
   display: block;
   margin-bottom: 8px;
   font-family: 'BerkshireSwash', cursive;
@@ -73,11 +77,13 @@
   visibility: visible;
 }
 
-#termos-pg1 h2,
-#termos-pg2 h3,
+#section-termos1-pg1 h2,
+#section-termos1-pg2 h3,
+#section-termos2-pg1 h2,
+#section-termos2-pg2 h3,
 #section-senha h2,
-#sec-wizard h2,
-#sec-final h2{
+#section-wizard h2,
+#section-final h2{
   margin-bottom: 10px;
   font-size: 18px;
   color: #fff;
@@ -120,21 +126,27 @@
 }
 
 /* esconder apenas onde o fluxo antigo exige */
-.section-termos .parchment-title-rough,
-.section-termos .parchment-text-rough,
+.section-termos1 .parchment-title-rough,
+.section-termos1 .parchment-text-rough,
+.section-termos2 .parchment-title-rough,
+.section-termos2 .parchment-text-rough,
 #section-senha .parchment-title-rough,
 #section-senha .parchment-text-rough,
-#sec-final .parchment-title-rough,
-#sec-final .parchment-text-rough{
+#section-final .parchment-title-rough,
+#section-final .parchment-text-rough{
   display: none;
   opacity: 0;
   visibility: hidden;
 }
 
-.section-termos .parchment-title-rough.typing-active,
-.section-termos .parchment-title-rough.typing-done,
-.section-termos .parchment-text-rough.typing-active,
-.section-termos .parchment-text-rough.typing-done,
+.section-termos1 .parchment-title-rough.typing-active,
+.section-termos1 .parchment-title-rough.typing-done,
+.section-termos1 .parchment-text-rough.typing-active,
+.section-termos1 .parchment-text-rough.typing-done,
+.section-termos2 .parchment-title-rough.typing-active,
+.section-termos2 .parchment-title-rough.typing-done,
+.section-termos2 .parchment-text-rough.typing-active,
+.section-termos2 .parchment-text-rough.typing-done,
 #section-senha .parchment-title-rough.typing-active,
 #section-senha .parchment-title-rough.typing-done,
 #section-senha .parchment-text-rough.typing-active,
@@ -149,7 +161,8 @@
   text-align: left;
 }
 
-.section-termos .parchment-inner-rough{
+.section-termos1 .parchment-inner-rough,
+.section-termos2 .parchment-inner-rough{
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -169,14 +182,16 @@
   visibility: visible;
 }
 
-.section-termos .parchment-actions-rough,
+.section-termos1 .parchment-actions-rough,
+.section-termos2 .parchment-actions-rough,
 #section-senha .parchment-actions-rough,
-#sec-final .parchment-actions-rough{
+#section-final .parchment-actions-rough{
   position: sticky;
   bottom: 0;
 }
 
-.section-termos .parchment-actions-rough{
+.section-termos1 .parchment-actions-rough,
+.section-termos2 .parchment-actions-rough{
   display: flex;
   opacity: 1;
   visibility: visible;
