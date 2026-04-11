@@ -3,55 +3,94 @@
 <link rel="stylesheet" href="/assets/css/j-panel-glow.css">
 <link rel="stylesheet" href="/assets/css/styles-senha.css">
 
-<div id="jornada-content-wrapper">
-  <section id="section-senha">
-   <section id="section-senha" class="section j-screen-vert">
-    <div class="j-panel-glow senha-panel">
-      <div class="j-perg-v-inner">
-        <div class="j-arcane-card senha-wrap">
-          <div class="conteudo-pergaminho">
-          
-      <h2 class="titulo-pergaminho"
-          id="senha-instr1"
-          data-typing="true"
-          data-text="Digite a Palavra-Chave"//Digite a Palavra-Chave
-          data-speed="50"
-          data-cursor="true">
-      </h2>
-      <p id="senha-instr2"
-         data-typing="true"
-         data-text="A "//A Palavra-Chave é o segredo que abrirá as portas da sua jornada
-         data-speed="50"
-         data-cursor="true">
-      </p>
-      <p id="senha-instr3"
-         data-typing="true"
-         data-text="E " //Escolha com cuidado, pois ela reflete sua intenção
-         data-speed="50"
-         data-cursor="true">
-      </p>
-      <p id="senha-instr4"
-         data-typing="true"
-         data-text="P."//Pronto? Digite agora e avance
-         data-speed="50"
-         data-cursor="true">
-      </p>
-      <div class="senha-input on-pergaminho">
-        <input id="senha-input"
-               class="input-espinhos"
-               type="password"
-               placeholder="Digite a Palavra-Chave..."
-               aria-label="Digite a Palavra-Chave para a jornada"
-               disabled />
-        <button class="btn btn-toggle-senha" data-action="toggle-password" aria-label="Alternar visibilidade da Palavra-Chave" disabled>👁️</button>
-      </div>
-      <div class="senha-actions">
-        <button id="btn-senha-prev" class="btn btn-stone" aria-label="Voltar para a home" disabled>😢Voltar</button>
-        <button id="btn-senha-avancar" class="btn btn-stone" data-next-section="section-guia" aria-label="Avançar para a seção guia" disabled>💪Avançar</button>
-      </div>
-      <div id="guia-error" style="display:none; color:#ff3333; margin-top:8px; font-family:'BerkshireSwash', cursive;">
-        Não foi possível carregar os guias. Escolha um guia padrão abaixo.
+<section id="section-senha" class="section j-screen-vert" data-section="senha">
+  <div class="j-panel-glow senha-panel">
+    <div class="j-perg-v-inner">
+      <div class="j-arcane-card senha-wrap">
+        <div class="conteudo-pergaminho senha-panel-inner">
+
+          <h2 class="titulo-pergaminho senha-title"
+              id="senha-instr1"
+              data-typing="true"
+              data-cursor="true"
+              data-speed="50"
+              data-i18n="senha.title"
+              data-i18n-text="senha.title"
+              data-text="Digite a Palavra-Chave">
+          </h2>
+
+          <p id="senha-instr2"
+             class="senha-copy parchment-text-rough"
+             data-typing="true"
+             data-cursor="true"
+             data-speed="50"
+             data-i18n="senha.line1"
+             data-i18n-text="senha.line1"
+             data-text="A Palavra-Chave é o segredo que abrirá as portas da sua jornada.">
+          </p>
+
+          <p id="senha-instr3"
+             class="senha-copy parchment-text-rough"
+             data-typing="true"
+             data-cursor="true"
+             data-speed="50"
+             data-i18n="senha.line2"
+             data-i18n-text="senha.line2"
+             data-text="Escolha com cuidado, pois ela reflete sua intenção.">
+          </p>
+
+          <p id="senha-instr4"
+             class="senha-copy parchment-text-rough"
+             data-typing="true"
+             data-cursor="true"
+             data-speed="50"
+             data-i18n="senha.line3"
+             data-i18n-text="senha.line3"
+             data-text="Pronto? Digite agora e avance.">
+          </p>
+
+          <div class="senha-input-wrap on-pergaminho">
+            <input id="senha-input"
+                   class="input-espinhos input-senha"
+                   type="password"
+                   placeholder="Digite a Palavra-Chave..."
+                   data-i18n-placeholder="senha.placeholder"
+                   aria-label="Digite a Palavra-Chave para a jornada"
+                   disabled />
+
+            <button class="btn btn-toggle-senha"
+                    data-action="toggle-password"
+                    aria-label="Alternar visibilidade da Palavra-Chave"
+                    disabled>
+              👁️
+            </button>
+          </div>
+
+          <div class="senha-actions">
+            <button id="btn-senha-prev"
+                    class="btn btn-stone"
+                    aria-label="Voltar para a home"
+                    disabled>
+              😢Voltar
+            </button>
+
+            <button id="btn-senha-avancar"
+                    class="btn btn-stone"
+                    data-next-section="section-guia"
+                    aria-label="Avançar para a seção guia"
+                    disabled>
+              💪Avançar
+            </button>
+          </div>
+
+          <div id="guia-error"
+               class="guia-error"
+               style="display:none;">
+            Não foi possível carregar os guias. Escolha um guia padrão abaixo.
+          </div>
+
+        </div>
       </div>
     </div>
-  </section>
-</div>
+  </div>
+</section>
