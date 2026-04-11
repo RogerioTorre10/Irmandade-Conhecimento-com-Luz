@@ -707,35 +707,30 @@
    REMOÇÃO TOTAL DE BULLETS (FORÇADO)
    ========================================= */
 
-#section-termos1 li,
-#section-termos2 li {
+#section-termos1 li {
   list-style: none !important;
   margin-left: 0 !important;
   padding-left: 0 !important;
 }
 
 /* remove qualquer marcador padrão */
-#section-termos1 li::marker,
-#section-termos2 li::marker {
+#section-termos1 li::marker {
   content: "" !important;
 }
 
 /* remove pseudo-bullets */
-#section-termos1 li::before,
-#section-termos2 li::before {
+#section-termos1 li::before {
   content: "" !important;
   display: none !important;
 }
 
 /* remove bullets vindos como texto (•) */
-#section-termos1 .parchment-text-rough,
-#section-termos2 .parchment-text-rough {
+#section-termos1 .parchment-text-rough {
   text-indent: 0 !important;
 }
 
 /* remove qualquer bullet Unicode no início */
-#section-termos1 .parchment-text-rough span:first-child::before,
-#section-termos2 .parchment-text-rough span:first-child::before {
+#section-termos1 .parchment-text-rough span:first-child::before {
   content: none !important;
 }
 /* =========================================================
@@ -743,8 +738,7 @@
    ========================================================= */
 
 /* garante contexto visual do texto */
-#section-termos1 .parchment-text-rough,
-#section-termos2 .parchment-text-rough {
+#section-termos1 .parchment-text-rough {
   position: relative !important;
   display: inline-block !important;
   width: fit-content !important;
@@ -754,8 +748,7 @@
 }
 
 /* aura viva durante a digitação */
-#section-termos1 .parchment-text-rough.typing-active::before,
-#section-termos2 .parchment-text-rough.typing-active::before {
+#section-termos1 .parchment-text-rough.typing-active::before {
   content: "";
   position: absolute;
   inset: -6px -10px !important;
@@ -785,9 +778,7 @@
 
 /* leve aura residual após terminar */
 #section-termos1 .parchment-text-rough.typing-done::before,
-#section-termos1 .parchment-text-rough.type-done::before,
-#section-termos2 .parchment-text-rough.typing-done::before,
-#section-termos2 .parchment-text-rough.type-done::before {
+#section-termos1 .parchment-text-rough.type-done::before {
   content: "";
   position: absolute;
   inset: -4px -8px !important;
@@ -809,8 +800,7 @@
 }
 
 /* reforço do brilho das letras enquanto digita */
-#section-termos1 .parchment-text-rough.typing-active,
-#section-termos2 .parchment-text-rough.typing-active {
+#section-termos1 .parchment-text-rough.typing-active {
   text-shadow:
     0 0 6px rgba(255, 230, 120, 0.95),
     0 0 12px rgba(255, 210, 90, 0.80),
@@ -820,16 +810,13 @@
 
 /* mobile */
 @media (max-width: 600px) {
-  #section-termos1 .parchment-text-rough.typing-active::before,
-  #section-termos2 .parchment-text-rough.typing-active::before {
+    #section-termos1 .parchment-text-rough.typing-active::before {
     inset: -4px -7px !important;
     border-radius: 12px;
   }
 
   #section-termos1 .parchment-text-rough.typing-done::before,
-  #section-termos1 .parchment-text-rough.type-done::before,
-  #section-termos2 .parchment-text-rough.typing-done::before,
-  #section-termos2 .parchment-text-rough.type-done::before {
+  #section-termos1 .parchment-text-rough.type-done::before {
     inset: -3px -6px !important;
     border-radius: 10px;
   }
