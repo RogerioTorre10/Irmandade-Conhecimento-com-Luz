@@ -5,6 +5,8 @@
   const PREV_SECTION_ID = 'section-intro';
   const NEXT_SECTION_ID = 'section-termos2';
   const HIDE_CLASS = 'hidden';
+  const TYPING_SPEED = 34;
+  const TTS_LATCH_MS = 600;
 
   if (window.JCTermos1?.__bound) {
     console.log('[JCTermos1] já carregado');
@@ -19,6 +21,7 @@
   };
 
   const q = (sel, root = document) => root.querySelector(sel);
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
   function ensureVisible(el) {
     if (!el) return;
@@ -170,6 +173,17 @@
     return true;
   }
 
+  function sanitizeTypingText(text) {
+    return String(text || '')
+      .replace(/\r/g, '')
+      .replace(/^\s*[•●▪◦·]\s*/gm, '')
+      .replace(/<li[^>]*>/gi, '')
+      .replace(/<\/li>/gi, '\n')
+      .replace(/<\/?(ul|ol)[^>]*>/gi, '')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+  }
+
   function syncTranslatedFallbacksFromDOM(root) {
     if (!root) return;
 
@@ -179,23 +193,26 @@
       const domText = (el.textContent || '').trim();
 
       if (isRealTranslatedText(domText, key)) {
-        el.dataset.text = domText;
-        el.setAttribute('data-text', domText);
+        const clean = sanitizeTypingText(domText);
+        el.dataset.text = clean;
+        el.setAttribute('data-text', clean);
         return;
       }
 
       const translated = window.i18n?.t?.(key);
       if (isRealTranslatedText(translated, key)) {
-        el.textContent = translated;
-        el.dataset.text = translated;
-        el.setAttribute('data-text', translated);
+        const clean = sanitizeTypingText(translated);
+        el.textContent = clean;
+        el.dataset.text = clean;
+        el.setAttribute('data-text', clean);
         return;
       }
 
       if (originalFallback) {
-        el.textContent = originalFallback;
-        el.dataset.text = originalFallback;
-        el.setAttribute('data-text', originalFallback);
+        const clean = sanitizeTypingText(originalFallback);
+        el.textContent = clean;
+        el.dataset.text = clean;
+        el.setAttribute('data-text', clean);
       }
     });
 
@@ -220,6 +237,7 @@
       }
 
       if (!finalText) return;
+      finalText = sanitizeTypingText(finalText);
 
       if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
         if (el.hasAttribute('placeholder')) {
@@ -241,7 +259,33 @@
       el.removeAttribute('data-spoken');
       el.removeAttribute('data-typed');
       el.removeAttribute('aria-busy');
+
+      const txt =
+        el.getAttribute('data-text') ||
+        el.dataset?.text ||
+        el.textContent ||
+        '';
+
+      const clean = sanitizeTypingText(txt);
+      el.dataset.text = clean;
+      el.setAttribute('data-text', clean);
+      el.textContent = '';
     });
+  }
+
+  function activateTypingAura(el) {
+    if (!el) return;
+    el.classList.remove('typing-done', 'type-done');
+    el.classList.add('typing-active');
+    el.setAttribute('aria-busy', 'true');
+  }
+
+  function finishTypingAura(el) {
+    if (!el) return;
+    el.classList.remove('typing-active');
+    el.classList.add('typing-done');
+    el.removeAttribute('aria-busy');
+    el.setAttribute('data-typed', 'true');
   }
 
   async function flushFrames(count = 2) {
@@ -250,9 +294,91 @@
     }
   }
 
-  async function initOnce(root) {
-    if (!root) return;
+  async function localType(el, text, speed = TYPING_SPEED) {
+    return new Promise((resolve) => {
+      let i = 0;
+      el.textContent = '';
+      (function tick() {
+        if (i < text.length) {
+          el.textContent += text.charAt(i++);
+          setTimeout(tick, speed);
+        } else {
+          resolve();
+        }
+      })();
+    });
+  }
 
+  async function typeOnce(el, { speed = TYPING_SPEED, speak = true, voiceCtx = null } = {}) {
+    if (!el) return;
+
+    const key = el.dataset?.i18nText;
+    const rawText =
+      (key && window.i18n?.t ? window.i18n.t(key) : null) ||
+      el.dataset?.text ||
+      el.getAttribute('data-text') ||
+      el.textContent ||
+      '';
+
+    const normalizedText = sanitizeTypingText(rawText);
+    if (!normalizedText) return;
+
+    el.dataset.text = normalizedText;
+    el.setAttribute('data-text', normalizedText);
+
+    activateTypingAura(el);
+
+    let usedFallback = false;
+
+    if (typeof window.runTyping === 'function') {
+      await new Promise((res) => {
+        try {
+          window.runTyping(el, normalizedText, () => res(), { speed, cursor: true });
+        } catch (err) {
+          console.warn('[JCTermos1] runTyping falhou, usando fallback:', err);
+          usedFallback = true;
+          res();
+        }
+      });
+    } else {
+      usedFallback = true;
+    }
+
+    if (usedFallback) {
+      await localType(el, normalizedText, speed);
+    }
+
+    finishTypingAura(el);
+
+    if (speak && normalizedText && !el.dataset.spoken) {
+      try {
+        speechSynthesis.cancel?.();
+
+        if (window.EffectCoordinator?.speak) {
+          const speakOptions = {
+            rate: voiceCtx?.rate ?? 1.05,
+            pitch: voiceCtx?.pitch ?? 1.0,
+            lang: voiceCtx?.lang ?? getActiveLang(),
+            gender: voiceCtx?.voiceGender ?? 'female',
+            guide: voiceCtx?.guide ?? getActiveGuide(),
+            style: voiceCtx?.style ?? 'acolhedora'
+          };
+
+          await window.EffectCoordinator.speak(normalizedText, speakOptions);
+          await sleep(TTS_LATCH_MS);
+          el.dataset.spoken = 'true';
+        }
+      } catch (err) {
+        console.warn('[JCTermos1] falha no speak:', err);
+      }
+    }
+
+    await sleep(80);
+  }
+
+  async function initOnce(root) {
+    if (!root || root.dataset.termos1Initialized === 'true') return;
+    root.dataset.termos1Initialized = 'true';
     root.dataset.transitionReady = 'false';
 
     await waitForTransitionUnlock();
@@ -263,12 +389,28 @@
 
     syncTranslatedFallbacksFromDOM(root);
     prepareTypingNodes(root);
-    syncGuideVoiceContext(root);
+    const voiceCtx = syncGuideVoiceContext(root);
 
     await flushFrames(1);
     root.dataset.transitionReady = 'true';
 
-    const { btnNext, btnPrev } = pick(root);
+    const { btnNext, btnPrev, scope } = pick(root);
+
+    btnPrev?.removeAttribute('disabled');
+    btnNext?.setAttribute('disabled', 'true');
+    btnNext?.classList?.add('is-hidden');
+
+    const items = scope.querySelectorAll('[data-typing="true"]');
+    for (const el of items) {
+      if (!el.classList.contains('typing-done')) {
+        await typeOnce(el, { speed: TYPING_SPEED, speak: true, voiceCtx });
+      }
+    }
+
+    btnNext?.removeAttribute('disabled');
+    btnNext?.classList?.remove('is-hidden');
+    btnNext?.classList?.add('btn-ready-pulse');
+    setTimeout(() => btnNext?.classList?.remove('btn-ready-pulse'), 700);
 
     if (btnPrev && btnPrev.dataset.termos1Bound !== '1') {
       btnPrev.dataset.termos1Bound = '1';
@@ -286,16 +428,10 @@
       });
     }
 
-    btnPrev?.removeAttribute('disabled');
-    btnNext?.removeAttribute('disabled');
-
-    btnNext?.classList?.add('btn-ready-pulse');
-    setTimeout(() => btnNext?.classList?.remove('btn-ready-pulse'), 700);
-
     root.dataset.termos1Initialized = 'true';
     window.JCTermos1.state.ready = true;
 
-    console.log('[JCTermos1] pronto — mesma técnica da intro aplicada ao termos1');
+    console.log('[JCTermos1] pronto — typing, aura, i18n e voz aplicados ao termos1');
   }
 
   function onSectionShown(evt) {
