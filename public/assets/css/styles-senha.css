@@ -480,3 +480,73 @@
     border-radius: 12px;
   }
 }
+/* ======================================================
+   PATCH FINAL — CENTRALIZAÇÃO E EIXO DO PERGAMINHO
+   ====================================================== */
+
+/* palco central absoluto */
+#section-senha {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: flex-start !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* centro real do bloco */
+#section-senha .senha-panel,
+#section-senha .j-panel-glow,
+#section-senha .j-perg-v-inner,
+#section-senha .j-arcane-card,
+#section-senha .senha-wrap {
+  margin-left: auto !important;
+  margin-right: auto !important;
+  left: auto !important;
+  right: auto !important;
+  transform: none !important;
+}
+
+/* pergaminho de fundo preso no eixo */
+#section-senha .j-perg-v-inner {
+  display: flex !important;
+  justify-content: center !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  background-position: top center !important;
+}
+
+/* evita puxar o painel para a direita no mobile */
+@media (max-width: 899px) {
+  #section-senha {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  #section-senha .senha-panel,
+  #section-senha .j-panel-glow {
+    width: min(calc(100vw - 20px), 520px) !important;
+    max-width: min(calc(100vw - 20px), 520px) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  #section-senha .j-arcane-card,
+  #section-senha .senha-wrap {
+    width: 100% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+}
+
+/* mobile pequeno: tira qualquer sobra lateral */
+@media (max-width: 480px) {
+  html, body {
+    overflow-x: hidden !important;
+  }
+
+  #section-senha .senha-panel,
+  #section-senha .j-panel-glow {
+    width: min(calc(100vw - 12px), 430px) !important;
+    max-width: min(calc(100vw - 12px), 430px) !important;
+  }
+}
