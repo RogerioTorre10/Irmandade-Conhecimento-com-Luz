@@ -6,9 +6,9 @@
   const NEXT_SECTION_ID = 'section-guia';
   const HIDE_CLASS = 'hidden';
 
-  const TYPING_SPEED = 36;
+  const TYPING_SPEED = 48;
   const INITIAL_DELAY_MS = 260;
-  const TTS_LATCH_MS = 220;
+  const TTS_LATCH_MS = 420;
   const START_DELAY_MS = 420;
 
   if (window.JCSenha?.__bound) {
