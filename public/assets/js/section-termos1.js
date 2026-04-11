@@ -7,6 +7,7 @@
   const HIDE_CLASS = 'hidden';
   const TYPING_SPEED = 34;
   const TTS_LATCH_MS = 600;
+  const START_DELAY_MS = 420;
 
   if (window.JCTermos1?.__bound) {
     console.log('[JCTermos1] já carregado');
@@ -17,7 +18,9 @@
   window.JCTermos1.__bound = true;
   window.JCTermos1.state = {
     ready: false,
-    listenerOn: false
+    listenerOn: false,
+    initToken: 0,
+    activeRunToken: 0
   };
 
   const q = (sel, root = document) => root.querySelector(sel);
@@ -30,6 +33,50 @@
     el.style.removeProperty('display');
     el.style.removeProperty('opacity');
     el.style.removeProperty('visibility');
+  }
+
+  function cancelAllSpeech() {
+    try { window.speechSynthesis?.cancel?.(); } catch {}
+    try { window.EffectCoordinator?.stop?.(); } catch {}
+  }
+
+  function isElementActuallyVisible(el) {
+    if (!el) return false;
+
+    const style = window.getComputedStyle(el);
+    if (
+      style.display === 'none' ||
+      style.visibility === 'hidden' ||
+      style.opacity === '0' ||
+      el.classList.contains(HIDE_CLASS) ||
+      el.getAttribute('aria-hidden') === 'true'
+    ) {
+      return false;
+    }
+
+    const rect = el.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) return false;
+
+    const vw = window.innerWidth || document.documentElement.clientWidth || 0;
+    const vh = window.innerHeight || document.documentElement.clientHeight || 0;
+
+    const visibleX = Math.max(0, Math.min(rect.right, vw) - Math.max(rect.left, 0));
+    const visibleY = Math.max(0, Math.min(rect.bottom, vh) - Math.max(rect.top, 0));
+    const visibleArea = visibleX * visibleY;
+    const totalArea = Math.max(1, rect.width * rect.height);
+
+    return (visibleArea / totalArea) > 0.25;
+  }
+
+  async function waitForSectionVisible(root, timeoutMs = 10000) {
+    const start = Date.now();
+
+    while (Date.now() - start < timeoutMs) {
+      if (isElementActuallyVisible(root)) return true;
+      await sleep(120);
+    }
+
+    return isElementActuallyVisible(root);
   }
 
   async function waitForTransitionUnlock(timeoutMs = 10000) {
@@ -61,7 +108,7 @@
       const onEnd = () => {
         setTimeout(() => {
           if (!transitionStillRunning()) finish();
-        }, 60);
+        }, 80);
       };
 
       const timer = setInterval(() => {
@@ -309,8 +356,9 @@
     });
   }
 
-  async function typeOnce(el, { speed = TYPING_SPEED, speak = true, voiceCtx = null } = {}) {
+  async function typeOnce(el, { speed = TYPING_SPEED, speak = true, voiceCtx = null, runToken = 0 } = {}) {
     if (!el) return;
+    if (runToken !== window.JCTermos1.state.activeRunToken) return;
 
     const key = el.dataset?.i18nText;
     const rawText =
@@ -344,15 +392,17 @@
       usedFallback = true;
     }
 
+    if (runToken !== window.JCTermos1.state.activeRunToken) return;
+
     if (usedFallback) {
       await localType(el, normalizedText, speed);
     }
 
     finishTypingAura(el);
 
-    if (speak && normalizedText && !el.dataset.spoken) {
+    if (speak && normalizedText && !el.dataset.spoken && runToken === window.JCTermos1.state.activeRunToken) {
       try {
-        speechSynthesis.cancel?.();
+        cancelAllSpeech();
 
         if (window.EffectCoordinator?.speak) {
           const speakOptions = {
@@ -376,34 +426,47 @@
     await sleep(80);
   }
 
-  async function initOnce(root) {
-    if (!root || root.dataset.termos1Initialized === 'true') return;
+  async function initOnce(root, triggerToken) {
+    if (!root) return;
+    if (triggerToken !== window.JCTermos1.state.initToken) return;
 
     root.dataset.transitionReady = 'false';
+    root.dataset.termos1Initialized = 'false';
 
-    try { window.speechSynthesis?.cancel?.(); } catch {}
-
+    cancelAllSpeech();
     prepareTypingNodes(root);
+
     await waitForTransitionUnlock();
     await flushFrames(3);
+    await sleep(START_DELAY_MS);
 
-    if (root.classList.contains(HIDE_CLASS) || root.getAttribute('aria-hidden') === 'true') {
+    if (triggerToken !== window.JCTermos1.state.initToken) return;
+
+    const visible = await waitForSectionVisible(root, 6000);
+    if (!visible) {
+      console.warn('[JCTermos1] section não ficou visível a tempo; init cancelado');
       return;
     }
 
-    root.dataset.termos1Initialized = 'true';
+    if (triggerToken !== window.JCTermos1.state.initToken) return;
 
     ensureVisible(root);
 
     await applySectionI18n(root);
     await flushFrames(2);
 
+    if (triggerToken !== window.JCTermos1.state.initToken) return;
+
     syncTranslatedFallbacksFromDOM(root);
     prepareTypingNodes(root);
     const voiceCtx = syncGuideVoiceContext(root);
 
-    await flushFrames(1);
+    await flushFrames(2);
+
+    if (triggerToken !== window.JCTermos1.state.initToken) return;
+
     root.dataset.transitionReady = 'true';
+    root.dataset.termos1Initialized = 'true';
 
     const { btnNext, btnPrev, scope } = pick(root);
 
@@ -411,12 +474,17 @@
     btnNext?.setAttribute('disabled', 'true');
     btnNext?.classList?.add('is-hidden');
 
+    window.JCTermos1.state.activeRunToken = triggerToken;
+
     const items = scope.querySelectorAll('[data-typing="true"]');
     for (const el of items) {
+      if (triggerToken !== window.JCTermos1.state.activeRunToken) return;
       if (!el.classList.contains('typing-done')) {
-        await typeOnce(el, { speed: TYPING_SPEED, speak: true, voiceCtx });
+        await typeOnce(el, { speed: TYPING_SPEED, speak: true, voiceCtx, runToken: triggerToken });
       }
     }
+
+    if (triggerToken !== window.JCTermos1.state.activeRunToken) return;
 
     btnNext?.removeAttribute('disabled');
     btnNext?.classList?.remove('is-hidden');
@@ -426,7 +494,9 @@
     if (btnPrev && btnPrev.dataset.termos1Bound !== '1') {
       btnPrev.dataset.termos1Bound = '1';
       btnPrev.addEventListener('click', () => {
-        try { window.speechSynthesis?.cancel?.(); } catch {}
+        cancelAllSpeech();
+        window.JCTermos1.state.initToken++;
+        window.JCTermos1.state.activeRunToken = 0;
         root.dataset.termos1Initialized = 'false';
         window.JC?.show?.(PREV_SECTION_ID) ?? history.back();
       });
@@ -435,20 +505,30 @@
     if (btnNext && btnNext.dataset.termos1Bound !== '1') {
       btnNext.dataset.termos1Bound = '1';
       btnNext.addEventListener('click', () => {
-        try { window.speechSynthesis?.cancel?.(); } catch {}
+        cancelAllSpeech();
+        window.JCTermos1.state.initToken++;
+        window.JCTermos1.state.activeRunToken = 0;
         root.dataset.termos1Initialized = 'false';
         window.JC?.show?.(NEXT_SECTION_ID) ?? (location.hash = `#${NEXT_SECTION_ID}`);
       });
     }
 
     window.JCTermos1.state.ready = true;
-    console.log('[JCTermos1] pronto — typing, aura, i18n e voz aplicados ao termos1');
+    console.log('[JCTermos1] pronto — início pós-transição validado, typing, aura, i18n e voz aplicados');
   }
 
   function onSectionShown(evt) {
     const { sectionId, node } = evt?.detail || {};
     if (sectionId !== SECTION_ID) return;
-    initOnce(node || document.getElementById(SECTION_ID));
+
+    const root = node || document.getElementById(SECTION_ID);
+    if (!root) return;
+
+    cancelAllSpeech();
+    window.JCTermos1.state.initToken += 1;
+    const myToken = window.JCTermos1.state.initToken;
+
+    initOnce(root, myToken);
   }
 
   function bind() {
@@ -456,9 +536,6 @@
       document.addEventListener('section:shown', onSectionShown, { passive: true });
       window.JCTermos1.state.listenerOn = true;
     }
-
-    // Não inicializa no DOMContentLoaded.
-    // O termos1 só deve começar quando o controller emitir section:shown.
   }
 
   if (document.readyState === 'loading') {
