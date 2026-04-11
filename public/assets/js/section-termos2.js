@@ -95,6 +95,17 @@
     }
   }
 
+  function sanitizeTypingText(text) {
+    return String(text || '')
+      .replace(/\r/g, '')
+      .replace(/^\s*[•●▪◦·]\s*/gm, '')
+      .replace(/<li[^>]*>/gi, '')
+      .replace(/<\/li>/gi, '\n')
+      .replace(/<\/?(ul|ol)[^>]*>/gi, '')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+  }
+
   function syncTranslatedFallbacks(root) {
     if (!root) return;
 
@@ -109,9 +120,14 @@
         translated.trim() &&
         translated !== key
       ) {
-        el.textContent = translated;
-        el.dataset.text = translated;
-        el.setAttribute('data-text', translated);
+        const clean = sanitizeTypingText(translated);
+        el.textContent = clean;
+        el.dataset.text = clean;
+        el.setAttribute('data-text', clean);
+      } else {
+        const clean = sanitizeTypingText(el.dataset.text || el.getAttribute('data-text') || el.textContent || '');
+        el.dataset.text = clean;
+        el.setAttribute('data-text', clean);
       }
     });
 
@@ -127,14 +143,16 @@
         translated === key
       ) return;
 
+      const clean = sanitizeTypingText(translated);
+
       if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
         if (el.hasAttribute('placeholder')) {
-          el.placeholder = translated;
+          el.placeholder = clean;
         } else {
-          el.value = translated;
+          el.value = clean;
         }
       } else if (!el.hasAttribute('data-i18n-text')) {
-        el.textContent = translated;
+        el.textContent = clean;
       }
     });
   }
@@ -147,7 +165,33 @@
       el.removeAttribute('data-spoken');
       el.removeAttribute('data-typed');
       el.removeAttribute('aria-busy');
+
+      const txt =
+        el.getAttribute('data-text') ||
+        el.dataset?.text ||
+        el.textContent ||
+        '';
+
+      const clean = sanitizeTypingText(txt);
+      el.dataset.text = clean;
+      el.setAttribute('data-text', clean);
+      el.textContent = '';
     });
+  }
+
+  function activateTypingAura(el) {
+    if (!el) return;
+    el.classList.remove('typing-done', 'type-done');
+    el.classList.add('typing-active');
+    el.setAttribute('aria-busy', 'true');
+  }
+
+  function finishTypingAura(el) {
+    if (!el) return;
+    el.classList.remove('typing-active');
+    el.classList.add('typing-done');
+    el.removeAttribute('aria-busy');
+    el.setAttribute('data-typed', 'true');
   }
 
   async function flushFrames(count = 2) {
@@ -216,17 +260,20 @@
     if (!el) return;
 
     const key = el.dataset?.i18nText;
-    const text =
+    const rawText =
       (key && window.i18n?.t ? window.i18n.t(key) : null) ||
       el.dataset?.text ||
+      el.getAttribute('data-text') ||
       el.textContent ||
       '';
 
-    const normalizedText = String(text).trim();
+    const normalizedText = sanitizeTypingText(rawText);
     if (!normalizedText) return;
 
-    el.classList.add('typing-active');
-    el.classList.remove('typing-done');
+    el.dataset.text = normalizedText;
+    el.setAttribute('data-text', normalizedText);
+
+    activateTypingAura(el);
 
     let usedFallback = false;
 
@@ -234,7 +281,8 @@
       await new Promise(res => {
         try {
           window.runTyping(el, normalizedText, () => res(), { speed, cursor: true });
-        } catch {
+        } catch (err) {
+          console.warn('[JCTermos2] runTyping falhou, usando fallback:', err);
           usedFallback = true;
           res();
         }
@@ -247,8 +295,7 @@
       await localType(el, normalizedText, speed);
     }
 
-    el.classList.remove('typing-active');
-    el.classList.add('typing-done');
+    finishTypingAura(el);
 
     if (speak && normalizedText && !el.dataset.spoken) {
       try {
@@ -360,7 +407,7 @@
     }
 
     window.JCTermos2.state.ready = true;
-    console.log('[JCTermos2] pronto — i18n aplicado, fallback sincronizado, voz alinhada e transição preservada');
+    console.log('[JCTermos2] pronto — i18n aplicado, typing com aura, fallback sincronizado, voz alinhada e transição preservada');
   }
 
   function onSectionShown(evt) {
