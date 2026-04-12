@@ -77,6 +77,20 @@
     "placeholder": "NAME.",
     "notice": "Hover gently over the buttons to preview each guide’s profile. To confirm your choice, click again or use a double click."
   },
+  "guias": {
+  "zion": {
+    "nome": "xAI GROK",
+    "descricao": "ZION Curious and direct, seeks deep answers with a cosmic vision."
+  },
+  "lumen": {
+    "nome": "OpenAI ChatGPT",
+    "descricao": "LUMEN Warm and reflective, guides with empathy and clarity."
+  },
+  "arian": {
+    "nome": "Google Gemini",
+    "descricao": "ARIAN Creative and versatile, inspires with innovative perspectives."
+  }
+ },
   "selfie": {
     "title": "Take Your Photo",
     "instruction": "Hold the phone a bit away and position your face. Your guide will lead you.",
