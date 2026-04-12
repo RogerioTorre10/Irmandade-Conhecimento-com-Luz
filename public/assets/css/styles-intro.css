@@ -575,3 +575,40 @@
   pointer-events: none;
   animation: none;
 }
+/* =========================================
+   SENHA — AURA TAMBÉM DURANTE A FALA
+   ========================================= */
+
+#section-intro [data-typing="true"].speaking-active {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 220, 120, 0.16) 0%,
+    rgba(255, 190, 70, 0.08) 45%,
+    transparent 100%
+  ) !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 220, 120, 0.18),
+    0 0 10px rgba(255, 220, 120, 0.18),
+    0 0 22px rgba(255, 180, 60, 0.14),
+    inset 0 0 10px rgba(255, 240, 180, 0.04) !important;
+  text-shadow:
+    0 0 6px rgba(255, 230, 120, 0.95),
+    0 0 12px rgba(255, 210, 90, 0.72),
+    0 0 20px rgba(255, 170, 40, 0.36) !important;
+  animation: senhaAuraPulse 1.6s ease-in-out infinite;
+}
+
+#section-intro [data-typing="true"].speaking-active::before {
+  content: "";
+  position: absolute;
+  inset: -4px -6px;
+  border-radius: 14px;
+  pointer-events: none;
+  z-index: -1;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 220, 120, 0.10) 0%,
+    rgba(255, 180, 60, 0.05) 55%,
+    transparent 100%
+  );
+}
