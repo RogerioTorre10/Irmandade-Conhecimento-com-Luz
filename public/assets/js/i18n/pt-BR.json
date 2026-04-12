@@ -75,14 +75,18 @@
     "p3": "Pronto? Digite agora e avance.",
     "placeholder": "Digite a Palavra-Chave..."
   },
-  "guia": {
-    "title": "Escolha seu Guia",
-    "subtitle": "Selecione quem irá acompanhar você nesta jornada.",
-    "p1": "Para liberar o Guia, insira seu nome.",
-    "placeholder": "NOME.",
-    "notice": "Ao passar suavemente o cursor sobre os botões, será exibido o perfil do guia. Para confirmar, clique novamente ou utilize duplo clique."
-  },
-  "guias": {
+ "guia": {
+  "title": "Escolha seu Guia",
+  "subtitle": "Olá, {{nome}}! Escolha seu guia para a Jornada.",
+  "p1": "Para liberar o Guia, Insira seu nome",
+  "placeholder": "NOME",
+  "notice": "Ao passar suavemente o cursor sobre os botões, será exibido o perfil do guia. Para confirmar, clique novamente ou utilize duplo clique.",
+  "armed": "Você escolheu {{guia}}. Clique novamente para confirmar.",
+  "timeout": "Tempo esgotado. Selecione o guia e clique novamente para confirmar.",
+  "load_error": "Não foi possível carregar os guias. Tente novamente mais tarde.",
+  "choose_guide_aria": "Escolher o guia {{guia}}"
+},
+"guias": {
   "zion": {
     "nome": "xAI GROK",
     "descricao": "ZION Curioso e direto, busca respostas profundas com visão cósmica."
