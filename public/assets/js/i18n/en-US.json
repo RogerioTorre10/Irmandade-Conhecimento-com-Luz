@@ -74,7 +74,8 @@
     "title": "Choose Your Guide",
     "subtitle": "Select who will accompany you on this journey.",
     "p1": "To unlock the Guide, enter your name.",
-    "placeholder": "NAME."
+    "placeholder": "NAME.",
+    "notice": "Hover gently over the buttons to preview each guide’s profile. To confirm your choice, click again or use a double click."
   },
   "selfie": {
     "title": "Take Your Photo",
