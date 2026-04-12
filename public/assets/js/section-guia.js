@@ -1,6 +1,4 @@
-// /assets/js/section-guia.js — v3.5 (lapidado)
-// Guia: preview com áudio antes do nome; TTS da descrição após confirmar nome.
-
+// /assets/js/section-guia.js — v4.0 i18n blindado
 (function () {
   'use strict';
 
@@ -12,11 +10,8 @@
   const TTS_LATCH_MS = 600;
   const DATA_URL = '/assets/data/guias.json';
 
-  // UX: confirmação em 2 passos
   const ARM_TIMEOUT_MS = 10000;
   const HOVER_DELAY_MS = 150;
-
-  // Preview
   const PREVIEW_TIMEOUT_MS = 10200;
 
   if (window.JCGuia?.__bound) return;
@@ -27,9 +22,6 @@
   const q = (sel, root = document) => root.querySelector(sel);
   const qa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
-  // =====================================================
-  // ESTADO
-  // =====================================================
   let nomeConfirmado = false;
 
   let hoverTimers = new Map();
@@ -43,9 +35,20 @@
   let previewPlaying = false;
   let previewCurrentSrc = null;
 
-  // =====================================================
-  // HELPERS
-  // =====================================================
+  function t(key, fallback = '') {
+    try {
+      const out = window.i18n?.t?.(key);
+      if (typeof out === 'string' && out.trim() && out !== key) return out.trim();
+    } catch {}
+    return fallback;
+  }
+
+  function interpolate(template, vars = {}) {
+    return String(template || '').replace(/\{\{\s*([\w.]+)\s*\}\}/g, (_, k) => {
+      return vars[k] != null ? String(vars[k]) : '';
+    });
+  }
+
   function canonGuia(v) {
     const s = String(v || '').trim().toLowerCase();
     if (!s) return '';
@@ -66,6 +69,73 @@
 
   function safeSpeechCancel() {
     try { window.speechSynthesis?.cancel?.(); } catch {}
+  }
+
+  function getActiveLang() {
+    return (
+      window.i18n?.getLanguage?.() ||
+      localStorage.getItem('i18n_lang') ||
+      sessionStorage.getItem('i18n_lang') ||
+      document.documentElement.lang ||
+      'pt-BR'
+    );
+  }
+
+  function applySectionI18n(root) {
+    if (!root) return;
+
+    root.querySelectorAll('[data-i18n-text]').forEach((el) => {
+      const key = el.dataset.i18nText;
+      if (!key) return;
+      const translated = t(key, el.getAttribute('data-text') || el.textContent || '');
+      if (!translated) return;
+      el.dataset.text = translated;
+      el.setAttribute('data-text', translated);
+      if (!el.hasAttribute('data-typing')) {
+        el.textContent = translated;
+      }
+    });
+
+    root.querySelectorAll('[data-i18n]').forEach((el) => {
+      if (el.hasAttribute('data-i18n-text')) return;
+      const key = el.dataset.i18n;
+      if (!key) return;
+      const translated = t(key, el.getAttribute('data-text') || el.textContent || '');
+      if (!translated) return;
+      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+        if (el.hasAttribute('placeholder')) {
+          el.placeholder = translated;
+        } else {
+          el.value = translated;
+        }
+      } else {
+        el.textContent = translated;
+      }
+    });
+
+    root.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
+      const key = el.dataset.i18nPlaceholder;
+      if (!key) return;
+      const translated = t(key, el.placeholder || '');
+      if (translated) el.placeholder = translated;
+    });
+  }
+
+  function getGuideVoiceContext() {
+    const guide = getGuideForVoice();
+    const lang = getActiveLang();
+
+    const presetByGuide = {
+      lumen: { voiceGender: 'female', pitch: 1.08, rate: 1.00, style: 'acolhedora' },
+      zion:  { voiceGender: 'male',   pitch: 0.92, rate: 0.98, style: 'firme' },
+      arian: { voiceGender: 'female', pitch: 1.16, rate: 1.02, style: 'inspiradora' }
+    };
+
+    return {
+      lang,
+      guide,
+      ...(presetByGuide[guide] || presetByGuide.lumen)
+    };
   }
 
   function readSavedGuide() {
@@ -89,7 +159,6 @@
     sessionStorage.setItem('JORNADA_GUIA', guiaCanon);
     localStorage.setItem('JORNADA_GUIA', guiaCanon);
 
-    // chaves legadas compatíveis
     sessionStorage.setItem('jornada.guia', guiaCanon);
     localStorage.setItem('jc.guia', guiaCanon);
     localStorage.setItem('jc.guiaSelecionado', guiaCanon);
@@ -118,9 +187,6 @@
     window.JC.data.nome = upperName;
   }
 
-  // =====================================================
-  // PREVIEW
-  // =====================================================
   function ensurePreviewRefs() {
     if (previewOverlay && previewVideo) return true;
 
@@ -219,13 +285,11 @@
       });
 
       btn.addEventListener('mouseleave', stopPreview);
-
       btn.addEventListener('focusin', () => {
         const src = getSrc();
         if (!src) return;
         playPreviewSrc(src, !nomeConfirmado);
       });
-
       btn.addEventListener('focusout', stopPreview);
 
       btn.addEventListener('touchstart', () => {
@@ -238,9 +302,6 @@
     window.addEventListener('jc:section:leave', stopPreview, { passive: true });
   }
 
-  // =====================================================
-  // TRANSIÇÃO
-  // =====================================================
   async function waitForTransitionUnlock(timeoutMs = 20000) {
     if (!window.__TRANSITION_LOCK) return;
 
@@ -327,9 +388,6 @@
     }
   }
 
-  // =====================================================
-  // DATILOGRAFIA / TTS
-  // =====================================================
   async function localType(el, text, speed = TYPING_SPEED) {
     return new Promise((resolve) => {
       let i = 0;
@@ -346,9 +404,6 @@
     });
   }
 
-  // ===============================================
-  // VOZ DO GUIA
-  // ===============================================
   function getGuideForVoice() {
     const g =
       sessionStorage.getItem('jornada.guia') ||
@@ -359,7 +414,7 @@
     return canonGuia(g) || 'lumen';
   }
 
- function pickVoiceForGuide(lang) {
+  function pickVoiceForGuide(lang) {
     const resolvedLang = lang || document.documentElement.lang || localStorage.getItem('i18n_lang') || 'pt-BR';
     const voices = window.speechSynthesis?.getVoices?.() || [];
     if (!voices.length) return null;
@@ -376,7 +431,7 @@
       'natural male', 'google português'
     ];
 
-    const langNorm = String(lang || 'pt-BR').toLowerCase();
+    const langNorm = String(resolvedLang).toLowerCase();
     const langShort = langNorm.slice(0, 2);
 
     const filtered = voices.filter(v =>
@@ -385,21 +440,18 @@
 
     const list = filtered.length ? filtered : voices;
 
-    // Lumen → feminina suave
     if (guide === 'lumen') {
       return list.find(v =>
         femaleHints.some(h => String(v.name || '').toLowerCase().includes(h))
       ) || list[0] || null;
     }
 
-    // Zion → masculina
     if (guide === 'zion') {
       return list.find(v =>
         maleHints.some(h => String(v.name || '').toLowerCase().includes(h))
       ) || list[0] || null;
     }
 
-    // Arian → feminina inspiradora
     if (guide === 'arian') {
       return list.find(v =>
         femaleHints.some(h => String(v.name || '').toLowerCase().includes(h))
@@ -412,11 +464,21 @@
   async function typeOnce(el, text, { speed = TYPING_SPEED, speak = true } = {}) {
     if (!el) return;
 
-    const msg = (text || el.dataset?.text || el.textContent || '').trim();
+    const msg = String(
+      text ??
+      el.dataset?.text ??
+      el.textContent ??
+      ''
+    ).trim();
+
     if (!msg) return;
 
+    el.dataset.text = msg;
+    el.setAttribute('data-text', msg);
+
     el.classList.add('typing-active');
-    el.classList.remove('typing-done');
+    el.classList.remove('typing-done', 'speaking-active');
+    el.textContent = '';
 
     let usedFallback = false;
 
@@ -438,34 +500,19 @@
     }
 
     el.classList.remove('typing-active');
-    el.classList.add('typing-done');
+    el.classList.add('speaking-active');
 
     if (speak && msg && !el.dataset.spoken) {
       try {
         safeSpeechCancel();
 
-        const lang = document.documentElement.lang || 'pt-BR';
-        const guide = getGuideForVoice();
+        const lang = getActiveLang();
+        const voiceCtx = getGuideVoiceContext();
 
         const utter = new SpeechSynthesisUtterance(msg);
         utter.lang = lang;
-        utter.rate = 1.02;
-        utter.pitch = 1;
-
-        if (guide === 'zion') {
-          utter.pitch = 0.9;
-          utter.rate = 1.0;
-        }
-
-        if (guide === 'lumen') {
-          utter.pitch = 1.1;
-          utter.rate = 1.02;
-        }
-
-        if (guide === 'arian') {
-          utter.pitch = 1.2;
-          utter.rate = 1.05;
-        }
+        utter.rate = voiceCtx.rate ?? 1.0;
+        utter.pitch = voiceCtx.pitch ?? 1.0;
 
         const voice = pickVoiceForGuide(lang);
         if (voice) utter.voice = voice;
@@ -481,12 +528,11 @@
       } catch {}
     }
 
+    el.classList.remove('speaking-active');
+    el.classList.add('typing-done');
     await sleep(60);
   }
 
-  // =====================================================
-  // TEMA
-  // =====================================================
   function applyGuiaTheme(guiaIdOrNull) {
     const guia = guiaIdOrNull ? canonGuia(guiaIdOrNull) : readSavedGuide();
 
@@ -530,16 +576,12 @@
     document.documentElement.style.setProperty('--guide-color', main);
 
     document.body.setAttribute('data-guia', guia);
-    console.log('[THEME] aplicado:', guia);
     return true;
   }
 
   window.applyGuideTheme = applyGuideThemeVars;
   window.aplicarGuiaTheme = window.aplicarGuiaTheme || applyGuiaTheme;
 
-  // =====================================================
-  // DADOS / RENDER
-  // =====================================================
   function pick(root) {
     return {
       root,
@@ -561,7 +603,6 @@
 
   function renderButtons(optionsBox, guias) {
     if (!optionsBox) return;
-
     optionsBox.innerHTML = '';
 
     guias.forEach((g) => {
@@ -569,22 +610,28 @@
       btn.type = 'button';
       btn.className = 'btn btn-stone-espinhos no-anim guia-option';
       btn.dataset.action = 'select-guia';
-      btn.dataset.guia = canonGuia(g.id || g.nome || '');
+
+      const canon = canonGuia(g.id || g.nome || '');
+      const nomeTraduzido =
+        (g.nomeKey ? t(g.nomeKey, '') : '') ||
+        g.nome ||
+        canon.toUpperCase();
+
+      btn.dataset.guia = canon;
       btn.dataset.locked = '1';
-      btn.dataset.nome = g.nome || '';
+      btn.dataset.nome = nomeTraduzido;
       btn.setAttribute('aria-disabled', 'true');
-      btn.setAttribute('aria-label', `Escolher o guia ${g.nome || ''}`);
+      btn.setAttribute('aria-label', interpolate(t('guia.choose_guide_aria', 'Escolher o guia {{guia}}'), { guia: nomeTraduzido }));
       btn.classList.add('is-locked');
 
-      const gid = btn.dataset.guia;
       const PREVIEW_BY_ID = {
         zion: '/assets/videos/Zion-escolhido.mp4',
         lumen: '/assets/videos/Lumen-escolhida.mp4',
         arian: '/assets/videos/Arian-escolhida.mp4'
       };
 
-      btn.dataset.previewSrc = encodeURI(PREVIEW_BY_ID[gid] || '');
-      btn.innerHTML = `<span class="label">${g.nome || gid}</span>`;
+      btn.dataset.previewSrc = encodeURI(PREVIEW_BY_ID[canon] || '');
+      btn.innerHTML = `<span class="label">${nomeTraduzido}</span>`;
 
       if (g.bgImage) {
         btn.style.backgroundImage = `url('${g.bgImage}')`;
@@ -601,9 +648,22 @@
     return guias.find((g) => canonGuia(g.id || g.nome || '') === canon);
   }
 
-  // =====================================================
-  // NOTICE
-  // =====================================================
+  function getGuideLabel(g) {
+    return (
+      (g?.nomeKey ? t(g.nomeKey, '') : '') ||
+      g?.nome ||
+      canonGuia(g?.id || '')
+    );
+  }
+
+  function getGuideDescription(g) {
+    return (
+      (g?.descricaoKey ? t(g.descricaoKey, '') : '') ||
+      g?.descricao ||
+      ''
+    );
+  }
+
   function getNoticeRefs(root) {
     const box = q('#guia-error', root);
     if (!box) return { box: null, span: null };
@@ -629,7 +689,7 @@
     span.dataset.spoken = '';
     span.textContent = '';
 
-    await typeOnce(span, null, { speed: 30, speak });
+    await typeOnce(span, text, { speed: 30, speak });
   }
 
   function hideNotice(root) {
@@ -645,9 +705,6 @@
     box.setAttribute('aria-hidden', 'true');
   }
 
-  // =====================================================
-  // ARM / CONFIRM
-  // =====================================================
   function unlockGuideButtons(buttons) {
     buttons.forEach((b) => {
       b.dataset.locked = '0';
@@ -665,7 +722,7 @@
       b.dataset.locked = '1';
       b.setAttribute('aria-disabled', 'true');
       b.classList.add('is-locked');
-      b.disabled = false; // mantém preview funcionando
+      b.disabled = false;
       b.style.opacity = '0.6';
       b.style.cursor = 'pointer';
       b.style.pointerEvents = 'auto';
@@ -697,7 +754,12 @@
 
     armedId = guiaId;
 
-    showNotice(root, `Você escolheu ${label}. Clique novamente para confirmar.`, { speak: true });
+    const armedMsg = interpolate(
+      t('guia.armed', 'Você escolheu {{guia}}. Clique novamente para confirmar.'),
+      { guia: label }
+    );
+
+    showNotice(root, armedMsg, { speak: true });
 
     armTimer = setTimeout(() => {
       armedId = null;
@@ -708,7 +770,11 @@
         el.setAttribute('aria-pressed', 'false');
       });
 
-      showNotice(root, 'Tempo esgotado. Selecione o guia e clique novamente para confirmar.', { speak: true });
+      showNotice(
+        root,
+        t('guia.timeout', 'Tempo esgotado. Selecione o guia e clique novamente para confirmar.'),
+        { speak: true }
+      );
     }, ARM_TIMEOUT_MS);
   }
 
@@ -756,7 +822,6 @@
         document.body.setAttribute('data-guia', guiaCanon);
       }
 
-      // limpa artefatos antigos
       sessionStorage.removeItem('JORNADA_SELFIECARD');
       sessionStorage.removeItem('SELFIE_CARD');
       sessionStorage.removeItem('__SELFIECARD_SIG__');
@@ -784,15 +849,13 @@
     }
   }
 
-  // =====================================================
-  // INIT
-  // =====================================================
   async function initOnce(root) {
     if (!root || root.dataset.guiaInitialized === 'true') return;
     root.dataset.guiaInitialized = 'true';
 
     await waitForTransitionUnlock();
     ensureVisible(root);
+    applySectionI18n(root);
 
     const els = pick(root);
     let guias = [];
@@ -801,7 +864,6 @@
     const topBox = root.querySelector('.guia-options-top');
     const bottomBox = root.querySelector('.guia-options-bottom');
 
-    // nome em maiúsculo
     if (els.nameInput && !els.nameInput.dataset.upperBound) {
       els.nameInput.dataset.upperBound = '1';
       els.nameInput.addEventListener('input', () => {
@@ -812,7 +874,6 @@
       });
     }
 
-    // garante botão confirmar visível no JS também
     if (els.confirmBtn) {
       els.confirmBtn.hidden = false;
       els.confirmBtn.style.removeProperty('display');
@@ -820,9 +881,12 @@
       els.confirmBtn.style.removeProperty('opacity');
     }
 
-    // título
     if (els.title && !els.title.classList.contains('typing-done')) {
-      await typeOnce(els.title, null, { speed: 34, speak: true });
+      const titleText = t(
+        els.title.dataset.i18nText || els.title.dataset.i18n || '',
+        els.title.dataset.text || 'Escolha seu Guia'
+      );
+      await typeOnce(els.title, titleText, { speed: 34, speak: true });
     }
 
     try {
@@ -843,9 +907,11 @@
 
       hideNotice(root);
     } catch {
-      showNotice(root, 'Não foi possível carregar os guias. Tente novamente mais tarde.', {
-        speak: false
-      });
+      showNotice(
+        root,
+        t('guia.load_error', 'Não foi possível carregar os guias. Tente novamente mais tarde.'),
+        { speak: false }
+      );
       return;
     }
 
@@ -910,10 +976,10 @@
             const base = (
               els.guiaTexto.dataset?.text ||
               els.guiaTexto.textContent ||
-              'Escolha seu guia para a Jornada.'
+              t('guia.subtitle', 'Olá, {{nome}}! Escolha seu guia para a Jornada.')
             ).trim();
 
-            const msg = base.replace(/\{\{\s*(nome|name)\s*\}\}/gi, upperName);
+            const msg = interpolate(base, { nome: upperName, name: upperName });
 
             els.guiaTexto.textContent = '';
             els.guiaTexto.dataset.spoken = '';
@@ -934,7 +1000,8 @@
 
       guideButtons.forEach((btn) => {
         const guiaId = canonGuia(btn.dataset.guia || btn.textContent || '');
-        const label = (btn.dataset.nome || btn.textContent || 'guia').trim().toUpperCase();
+        const guiaData = findGuia(guias, guiaId);
+        const label = String(getGuideLabel(guiaData) || btn.dataset.nome || btn.textContent || 'guia').trim();
 
         btn.addEventListener('mouseenter', () => {
           if (!guiaId) return;
@@ -945,9 +1012,10 @@
 
           const timer = setTimeout(async () => {
             const g = findGuia(guias, guiaId);
-            if (g && els.guiaTexto) {
+            const desc = getGuideDescription(g);
+            if (desc && els.guiaTexto) {
               els.guiaTexto.dataset.spoken = '';
-              await typeOnce(els.guiaTexto, g.descricao, {
+              await typeOnce(els.guiaTexto, desc, {
                 speed: 34,
                 speak: !!nomeConfirmado
               });
@@ -972,9 +1040,10 @@
 
         btn.addEventListener('focus', () => {
           const g = findGuia(guias, guiaId);
-          if (g && els.guiaTexto) {
+          const desc = getGuideDescription(g);
+          if (desc && els.guiaTexto) {
             els.guiaTexto.dataset.spoken = '';
-            typeOnce(els.guiaTexto, g.descricao, {
+            typeOnce(els.guiaTexto, desc, {
               speed: 34,
               speak: !!nomeConfirmado
             });
@@ -1024,7 +1093,6 @@
       }
     }
 
-    // reaplica tema salvo se já existir
     setTimeout(() => {
       try {
         applyGuideThemeVars();
@@ -1032,9 +1100,6 @@
     }, 50);
   }
 
-  // =====================================================
-  // BIND GLOBAL
-  // =====================================================
   function onSectionShown(evt) {
     const { sectionId, node } = evt?.detail || {};
     if (sectionId !== SECTION_ID) return;
