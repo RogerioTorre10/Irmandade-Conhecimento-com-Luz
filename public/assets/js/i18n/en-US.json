@@ -1,11 +1,31 @@
 {
   "meta": { "lang": "en-US", "label": "English (US)" },
-  "common": {
-    "continue": "Continue",
-    "next": "Next",
-    "back": "Back",
-    "loading": "Loading..."
-  },
+ "common": {
+  "back": "Back",
+  "next": "Next",
+  "continue": "Continue",
+  "confirm": "Confirm",
+  "start": "Start",
+  "finish": "Finish",
+
+  "yes": "Yes",
+  "no": "No",
+  "cancel": "Cancel",
+  "skip": "Skip",
+
+  "loading": "Loading...",
+  "processing": "Processing...",
+  "please_wait": "Please wait...",
+
+  "error": "An error occurred",
+  "try_again": "Try again",
+
+  "enter_here": "Type here...",
+  "required_field": "Required field",
+
+  "success": "Success",
+  "attention": "Attention"
+},
   "site": { "title": "Journey • Brotherhood of Knowledge with Light" },
   "intro": {
     "title": "Journey of Knowledge",
