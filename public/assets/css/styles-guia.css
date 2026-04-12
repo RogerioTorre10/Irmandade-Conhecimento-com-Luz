@@ -1,8 +1,7 @@
 /* ======================================================
-   SECTION-GUIA — estilos específicos e consolidados
+   SECTION-GUIA — LIMPO, CENTRALIZADO E COMPATÍVEL
    ====================================================== */
 
-/* ── Variáveis de cor por guia ── */
 :root {
   --espinhos-img: url('/assets/img/moldura-medieval-espinhos.png');
   --btn-gold-outer: rgba(255, 230, 120, 0.40);
@@ -10,6 +9,9 @@
   --btn-gold-in:    rgba(255, 255, 230, 0.25);
   --btn-gold-line:  rgba(255, 215,   0, 0.25);
   --btn-text:       #f9e7c2;
+  --guia-gold:      #ffd700;
+  --guia-text:      #f2d46b;
+  --guia-text-soft: #f8f1dc;
 }
 
 body[data-guia="lumen"],
@@ -46,15 +48,16 @@ body[data-guia-hover="arian"] {
 }
 
 /* ======================================================
-   PALCO BASE
+   PALCO
    ====================================================== */
-.section-guia,
+
 #section-guia {
   position: relative;
   background: transparent !important;
-  padding: 24px 24px 42px;
-  border-radius: 12px;
-  max-width: 600px;
+  width: 100%;
+  max-width: 100%;
+  min-height: 100vh;
+  padding: 18px 0 42px;
   margin: 0 auto;
   text-align: center;
   box-shadow: none;
@@ -65,68 +68,38 @@ body[data-guia-hover="arian"] {
   opacity: 1;
   visibility: visible;
   z-index: 2;
-  overflow: visible !important;
-  min-height: 100vh;
-  height: auto;
+  overflow-x: hidden !important;
+  overflow-y: visible !important;
   box-sizing: border-box;
 }
 
 #section-guia .j-perg-v-inner {
   position: relative;
   width: 100%;
+  max-width: 100%;
   margin: 0 auto;
   overflow: visible !important;
   z-index: 5;
+  display: flex;
+  justify-content: center;
 }
 
 #section-guia .j-panel-glow,
 #section-guia .j-panel-glow.guia-panel {
   position: relative !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
+  width: min(92vw, 520px) !important;
+  max-width: 520px !important;
+  margin: 0 auto !important;
   left: auto !important;
   right: auto !important;
   transform: none !important;
-  padding: 10px;
+  padding: 10px !important;
   border-radius: 28px !important;
   overflow: hidden !important;
   isolation: isolate !important;
   z-index: 6 !important;
 }
 
-#section-guia .guia-wrap,
-#section-guia .conteudo-pergaminho {
-  width: 100%;
-  max-width: 100%;
-}
-
-.conteudo-pergaminho {
-  text-align: center;
-  margin: 0 auto;
-  max-width: 720px;
-}
-
-/* Glow ambiente */
-#section-guia::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -70px;
-  height: 160px;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.75;
-  background: linear-gradient(
-    to bottom,
-    transparent,
-    var(--progress-glow-1, rgba(255,210,120,0.85)),
-    var(--progress-glow-2, rgba(255,210,120,0.40))
-  );
-  filter: blur(22px);
-}
-
-/* Glow painel principal */
 #section-guia .j-panel-glow::before {
   content: '';
   position: absolute;
@@ -156,89 +129,143 @@ body[data-guia-hover="arian"] {
 #section-guia .j-arcane-card {
   position: relative;
   z-index: 2;
-  margin-top: 0 !important;
-  margin-bottom: 34px !important;
+  width: 100% !important;
   min-height: 640px !important;
-  padding-bottom: 34px !important;
-  overflow: visible !important;
+  margin: 0 0 28px !important;
+  padding: 26px 20px 30px !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
 }
 
-/* glow complementar em cards e inputs */
-#section-guia .card,
-#section-guia .glass,
-#section-guia .glass-panel,
-#section-guia .guia-card,
-#section-guia .j-card,
-#section-guia .j-panel {
-  position: relative;
-  z-index: 1;
-  border: 2px solid var(--progress-main, #ffd700) !important;
+#section-guia .guia-panel-inner {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* ======================================================
+   AURA DO TYPING
+   ====================================================== */
+
+#section-guia [data-typing="true"] {
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  isolation: isolate !important;
+}
+
+#section-guia [data-typing="true"][data-cursor="true"] {
+  padding-right: 0.45em !important;
+}
+
+#section-guia [data-typing="true"][data-cursor="true"].typing-active::after {
+  content: "";
+  position: absolute;
+  right: 0.05em;
+  bottom: 0.18em;
+  width: 2px;
+  height: 1em;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #ffe08a 0%, #ffbf3b 100%);
+  box-shadow: 0 0 6px rgba(255, 210, 100, 0.9);
+  animation: guiaCaretBlink 1s steps(1, end) infinite;
+}
+
+#section-guia [data-typing="true"].typing-done::after,
+#section-guia [data-typing="true"].type-done::after {
+  content: none;
+}
+
+#section-guia [data-typing="true"].typing-active,
+#section-guia [data-typing="true"].speaking-active {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 220, 120, 0.16) 0%,
+    rgba(255, 190, 70, 0.08) 45%,
+    transparent 100%
+  ) !important;
   box-shadow:
-    0 0 16px color-mix(in srgb, var(--progress-main, #ffd700) 35%, transparent),
-    0 0 34px color-mix(in srgb, var(--progress-glow-1, rgba(255,210,120,0.85)) 32%, transparent),
-    inset 0 0 24px rgba(0,0,0,0.52) !important;
-  filter: saturate(1.05);
+    0 0 0 1px rgba(255, 220, 120, 0.18),
+    0 0 10px rgba(255, 220, 120, 0.18),
+    0 0 22px rgba(255, 180, 60, 0.14),
+    inset 0 0 10px rgba(255, 240, 180, 0.04) !important;
+  text-shadow:
+    0 0 6px rgba(255, 230, 120, 0.95),
+    0 0 12px rgba(255, 210, 90, 0.72),
+    0 0 20px rgba(255, 170, 40, 0.36) !important;
+  animation: guiaAuraPulse 1.6s ease-in-out infinite;
 }
 
-#section-guia input,
-#section-guia .input-espinhos {
-  border-color: var(--progress-main, #ffd700) !important;
-  box-shadow: 0 0 14px color-mix(in srgb, var(--progress-main, #ffd700) 55%, transparent) !important;
+#section-guia [data-typing="true"].typing-active::before,
+#section-guia [data-typing="true"].typing-done::before,
+#section-guia [data-typing="true"].type-done::before,
+#section-guia [data-typing="true"].speaking-active::before {
+  content: "";
+  position: absolute;
+  inset: -4px -6px;
+  border-radius: 14px;
+  pointer-events: none;
+  z-index: -1;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 220, 120, 0.10) 0%,
+    rgba(255, 180, 60, 0.05) 55%,
+    transparent 100%
+  );
 }
 
 /* ======================================================
    TÍTULO
    ====================================================== */
-.titulo-pergaminho {
+
+#section-guia .titulo-pergaminho,
+#section-guia .guia-title {
   font-family: 'ManufacturingConsent', sans-serif;
-  font-size: 22px;
-  color: #fff;
-  margin: 0 auto 12px;
+  font-size: 24px;
+  color: var(--guia-gold);
+  margin: 0 auto 16px;
   text-align: center !important;
-  opacity: 0;
+  opacity: 1;
   visibility: visible;
   display: block;
-}
-
-.titulo-pergaminho.lumen-typing.typing-active,
-.titulo-pergaminho.lumen-typing.typing-done {
-  opacity: 1 !important;
-  display: block !important;
-  visibility: visible !important;
+  padding: 4px 8px;
+  border-radius: 12px;
 }
 
 /* ======================================================
-   INPUT NOME + BOTÃO CONFIRMAR
+   LABEL + INPUT + CONFIRMAR
    ====================================================== */
-.guia-name-input.on-pergaminho{
-  display:flex !important;
-  flex-direction:column !important;
-  align-items:center !important;
-  justify-content:center !important;
-  width:100% !important;
-  margin:10px 0 8px !important;
-  gap:10px !important;
+
+.guia-name-input.on-pergaminho {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  margin: 12px 0 10px !important;
+  gap: 10px !important;
 }
 
-.guia-name-input .sr-only {
-  position: static !important;
-  width: auto !important;
-  height: auto !important;
-  clip: auto !important;
-  clip-path: none !important;
-  overflow: visible !important;
-  white-space: normal !important;
-  display: block !important;
+.guia-name-label {
+  display: block;
+  width: min(92%, 380px);
+  margin: 0 auto;
+  padding: 10px 12px;
+  border-radius: 10px;
   font-family: 'BerkshireSwash', cursive;
   font-size: 14px;
-  color: var(--theme-main-color, #ffd700);
+  line-height: 1.45;
+  color: var(--guia-gold);
   text-align: center;
-  margin-bottom: 2px;
+  box-sizing: border-box;
 }
 
-.input-espinhos {
-  width: min(80%, 360px);
-  padding: 10px 12px;
+.input-espinhos,
+#guiaNameInput {
+  width: min(82%, 360px);
+  padding: 12px 14px;
   background: rgba(255,255,255,0.98);
   color: #3e2723;
   font-size: 16px;
@@ -250,12 +277,21 @@ body[data-guia-hover="arian"] {
   font-family: 'Cardo', serif;
   display: block !important;
   margin: 0 auto !important;
+  box-sizing: border-box;
 }
 
 #guiaNameInput {
   text-transform: uppercase;
   letter-spacing: 1.5px;
   font-weight: 600;
+}
+
+.guia-confirm-wrap {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
+  margin: 0 0 16px !important;
 }
 
 #btn-confirmar-nome {
@@ -267,17 +303,16 @@ body[data-guia-hover="arian"] {
   margin: 0 auto !important;
   min-width: 170px !important;
   height: 42px !important;
-  padding: 0 16px !important;
+  padding: 0 18px !important;
   font-size: 15px !important;
   font-family: 'ManufacturingConsent', sans-serif;
-  position: relative !important;
-  padding:0 18px !important;
   z-index: 20 !important;
 }
 
 /* ======================================================
-   MOLDURA TEXTO DO GUIA
+   MOLDURA DO TEXTO
    ====================================================== */
+
 .moldura-grande {
   margin: 10px auto 12px;
   width: min(92%, 720px);
@@ -287,6 +322,7 @@ body[data-guia-hover="arian"] {
   display: flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
 }
 
 .guia-descricao-medieval {
@@ -299,48 +335,67 @@ body[data-guia-hover="arian"] {
   line-height: 1.45;
   margin: 0 auto;
   padding: 12px 18px;
+  box-sizing: border-box;
 }
 
 .guia-descricao-medieval p {
   margin: 6px 0;
 }
 
-#guia-error {
-  color: #ff3333;
+.guia-notice {
   margin-top: 8px;
+  text-align: center;
+}
+
+.guia-notice-text {
+  display: block;
+  width: min(92%, 420px);
+  margin: 0 auto;
+  padding: 8px 10px;
+  border-radius: 12px;
   font-family: 'BerkshireSwash', cursive;
   font-size: 14px;
+  line-height: 1.45;
+  color: var(--guia-gold);
   text-align: center;
+  box-sizing: border-box;
+}
+
+#guia-error.hidden {
+  display: none !important;
 }
 
 /* ======================================================
    BOTÕES DOS GUIAS
    ====================================================== */
+
 .guia-options {
-  width: min(92%, 720px);
-  margin: 10px auto 4px;
+  width: min(92%, 420px);
+  margin: 10px auto 8px;
   display: grid;
-  grid-template-columns: repeat(3, minmax(120px, 1fr));
-  gap: clamp(8px, 2.4vw, 16px);
-  justify-items: center;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  justify-items: stretch;
+  align-items: stretch;
+  box-sizing: border-box;
 }
 
 .guia-options .btn-stone-espinhos {
   width: 100%;
-  max-width: 180px;
+  max-width: none;
   padding: 8px 10px;
   font-family: 'ManufacturingConsent', sans-serif;
   font-weight: 700;
-  font-size: 16px;
+  font-size: 15px;
   color: #ffd36a !important;
   text-shadow: 0 1px 2px rgba(0,0,0,0.85), 0 0 6px rgba(255,220,120,0.35);
   text-align: center;
-  white-space: nowrap;
+  white-space: normal;
   display: flex;
   align-items: center;
   justify-content: center;
   line-height: 1.1;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
   background:
     linear-gradient(to bottom, rgba(255,255,255,0.15), rgba(0,0,0,0.22)),
     url('/assets/img/textura-de-pedra.jpg') center/cover no-repeat;
@@ -350,12 +405,7 @@ body[data-guia-hover="arian"] {
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.35));
   transition: transform 0.12s ease, filter 0.12s ease, opacity 0.12s ease;
   cursor: pointer;
-}
-
-.guia-options .btn-stone-espinhos .label,
-.guia-options .btn-stone-espinhos span {
-  white-space: normal;
-  transform: translateY(1px);
+  box-sizing: border-box;
 }
 
 .guia-options .btn-stone-espinhos:hover {
@@ -383,8 +433,9 @@ body[data-guia-hover="arian"] {
 }
 
 /* ======================================================
-   BOTÃO MEDIEVAL GENÉRICO
+   BOTÃO ESPINHOS GENÉRICO
    ====================================================== */
+
 .btn-stone-espinhos {
   position: relative;
   overflow: hidden;
@@ -435,29 +486,23 @@ body[data-guia-hover="arian"] {
 .btn-stone-espinhos:hover:not(:disabled) {
   filter: brightness(1.08);
   transform: translateY(-1px);
-  animation: brilhoDivino 1.8s ease-in-out infinite;
-}
-
-.btn-stone-espinhos:hover:not(:disabled)::before {
-  animation: reflexoDourado 2s linear forwards;
 }
 
 .btn-stone-espinhos:active:not(:disabled) {
   transform: translateY(0);
   filter: brightness(.98);
-  animation: none;
 }
 
 .btn-stone-espinhos:disabled {
   opacity: .7;
   filter: grayscale(.15);
   cursor: not-allowed;
-  animation: none;
 }
 
 /* ======================================================
-   PREVIEW CINEMATOGRÁFICO
+   PREVIEW
    ====================================================== */
+
 .guia-preview-overlay {
   position: fixed;
   inset: 0;
@@ -487,89 +532,52 @@ body[data-guia-hover="arian"] {
   opacity: 0.98;
 }
 
-.guia-option.is-locked,
-button.guia-option.is-locked {
-  opacity: 0.85;
+/* ======================================================
+   ANIMAÇÕES
+   ====================================================== */
+
+@keyframes guiaCaretBlink {
+  0%, 45% { opacity: 0.95; }
+  50%, 100% { opacity: 0; }
 }
 
-button[data-guia].is-locked {
-  cursor: pointer;
-}
-
-#section-guia .guia-demo-active {
-  transform: translateY(-2px);
-  box-shadow: 0 0 16px rgba(255,255,210,0.9);
+@keyframes guiaAuraPulse {
+  0% {
+    box-shadow:
+      0 0 0 1px rgba(255, 220, 120, 0.16),
+      0 0 8px rgba(255, 220, 120, 0.14),
+      0 0 16px rgba(255, 180, 60, 0.10),
+      inset 0 0 8px rgba(255, 240, 180, 0.03);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(255, 220, 120, 0.24),
+      0 0 14px rgba(255, 220, 120, 0.24),
+      0 0 26px rgba(255, 180, 60, 0.18),
+      inset 0 0 12px rgba(255, 240, 180, 0.06);
+  }
+  100% {
+    box-shadow:
+      0 0 0 1px rgba(255, 220, 120, 0.16),
+      0 0 8px rgba(255, 220, 120, 0.14),
+      0 0 16px rgba(255, 180, 60, 0.10),
+      inset 0 0 8px rgba(255, 240, 180, 0.03);
+  }
 }
 
 /* ======================================================
-   DESKTOP  (≥ 900px)
+   DESKTOP
    ====================================================== */
+
 @media (min-width: 900px) {
-
-  #section-guia .j-perg-v-inner {
-    position: relative !important;
-    transform: translateY(24px) !important;
-    top: 0 !important;
-    margin-top: 0 !important;
-    padding-top: 0 !important;
-    padding-bottom: 28px !important;
-    overflow: visible !important;
-    z-index: 5 !important;
-  }
-
   #section-guia .j-panel-glow {
-    position: relative !important;
-    transform: none !important;
-    top: 0 !important;
-    margin-top: 0 !important;
-    width: min(90%, 500px) !important;
-    max-width: 500px !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    z-index: 6 !important;
-    overflow: hidden !important;
-    border-radius: 28px !important;
-    padding-bottom: 16px !important;
+    width: min(92vw, 520px) !important;
+    max-width: 520px !important;
   }
 
-  .guia-confirm-wrap{
-  display:flex !important;
-  justify-content:center !important;
-  align-items:center !important;
-  width:100% !important;
-  margin:0 0 14px !important; 
-  padding-bottom: 20px !important;
-  }
-
-  #section-guia .guia-panel-inner,
-  #section-guia .j-panel-inner {
-    padding: 28px 24px 34px !important;
-    box-sizing: border-box !important;
-  }
-
-  #section-guia .guia-options,
-  #section-guia .guia-buttons-row,
-  #section-guia .card-actions,
-  #section-guia .guia-actions {
-    display: flex;
-    gap: 10px;
-    padding: 0 18px 18px;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  #section-guia .guia-options button,
-  #section-guia .guia-buttons-row button,
-  #section-guia .card-actions .btn,
-  #section-guia .guia-actions button {
-    flex: 1 1 0;
-    max-width: 32%;
-    margin: 0 !important;
-    padding: 6px 4px;
-    font-size: 16px;
-    box-sizing: border-box;
+  #section-guia .j-arcane-card {
+    min-height: 650px !important;
+    padding: 28px 22px 34px !important;
   }
 
   .guia-preview-video {
@@ -578,63 +586,37 @@ button[data-guia].is-locked {
 }
 
 /* ======================================================
-   TABLET  (≤ 640px)
+   MOBILE
    ====================================================== */
-@media (max-width: 640px) {
-  .guia-options {
-    grid-template-columns: repeat(2, minmax(120px, 1fr));
-  }
-}
 
-/* ======================================================
-   MOBILE  (≤ 600px)
-   ====================================================== */
 @media (max-width: 600px) {
-
   #section-guia {
-    padding: 18px 0 120px !important;
-    min-height: 100vh !important;
-    height: auto !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: flex-start !important;
-    overflow: visible !important;
+    padding: 14px 0 110px !important;
   }
 
   #section-guia .j-panel-glow {
-    position: relative !important;
-    left: 0 !important;
-    right: 0 !important;
-    transform: translate(-6px, -16px) !important;
-    width: calc(100vw - 48px) !important;
+    width: calc(100vw - 24px) !important;
     max-width: 460px !important;
     margin: 0 auto !important;
+    transform: none !important;
     border-radius: 22px !important;
-    box-sizing: border-box !important;
-    overflow: hidden !important;
-    padding-bottom: 14px !important;
+    padding: 10px !important;
   }
 
-  #section-guia .guia-wrap {
-    width: 100% !important;
-    max-width: 100% !important;
-    padding: 12px 10px 18px !important;
-    box-sizing: border-box !important;
+  #section-guia .j-arcane-card {
+    min-height: 600px !important;
+    padding: 20px 14px 24px !important;
   }
 
-   .guia-confirm-wrap{
-    margin:0 0 12px !important;
+  .guia-options {
+    width: min(94%, 390px);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
   }
 
-  #section-guia .guia-panel-inner,
-  #section-guia .j-panel-inner {
-    padding: 22px 18px 30px !important;
-    box-sizing: border-box !important;
-  }
-
-  #section-guia .guia-name-input.on-pergaminho {
-    margin: 10px 0 20px !important;
-    gap: 10px !important;
+  .guia-options .btn-stone-espinhos {
+    font-size: 13px;
+    padding: 7px 4px;
   }
 
   #btn-confirmar-nome {
@@ -643,38 +625,18 @@ button[data-guia].is-locked {
     font-size: 14px !important;
   }
 
-  #section-guia .guia-buttons,
-  #section-guia .guia-options {
-    width: min(92%, 380px) !important;
-    margin: 12px auto 0 !important;
-    display: grid !important;
-    grid-template-columns: repeat(3, 1fr) !important;
-    gap: 0 !important;
-    justify-items: stretch !important;
-    align-items: stretch !important;
+  .moldura-grande {
+    width: min(96%, 420px);
+    min-height: 150px;
+    padding: 22px 18px;
   }
 
-  #section-guia .guia-buttons .btn-guia,
-  #section-guia .guia-options .btn-stone-espinhos {
-    width: 100% !important;
-    min-width: 0 !important;
-    padding: 6px 2px !important;
-    font-size: 13px !important;
-    white-space: nowrap !important;
-    box-sizing: border-box !important;
-  }
-
-  #section-guia::before {
-    bottom: -55px;
-    height: 130px;
-    filter: blur(18px);
-    opacity: 0.65;
+  .guia-descricao-medieval {
+    font-size: 15px;
+    padding: 10px 12px;
   }
 }
 
-/* ======================================================
-   MOBILE PEQUENO  (≤ 380px)
-   ====================================================== */
 @media (max-width: 380px) {
   .guia-options {
     grid-template-columns: 1fr;
