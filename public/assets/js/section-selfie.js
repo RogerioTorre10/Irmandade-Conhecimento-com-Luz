@@ -337,96 +337,97 @@
   }
 
   function fixSelfieLayout() {
-    const section = getById('section-selfie');
-    if (!section) return;
+  const section = getById('section-selfie');
+  if (!section) return;
 
-    const panel = section.querySelector('.j-panel-glow.selfie-panel') || section.querySelector('.j-panel-glow');
-    const inner = section.querySelector('.j-perg-v-inner');
-    const card = section.querySelector('.j-arcane-card');
-    const content =
-      section.querySelector('.conteudo-pergaminho') ||
-      section.querySelector('.pergaminho-content');
-    const frame = getFrameEl();
+  const panel = section.querySelector('.j-panel-glow.selfie-panel') || section.querySelector('.j-panel-glow');
+  const inner = section.querySelector('.j-perg-v-inner');
+  const card = section.querySelector('.j-arcane-card');
+  const content =
+    section.querySelector('.conteudo-pergaminho') ||
+    section.querySelector('.pergaminho-content');
+  const frame = getFrameEl();
 
-    section.style.overflowX = 'hidden';
-    section.style.boxSizing = 'border-box';
-    section.style.overflowY = 'auto';
-    section.style.minHeight = '100vh';
-    section.style.height = 'auto';
-    section.style.paddingBottom = '40px';
-    section.style.webkitOverflowScrolling = 'touch';
-    section.style.paddingLeft = '0';
-    section.style.paddingRight = '0';
+  section.style.overflowX = 'hidden';
+  section.style.overflowY = 'visible';
+  section.style.boxSizing = 'border-box';
+  section.style.minHeight = '100vh';
+  section.style.height = 'auto';
+  section.style.paddingBottom = '28px';
+  section.style.paddingLeft = '0';
+  section.style.paddingRight = '0';
 
-    [panel, inner, card, content].forEach((el) => {
-      if (!el) return;
-      el.style.boxSizing = 'border-box';
-      el.style.marginLeft = 'auto';
-      el.style.marginRight = 'auto';
-      el.style.maxWidth = '100%';
-      el.style.left = 'auto';
-      el.style.right = 'auto';
-    });
+  [panel, inner, card, content].forEach((el) => {
+    if (!el) return;
+    el.style.boxSizing = 'border-box';
+    el.style.marginLeft = 'auto';
+    el.style.marginRight = 'auto';
+    el.style.left = 'auto';
+    el.style.right = 'auto';
+    el.style.transform = 'none';
+    el.style.maxWidth = '100%';
+  });
 
-    if (panel) {
-      if (window.innerWidth <= 768) {
-        panel.style.width = 'calc(100vw - 16px)';
-        panel.style.maxWidth = '430px';
-        panel.style.transform = 'none';
-        panel.style.overflow = 'visible';
-      } else {
-        panel.style.width = 'min(94vw, 620px)';
-        panel.style.maxWidth = '620px';
-        panel.style.transform = 'none';
-      }
-    }
-
-    if (frame) {
-      frame.style.position = 'relative';
-      frame.style.overflow = 'hidden';
-      frame.style.marginLeft = 'auto';
-      frame.style.marginRight = 'auto';
-      frame.style.marginBottom = '10px';
-      frame.style.width = 'min(100%, 320px)';
-      frame.style.maxWidth = '320px';
-      frame.style.height = '360px';
-      frame.style.maxHeight = '360px';
-      frame.style.background = '#000';
-      frame.style.zIndex = '10';
-    }
-
-    const slidersWrap =
-      section.querySelector('.ranges-panel') ||
-      section.querySelector('.selfie-sliders') ||
-      section.querySelector('.camera-sliders') ||
-      section.querySelector('.ajustes-camera');
-
-    if (slidersWrap) {
-      slidersWrap.style.width = 'min(100%, 320px)';
-      slidersWrap.style.maxWidth = '320px';
-      slidersWrap.style.marginLeft = 'auto';
-      slidersWrap.style.marginRight = 'auto';
-      slidersWrap.style.marginTop = '8px';
-      slidersWrap.style.marginBottom = '24px';
-      slidersWrap.style.paddingBottom = '20px';
-      slidersWrap.style.position = 'relative';
-      slidersWrap.style.zIndex = '40';
-      slidersWrap.style.pointerEvents = 'auto';
-    }
-
-    section.querySelectorAll('input[type="range"]').forEach((el) => {
-      el.style.width = '100%';
-      el.style.position = 'relative';
-      el.style.zIndex = '60';
-      el.style.pointerEvents = 'auto';
-      el.style.touchAction = 'pan-x';
-    });
-
-    if (content) {
-      content.style.paddingBottom = '32px';
-      content.style.overflow = 'visible';
+  if (panel) {
+    if (window.innerWidth <= 768) {
+      panel.style.width = 'min(calc(100vw - 16px), 430px)';
+      panel.style.maxWidth = '430px';
+      panel.style.transform = 'none';
+      panel.style.overflow = 'visible';
+    } else {
+      panel.style.width = 'min(94vw, 620px)';
+      panel.style.maxWidth = '620px';
+      panel.style.transform = 'none';
+      panel.style.overflow = 'visible';
     }
   }
+
+  if (frame) {
+    frame.style.position = 'relative';
+    frame.style.overflow = 'hidden';
+    frame.style.marginLeft = 'auto';
+    frame.style.marginRight = 'auto';
+    frame.style.marginBottom = '10px';
+    frame.style.width = 'min(100%, 320px)';
+    frame.style.maxWidth = '320px';
+    frame.style.height = '360px';
+    frame.style.maxHeight = '360px';
+    frame.style.background = '#000';
+    frame.style.zIndex = '10';
+  }
+
+  const slidersWrap =
+    section.querySelector('.ranges-panel') ||
+    section.querySelector('.selfie-sliders') ||
+    section.querySelector('.camera-sliders') ||
+    section.querySelector('.ajustes-camera');
+
+  if (slidersWrap) {
+    slidersWrap.style.width = 'min(100%, 320px)';
+    slidersWrap.style.maxWidth = '320px';
+    slidersWrap.style.marginLeft = 'auto';
+    slidersWrap.style.marginRight = 'auto';
+    slidersWrap.style.marginTop = '8px';
+    slidersWrap.style.marginBottom = '18px';
+    slidersWrap.style.paddingBottom = '14px';
+    slidersWrap.style.position = 'relative';
+    slidersWrap.style.zIndex = '40';
+    slidersWrap.style.pointerEvents = 'auto';
+  }
+
+  section.querySelectorAll('input[type="range"]').forEach((el) => {
+    el.style.width = '100%';
+    el.style.position = 'relative';
+    el.style.zIndex = '60';
+    el.style.pointerEvents = 'auto';
+    el.style.touchAction = 'pan-x';
+  });
+
+  if (content) {
+    content.style.paddingBottom = '20px';
+    content.style.overflow = 'visible';
+  }
+}
 
   function renderLivePreviewScale() {
     const allInput = getById('zoomAll');
