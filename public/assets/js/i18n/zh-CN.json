@@ -77,6 +77,20 @@
     "placeholder": "姓名",
     "notice": "将鼠标轻轻移动到按钮上，即可预览引导者的资料。确认选择请再次点击或使用双击。"
   },
+  "guias": {
+  "zion": {
+    "nome": "xAI GROK",
+    "descricao": "ZION 好奇而直接，以宇宙般的视野寻找深刻答案。"
+  },
+  "lumen": {
+    "nome": "OpenAI ChatGPT",
+    "descricao": "LUMEN 温柔而善于反思，以共情和清晰引导你。"
+  },
+  "arian": {
+    "nome": "Google Gemini",
+    "descricao": "ARIAN 富有创造力且多才多艺，以创新视角带来启发。"
+  }
+ },
   "selfie": {
     "title": "拍摄您的照片",
     "instruction": "将手机稍微拿远一点，摆正您的脸部。您的引导者将引领您。",
