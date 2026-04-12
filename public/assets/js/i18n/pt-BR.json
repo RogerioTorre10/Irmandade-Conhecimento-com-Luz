@@ -3,12 +3,32 @@
     "lang": "pt-BR",
     "label": "Português (Brasil)"
   },
-  "common": {
-    "continue": "Continuar",
-    "next": "Avançar",
-    "back": "Voltar",
-    "loading": "Carregando..."
-  },
+ "common": {
+  "back": "Voltar",
+  "next": "Avançar",
+  "continue": "Continuar",
+  "confirm": "Confirmar",
+  "start": "Iniciar",
+  "finish": "Finalizar",
+
+  "yes": "Sim",
+  "no": "Não",
+  "cancel": "Cancelar",
+  "skip": "Pular",
+
+  "loading": "Carregando...",
+  "processing": "Processando...",
+  "please_wait": "Por favor, aguarde...",
+
+  "error": "Ocorreu um erro",
+  "try_again": "Tentar novamente",
+
+  "enter_here": "Digite aqui...",
+  "required_field": "Campo obrigatório",
+
+  "success": "Sucesso",
+  "attention": "Atenção"
+}
   "site": {
     "title": "Jornada • Irmandade Conhecimento com Luz"
   },
