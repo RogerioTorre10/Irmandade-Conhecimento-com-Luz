@@ -1,11 +1,31 @@
 {
   "meta": { "lang": "de-DE", "label": "Deutsch (Deutschland)" },
-  "common": {
-    "continue": "Weiter",
-    "next": "Weiter",
-    "back": "Zurück",
-    "loading": "Wird geladen..."
-  },
+ "common": {
+  "back": "Zurück",
+  "next": "Weiter",
+  "continue": "Fortfahren",
+  "confirm": "Bestätigen",
+  "start": "Starten",
+  "finish": "Abschließen",
+
+  "yes": "Ja",
+  "no": "Nein",
+  "cancel": "Abbrechen",
+  "skip": "Überspringen",
+
+  "loading": "Lädt...",
+  "processing": "Verarbeitung läuft...",
+  "please_wait": "Bitte warten...",
+
+  "error": "Ein Fehler ist aufgetreten",
+  "try_again": "Erneut versuchen",
+
+  "enter_here": "Hier eingeben...",
+  "required_field": "Pflichtfeld",
+
+  "success": "Erfolg",
+  "attention": "Achtung"
+},
   "site": { "title": "Reise • Bruderschaft des Wissens mit Licht" },
   "intro": {
     "title": "Reise des Wissens",
