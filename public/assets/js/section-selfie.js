@@ -195,8 +195,8 @@
     section.style.height = 'auto';
     section.style.paddingBottom = '40px';
     section.style.webkitOverflowScrolling = 'touch';
-    section.style.paddingLeft = '6px';
-    section.style.paddingRight = '6px';
+    section.style.paddingLeft = '0';
+    section.style.paddingRight = '0';
 
     [panel, inner, card, content].forEach((el) => {
       if (!el) return;
@@ -207,7 +207,7 @@
     });
 
     if (panel && window.innerWidth <= 768) {
-     panel.style.width = 'calc(100vw - 14px)';
+     panel.style.width = 'calc(100vw - 20px)';
      panel.style.maxWidth = '420px';
      panel.style.marginLeft = 'auto';
      panel.style.marginRight = 'auto';
