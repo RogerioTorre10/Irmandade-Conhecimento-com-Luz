@@ -627,34 +627,40 @@
 
     setTimeout(() => {
       if (title && !title.classList.contains('typed')) {
-        const titleText = (title.dataset.text || 'Prepare sua selfie').trim();
+      const titleText =
+        window.i18n?.t?.('selfie.title') ||
+        title.dataset.text ||
+       'Prepare sua selfie';
+
         title.textContent = '';
-        typeWriter(title, titleText, 40);
+        typeWriter(title, titleText.trim(), 40);
         title.classList.add('typed');
       }
 
       if (texto && !texto.classList.contains('typed')) {
         const guiaNomeMap = {
-          arian: 'Arian',
-          lumen: 'Lumen',
-          zion: 'Zion'
-        };
+  arian: 'Arian',
+  lumen: 'Lumen',
+  zion: 'Zion'
+};
 
-        const guiaNome = guiaNomeMap[guia] || 'Guia';
-       const i18nText = window.i18n?.t?.('selfie.texto') 
-  || '{nome}, afaste o celular e posicione o rosto. {guia} te guiará.';
+const guiaNome = guiaNomeMap[guia] || 'Guia';
 
-  const fullText = i18nText
-   .replace('{nome}', nome)
-   .replace('{guia}', guiaNome);
+const template =
+  window.i18n?.t?.('selfie.instruction') ||
+  texto.dataset.text ||
+  '{nome}, afaste um pouco o celular e posicione seu rosto. {guia} vai conduzir você.';
 
-   texto.textContent = '';
-   texto.setAttribute('data-typing', 'true'); // ativa AURA
-   typeWriter(texto, fullText, 36);
+const fullText = template
+  .replace(/\{nome\}/g, nome)
+  .replace(/\{guia\}/g, guiaNome);
 
-  setTimeout(() => {
-   speak(fullText);
-   }, 400);
+texto.textContent = '';
+typeWriter(texto, fullText, 36);
+
+setTimeout(() => {
+  speak(fullText);
+}, 350);
 
     bindRangeInputs();
     bindButtons();
