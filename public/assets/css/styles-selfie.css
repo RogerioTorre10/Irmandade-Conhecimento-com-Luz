@@ -531,10 +531,9 @@
   }
 }
 /* =======================================================
-   SELFIE — PATCH FINAL DE CENTRALIZAÇÃO
+   SELFIE — OVERRIDE FINAL DE CENTRALIZAÇÃO
    ======================================================= */
 
-/* palco sem scroll lateral nem barra vertical própria no desktop */
 html, body {
   overflow-x: hidden !important;
 }
@@ -547,9 +546,10 @@ html, body {
   overflow-y: visible !important;
   padding-left: 0 !important;
   padding-right: 0 !important;
+  margin: 0 auto !important;
 }
 
-/* centro real do painel */
+/* neutraliza qualquer deslocamento antigo */
 #section-selfie .j-perg-v-inner,
 #section-selfie .j-panel-glow.selfie-panel,
 #section-selfie .j-panel-glow,
@@ -562,7 +562,7 @@ html, body {
   transform: none !important;
 }
 
-/* desktop: remove a barra lateral visual da própria section */
+/* desktop */
 @media (min-width: 769px) {
   #section-selfie {
     overflow-y: visible !important;
@@ -574,18 +574,21 @@ html, body {
     width: min(94vw, 620px) !important;
     max-width: 620px !important;
     transform: none !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
   }
 
+  /* remove barra lateral visual da própria selfie */
   #section-selfie .selfie-wrap {
     overflow: hidden !important;
   }
 }
 
-/* mobile: recentraliza sem jogar para a direita */
+/* mobile */
 @media (max-width: 768px) {
   #section-selfie .j-panel-glow.selfie-panel,
   #section-selfie .j-panel-glow {
-    width: min(calc(100vw - 16px), 430px) !important;
+    width: calc(100vw - 20px) !important;
     max-width: 430px !important;
     margin-left: auto !important;
     margin-right: auto !important;
