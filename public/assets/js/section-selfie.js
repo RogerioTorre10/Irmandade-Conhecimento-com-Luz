@@ -1,4 +1,4 @@
-/* section-selfie.js — VERSÃO ESTÁVEL FINAL / i18n + typing + aura */
+/* section-selfie.js — VERSÃO ESTÁVEL FINAL */
 (function (window) {
   'use strict';
 
@@ -18,75 +18,16 @@
   let previewImg = null;
   let lastCapture = null;
 
-  const TYPING_SPEED = 42;
-  const TTS_LATCH_MS = 320;
-  const BETWEEN_BLOCKS_MS = 380;
-
   const toast = (msg) => window.toast?.(msg) || alert(msg);
+
+  window.DEBUG_JC = () => {
+    console.log('JC.data:', window.JC?.data);
+    console.log('sessionStorage.jornada.guia:', sessionStorage.getItem('jornada.guia'));
+    console.log('localStorage.jc.nome:', localStorage.getItem('jc.nome'));
+  };
 
   function getById(id) {
     return document.getElementById(id);
-  }
-
-  function sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
-
-  function t(key, fallback = '') {
-    try {
-      const out = window.i18n?.t?.(key);
-      if (typeof out === 'string' && out.trim() && out !== key) return out.trim();
-    } catch {}
-    return fallback;
-  }
-
-  async function applySectionI18n(root) {
-    if (!root) return;
-
-    try {
-      if (window.i18n?.apply) {
-        await window.i18n.apply(root);
-      } else if (window.applyI18n) {
-        await window.applyI18n(root);
-      }
-    } catch (err) {
-      console.warn('[SELFIE] Falha ao aplicar i18n:', err);
-    }
-
-    root.querySelectorAll('[data-i18n-text]').forEach((el) => {
-      const key = el.dataset.i18nText;
-      if (!key) return;
-      const translated = t(key, el.getAttribute('data-text') || el.textContent || '');
-      if (!translated) return;
-      el.dataset.text = translated;
-      el.setAttribute('data-text', translated);
-    });
-
-    root.querySelectorAll('[data-i18n]').forEach((el) => {
-      if (el.hasAttribute('data-i18n-text')) return;
-      const key = el.dataset.i18n;
-      if (!key) return;
-      const translated = t(key, el.textContent || '');
-      if (!translated) return;
-      el.textContent = translated;
-    });
-
-    root.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
-      const key = el.dataset.i18nPlaceholder;
-      if (!key) return;
-      const translated = t(key, el.placeholder || '');
-      if (translated) el.placeholder = translated;
-    });
-
-    root.querySelectorAll('[data-i18n-title]').forEach((el) => {
-      const key = el.dataset.i18nTitle;
-      if (!key) return;
-      const translated = t(key, el.title || el.alt || '');
-      if (translated) {
-        el.title = translated;
-        if (el.tagName === 'IMG') el.alt = translated;
-      }
-    });
   }
 
   function getFrameEl() {
@@ -139,137 +80,36 @@
     return { nome, guia };
   }
 
-  function getGuideVoiceContext() {
-    const guia = (sessionStorage.getItem('jornada.guia') || localStorage.getItem('jc.guia') || 'lumen').toLowerCase();
-    const lang =
-      window.i18n?.getLanguage?.() ||
-      localStorage.getItem('i18n_lang') ||
-      sessionStorage.getItem('i18n_lang') ||
-      document.documentElement.lang ||
-      'pt-BR';
-
-    const presetByGuide = {
-      lumen: { voiceGender: 'female', pitch: 1.08, rate: 0.98 },
-      zion:  { voiceGender: 'male',   pitch: 0.92, rate: 0.96 },
-      arian: { voiceGender: 'female', pitch: 1.16, rate: 1.00 }
-    };
-
-    return {
-      lang,
-      guide: guia,
-      ...(presetByGuide[guia] || presetByGuide.lumen)
-    };
-  }
-
-  async function localType(el, text, speed = TYPING_SPEED) {
-    return new Promise((resolve) => {
-      let i = 0;
-      el.textContent = '';
-      (function tick() {
-        if (i < text.length) {
-          el.textContent += text.charAt(i++);
-          setTimeout(tick, speed);
-        } else {
-          resolve();
-        }
-      })();
-    });
-  }
-
-  async function speakText(text, voiceCtx) {
-    if (!text) return;
-
-    try {
-      if (window.EffectCoordinator?.speak) {
-        try { window.speechSynthesis?.cancel?.(); } catch {}
-        await window.EffectCoordinator.speak(text, {
-          rate: voiceCtx?.rate ?? 0.96,
-          pitch: voiceCtx?.pitch ?? 1.0,
-          lang: voiceCtx?.lang ?? document.documentElement.lang ?? 'pt-BR',
-          gender: voiceCtx?.voiceGender ?? 'female',
-          guide: voiceCtx?.guide ?? 'lumen',
-          style: 'acolhedora'
-        });
-        await sleep(TTS_LATCH_MS);
-        return;
-      }
-
-      if ('speechSynthesis' in window) {
-        await new Promise((resolve) => {
-          try { window.speechSynthesis.cancel(); } catch {}
-          const u = new SpeechSynthesisUtterance(text);
-          u.lang = voiceCtx?.lang ?? document.documentElement.lang ?? 'pt-BR';
-          u.rate = voiceCtx?.rate ?? 0.96;
-          u.pitch = voiceCtx?.pitch ?? 1.0;
-          u.onend = () => resolve();
-          u.onerror = () => resolve();
-          window.speechSynthesis.speak(u);
-        });
-        await sleep(TTS_LATCH_MS);
-      }
-    } catch (e) {
-      console.warn('[SELFIE] Erro no TTS:', e);
-    }
-  }
-
-  async function typeOnce(el, text, { speed = TYPING_SPEED, speak = true, voiceCtx = null } = {}) {
+  function typeWriter(el, text, speed = 35) {
     if (!el) return;
-
-    const key = el.dataset?.i18nText;
-    const translated =
-      (key && window.i18n?.t ? window.i18n.t(key) : null);
-
-    const msg = String(
-      (translated && translated !== key ? translated : null) ||
-      text ||
-      el.dataset?.text ||
-      el.getAttribute('data-text') ||
-      el.textContent ||
-      ''
-    ).trim();
-
-    if (!msg) return;
-
-    el.dataset.text = msg;
-    el.setAttribute('data-text', msg);
     el.textContent = '';
+    el.style.opacity = '1';
 
-    el.classList.remove('typing-done', 'type-done', 'speaking-active');
-    el.classList.add('typing-active');
-    el.setAttribute('aria-busy', 'true');
+    let i = 0;
+    const timer = setInterval(() => {
+      if (i < text.length) {
+        el.textContent += text[i++];
+      } else {
+        clearInterval(timer);
+      }
+    }, speed);
+  }
 
-    let usedFallback = false;
-
-    if (typeof window.runTyping === 'function') {
-      await new Promise((resolve) => {
-        try {
-          window.runTyping(el, msg, () => resolve(), { speed, cursor: true });
-        } catch (err) {
-          console.warn('[SELFIE] runTyping falhou, fallback local', err);
-          usedFallback = true;
-          resolve();
-        }
-      });
-    } else {
-      usedFallback = true;
+  function speak(text) {
+    if (window.speak) {
+      window.speak(text);
+      return;
     }
 
-    if (usedFallback) {
-      await localType(el, msg, speed);
-    }
-
-    el.classList.remove('typing-active');
-    el.classList.add('speaking-active');
-
-    if (speak) {
-      await speakText(msg, voiceCtx);
-    }
-
-    el.classList.remove('speaking-active');
-    el.classList.add('typing-done');
-    el.removeAttribute('aria-busy');
-
-    await sleep(80);
+   if (window.EffectCoordinator?.speak) {
+  window.EffectCoordinator.speak(text, { rate: 0.9 });
+} else if ('speechSynthesis' in window) {
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = document.documentElement.lang || 'pt-BR';
+  u.rate = 0.9;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
   }
 
   function applyLiveStyle(el) {
@@ -337,137 +177,125 @@
   }
 
   function fixSelfieLayout() {
-  const section = getById('section-selfie');
-  if (!section) return;
+    const section = getById('section-selfie');
+    if (!section) return;
 
-  const panel = section.querySelector('.j-panel-glow.selfie-panel') || section.querySelector('.j-panel-glow');
-  const inner = section.querySelector('.j-perg-v-inner');
-  const card = section.querySelector('.j-arcane-card');
-  const content =
-    section.querySelector('.conteudo-pergaminho') ||
-    section.querySelector('.pergaminho-content');
-  const frame = getFrameEl();
+    const panel = section.querySelector('.j-panel-glow.selfie-panel') || section.querySelector('.j-panel-glow');
+    const inner = section.querySelector('.j-perg-v-inner');
+    const card = section.querySelector('.j-arcane-card');
+    const content =
+      section.querySelector('.conteudo-pergaminho') ||
+      section.querySelector('.pergaminho-content');
+    const frame = getFrameEl();
 
-  // não cria rolagem própria da section
-  section.style.overflowX = 'hidden';
-  section.style.overflowY = 'visible';
-  section.style.boxSizing = 'border-box';
-  section.style.minHeight = '100vh';
-  section.style.height = 'auto';
-  section.style.paddingBottom = '24px';
-  section.style.paddingLeft = '0';
-  section.style.paddingRight = '0';
-  section.style.margin = '0 auto';
+    section.style.overflowX = 'hidden';
+    section.style.boxSizing = 'border-box';
+    section.style.overflowY = 'hidden';
+    section.style.minHeight = '100vh';
+    section.style.height = 'auto';
+    section.style.paddingBottom = '40px';
+    section.style.webkitOverflowScrolling = 'touch';
+    section.style.paddingLeft = '6px';
+    section.style.paddingRight = '6px';
 
-  [inner, panel, card, content].forEach((el) => {
-    if (!el) return;
-    el.style.boxSizing = 'border-box';
-    el.style.marginLeft = 'auto';
-    el.style.marginRight = 'auto';
-    el.style.left = 'auto';
-    el.style.right = 'auto';
-    el.style.transform = 'none';
-    el.style.maxWidth = '100%';
-  });
+    [panel, inner, card, content].forEach((el) => {
+      if (!el) return;
+      el.style.boxSizing = 'border-box';
+      el.style.marginLeft = 'auto';
+      el.style.marginRight = 'auto';
+      el.style.maxWidth = '100%';
+    });
 
-  if (panel) {
-    if (window.innerWidth <= 768) {
-      panel.style.width = 'calc(100vw - 20px)';
-      panel.style.maxWidth = '430px';
-    } else {
-      panel.style.width = 'min(94vw, 620px)';
-      panel.style.maxWidth = '620px';
+    if (panel && window.innerWidth <= 768) {
+     panel.style.width = 'calc(100vw - 14px)';
+     panel.style.maxWidth = '420px';
+     panel.style.marginLeft = 'auto';
+     panel.style.marginRight = 'auto';
+     panel.style.transform = 'translateX(0)';
+     panel.style.overflow = 'visible';
+   }
+
+    if (frame) {
+      frame.style.position = 'relative';
+      frame.style.overflow = 'hidden';
+      frame.style.marginLeft = 'auto';
+      frame.style.marginRight = 'auto';
+      frame.style.marginBottom = '10px';
+      frame.style.width = 'min(100%, 320px)';
+      frame.style.maxWidth = '320px';
+      frame.style.height = '360px';
+      frame.style.maxHeight = '360px';
+      frame.style.background = '#000';
+      frame.style.zIndex = '10';
     }
 
-    panel.style.marginLeft = 'auto';
-    panel.style.marginRight = 'auto';
-    panel.style.transform = 'none';
-    panel.style.left = 'auto';
-    panel.style.right = 'auto';
-    panel.style.overflow = 'visible';
+    const slidersWrap =
+      section.querySelector('.ranges-panel') ||
+      section.querySelector('.selfie-sliders') ||
+      section.querySelector('.camera-sliders') ||
+      section.querySelector('.ajustes-camera');
+
+    if (slidersWrap) {
+      slidersWrap.style.width = 'min(100%, 320px)';
+      slidersWrap.style.maxWidth = '320px';
+      slidersWrap.style.marginLeft = 'auto';
+      slidersWrap.style.marginRight = 'auto';
+      slidersWrap.style.marginTop = '8px';
+      slidersWrap.style.marginBottom = '24px';
+      slidersWrap.style.paddingBottom = '20px';
+      slidersWrap.style.position = 'relative';
+      slidersWrap.style.zIndex = '40';
+      slidersWrap.style.pointerEvents = 'auto';
+    }
+
+    section.querySelectorAll('input[type="range"]').forEach((el) => {
+      el.style.width = '100%';
+      el.style.position = 'relative';
+      el.style.zIndex = '60';
+      el.style.pointerEvents = 'auto';
+      el.style.touchAction = 'pan-x';
+    });
+
+    if (content) {
+      content.style.paddingBottom = '32px';
+      content.style.overflow = 'visible';
+    }
   }
-
-  if (frame) {
-    frame.style.position = 'relative';
-    frame.style.overflow = 'hidden';
-    frame.style.marginLeft = 'auto';
-    frame.style.marginRight = 'auto';
-    frame.style.marginBottom = '10px';
-    frame.style.width = 'min(100%, 320px)';
-    frame.style.maxWidth = '320px';
-    frame.style.height = '360px';
-    frame.style.maxHeight = '360px';
-    frame.style.background = '#000';
-    frame.style.zIndex = '10';
-  }
-
-  const slidersWrap =
-    section.querySelector('.ranges-panel') ||
-    section.querySelector('.selfie-sliders') ||
-    section.querySelector('.camera-sliders') ||
-    section.querySelector('.ajustes-camera');
-
-  if (slidersWrap) {
-    slidersWrap.style.width = 'min(100%, 320px)';
-    slidersWrap.style.maxWidth = '320px';
-    slidersWrap.style.marginLeft = 'auto';
-    slidersWrap.style.marginRight = 'auto';
-    slidersWrap.style.marginTop = '8px';
-    slidersWrap.style.marginBottom = '18px';
-    slidersWrap.style.paddingBottom = '12px';
-    slidersWrap.style.position = 'relative';
-    slidersWrap.style.zIndex = '40';
-    slidersWrap.style.pointerEvents = 'auto';
-  }
-
-  section.querySelectorAll('input[type="range"]').forEach((el) => {
-    el.style.width = '100%';
-    el.style.position = 'relative';
-    el.style.zIndex = '60';
-    el.style.pointerEvents = 'auto';
-    el.style.touchAction = 'pan-x';
-  });
-
-  if (content) {
-    content.style.paddingBottom = '18px';
-    content.style.overflow = 'visible';
-  }
-}
 
   function renderLivePreviewScale() {
-    const allInput = getById('zoomAll');
-    const xInput = getById('zoomX');
-    const yInput = getById('zoomY');
+  const allInput = getById('zoomAll');
+  const xInput = getById('zoomX');
+  const yInput = getById('zoomY');
 
-    const all = clamp(parseFloat(allInput?.value || FINAL_ZOOM), 0.2, 3);
-    const x = clamp(parseFloat(xInput?.value || 1), 0.2, 3);
-    const y = clamp(parseFloat(yInput?.value || 1), 0.2, 3);
+  const all = clamp(parseFloat(allInput?.value || FINAL_ZOOM), 0.2, 3);
+  const x = clamp(parseFloat(xInput?.value || 1), 0.2, 3);
+  const y = clamp(parseFloat(yInput?.value || 1), 0.2, 3);
 
-    zoomState.all = all;
-    zoomState.x = x;
-    zoomState.y = y;
+  zoomState.all = all;
+  zoomState.x = x;
+  zoomState.y = y;
 
-    const zoomAllVal = getById('zoomAllVal');
-    const zoomXVal = getById('zoomXVal');
-    const zoomYVal = getById('zoomYVal');
+  const zoomAllVal = getById('zoomAllVal');
+  const zoomXVal = getById('zoomXVal');
+  const zoomYVal = getById('zoomYVal');
 
-    if (zoomAllVal) zoomAllVal.textContent = `${all.toFixed(2)}×`;
-    if (zoomXVal) zoomXVal.textContent = `${x.toFixed(2)}×`;
-    if (zoomYVal) zoomYVal.textContent = `${y.toFixed(2)}×`;
+  if (zoomAllVal) zoomAllVal.textContent = `${all.toFixed(2)}×`;
+  if (zoomXVal) zoomXVal.textContent = `${x.toFixed(2)}×`;
+  if (zoomYVal) zoomYVal.textContent = `${y.toFixed(2)}×`;
 
-    const scaleX = clamp(all * x, 0.2, 3);
-    const scaleY = clamp(all * y, 0.2, 3);
+  const scaleX = clamp(all * x, 0.2, 3);
+  const scaleY = clamp(all * y, 0.2, 3);
 
-    if (videoEl && videoEl.style.display !== 'none') {
-      applyLiveStyle(videoEl);
-      videoEl.style.transformOrigin = '50% 50%';
-      videoEl.style.transform = `translate(-50%, -50%) scaleX(${scaleX}) scaleY(${scaleY})`;
-      videoEl.style.objectPosition = '50% 52%';
-      videoEl.style.display = 'block';
-      videoEl.style.opacity = '1';
-      videoEl.style.visibility = 'visible';
-    }
-  }
+ if (videoEl && videoEl.style.display !== 'none') {
+  applyLiveStyle(videoEl);
+  videoEl.style.transformOrigin = '50% 50%';
+  videoEl.style.transform = `translate(-50%, -50%) scaleX(${scaleX}) scaleY(${scaleY})`;
+  videoEl.style.objectPosition = '50% 52%';
+  videoEl.style.display = 'block';
+  videoEl.style.opacity = '1';
+  videoEl.style.visibility = 'visible';
+}
+}
 
   function updateZoom() {
     renderLivePreviewScale();
@@ -516,7 +344,7 @@
 
       const captureBtn = getById('btn-selfie-capture');
       const confirmBtn = getById('btn-selfie-confirm');
-      const errorEl = getById('selfie-erro');
+      const errorEl = getById('selfie-error');
 
       if (captureBtn) captureBtn.disabled = false;
       if (confirmBtn) confirmBtn.disabled = true;
@@ -526,12 +354,9 @@
       renderLivePreviewScale();
     } catch (e) {
       console.error('[SELFIE] Erro ao iniciar câmera:', e);
-      toast(t('selfie.error', 'Não foi possível acessar a câmera. Verifique as permissões.'));
-      const errorEl = getById('selfie-erro');
-      if (errorEl) {
-        errorEl.style.display = 'block';
-        errorEl.textContent = t('selfie.error', errorEl.dataset.text || 'Não foi possível acessar a câmera. Verifique as permissões.');
-      }
+      toast('Câmera bloqueada. Ative as permissões.');
+      const errorEl = getById('selfie-error');
+      if (errorEl) errorEl.style.display = 'block';
     }
   }
 
@@ -669,6 +494,8 @@
   }
 
   function playTransitionThenGo() {
+    console.log(`[SELFIE] Transição → ${NEXT_SECTION_ID}`);
+
     if (window.playTransitionVideo) {
       window.playTransitionVideo(VIDEO_SRC, NEXT_SECTION_ID);
       return;
@@ -748,7 +575,7 @@
       getById('btn-selfie-preview') ||
       getById('btn-preview-selfie') ||
       Array.from(document.querySelectorAll('#section-selfie button')).find(
-        (btn) => /prévia|previa|preview|vorschau/i.test((btn.textContent || '').trim())
+        (btn) => /prévia|previa/i.test((btn.textContent || '').trim())
       );
 
     const startBtn = getById('startCamBtn');
@@ -768,15 +595,11 @@
     }
   }
 
-  async function initSectionSelfie() {
-    const root = getById('section-selfie');
-    if (!root) return;
-
+  function initSectionSelfie() {
     videoEl = getById('selfieVideo');
     canvasEl = getById('selfieCanvas');
     previewImg = getById('selfiePreview');
 
-    await applySectionI18n(root);
     fixSelfieLayout();
 
     if (videoEl) applyLiveStyle(videoEl);
@@ -796,37 +619,31 @@
     const title = getById('selfie-title');
     const texto = getById('selfieTexto');
     const { nome, guia } = getUserData();
-    const voiceCtx = getGuideVoiceContext();
 
-    if (title && !title.classList.contains('typing-done')) {
-      const titleText = t(
-        title.dataset.i18nText || '',
-        title.dataset.text || 'Tirar sua foto'
-      );
-      await typeOnce(title, titleText, { speed: 40, speak: true, voiceCtx });
-      await sleep(BETWEEN_BLOCKS_MS);
-    }
+    setTimeout(() => {
+      if (title && !title.classList.contains('typed')) {
+        const titleText = (title.dataset.text || 'Prepare sua selfie').trim();
+        title.textContent = '';
+        typeWriter(title, titleText, 40);
+        title.classList.add('typed');
+      }
 
-    if (texto && !texto.classList.contains('typing-done')) {
-      const translatedBase = t(
-        texto.dataset.i18nText || '',
-        texto.dataset.text || 'Afaste um pouco o celular e posicione seu rosto. Sua guia ou guia vai conduzir você.'
-      );
+      if (texto && !texto.classList.contains('typed')) {
+        const guiaNomeMap = {
+          arian: 'Arian',
+          lumen: 'Lumen',
+          zion: 'Zion'
+        };
 
-      const guiaNomeMap = {
-        arian: 'Arian',
-        lumen: 'Lumen',
-        zion: 'Zion'
-      };
+        const guiaNome = guiaNomeMap[guia] || 'Guia';
+        const fullText = `${nome}, afaste o celular e posicione o rosto. ${guiaNome} te guiará.`;
 
-      const guiaNome = guiaNomeMap[guia] || 'Guia';
-      const finalText = String(translatedBase)
-        .replace(/\{\{\s*nome\s*\}\}/gi, nome)
-        .replace(/\{\{\s*guide\s*\}\}/gi, guiaNome)
-        .replace(/\{\{\s*guia\s*\}\}/gi, guiaNome);
-
-      await typeOnce(texto, finalText, { speed: 36, speak: true, voiceCtx });
-    }
+        texto.textContent = '';
+        typeWriter(texto, fullText, 36);
+        speak(fullText);
+        texto.classList.add('typed');
+      }
+    }, 300);
 
     bindRangeInputs();
     bindButtons();
@@ -862,6 +679,8 @@
   }
 
   (function () {
+    'use strict';
+
     function applyThemeFromSession() {
       const guiaRaw = sessionStorage.getItem('jornada.guia');
       const guia = guiaRaw ? guiaRaw.toLowerCase().trim() : '';
