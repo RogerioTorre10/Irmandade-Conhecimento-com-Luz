@@ -637,14 +637,20 @@
         };
 
         const guiaNome = guiaNomeMap[guia] || 'Guia';
-        const fullText = `${nome}, afaste o celular e posicione o rosto. ${guiaNome} te guiará.`;
+       const i18nText = window.i18n?.t?.('selfie.texto') 
+  || '{nome}, afaste o celular e posicione o rosto. {guia} te guiará.';
 
-        texto.textContent = '';
-        typeWriter(texto, fullText, 36);
-        speak(fullText);
-        texto.classList.add('typed');
-      }
-    }, 300);
+  const fullText = i18nText
+   .replace('{nome}', nome)
+   .replace('{guia}', guiaNome);
+
+   texto.textContent = '';
+   texto.setAttribute('data-typing', 'true'); // ativa AURA
+   typeWriter(texto, fullText, 36);
+
+  setTimeout(() => {
+   speak(fullText);
+   }, 400);
 
     bindRangeInputs();
     bindButtons();
