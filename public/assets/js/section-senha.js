@@ -238,33 +238,38 @@
   }
 
   function normalizeParagraph(el, { clear = false } = {}) {
-    if (!el) return false;
+  if (!el) return false;
 
-    const source = (
-      el.getAttribute('data-text') ||
-      el.dataset?.text ||
-      el.textContent ||
-      ''
-    ).trim();
+  const key = el.dataset?.i18nText;
+  const translated =
+    (key && window.i18n?.t ? window.i18n.t(key) : null);
 
-    if (!source) return false;
+  const source = (
+    (translated && translated !== key ? translated : null) ||
+    el.getAttribute('data-text') ||
+    el.dataset?.text ||
+    el.textContent ||
+    ''
+  ).trim();
 
-    el.dataset.text = source;
-    el.setAttribute('data-text', source);
+  if (!source) return false;
 
-    el.classList.remove('typing-active', 'typing-done', 'type-done');
-    el.removeAttribute('data-spoken');
-    el.removeAttribute('data-typed');
-    el.removeAttribute('aria-busy');
+  el.dataset.text = source;
+  el.setAttribute('data-text', source);
 
-    if (clear) {
-      el.textContent = '';
-    } else if (!el.textContent.trim()) {
-      el.textContent = source;
-    }
+  el.classList.remove('typing-active', 'typing-done', 'type-done');
+  el.removeAttribute('data-spoken');
+  el.removeAttribute('data-typed');
+  el.removeAttribute('aria-busy');
 
-    return true;
+  if (clear) {
+    el.textContent = '';
+  } else if (!el.textContent.trim()) {
+    el.textContent = source;
   }
+
+  return true;
+}
 
   function prepareTypingNodes(root, { clear = false } = {}) {
     if (!root) return;
