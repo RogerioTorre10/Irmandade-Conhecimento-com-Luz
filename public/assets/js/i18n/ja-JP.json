@@ -1,11 +1,31 @@
 {
   "meta": { "lang": "ja-JP", "label": "日本語 (日本)" },
-  "common": {
-    "continue": "続ける",
-    "next": "次へ",
-    "back": "戻る",
-    "loading": "読み込み中..."
-  },
+ "common": {
+  "back": "戻る",
+  "next": "次へ",
+  "continue": "続ける",
+  "confirm": "確認",
+  "start": "開始",
+  "finish": "完了",
+
+  "yes": "はい",
+  "no": "いいえ",
+  "cancel": "キャンセル",
+  "skip": "スキップ",
+
+  "loading": "読み込み中...",
+  "processing": "処理中...",
+  "please_wait": "お待ちください...",
+
+  "error": "エラーが発生しました",
+  "try_again": "再試行",
+
+  "enter_here": "ここに入力...",
+  "required_field": "必須項目です",
+
+  "success": "成功",
+  "attention": "注意"
+},
   "site": { "title": "旅 • 光と共に知識の兄弟団" },
   "intro": {
     "title": "知識の旅",
