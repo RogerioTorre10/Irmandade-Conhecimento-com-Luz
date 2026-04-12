@@ -7,9 +7,10 @@
   const HIDE_CLASS = 'hidden';
 
   const TYPING_SPEED = 48;
-  const INITIAL_DELAY_MS = 260;
+  const INITIAL_DELAY_MS = 180;
   const TTS_LATCH_MS = 420;
-  const START_DELAY_MS = 420;
+  const START_DELAY_MS = 260;
+  const BETWEEN_BLOCKS_MS = 520;
 
   if (window.JCSenha?.__bound) {
     console.log('[JCSenha] já carregado');
@@ -26,7 +27,6 @@
   };
 
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-  const q = (sel, root = document) => root.querySelector(sel);
 
   async function waitForElement(selector, { within = document, timeout = 8000, step = 100 } = {}) {
     const t0 = performance.now();
@@ -112,17 +112,7 @@
     }
 
     const rect = el.getBoundingClientRect();
-    if (rect.width <= 0 || rect.height <= 0) return false;
-
-    const vw = window.innerWidth || document.documentElement.clientWidth || 0;
-    const vh = window.innerHeight || document.documentElement.clientHeight || 0;
-
-    const visibleX = Math.max(0, Math.min(rect.right, vw) - Math.max(rect.left, 0));
-    const visibleY = Math.max(0, Math.min(rect.bottom, vh) - Math.max(rect.top, 0));
-    const visibleArea = visibleX * visibleY;
-    const totalArea = Math.max(1, rect.width * rect.height);
-
-    return (visibleArea / totalArea) > 0.25;
+    return rect.width > 0 && rect.height > 0;
   }
 
   async function waitForSectionVisible(root, timeoutMs = 8000) {
@@ -225,8 +215,9 @@
         translated.trim() &&
         translated !== key
       ) {
-        el.dataset.text = translated.trim();
-        el.setAttribute('data-text', translated.trim());
+        const clean = translated.trim();
+        el.dataset.text = clean;
+        el.setAttribute('data-text', clean);
       }
     });
 
@@ -246,29 +237,38 @@
     });
   }
 
-  function normalizeParagraph(el) {
+  function normalizeParagraph(el, { clear = false } = {}) {
     if (!el) return false;
 
-    const current = (el.textContent || '').trim();
-    const ds = (el.dataset?.text || '').trim();
-    const source = ds || current;
+    const source = (
+      el.getAttribute('data-text') ||
+      el.dataset?.text ||
+      el.textContent ||
+      ''
+    ).trim();
 
     if (!source) return false;
 
     el.dataset.text = source;
     el.setAttribute('data-text', source);
-    el.textContent = '';
+
     el.classList.remove('typing-active', 'typing-done', 'type-done');
     el.removeAttribute('data-spoken');
     el.removeAttribute('data-typed');
     el.removeAttribute('aria-busy');
 
+    if (clear) {
+      el.textContent = '';
+    } else if (!el.textContent.trim()) {
+      el.textContent = source;
+    }
+
     return true;
   }
 
-  function prepareTypingNodes(root) {
+  function prepareTypingNodes(root, { clear = false } = {}) {
     if (!root) return;
-    root.querySelectorAll('[data-typing="true"]').forEach(normalizeParagraph);
+    root.querySelectorAll('[data-typing="true"]').forEach((el) => normalizeParagraph(el, { clear }));
   }
 
   async function localType(el, text, speed = TYPING_SPEED) {
@@ -353,7 +353,7 @@
           cancelAllSpeech();
 
           const speakOptions = {
-            rate: voiceCtx?.rate ?? 1.02,
+            rate: voiceCtx?.rate ?? 1.0,
             pitch: voiceCtx?.pitch ?? 1.0,
             lang: voiceCtx?.lang ?? document.documentElement.lang ?? 'pt-BR',
             gender: voiceCtx?.voiceGender ?? 'female',
@@ -398,21 +398,21 @@
     root.dataset.transitionReady = 'false';
 
     cancelAllSpeech();
-    prepareTypingNodes(root);
+
+    // Mantém fallback visível até a hora real de começar
+    prepareTypingNodes(root, { clear: false });
 
     await waitForTransitionUnlock();
-    await flushFrames(3);
+    await flushFrames(2);
     await sleep(START_DELAY_MS);
 
     if (triggerToken !== window.JCSenha.state.initToken) return;
 
     const visible = await waitForSectionVisible(root, 6000);
     if (!visible) {
-      console.warn('[JCSenha] section não ficou visível a tempo; init cancelado');
+      console.warn('[JCSenha] section não ficou visível a tempo; mantendo texto fallback');
       return;
     }
-
-    if (triggerToken !== window.JCSenha.state.initToken) return;
 
     ensureVisible(root);
 
@@ -436,7 +436,7 @@
     await flushFrames(2);
 
     const seq = [instr1, instr2, instr3, instr4].filter(Boolean);
-    seq.forEach(normalizeParagraph);
+    seq.forEach((el) => normalizeParagraph(el, { clear: false }));
 
     const voiceCtx = syncGuideVoiceContext(root);
 
@@ -448,19 +448,20 @@
 
     window.JCSenha.state.activeRunToken = triggerToken;
 
+    // Só agora limpa para digitar
+    seq.forEach((el) => normalizeParagraph(el, { clear: true }));
+
     for (const el of seq) {
-  if (triggerToken !== window.JCSenha.state.activeRunToken) return;
+      if (triggerToken !== window.JCSenha.state.activeRunToken) return;
 
-  await typeOnce(el, {
-    speed: TYPING_SPEED,
-    speak: true,
-    voiceCtx,
-    runToken: triggerToken
-  });
+      await typeOnce(el, {
+        speed: TYPING_SPEED,
+        speak: true,
+        voiceCtx,
+        runToken: triggerToken
+      });
 
-  // 👇 pausa entre blocos (ESSENCIAL)
-  await sleep(520);
-}
+      await sleep(BETWEEN_BLOCKS_MS);
     }
 
     if (triggerToken !== window.JCSenha.state.activeRunToken) return;
@@ -548,8 +549,6 @@
       document.addEventListener('section:shown', onSectionShown, { passive: true });
       window.JCSenha.state.listenerOn = true;
     }
-
-    // não auto-inicializa no DOMContentLoaded
   }
 
   document.readyState === 'loading'
