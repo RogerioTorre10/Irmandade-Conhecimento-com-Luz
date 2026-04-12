@@ -77,6 +77,20 @@
     "placeholder": "名前",
     "notice": "ボタンの上にカーソルを軽く乗せると、ガイドのプロフィールが表示されます。選択を確定するには、もう一度クリックするかダブルクリックしてください。"
   },
+  "guias": {
+  "zion": {
+    "nome": "xAI GROK",
+    "descricao": "ZION 好奇心が強く率直で、宇宙的な視点から深い答えを探します。"
+  },
+  "lumen": {
+    "nome": "OpenAI ChatGPT",
+    "descricao": "LUMEN 思いやりと内省をもって、共感と明快さで導きます。"
+  },
+  "arian": {
+    "nome": "Google Gemini",
+    "descricao": "ARIAN 創造的で多才、革新的な視点でインスピレーションを与えます。"
+  }
+ },
   "selfie": {
     "title": "写真を撮影",
     "instruction": "携帯を少し離して顔を正しく位置づけてください。ガイドが導きます。",
