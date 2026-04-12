@@ -80,20 +80,24 @@
     return { nome, guia };
   }
 
-  function typeWriter(el, text, speed = 35) {
-    if (!el) return;
-    el.textContent = '';
-    el.style.opacity = '1';
+ function typeWriter(el, text, speed = 35) {
+  if (!el) return;
 
-    let i = 0;
-    const timer = setInterval(() => {
-      if (i < text.length) {
-        el.textContent += text[i++];
-      } else {
-        clearInterval(timer);
-      }
-    }, speed);
-  }
+  el.classList.add('typing-active');
+  el.textContent = '';
+  el.style.opacity = '1';
+
+  let i = 0;
+  const timer = setInterval(() => {
+    if (i < text.length) {
+      el.textContent += text[i++];
+    } else {
+      clearInterval(timer);
+      el.classList.remove('typing-active');
+      el.classList.add('typing-done');
+    }
+  }, speed);
+}
 
   function speak(text) {
     if (window.speak) {
