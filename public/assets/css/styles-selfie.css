@@ -15,6 +15,13 @@
   box-sizing: border-box;
   overflow-x: hidden !important;
   overflow-y: visible !important;
+  /* remove scrollbar desktop */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+#section-selfie::-webkit-scrollbar {
+  display: none;
 }
 
 #section-selfie .j-perg-v-inner {
@@ -530,12 +537,20 @@
     border-radius: 12px;
   }
 }
+
 /* =======================================================
-   SELFIE — OVERRIDE FINAL DE CENTRALIZAÇÃO
+   CENTRALIZAÇÃO E SCROLLBAR — OVERRIDE FINAL
    ======================================================= */
 
 html, body {
   overflow-x: hidden !important;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
 }
 
 #section-selfie {
@@ -578,7 +593,6 @@ html, body {
     margin-right: auto !important;
   }
 
-  /* remove barra lateral visual da própria selfie */
   #section-selfie .selfie-wrap {
     overflow: hidden !important;
   }
