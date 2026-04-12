@@ -190,7 +190,7 @@
 
     section.style.overflowX = 'hidden';
     section.style.boxSizing = 'border-box';
-    section.style.overflowY = 'hidden';
+    section.style.overflowY = 'visible';
     section.style.minHeight = '100vh';
     section.style.height = 'auto';
     section.style.paddingBottom = '40px';
@@ -223,8 +223,9 @@
       frame.style.marginBottom = '10px';
       frame.style.width = 'min(100%, 320px)';
       frame.style.maxWidth = '320px';
-      frame.style.height = '360px';
-      frame.style.maxHeight = '360px';
+      frame.style.aspectRatio = '3 / 4';
+      frame.style.height = 'auto';
+      frame.style.maxHeight = '420px';
       frame.style.background = '#000';
       frame.style.zIndex = '10';
     }
