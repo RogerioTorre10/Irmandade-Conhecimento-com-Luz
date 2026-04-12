@@ -74,7 +74,8 @@
     "title": "Wählen Sie Ihren Guide",
     "subtitle": "Wählen Sie aus, wer Sie auf dieser Reise begleiten wird.",
     "p1": "Um den Guide freizuschalten, geben Sie Ihren Namen ein.",
-    "placeholder": "NAME."
+    "placeholder": "NAME.",
+    "notice": "Wenn Sie den Cursor sanft über die Schaltflächen bewegen, wird das Profil des Guides angezeigt. Zur Bestätigung klicken Sie erneut oder verwenden Sie einen Doppelklick."
   },
   "selfie": {
     "title": "Machen Sie Ihr Foto",
