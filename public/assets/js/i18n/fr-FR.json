@@ -1,11 +1,31 @@
 {
   "meta": { "lang": "fr-FR", "label": "Français (France)" },
-  "common": {
-    "continue": "Continuer",
-    "next": "Suivant",
-    "back": "Retour",
-    "loading": "Chargement..."
-  },
+ "common": {
+  "back": "Retour",
+  "next": "Suivant",
+  "continue": "Continuer",
+  "confirm": "Confirmer",
+  "start": "Commencer",
+  "finish": "Terminer",
+
+  "yes": "Oui",
+  "no": "Non",
+  "cancel": "Annuler",
+  "skip": "Passer",
+
+  "loading": "Chargement...",
+  "processing": "Traitement...",
+  "please_wait": "Veuillez patienter...",
+
+  "error": "Une erreur est survenue",
+  "try_again": "Réessayer",
+
+  "enter_here": "Saisissez ici...",
+  "required_field": "Champ obligatoire",
+
+  "success": "Succès",
+  "attention": "Attention"
+},
   "site": { "title": "Voyage • Fraternité Connaissance avec Lumière" },
   "intro": {
     "title": "Voyage de la Connaissance",
