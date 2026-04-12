@@ -1,11 +1,31 @@
 {
   "meta": { "lang": "es-ES", "label": "Español (España)" },
   "common": {
-    "continue": "Continuar",
-    "next": "Avanzar",
-    "back": "Volver",
-    "loading": "Cargando..."
-  },
+  "back": "Volver",
+  "next": "Avanzar",
+  "continue": "Continuar",
+  "confirm": "Confirmar",
+  "start": "Iniciar",
+  "finish": "Finalizar",
+
+  "yes": "Sí",
+  "no": "No",
+  "cancel": "Cancelar",
+  "skip": "Saltar",
+
+  "loading": "Cargando...",
+  "processing": "Procesando...",
+  "please_wait": "Por favor, espera...",
+
+  "error": "Ocurrió un error",
+  "try_again": "Intentar nuevamente",
+
+  "enter_here": "Escribe aquí...",
+  "required_field": "Campo obligatorio",
+
+  "success": "Éxito",
+  "attention": "Atención"
+}
   "site": { "title": "Viaje • Hermandad Conocimiento con Luz" },
   "intro": {
     "title": "Viaje del Conocimiento",
