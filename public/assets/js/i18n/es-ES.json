@@ -71,13 +71,17 @@
     "placeholder": "Escribe la Palabra Clave..."
   },
   "guia": {
-    "title": "Elige tu Guía",
-    "subtitle": "Selecciona quién te acompañará en este viaje.",
-    "p1": "Para desbloquear la Guía, ingresa tu nombre.",
-    "placeholder": "NOMBRE.",
-    "notice": "Al pasar suavemente el cursor sobre los botones, se mostrará el perfil del guía. Para confirmar, haz clic nuevamente o utiliza doble clic."
-  },
-  "guias": {
+  "title": "Elige tu Guía",
+  "subtitle": "Hola, {{nome}}. Elige tu guía para la Jornada.",
+  "p1": "Para liberar al Guía, ingresa tu nombre",
+  "placeholder": "NOMBRE",
+  "notice": "Al pasar suavemente el cursor sobre los botones, se mostrará el perfil del guía. Para confirmar, haz clic nuevamente o utiliza doble clic.",
+  "armed": "Has elegido {{guia}}. Haz clic nuevamente para confirmar.",
+  "timeout": "Se acabó el tiempo. Selecciona el guía y haz clic nuevamente para confirmar.",
+  "load_error": "No fue posible cargar los guías. Inténtalo nuevamente más tarde.",
+  "choose_guide_aria": "Elegir el guía {{guia}}"
+},
+"guias": {
   "zion": {
     "nome": "xAI GROK",
     "descricao": "ZION Curioso y directo, busca respuestas profundas con visión cósmica."
@@ -90,7 +94,7 @@
     "nome": "Google Gemini",
     "descricao": "ARIAN Creativa y versátil, inspira con perspectivas innovadoras."
   }
- },
+},
   "selfie": {
     "title": "Toma tu foto",
     "instruction": "Aleja un poco el celular y posiciona tu rostro. Tu guía te conducirá.",
