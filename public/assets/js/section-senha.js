@@ -292,87 +292,95 @@
     }
   }
 
-  async function typeOnce(el, { speed = TYPING_SPEED, speak = true, voiceCtx = null, runToken = 0 } = {}) {
-    if (!el) return;
-    if (runToken !== window.JCSenha.state.activeRunToken) return;
+ async function typeOnce(el, { speed = TYPING_SPEED, speak = true, voiceCtx = null, runToken = 0 } = {}) {
+  if (!el) return;
+  if (runToken !== window.JCSenha.state.activeRunToken) return;
 
-    const rawText =
-      el.dataset?.text ||
-      el.getAttribute('data-text') ||
-      el.textContent ||
-      '';
+  const key = el.dataset?.i18nText;
+  const translated =
+    (key && window.i18n?.t ? window.i18n.t(key) : null);
 
-    const text = String(rawText).trim();
-    if (!text) return;
+  const rawText =
+    (translated && translated !== key ? translated : null) ||
+    el.dataset?.text ||
+    el.getAttribute('data-text') ||
+    el.textContent ||
+    '';
 
-    window.G = window.G || {};
-    const prevLock = !!window.G.__typingLock;
-    window.G.__typingLock = true;
+  const text = String(rawText).trim();
+  if (!text) return;
 
-    el.textContent = '';
-    el.classList.add('typing-active');
-    el.classList.remove('typing-done', 'type-done');
-    el.removeAttribute('data-spoken');
-    el.setAttribute('aria-busy', 'true');
+  el.dataset.text = text;
+  el.setAttribute('data-text', text);
 
-    let usedFallback = false;
+  window.G = window.G || {};
+  const prevLock = !!window.G.__typingLock;
+  window.G.__typingLock = true;
 
-    if (typeof window.runTyping === 'function') {
-      await new Promise((resolve) => {
-        try {
-          window.runTyping(el, text, () => resolve(), {
-            speed,
-            cursor: true
-          });
-        } catch (err) {
-          console.warn('[JCSenha] runTyping falhou, fallback local', err);
-          usedFallback = true;
-          resolve();
-        }
-      });
-    } else {
-      usedFallback = true;
-    }
+  el.textContent = '';
+  el.classList.add('typing-active');
+  el.classList.remove('typing-done', 'type-done');
+  el.removeAttribute('data-spoken');
+  el.setAttribute('aria-busy', 'true');
 
-    if (runToken !== window.JCSenha.state.activeRunToken) return;
+  let usedFallback = false;
 
-    if (usedFallback) {
-      await localType(el, text, speed);
-    }
-
-    el.classList.remove('typing-active');
-    el.classList.add('typing-done');
-    el.removeAttribute('aria-busy');
-    el.setAttribute('data-typed', 'true');
-
-    window.G.__typingLock = prevLock;
-
-    if (speak && text && !el.dataset.spoken && runToken === window.JCSenha.state.activeRunToken) {
+  if (typeof window.runTyping === 'function') {
+    await new Promise((resolve) => {
       try {
-        if (window.EffectCoordinator?.speak) {
-          cancelAllSpeech();
-
-          const speakOptions = {
-            rate: voiceCtx?.rate ?? 1.0,
-            pitch: voiceCtx?.pitch ?? 1.0,
-            lang: voiceCtx?.lang ?? document.documentElement.lang ?? 'pt-BR',
-            gender: voiceCtx?.voiceGender ?? 'female',
-            guide: voiceCtx?.guide ?? 'lumen',
-            style: voiceCtx?.style ?? 'acolhedora'
-          };
-
-          await window.EffectCoordinator.speak(text, speakOptions);
-          await sleep(TTS_LATCH_MS);
-          el.dataset.spoken = 'true';
-        }
+        window.runTyping(el, text, () => resolve(), {
+          speed,
+          cursor: true
+        });
       } catch (err) {
-        console.error('[JCSenha] erro no TTS:', err);
+        console.warn('[JCSenha] runTyping falhou, fallback local', err);
+        usedFallback = true;
+        resolve();
       }
-    }
-
-    await sleep(80);
+    });
+  } else {
+    usedFallback = true;
   }
 
+  if (runToken !== window.JCSenha.state.activeRunToken) return;
+
+  if (usedFallback) {
+    await localType(el, text, speed);
+  }
+
+  el.classList.remove('typing-active');
+  el.classList.add('typing-done');
+  el.removeAttribute('aria-busy');
+  el.setAttribute('data-typed', 'true');
+
+  window.G.__typingLock = prevLock;
+
+  if (speak && text && !el.dataset.spoken && runToken === window.JCSenha.state.activeRunToken) {
+    try {
+      if (window.EffectCoordinator?.speak) {
+        cancelAllSpeech();
+
+        const speakOptions = {
+          rate: voiceCtx?.rate ?? 1.0,
+          pitch: voiceCtx?.pitch ?? 1.0,
+          lang: voiceCtx?.lang ?? document.documentElement.lang ?? 'pt-BR',
+          gender: voiceCtx?.voiceGender ?? 'female',
+          guide: voiceCtx?.guide ?? 'lumen',
+          style: voiceCtx?.style ?? 'acolhedora'
+        };
+
+        await window.EffectCoordinator.speak(text, speakOptions);
+        await sleep(TTS_LATCH_MS);
+        el.dataset.spoken = 'true';
+      }
+    } catch (err) {
+      console.error('[JCSenha] erro no TTS:', err);
+    }
+  }
+
+  await sleep(80);
+}
+  
   function getTransitionSrc(root, btn) {
     return (btn?.dataset?.transitionSrc)
       || (root?.dataset?.transitionSrc)
