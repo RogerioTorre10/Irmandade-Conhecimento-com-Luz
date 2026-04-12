@@ -79,7 +79,8 @@
     "title": "Escolha seu Guia",
     "subtitle": "Selecione quem irá acompanhar você nesta jornada.",
     "p1": "Para liberar o Guia, insira seu nome.",
-    "placeholder": "NOME."
+    "placeholder": "NOME.",
+    "notice": "Ao passar suavemente o cursor sobre os botões, será exibido o perfil do guia. Para confirmar, clique novamente ou utilize duplo clique."
   },
   "selfie": {
     "title": "Tirar sua foto",
