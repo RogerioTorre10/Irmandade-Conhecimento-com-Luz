@@ -348,16 +348,18 @@
     section.querySelector('.pergaminho-content');
   const frame = getFrameEl();
 
+  // não cria rolagem própria da section
   section.style.overflowX = 'hidden';
   section.style.overflowY = 'visible';
   section.style.boxSizing = 'border-box';
   section.style.minHeight = '100vh';
   section.style.height = 'auto';
-  section.style.paddingBottom = '28px';
+  section.style.paddingBottom = '24px';
   section.style.paddingLeft = '0';
   section.style.paddingRight = '0';
+  section.style.margin = '0 auto';
 
-  [panel, inner, card, content].forEach((el) => {
+  [inner, panel, card, content].forEach((el) => {
     if (!el) return;
     el.style.boxSizing = 'border-box';
     el.style.marginLeft = 'auto';
@@ -370,16 +372,19 @@
 
   if (panel) {
     if (window.innerWidth <= 768) {
-      panel.style.width = 'min(calc(100vw - 16px), 430px)';
+      panel.style.width = 'calc(100vw - 20px)';
       panel.style.maxWidth = '430px';
-      panel.style.transform = 'none';
-      panel.style.overflow = 'visible';
     } else {
       panel.style.width = 'min(94vw, 620px)';
       panel.style.maxWidth = '620px';
-      panel.style.transform = 'none';
-      panel.style.overflow = 'visible';
     }
+
+    panel.style.marginLeft = 'auto';
+    panel.style.marginRight = 'auto';
+    panel.style.transform = 'none';
+    panel.style.left = 'auto';
+    panel.style.right = 'auto';
+    panel.style.overflow = 'visible';
   }
 
   if (frame) {
@@ -409,7 +414,7 @@
     slidersWrap.style.marginRight = 'auto';
     slidersWrap.style.marginTop = '8px';
     slidersWrap.style.marginBottom = '18px';
-    slidersWrap.style.paddingBottom = '14px';
+    slidersWrap.style.paddingBottom = '12px';
     slidersWrap.style.position = 'relative';
     slidersWrap.style.zIndex = '40';
     slidersWrap.style.pointerEvents = 'auto';
@@ -424,7 +429,7 @@
   });
 
   if (content) {
-    content.style.paddingBottom = '20px';
+    content.style.paddingBottom = '18px';
     content.style.overflow = 'visible';
   }
 }
