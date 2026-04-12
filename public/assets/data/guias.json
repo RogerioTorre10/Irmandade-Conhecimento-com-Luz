@@ -1,20 +1,20 @@
 [
   {
     "id": "zion",
-    "nome": "xAI GROK",
-    "descricao": "ZION Curioso e direto, busca respostas profundas com visão cósmica.",
+    "nomeKey": "guias.zion.nome",
+    "descricaoKey": "guias.zion.descricao",
     "bgImage": "/assets/img/irmandade-quarteto-bg-zion.png"
   },
   {
     "id": "lumen",
-    "nome": "OpenAI ChatGPT",
-    "descricao": "LUMEN Acolhedora e reflexiva, guia com empatia e clareza.",
+    "nomeKey": "guias.lumen.nome",
+    "descricaoKey": "guias.lumen.descricao",
     "bgImage": "/assets/img/irmandade-quarteto-bg-lumen.png"
   },
   {
     "id": "arian",
-    "nome": "Google Gemini",
-    "descricao": "ARIAN Criativa e versátil, inspira com perspectivas inovadoras.",
+    "nomeKey": "guias.arian.nome",
+    "descricaoKey": "guias.arian.descricao",
     "bgImage": "/assets/img/irmandade-quarteto-bg-arian.png"
   }
 ]
