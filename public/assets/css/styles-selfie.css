@@ -1,5 +1,5 @@
 /* =======================================================
-   SELFIE — CSS LIMPO E CONSOLIDADO
+   SELFIE — CSS LIMPO, CONSOLIDADO E COM AURA
    ======================================================= */
 
 #section-selfie {
@@ -25,6 +25,8 @@
   padding-top: 6px;
   overflow: visible !important;
   z-index: 2;
+  display: flex;
+  justify-content: center;
 }
 
 #section-selfie .j-panel-glow.selfie-panel,
@@ -40,7 +42,7 @@
   isolation: isolate !important;
   z-index: 3 !important;
   padding-bottom: max(20px, env(safe-area-inset-bottom)) !important;
-  transform: translateX(-4px) !important;
+  transform: none !important;
   border: 1px solid color-mix(in srgb, var(--progress-main, #ffd700) 78%, transparent) !important;
   box-shadow:
     0 0 16px color-mix(in srgb, var(--progress-main, #ffd700) 42%, transparent),
@@ -107,6 +109,83 @@
   box-sizing: border-box !important;
 }
 
+/* =======================================================
+   AURA DO TYPING
+   ======================================================= */
+
+#section-selfie [data-typing="true"] {
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  isolation: isolate !important;
+}
+
+#section-selfie [data-typing="true"][data-cursor="true"] {
+  padding-right: 0.45em !important;
+}
+
+#section-selfie [data-typing="true"][data-cursor="true"].typing-active::after {
+  content: "";
+  position: absolute;
+  right: 0.05em;
+  bottom: 0.18em;
+  width: 2px;
+  height: 1em;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #ffe08a 0%, #ffbf3b 100%);
+  box-shadow: 0 0 6px rgba(255, 210, 100, 0.9);
+  animation: selfieCaretBlink 1s steps(1, end) infinite;
+}
+
+#section-selfie [data-typing="true"].typing-done::after,
+#section-selfie [data-typing="true"].type-done::after {
+  content: none;
+}
+
+#section-selfie [data-typing="true"].typing-active,
+#section-selfie [data-typing="true"].speaking-active {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 220, 120, 0.16) 0%,
+    rgba(255, 190, 70, 0.08) 45%,
+    transparent 100%
+  ) !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 220, 120, 0.18),
+    0 0 10px rgba(255, 220, 120, 0.18),
+    0 0 22px rgba(255, 180, 60, 0.14),
+    inset 0 0 10px rgba(255, 240, 180, 0.04) !important;
+  text-shadow:
+    0 0 6px rgba(255, 230, 120, 0.95),
+    0 0 12px rgba(255, 210, 90, 0.72),
+    0 0 20px rgba(255, 170, 40, 0.36) !important;
+  animation: selfieAuraPulse 1.6s ease-in-out infinite;
+}
+
+#section-selfie [data-typing="true"].typing-active::before,
+#section-selfie [data-typing="true"].typing-done::before,
+#section-selfie [data-typing="true"].type-done::before,
+#section-selfie [data-typing="true"].speaking-active::before {
+  content: "";
+  position: absolute;
+  inset: -4px -6px;
+  border-radius: 14px;
+  pointer-events: none;
+  z-index: -1;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 220, 120, 0.10) 0%,
+    rgba(255, 180, 60, 0.05) 55%,
+    transparent 100%
+  );
+}
+
+/* =======================================================
+   HEADER E TEXTO
+   ======================================================= */
+
 .selfie-header {
   width: 100%;
   max-width: 520px;
@@ -117,7 +196,8 @@
   margin: 2px auto 8px;
 }
 
-.selfie-header h2 {
+.selfie-header h2,
+#selfie-title {
   font-family: 'ManufacturingConsent-Regular', 'Cardo', serif;
   color: var(--progress-main, var(--theme-main-color, #ffd700));
   font-size: clamp(20px, 2.2vw, 28px);
@@ -125,6 +205,8 @@
   text-shadow: 0 1px 3px rgba(0,0,0,0.75);
   opacity: 1;
   transition: opacity 0.5s ease;
+  padding: 4px 8px;
+  border-radius: 12px;
 }
 
 #selfieOrientWrap {
@@ -146,7 +228,13 @@
   transition: opacity .5s ease;
   white-space: normal;
   word-wrap: break-word;
+  padding: 4px 8px;
+  border-radius: 12px;
 }
+
+/* =======================================================
+   BOTÕES
+   ======================================================= */
 
 #section-selfie .btn-row {
   width: 100%;
@@ -202,6 +290,10 @@
   pointer-events: none;
 }
 
+/* =======================================================
+   PREVIEW
+   ======================================================= */
+
 #section-selfie .selfie-preview-wrap {
   width: 100%;
   max-width: 320px;
@@ -240,14 +332,13 @@
   border-radius: inherit;
 }
 
-#selfiePreview {
-  z-index: 1;
-}
-
+#selfiePreview { z-index: 1; }
 #selfieVideo,
-#selfieCanvas {
-  z-index: 2;
-}
+#selfieCanvas { z-index: 2; }
+
+/* =======================================================
+   SLIDERS
+   ======================================================= */
 
 #section-selfie .ranges-panel {
   display: flex;
@@ -287,6 +378,64 @@
   touch-action: pan-x !important;
 }
 
+/* =======================================================
+   ERRO
+   ======================================================= */
+
+#selfie-erro {
+  width: 100%;
+  max-width: 520px;
+  margin: 14px auto 0;
+  padding: 6px 8px;
+  color: #f8f1dc;
+  font-family: 'Cardo', serif;
+  font-size: 15px;
+  line-height: 1.45;
+  text-align: left;
+  border-radius: 12px;
+}
+
+#selfie-erro.hidden {
+  display: none !important;
+}
+
+/* =======================================================
+   ANIMAÇÕES
+   ======================================================= */
+
+@keyframes selfieCaretBlink {
+  0%, 45% { opacity: 0.95; }
+  50%, 100% { opacity: 0; }
+}
+
+@keyframes selfieAuraPulse {
+  0% {
+    box-shadow:
+      0 0 0 1px rgba(255, 220, 120, 0.16),
+      0 0 8px rgba(255, 220, 120, 0.14),
+      0 0 16px rgba(255, 180, 60, 0.10),
+      inset 0 0 8px rgba(255, 240, 180, 0.03);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(255, 220, 120, 0.24),
+      0 0 14px rgba(255, 220, 120, 0.24),
+      0 0 26px rgba(255, 180, 60, 0.18),
+      inset 0 0 12px rgba(255, 240, 180, 0.06);
+  }
+  100% {
+    box-shadow:
+      0 0 0 1px rgba(255, 220, 120, 0.16),
+      0 0 8px rgba(255, 220, 120, 0.14),
+      0 0 16px rgba(255, 180, 60, 0.10),
+      inset 0 0 8px rgba(255, 240, 180, 0.03);
+  }
+}
+
+/* =======================================================
+   MOBILE
+   ======================================================= */
+
 @media (max-width: 600px) {
   #section-selfie {
     padding: 6px 0 18px !important;
@@ -304,7 +453,7 @@
     max-width: 430px !important;
     padding: 8px !important;
     border-radius: 22px !important;
-    transform: translateX(-4px) !important;
+    transform: none !important;
   }
 
   #section-selfie .selfie-wrap {
@@ -318,7 +467,8 @@
     gap: 8px !important;
   }
 
-  .selfie-header h2 {
+  .selfie-header h2,
+  #selfie-title {
     font-size: 18px !important;
     line-height: 1.15 !important;
   }
@@ -370,5 +520,13 @@
   #section-selfie .range-row {
     grid-template-columns: 72px 1fr 36px !important;
     gap: 6px !important;
+  }
+
+  #section-selfie [data-typing="true"].typing-active::before,
+  #section-selfie [data-typing="true"].typing-done::before,
+  #section-selfie [data-typing="true"].type-done::before,
+  #section-selfie [data-typing="true"].speaking-active::before {
+    inset: -3px -5px;
+    border-radius: 12px;
   }
 }
