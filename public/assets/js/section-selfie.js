@@ -83,6 +83,7 @@
  function typeWriter(el, text, speed = 35) {
   if (!el) return;
 
+  el.classList.remove('typing-done', 'type-done');
   el.classList.add('typing-active');
   el.textContent = '';
   el.style.opacity = '1';
@@ -626,41 +627,46 @@
     const { nome, guia } = getUserData();
 
     setTimeout(() => {
-      if (title && !title.classList.contains('typed')) {
-      const titleText =
-        window.i18n?.t?.('selfie.title') ||
-        title.dataset.text ||
-       'Prepare sua selfie';
+     if (title && !title.classList.contains('typed')) {
+  const titleText =
+    window.i18n?.t?.('selfie.title') ||
+    title.dataset.text ||
+    'Prepare sua selfie';
 
-        title.textContent = '';
-        typeWriter(title, titleText.trim(), 40);
-        title.classList.add('typed');
-      }
+  title.textContent = '';
+  title.setAttribute('data-typing', 'true');
+  typeWriter(title, titleText.trim(), 40);
+  title.classList.add('typed');
+}
 
-      if (texto && !texto.classList.contains('typed')) {
-        const guiaNomeMap = {
-  arian: 'Arian',
-  lumen: 'Lumen',
-  zion: 'Zion'
-};
+if (texto && !texto.classList.contains('typed')) {
+  const guiaNomeMap = {
+    arian: 'Arian',
+    lumen: 'Lumen',
+    zion: 'Zion'
+  };
 
-const guiaNome = guiaNomeMap[guia] || 'Guia';
+  const guiaNome = guiaNomeMap[guia] || 'Guia';
 
-const template =
-  window.i18n?.t?.('selfie.instruction') ||
-  texto.dataset.text ||
-  '{nome}, afaste um pouco o celular e posicione seu rosto. {guia} vai conduzir você.';
+  const template =
+    window.i18n?.t?.('selfie.instruction') ||
+    texto.dataset.text ||
+    '{nome}, afaste um pouco o celular e posicione seu rosto. {guia} vai conduzir você.';
 
-const fullText = template
-  .replace(/\{nome\}/g, nome)
-  .replace(/\{guia\}/g, guiaNome);
+  const fullText = template
+    .replace(/\{nome\}/g, nome)
+    .replace(/\{guia\}/g, guiaNome);
 
-texto.textContent = '';
-typeWriter(texto, fullText, 36);
+  texto.textContent = '';
+  texto.setAttribute('data-typing', 'true');
+  typeWriter(texto, fullText, 36);
 
-setTimeout(() => {
-  speak(fullText);
-}, 350);
+  setTimeout(() => {
+    speak(fullText);
+  }, 350);
+
+  texto.classList.add('typed');
+}
 
     bindRangeInputs();
     bindButtons();
