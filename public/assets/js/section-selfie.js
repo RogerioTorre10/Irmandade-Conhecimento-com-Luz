@@ -80,7 +80,7 @@
     return { nome, guia };
   }
 
- function typeWriter(el, text, speed = 35) {
+ function typewriter(el, text, speed = 35) {
   if (!el) return;
 
   el.classList.remove('typing-done', 'type-done');
@@ -635,7 +635,7 @@
 
   title.textContent = '';
   title.setAttribute('data-typing', 'true');
-  typeWriter(title, titleText.trim(), 40);
+  typewriter(title, titleText.trim(), 40);
   title.classList.add('typed');
 }
 
