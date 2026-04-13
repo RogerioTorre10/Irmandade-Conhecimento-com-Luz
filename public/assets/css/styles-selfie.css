@@ -353,71 +353,11 @@
   }
 }
 /* ==========================================
-   SECTION SELFIE — CENTRALIZA PREVIEW E CONTROLES
+   SELFIE — AJUSTE FINAL ESTÁVEL
+   mobile preservado + desktop alinhado
    ========================================== */
 
-#section-selfie .camera-wrap,
-#section-selfie .selfie-frame,
-#section-selfie .camera-preview-wrap,
-#section-selfie .preview-shell {
-  width: 100% !important;
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-  box-sizing: border-box !important;
-}
-
-#section-selfie video,
-#section-selfie canvas,
-#section-selfie img,
-#section-selfie .camera-preview {
-  display: block !important;
-  margin: 0 auto !important;
-  object-fit: cover !important;
-  object-position: center center !important;
-}
-
-/* quadro do preview */
-#section-selfie .camera-preview-wrap,
-#section-selfie .selfie-frame {
-  max-width: 320px !important;
-  width: 100% !important;
-}
-
-/* área dos botões principais */
-#section-selfie .selfie-actions,
-#section-selfie .camera-actions {
-  position: relative !important;
-  z-index: 5 !important;
-  margin-top: 10px !important;
-  margin-bottom: 10px !important;
-}
-
-/* sliders / ajustes finos */
-#section-selfie .selfie-sliders,
-#section-selfie .camera-sliders,
-#section-selfie .ajustes-camera {
-  position: relative !important;
-  z-index: 6 !important;
-  width: 100% !important;
-  max-width: 320px !important;
-  margin: 10px auto 0 !important;
-  padding: 8px 0 0 !important;
-}
-
-/* cada controle deslizante */
-#section-selfie .selfie-sliders input[type="range"],
-#section-selfie .camera-sliders input[type="range"],
-#section-selfie .ajustes-camera input[type="range"] {
-  width: 100% !important;
-  display: block !important;
-  margin: 8px 0 !important;
-  pointer-events: auto !important;
-}
-
-/* evita corte do rodapé da área de selfie */
+/* base segura */
 #section-selfie .conteudo-pergaminho,
 #section-selfie .j-arcane-card,
 #section-selfie .pergaminho-content {
@@ -425,23 +365,86 @@
   padding-bottom: 18px !important;
   width: 100%;
   max-width: 100%;
-  box-sizing: border-box !important;   
+  box-sizing: border-box !important;
 }
 
+/* preview e sliders centralizados sem forçar tudo */
+#section-selfie .selfie-preview-wrap {
+  width: 100%;
+  max-width: 340px;
+  margin: 0 auto 8px !important;
+}
 
+#section-selfie .preview-frame {
+  position: relative;
+  width: 100%;
+  max-width: 340px;
+  margin: 0 auto;
+  padding-bottom: 112%;
+  background: #000;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+#section-selfie .ranges-panel {
+  width: 100%;
+  max-width: 340px;
+  margin: 10px auto 8px !important;
+}
+
+/* mídia dentro do preview */
+#selfiePreview,
+#selfieVideo,
+#selfieCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  margin: 0 auto;
+  object-fit: cover !important;
+  object-position: center center !important;
+  border-radius: inherit;
+}
+
+/* desktop: só um pequeno ajuste para a esquerda */
+@media (min-width: 769px) {
+  #section-selfie .j-panel-glow.selfie-panel {
+    transform: translateX(-18px) !important;
+  }
+
+  #section-selfie .selfie-preview-wrap,
+  #section-selfie .preview-frame,
+  #section-selfie .ranges-panel {
+    max-width: 320px !important;
+  }
+}
+
+/* mobile: mantém o que estava bom */
 @media (max-width: 768px) {
-  #section-selfie .camera-preview-wrap,
-  #section-selfie .selfie-frame,
-  #section-selfie .selfie-sliders,
-  #section-selfie .camera-sliders,
-  #section-selfie .ajustes-camera {
+  #section-selfie .j-panel-glow.selfie-panel {
+    transform: none !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    width: min(96vw, 430px) !important;
+    max-width: 430px !important;
+  }
+
+  #section-selfie .selfie-wrap {
+    padding: 14px 12px 14px !important;
+  }
+
+  #section-selfie .selfie-preview-wrap,
+  #section-selfie .preview-frame,
+  #section-selfie .ranges-panel {
     max-width: 280px !important;
   }
 
-  #section-selfie .selfie-actions,
-  #section-selfie .camera-actions {
-    gap: 8px !important;
-    flex-wrap: wrap !important;
-    justify-content: center !important;
+  #section-selfie .preview-frame {
+    padding-bottom: 104% !important;
+  }
+
+  #section-selfie .ranges-panel {
+    padding: 10px 10px !important;
   }
 }
