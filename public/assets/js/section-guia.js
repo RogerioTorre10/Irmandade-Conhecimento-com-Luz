@@ -972,23 +972,24 @@
         if (!nameConfirmedOnce) {
           nameConfirmedOnce = true;
 
-          if (els.guiaTexto) {
-            const base = (
-              els.guiaTexto.dataset?.text ||
-              els.guiaTexto.textContent ||
-              t('guia.subtitle', 'Olá, {{nome}}! Escolha seu guia para a Jornada.')
-            ).trim();
+         if (els.guiaTexto) {
+  const base =
+    window.i18n?.t?.('guia.subtitle') ||
+    els.guiaTexto.dataset?.text ||
+    els.guiaTexto.textContent ||
+    'Hello, {{nome}}! Choose your guide for the Journey.';
 
-            const msg = interpolate(base, { nome: upperName, name: upperName });
+  const msg = interpolate(base.trim(), { nome: upperName, name: upperName });
 
-            els.guiaTexto.textContent = '';
-            els.guiaTexto.dataset.spoken = '';
-            await typeOnce(els.guiaTexto, msg, { speed: 38, speak: true });
+  els.guiaTexto.textContent = '';
+  els.guiaTexto.dataset.spoken = '';
+  els.guiaTexto.setAttribute('data-typing', 'true');
 
-            els.moldura?.classList.add('glow');
-            els.guiaTexto?.classList.add('glow');
-          }
-        }
+  await typeOnce(els.guiaTexto, msg, { speed: 38, speak: true });
+
+  els.moldura?.classList.add('glow');
+  els.guiaTexto?.classList.add('glow');
+}
 
         unlockGuideButtons(guideButtons);
         hideNotice(root);
