@@ -80,25 +80,20 @@
     return { nome, guia };
   }
 
- function typewriter(el, text, speed = 35) {
-  if (!el) return;
+  function typeWriter(el, text, speed = 35) {
+    if (!el) return;
+    el.textContent = '';
+    el.style.opacity = '1';
 
-  el.classList.remove('typing-done', 'type-done');
-  el.classList.add('typing-active');
-  el.textContent = '';
-  el.style.opacity = '1';
-
-  let i = 0;
-  const timer = setInterval(() => {
-    if (i < text.length) {
-      el.textContent += text[i++];
-    } else {
-      clearInterval(timer);
-      el.classList.remove('typing-active');
-      el.classList.add('typing-done');
-    }
-  }, speed);
-}
+    let i = 0;
+    const timer = setInterval(() => {
+      if (i < text.length) {
+        el.textContent += text[i++];
+      } else {
+        clearInterval(timer);
+      }
+    }, speed);
+  }
 
   function speak(text) {
     if (window.speak) {
@@ -195,13 +190,20 @@
 
     section.style.overflowX = 'hidden';
     section.style.boxSizing = 'border-box';
-    section.style.overflowY = 'visible';
+    section.style.overflowY = 'hidden';
     section.style.minHeight = '100vh';
     section.style.height = 'auto';
     section.style.paddingBottom = '40px';
     section.style.webkitOverflowScrolling = 'touch';
     section.style.paddingLeft = '0';
     section.style.paddingRight = '0';
+    section.style.marginLeft = '0';
+    section.style.marginRight = '0';
+    section.style.width = '100%';
+    section.style.maxWidth = '100vw';
+    section.style.display = 'flex';
+    section.style.flexDirection = 'column';
+    section.style.alignItems = 'center';
 
     [panel, inner, card, content].forEach((el) => {
       if (!el) return;
@@ -209,16 +211,28 @@
       el.style.marginLeft = 'auto';
       el.style.marginRight = 'auto';
       el.style.maxWidth = '100%';
+      el.style.transform = 'none';
+      el.style.left = '0';
+      el.style.right = '0';
+      el.style.position = 'relative';
     });
 
-    if (panel && window.innerWidth <= 768) {
-     panel.style.width = 'calc(100vw - 20px)';
-     panel.style.maxWidth = '420px';
-     panel.style.marginLeft = 'auto';
-     panel.style.marginRight = 'auto';
-     panel.style.transform = 'translateX(0)';
-     panel.style.overflow = 'visible';
-   }
+    if (panel) {
+      panel.style.transform = 'none';
+      panel.style.marginLeft = 'auto';
+      panel.style.marginRight = 'auto';
+      panel.style.position = 'relative';
+      panel.style.left = '0';
+      panel.style.right = '0';
+      if (window.innerWidth <= 768) {
+        panel.style.width = 'calc(100vw - 24px)';
+        panel.style.maxWidth = '420px';
+      } else {
+        panel.style.width = 'min(94vw, 620px)';
+        panel.style.maxWidth = '620px';
+      }
+      panel.style.overflow = 'visible';
+    }
 
     if (frame) {
       frame.style.position = 'relative';
@@ -228,9 +242,8 @@
       frame.style.marginBottom = '10px';
       frame.style.width = 'min(100%, 320px)';
       frame.style.maxWidth = '320px';
-      frame.style.aspectRatio = '3 / 4';
-      frame.style.height = 'auto';
-      frame.style.maxHeight = '420px';
+      frame.style.height = '360px';
+      frame.style.maxHeight = '360px';
       frame.style.background = '#000';
       frame.style.zIndex = '10';
     }
@@ -627,46 +640,29 @@
     const { nome, guia } = getUserData();
 
     setTimeout(() => {
-     if (title && !title.classList.contains('typed')) {
-  const titleText =
-    window.i18n?.t?.('selfie.title') ||
-    title.dataset.text ||
-    'Prepare sua selfie';
+      if (title && !title.classList.contains('typed')) {
+        const titleText = (title.dataset.text || 'Prepare sua selfie').trim();
+        title.textContent = '';
+        typeWriter(title, titleText, 40);
+        title.classList.add('typed');
+      }
 
-  title.textContent = '';
-  title.setAttribute('data-typing', 'true');
-  typewriter(title, titleText.trim(), 40);
-  title.classList.add('typed');
-}
+      if (texto && !texto.classList.contains('typed')) {
+        const guiaNomeMap = {
+          arian: 'Arian',
+          lumen: 'Lumen',
+          zion: 'Zion'
+        };
 
-if (texto && !texto.classList.contains('typed')) {
-  const guiaNomeMap = {
-    arian: 'Arian',
-    lumen: 'Lumen',
-    zion: 'Zion'
-  };
+        const guiaNome = guiaNomeMap[guia] || 'Guia';
+        const fullText = `${nome}, afaste o celular e posicione o rosto. ${guiaNome} te guiará.`;
 
-  const guiaNome = guiaNomeMap[guia] || 'Guia';
-
-  const template =
-    window.i18n?.t?.('selfie.instruction') ||
-    texto.dataset.text ||
-    '{nome}, afaste um pouco o celular e posicione seu rosto. {guia} vai conduzir voce.';
-
-  const fullText = template
-    .replace(/\{nome\}/g, nome)
-    .replace(/\{guia\}/g, guiaNome);
-
-  texto.textContent = '';
-  texto.setAttribute('data-typing', 'true');
-  typewrite(texto, fullText, 36);
-  
-  setTimeout(() => {
-    speak(fullText);
-  }, 350);
-
-  texto.classList.add('typed');
-}
+        texto.textContent = '';
+        typeWriter(texto, fullText, 36);
+        speak(fullText);
+        texto.classList.add('typed');
+      }
+    }, 300);
 
     bindRangeInputs();
     bindButtons();
