@@ -609,3 +609,10 @@ body::-webkit-scrollbar {
     transform: none !important;
   }
 }
+
+@media (min-width: 769px) {
+  #section-selfie .j-panel-glow.selfie-panel,
+  #section-selfie .j-panel-glow {
+    transform: translateX(-24px) !important;
+  }
+}
