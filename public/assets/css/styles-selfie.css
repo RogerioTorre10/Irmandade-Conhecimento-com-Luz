@@ -410,7 +410,7 @@
 /* desktop: só um pequeno ajuste para a esquerda */
 @media (min-width: 769px) {
   #section-selfie .j-panel-glow.selfie-panel {
-    transform: translateX(-40px) !important;
+    transform: translateX(-50px) !important;
   }
 
   #section-selfie .selfie-preview-wrap,
