@@ -20,9 +20,6 @@
 }
 
 /* sections antigas — sem invadir a intro */
-#section-termos1,
-#section-termos2,
-#section-senha,
 #section-final{
   max-width: 600px;
   min-height: 80vh;
@@ -40,9 +37,6 @@
   overflow: hidden;
 }
 
-#section-termos1.pergaminho-v::before,
-#section-termos2.pergaminho-v::before,
-#section-senha.pergaminho-v::before,
 #section-final.pergaminho-v::before{
   background-image: url('/assets/img/pergaminho-rasgado-vert.png') !important;
   background-size: cover;
@@ -57,12 +51,7 @@
 }
 
 /* texto legado */
-#section-termos1-pg1,
-#section-termos1-pg2,
-#section-termos2-pg1,
-#section-termos2-pg2,
-#section-senha h2,
-#section-senha p,
+
 #section-wizard #q-text,
 #section-final p{
   display: block;
@@ -77,11 +66,6 @@
   visibility: visible;
 }
 
-#section-termos1-pg1 h2,
-#section-termos1-pg2 h3,
-#section-termos2-pg1 h2,
-#section-termos2-pg2 h3,
-#section-senha h2,
 #section-wizard h2,
 #section-final h2{
   margin-bottom: 10px;
@@ -126,12 +110,6 @@
 }
 
 /* esconder apenas onde o fluxo antigo exige */
-.section-termos1 .parchment-title-rough,
-.section-termos1 .parchment-text-rough,
-.section-termos2 .parchment-title-rough,
-.section-termos2 .parchment-text-rough,
-#section-senha .parchment-title-rough,
-#section-senha .parchment-text-rough,
 #section-final .parchment-title-rough,
 #section-final .parchment-text-rough{
   display: none;
@@ -139,30 +117,17 @@
   visibility: hidden;
 }
 
-.section-termos1 .parchment-title-rough.typing-active,
-.section-termos1 .parchment-title-rough.typing-done,
-.section-termos1 .parchment-text-rough.typing-active,
-.section-termos1 .parchment-text-rough.typing-done,
-.section-termos2 .parchment-title-rough.typing-active,
-.section-termos2 .parchment-title-rough.typing-done,
-.section-termos2 .parchment-text-rough.typing-active,
-.section-termos2 .parchment-text-rough.typing-done,
-#section-senha .parchment-title-rough.typing-active,
-#section-senha .parchment-title-rough.typing-done,
-#section-senha .parchment-text-rough.typing-active,
-#section-senha .parchment-text-rough.typing-done,
-#sec-final .parchment-title-rough.typing-active,
-#sec-final .parchment-title-rough.typing-done,
-#sec-final .parchment-text-rough.typing-active,
-#sec-final .parchment-text-rough.typing-done{
+#section-final .parchment-title-rough.typing-active,
+#section-final .parchment-title-rough.typing-done,
+#section-final .parchment-text-rough.typing-active,
+#section-final .parchment-text-rough.typing-done{
   display: block;
   opacity: 1;
   visibility: visible;
   text-align: left;
 }
 
-.section-termos1 .parchment-inner-rough,
-.section-termos2 .parchment-inner-rough{
+.section-final .parchment-inner-rough{
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -182,16 +147,12 @@
   visibility: visible;
 }
 
-.section-termos1 .parchment-actions-rough,
-.section-termos2 .parchment-actions-rough,
-#section-senha .parchment-actions-rough,
 #section-final .parchment-actions-rough{
   position: sticky;
   bottom: 0;
 }
 
-.section-termos1 .parchment-actions-rough,
-.section-termos2 .parchment-actions-rough{
+.section-final .parchment-actions-rough{
   display: flex;
   opacity: 1;
   visibility: visible;
@@ -209,14 +170,14 @@
 }
 
 /* seção guia — base */
-.guia-header-moldura{
+.section-guia-header-moldura{
   position: relative;
   z-index: 10;
   padding: 30px 40px 20px;
   text-align: center;
 }
 
-.guia-name-input label{
+.section-guia-name-input label{
   display: block;
   width: fit-content;
   margin: 0 auto 10px;
@@ -229,7 +190,7 @@
   font-variant: small-caps;
 }
 
-.guia-name-input input{
+.section-guia-name-input input{
   width: 65%;
   max-width: 250px;
   margin: 0 auto;
@@ -251,7 +212,7 @@
   color: #fff;
 }
 
-.guia-name-input.on-pergaminho{
+.section-guia-name-input.on-pergaminho{
   display: flex;
   justify-content: center;
   margin: 6px 0 14px;
