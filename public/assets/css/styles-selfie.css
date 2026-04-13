@@ -418,11 +418,16 @@
 }
 
 /* evita corte do rodapé da área de selfie */
+#section-selfie .conteudo-pergaminho,
 #section-selfie .j-arcane-card,
 #section-selfie .pergaminho-content {
   overflow: visible !important;
   padding-bottom: 18px !important;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box !important;   
 }
+
 
 @media (max-width: 768px) {
   #section-selfie .camera-preview-wrap,
