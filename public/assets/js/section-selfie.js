@@ -659,8 +659,8 @@ if (texto && !texto.classList.contains('typed')) {
 
   texto.textContent = '';
   texto.setAttribute('data-typing', 'true');
-  typeWriter(texto, fullText, 36);
-
+  typewrite(texto, fullText, 36);
+  
   setTimeout(() => {
     speak(fullText);
   }, 350);
