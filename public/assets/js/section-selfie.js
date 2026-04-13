@@ -651,7 +651,7 @@ if (texto && !texto.classList.contains('typed')) {
   const template =
     window.i18n?.t?.('selfie.instruction') ||
     texto.dataset.text ||
-    '{nome}, afaste um pouco o celular e posicione seu rosto. {guia} vai conduzir você.';
+    '{nome}, afaste um pouco o celular e posicione seu rosto. {guia} vai conduzir voce.';
 
   const fullText = template
     .replace(/\{nome\}/g, nome)
