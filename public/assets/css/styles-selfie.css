@@ -673,3 +673,30 @@ html, body {
     max-width: 430px !important;
   }
 }
+
+/* =======================================================
+   V6 — REMOVER BARRA DE ROLAGEM LATERAL (DESKTOP + MOBILE)
+   ======================================================= */
+
+/* Bloqueia scroll horizontal no documento inteiro quando selfie está ativa */
+html, body {
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+}
+
+/* Garante que nenhum filho extrapole a viewport */
+#section-selfie,
+#section-selfie * {
+  max-width: 100vw !important;
+}
+
+/* Esconde scrollbar vertical no WebKit (Chrome/Safari) se indesejada */
+#section-selfie::-webkit-scrollbar {
+  width: 0 !important;
+  display: none !important;
+}
+
+#section-selfie {
+  scrollbar-width: none !important;  /* Firefox */
+  -ms-overflow-style: none !important; /* IE/Edge */
+}
