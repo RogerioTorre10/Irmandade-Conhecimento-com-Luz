@@ -640,58 +640,58 @@
     previewImg.removeAttribute('src');
   }
 
-  const title = getById('selfie-title');
-  const texto = getById('selfieTexto');
-  const { nome, guia } = getUserData();
-
-  setTimeout(() => {
-    if (title && !title.classList.contains('typed')) {
-      const titleText =
-        window.i18n?.t?.('selfie.title') ||
-        title.dataset.text ||
-        'Prepare sua selfie';
-
-      title.textContent = '';
-      title.setAttribute('data-typing', 'true');
-      typeWriter(title, String(titleText).trim(), 40);
-      title.classList.add('typed');
-    }
-
-    if (texto && !texto.classList.contains('typed')) {
-      const guiaNomeMap = {
-        arian: 'Arian',
-        lumen: 'Lumen',
-        zion: 'Zion'
-      };
-
-      const guiaNome = guiaNomeMap[guia] || 'Guia';
-
-const template =
-  window.i18n?.t?.('selfie.instruction') ||
-  texto.dataset.text ||
-  '{nome}, afaste um pouco o celular e posicione seu rosto. {guia} vai conduzir voce.';
-
-/* ===== SUBSTITUIÇÃO BLINDADA ===== */
-const fullText = String(template)
-  .split('{{nome}}').join(nome)
-  .split('{nome}').join(nome)
-  .split('{{guia}}').join(guiaNome)
-  .split('{guia}').join(guiaNome);
-/* ================================= */
-
-texto.textContent = '';
-texto.setAttribute('data-typing', 'true');
-typeWriter(texto, fullText, 36);
+ const title = getById('selfie-title');
+const texto = getById('selfieTexto');
+const { nome, guia } = getUserData();
 
 setTimeout(() => {
-  speak(fullText);
-}, 350);
+  if (title && !title.classList.contains('typed')) {
+    const titleText =
+      window.i18n?.t?.('selfie.title') ||
+      title.dataset.text ||
+      'Prepare sua selfie';
 
-texto.classList.add('typed');
-      
-  bindRangeInputs();
-  bindButtons();
-  updateZoom();
+    title.textContent = '';
+    title.setAttribute('data-typing', 'true');
+    typeWriter(title, String(titleText).trim(), 40);
+    title.classList.add('typed');
+  }
+
+  if (texto && !texto.classList.contains('typed')) {
+    const guiaNomeMap = {
+      arian: 'Arian',
+      lumen: 'Lumen',
+      zion: 'Zion'
+    };
+
+    const guiaNome = guiaNomeMap[guia] || 'Guia';
+
+    const template =
+      window.i18n?.t?.('selfie.instruction') ||
+      texto.dataset.text ||
+      '{nome}, afaste um pouco o celular e posicione seu rosto. {guia} vai conduzir voce.';
+
+    const fullText = String(template)
+      .split('{{nome}}').join(nome)
+      .split('{nome}').join(nome)
+      .split('{{guia}}').join(guiaNome)
+      .split('{guia}').join(guiaNome);
+
+    texto.textContent = '';
+    texto.setAttribute('data-typing', 'true');
+    typeWriter(texto, fullText, 36);
+
+    setTimeout(() => {
+      speak(fullText);
+    }, 350);
+
+    texto.classList.add('typed');
+  }
+}, 300);
+
+bindRangeInputs();
+bindButtons();
+updateZoom();
 }
 
   document.addEventListener('sectionLoaded', (e) => {
