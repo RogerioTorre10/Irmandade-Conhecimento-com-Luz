@@ -97,7 +97,7 @@
 },
   "selfie": {
     "title": "Prenez votre photo",
-    "instruction": "Éloignez un peu le téléphone et positionnez votre visage. Votre guide vous accompagnera.",
+    "instruction": "{nome}, éloignez un peu le téléphone et positionnez votre visage. {guia} va vous accompagner."
     "preview": "Aperçu",
     "capture": "Capturer",
     "start": "Commencer",
