@@ -637,6 +637,8 @@
           'Prepare sua selfie';
 
         title.textContent = '';
+        title.style.width = '100%';
+        title.style.minHeight = '34px';
         title.setAttribute('data-typing', 'true');
         typeWriter(title, String(titleText).trim(), 40);
         title.classList.add('typed');
@@ -668,6 +670,8 @@
         console.log('[SELFIE] fullText:', fullText);
 
         texto.textContent = '';
+        texto.style.width = '100%';
+        texto.style.minHeight = '52px';
         texto.setAttribute('data-typing', 'true');
         typeWriter(texto, fullText, 36);
 
