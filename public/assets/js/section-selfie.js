@@ -636,33 +636,49 @@
     }
 
     const title = getById('selfie-title');
-    const texto = getById('selfieTexto');
-    const { nome, guia } = getUserData();
+const texto = getById('selfieTexto');
+const { nome, guia } = getUserData();
+
+setTimeout(() => {
+  if (title && !title.classList.contains('typed')) {
+    const titleText =
+      tSelfie('selfie.title', title.dataset.text || 'Prepare sua selfie');
+
+    title.textContent = '';
+    title.setAttribute('data-typing', 'true');
+    typeWriter(title, titleText, 40);
+    title.classList.add('typed');
+  }
+
+  if (texto && !texto.classList.contains('typed')) {
+    const guiaNomeMap = {
+      arian: 'Arian',
+      lumen: 'Lumen',
+      zion: 'Zion'
+    };
+
+    const guiaNome = guiaNomeMap[guia] || 'Guia';
+
+    const template = tSelfie(
+      'selfie.instruction',
+      texto.dataset.text || '{nome}, afaste um pouco o celular e posicione seu rosto. {guia} vai conduzir voce.'
+    );
+
+    const fullText = template
+      .replace(/\{\{?\s*nome\s*\}?\}/gi, nome)
+      .replace(/\{\{?\s*guia\s*\}?\}/gi, guiaNome);
+
+    texto.textContent = '';
+    texto.setAttribute('data-typing', 'true');
+    typeWriter(texto, fullText, 36);
 
     setTimeout(() => {
-      if (title && !title.classList.contains('typed')) {
-        const titleText = (title.dataset.text || 'Prepare sua selfie').trim();
-        title.textContent = '';
-        typeWriter(title, titleText, 40);
-        title.classList.add('typed');
-      }
+      speak(fullText);
+    }, 350);
 
-      if (texto && !texto.classList.contains('typed')) {
-        const guiaNomeMap = {
-          arian: 'Arian',
-          lumen: 'Lumen',
-          zion: 'Zion'
-        };
-
-        const guiaNome = guiaNomeMap[guia] || 'Guia';
-        const fullText = `${nome}, afaste o celular e posicione o rosto. ${guiaNome} te guiará.`;
-
-        texto.textContent = '';
-        typeWriter(texto, fullText, 36);
-        speak(fullText);
-        texto.classList.add('typed');
-      }
-    }, 300);
+    texto.classList.add('typed');
+  }
+}, 300);
 
     bindRangeInputs();
     bindButtons();
