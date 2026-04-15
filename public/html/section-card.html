@@ -6,28 +6,55 @@
   <div class="j-panel-glow card-panel">
     <div id="section-conteudo" class="conteudo-pergaminho">
 
-      <!-- Fundo do guia (JS troca o src conforme guia) -->
-      <img id="guideBg" class="guide-bg" alt="Fundo do Guia" />
+      <!-- Título com suporte à aura / typing -->
+      <h1
+        class="titulo-selfie"
+        id="card-title"
+        data-typing="true"
+        data-cursor="true"
+        data-speed="34"
+        data-i18n-text="card.title"
+        data-text="Eu na Irmandade"
+      >
+        Eu na Irmandade
+      </h1>
 
-      <!-- Camada do card (selfie + nome). JS atualiza #selfieImage e #userNameSlot -->
-      <div class="flame-layer show placeholder-only" aria-hidden="true">
+      <div class="card-stage">
+
+        <!-- Fundo do guia -->
         <img
-          id="selfieImage"
-          class="flame-selfie"
-          src="/assets/img/irmandade-card-placeholder.png"
-          alt="Sua foto na Irmandade"
+          id="guideBg"
+          class="guide-bg"
+          alt="Fundo do Guia"
         />
 
-        <div class="card-footer">
-          <span class="card-name-badge">
-            <span id="userNameSlot">Carregando...</span>
-          </span>
+        <!-- Camada do card (selfie + nome) -->
+        <div class="flame-layer show placeholder-only" aria-hidden="true">
+          <img
+            id="selfieImage"
+            class="flame-selfie"
+            src="/assets/img/irmandade-card-placeholder.png"
+            alt="Sua Foto na Irmandade"
+          />
+
+          <div class="card-footer">
+            <span class="card-name-badge">
+              <span id="userNameSlot">Carregando...</span>
+            </span>
+          </div>
         </div>
       </div>
 
       <!-- Ações -->
       <div class="card-actions-below">
-        <button id="btnNext" class="btn btn-stone">✅ Continuar</button>
+        <button
+          id="btnNext"
+          class="btn btn-stone"
+          type="button"
+          data-i18n="card.continuar"
+        >
+          Continuar
+        </button>
       </div>
 
     </div>
