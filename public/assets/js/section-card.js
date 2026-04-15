@@ -513,25 +513,45 @@
   }
 
   async function runTypingInSection(section) {
-    const typingEls = qsa('[data-typing="true"]', section);
+  const typingEls = qsa('[data-typing="true"]', section);
 
-    for (const el of typingEls) {
-      const text =
-        el.dataset.text ||
-        el.textContent ||
-        '';
-      const speed = Number(el.dataset.speed || 40);
-      const cursor = String(el.dataset.cursor || 'true') !== 'false';
+  for (const el of typingEls) {
+    const text =
+      el.dataset.text ||
+      el.textContent ||
+      '';
+    const speed = Number(el.dataset.speed || 40);
+    const cursor = String(el.dataset.cursor || 'true') !== 'false';
 
-      el.textContent = '';
+    el.textContent = '';
 
-      if (typeof window.runTyping === 'function') {
-        await new Promise((res) => window.runTyping(el, text, res, { speed, cursor }));
-      } else {
-        el.textContent = text;
+    if (typeof window.runTyping === 'function') {
+      await new Promise((res) => {
+        window.runTyping(el, text, res, { speed, cursor });
+      });
+    } else {
+      el.textContent = text;
+    }
+
+    if (el.id === 'card-title') {
+      try {
+        if (window.speak) {
+          window.speak(text);
+        } else if (window.EffectCoordinator?.speak) {
+          window.EffectCoordinator.speak(text, { rate: 0.9 });
+        } else if ('speechSynthesis' in window) {
+          const u = new SpeechSynthesisUtterance(text);
+          u.lang = document.documentElement.lang || 'pt-BR';
+          u.rate = 0.9;
+          speechSynthesis.cancel();
+          speechSynthesis.speak(u);
+        }
+      } catch (e) {
+        console.warn('[CARD] falha ao narrar título', e);
       }
     }
   }
+}
 
   function bind(section) {
     const btnNext = qs('#btnNext', section);
