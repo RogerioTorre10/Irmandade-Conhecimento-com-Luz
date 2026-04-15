@@ -630,73 +630,76 @@
     const { nome, guia } = getUserData();
 
     setTimeout(() => {
-      if (title && !title.classList.contains('typed')) {
-        const titleText =
-          window.i18n?.t?.('selfie.title') ||
-          title.dataset.text ||
-          'Prepare sua selfie';
+  if (title && !title.classList.contains('typed')) {
+    const titleText =
+      window.i18n?.t?.('selfie.title') ||
+      title.dataset.text ||
+      'Prepare sua selfie';
 
-        title.textContent = '';
-        title.setAttribute('data-typing', 'true');
-        typeWriter(title, String(titleText).trim(), 40);
-        title.classList.add('typed');
-      }
+    title.textContent = '';
+    title.style.width = '100%';
+    title.style.minHeight = '34px';
+    title.setAttribute('data-typing', 'true');
+    typeWriter(title, String(titleText).trim(), 40);
+    title.classList.add('typed');
+  }
 
-      if (texto && !texto.classList.contains('typed')) {
-  const guiaNomeMap = {
-    arion: 'Arion',
-    arian: 'Arion',
-    lumen: 'Lumen',
-    zion: 'Zion'
-  };
+  if (texto && !texto.classList.contains('typed')) {
+    const guiaNomeMap = {
+      arion: 'Arion',
+      arian: 'Arion',
+      lumen: 'Lumen',
+      zion: 'Zion'
+    };
 
-  const participantName = (
-    window.JC?.data?.nome ||
-    sessionStorage.getItem('jornada.nome') ||
-    localStorage.getItem('jc.nome') ||
-    nome ||
-    'AMOR'
-  ).toUpperCase().trim();
+    const participantName = (
+      window.JC?.data?.nome ||
+      sessionStorage.getItem('jornada.nome') ||
+      localStorage.getItem('jc.nome') ||
+      nome ||
+      'AMOR'
+    ).toUpperCase().trim();
 
-  const guiaCanon = (
-    window.JC?.data?.guia ||
-    sessionStorage.getItem('jornada.guia') ||
-    localStorage.getItem('jc.guia') ||
-    guia ||
-    'zion'
-  ).toLowerCase().trim();
+    const guiaCanon = (
+      window.JC?.data?.guia ||
+      sessionStorage.getItem('jornada.guia') ||
+      localStorage.getItem('jc.guia') ||
+      guia ||
+      'zion'
+    ).toLowerCase().trim();
 
-  const selectedGuide = guiaNomeMap[guiaCanon] || 'Guia';
+    const selectedGuide = guiaNomeMap[guiaCanon] || 'Guia';
 
-  const template =
-    window.i18n?.t?.('selfie.instruction') ||
-    texto.dataset.text ||
-    '{nome}, afaste um pouco o celular e posicione seu rosto. {guia} vai conduzir voce.';
+    const template =
+      window.i18n?.t?.('selfie.instruction') ||
+      texto.dataset.text ||
+      '{nome}, afaste um pouco o celular e posicione seu rosto. {guia} vai conduzir voce.';
 
-  const fullText = String(template)
-    .replaceAll('{{nome}}', participantName)
-    .replaceAll('{nome}', participantName)
-    .replaceAll('{{guia}}', selectedGuide)
-    .replaceAll('{guia}', selectedGuide);
+    const fullText = String(template)
+      .replaceAll('{{nome}}', participantName)
+      .replaceAll('{nome}', participantName)
+      .replaceAll('{{guia}}', selectedGuide)
+      .replaceAll('{guia}', selectedGuide);
 
-  console.log('[SELFIE] template:', template);
-  console.log('[SELFIE] participantName:', participantName);
-  console.log('[SELFIE] selectedGuide:', selectedGuide);
-  console.log('[SELFIE] fullText:', fullText);
+    console.log('[SELFIE] template:', template);
+    console.log('[SELFIE] participantName:', participantName);
+    console.log('[SELFIE] selectedGuide:', selectedGuide);
+    console.log('[SELFIE] fullText:', fullText);
 
-  texto.textContent = '';
-  texto.style.width = '100%';
-  texto.style.minHeight = '52px';
-  texto.setAttribute('data-typing', 'true');
-  typeWriter(texto, fullText, 36);
+    texto.textContent = '';
+    texto.style.width = '100%';
+    texto.style.minHeight = '52px';
+    texto.setAttribute('data-typing', 'true');
+    typeWriter(texto, fullText, 36);
 
-  setTimeout(() => {
-    speak(fullText);
-  }, 350);
+    setTimeout(() => {
+      speak(fullText);
+    }, 350);
 
-  texto.classList.add('typed');
-}
-
+    texto.classList.add('typed');
+  }
+}, 300);
+    
     bindRangeInputs();
     bindButtons();
     updateZoom();
