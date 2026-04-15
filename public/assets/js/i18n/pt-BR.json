@@ -102,7 +102,7 @@
 },
   "selfie": {
     "title": "Tirar sua foto",
-    "instruction": "Afaste um pouco o celular e posicione seu rosto. Seu guia vai conduzir você.",
+    "instruction": "{nome}, afaste um pouco o celular e posicione seu rosto. {guia} vai conduzir você."
     "preview": "Prévia",
     "capture": "Capturar",
     "start": "Iniciar",
