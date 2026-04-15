@@ -643,41 +643,59 @@
       }
 
       if (texto && !texto.classList.contains('typed')) {
-        const guiaNomeMap = {
-          arian: 'Arian',
-          lumen: 'Lumen',
-          zion: 'Zion'
-        };
+  const guiaNomeMap = {
+    arion: 'Arion',
+    arian: 'Arion',
+    lumen: 'Lumen',
+    zion: 'Zion'
+  };
 
-        const guiaNome = guiaNomeMap[guia] || 'Guia';
+  const participantName = (
+    window.JC?.data?.nome ||
+    sessionStorage.getItem('jornada.nome') ||
+    localStorage.getItem('jc.nome') ||
+    nome ||
+    'AMOR'
+  ).toUpperCase().trim();
 
-        const template =
-          window.i18n?.t?.('selfie.instruction') ||
-          texto.dataset.text ||
-          '{nome}, afaste um pouco o celular e posicione seu rosto. {guia} vai conduzir voce.';
+  const guiaCanon = (
+    window.JC?.data?.guia ||
+    sessionStorage.getItem('jornada.guia') ||
+    localStorage.getItem('jc.guia') ||
+    guia ||
+    'zion'
+  ).toLowerCase().trim();
 
-        const fullText = String(template)
-          .replaceAll('{{nome}}', nome)
-          .replaceAll('{nome}', nome)
-          .replaceAll('{{guia}}', guiaNome)
-          .replaceAll('{guia}', guiaNome);
+  const selectedGuide = guiaNomeMap[guiaCanon] || 'Guia';
 
-        console.log('[SELFIE] template:', template);
-        console.log('[SELFIE] nome:', nome);
-        console.log('[SELFIE] guiaNome:', guiaNome);
-        console.log('[SELFIE] fullText:', fullText);
+  const template =
+    window.i18n?.t?.('selfie.instruction') ||
+    texto.dataset.text ||
+    '{nome}, afaste um pouco o celular e posicione seu rosto. {guia} vai conduzir voce.';
 
-        texto.textContent = '';
-        texto.setAttribute('data-typing', 'true');
-        typeWriter(texto, fullText, 36);
+  const fullText = String(template)
+    .replaceAll('{{nome}}', participantName)
+    .replaceAll('{nome}', participantName)
+    .replaceAll('{{guia}}', selectedGuide)
+    .replaceAll('{guia}', selectedGuide);
 
-        setTimeout(() => {
-          speak(fullText);
-        }, 350);
+  console.log('[SELFIE] template:', template);
+  console.log('[SELFIE] participantName:', participantName);
+  console.log('[SELFIE] selectedGuide:', selectedGuide);
+  console.log('[SELFIE] fullText:', fullText);
 
-        texto.classList.add('typed');
-      }
-    }, 300);
+  texto.textContent = '';
+  texto.style.width = '100%';
+  texto.style.minHeight = '52px';
+  texto.setAttribute('data-typing', 'true');
+  typeWriter(texto, fullText, 36);
+
+  setTimeout(() => {
+    speak(fullText);
+  }, 350);
+
+  texto.classList.add('typed');
+}
 
     bindRangeInputs();
     bindButtons();
