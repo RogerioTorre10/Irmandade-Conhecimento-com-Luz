@@ -72,7 +72,7 @@
   },
   "guia": {
   "title": "Elige tu Guía",
-  "subtitle": "Hola, {{nome}}. Elige tu guía para la Jornada.",
+  "instruction": "{nome}, aleja un poco el teléfono y coloca tu rostro. {guia} te guiará."
   "p1": "Para liberar al Guía, ingresa tu nombre",
   "placeholder": "NOMBRE",
   "notice": "Al pasar suavemente el cursor sobre los botones, se mostrará el perfil del guía. Para confirmar, haz clic nuevamente o utiliza doble clic.",
