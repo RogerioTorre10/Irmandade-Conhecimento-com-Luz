@@ -620,75 +620,77 @@
   }
 
   function initSectionSelfie() {
-    videoEl = getById('selfieVideo');
-    canvasEl = getById('selfieCanvas');
-    previewImg = getById('selfiePreview');
+  videoEl = getById('selfieVideo');
+  canvasEl = getById('selfieCanvas');
+  previewImg = getById('selfiePreview');
 
-    fixSelfieLayout();
+  fixSelfieLayout();
 
-    if (videoEl) applyLiveStyle(videoEl);
+  if (videoEl) applyLiveStyle(videoEl);
 
-    if (canvasEl) {
-      applyCapturedCanvasStyle(canvasEl);
-      canvasEl.style.display = 'none';
-      canvasEl.style.opacity = '0';
-      canvasEl.style.visibility = 'hidden';
+  if (canvasEl) {
+    applyCapturedCanvasStyle(canvasEl);
+    canvasEl.style.display = 'none';
+    canvasEl.style.opacity = '0';
+    canvasEl.style.visibility = 'hidden';
+  }
+
+  if (previewImg) {
+    previewImg.style.display = 'none';
+    previewImg.removeAttribute('src');
+  }
+
+  const title = getById('selfie-title');
+  const texto = getById('selfieTexto');
+  const { nome, guia } = getUserData();
+
+  setTimeout(() => {
+    if (title && !title.classList.contains('typed')) {
+      const titleText =
+        window.i18n?.t?.('selfie.title') ||
+        title.dataset.text ||
+        'Prepare sua selfie';
+
+      title.textContent = '';
+      title.setAttribute('data-typing', 'true');
+      typeWriter(title, String(titleText).trim(), 40);
+      title.classList.add('typed');
     }
 
-    if (previewImg) {
-      previewImg.style.display = 'none';
-      previewImg.removeAttribute('src');
+    if (texto && !texto.classList.contains('typed')) {
+      const guiaNomeMap = {
+        arian: 'Arian',
+        lumen: 'Lumen',
+        zion: 'Zion'
+      };
+
+      const guiaNome = guiaNomeMap[guia] || 'Guia';
+
+      const template =
+        window.i18n?.t?.('selfie.instruction') ||
+        texto.dataset.text ||
+        '{nome}, afaste um pouco o celular e posicione seu rosto. {guia} vai conduzir voce.';
+
+      const fullText = String(template)
+        .replace(/\{\{\s*nome\s*\}\}|\{nome\}/gi, nome)
+        .replace(/\{\{\s*guia\s*\}\}|\{guia\}/gi, guiaNome);
+
+      texto.textContent = '';
+      texto.setAttribute('data-typing', 'true');
+      typeWriter(texto, fullText, 36);
+
+      setTimeout(() => {
+        speak(fullText);
+      }, 350);
+
+      texto.classList.add('typed');
     }
+  }, 300);
 
-    const title = getById('selfie-title');
-const texto = getById('selfieTexto');
-const { nome, guia } = getUserData();
-
-setTimeout(() => {
-  if (title && !title.classList.contains('typed')) {
-    const titleText =
-      tSelfie('selfie.title', title.dataset.text || 'Prepare sua selfie');
-
-    title.textContent = '';
-    title.setAttribute('data-typing', 'true');
-    typeWriter(title, titleText, 40);
-    title.classList.add('typed');
-  }
-
-  if (texto && !texto.classList.contains('typed')) {
-    const guiaNomeMap = {
-      arian: 'Arian',
-      lumen: 'Lumen',
-      zion: 'Zion'
-    };
-
-    const guiaNome = guiaNomeMap[guia] || 'Guia';
-
-    const template = tSelfie(
-      'selfie.instruction',
-      texto.dataset.text || '{nome}, afaste um pouco o celular e posicione seu rosto. {guia} vai conduzir voce.'
-    );
-
-    const fullText = template
-      .replace(/\{\{?\s*nome\s*\}?\}/gi, nome)
-      .replace(/\{\{?\s*guia\s*\}?\}/gi, guiaNome);
-
-    texto.textContent = '';
-    texto.setAttribute('data-typing', 'true');
-    typeWriter(texto, fullText, 36);
-
-    setTimeout(() => {
-      speak(fullText);
-    }, 350);
-
-    texto.classList.add('typed');
-  }
-}, 300);
-
-    bindRangeInputs();
-    bindButtons();
-    updateZoom();
-  }
+  bindRangeInputs();
+  bindButtons();
+  updateZoom();
+}
 
   document.addEventListener('sectionLoaded', (e) => {
     if (e.detail?.sectionId !== 'section-selfie') return;
