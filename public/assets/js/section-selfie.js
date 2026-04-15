@@ -696,7 +696,7 @@ bindRangeInputs();
 bindButtons();
 updateZoom();
 }
-
+}
   document.addEventListener('sectionLoaded', (e) => {
     if (e.detail?.sectionId !== 'section-selfie') return;
     initSectionSelfie();
@@ -724,7 +724,7 @@ updateZoom();
       );
     }, 100);
   }
-
+  }
   (function () {
     'use strict';
 
