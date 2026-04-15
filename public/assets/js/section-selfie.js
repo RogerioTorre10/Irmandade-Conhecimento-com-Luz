@@ -666,27 +666,29 @@
 
       const guiaNome = guiaNomeMap[guia] || 'Guia';
 
-      const template =
-        window.i18n?.t?.('selfie.instruction') ||
-        texto.dataset.text ||
-        '{nome}, afaste um pouco o celular e posicione seu rosto. {guia} vai conduzir voce.';
+const template =
+  window.i18n?.t?.('selfie.instruction') ||
+  texto.dataset.text ||
+  '{nome}, afaste um pouco o celular e posicione seu rosto. {guia} vai conduzir voce.';
 
-      const fullText = String(template)
-        .replace(/\{\{\s*nome\s*\}\}|\{nome\}/gi, nome)
-        .replace(/\{\{\s*guia\s*\}\}|\{guia\}/gi, guiaNome);
+/* ===== SUBSTITUIÇÃO BLINDADA ===== */
+const fullText = String(template)
+  .split('{{nome}}').join(nome)
+  .split('{nome}').join(nome)
+  .split('{{guia}}').join(guiaNome)
+  .split('{guia}').join(guiaNome);
+/* ================================= */
 
-      texto.textContent = '';
-      texto.setAttribute('data-typing', 'true');
-      typeWriter(texto, fullText, 36);
+texto.textContent = '';
+texto.setAttribute('data-typing', 'true');
+typeWriter(texto, fullText, 36);
 
-      setTimeout(() => {
-        speak(fullText);
-      }, 350);
+setTimeout(() => {
+  speak(fullText);
+}, 350);
 
-      texto.classList.add('typed');
-    }
-  }, 300);
-
+texto.classList.add('typed');
+      
   bindRangeInputs();
   bindButtons();
   updateZoom();
