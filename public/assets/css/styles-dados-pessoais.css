@@ -185,15 +185,29 @@ body {
     overflow-y: visible !important;
   }
 
-  #section-dados-pessoais .j-panel-glow {
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 auto !important;
-    overflow-x: hidden !important;
-    overflow-y: visible !important;
-    padding-right: 0 !important;
-  }
+  /* SCROLL INTERNO APENAS NO CONTEÚDO */
+#section-dados-pessoais .j-panel-glow {
+  max-height: none !important;
+  overflow: visible !important;
+  padding-right: 0 !important;
+}
 
+#section-dados-pessoais .j-arcane-card {
+  max-height: 90vh !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding-right: 6px;
+}
+
+/* barra bonita só na área interna */
+#section-dados-pessoais .j-arcane-card::-webkit-scrollbar {
+  width: 6px;
+}
+
+#section-dados-pessoais .j-arcane-card::-webkit-scrollbar-thumb {
+  background: rgba(0,255,150,0.6);
+  border-radius: 6px;
+}
   #section-dados-pessoais .pergaminho-content,
   #section-dados-pessoais .form-grid {
     gap: 12px;
