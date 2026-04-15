@@ -1,29 +1,34 @@
 <link rel="stylesheet" href="/assets/css/styles-base.css">
 <link rel="stylesheet" href="/assets/css/brilho-texturas.css">
 <link rel="stylesheet" href="/assets/css/j-panel-glow.css">
-<link rel="stylesheet" href="/assets/css/styles-intro.css">
+<link rel="stylesheet" href="/assets/css/styles-dados-pessoais.css">
 
 <section id="section-dados-pessoais" class="section section-dados-pessoais">
-  <div class="j-panel-glow">
+  <div class="j-panel-glow dados-painel">
     <div class="j-perg-v-inner">
       <div class="j-arcane-card">
         <div class="pergaminho-content">
 
-          <!-- TÍTULO -->
-          <h1 class="typing-text"
-              data-typing="true"
-              data-i18n-text="dados.title"
-              data-text="Dados Pessoais">
-          </h1>
+          <h1
+            id="dp-title"
+            class="typing-text"
+            data-typing="true"
+            data-cursor="true"
+            data-speed="38"
+            data-i18n-text="dados.title"
+            data-text="Dados Pessoais"
+          >Dados Pessoais</h1>
 
-          <!-- SUBTÍTULO -->
-          <p class="intro-text"
-             data-typing="true"
-             data-i18n-text="dados.subtitle"
-             data-text="Preencha os dados para enriquecer sua devolutiva.">
-          </p>
+          <p
+            id="dp-subtitle"
+            class="intro-text"
+            data-typing="true"
+            data-cursor="true"
+            data-speed="30"
+            data-i18n-text="dados.subtitle"
+            data-text="Preencha os dados para enriquecer sua devolutiva."
+          >Preencha os dados para enriquecer sua devolutiva.</p>
 
-          <!-- FORM -->
           <div class="form-grid">
 
             <input id="dp-nome"
@@ -51,58 +56,52 @@
                    data-i18n-placeholder="dados.religiao"
                    placeholder="Religião / espiritualidade" />
 
-            <!-- LINHA TRIPLA -->
             <div class="dados-linha-tripla">
 
               <select id="dp-idade-faixa">
                 <option value="" data-i18n="dados.idade">Faixa etária</option>
-                <option data-i18n="dados.idade1">Até 17</option>
-                <option data-i18n="dados.idade2">18 a 24</option>
-                <option data-i18n="dados.idade3">25 a 34</option>
-                <option data-i18n="dados.idade4">35 a 44</option>
-                <option data-i18n="dados.idade5">45 a 59</option>
-                <option data-i18n="dados.idade6">60+</option>
+                <option value="Até 17" data-i18n="dados.idade1">Até 17</option>
+                <option value="18 a 24" data-i18n="dados.idade2">18 a 24</option>
+                <option value="25 a 34" data-i18n="dados.idade3">25 a 34</option>
+                <option value="35 a 44" data-i18n="dados.idade4">35 a 44</option>
+                <option value="45 a 59" data-i18n="dados.idade5">45 a 59</option>
+                <option value="60+" data-i18n="dados.idade6">60+</option>
               </select>
 
               <select id="dp-estado-civil">
                 <option value="" data-i18n="dados.estado_civil">Estado civil</option>
-                <option data-i18n="dados.ec1">Solteiro(a)</option>
-                <option data-i18n="dados.ec2">Casado(a)</option>
-                <option data-i18n="dados.ec3">Divorciado(a)</option>
-                <option data-i18n="dados.ec4">Viúvo(a)</option>
-                <option data-i18n="dados.ec5">Outro</option>
+                <option value="Solteiro(a)" data-i18n="dados.ec1">Solteiro(a)</option>
+                <option value="Casado(a)" data-i18n="dados.ec2">Casado(a)</option>
+                <option value="Divorciado(a)" data-i18n="dados.ec3">Divorciado(a)</option>
+                <option value="Viúvo(a)" data-i18n="dados.ec4">Viúvo(a)</option>
+                <option value="Outro" data-i18n="dados.ec5">Outro</option>
               </select>
 
               <select id="dp-filhos">
                 <option value="" data-i18n="dados.filhos">Filhos</option>
-                <option data-i18n="dados.filhos_nao">Não</option>
-                <option data-i18n="dados.filhos_sim">Sim</option>
+                <option value="Não" data-i18n="dados.filhos_nao">Não</option>
+                <option value="Sim" data-i18n="dados.filhos_sim">Sim</option>
               </select>
 
             </div>
 
-            <!-- TEXTAREA -->
             <textarea id="dp-observacoes"
                       rows="4"
                       data-i18n-placeholder="dados.obs"
-                      placeholder="Algo importante que deseja compartilhar?">
-            </textarea>
+                      placeholder="Algo importante que deseja compartilhar?"></textarea>
 
-            <!-- BOTÃO -->
             <div class="final-acoes">
               <button id="btn-dp-continuar"
                       type="button"
                       class="btn btn-stone"
                       data-i18n="common.continue">
-                Continuar ➜
+                Continuar
               </button>
             </div>
 
-            <!-- STATUS -->
             <div id="dados-pessoais-status"
                  class="status-box"
-                 style="display:none;">
-            </div>
+                 style="display:none;"></div>
 
           </div>
 
