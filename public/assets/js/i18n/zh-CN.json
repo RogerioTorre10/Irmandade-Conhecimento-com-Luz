@@ -97,7 +97,7 @@
 },
   "selfie": {
     "title": "拍摄您的照片",
-   "instruction": "{nome}，请将手机稍微拿远一些，并调整好你的面部位置。{guia} 会引导你。"
+   "instruction": "{nome}，请将手机稍微拿远一些，并调整好你的面部位置。{guia} 会引导你。",
     "preview": "预览",
     "capture": "拍摄",
     "start": "开始",
