@@ -657,37 +657,40 @@ setTimeout(() => {
     title.classList.add('typed');
   }
 
-  if (texto && !texto.classList.contains('typed')) {
-    const guiaNomeMap = {
-      arian: 'Arian',
-      lumen: 'Lumen',
-      zion: 'Zion'
-    };
+ if (texto && !texto.classList.contains('typed')) {
+  const guiaNomeMap = {
+    arian: 'Arian',
+    lumen: 'Lumen',
+    zion: 'Zion'
+  };
 
-    const guiaNome = guiaNomeMap[guia] || 'Guia';
+  const guiaNome = guiaNomeMap[guia] || 'Guia';
 
-    const template =
-      window.i18n?.t?.('selfie.instruction') ||
-      texto.dataset.text ||
-      '{nome}, afaste um pouco o celular e posicione seu rosto. {guia} vai conduzir voce.';
+  const template =
+    window.i18n?.t?.('selfie.instruction') ||
+    texto.dataset.text ||
+    '{nome}, afaste um pouco o celular e posicione seu rosto. {guia} vai conduzir voce.';
 
-    const fullText = String(template)
-      .split('{{nome}}').join(nome)
-      .split('{nome}').join(nome)
-      .split('{{guia}}').join(guiaNome)
-      .split('{guia}').join(guiaNome);
+  const fullText = String(template)
+    .replaceAll('{{nome}}', nome)
+    .replaceAll('{nome}', nome)
+    .replaceAll('{{guia}}', guiaNome)
+    .replaceAll('{guia}', guiaNome);
 
-    texto.textContent = '';
-    texto.setAttribute('data-typing', 'true');
-    typeWriter(texto, fullText, 36);
+  console.log('[SELFIE] template:', template);
+  console.log('[SELFIE] nome:', nome);
+  console.log('[SELFIE] guiaNome:', guiaNome);
+  console.log('[SELFIE] fullText:', fullText);
 
-    setTimeout(() => {
-      speak(fullText);
-    }, 350);
+  texto.textContent = '';
+  texto.setAttribute('data-typing', 'true');
+  typeWriter(texto, fullText, 36);
 
-    texto.classList.add('typed');
-  }
-}, 300);
+  setTimeout(() => {
+    speak(fullText);
+  }, 350);
+
+  texto.classList.add('typed');
 
 bindRangeInputs();
 bindButtons();
