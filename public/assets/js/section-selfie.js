@@ -80,7 +80,7 @@
     return { nome, guia };
   }
 
-  function typeWriter(el, text, speed = 35) {
+ function typeWriter(el, text, speed = 35) {
   if (!el) return;
 
   el.classList.remove('typing-done', 'type-done');
