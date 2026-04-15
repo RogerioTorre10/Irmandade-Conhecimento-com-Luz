@@ -72,7 +72,7 @@
   },
   "guia": {
   "title": "Elige tu Guía",
-  "subtitle": "Selecciona quién te acompañará en esta jornada."
+  "subtitle": "Selecciona quién te acompañará en esta jornada.",
   "p1": "Para liberar al Guía, ingresa tu nombre",
   "placeholder": "NOMBRE",
   "notice": "Al pasar suavemente el cursor sobre los botones, se mostrará el perfil del guía. Para confirmar, haz clic nuevamente o utiliza doble clic.",
@@ -97,7 +97,7 @@
 },
   "selfie": {
     "title": "Toma tu foto",
-   "instruction": "{nome}, aleja un poco el teléfono y coloca tu rostro. {guia} te guiará."
+    "instruction": "{nome}, aleja un poco el teléfono y coloca tu rostro. {guia} te guiará.",
     "preview": "Vista previa",
     "capture": "Capturar",
     "start": "Iniciar",
