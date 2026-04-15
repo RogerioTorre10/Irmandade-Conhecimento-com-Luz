@@ -47,33 +47,25 @@
     return Math.max(min, Math.min(max, n));
   }
 
-  function firstNonEmpty(...values) {
-    for (const v of values) {
-      if (typeof v === 'string' && v.trim()) return v.trim();
-    }
-    return '';
-  }
-
   function getUserData() {
-    const nomeBruto = firstNonEmpty(
-      sessionStorage.getItem('jornada.nome'),
-      sessionStorage.getItem('nomeParticipante'),
-      sessionStorage.getItem('participantName'),
-      window.JC?.data?.nome,
-      localStorage.getItem('jc.nome'),
-      localStorage.getItem('nomeParticipante')
-    );
+    let nome = 'AMOR';
+    let guia = 'zion';
 
-    const guiaBruto = firstNonEmpty(
-      sessionStorage.getItem('jornada.guia'),
-      sessionStorage.getItem('guiaEscolhido'),
-      window.JC?.data?.guia,
-      localStorage.getItem('jc.guia'),
-      localStorage.getItem('guiaEscolhido')
-    );
+    const ssNome = sessionStorage.getItem('jornada.nome');
+    const ssGuia = sessionStorage.getItem('jornada.guia');
 
-    const nome = (nomeBruto || 'AMOR').toUpperCase().trim();
-    const guia = (guiaBruto || 'zion').toLowerCase().trim();
+    if (ssNome && ssNome.trim()) nome = ssNome.trim();
+    if (ssGuia && ssGuia.trim()) guia = ssGuia.trim().toLowerCase();
+
+    if (!ssNome || !ssGuia) {
+      const lsNome = localStorage.getItem('jc.nome');
+      const lsGuia = localStorage.getItem('jc.guia');
+      if (lsNome) nome = lsNome;
+      if (lsGuia) guia = lsGuia;
+    }
+
+    nome = nome.toUpperCase().trim();
+    guia = guia.toLowerCase().trim();
 
     window.JC = window.JC || {};
     window.JC.data = window.JC.data || {};
@@ -380,7 +372,7 @@
 
       const captureBtn = getById('btn-selfie-capture');
       const confirmBtn = getById('btn-selfie-confirm');
-      const errorEl = getById('selfie-error');
+      const errorEl = getById('selfie-erro') || getById('selfie-error');
 
       if (captureBtn) captureBtn.disabled = false;
       if (confirmBtn) confirmBtn.disabled = true;
@@ -630,76 +622,78 @@
     const { nome, guia } = getUserData();
 
     setTimeout(() => {
-  if (title && !title.classList.contains('typed')) {
-    const titleText =
-      window.i18n?.t?.('selfie.title') ||
-      title.dataset.text ||
-      'Prepare sua selfie';
+      if (title && !title.classList.contains('typed')) {
+        const titleText =
+          window.i18n?.t?.('selfie.title') ||
+          title.dataset.text ||
+          'Prepare sua selfie';
 
-    title.textContent = '';
-    title.style.width = '100%';
-    title.style.minHeight = '34px';
-    title.setAttribute('data-typing', 'true');
-    typeWriter(title, String(titleText).trim(), 40);
-    title.classList.add('typed');
-  }
+        title.textContent = '';
+        title.style.width = '100%';
+        title.style.minHeight = '34px';
+        title.setAttribute('data-typing', 'true');
+        typeWriter(title, String(titleText).trim(), 40);
+        title.classList.add('typed');
+      }
 
-  if (texto && !texto.classList.contains('typed')) {
-    const guiaNomeMap = {
-      arion: 'Arion',
-      arian: 'Arion',
-      lumen: 'Lumen',
-      zion: 'Zion'
-    };
+      if (texto && !texto.classList.contains('typed')) {
+        const guiaNomeMap = {
+          arion: 'Arion',
+          arian: 'Arion',
+          lumen: 'Lumen',
+          zion: 'Zion'
+        };
 
-    const participantName = (
-      window.JC?.data?.nome ||
-      sessionStorage.getItem('jornada.nome') ||
-      localStorage.getItem('jc.nome') ||
-      nome ||
-      'AMOR'
-    ).toUpperCase().trim();
+        const participantName = (
+          window.JC?.data?.nome ||
+          sessionStorage.getItem('jornada.nome') ||
+          localStorage.getItem('jc.nome') ||
+          nome ||
+          'AMOR'
+        ).toUpperCase().trim();
 
-    const guiaCanon = (
-      window.JC?.data?.guia ||
-      sessionStorage.getItem('jornada.guia') ||
-      localStorage.getItem('jc.guia') ||
-      guia ||
-      'zion'
-    ).toLowerCase().trim();
+        const guiaCanon = (
+          window.JC?.data?.guia ||
+          sessionStorage.getItem('jornada.guia') ||
+          localStorage.getItem('jc.guia') ||
+          guia ||
+          'zion'
+        ).toLowerCase().trim();
 
-    const selectedGuide = guiaNomeMap[guiaCanon] || 'Guia';
+        const selectedGuide = guiaNomeMap[guiaCanon] || 'Guia';
 
-    const template =
-      window.i18n?.t?.('selfie.instruction') ||
-      texto.dataset.text ||
-      '{nome}, afaste um pouco o celular e posicione seu rosto. {guia} vai conduzir voce.';
+        const template =
+          window.i18n?.t?.('selfie.instruction') ||
+          texto.dataset.text ||
+          '{nome}, afaste um pouco o celular e posicione seu rosto. {guia} vai conduzir voce.';
 
-    const fullText = String(template)
-      .replaceAll('{{nome}}', participantName)
-      .replaceAll('{nome}', participantName)
-      .replaceAll('{{guia}}', selectedGuide)
-      .replaceAll('{guia}', selectedGuide);
+        const fullText = String(template)
+          .replace(/\{\{\s*nome\s*\}\}/g, participantName)
+          .replace(/\{\s*nome\s*\}/g, participantName)
+          .replace(/\[\s*nome\s*\]/g, participantName)
+          .replace(/\{\{\s*guia\s*\}\}/g, selectedGuide)
+          .replace(/\{\s*guia\s*\}/g, selectedGuide)
+          .replace(/\[\s*guia\s*\]/g, selectedGuide);
 
-    console.log('[SELFIE] template:', template);
-    console.log('[SELFIE] participantName:', participantName);
-    console.log('[SELFIE] selectedGuide:', selectedGuide);
-    console.log('[SELFIE] fullText:', fullText);
+        console.log('[SELFIE] template:', template);
+        console.log('[SELFIE] participantName:', participantName);
+        console.log('[SELFIE] selectedGuide:', selectedGuide);
+        console.log('[SELFIE] fullText:', fullText);
 
-    texto.textContent = '';
-    texto.style.width = '100%';
-    texto.style.minHeight = '52px';
-    texto.setAttribute('data-typing', 'true');
-    typeWriter(texto, fullText, 36);
+        texto.textContent = '';
+        texto.style.width = '100%';
+        texto.style.minHeight = '52px';
+        texto.setAttribute('data-typing', 'true');
+        typeWriter(texto, fullText, 36);
 
-    setTimeout(() => {
-      speak(fullText);
-    }, 350);
+        setTimeout(() => {
+          speak(fullText);
+        }, 350);
 
-    texto.classList.add('typed');
-  }
-}, 300);
-    
+        texto.classList.add('typed');
+      }
+    }, 300);
+
     bindRangeInputs();
     bindButtons();
     updateZoom();
@@ -756,7 +750,7 @@
         g2 = 'rgba(255,214,91,0.70)';
       }
 
-      if (guia === 'arian') {
+      if (guia === 'arian' || guia === 'arion') {
         main = '#ff00ff';
         g1 = 'rgba(255,120,255,0.95)';
         g2 = 'rgba(255,180,255,0.80)';
@@ -774,9 +768,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', applyThemeFromSession);
-    document.addEventListener('sectionLoaded', () =>
-      setTimeout(applyThemeFromSession, 50)
-    );
+    document.addEventListener('sectionLoaded', () => setTimeout(applyThemeFromSession, 50));
     document.addEventListener('guia:changed', applyThemeFromSession);
   })();
 })(window);
