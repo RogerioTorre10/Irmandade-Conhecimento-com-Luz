@@ -1,4 +1,4 @@
-/* /assets/js/section-card.js — STABLE CLEAN BUILD (com SELFIECARD + moldura dourada) */
+/* /assets/js/section-card.js — BUILD FINAL COM i18n + typing */
 (function () {
   'use strict';
 
@@ -18,533 +18,183 @@
   const qs  = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
 
-  // -----------------------------
-  // Normalização de guia
-  // -----------------------------
+  // =========================
+  // DADOS
+  // =========================
+
   function canonGuia(v) {
     const s = String(v || '').trim().toLowerCase();
-    if (!s) return '';
     if (s.includes('lumen')) return 'lumen';
     if (s.includes('zion')) return 'zion';
     if (s.includes('arion') || s.includes('arian')) return 'arion';
-    return s;
+    return 'zion';
   }
 
   function prettyGuia(id) {
-    const g = canonGuia(id);
-    return g === 'lumen' ? 'Lumen'
-      : g === 'zion'  ? 'Zion'
-      : g === 'arion' ? 'Arion'
-      : (id ? String(id) : '');
+    return id === 'lumen' ? 'Lumen'
+      : id === 'zion'  ? 'Zion'
+      : 'Arion';
   }
 
   function getNome() {
-    try {
-      const n =
-        window.JORNADA_STATE?.nome ||
-        localStorage.getItem('JORNADA_NOME') ||
-        localStorage.getItem('jc.nome') ||
-        window.JC?.data?.nome ||
-        '';
-      return (n || 'AMOR').toUpperCase().trim();
-    } catch {
-      return 'AMOR';
-    }
+    return (
+      window.JC?.data?.nome ||
+      sessionStorage.getItem('jornada.nome') ||
+      localStorage.getItem('jc.nome') ||
+      'AMOR'
+    ).toUpperCase();
   }
 
   function getGuiaCanon() {
-    let g = '';
-    try {
-      g =
-        canonGuia(window.JORNADA_STATE?.guiaSelecionado) ||
-        canonGuia(window.JORNADA_STATE?.guia) ||
-        canonGuia(window.JC?.data?.guiaSelecionado) ||
-        canonGuia(window.JC?.data?.guia) ||
-        canonGuia(sessionStorage.getItem('JORNADA_GUIA')) ||
-        canonGuia(localStorage.getItem('JORNADA_GUIA')) ||
-        canonGuia(localStorage.getItem('jc.guiaSelecionado')) ||
-        canonGuia(localStorage.getItem('jc.guia')) ||
-        canonGuia(sessionStorage.getItem('jornada.guia')) ||
-        '';
-    } catch {}
-
-    if (!g || !CARD_BG[g]) g = 'zion';
-    return g;
+    return canonGuia(
+      window.JC?.data?.guia ||
+      sessionStorage.getItem('jornada.guia') ||
+      localStorage.getItem('jc.guia')
+    );
   }
 
-  function persistGuiaCanon(g) {
-    const guiaCanon = canonGuia(g);
-    if (!guiaCanon || !CARD_BG[guiaCanon]) return;
-    try {
-      window.JORNADA_STATE = window.JORNADA_STATE || {};
-      window.JORNADA_STATE.guia = guiaCanon;
-      window.JORNADA_STATE.guiaSelecionado = guiaCanon;
+  // =========================
+  // i18n (🔥 CORREÇÃO PRINCIPAL)
+  // =========================
 
-      sessionStorage.setItem('JORNADA_GUIA', guiaCanon);
-      localStorage.setItem('JORNADA_GUIA', guiaCanon);
-      sessionStorage.setItem('jornada.guia', guiaCanon);
-    } catch {}
-  }
+  function applyCardI18n(section) {
+    const title = qs('#card-title', section);
+    const btn = qs('#btnNext', section);
 
-  function applyCardI18n() {
-  const title = document.getElementById('card-title');
-  const btn = document.getElementById('btnNext');
-
-  if (title) {
     const translatedTitle =
       window.i18n?.t?.('card.title') ||
-      title.dataset.text ||
       'Eu na Irmandade';
 
-    title.textContent = translatedTitle;
-  }
-
-  if (btn) {
     const translatedBtn =
       window.i18n?.t?.('card.continuar') ||
       'Continuar';
 
-    btn.textContent = translatedBtn;
-  }
-}
+    if (title) {
+      title.textContent = '';
+      title.setAttribute('data-typing', 'true');
 
-  // -----------------------------
-  // Tema (cor do guia) — aplica CSS vars
-  // -----------------------------
-  function applyThemeFromStorage() {
-    const guia = getGuiaCanon();
+      if (window.typeWriter) {
+        window.typeWriter(title, translatedTitle, 40);
+      } else {
+        title.textContent = translatedTitle;
+      }
+    }
 
-    let main = '#ffd700', g1 = 'rgba(255,230,180,0.85)', g2 = 'rgba(255,210,120,0.75)';
-
-    if (guia === 'lumen') { main = '#00ff9d'; g1 = 'rgba(0,255,157,0.90)'; g2 = 'rgba(120,255,200,0.70)'; }
-    if (guia === 'zion')  { main = '#00aaff'; g1 = 'rgba(0,170,255,0.90)'; g2 = 'rgba(255,214,91,0.70)'; }
-    if (guia === 'arion') { main = '#ff00ff'; g1 = 'rgba(255,120,255,0.95)'; g2 = 'rgba(255,180,255,0.80)'; }
-
-    document.documentElement.style.setProperty('--theme-main-color', main);
-    document.documentElement.style.setProperty('--progress-main', main);
-    document.documentElement.style.setProperty('--progress-glow-1', g1);
-    document.documentElement.style.setProperty('--progress-glow-2', g2);
-    document.documentElement.style.setProperty('--guide-color', main);
-
-    document.body.setAttribute('data-guia', guia);
+    if (btn) {
+      btn.textContent = translatedBtn;
+    }
   }
 
-  // -----------------------------
-  // Markup do Card
-  // -----------------------------
+  // =========================
+  // MARKUP (🔥 CORRIGIDO)
+  // =========================
+
   function buildMarkup(section) {
-    if (!section) return;
-    if (section.__CARD_BUILT__) return;
+    if (section.__BUILT__) return;
 
     section.innerHTML = `
       <div class="j-panel-glow card-panel">
         <div class="conteudo-pergaminho">
-          <h2
-            data-typing="true"
-            data-text="Eu na Irmandade"
-            data-speed="40"
-            data-cursor="true"
-            class="titulo-selfie"
-          >Eu na Irmandade</h2>
 
-          <img id="guideBg" class="guide-bg" alt="Fundo do Guia" loading="lazy" />
+          <h2 id="card-title" class="titulo-selfie"></h2>
 
-          <div class="flame-layer show placeholder-only" aria-hidden="true">
-            <img
-              id="selfieImage"
-              class="flame-selfie"
-              src="${PLACEHOLDER_SELFIE}"
-              alt="Sua foto na Irmandade"
-              loading="lazy"
-            />
+          <img id="guideBg" class="guide-bg" />
+
+          <div class="flame-layer show placeholder-only">
+            <img id="selfieImage" class="flame-selfie" src="${PLACEHOLDER_SELFIE}" />
+
             <div class="card-footer">
               <span class="card-name-badge">
-                <span id="userNameSlot">Carregando...</span>
+                <span id="userNameSlot"></span>
               </span>
             </div>
           </div>
 
           <div class="card-actions-below">
-            <button id="btnNext" class="btn btn-stone">✅ Continuar</button>
+            <button id="btnNext" class="btn btn-stone"></button>
           </div>
+
         </div>
       </div>
-    `.trim();
+    `;
 
-    section.__CARD_BUILT__ = true;
+    section.__BUILT__ = true;
   }
 
-  // -----------------------------
-  // Render do Card
-  // -----------------------------
-  function renderCard(section) {
-    if (!section) return;
+  // =========================
+  // RENDER
+  // =========================
 
+  function renderCard(section) {
     const nome = getNome();
     const guia = getGuiaCanon();
-    persistGuiaCanon(guia);
-    applyThemeFromStorage();
 
-    const guideBg = qs('#guideBg', section);
-    if (guideBg) guideBg.src = CARD_BG[guia] || CARD_BG.zion;
+    qs('#guideBg', section).src = CARD_BG[guia];
+    qs('#userNameSlot', section).textContent = nome;
 
-    const selfieImg = qs('#selfieImage', section);
-    if (selfieImg) {
-      let src = '';
-      try {
-        src =
-          window.JORNADA_STATE?.selfieDataUrl ||
-          window.JC?.data?.selfieDataUrl ||
-          sessionStorage.getItem('JORNADA_SELFIE') ||
-          localStorage.getItem('JORNADA_SELFIE') ||
-          localStorage.getItem('jc.selfieDataUrl') ||
-          '';
-      } catch {}
+    const selfie =
+      window.JC?.data?.selfieDataUrl ||
+      localStorage.getItem('jc.selfieDataUrl');
 
-      try {
-        const sc1 = sessionStorage.getItem('JORNADA_SELFIECARD') || '';
-        const sc2 = sessionStorage.getItem('SELFIE_CARD') || '';
-        if (src && (src === sc1 || src === sc2)) src = '';
-      } catch {}
-
-      selfieImg.src = src || PLACEHOLDER_SELFIE;
+    if (selfie) {
+      qs('#selfieImage', section).src = selfie;
     }
 
-    const nameSlot = qs('#userNameSlot', section);
-    if (nameSlot) nameSlot.textContent = nome;
+    applyCardI18n(section);
 
-    console.log('%c[CARD] Render ok!', 'color: gold', { nome, guia });
-
-    selfieCardSafeMode(section, { nome, guia });
+    console.log('[CARD] OK', { nome, guia });
   }
 
-  // -----------------------------
-  // Canvas helpers
-  // -----------------------------
-  function isSameOrigin(url) {
-    try {
-      const u = new URL(url, location.href);
-      return u.origin === location.origin;
-    } catch {
-      return false;
-    }
-  }
+  // =========================
+  // NAVEGAÇÃO
+  // =========================
 
-  function loadImg(src) {
-    return new Promise((resolve) => {
-      if (!src) return resolve(null);
-
-      const im = new Image();
-      const s = String(src);
-
-      const shouldUseCORS =
-        !(s.startsWith('data:') || s.startsWith('blob:') || s.startsWith('/')) &&
-        !isSameOrigin(s);
-
-      if (shouldUseCORS) im.crossOrigin = 'anonymous';
-
-      im.onload = () => resolve(im);
-      im.onerror = () => resolve(null);
-      im.src = s;
-    });
-  }
-
-  function drawGoldFrame(ctx, W, H, opts = {}) {
-    const pad = Math.max(10, opts.pad ?? 28);
-    const rad = Math.max(6, opts.radius ?? 28);
-    const glow = opts.glow ?? true;
-
-    function rrPath(x, y, w, h, r) {
-      const rr = Math.min(r, w / 2, h / 2);
-      ctx.beginPath();
-      ctx.moveTo(x + rr, y);
-      ctx.arcTo(x + w, y, x + w, y + h, rr);
-      ctx.arcTo(x + w, y + h, x, y + h, rr);
-      ctx.arcTo(x, y + h, x, y, rr);
-      ctx.arcTo(x, y, x + w, y, rr);
-      ctx.closePath();
-    }
-
-    ctx.save();
-
-    if (glow) {
-      ctx.shadowBlur = 18;
-      ctx.shadowColor = "rgba(255, 210, 120, 0.55)";
-    }
-
-    rrPath(2, 2, W - 4, H - 4, rad + 6);
-    ctx.fillStyle = "rgba(255, 220, 160, 0.08)";
-    ctx.fill();
-
-    ctx.shadowBlur = 0;
-
-    const grad = ctx.createLinearGradient(0, 0, W, H);
-    grad.addColorStop(0.00, "rgba(255, 242, 210, 0.95)");
-    grad.addColorStop(0.25, "rgba(255, 205, 120, 0.95)");
-    grad.addColorStop(0.50, "rgba(210, 150, 70, 0.95)");
-    grad.addColorStop(0.75, "rgba(255, 205, 120, 0.95)");
-    grad.addColorStop(1.00, "rgba(255, 242, 210, 0.95)");
-
-    ctx.lineWidth = pad;
-    ctx.strokeStyle = grad;
-    rrPath(pad / 2, pad / 2, W - pad, H - pad, rad);
-    ctx.stroke();
-
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = "rgba(60, 30, 10, 0.35)";
-    rrPath(pad + 2, pad + 2, W - (pad + 4) * 2, H - (pad + 4) * 2, Math.max(8, rad - 10));
-    ctx.stroke();
-
-    if (glow) {
-      const spark = (x, y, a = 0.85) => {
-        ctx.save();
-        ctx.globalAlpha = a;
-        ctx.beginPath();
-        ctx.arc(x, y, 4, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(255,255,255,0.9)";
-        ctx.fill();
-        ctx.restore();
-      };
-      spark(pad * 0.55, pad * 0.55, 0.55);
-      spark(W - pad * 0.55, pad * 0.55, 0.45);
-      spark(pad * 0.55, H - pad * 0.55, 0.45);
-      spark(W - pad * 0.55, H - pad * 0.55, 0.55);
-    }
-
-    ctx.restore();
-  }
-
-  // -----------------------------
-  // Gera SELFIECARD
-  // -----------------------------
-  function selfieCardSafeMode(section, ctxData) {
-    const nome = String(ctxData?.nome || getNome() || 'PARTICIPANTE').trim();
-    const guia = canonGuia(ctxData?.guia) || getGuiaCanon() || 'zion';
-
-    const signature = `${nome}__${guia}`;
-    const last = sessionStorage.getItem('__SELFIECARD_SIG__') || '';
-    if (last === signature && sessionStorage.getItem('JORNADA_SELFIECARD')) return;
-    sessionStorage.setItem('__SELFIECARD_SIG__', signature);
-
-    const run = async () => {
-      const sec = section || document.getElementById('section-card') || document;
-
-      const selfieSrc =
-        (window.JORNADA_STATE?.selfieDataUrl || '') ||
-        (sessionStorage.getItem('JORNADA_SELFIE') || '') ||
-        (localStorage.getItem('JORNADA_SELFIE') || '') ||
-        (localStorage.getItem('jc.selfieDataUrl') || '') ||
-        (sec.querySelector('#selfieImage')?.src || '');
-
-      const bgSrc =
-        (sec.querySelector('#guideBg')?.getAttribute('src') || '') ||
-        (sec.querySelector('#guideBg')?.src || '') ||
-        (CARD_BG?.[guia] || CARD_BG?.zion || '');
-
-      const bgImg = await loadImg(bgSrc);
-      let selfieImg = await loadImg(selfieSrc);
-
-      if (!selfieImg) {
-        console.warn('[CARD][SELFIECARD] selfieImg não carregou. Usando PLACEHOLDER_SELFIE.');
-        selfieImg = await loadImg(PLACEHOLDER_SELFIE);
-      }
-      if (!selfieImg) {
-        console.warn('[CARD][SELFIECARD] PLACEHOLDER_SELFIE também falhou.');
-        return;
-      }
-
-      const W = 512, H = 720;
-      const canvas = document.createElement('canvas');
-      canvas.width = W;
-      canvas.height = H;
-      const c = canvas.getContext('2d', { alpha: true });
-
-      c.fillStyle = '#0b0f16';
-      c.fillRect(0, 0, W, H);
-
-      const P = 34;
-      const ix = P, iy = P, iw = W - 2 * P, ih = H - 2 * P;
-
-      if (bgImg && (bgImg.naturalWidth || bgImg.width)) {
-        const bw = bgImg.naturalWidth || bgImg.width;
-        const bh = bgImg.naturalHeight || bgImg.height;
-        const r = Math.max(iw / bw, ih / bh);
-        const dw = bw * r;
-        const dh = bh * r;
-        c.drawImage(bgImg, ix + (iw - dw) / 2, iy + (ih - dh) / 2, dw, dh);
-      } else {
-        c.fillStyle = 'rgba(0,0,0,0.35)';
-        c.fillRect(ix, iy, iw, ih);
-      }
-
-      function roundRectPath(ctx, x, y, w, h, r) {
-        const rr = Math.max(0, Math.min(r, Math.min(w, h) / 2));
-        ctx.beginPath();
-        ctx.moveTo(x + rr, y);
-        ctx.arcTo(x + w, y, x + w, y + h, rr);
-        ctx.arcTo(x + w, y + h, x, y + h, rr);
-        ctx.arcTo(x, y + h, x, y, rr);
-        ctx.arcTo(x, y, x + w, y, rr);
-        ctx.closePath();
-      }
-
-      const cx = ix + iw / 2;
-      const cy = iy + ih * 0.72;
-      const box = iw * 0.42;
-      const rBox = box * 0.18;
-      const x0 = Math.round(cx - box / 2);
-      const y0 = Math.round(cy - box / 2);
-
-      c.save();
-      roundRectPath(c, x0, y0, box, box, rBox);
-      c.clip();
-
-      const sw = selfieImg.naturalWidth || selfieImg.width || 1;
-      const sh = selfieImg.naturalHeight || selfieImg.height || 1;
-      const scale = Math.max(box / sw, box / sh);
-      const dw = sw * scale;
-      const dh = sh * scale;
-      c.drawImage(selfieImg, cx - dw / 2, cy - dh / 2, dw, dh);
-      c.restore();
-
-      drawGoldFrame(c, W, H, { pad: 28, radius: 28, glow: true });
-
-      const guiaNome = prettyGuia(guia);
-
-      c.textAlign = 'center';
-      c.fillStyle = 'rgba(255,255,255,0.92)';
-      c.font = 'bold 30px Cardo, serif';
-      c.fillText(nome.toUpperCase(), cx, iy + ih * 0.90);
-
-      c.fillStyle = 'rgba(255,255,255,0.78)';
-      c.font = '22px Cardo, serif';
-      c.fillText(`Guia: ${guiaNome || '—'}`, cx, iy + ih * 0.95);
-
-      const dataUrl = canvas.toDataURL('image/png');
-
-      sessionStorage.setItem('JORNADA_SELFIECARD', dataUrl);
-      sessionStorage.setItem('SELFIE_CARD', dataUrl);
-      try {
-        localStorage.setItem('JORNADA_SELFIECARD', dataUrl);
-        localStorage.setItem('SELFIE_CARD', dataUrl);
-      } catch {}
-
-      window.JORNADA_STATE = window.JORNADA_STATE || {};
-      window.JORNADA_STATE.selfieCard = dataUrl;
-
-      console.log('[CARD][SELFIECARD] ✅ salva!', signature);
-    };
-
-    try {
-      window.__SELFIECARD_PROMISE__ = new Promise((resolve) => {
-        setTimeout(() => {
-          const done = () => resolve(true);
-
-          if ('requestIdleCallback' in window) {
-            requestIdleCallback(() => {
-              Promise.resolve().then(run).then(done).catch(done);
-            }, { timeout: 1200 });
-          } else {
-            Promise.resolve().then(run).then(done).catch(done);
-          }
-        }, 60);
-      });
-    } catch {
-      window.__SELFIECARD_PROMISE__ = Promise.resolve(true);
-    }
-  }
-
-  // -----------------------------
-  // Navegação
-  // -----------------------------
   function goNext() {
-    try { speechSynthesis.cancel(); } catch {}
-
-    const proceed = () => {
-      if (typeof window.playTransitionVideo === 'function') {
-        window.playTransitionVideo(VIDEO_SRC, NEXT_SECTION_ID);
-        return;
-      }
-
-      if (window.JornadaController?.show) {
-        window.JornadaController.show(NEXT_SECTION_ID);
-        return;
-      }
-
-      if (window.JC && typeof window.JC.show === 'function') {
-        window.JC.show(NEXT_SECTION_ID, { force: true });
-      }
-    };
-
-    try {
-      Promise.race([
-        window.__SELFIECARD_PROMISE__ || Promise.resolve(),
-        new Promise((r) => setTimeout(r, 900)),
-      ]).then(proceed).catch(proceed);
-    } catch {
-      proceed();
-    }
-  }
-
-  // -----------------------------
-  // Bind + init
-  // -----------------------------
-  function findSection(root) {
-    if (root && root.id && SECTION_IDS.includes(root.id)) return root;
-    for (const id of SECTION_IDS) {
-      const el = document.getElementById(id);
-      if (el) return el;
-    }
-    return null;
-  }
-
-  async function runTypingInSection(section) {
-    const typingEls = qsa('[data-typing="true"]', section);
-    for (const el of typingEls) {
-      const text = el.dataset.text || el.textContent || '';
-      const speed = Number(el.dataset.speed || 40);
-      const cursor = String(el.dataset.cursor || 'true') !== 'false';
-
-      if (typeof window.runTyping === 'function') {
-        await new Promise((res) => window.runTyping(el, text, res, { speed, cursor }));
-      } else {
-        el.textContent = text;
-      }
+    if (window.playTransitionVideo) {
+      window.playTransitionVideo(VIDEO_SRC, NEXT_SECTION_ID);
+    } else {
+      window.JC?.show?.(NEXT_SECTION_ID, { force: true });
     }
   }
 
   function bind(section) {
-    const btnNext = qs('#btnNext', section);
-    if (btnNext && !btnNext.__BOUND__) {
-      btnNext.__BOUND__ = true;
-      btnNext.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        goNext();
-      });
+    const btn = qs('#btnNext', section);
+    if (btn && !btn.__BOUND__) {
+      btn.__BOUND__ = true;
+      btn.onclick = goNext;
     }
   }
 
-  function init(root) {
-    const section = findSection(root || null);
-    if (!section) return;
+  // =========================
+  // INIT
+  // =========================
 
+  function init(section) {
     buildMarkup(section);
     renderCard(section);
     bind(section);
-    runTypingInSection(section).catch(() => {});
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    applyThemeFromStorage();
-  });
+  // =========================
+  // EVENTOS
+  // =========================
 
   document.addEventListener('section:shown', (e) => {
-    const id = e.detail && e.detail.sectionId;
-    if (!id || SECTION_IDS.indexOf(id) === -1) return;
-    const node = e.detail.node || qs('#' + id);
+    const id = e.detail?.sectionId;
+    if (!SECTION_IDS.includes(id)) return;
+
+    const node = document.getElementById(id);
+    if (!node) return;
+
     init(node);
   });
 
-  console.log('[' + MOD + '] carregado');
+  document.addEventListener('i18n:changed', () => {
+    const section = document.getElementById('section-card');
+    if (!section?.classList.contains('active')) return;
+
+    applyCardI18n(section);
+  });
+
+  console.log('[section-card] FINAL carregado');
 })();
