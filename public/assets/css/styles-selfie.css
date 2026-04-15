@@ -700,3 +700,68 @@ html, body {
   scrollbar-width: none !important;  /* Firefox */
   -ms-overflow-style: none !important; /* IE/Edge */
 }
+/* ==========================================
+   SELFIE — REVELA TÍTULO E TEXTO NO TOPO
+   ========================================== */
+
+#section-selfie .selfie-header {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  margin: 0 auto 10px !important;
+  max-width: 520px !important;
+  width: 100% !important;
+}
+
+#section-selfie #selfie-title {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  min-height: 32px !important;
+  flex: 1 1 auto !important;
+  margin: 0 !important;
+}
+
+#section-selfie #selfieOrientWrap {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  width: 100% !important;
+  max-width: 520px !important;
+  margin: 8px auto 12px !important;
+}
+
+#section-selfie #selfieTexto {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  min-height: 42px !important;
+}
+
+/* importante: não recortar o topo do conteúdo */
+#section-selfie .j-panel-glow.selfie-panel,
+#section-selfie .j-perg-v-inner,
+#section-selfie .j-arcane-card.selfie-wrap,
+#section-selfie .conteudo-pergaminho {
+  overflow: visible !important;
+}
+
+/* dá espaço real para título + orientação acima dos botões */
+#section-selfie .selfie-wrap {
+  padding-top: 22px !important;
+}
+
+@media (max-width: 768px) {
+  #section-selfie .selfie-wrap {
+    padding-top: 18px !important;
+  }
+
+  #section-selfie #selfie-title {
+    min-height: 26px !important;
+  }
+
+  #section-selfie #selfieTexto {
+    min-height: 36px !important;
+  }
+}
