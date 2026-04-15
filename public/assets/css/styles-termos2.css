@@ -442,13 +442,11 @@
 @media (max-width: 768px) {
 
   /* container principal continua fixo */
-  #section-termos1,
   #section-termos2 {
     overflow: hidden !important;
   }
 
   /* libera espaço do painel */
-  #section-termos1 .j-panel-glow,
   #section-termos2 .j-panel-glow {
     max-height: 88vh !important;
     overflow: hidden !important;
@@ -457,7 +455,6 @@
   }
 
   /* 👇 AQUI ACONTECE O SCROLL */
-  #section-termos1 .j-arcane-card,
   #section-termos2 .j-arcane-card {
     flex: 1;
     overflow-y: auto !important;
@@ -467,7 +464,6 @@
   }
 
   /* garante espaço pro botão */
-  #section-termos1 .footer-actions,
   #section-termos2 .footer-actions {
     position: sticky;
     bottom: 0;
