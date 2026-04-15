@@ -86,6 +86,28 @@
     } catch {}
   }
 
+  function applyCardI18n() {
+  const title = document.getElementById('card-title');
+  const btn = document.getElementById('btnNext');
+
+  if (title) {
+    const translatedTitle =
+      window.i18n?.t?.('card.title') ||
+      title.dataset.text ||
+      'Eu na Irmandade';
+
+    title.textContent = translatedTitle;
+  }
+
+  if (btn) {
+    const translatedBtn =
+      window.i18n?.t?.('card.continuar') ||
+      'Continuar';
+
+    btn.textContent = translatedBtn;
+  }
+}
+
   // -----------------------------
   // Tema (cor do guia) — aplica CSS vars
   // -----------------------------
