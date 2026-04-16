@@ -662,46 +662,54 @@
 
       const selectedGuide = guiaNomeMap[guiaCanon] || 'Guia';
 
-      const template =
-        window.i18n?.t?.('selfie.instruction') ||
-        texto.dataset.text ||
-        '{nome}, afaste um pouco o celular e posicione seu rosto. {guia} vai conduzir voce.';
+const template =
+  window.i18n?.t?.('selfie.instruction') ||
+  texto.dataset.text ||
+  '{nome}, afaste um pouco o celular e posicione seu rosto. {guia} vai conduzir voce.';
 
-      const fullText = String(template)
-        .replace(/\{\{\s*nome\s*\}\}/g, participantName)
-        .replace(/\{\s*nome\s*\}/g, participantName)
-        .replace(/\[\s*nome\s*\]/g, participantName)
-        .replace(/\{\{\s*guia\s*\}\}/g, selectedGuide)
-        .replace(/\{\s*guia\s*\}/g, selectedGuide)
-        .replace(/\[\s*guia\s*\]/g, selectedGuide);
+const fullText = String(template)
+  .replace(/\{\{\s*nome\s*\}\}/g, participantName)
+  .replace(/\{\s*nome\s*\}/g, participantName)
+  .replace(/\[\s*nome\s*\]/g, participantName)
+  .replace(/\{\{\s*guia\s*\}\}/g, selectedGuide)
+  .replace(/\{\s*guia\s*\}/g, selectedGuide)
+  .replace(/\[\s*guia\s*\]/g, selectedGuide);
 
-      console.log('[SELFIE] template:', template);
-      console.log('[SELFIE] participantName:', participantName);
-      console.log('[SELFIE] selectedGuide:', selectedGuide);
-      console.log('[SELFIE] fullText:', fullText);
+console.log('[SELFIE] template:', template);
+console.log('[SELFIE] participantName:', participantName);
+console.log('[SELFIE] selectedGuide:', selectedGuide);
+console.log('[SELFIE] fullText:', fullText);
 
-      /* blindagem contra re-render */
-      texto.dataset.text = fullText;
-      texto.setAttribute('data-text', fullText);
-      texto.removeAttribute('data-i18n-text');
+/* 🔒 tira o elemento do radar do i18n */
+texto.dataset.text = fullText;
+texto.setAttribute('data-text', fullText);
+texto.setAttribute('data-i18n-skip', 'true');
+texto.setAttribute('data-no-i18n', 'true');
 
-      texto.textContent = '';
-      texto.style.width = '100%';
-      texto.style.minHeight = '52px';
-      texto.setAttribute('data-typing', 'true');
-      typeWriter(texto, fullText, 36);
+texto.removeAttribute('data-i18n');
+texto.removeAttribute('data-i18n-text');
+texto.removeAttribute('data-i18n-key');
+texto.removeAttribute('data-i18n-placeholder');
 
-      setTimeout(() => {
-        speak(fullText);
-      }, 350);
+texto.textContent = '';
+texto.style.width = '100%';
+texto.style.minHeight = '52px';
+texto.setAttribute('data-typing', 'true');
+typeWriter(texto, fullText, 36);
 
-      setTimeout(() => {
-        texto.textContent = fullText;
-        texto.dataset.text = fullText;
-        texto.setAttribute('data-text', fullText);
-      }, Math.max(1200, fullText.length * 36 + 500));
+setTimeout(() => {
+  speak(fullText);
+}, 350);
 
-      texto.classList.add('typed');
+setTimeout(() => {
+  texto.textContent = fullText;
+  texto.dataset.text = fullText;
+  texto.setAttribute('data-text', fullText);
+  texto.setAttribute('data-i18n-skip', 'true');
+  texto.setAttribute('data-no-i18n', 'true');
+}, Math.max(1200, fullText.length * 36 + 500));
+
+texto.classList.add('typed');
     }
   }, 300);
 
@@ -735,7 +743,8 @@ if (section && section.classList.contains('active')) {
       })
     );
   }, 100);
-}
+})(window);
+
   
   (function () {
     'use strict';
@@ -781,4 +790,5 @@ if (section && section.classList.contains('active')) {
     document.addEventListener('sectionLoaded', () => setTimeout(applyThemeFromSession, 50));
     document.addEventListener('guia:changed', applyThemeFromSession);
   })();
+
 })(window);
