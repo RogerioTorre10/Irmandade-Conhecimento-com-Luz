@@ -637,79 +637,79 @@
     }
 
     if (texto && !texto.classList.contains('typed')) {
-      const guiaNomeMap = {
-        arion: 'Arion',
-        arian: 'Arion',
-        lumen: 'Lumen',
-        zion: 'Zion'
-      };
+  const guiaNomeMap = {
+    arion: 'Arion',
+    arian: 'Arion',
+    lumen: 'Lumen',
+    zion: 'Zion'
+  };
 
-      const participantName = (
-        window.JC?.data?.nome ||
-        sessionStorage.getItem('jornada.nome') ||
-        localStorage.getItem('jc.nome') ||
-        nome ||
-        'AMOR'
-      ).toUpperCase().trim();
+  const participantName = (
+    window.JC?.data?.nome ||
+    sessionStorage.getItem('jornada.nome') ||
+    localStorage.getItem('jc.nome') ||
+    nome ||
+    'AMOR'
+  ).toUpperCase().trim();
 
-      const guiaCanon = (
-        window.JC?.data?.guia ||
-        sessionStorage.getItem('jornada.guia') ||
-        localStorage.getItem('jc.guia') ||
-        guia ||
-        'zion'
-      ).toLowerCase().trim();
+  const guiaCanon = (
+    window.JC?.data?.guia ||
+    sessionStorage.getItem('jornada.guia') ||
+    localStorage.getItem('jc.guia') ||
+    guia ||
+    'zion'
+  ).toLowerCase().trim();
 
-      const selectedGuide = guiaNomeMap[guiaCanon] || 'Guia';
+  const selectedGuide = guiaNomeMap[guiaCanon] || 'Guia';
 
-const template =
-  window.i18n?.t?.('selfie.instruction') ||
-  texto.dataset.text ||
-  '{nome}, afaste um pouco o celular e posicione seu rosto. {guia} vai conduzir voce.';
+  const template =
+    window.i18n?.t?.('selfie.instruction') ||
+    texto.dataset.text ||
+    '{nome}, afaste um pouco o celular e posicione seu rosto. {guia} vai conduzir voce.';
 
-const fullText = String(template)
-  .replace(/\{\{\s*nome\s*\}\}/g, participantName)
-  .replace(/\{\s*nome\s*\}/g, participantName)
-  .replace(/\[\s*nome\s*\]/g, participantName)
-  .replace(/\{\{\s*guia\s*\}\}/g, selectedGuide)
-  .replace(/\{\s*guia\s*\}/g, selectedGuide)
-  .replace(/\[\s*guia\s*\]/g, selectedGuide);
+  const fullText = String(template)
+    .replace(/\{\{\s*nome\s*\}\}/g, participantName)
+    .replace(/\{\s*nome\s*\}/g, participantName)
+    .replace(/\[\s*nome\s*\]/g, participantName)
+    .replace(/\{\{\s*guia\s*\}\}/g, selectedGuide)
+    .replace(/\{\s*guia\s*\}/g, selectedGuide)
+    .replace(/\[\s*guia\s*\]/g, selectedGuide);
 
-console.log('[SELFIE] template:', template);
-console.log('[SELFIE] participantName:', participantName);
-console.log('[SELFIE] selectedGuide:', selectedGuide);
-console.log('[SELFIE] fullText:', fullText);
+  console.log('[SELFIE] template:', template);
+  console.log('[SELFIE] participantName:', participantName);
+  console.log('[SELFIE] selectedGuide:', selectedGuide);
+  console.log('[SELFIE] fullText:', fullText);
 
-/* 🔒 tira o elemento do radar do i18n */
-texto.dataset.text = fullText;
-texto.setAttribute('data-text', fullText);
-texto.setAttribute('data-i18n-skip', 'true');
-texto.setAttribute('data-no-i18n', 'true');
-
-texto.removeAttribute('data-i18n');
-texto.removeAttribute('data-i18n-text');
-texto.removeAttribute('data-i18n-key');
-texto.removeAttribute('data-i18n-placeholder');
-
-texto.textContent = '';
-texto.style.width = '100%';
-texto.style.minHeight = '52px';
-texto.setAttribute('data-typing', 'true');
-typeWriter(texto, fullText, 36);
-
-setTimeout(() => {
-  speak(fullText);
-}, 350);
-
-setTimeout(() => {
-  texto.textContent = fullText;
   texto.dataset.text = fullText;
   texto.setAttribute('data-text', fullText);
   texto.setAttribute('data-i18n-skip', 'true');
   texto.setAttribute('data-no-i18n', 'true');
-}, Math.max(1200, fullText.length * 36 + 500));
 
-texto.classList.add('typed');
+  texto.removeAttribute('data-i18n');
+  texto.removeAttribute('data-i18n-text');
+  texto.removeAttribute('data-i18n-key');
+  texto.removeAttribute('data-i18n-placeholder');
+
+  texto.textContent = '';
+  texto.style.width = '100%';
+  texto.style.minHeight = '52px';
+  texto.setAttribute('data-typing', 'true');
+  typeWriter(texto, fullText, 36);
+
+  setTimeout(() => {
+    speak(fullText);
+  }, 350);
+
+  setTimeout(() => {
+    texto.textContent = fullText;
+    texto.dataset.text = fullText;
+    texto.setAttribute('data-text', fullText);
+    texto.setAttribute('data-i18n-skip', 'true');
+    texto.setAttribute('data-no-i18n', 'true');
+  }, Math.max(1200, fullText.length * 36 + 500));
+
+  texto.classList.add('typed');
+}
     }
   }, 300);
 
