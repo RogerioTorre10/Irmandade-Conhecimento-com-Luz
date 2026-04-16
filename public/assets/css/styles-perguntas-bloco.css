@@ -1,7 +1,7 @@
 /* ===========================================================
-   STYLES-PERGUNTAS BLOCO — AJUSTADO
-   Desktop estável + Mobile preservado
-   =========================================================== */
+STYLES-PERGUNTAS BLOCO — AJUSTADO
+Desktop estável + Mobile preservado
+=========================================================== */
 
 :root {
   --progress-main: var(--theme-main-color, #f5d47b);
@@ -25,8 +25,59 @@ body {
 }
 
 /* ===========================================================
-   WRAPPER GERAL
-   =========================================================== */
+REMOVE SIDEBAR NO DESKTOP — SEÇÕES DE PERGUNTAS
+=========================================================== */
+
+/* Esconde a barra lateral (sidebar) quando estiver dentro das seções de perguntas */
+@media (min-width: 769px) {
+
+  /* Oculta sidebar genérica de builders (Elementor, WPBakery, etc.) */
+  section[id^="section-perguntas-"] ~ aside,
+  section[id^="section-perguntas-"] ~ .sidebar,
+  section[id^="section-perguntas-"] ~ [class*="sidebar"],
+  section[id^="section-perguntas-"] ~ [id*="sidebar"],
+  .section-perguntas ~ aside,
+  .section-perguntas ~ .sidebar,
+  .section-perguntas ~ [class*="sidebar"],
+  .section-perguntas ~ [id*="sidebar"] {
+    display: none !important;
+    width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  /* Garante que o wrapper pai ocupa 100% sem sidebar */
+  body:has(section[id^="section-perguntas-"]) .site-content,
+  body:has(section[id^="section-perguntas-"]) .content-area,
+  body:has(section[id^="section-perguntas-"]) #content,
+  body:has(section[id^="section-perguntas-"]) #primary,
+  body:has(section[id^="section-perguntas-"]) .elementor-section-wrap,
+  body:has(section[id^="section-perguntas-"]) .e-con-inner {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    float: none !important;
+    flex: 1 !important;
+  }
+
+  /* Remove margem/padding lateral injetado por temas que reservam espaço para sidebar */
+  body:has(section[id^="section-perguntas-"]) {
+    --sidebar-width: 0px;
+  }
+
+  /* Elementor — garante que a seção ocupe 100vw */
+  .elementor-section:has(section[id^="section-perguntas-"]),
+  .elementor-container:has(section[id^="section-perguntas-"]) {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+}
+
+/* ===========================================================
+WRAPPER GERAL
+=========================================================== */
 
 .section-perguntas,
 section[id^="section-perguntas-"] {
@@ -88,8 +139,8 @@ section[id^="section-perguntas-"] .pergaminho-content {
 }
 
 /* ===========================================================
-   DESKTOP FIX DEFINITIVO
-   =========================================================== */
+DESKTOP FIX DEFINITIVO
+=========================================================== */
 
 @media (min-width: 769px) {
   section[id^="section-perguntas-"] {
@@ -126,8 +177,8 @@ section[id^="section-perguntas-"] .pergaminho-content {
 }
 
 /* ===========================================================
-   HUD — BARRA TOPO (BLOCOS)
-   =========================================================== */
+HUD — BARRA TOPO (BLOCOS)
+=========================================================== */
 
 .progress-top {
   position: absolute;
@@ -172,8 +223,8 @@ section[id^="section-perguntas-"] .pergaminho-content {
 }
 
 /* ===========================================================
-   HUD — BARRA MEIO (PERGUNTAS)
-   =========================================================== */
+HUD — BARRA MEIO (PERGUNTAS)
+=========================================================== */
 
 .progress-middle {
   position: absolute;
@@ -222,8 +273,8 @@ section[id^="section-perguntas-"] .pergaminho-content {
 }
 
 /* ===========================================================
-   HUD — AMPULHETA / TOTAL
-   =========================================================== */
+HUD — AMPULHETA / TOTAL
+=========================================================== */
 
 .progress-total,
 .jp-total-top {
@@ -247,7 +298,7 @@ section[id^="section-perguntas-"] .pergaminho-content {
   font-size: 1.9rem;
   display: inline-block;
   animation: ampulheta-flow 6s ease-in-out infinite,
-             ampulheta-glow 3s ease-in-out infinite alternate;
+    ampulheta-glow 3s ease-in-out infinite alternate;
   transform-origin: center;
 }
 
@@ -259,8 +310,8 @@ section[id^="section-perguntas-"] .pergaminho-content {
 }
 
 /* ===========================================================
-   BARRAS DE PROGRESSO INLINE
-   =========================================================== */
+BARRAS DE PROGRESSO INLINE
+=========================================================== */
 
 #progress-block-outer,
 #progress-question-outer,
@@ -316,8 +367,8 @@ section[id^="section-perguntas-"] .pergaminho-content {
 }
 
 /* ===========================================================
-   CABEÇALHO / BLOCO / PERGAMINHO
-   =========================================================== */
+CABEÇALHO / BLOCO / PERGAMINHO
+=========================================================== */
 
 .perguntas-header {
   display: flex;
@@ -389,8 +440,8 @@ section[id^="section-perguntas-"] .pergaminho-content {
 }
 
 /* ===========================================================
-   ANSWER FRAME
-   =========================================================== */
+ANSWER FRAME
+=========================================================== */
 
 .jp-answer-frame {
   position: relative;
@@ -435,8 +486,8 @@ section[id^="section-perguntas-"] .pergaminho-content {
 }
 
 /* ===========================================================
-   DEVOLUTIVA DA API
-   =========================================================== */
+DEVOLUTIVA DA API
+=========================================================== */
 
 .jp-ai-response-wrap,
 #jp-ai-response,
@@ -508,8 +559,8 @@ section[id^="section-perguntas-"] .pergaminho-content {
 }
 
 /* ===========================================================
-   BOTÕES
-   =========================================================== */
+BOTÕES
+=========================================================== */
 
 .perguntas-controls {
   display: grid !important;
@@ -591,8 +642,8 @@ section[id^="section-perguntas-"] .pergaminho-content {
 }
 
 /* ===========================================================
-   MIC
-   =========================================================== */
+MIC
+=========================================================== */
 
 #jp-btn-falar.recording,
 .perguntas-controls #jp-btn-falar.recording,
@@ -618,8 +669,8 @@ section[id^="section-perguntas-"] .pergaminho-content {
 }
 
 /* ===========================================================
-   TEMAS
-   =========================================================== */
+TEMAS
+=========================================================== */
 
 #section-perguntas-raizes,
 #section-perguntas-reflexoes,
@@ -722,8 +773,8 @@ body[data-guia="arion"] .perguntas-controls .btn-perguntas {
 }
 
 /* ===========================================================
-   VÍDEO DE TRANSIÇÃO
-   =========================================================== */
+VÍDEO DE TRANSIÇÃO
+=========================================================== */
 
 #videoOverlay,
 .video-overlay {
@@ -761,8 +812,8 @@ body[data-guia="arion"] .perguntas-controls .btn-perguntas {
 }
 
 /* ===========================================================
-   ANIMAÇÕES
-   =========================================================== */
+ANIMAÇÕES
+=========================================================== */
 
 @keyframes guiaGlow {
   0%, 100% {
@@ -790,40 +841,40 @@ body[data-guia="arion"] .perguntas-controls .btn-perguntas {
 }
 
 @keyframes barra-glow {
-  0%   { box-shadow: 0 0 15px var(--progress-main), 0 0 30px var(--progress-glow-1); }
+  0% { box-shadow: 0 0 15px var(--progress-main), 0 0 30px var(--progress-glow-1); }
   100% { box-shadow: 0 0 30px var(--progress-main), 0 0 60px var(--progress-glow-1), inset 0 0 35px var(--progress-glow-2); }
 }
 
 @keyframes ampulheta-flow {
-  0%   { transform: rotate(0deg) scale(1); }
-  40%  { transform: rotate(180deg) scale(1.05); }
-  60%  { transform: rotate(180deg) scale(1.05); }
+  0% { transform: rotate(0deg) scale(1); }
+  40% { transform: rotate(180deg) scale(1.05); }
+  60% { transform: rotate(180deg) scale(1.05); }
   100% { transform: rotate(360deg) scale(1); }
 }
 
 @keyframes ampulheta-glow {
-  0%   { filter: drop-shadow(0 0 4px rgba(255, 210, 120, 0.4)); }
+  0% { filter: drop-shadow(0 0 4px rgba(255, 210, 120, 0.4)); }
   100% { filter: drop-shadow(0 0 12px rgba(255, 210, 120, 0.8)); }
 }
 
 @keyframes pulse-recording {
   0%, 100% { box-shadow: 0 0 30px #ff1744, 0 0 60px #ff4444, 0 0 90px rgba(255, 23, 68, 0.8); }
-  50%       { box-shadow: 0 0 45px #ff1744, 0 0 80px #ff6666, 0 0 120px rgba(255, 23, 68, 1); }
+  50% { box-shadow: 0 0 45px #ff1744, 0 0 80px #ff6666, 0 0 120px rgba(255, 23, 68, 1); }
 }
 
 @keyframes blink {
   0%, 100% { opacity: 1; }
-  50%       { opacity: 0.3; }
+  50% { opacity: 0.3; }
 }
 
 @keyframes btn-glow {
-  0%   { box-shadow: 0 0 15px var(--progress-main), 0 0 30px var(--progress-glow-1), 0 0 50px var(--progress-glow-2); }
+  0% { box-shadow: 0 0 15px var(--progress-main), 0 0 30px var(--progress-glow-1), 0 0 50px var(--progress-glow-2); }
   100% { box-shadow: 0 0 25px var(--progress-main), 0 0 50px var(--progress-glow-1), 0 0 80px var(--progress-glow-2); }
 }
 
 /* ===========================================================
-   MOBILE — MANTÉM O QUE ESTAVA BOM
-   =========================================================== */
+MOBILE — MANTÉM O QUE ESTAVA BOM
+=========================================================== */
 
 @media (max-width: 768px) {
   section[id^="section-perguntas-"] {
@@ -925,8 +976,8 @@ body[data-guia="arion"] .perguntas-controls .btn-perguntas {
 }
 
 /* ===========================================================
-   DEVOLUTIVA DO GUIA — ORÁCULO VIVO
-   =========================================================== */
+DEVOLUTIVA DO GUIA — ORÁCULO VIVO
+=========================================================== */
 
 .jp-ai-response-wrap {
   position: relative;
