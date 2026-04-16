@@ -160,7 +160,7 @@
       title.style.textShadow = `0 0 10px ${theme.soft}, 0 0 24px ${theme.strong}`;
     }
 
-    const question = section?.querySelector('#question-display, .jp-question-typed');
+    const question = section?.querySelector('#jp-question-typed, .jp-question-typed');
     if (question) {
       question.style.color = theme.text;
       question.style.textShadow = `0 0 6px ${theme.soft}`;
