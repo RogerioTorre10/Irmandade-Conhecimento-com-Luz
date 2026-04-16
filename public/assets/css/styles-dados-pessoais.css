@@ -1,255 +1,124 @@
-/* =====================================================
-   SECTION DADOS PESSOAIS — LIMPO E ESTÁVEL
-   ===================================================== */
+/* ==========================================
+   DADOS PESSOAIS — SCROLL ÚNICO E LIMPO
+   ========================================== */
 
+/* sem rolagem paralela fora da área útil */
 html,
 body {
   min-height: 100%;
   overflow-x: hidden !important;
+  overflow-y: hidden !important;
 }
 
+/* a section não deve criar barra própria */
 .section-dados-pessoais,
 #section-dados-pessoais {
   display: flex;
   align-items: flex-start;
   justify-content: center;
   width: 100%;
-  min-height: 100vh;
-  height: auto !important;
-  padding: 20px 16px 40px !important;
-  overflow-x: hidden !important;
-  overflow-y: visible !important;
-  box-sizing: border-box;
-  -webkit-overflow-scrolling: touch;
-  scroll-behavior: smooth;
+  min-height: 100vh !important;
+  height: 100vh !important;
+  padding: 16px 12px !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
 }
 
-.dados-painel,
-#section-dados-pessoais .j-panel-glow {
-  width: 100%;
-  max-width: 720px;
+/* painel externo sem scroll */
+#section-dados-pessoais .j-panel-glow,
+#section-dados-pessoais .j-perg-v-inner {
+  width: 100% !important;
+  max-width: 720px !important;
+  height: 100% !important;
+  max-height: 100% !important;
   margin: 0 auto !important;
-  box-sizing: border-box;
-  overflow-x: hidden !important;
-  overflow-y: visible !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
 }
 
-#section-dados-pessoais .j-perg-v-inner,
-#section-dados-pessoais .j-arcane-card,
-#section-dados-pessoais .pergaminho-content {
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-  overflow-x: hidden !important;
-  overflow-y: visible !important;
-}
-
-#section-dados-pessoais .pergaminho-content,
-#section-dados-pessoais .form-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding-bottom: 18px !important;
-}
-
-#section-dados-pessoais h1,
-#section-dados-pessoais .typing-text {
-  display: block !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  min-height: 40px;
-  margin: 0 0 8px 0;
-  box-sizing: border-box;
-  text-align: center;
-}
-
-#section-dados-pessoais .intro-text {
-  display: block !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  min-height: 44px;
-  margin: 0 0 6px 0;
-  box-sizing: border-box;
-  text-align: center;
-}
-
-#section-dados-pessoais input,
-#section-dados-pessoais select,
-#section-dados-pessoais textarea {
-  width: 100% !important;
-  max-width: 100% !important;
-  box-sizing: border-box;
-  display: block;
-  background: rgba(5, 8, 18, 0.85);
-  border: 1.8px solid color-mix(in srgb, var(--guia-main, #00ff9c) 50%, rgba(255,255,255,0.2));
-  border-radius: 14px;
-  color: #f6f2e8;
-  padding: 13px 14px;
-  font-size: 15px;
-  line-height: 1.3;
-  min-height: 48px;
-  margin: 0;
-}
-
-#section-dados-pessoais textarea,
-#section-dados-pessoais #dp-observacoes {
-  min-height: 110px !important;
-  resize: vertical;
-}
-
-#section-dados-pessoais .dados-linha-tripla,
-#section-dados-pessoais .dados-row-3 {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 8px;
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-#section-dados-pessoais .status-box,
-#section-dados-pessoais .dados-info,
-#section-dados-pessoais .info-box,
-#section-dados-pessoais .mensagem-box {
-  position: relative !important;
-  z-index: 1 !important;
-  margin-top: 14px;
-  margin-bottom: 14px;
-  text-align: center;
-  color: #f3ead7;
-}
-
-#section-dados-pessoais .final-acoes {
-  width: 100%;
-  max-width: 100%;
-}
-
-#section-dados-pessoais #btn-dp-continuar {
-  position: relative !important;
-  left: auto !important;
-  right: auto !important;
-  bottom: auto !important;
-  top: auto !important;
-  transform: none !important;
-  z-index: 2 !important;
-
-  display: flex !important;
-  align-items: center;
-  justify-content: center;
-  width: 100% !important;
-  max-width: 100% !important;
-  min-height: 52px;
-  margin: 18px 0 0 !important;
-  padding: 12px 20px;
-  border-radius: 999px;
-  border: 1.8px solid rgba(255, 230, 160, 0.8);
-  color: #f7f1df;
-  font-size: 15.5px;
-  font-weight: 700;
-  letter-spacing: 0.4px;
-  cursor: pointer;
-  text-align: center;
-  box-sizing: border-box;
-
-  background:
-    linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.03)),
-    url('/assets/img/textura-de-pedra.jpg') center/cover,
-    linear-gradient(180deg, #4b4338 0%, #2b251f 50%, #171311 100%);
-
-  box-shadow:
-    0 4px 15px rgba(0,0,0,0.5),
-    0 0 15px color-mix(in srgb, var(--guia-main, #00ff9c) 30%, transparent) !important;
-}
-
-#section-dados-pessoais #btn-dp-continuar:active,
-#section-dados-pessoais #btn-dp-continuar.is-pressed {
-  transform: translateY(2px) scale(0.98) !important;
-  box-shadow: 0 0 20px rgba(0,255,156,0.6) !important;
-}
-
-@media (hover: hover) {
-  #section-dados-pessoais #btn-dp-continuar:hover {
-    filter: brightness(1.12);
-    transform: translateY(-1px) !important;
-  }
-}
-
-@media (max-width: 768px) {
-  .section-dados-pessoais,
-  #section-dados-pessoais {
-    display: block !important;
-    min-height: auto !important;
-    height: auto !important;
-    padding: 16px 12px 32px !important;
-    overflow-x: hidden !important;
-    overflow-y: visible !important;
-  }
-
-  /* SCROLL INTERNO APENAS NO CONTEÚDO */
-#section-dados-pessoais .j-panel-glow {
-  max-height: none !important;
-  overflow: visible !important;
-  padding-right: 0 !important;
-}
-
+/* 🔥 ÚNICO SCROLL DA PÁGINA */
 #section-dados-pessoais .j-arcane-card {
-  max-height: 90vh !important;
+  width: 100% !important;
+  height: calc(100vh - 32px) !important;
+  max-height: calc(100vh - 32px) !important;
   overflow-y: auto !important;
   overflow-x: hidden !important;
-  padding-right: 6px;
+  box-sizing: border-box !important;
+  padding-right: 6px !important;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0,255,150,0.6) rgba(255,255,255,0.08);
 }
 
-/* barra bonita só na área interna */
+/* conteúdo interno sem barra própria */
+#section-dados-pessoais .pergaminho-content,
+#section-dados-pessoais .form-grid {
+  overflow: visible !important;
+  max-height: none !important;
+}
+
+/* remove qualquer barra em wrappers internos */
+#section-dados-pessoais .dados-painel,
+#section-dados-pessoais .status-box,
+#section-dados-pessoais .final-acoes {
+  overflow: visible !important;
+}
+
+/* barra bonita só no card */
 #section-dados-pessoais .j-arcane-card::-webkit-scrollbar {
   width: 6px;
 }
 
 #section-dados-pessoais .j-arcane-card::-webkit-scrollbar-thumb {
   background: rgba(0,255,150,0.6);
-  border-radius: 6px;
+  border-radius: 8px;
 }
-  #section-dados-pessoais .pergaminho-content,
-  #section-dados-pessoais .form-grid {
-    gap: 12px;
-    padding-bottom: 20px !important;
+
+#section-dados-pessoais .j-arcane-card::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.06);
+  border-radius: 8px;
+}
+
+/* garante que nada estoure horizontalmente */
+#section-dados-pessoais * {
+  box-sizing: border-box !important;
+}
+
+#section-dados-pessoais input,
+#section-dados-pessoais select,
+#section-dados-pessoais textarea,
+#section-dados-pessoais .dados-linha-tripla,
+#section-dados-pessoais .dados-row-3 {
+  max-width: 100% !important;
+}
+
+/* mobile */
+@media (max-width: 768px) {
+  #section-dados-pessoais {
+    padding: 14px 10px !important;
+  }
+
+  #section-dados-pessoais .j-panel-glow,
+  #section-dados-pessoais .j-perg-v-inner {
+    max-width: 100% !important;
+  }
+
+  #section-dados-pessoais .j-arcane-card {
+    height: calc(100vh - 28px) !important;
+    max-height: calc(100vh - 28px) !important;
+    padding-right: 4px !important;
   }
 
   #section-dados-pessoais .dados-linha-tripla,
   #section-dados-pessoais .dados-row-3 {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-
-  #section-dados-pessoais input,
-  #section-dados-pessoais select,
-  #section-dados-pessoais textarea {
-    font-size: 16px !important;
-  }
-
-  #section-dados-pessoais #btn-dp-continuar {
-    width: 100% !important;
-    min-height: 50px;
-    margin: 18px 0 18px !important;
-    font-size: 15px;
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
   }
 }
 
-@media (max-width: 360px) {
-  .section-dados-pessoais,
-  #section-dados-pessoais {
-    padding-left: 12px !important;
-    padding-right: 12px !important;
-  }
-
-  #section-dados-pessoais input,
-  #section-dados-pessoais select,
-  #section-dados-pessoais textarea {
-    font-size: 14px;
-    padding: 11px 12px;
-  }
-
-  #section-dados-pessoais #btn-dp-continuar {
-    min-height: 48px;
-    font-size: 14.5px;
+/* desktop */
+@media (min-width: 769px) {
+  #section-dados-pessoais .j-arcane-card {
+    height: calc(100vh - 40px) !important;
+    max-height: calc(100vh - 40px) !important;
   }
 }
