@@ -660,45 +660,48 @@
         'zion'
       ).toLowerCase().trim();
 
-      const selectedGuide = guiaNomeMap[guiaCanon] || 'Guia';
+     const selectedGuide = guiaNomeMap[guiaCanon] || 'Guia';
 
-      const template =
-        window.i18n?.t?.('selfie.instruction') ||
-        texto.dataset.text ||
-        '{nome}, afaste um pouco o celular e posicione seu rosto. {guia} vai conduzir voce.';
+const template =
+  window.i18n?.t?.('selfie.instruction') ||
+  texto.dataset.text ||
+  '{nome}, afaste um pouco o celular e posicione seu rosto. {guia} vai conduzir voce.';
 
-      const fullText = String(template)
-        .replace(/\{\{\s*nome\s*\}\}/g, participantName)
-        .replace(/\{\s*nome\s*\}/g, participantName)
-        .replace(/\[\s*nome\s*\]/g, participantName)
-        .replace(/\{\{\s*guia\s*\}\}/g, selectedGuide)
-        .replace(/\{\s*guia\s*\}/g, selectedGuide)
-        .replace(/\[\s*guia\s*\]/g, selectedGuide);
+const fullText = String(template)
+  .replace(/\{\{\s*nome\s*\}\}/g, participantName)
+  .replace(/\{\s*nome\s*\}/g, participantName)
+  .replace(/\[\s*nome\s*\]/g, participantName)
+  .replace(/\{\{\s*guia\s*\}\}/g, selectedGuide)
+  .replace(/\{\s*guia\s*\}/g, selectedGuide)
+  .replace(/\[\s*guia\s*\]/g, selectedGuide);
 
-      console.log('[SELFIE] template:', template);
-      console.log('[SELFIE] participantName:', participantName);
-      console.log('[SELFIE] selectedGuide:', selectedGuide);
-      console.log('[SELFIE] fullText:', fullText);
+console.log('[SELFIE] template:', template);
+console.log('[SELFIE] participantName:', participantName);
+console.log('[SELFIE] selectedGuide:', selectedGuide);
+console.log('[SELFIE] fullText:', fullText);
 
-      texto.dataset.text = fullText;
-      texto.textContent = '';
-      texto.style.width = '100%';
-      texto.style.minHeight = '52px';
-      texto.setAttribute('data-typing', 'true');
-      typeWriter(texto, fullText, 36);
+/* 🔒 blindagem contra re-render/i18n posterior */
+texto.dataset.text = fullText;
+texto.setAttribute('data-text', fullText);
+texto.removeAttribute('data-i18n-text');
 
-      setTimeout(() => {
-        speak(fullText);
-      }, 350);
+texto.textContent = '';
+texto.style.width = '100%';
+texto.style.minHeight = '52px';
+texto.setAttribute('data-typing', 'true');
+typeWriter(texto, fullText, 36);
 
-      setTimeout(() => {
-        texto.textContent = fullText;
-        texto.dataset.text = fullText;
-      }, Math.max(1200, fullText.length * 36 + 500));
+setTimeout(() => {
+  speak(fullText);
+}, 350);
 
-      texto.classList.add('typed');
-    }
-  }, 300);
+setTimeout(() => {
+  texto.textContent = fullText;
+  texto.dataset.text = fullText;
+  texto.setAttribute('data-text', fullText);
+}, Math.max(1200, fullText.length * 36 + 500));
+
+texto.classList.add('typed');
 
   bindRangeInputs();
   bindButtons();
