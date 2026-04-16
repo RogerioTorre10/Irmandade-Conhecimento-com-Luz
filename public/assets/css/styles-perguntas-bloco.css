@@ -1,7 +1,7 @@
 /* ===========================================================
-STYLES-PERGUNTAS BLOCO — AJUSTADO
-Desktop estável + Mobile preservado
-=========================================================== */
+   STYLES-PERGUNTAS BLOCO — AJUSTADO
+   Desktop estável + Mobile preservado
+   =========================================================== */
 
 :root {
   --progress-main: var(--theme-main-color, #f5d47b);
@@ -25,12 +25,28 @@ body {
 }
 
 /* ===========================================================
-REMOVE SIDEBAR NO DESKTOP — SEÇÕES DE PERGUNTAS
-=========================================================== */
+   ESCAPE DO CONTAINER PAI (sem tocar em outras páginas)
+   Técnica: negative margin + width 100vw, escopo 100% isolado
+   na própria section. Não usa :has(), não afeta nenhum outro
+   elemento fora de section[id^="section-perguntas-"].
+   =========================================================== */
 
-/* Esconde a barra lateral (sidebar) quando estiver dentro das seções de perguntas */
+section[id^="section-perguntas-"],
+.section-perguntas {
+  width: 100vw !important;
+  max-width: 100vw !important;
+  /* Quebra qualquer container pai com max-width (ex: #section-conteudo: 600px) */
+  margin-left: calc(-50vw + 50%) !important;
+  margin-right: calc(-50vw + 50%) !important;
+  box-sizing: border-box !important;
+  overflow-x: hidden !important;
+}
+
+/* ===========================================================
+   REMOVE SIDEBAR NO DESKTOP
+   =========================================================== */
+
 @media (min-width: 769px) {
-
   /* Oculta sidebar genérica de builders (Elementor, WPBakery, etc.) */
   section[id^="section-perguntas-"] ~ aside,
   section[id^="section-perguntas-"] ~ .sidebar,
@@ -45,26 +61,6 @@ REMOVE SIDEBAR NO DESKTOP — SEÇÕES DE PERGUNTAS
     overflow: hidden !important;
   }
 
-  /* Garante que o wrapper pai ocupa 100% sem sidebar */
-  body:has(section[id^="section-perguntas-"]) .site-content,
-  body:has(section[id^="section-perguntas-"]) .content-area,
-  body:has(section[id^="section-perguntas-"]) #content,
-  body:has(section[id^="section-perguntas-"]) #primary,
-  body:has(section[id^="section-perguntas-"]) .elementor-section-wrap,
-  body:has(section[id^="section-perguntas-"]) .e-con-inner {
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    float: none !important;
-    flex: 1 !important;
-  }
-
-  /* Remove margem/padding lateral injetado por temas que reservam espaço para sidebar */
-  body:has(section[id^="section-perguntas-"]) {
-    --sidebar-width: 0px;
-  }
-
   /* Elementor — garante que a seção ocupe 100vw */
   .elementor-section:has(section[id^="section-perguntas-"]),
   .elementor-container:has(section[id^="section-perguntas-"]) {
@@ -76,8 +72,8 @@ REMOVE SIDEBAR NO DESKTOP — SEÇÕES DE PERGUNTAS
 }
 
 /* ===========================================================
-WRAPPER GERAL
-=========================================================== */
+   WRAPPER GERAL
+   =========================================================== */
 
 .section-perguntas,
 section[id^="section-perguntas-"] {
@@ -90,8 +86,6 @@ section[id^="section-perguntas-"] {
   font-family: "Cardo", serif;
   color: #f5e9d6;
   background: transparent;
-  overflow-x: hidden !important;
-  box-sizing: border-box;
 }
 
 .section-perguntas .perguntas-wrap,
@@ -139,8 +133,8 @@ section[id^="section-perguntas-"] .pergaminho-content {
 }
 
 /* ===========================================================
-DESKTOP FIX DEFINITIVO
-=========================================================== */
+   DESKTOP FIX DEFINITIVO
+   =========================================================== */
 
 @media (min-width: 769px) {
   section[id^="section-perguntas-"] {
@@ -177,8 +171,8 @@ DESKTOP FIX DEFINITIVO
 }
 
 /* ===========================================================
-HUD — BARRA TOPO (BLOCOS)
-=========================================================== */
+   HUD — BARRA TOPO (BLOCOS)
+   =========================================================== */
 
 .progress-top {
   position: absolute;
@@ -223,8 +217,8 @@ HUD — BARRA TOPO (BLOCOS)
 }
 
 /* ===========================================================
-HUD — BARRA MEIO (PERGUNTAS)
-=========================================================== */
+   HUD — BARRA MEIO (PERGUNTAS)
+   =========================================================== */
 
 .progress-middle {
   position: absolute;
@@ -273,8 +267,8 @@ HUD — BARRA MEIO (PERGUNTAS)
 }
 
 /* ===========================================================
-HUD — AMPULHETA / TOTAL
-=========================================================== */
+   HUD — AMPULHETA / TOTAL
+   =========================================================== */
 
 .progress-total,
 .jp-total-top {
@@ -310,8 +304,8 @@ HUD — AMPULHETA / TOTAL
 }
 
 /* ===========================================================
-BARRAS DE PROGRESSO INLINE
-=========================================================== */
+   BARRAS DE PROGRESSO INLINE
+   =========================================================== */
 
 #progress-block-outer,
 #progress-question-outer,
@@ -367,8 +361,8 @@ BARRAS DE PROGRESSO INLINE
 }
 
 /* ===========================================================
-CABEÇALHO / BLOCO / PERGAMINHO
-=========================================================== */
+   CABEÇALHO / BLOCO / PERGAMINHO
+   =========================================================== */
 
 .perguntas-header {
   display: flex;
@@ -440,8 +434,8 @@ CABEÇALHO / BLOCO / PERGAMINHO
 }
 
 /* ===========================================================
-ANSWER FRAME
-=========================================================== */
+   ANSWER FRAME
+   =========================================================== */
 
 .jp-answer-frame {
   position: relative;
@@ -486,8 +480,8 @@ ANSWER FRAME
 }
 
 /* ===========================================================
-DEVOLUTIVA DA API
-=========================================================== */
+   DEVOLUTIVA DA API
+   =========================================================== */
 
 .jp-ai-response-wrap,
 #jp-ai-response,
@@ -559,8 +553,8 @@ DEVOLUTIVA DA API
 }
 
 /* ===========================================================
-BOTÕES
-=========================================================== */
+   BOTÕES
+   =========================================================== */
 
 .perguntas-controls {
   display: grid !important;
@@ -642,8 +636,8 @@ BOTÕES
 }
 
 /* ===========================================================
-MIC
-=========================================================== */
+   MIC
+   =========================================================== */
 
 #jp-btn-falar.recording,
 .perguntas-controls #jp-btn-falar.recording,
@@ -669,8 +663,8 @@ MIC
 }
 
 /* ===========================================================
-TEMAS
-=========================================================== */
+   TEMAS
+   =========================================================== */
 
 #section-perguntas-raizes,
 #section-perguntas-reflexoes,
@@ -773,8 +767,8 @@ body[data-guia="arion"] .perguntas-controls .btn-perguntas {
 }
 
 /* ===========================================================
-VÍDEO DE TRANSIÇÃO
-=========================================================== */
+   VÍDEO DE TRANSIÇÃO
+   =========================================================== */
 
 #videoOverlay,
 .video-overlay {
@@ -812,8 +806,8 @@ VÍDEO DE TRANSIÇÃO
 }
 
 /* ===========================================================
-ANIMAÇÕES
-=========================================================== */
+   ANIMAÇÕES
+   =========================================================== */
 
 @keyframes guiaGlow {
   0%, 100% {
@@ -873,11 +867,16 @@ ANIMAÇÕES
 }
 
 /* ===========================================================
-MOBILE — MANTÉM O QUE ESTAVA BOM
-=========================================================== */
+   MOBILE — MANTÉM O QUE ESTAVA BOM
+   =========================================================== */
 
 @media (max-width: 768px) {
   section[id^="section-perguntas-"] {
+    /* Reseta o negative margin no mobile — não precisa dele */
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
     min-height: 100svh !important;
     height: auto !important;
     overflow-y: auto !important;
@@ -976,8 +975,8 @@ MOBILE — MANTÉM O QUE ESTAVA BOM
 }
 
 /* ===========================================================
-DEVOLUTIVA DO GUIA — ORÁCULO VIVO
-=========================================================== */
+   DEVOLUTIVA DO GUIA — ORÁCULO VIVO
+   =========================================================== */
 
 .jp-ai-response-wrap {
   position: relative;
