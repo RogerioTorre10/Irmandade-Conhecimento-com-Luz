@@ -182,38 +182,24 @@
   }
 
 function getQuestionText(bloco, qIndex = 0) {
-  const pergunta = bloco?.questions?.[qIndex];
-  if (!pergunta) return '';
-
-  // 1) prioridade: chave específica da pergunta
-  if (pergunta.data_i18n && window.i18n?.t) {
-    const translated = window.i18n.t(
-      `questions.${String(pergunta.data_i18n).replace('pergunta_', '')}`,
-      ''
-    );
-
-    if (translated && typeof translated === 'string' && translated.trim()) {
-      return translated.trim();
-    }
+  try {
+    const pergunta = bloco?.questions?.[qIndex];
+    return String(pergunta?.label || 'Pergunta não encontrada').trim();
+  } catch (e) {
+    console.warn('[getQuestionText] erro:', e);
+    return 'Pergunta indisponível';
   }
-
-  // 2) fallback por bloco + índice
-  const blocoKey = bloco?.id || bloco?.slug || bloco?.data_i18n || '';
-  if (blocoKey && window.i18n?.t) {
-    const translated = window.i18n.t(`perguntas.${blocoKey}.${qIndex}`, '');
-    if (translated && typeof translated === 'string' && translated.trim()) {
-      return translated.trim();
-    }
-  }
-
-  // 3) fallback final
-  return String(
-    pergunta.label ||
-    pergunta.texto ||
-    pergunta.text ||
-    ''
-  ).trim();
 }
+
+function getQuestionId(bloco, qIndex = 0) {
+  const pergunta = bloco?.questions?.[qIndex];
+  return pergunta?.id || `q${qIndex + 1}`;
+}
+
+function answerKey(bloco, qIndex = 0) {
+  return `jornada_resp_${bloco.id}_${getQuestionId(bloco, qIndex)}`;
+}
+  
   function getQuestionId(bloco, qIndex = 0) {
     const pergunta = bloco?.questions?.[qIndex];
     return pergunta?.id || `q${qIndex + 1}`;
