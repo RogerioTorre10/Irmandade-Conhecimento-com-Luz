@@ -660,81 +660,83 @@
         'zion'
       ).toLowerCase().trim();
 
-     const selectedGuide = guiaNomeMap[guiaCanon] || 'Guia';
+      const selectedGuide = guiaNomeMap[guiaCanon] || 'Guia';
 
-const template =
-  window.i18n?.t?.('selfie.instruction') ||
-  texto.dataset.text ||
-  '{nome}, afaste um pouco o celular e posicione seu rosto. {guia} vai conduzir voce.';
+      const template =
+        window.i18n?.t?.('selfie.instruction') ||
+        texto.dataset.text ||
+        '{nome}, afaste um pouco o celular e posicione seu rosto. {guia} vai conduzir voce.';
 
-const fullText = String(template)
-  .replace(/\{\{\s*nome\s*\}\}/g, participantName)
-  .replace(/\{\s*nome\s*\}/g, participantName)
-  .replace(/\[\s*nome\s*\]/g, participantName)
-  .replace(/\{\{\s*guia\s*\}\}/g, selectedGuide)
-  .replace(/\{\s*guia\s*\}/g, selectedGuide)
-  .replace(/\[\s*guia\s*\]/g, selectedGuide);
+      const fullText = String(template)
+        .replace(/\{\{\s*nome\s*\}\}/g, participantName)
+        .replace(/\{\s*nome\s*\}/g, participantName)
+        .replace(/\[\s*nome\s*\]/g, participantName)
+        .replace(/\{\{\s*guia\s*\}\}/g, selectedGuide)
+        .replace(/\{\s*guia\s*\}/g, selectedGuide)
+        .replace(/\[\s*guia\s*\]/g, selectedGuide);
 
-console.log('[SELFIE] template:', template);
-console.log('[SELFIE] participantName:', participantName);
-console.log('[SELFIE] selectedGuide:', selectedGuide);
-console.log('[SELFIE] fullText:', fullText);
+      console.log('[SELFIE] template:', template);
+      console.log('[SELFIE] participantName:', participantName);
+      console.log('[SELFIE] selectedGuide:', selectedGuide);
+      console.log('[SELFIE] fullText:', fullText);
 
-/* 🔒 blindagem contra re-render/i18n posterior */
-texto.dataset.text = fullText;
-texto.setAttribute('data-text', fullText);
-texto.removeAttribute('data-i18n-text');
+      /* blindagem contra re-render */
+      texto.dataset.text = fullText;
+      texto.setAttribute('data-text', fullText);
+      texto.removeAttribute('data-i18n-text');
 
-texto.textContent = '';
-texto.style.width = '100%';
-texto.style.minHeight = '52px';
-texto.setAttribute('data-typing', 'true');
-typeWriter(texto, fullText, 36);
+      texto.textContent = '';
+      texto.style.width = '100%';
+      texto.style.minHeight = '52px';
+      texto.setAttribute('data-typing', 'true');
+      typeWriter(texto, fullText, 36);
 
-setTimeout(() => {
-  speak(fullText);
-}, 350);
+      setTimeout(() => {
+        speak(fullText);
+      }, 350);
 
-setTimeout(() => {
-  texto.textContent = fullText;
-  texto.dataset.text = fullText;
-  texto.setAttribute('data-text', fullText);
-}, Math.max(1200, fullText.length * 36 + 500));
+      setTimeout(() => {
+        texto.textContent = fullText;
+        texto.dataset.text = fullText;
+        texto.setAttribute('data-text', fullText);
+      }, Math.max(1200, fullText.length * 36 + 500));
 
-texto.classList.add('typed');
+      texto.classList.add('typed');
+    }
+  }, 300);
 
   bindRangeInputs();
   bindButtons();
   updateZoom();
 }
-  document.addEventListener('sectionLoaded', (e) => {
-    if (e.detail?.sectionId !== 'section-selfie') return;
-    initSectionSelfie();
-  });
+ document.addEventListener('sectionLoaded', (e) => {
+  if (e.detail?.sectionId !== 'section-selfie') return;
+  initSectionSelfie();
+});
 
-  document.addEventListener('sectionWillHide', (e) => {
-    if (e.detail?.sectionId === 'section-selfie') {
-      stopCamera();
-    }
-  });
-
-  window.addEventListener('resize', () => {
-    if (!document.getElementById('section-selfie')?.classList.contains('active')) return;
-    fixSelfieLayout();
-    renderLivePreviewScale();
-  });
-
-  const section = document.getElementById('section-selfie');
-  if (section && section.classList.contains('active')) {
-    setTimeout(() => {
-      document.dispatchEvent(
-        new CustomEvent('sectionLoaded', {
-          detail: { sectionId: 'section-selfie' }
-        })
-      );
-    }, 100);
+document.addEventListener('sectionWillHide', (e) => {
+  if (e.detail?.sectionId === 'section-selfie') {
+    stopCamera();
   }
+});
 
+window.addEventListener('resize', () => {
+  if (!document.getElementById('section-selfie')?.classList.contains('active')) return;
+  fixSelfieLayout();
+  renderLivePreviewScale();
+});
+
+const section = document.getElementById('section-selfie');
+if (section && section.classList.contains('active')) {
+  setTimeout(() => {
+    document.dispatchEvent(
+      new CustomEvent('sectionLoaded', {
+        detail: { sectionId: 'section-selfie' }
+      })
+    );
+  }, 100);
+}
+  
   (function () {
     'use strict';
 
