@@ -1083,31 +1083,38 @@ async function maybeHandleBlockClosure(section, bloco) {
  }
     
     const questionEl =
-      $('#question-display', section) ||
-      $('#jp-question-typed', section) ||
-      $('.jp-question-typed', section);
+  $('#jp-question-typed', section) ||
+  $('.jp-question-typed', section) ||
+  $('#question-display', section);
 
-    const textarea =
-      $('#jp-answer-input', section) ||
-      $('#answer-input', section) ||
-      $('textarea', section);
+const textarea =
+  $('#jp-answer-input', section) ||
+  $('#answer-input', section) ||
+  $('textarea', section);
 
-    const perguntaText = getQuestionText(bloco, 0);
+const perguntaText = getQuestionText(bloco, 0);
 
-    if (textarea) {
-      textarea.value = getAnswer(bloco, 0);
-      textarea.focus();
-      ensureMicAttached(textarea);
-    }
+if (textarea) {
+  textarea.value = getAnswer(bloco, 0);
+  textarea.focus();
+  ensureMicAttached(textarea);
+}
 
-    setGuideResponse('');
-    setContinueState(section, 'idle');
-    updateProgress(bloco);
-    bindButtons(section, bloco, perguntaText);
+setGuideResponse('');
+setContinueState(section, 'idle');
+updateProgress(bloco);
+bindButtons(section, bloco, perguntaText);
 
-    if (questionEl) {
-      await typeQuestion(questionEl, perguntaText, 26, true);
-    }
+if (questionEl) {
+  questionEl.textContent = '';
+  questionEl.style.display = 'block';
+  questionEl.style.visibility = 'visible';
+  questionEl.style.opacity = '1';
+  questionEl.style.minHeight = '42px';
+  questionEl.setAttribute('data-typing', 'true');
+
+  await typeQuestion(questionEl, perguntaText, 28, true);
+}
 
     log('Bloco renderizado:', bloco.id);
   }
