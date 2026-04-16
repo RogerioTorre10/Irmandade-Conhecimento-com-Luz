@@ -1,46 +1,53 @@
 /* ===========================================================
-   STYLES-PERGUNTAS v3.0 — LIMPO / SEM DUPLICAÇÕES
-   Escopo: .section-perguntas / #section-perguntas
-   Estrutura: Variáveis → Layout → HUD → Pergaminho →
-              Botões → Temas → Animações → Mobile
+   STYLES-PERGUNTAS BLOCO — AJUSTADO
+   Desktop estável + Mobile preservado
    =========================================================== */
 
-
-/* ============================
-   VARIÁVEIS GLOBAIS
-   ============================ */
-
 :root {
-  --progress-main:   var(--theme-main-color, #f5d47b);
+  --progress-main: var(--theme-main-color, #f5d47b);
   --progress-glow-1: rgba(255, 230, 180, 0.85);
   --progress-glow-2: rgba(255, 210, 120, 0.75);
-  --guide-color:     var(--theme-main-color, #ffd700);
-  --guide-glow-1:    rgba(255, 230, 180, 0.85);
-  --guide-glow-2:    rgba(255, 210, 120, 0.75);
-  --gold-gradient:   linear-gradient(90deg, #d4af37, #ffd700, #ffcc33);
+  --guide-color: var(--theme-main-color, #ffd700);
+  --guide-glow-1: rgba(255, 230, 180, 0.85);
+  --guide-glow-2: rgba(255, 210, 120, 0.75);
+  --gold-gradient: linear-gradient(90deg, #d4af37, #ffd700, #ffcc33);
   --silver-gradient: linear-gradient(90deg, #d3d3d3, #b0b0b0, #f0f0f0);
 }
 
+html,
+body {
+  min-height: 100%;
+  overflow-x: hidden !important;
+}
 
-/* ============================
+body {
+  overflow-x: hidden !important;
+}
+
+/* ===========================================================
    WRAPPER GERAL
-   ============================ */
+   =========================================================== */
 
-.section-perguntas {
+.section-perguntas,
+section[id^="section-perguntas-"] {
   position: relative;
   min-height: 100dvh;
-  padding: 32px 12px 18px;
+  padding: 20px 12px 18px;
   display: flex;
   justify-content: center;
   align-items: flex-start;
   font-family: "Cardo", serif;
   color: #f5e9d6;
   background: transparent;
+  overflow-x: hidden !important;
+  box-sizing: border-box;
 }
 
-.section-perguntas .perguntas-wrap {
+.section-perguntas .perguntas-wrap,
+section[id^="section-perguntas-"] .perguntas-wrap {
   position: relative;
-  width: min(1024px, 100%);
+  width: 100%;
+  max-width: 100%;
   margin: 0 auto;
   padding: 18px 14px 16px;
   border-radius: 18px;
@@ -48,19 +55,79 @@
   box-shadow: 0 18px 60px rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(6px);
   box-sizing: border-box;
+  overflow: visible;
+}
+
+.perguntas-panel,
+section[id^="section-perguntas-"] .perguntas-panel {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden !important;
+}
+
+.perguntas-panel .j-panel-glow,
+section[id^="section-perguntas-"] .j-panel-glow {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 auto !important;
+  transform: none !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
 }
 
 .perguntas-panel .j-arcane-card,
 .perguntas-panel .perguntas-wrap,
-.perguntas-panel #jp-blocks-wrapper {
+.perguntas-panel #jp-blocks-wrapper,
+section[id^="section-perguntas-"] .j-arcane-card,
+section[id^="section-perguntas-"] #jp-blocks-wrapper,
+section[id^="section-perguntas-"] .pergaminho-content {
   width: 100%;
   max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden !important;
 }
 
+/* ===========================================================
+   DESKTOP FIX DEFINITIVO
+   =========================================================== */
 
-/* ============================
+@media (min-width: 769px) {
+  section[id^="section-perguntas-"] {
+    padding: 24px 0 24px !important;
+  }
+
+  section[id^="section-perguntas-"] .j-panel-glow,
+  section[id^="section-perguntas-"] .perguntas-wrap {
+    width: min(880px, 92vw) !important;
+    max-width: 880px !important;
+    margin: 0 auto !important;
+  }
+
+  section[id^="section-perguntas-"] .j-arcane-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+
+  section[id^="section-perguntas-"] .pergaminho-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+
+  .jp-ai-response-wrap,
+  #jp-ai-response,
+  .jp-ai-response,
+  .jp-progress-inline,
+  .perguntas-controls {
+    max-width: 100% !important;
+  }
+}
+
+/* ===========================================================
    HUD — BARRA TOPO (BLOCOS)
-   ============================ */
+   =========================================================== */
 
 .progress-top {
   position: absolute;
@@ -104,10 +171,9 @@
   pointer-events: none;
 }
 
-
-/* ============================
+/* ===========================================================
    HUD — BARRA MEIO (PERGUNTAS)
-   ============================ */
+   =========================================================== */
 
 .progress-middle {
   position: absolute;
@@ -155,10 +221,9 @@
   letter-spacing: 0.04em;
 }
 
-
-/* ============================
+/* ===========================================================
    HUD — AMPULHETA / TOTAL
-   ============================ */
+   =========================================================== */
 
 .progress-total,
 .jp-total-top {
@@ -193,10 +258,9 @@
   text-shadow: 0 0 10px rgba(255, 220, 120, 0.35);
 }
 
-
-/* ============================
+/* ===========================================================
    BARRAS DE PROGRESSO INLINE
-   ============================ */
+   =========================================================== */
 
 #progress-block-outer,
 #progress-question-outer,
@@ -251,10 +315,9 @@
   font-size: 1rem !important;
 }
 
-
-/* ============================
+/* ===========================================================
    CABEÇALHO / BLOCO / PERGAMINHO
-   ============================ */
+   =========================================================== */
 
 .perguntas-header {
   display: flex;
@@ -291,9 +354,11 @@
   background-repeat: no-repeat;
 }
 
-/* Pergunta datilografada */
 .jp-question-typed,
 #jp-question-typed {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
   min-height: 42px;
   margin-bottom: 14px;
   font-size: 20px;
@@ -302,9 +367,10 @@
   font-weight: 600;
   text-shadow: 0 2px 6px rgba(0, 0, 0, 0.95) !important;
   animation: none !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
-/* container do progresso no bloco */
 .perguntas-no-bloco {
   position: relative !important;
   margin-top: 15px !important;
@@ -322,10 +388,9 @@
   margin-top: 4px !important;
 }
 
-
-/* ============================
-   ANSWER FRAME (moldura medieval)
-   ============================ */
+/* ===========================================================
+   ANSWER FRAME
+   =========================================================== */
 
 .jp-answer-frame {
   position: relative;
@@ -363,17 +428,15 @@
   z-index: 5;
 }
 
-/* Microfone oculto */
 .jp-answer-frame .jp-mic {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
 }
 
-
-/* ============================
+/* ===========================================================
    DEVOLUTIVA DA API
-   ============================ */
+   =========================================================== */
 
 .jp-ai-response-wrap,
 #jp-ai-response,
@@ -394,6 +457,7 @@
   color: #f7e7c4;
   text-shadow: 0 1px 2px #000;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 #jp-ai-response[hidden] {
@@ -409,7 +473,6 @@
   opacity: 0.92;
 }
 
-/* barra de progresso inline do bloco */
 .jp-progress-inline {
   width: 100%;
   max-width: 720px;
@@ -417,6 +480,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  box-sizing: border-box;
 }
 
 .jp-progress-bar {
@@ -443,10 +507,9 @@
   color: #fff3c0;
 }
 
-
-/* ============================
-   BOTÕES — 4 LADO A LADO
-   ============================ */
+/* ===========================================================
+   BOTÕES
+   =========================================================== */
 
 .perguntas-controls {
   display: grid !important;
@@ -455,7 +518,7 @@
   width: 100% !important;
   max-width: 720px !important;
   margin: 14px auto 0 !important;
-  padding: 10px 20px !important;
+  padding: 10px 0 0 !important;
   align-items: stretch !important;
   box-sizing: border-box !important;
 }
@@ -495,7 +558,6 @@
   overflow: hidden !important;
 }
 
-/* Botão Confirmar/Avançar — ligeiramente maior */
 .perguntas-controls .btn-confirm,
 #jp-btn-confirmar {
   flex: 1.6 !important;
@@ -528,10 +590,9 @@
   transform: scale(0.98) !important;
 }
 
-
-/* ============================
-   MIC — ESTADO GRAVANDO
-   ============================ */
+/* ===========================================================
+   MIC
+   =========================================================== */
 
 #jp-btn-falar.recording,
 .perguntas-controls #jp-btn-falar.recording,
@@ -556,54 +617,49 @@
   animation: blink 1s infinite;
 }
 
+/* ===========================================================
+   TEMAS
+   =========================================================== */
 
-/* ============================
-   TEMAS POR GUIA — VARIÁVEIS
-   ============================ */
-
-/* Padrão / Zion */
 #section-perguntas-raizes,
 #section-perguntas-reflexoes,
 #section-perguntas-crescimento,
 #section-perguntas-integracao,
 #section-perguntas-sintese {
-  --guia-main:   #ffd54a;
-  --guia-soft:   rgba(255, 213, 74, 0.32);
+  --guia-main: #ffd54a;
+  --guia-soft: rgba(255, 213, 74, 0.32);
   --guia-strong: rgba(255, 213, 74, 0.68);
-  --guia-text:   #fff4c8;
-  --btn-press:   #b31217;
+  --guia-text: #fff4c8;
+  --btn-press: #b31217;
 }
 
-/* Lumen */
 body[data-guia="lumen"] #section-perguntas-raizes,
 body[data-guia="lumen"] #section-perguntas-reflexoes,
 body[data-guia="lumen"] #section-perguntas-crescimento,
 body[data-guia="lumen"] #section-perguntas-integracao,
 body[data-guia="lumen"] #section-perguntas-sintese {
-  --guia-main:   #9cff57;
-  --guia-soft:   rgba(156, 255, 87, 0.30);
+  --guia-main: #9cff57;
+  --guia-soft: rgba(156, 255, 87, 0.30);
   --guia-strong: rgba(156, 255, 87, 0.64);
-  --guia-text:   #efffde;
+  --guia-text: #efffde;
 }
 
-/* Arion */
 body[data-guia="arion"] #section-perguntas-raizes,
 body[data-guia="arion"] #section-perguntas-reflexoes,
 body[data-guia="arion"] #section-perguntas-crescimento,
 body[data-guia="arion"] #section-perguntas-integracao,
-body[data-guia="arion"] #section-perguntas-sintese {
-  --guia-main:   #6dc8ff;
-  --guia-soft:   rgba(109, 200, 255, 0.30);
+body[data-guia="arion"] #section-perguntas-sintese,
+body[data-guia="arian"] #section-perguntas-raizes,
+body[data-guia="arian"] #section-perguntas-reflexoes,
+body[data-guia="arian"] #section-perguntas-crescimento,
+body[data-guia="arian"] #section-perguntas-integracao,
+body[data-guia="arian"] #section-perguntas-sintese {
+  --guia-main: #6dc8ff;
+  --guia-soft: rgba(109, 200, 255, 0.30);
   --guia-strong: rgba(109, 200, 255, 0.66);
-  --guia-text:   #e3f7ff;
+  --guia-text: #e3f7ff;
 }
 
-
-/* ============================
-   TEMAS POR GUIA — APLICAÇÃO
-   ============================ */
-
-/* Título do bloco */
 .jp-block-title,
 .perguntas-title,
 #question-block-title {
@@ -613,7 +669,6 @@ body[data-guia="arion"] #section-perguntas-sintese {
     0 0 24px var(--guia-strong) !important;
 }
 
-/* Caixa de resposta */
 #jp-answer-input,
 .jp-answer-input {
   border: 2px solid var(--guia-main) !important;
@@ -622,7 +677,6 @@ body[data-guia="arion"] #section-perguntas-sintese {
     inset 0 0 10px rgba(255, 255, 255, 0.04) !important;
 }
 
-/* Devolutiva */
 .jp-ai-response-label,
 #jp-ai-response-wrap {
   color: var(--guia-text) !important;
@@ -633,7 +687,6 @@ body[data-guia="arion"] #section-perguntas-sintese {
   box-shadow: 0 0 18px var(--guia-soft) !important;
 }
 
-/* Barra de progresso do bloco */
 .jp-progress-fill,
 #progress-question-fill {
   background: linear-gradient(
@@ -652,7 +705,6 @@ body[data-guia="arion"] #section-perguntas-sintese {
   text-shadow: 0 0 8px var(--guia-soft) !important;
 }
 
-/* Botões com aura do guia */
 body[data-guia="lumen"] .perguntas-controls .btn-perguntas {
   border-color: #00ff9d !important;
   box-shadow: 0 6px 18px rgba(0,0,0,0.6), 0 0 20px rgba(0,255,157,0.7) !important;
@@ -669,10 +721,9 @@ body[data-guia="arion"] .perguntas-controls .btn-perguntas {
   box-shadow: 0 6px 18px rgba(0,0,0,0.6), 0 0 25px rgba(255,0,255,0.8) !important;
 }
 
-
-/* ============================
+/* ===========================================================
    VÍDEO DE TRANSIÇÃO
-   ============================ */
+   =========================================================== */
 
 #videoOverlay,
 .video-overlay {
@@ -709,10 +760,9 @@ body[data-guia="arion"] .perguntas-controls .btn-perguntas {
   display: block !important;
 }
 
-
-/* ============================
-   ANIMAÇÕES (uma de cada)
-   ============================ */
+/* ===========================================================
+   ANIMAÇÕES
+   =========================================================== */
 
 @keyframes guiaGlow {
   0%, 100% {
@@ -771,20 +821,12 @@ body[data-guia="arion"] .perguntas-controls .btn-perguntas {
   100% { box-shadow: 0 0 25px var(--progress-main), 0 0 50px var(--progress-glow-1), 0 0 80px var(--progress-glow-2); }
 }
 
-html, body{
-  min-height: 100%;
-}
+/* ===========================================================
+   MOBILE — MANTÉM O QUE ESTAVA BOM
+   =========================================================== */
 
-body{
-  overflow-x: hidden;
-}
-
-/* ==========================================
-   MOBILE PROFISSIONAL — SCROLL DA DEVOLUTIVA
-   ========================================== */
-
-@media (max-width: 768px){
-  section[id^="section-perguntas-"]{
+@media (max-width: 768px) {
+  section[id^="section-perguntas-"] {
     min-height: 100svh !important;
     height: auto !important;
     overflow-y: auto !important;
@@ -802,24 +844,24 @@ body{
   section[id^="section-perguntas-"] .pergaminho-content,
   section[id^="section-perguntas-"] .j-panel-glow,
   section[id^="section-perguntas-"] .j-perg-v-inner,
-  section[id^="section-perguntas-"] .j-arcane-card{
+  section[id^="section-perguntas-"] .j-arcane-card {
     min-height: unset !important;
     height: auto !important;
     max-height: none !important;
     overflow: visible !important;
   }
 
-  section[id^="section-perguntas-"] .pergaminho-content{
+  section[id^="section-perguntas-"] .pergaminho-content {
     padding-bottom: 14px !important;
   }
 
-  section[id^="section-perguntas-"] .jp-answer-input{
+  section[id^="section-perguntas-"] .jp-answer-input {
     min-height: 72px !important;
     max-height: 100px !important;
     resize: none !important;
   }
 
-  section[id^="section-perguntas-"] .jp-ai-response-wrap{
+  section[id^="section-perguntas-"] .jp-ai-response-wrap {
     margin: 8px auto 10px !important;
     min-height: 0 !important;
     max-height: none !important;
@@ -827,7 +869,7 @@ body{
   }
 
   section[id^="section-perguntas-"] .jp-ai-response,
-  section[id^="section-perguntas-"] #jp-ai-response{
+  section[id^="section-perguntas-"] #jp-ai-response {
     max-height: 185px !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
@@ -838,18 +880,18 @@ body{
   }
 
   section[id^="section-perguntas-"] .jp-ai-response::-webkit-scrollbar,
-  section[id^="section-perguntas-"] #jp-ai-response::-webkit-scrollbar{
+  section[id^="section-perguntas-"] #jp-ai-response::-webkit-scrollbar {
     width: 8px;
   }
 
   section[id^="section-perguntas-"] .jp-ai-response::-webkit-scrollbar-track,
-  section[id^="section-perguntas-"] #jp-ai-response::-webkit-scrollbar-track{
+  section[id^="section-perguntas-"] #jp-ai-response::-webkit-scrollbar-track {
     background: rgba(255,255,255,.06);
     border-radius: 999px;
   }
 
   section[id^="section-perguntas-"] .jp-ai-response::-webkit-scrollbar-thumb,
-  section[id^="section-perguntas-"] #jp-ai-response::-webkit-scrollbar-thumb{
+  section[id^="section-perguntas-"] #jp-ai-response::-webkit-scrollbar-thumb {
     background: linear-gradient(
       180deg,
       rgba(255,225,130,.98),
@@ -859,11 +901,11 @@ body{
     border: 1px solid rgba(0,0,0,.18);
   }
 
-  section[id^="section-perguntas-"] .jp-progress-inline{
+  section[id^="section-perguntas-"] .jp-progress-inline {
     margin: 8px auto 8px !important;
   }
 
-  section[id^="section-perguntas-"] .perguntas-controls{
+  section[id^="section-perguntas-"] .perguntas-controls {
     grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
     gap: 8px !important;
     margin: 10px auto 0 !important;
@@ -874,7 +916,7 @@ body{
   section[id^="section-perguntas-"] #jp-btn-falar,
   section[id^="section-perguntas-"] #jp-btn-mic,
   section[id^="section-perguntas-"] #jp-btn-apagar,
-  section[id^="section-perguntas-"] #jp-btn-confirmar{
+  section[id^="section-perguntas-"] #jp-btn-confirmar {
     min-height: 46px !important;
     height: 46px !important;
     font-size: 11px !important;
@@ -882,16 +924,16 @@ body{
   }
 }
 
-/* ==========================================
+/* ===========================================================
    DEVOLUTIVA DO GUIA — ORÁCULO VIVO
-   ========================================== */
+   =========================================================== */
 
-.jp-ai-response-wrap{
+.jp-ai-response-wrap {
   position: relative;
 }
 
 #jp-ai-response,
-.jp-ai-response{
+.jp-ai-response {
   position: relative;
   overflow-x: hidden;
   opacity: 0;
@@ -915,140 +957,52 @@ body{
 #jp-ai-response.is-visible,
 .jp-ai-response.is-visible,
 #jp-ai-response.oracle-ready,
-.jp-ai-response.oracle-ready{
+.jp-ai-response.oracle-ready {
   opacity: 1;
   transform: translateY(0) scale(1);
   filter: blur(0);
 }
 
 #jp-ai-response .ai-line,
-.jp-ai-response .ai-line{
+.jp-ai-response .ai-line {
   opacity: 0;
   transform: translateY(6px);
   filter: blur(3px);
 }
 
 #jp-ai-response.is-visible .ai-line,
-.jp-ai-response.is-visible .ai-line{
+.jp-ai-response.is-visible .ai-line {
   animation: aiLineReveal .45s ease forwards;
 }
 
 #jp-ai-response .oracle-line,
-.jp-ai-response .oracle-line{
+.jp-ai-response .oracle-line {
   min-height: 1.2em;
   animation: oracleGlow 2.2s ease-in-out infinite alternate;
 }
 
-#jp-ai-response::before,
-.jp-ai-response::before{
-  content: "";
-  position: absolute;
-  inset: 0;
-  transform: translateX(-120%);
-  background: linear-gradient(
-    100deg,
-    transparent 0%,
-    rgba(255,255,255,0.02) 35%,
-    rgba(255,255,255,0.18) 50%,
-    rgba(255,255,255,0.02) 65%,
-    transparent 100%
-  );
-  pointer-events: none;
-  opacity: 0;
-}
-
-#jp-ai-response.is-revealing::before,
-.jp-ai-response.is-revealing::before{
-  opacity: 1;
-  animation: guiaRevealSweep 1.2s ease forwards;
-}
-
-#jp-btn-confirmar.is-error{
-  box-shadow: 0 0 14px rgba(255,120,120,.45);
-}
-
-@keyframes aiLineReveal{
-  to{
+@keyframes aiLineReveal {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+    filter: blur(3px);
+  }
+  to {
     opacity: 1;
     transform: translateY(0);
     filter: blur(0);
   }
 }
 
-@keyframes oracleGlow{
-  from{
-    text-shadow: 0 0 6px var(--guia-soft), 0 0 10px rgba(255,255,255,.04);
+@keyframes oracleGlow {
+  from {
+    text-shadow:
+      0 0 2px rgba(255,215,120,.15),
+      0 0 6px rgba(255,215,120,.12);
   }
-  to{
-    text-shadow: 0 0 10px var(--guia-soft), 0 0 18px var(--guia-strong);
+  to {
+    text-shadow:
+      0 0 4px rgba(255,215,120,.28),
+      0 0 12px rgba(255,215,120,.22);
   }
-}
-
-@keyframes guiaRevealSweep{
-  0%{
-    transform: translateX(-120%);
-  }
-  100%{
-    transform: translateX(120%);
-  }
-}
-@media (min-width: 769px) {
-  section[id^="section-perguntas-"] {
-    display: flex !important;
-    justify-content: center !important;
-    align-items: flex-start !important;
-    overflow-x: hidden !important;
-  }
-
-  section[id^="section-perguntas-"] .j-panel-glow,
-  section[id^="section-perguntas-"] .perguntas-wrap {
-    width: min(90vw, 820px) !important;
-    max-width: 820px !important;
-    margin: 0 auto !important;
-    transform: none !important;
-  }
-
-  section[id^="section-perguntas-"] .j-arcane-card,
-  section[id^="section-perguntas-"] .pergaminho-content {
-    width: 100% !important;
-    max-width: 100% !important;
-    overflow-x: hidden !important;
-  }
-}
-/* ==========================================
-   FIX DEFINITIVO DESKTOP — PERGUNTAS
-   ========================================== */
-
-@media (min-width: 769px) {
-
-  /* trava largura da página */
-  section[id^="section-perguntas-"] {
-    display: flex !important;
-    justify-content: center !important;
-    align-items: flex-start !important;
-    overflow-x: hidden !important;
-    padding: 20px 0 !important;
-  }
-
-  /* container principal */
-  section[id^="section-perguntas-"] .j-panel-glow {
-    width: min(880px, 92vw) !important;
-    max-width: 880px !important;
-    margin: 0 auto !important;
-    transform: none !important;
-  }
-
-  /* remove expansão lateral */
-  section[id^="section-perguntas-"] .perguntas-wrap {
-    width: 100% !important;
-    max-width: 100% !important;
-  }
-
-  /* garante alinhamento correto */
-  section[id^="section-perguntas-"] .j-arcane-card {
-    width: 100% !important;
-    max-width: 100% !important;
-    overflow: hidden !important;
-  }
-
 }
