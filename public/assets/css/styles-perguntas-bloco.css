@@ -25,53 +25,6 @@ body {
 }
 
 /* ===========================================================
-   ESCAPE DO CONTAINER PAI (sem tocar em outras páginas)
-   Técnica: negative margin + width 100vw, escopo 100% isolado
-   na própria section. Não usa :has(), não afeta nenhum outro
-   elemento fora de section[id^="section-perguntas-"].
-   =========================================================== */
-
-section[id^="section-perguntas-"],
-.section-perguntas {
-  width: 100vw !important;
-  max-width: 100vw !important;
-  /* Quebra qualquer container pai com max-width (ex: #section-conteudo: 600px) */
-  margin-left: calc(-50vw + 50%) !important;
-  margin-right: calc(-50vw + 50%) !important;
-  box-sizing: border-box !important;
-  overflow-x: hidden !important;
-}
-
-/* ===========================================================
-   REMOVE SIDEBAR NO DESKTOP
-   =========================================================== */
-
-@media (min-width: 769px) {
-  /* Oculta sidebar genérica de builders (Elementor, WPBakery, etc.) */
-  section[id^="section-perguntas-"] ~ aside,
-  section[id^="section-perguntas-"] ~ .sidebar,
-  section[id^="section-perguntas-"] ~ [class*="sidebar"],
-  section[id^="section-perguntas-"] ~ [id*="sidebar"],
-  .section-perguntas ~ aside,
-  .section-perguntas ~ .sidebar,
-  .section-perguntas ~ [class*="sidebar"],
-  .section-perguntas ~ [id*="sidebar"] {
-    display: none !important;
-    width: 0 !important;
-    overflow: hidden !important;
-  }
-
-  /* Elementor — garante que a seção ocupe 100vw */
-  .elementor-section:has(section[id^="section-perguntas-"]),
-  .elementor-container:has(section[id^="section-perguntas-"]) {
-    width: 100% !important;
-    max-width: 100% !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-  }
-}
-
-/* ===========================================================
    WRAPPER GERAL
    =========================================================== */
 
@@ -86,6 +39,8 @@ section[id^="section-perguntas-"] {
   font-family: "Cardo", serif;
   color: #f5e9d6;
   background: transparent;
+  overflow-x: hidden !important;
+  box-sizing: border-box;
 }
 
 .section-perguntas .perguntas-wrap,
@@ -137,14 +92,25 @@ section[id^="section-perguntas-"] .pergaminho-content {
    =========================================================== */
 
 @media (min-width: 769px) {
+  /* Seção ocupa a tela toda mas sem scrollbar lateral */
   section[id^="section-perguntas-"] {
-    padding: 24px 0 24px !important;
+    padding: 32px 0 32px !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
   }
 
+  section[id^="section-perguntas-"]::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+  }
+
+  /* Card mais fino e centralizado — proporcional ao mobile */
   section[id^="section-perguntas-"] .j-panel-glow,
   section[id^="section-perguntas-"] .perguntas-wrap {
-    width: min(880px, 92vw) !important;
-    max-width: 880px !important;
+    width: min(500px, 88vw) !important;
+    max-width: 500px !important;
     margin: 0 auto !important;
   }
 
@@ -292,7 +258,7 @@ section[id^="section-perguntas-"] .pergaminho-content {
   font-size: 1.9rem;
   display: inline-block;
   animation: ampulheta-flow 6s ease-in-out infinite,
-    ampulheta-glow 3s ease-in-out infinite alternate;
+             ampulheta-glow 3s ease-in-out infinite alternate;
   transform-origin: center;
 }
 
@@ -835,34 +801,34 @@ body[data-guia="arion"] .perguntas-controls .btn-perguntas {
 }
 
 @keyframes barra-glow {
-  0% { box-shadow: 0 0 15px var(--progress-main), 0 0 30px var(--progress-glow-1); }
+  0%   { box-shadow: 0 0 15px var(--progress-main), 0 0 30px var(--progress-glow-1); }
   100% { box-shadow: 0 0 30px var(--progress-main), 0 0 60px var(--progress-glow-1), inset 0 0 35px var(--progress-glow-2); }
 }
 
 @keyframes ampulheta-flow {
-  0% { transform: rotate(0deg) scale(1); }
-  40% { transform: rotate(180deg) scale(1.05); }
-  60% { transform: rotate(180deg) scale(1.05); }
+  0%   { transform: rotate(0deg) scale(1); }
+  40%  { transform: rotate(180deg) scale(1.05); }
+  60%  { transform: rotate(180deg) scale(1.05); }
   100% { transform: rotate(360deg) scale(1); }
 }
 
 @keyframes ampulheta-glow {
-  0% { filter: drop-shadow(0 0 4px rgba(255, 210, 120, 0.4)); }
+  0%   { filter: drop-shadow(0 0 4px rgba(255, 210, 120, 0.4)); }
   100% { filter: drop-shadow(0 0 12px rgba(255, 210, 120, 0.8)); }
 }
 
 @keyframes pulse-recording {
   0%, 100% { box-shadow: 0 0 30px #ff1744, 0 0 60px #ff4444, 0 0 90px rgba(255, 23, 68, 0.8); }
-  50% { box-shadow: 0 0 45px #ff1744, 0 0 80px #ff6666, 0 0 120px rgba(255, 23, 68, 1); }
+  50%       { box-shadow: 0 0 45px #ff1744, 0 0 80px #ff6666, 0 0 120px rgba(255, 23, 68, 1); }
 }
 
 @keyframes blink {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
+  50%       { opacity: 0.3; }
 }
 
 @keyframes btn-glow {
-  0% { box-shadow: 0 0 15px var(--progress-main), 0 0 30px var(--progress-glow-1), 0 0 50px var(--progress-glow-2); }
+  0%   { box-shadow: 0 0 15px var(--progress-main), 0 0 30px var(--progress-glow-1), 0 0 50px var(--progress-glow-2); }
   100% { box-shadow: 0 0 25px var(--progress-main), 0 0 50px var(--progress-glow-1), 0 0 80px var(--progress-glow-2); }
 }
 
@@ -872,11 +838,6 @@ body[data-guia="arion"] .perguntas-controls .btn-perguntas {
 
 @media (max-width: 768px) {
   section[id^="section-perguntas-"] {
-    /* Reseta o negative margin no mobile — não precisa dele */
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    width: 100% !important;
-    max-width: 100% !important;
     min-height: 100svh !important;
     height: auto !important;
     overflow-y: auto !important;
