@@ -992,3 +992,26 @@ body{
     transform: translateX(120%);
   }
 }
+@media (min-width: 769px) {
+  section[id^="section-perguntas-"] {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    overflow-x: hidden !important;
+  }
+
+  section[id^="section-perguntas-"] .j-panel-glow,
+  section[id^="section-perguntas-"] .perguntas-wrap {
+    width: min(90vw, 820px) !important;
+    max-width: 820px !important;
+    margin: 0 auto !important;
+    transform: none !important;
+  }
+
+  section[id^="section-perguntas-"] .j-arcane-card,
+  section[id^="section-perguntas-"] .pergaminho-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+}
