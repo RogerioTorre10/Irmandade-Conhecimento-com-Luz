@@ -1,4 +1,4 @@
-/* /assets/js/section-final.js — v8.1
+/* /assets/js/section-final.js — v8.2
  * Página final da Jornada Essencial
  * - Compatível com section-perguntas-bloco.js
  * - Coleta respostas via jornada-paper-qa.js
@@ -6,6 +6,7 @@
  * - PDF só libera após devolutiva final
  * - Mantém PDF + SelfieCard + Portal
  * - Fallback automático para Lumen quando Zion/Arion falharem
+ * - I18N blindado
  */
 
 (function () {
@@ -35,10 +36,26 @@
     const l4 = document.documentElement?.lang;
     return (l1 || l2 || l3 || l4 || 'pt-BR').toString().trim();
   }
-  
-  function t(key, fallback = '') {
-  return window.i18n?.t?.(key) || fallback;
-}
+
+  function t(key, fallback = '', vars = {}) {
+    let txt = window.i18n?.t?.(key) || fallback;
+    txt = String(txt).replace(/\{\{\s*(\w+)\s*\}\}/g, (_, token) => {
+      return vars[token] != null ? String(vars[token]) : `{{${token}}}`;
+    });
+    return txt;
+  }
+
+  function resolveTextFromEl(el, fallback = '') {
+    if (!el) return fallback || '';
+    return (
+      t(el.dataset?.i18nText || '', '') ||
+      el.dataset?.text ||
+      el.dataset?.original ||
+      el.textContent ||
+      fallback ||
+      ''
+    ).trim();
+  }
 
   function getStorageKey() {
     return (
@@ -113,7 +130,7 @@
     const el = root?.querySelector?.('#finalPdfStatus');
     if (!el) return;
     el.classList.remove('ok', 'err');
-    if (kind) el.classList.add(kind);
+    if (kind === 'ok' || kind === 'err') el.classList.add(kind);
     el.textContent = msg;
   }
 
@@ -135,108 +152,107 @@
       document.querySelector('.final-guide-feedback')
     );
   }
-  
-function getStoredBlockFeedbacks() {
-  try {
-    return JSON.parse(sessionStorage.getItem('JORNADA_DEVOLUTIVAS_BLOCO') || '[]');
-  } catch {
-    return [];
+
+  function getStoredBlockFeedbacks() {
+    try {
+      return JSON.parse(sessionStorage.getItem('JORNADA_DEVOLUTIVAS_BLOCO') || '[]');
+    } catch {
+      return [];
+    }
   }
-}
 
-function buildPdfBlocksFromSession() {
-  const feedbacks = getStoredBlockFeedbacks();
+  function buildPdfBlocksFromSession() {
+    const feedbacks = getStoredBlockFeedbacks();
 
-  // fallback baseado no que já foi salvo das devolutivas por bloco
-  return feedbacks.map((item) => ({
-    titulo: item?.blocoTitulo || item?.blocoId || 'Bloco',
-    respostas: Array.isArray(item?.respostas) ? item.respostas : [],
-    devolutiva: String(item?.texto || '').trim()
-  }));
-}
+    return feedbacks.map((item) => ({
+      titulo: item?.blocoTitulo || item?.blocoId || 'Bloco',
+      respostas: Array.isArray(item?.respostas) ? item.respostas : [],
+      devolutiva: String(item?.texto || '').trim()
+    }));
+  }
 
   function getStoredFinalFeedback() {
-  return String(
-    window.__JORNADA_DEVOLUTIVA_FINAL__ ||
-    sessionStorage.getItem('JORNADA_DEVOLUTIVA_FINAL') ||
-    ''
-  ).trim();
-}
-
-function getStoredAnswersFlat() {
-  try {
-    const raw =
-      JSON.parse(sessionStorage.getItem('JORNADA_RESPOSTAS') || '[]') ||
-      JSON.parse(localStorage.getItem('JORNADA_RESPOSTAS') || '[]') ||
-      [];
-
-    if (Array.isArray(raw)) {
-      return raw.map((x) => String(x || '').trim()).filter(Boolean);
-    }
-
-    return [];
-  } catch {
-    return [];
+    return String(
+      window.__JORNADA_DEVOLUTIVA_FINAL__ ||
+      sessionStorage.getItem('JORNADA_DEVOLUTIVA_FINAL') ||
+      ''
+    ).trim();
   }
-}
 
-function getParticipantNameFinal() {
-  return (
-    sessionStorage.getItem('jornada.nome') ||
-    localStorage.getItem('JORNADA_NOME') ||
-    localStorage.getItem('jc.nome') ||
-    'Participante'
-  );
-}
+  function getStoredAnswersFlat() {
+    try {
+      const raw =
+        JSON.parse(sessionStorage.getItem('JORNADA_RESPOSTAS') || '[]') ||
+        JSON.parse(localStorage.getItem('JORNADA_RESPOSTAS') || '[]') ||
+        [];
 
-function getGuideFinal() {
-  return (
-    window.__GUIA_FINAL_EFETIVO__ ||
-    sessionStorage.getItem('jornada.guia') ||
-    localStorage.getItem('JORNADA_GUIA') ||
-    localStorage.getItem('jornada.guia') ||
-    document.body.dataset.guia ||
-    'lumen'
-  );
-}
+      if (Array.isArray(raw)) {
+        return raw.map((x) => String(x || '').trim()).filter(Boolean);
+      }
 
-function getSelfieCardFinal() {
-  return (
-    sessionStorage.getItem('JORNADA_SELFIECARD') ||
-    localStorage.getItem('JORNADA_SELFIECARD') ||
-    sessionStorage.getItem('JORNADA_SELFIE_CARD') ||
-    localStorage.getItem('JORNADA_SELFIE_CARD') ||
-    sessionStorage.getItem('selfieCard') ||
-    localStorage.getItem('selfieCard') ||
-    sessionStorage.getItem('selfieBase64') ||
-    localStorage.getItem('selfieBase64') ||
-    localStorage.getItem('JORNADA_SELFIECARD_B64') ||
-    sessionStorage.getItem('JORNADA_SELFIECARD_B64') ||
-    ''
-  );
-}
+      return [];
+    } catch {
+      return [];
+    }
+  }
 
-function buildFinalPdfPayload() {
-  const nome = getParticipantNameFinal();
-  const guia = getGuideFinal();
-  const selfieCard = getSelfieCardFinal();
-  const devolutivaFinal = getStoredFinalFeedback();
-  const blocos = buildPdfBlocksFromSession();
+  function getParticipantNameFinal() {
+    return (
+      sessionStorage.getItem('jornada.nome') ||
+      localStorage.getItem('JORNADA_NOME') ||
+      localStorage.getItem('jc.nome') ||
+      'Participante'
+    );
+  }
 
-  const respostas = blocos.length
-    ? blocos.flatMap((b) => Array.isArray(b.respostas) ? b.respostas : [])
-    : getStoredAnswersFlat();
+  function getGuideFinal() {
+    return (
+      window.__GUIA_FINAL_EFETIVO__ ||
+      sessionStorage.getItem('jornada.guia') ||
+      localStorage.getItem('JORNADA_GUIA') ||
+      localStorage.getItem('jornada.guia') ||
+      document.body.dataset.guia ||
+      'lumen'
+    );
+  }
 
-  return {
-    nome,
-    guia,
-    respostas,
-    blocos,
-    selfieCard,
-    devolutivaFinal
-  };
-}
-  
+  function getSelfieCardFinal() {
+    return (
+      sessionStorage.getItem('JORNADA_SELFIECARD') ||
+      localStorage.getItem('JORNADA_SELFIECARD') ||
+      sessionStorage.getItem('JORNADA_SELFIE_CARD') ||
+      localStorage.getItem('JORNADA_SELFIE_CARD') ||
+      sessionStorage.getItem('selfieCard') ||
+      localStorage.getItem('selfieCard') ||
+      sessionStorage.getItem('selfieBase64') ||
+      localStorage.getItem('selfieBase64') ||
+      localStorage.getItem('JORNADA_SELFIECARD_B64') ||
+      sessionStorage.getItem('JORNADA_SELFIECARD_B64') ||
+      ''
+    );
+  }
+
+  function buildFinalPdfPayload() {
+    const nome = getParticipantNameFinal();
+    const guia = getGuideFinal();
+    const selfieCard = getSelfieCardFinal();
+    const devolutivaFinal = getStoredFinalFeedback();
+    const blocos = buildPdfBlocksFromSession();
+
+    const respostas = blocos.length
+      ? blocos.flatMap((b) => Array.isArray(b.respostas) ? b.respostas : [])
+      : getStoredAnswersFlat();
+
+    return {
+      nome,
+      guia,
+      respostas,
+      blocos,
+      selfieCard,
+      devolutivaFinal
+    };
+  }
+
   function getFinalButtons(section) {
     const scope = section || document.getElementById(SECTION_ID) || document;
     return [
@@ -279,8 +295,10 @@ function buildFinalPdfPayload() {
     });
   }
 
-  function lockFinalButtons(section, thinkingText = 'Guia pensando...') {
-    setFinalButtonsBusy(section, true, { thinkingText });
+  function lockFinalButtons(section, thinkingText = null) {
+    setFinalButtonsBusy(section, true, {
+      thinkingText: thinkingText || t('final.thinking', 'Guia pensando...')
+    });
   }
 
   function unlockFinalButtons(section) {
@@ -290,7 +308,7 @@ function buildFinalPdfPayload() {
   function showFinalError(section, msg) {
     const box = getFinalFeedbackBox(section);
     if (box) {
-      box.textContent = msg || 'Não consegui concluir a devolutiva final do guia.';
+      box.textContent = msg || t('final.feedbackError', 'Não consegui concluir a devolutiva final do guia.');
     }
   }
 
@@ -505,52 +523,52 @@ function buildFinalPdfPayload() {
   }
 
   function getDadosPessoaisPayload() {
-  try {
-    return JSON.parse(sessionStorage.getItem('JORNADA_DADOS_PESSOAIS') || '{}');
-  } catch {
-    return {};
+    try {
+      return JSON.parse(sessionStorage.getItem('JORNADA_DADOS_PESSOAIS') || '{}');
+    } catch {
+      return {};
+    }
   }
-}
 
   // ================================
   // PAYLOAD FINAL
   // ================================
-function buildFinalPayloadDiamante() {
-  const s = getJornadaState();
+  function buildFinalPayloadDiamante() {
+    const s = getJornadaState();
 
-  const nome = String(
-    s.nome ?? s.name ?? s.participantName ?? s.participante ??
-    localStorage.getItem('JORNADA_NOME') ?? sessionStorage.getItem('JORNADA_NOME') ?? ''
-  ).trim();
+    const nome = String(
+      s.nome ?? s.name ?? s.participantName ?? s.participante ??
+      localStorage.getItem('JORNADA_NOME') ?? sessionStorage.getItem('JORNADA_NOME') ?? ''
+    ).trim();
 
-  const guiaNorm = readGuideFromEverywhere(s);
-  const guia = String(guiaNorm.id || '').trim().toLowerCase();
+    const guiaNorm = readGuideFromEverywhere(s);
+    const guia = String(guiaNorm.id || '').trim().toLowerCase();
 
-  const respostasEstruturadas = collectPerguntasPayload();
-  const respostas = respostasEstruturadas
-    .map((item) => String(item.resposta || '').trim())
-    .filter(Boolean);
+    const respostasEstruturadas = collectPerguntasPayload();
+    const respostas = respostasEstruturadas
+      .map((item) => String(item.resposta || '').trim())
+      .filter(Boolean);
 
-  const selfieCard = readSelfieCardFromEverywhere(s);
-  const devolutivaFinal = getStoredFinalFeedback();
-  const dadosPessoais = getDadosPessoaisPayload();
+    const selfieCard = readSelfieCardFromEverywhere(s);
+    const devolutivaFinal = getStoredFinalFeedback();
+    const dadosPessoais = getDadosPessoaisPayload();
 
-  const payload = {
-    nome,
-    guia,
-    respostas,
-    blocos: buildPdfBlocksFromSession(),
-    selfieCard,
-    devolutivaFinal,
-    dadosPessoais
-  };
+    const payload = {
+      nome,
+      guia,
+      respostas,
+      blocos: buildPdfBlocksFromSession(),
+      selfieCard,
+      devolutivaFinal,
+      dadosPessoais
+    };
 
-  console.log('[FINAL][PAYLOAD NORMALIZED]', payload, '[GUIA]', guiaNorm);
-  return payload;
-}
+    console.log('[FINAL][PAYLOAD NORMALIZED]', payload, '[GUIA]', guiaNorm);
+    return payload;
+  }
 
-window.buildFinalPayloadDiamante = buildFinalPayloadDiamante;
-  
+  window.buildFinalPayloadDiamante = buildFinalPayloadDiamante;
+
   // ================================
   // TTS
   // ================================
@@ -735,52 +753,52 @@ window.buildFinalPayloadDiamante = buildFinalPayloadDiamante;
   }
 
   function buildGuideFallbackText(guiaRaw, nomeRaw) {
-  const guia = normalizeGuide(guiaRaw).id || 'lumen';
-  const nome = String(nomeRaw || 'Caminhante').trim() || 'Caminhante';
-  const lang = getActiveLang();
+    const guia = normalizeGuide(guiaRaw).id || 'lumen';
+    const nome = String(nomeRaw || 'Caminhante').trim() || 'Caminhante';
+    const lang = getActiveLang();
 
-  const fallbackI18n = {
-    'pt-BR': {
-      lumen: `${nome}, sua jornada revelou sinais de sensibilidade, coragem e abertura interior...`,
-      zion: `${nome}, você atravessou esta jornada com honestidade e presença...`,
-      arion: `${nome}, sua travessia demonstrou delicadeza, profundidade e desejo sincero de evolução...`
-    },
-    'en-US': {
-      lumen: `${nome}, your journey revealed signs of sensitivity, courage, and inner openness...`,
-      zion: `${nome}, you crossed this journey with honesty and presence...`,
-      arion: `${nome}, your path revealed delicacy, depth, and a sincere desire to evolve...`
-    },
-    'es-ES': {
-      lumen: `${nome}, tu jornada reveló señales de sensibilidad, valentía y apertura interior...`,
-      zion: `${nome}, atravesaste esta jornada con honestidad y presencia...`,
-      arion: `${nome}, tu travesía mostró delicadeza, profundidad y un deseo sincero de evolucionar...`
-    },
-    'de-DE': {
-      lumen: `${nome}, deine Reise hat Zeichen von Sensibilität, Mut und innerer Offenheit offenbart...`,
-      zion: `${nome}, du bist diesen Weg mit Ehrlichkeit und Präsenz gegangen...`,
-      arion: `${nome}, dein Weg zeigte Feinfühligkeit, Tiefe und den aufrichtigen Wunsch nach Entwicklung...`
-    },
-    'fr-FR': {
-      lumen: `${nome}, votre voyage a révélé des signes de sensibilité, de courage et d’ouverture intérieure...`,
-      zion: `${nome}, vous avez traversé ce voyage avec honnêteté et présence...`,
-      arion: `${nome}, votre parcours a révélé délicatesse, profondeur et un désir sincère d’évoluer...`
-    },
-    'zh-CN': {
-      lumen: `${nome}，你的旅程展现出了敏感、勇气与内在敞开的迹象……`,
-      zion: `${nome}，你以真诚与临在走过了这段旅程……`,
-      arion: `${nome}，你的道路展现出细腻、深度，以及真诚成长的愿望……`
-    },
-    'ja-JP': {
-      lumen: `${nome}さん、あなたの旅は、繊細さ、勇気、そして内なる開きのしるしを示しました……`,
-      zion: `${nome}さん、あなたは誠実さと確かな存在感をもってこの旅を進みました……`,
-      arion: `${nome}さん、あなたの歩みは、繊細さ、深さ、そして真摯な成長への願いを示しました……`
-    }
-  };
+    const fallbackI18n = {
+      'pt-BR': {
+        lumen: `${nome}, sua jornada revelou sinais de sensibilidade, coragem e abertura interior. Cada resposta sua deixou marcas de verdade no pergaminho da alma. Continue avançando com fé, porque a luz que você procura também cresce dentro de você.`,
+        zion: `${nome}, você atravessou esta jornada com honestidade e presença. O que foi despertado aqui não deve ficar parado. Transforme percepção em passo, passo em caminho, caminho em propósito.`,
+        arion: `${nome}, sua travessia demonstrou delicadeza, profundidade e desejo sincero de evolução. Permita que essa experiência fortaleça sua conexão com sua verdade e com a luz que floresce dentro de você.`
+      },
+      'en-US': {
+        lumen: `${nome}, your journey revealed signs of sensitivity, courage, and inner openness. Each answer left traces of truth on the parchment of your soul. Keep moving forward with faith, because the light you seek is also growing within you.`,
+        zion: `${nome}, you crossed this journey with honesty and presence. What was awakened here must not remain still. Turn perception into step, step into path, and path into purpose.`,
+        arion: `${nome}, your path revealed delicacy, depth, and a sincere desire to evolve. Let this experience strengthen your connection with your truth and with the light blooming within you.`
+      },
+      'es-ES': {
+        lumen: `${nome}, tu jornada reveló señales de sensibilidad, valentía y apertura interior. Cada respuesta dejó marcas de verdad en el pergamino del alma. Sigue avanzando con fe, porque la luz que buscas también está creciendo dentro de ti.`,
+        zion: `${nome}, atravesaste esta jornada con honestidad y presencia. Lo que despertó aquí no debe quedarse quieto. Convierte la percepción en paso, el paso en camino y el camino en propósito.`,
+        arion: `${nome}, tu travesía mostró delicadeza, profundidad y un deseo sincero de evolucionar. Permite que esta experiencia fortalezca tu conexión con tu verdad y con la luz que florece dentro de ti.`
+      },
+      'de-DE': {
+        lumen: `${nome}, deine Reise offenbarte Zeichen von Sensibilität, Mut und innerer Offenheit. Jede Antwort hinterließ Spuren der Wahrheit auf dem Pergament deiner Seele. Geh mit Vertrauen weiter, denn das Licht, das du suchst, wächst auch in dir.`,
+        zion: `${nome}, du bist diesen Weg mit Ehrlichkeit und Präsenz gegangen. Was hier geweckt wurde, darf nicht stillstehen. Verwandle Wahrnehmung in einen Schritt, den Schritt in einen Weg und den Weg in Bestimmung.`,
+        arion: `${nome}, dein Weg zeigte Feinfühligkeit, Tiefe und einen aufrichtigen Wunsch nach Entwicklung. Lass diese Erfahrung deine Verbindung zu deiner Wahrheit und zu dem Licht stärken, das in dir aufblüht.`
+      },
+      'fr-FR': {
+        lumen: `${nome}, votre voyage a révélé des signes de sensibilité, de courage et d’ouverture intérieure. Chaque réponse a laissé des traces de vérité sur le parchemin de l’âme. Continuez d’avancer avec foi, car la lumière que vous cherchez grandit aussi en vous.`,
+        zion: `${nome}, vous avez traversé ce voyage avec honnêteté et présence. Ce qui s’est éveillé ici ne doit pas rester immobile. Transformez la perception en pas, le pas en chemin, et le chemin en mission.`,
+        arion: `${nome}, votre parcours a révélé délicatesse, profondeur et un désir sincère d’évoluer. Permettez à cette expérience de renforcer votre lien avec votre vérité et avec la lumière qui fleurit en vous.`
+      },
+      'zh-CN': {
+        lumen: `${nome}，你的旅程展现出了敏感、勇气与内在敞开的迹象。你的每一个回答，都在灵魂的羊皮卷上留下了真实的印记。请继续怀着信念前行，因为你所寻找的光，也正在你内心生长。`,
+        zion: `${nome}，你以真诚与临在走过了这段旅程。在这里被唤醒的东西，不应停滞不前。让感知化为脚步，让脚步化为道路，让道路化为使命。`,
+        arion: `${nome}，你的道路展现出细腻、深度，以及真诚成长的愿望。愿这段经历加深你与真实自我、以及内心之光的连接。`
+      },
+      'ja-JP': {
+        lumen: `${nome}さん、あなたの旅は、繊細さ、勇気、そして内なる開きのしるしを示しました。あなたの答えの一つひとつが、魂の羊皮紙に真実の跡を残しました。どうか信じて前へ進んでください。あなたが探している光は、あなたの内側でも育っています。`,
+        zion: `${nome}さん、あなたは誠実さと確かな存在感をもってこの旅を進みました。ここで目覚めたものを止めてはいけません。気づきを一歩に、一歩を道に、そして道を使命へと変えてください。`,
+        arion: `${nome}さん、あなたの歩みは、繊細さ、深さ、そして真摯な成長への願いを示しました。この体験が、あなた自身の真実と、内に咲く光とのつながりをさらに強めますように。`
+      }
+    };
 
-  const bag = fallbackI18n[lang] || fallbackI18n['pt-BR'];
-  return bag[guia] || bag.lumen;
-}
-  
+    const bag = fallbackI18n[lang] || fallbackI18n['pt-BR'];
+    return bag[guia] || bag.lumen;
+  }
+
   // ================================
   // DEVOLUTIVA FINAL
   // ================================
@@ -915,13 +933,13 @@ window.buildFinalPayloadDiamante = buildFinalPayloadDiamante;
 
       const status = section.querySelector('#finalPdfStatus');
       if (status && status.parentNode) {
-        status.parentNode.insertBefore(box, status);
+        status.parentNode.insertBefore(box, status.nextSibling);
       } else {
         section.appendChild(box);
       }
     }
 
-    lockFinalButtons(section, 'Guia pensando...');
+    lockFinalButtons(section);
 
     try {
       box.textContent = t('final.gathering', 'O Guia está reunindo as chamas da sua jornada...');
@@ -953,7 +971,7 @@ window.buildFinalPayloadDiamante = buildFinalPayloadDiamante;
       return texto;
     } catch (err) {
       console.error('[FINAL] Sequência final falhou:', err);
-     showFinalError(section, t('final.feedbackError', 'Não consegui concluir a devolutiva final do guia.'));
+      showFinalError(section, t('final.feedbackError', 'Não consegui concluir a devolutiva final do guia.'));
       unlockFinalButtons(section);
       return null;
     }
@@ -1053,7 +1071,7 @@ window.buildFinalPayloadDiamante = buildFinalPayloadDiamante;
       btnPdf.id = 'btnPdf';
       btnPdf.type = 'button';
       btnPdf.className = 'btn btn-pdf';
-      btnPdf.textContent = '✅ PDF';
+      btnPdf.textContent = t('final.pdf', 'PDF');
       actionsRoot.appendChild(btnPdf);
     }
 
@@ -1063,7 +1081,7 @@ window.buildFinalPayloadDiamante = buildFinalPayloadDiamante;
       btnBaixarSelfie.id = 'btnBaixarSelfie';
       btnBaixarSelfie.type = 'button';
       btnBaixarSelfie.className = 'btn btn-selfie';
-      btnBaixarSelfie.textContent = '🖼️ SELFIECARD';
+      btnBaixarSelfie.textContent = t('final.selfie', 'SELFIECARD');
       actionsRoot.appendChild(btnBaixarSelfie);
     }
 
@@ -1073,172 +1091,168 @@ window.buildFinalPayloadDiamante = buildFinalPayloadDiamante;
       btnPortal.id = 'btnVoltarPortal';
       btnPortal.type = 'button';
       btnPortal.className = 'btn btn-portal';
-      btnPortal.textContent = '🏰 PORTAL';
+      btnPortal.textContent = t('final.back', 'VOLTAR');
       actionsRoot.appendChild(btnPortal);
     }
 
-    // [REMOVIDO] primeira baixarPdfComFeedback duplicada (código morto)
-
     async function baixarPdfComFeedback(ev) {
-  if (ev) {
-    ev.preventDefault();
-    ev.stopPropagation();
-  }
+      if (ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+      }
 
-  if (btnPdf.dataset.loading === '1') return;
-  if (btnPdf.disabled) return;
+      if (btnPdf.dataset.loading === '1') return;
+      if (btnPdf.disabled) return;
 
-  btnPdf.dataset.loading = '1';
-  btnPdf.disabled = true;
-  btnPdf.textContent = t('final.thinking', 'Guia pensando...');
-  btnPdf.classList.add('is-loading');
+      btnPdf.dataset.loading = '1';
+      btnPdf.disabled = true;
+      btnPdf.textContent = t('final.thinking', 'Guia pensando...');
+      btnPdf.classList.add('is-loading');
 
-  if (!window.API || typeof window.API.gerarPDFEHQ !== 'function') {
-    setPdfStatus(root, t('final.selfieUnavailable', '⚠️ SelfieCard ainda não está disponível.'), 'err');
-    btnPdf.dataset.loading = '0';
-    btnPdf.disabled = false;
-    btnPdf.textContent = btnPdf.dataset.originalText || '✅ PDF';
-    btnPdf.classList.remove('is-loading');
-    return;
-  }
+      if (!window.API || typeof window.API.gerarPDFEHQ !== 'function') {
+        setPdfStatus(root, t('final.apiUnavailable', '⚠ API não está pronta. Verifique se /assets/js/api.js carregou.'), 'err');
+        btnPdf.dataset.loading = '0';
+        btnPdf.disabled = false;
+        btnPdf.textContent = btnPdf.dataset.originalText || t('final.pdf', 'PDF');
+        btnPdf.classList.remove('is-loading');
+        return;
+      }
 
-  btnBaixarSelfie.disabled = true;
-  btnPortal.disabled = true;
+      btnBaixarSelfie.disabled = true;
+      btnPortal.disabled = true;
 
-  let timer = null;
-  let retryTimer = null;
+      let timer = null;
+      let retryTimer = null;
 
-  try {
-    try {
-      await Promise.race([
-        window.__SELFIECARD_PROMISE__ || Promise.resolve(),
-        new Promise((r) => setTimeout(r, 900))
-      ]);
-    } catch {}
+      try {
+        try {
+          await Promise.race([
+            window.__SELFIECARD_PROMISE__ || Promise.resolve(),
+            new Promise((r) => setTimeout(r, 900))
+          ]);
+        } catch {}
 
-   const payload =
-  (typeof buildFinalPayloadDiamante === 'function' && buildFinalPayloadDiamante()) ||
-  (typeof buildFinalPayload === 'function' && buildFinalPayload()) ||
-  window.__LAST_FINAL_PAYLOAD__ ||
-  null;
+        const payload =
+          (typeof buildFinalPayloadDiamante === 'function' && buildFinalPayloadDiamante()) ||
+          (typeof buildFinalPayload === 'function' && buildFinalPayload()) ||
+          window.__LAST_FINAL_PAYLOAD__ ||
+          null;
 
-if (!payload) {
-  setPdfStatus(root, t('final.selfieDownloadError', '❌ Não consegui baixar a SelfieCard. Veja o console.'), 'err');
-  return;
-}
+        if (!payload) {
+          setPdfStatus(root, t('final.payloadError', '❌ Não foi possível montar o payload do PDF.'), 'err');
+          return;
+        }
 
-payload.devolutivaFinal =
-  window.__JORNADA_DEVOLUTIVA_FINAL__ ||
-  sessionStorage.getItem('JORNADA_DEVOLUTIVA_FINAL') ||
-  '';
+        payload.devolutivaFinal =
+          window.__JORNADA_DEVOLUTIVA_FINAL__ ||
+          sessionStorage.getItem('JORNADA_DEVOLUTIVA_FINAL') ||
+          '';
 
-if (!payload.nome || payload.nome.length < 2) {
-  setPdfStatus(root, '⚠ Nome inválido. Volte e confirme o nome antes de gerar o PDF.', 'err');
-  return;
-}
+        if (!payload.nome || payload.nome.length < 2) {
+          setPdfStatus(root, t('final.invalidName', '⚠ Nome inválido. Volte e confirme o nome antes de gerar o PDF.'), 'err');
+          return;
+        }
 
-if (!payload.guia || payload.guia.length < 2) {
-  setPdfStatus(root, '⚠ Guia não identificado. Volte e selecione Lumen/Zion/Arian antes de gerar o PDF.', 'err');
-  return;
-}
+        if (!payload.guia || payload.guia.length < 2) {
+          setPdfStatus(root, t('final.invalidGuide', '⚠ Guia não identificado. Volte e selecione Lumen/Zion/Arian antes de gerar o PDF.'), 'err');
+          return;
+        }
 
-if (!hasAnyRespostaValida(collectPerguntasPayload())) {
-  setPdfStatus(root, '⚠ Sem respostas. Finalize as perguntas antes de gerar o PDF.', 'err');
-  return;
-}
+        if (!hasAnyRespostaValida(collectPerguntasPayload())) {
+          setPdfStatus(root, t('final.noAnswers', '⚠ Sem respostas. Finalize as perguntas antes de gerar o PDF.'), 'err');
+          return;
+        }
 
-const selfiecard =
-  sessionStorage.getItem('JORNADA_SELFIECARD') ||
-  localStorage.getItem('JORNADA_SELFIECARD') ||
-  sessionStorage.getItem('selfiecard') ||
-  localStorage.getItem('selfiecard') ||
-  sessionStorage.getItem('selfieCard') ||
-  localStorage.getItem('selfieCard') ||
-  sessionStorage.getItem('selfie_base64') ||
-  localStorage.getItem('selfie_base64') ||
-  payload.selfiecard ||
-  payload.selfieCard ||
-  payload.selfie_base64 ||
-  '';
+        const selfiecard =
+          sessionStorage.getItem('JORNADA_SELFIECARD') ||
+          localStorage.getItem('JORNADA_SELFIECARD') ||
+          sessionStorage.getItem('selfiecard') ||
+          localStorage.getItem('selfiecard') ||
+          sessionStorage.getItem('selfieCard') ||
+          localStorage.getItem('selfieCard') ||
+          sessionStorage.getItem('selfie_base64') ||
+          localStorage.getItem('selfie_base64') ||
+          payload.selfiecard ||
+          payload.selfieCard ||
+          payload.selfie_base64 ||
+          '';
 
-payload.selfiecard = selfiecard;
-payload.selfieCard = selfiecard;
-payload.selfie_base64 = selfiecard;
+        payload.selfiecard = selfiecard;
+        payload.selfieCard = selfiecard;
+        payload.selfie_base64 = selfiecard;
 
-console.log('[FINAL][PDF] selfie length:', selfiecard ? String(selfiecard).length : 0);
+        console.log('[FINAL][PDF] selfie length:', selfiecard ? String(selfiecard).length : 0);
 
-setPdfStatus(
-  root,
-  '⏳ Estou tendo dificuldades de conexão. Caso demore muito, o botão "Enviar novamente" será habilitado.',
-  'warn'
-);
+        setPdfStatus(
+          root,
+          t('final.pdfConnectionIssue', '⏳ Estou tendo dificuldades de conexão. Caso demore muito, o botão "Enviar novamente" será habilitado.'),
+          null
+        );
 
-retryTimer = setTimeout(() => {
-  let btnRetry = root.querySelector('#btn-pdf-retry');
-  if (!btnRetry) {
-    btnRetry = document.createElement('button');
-    btnRetry.id = 'btn-pdf-retry';
-    btnRetry.type = 'button';
-    btnRetry.className = 'btn btn-pdf-retry';
-    btnRetry.textContent = '🔁 Enviar novamente';
+        retryTimer = setTimeout(() => {
+          let btnRetry = root.querySelector('#btn-pdf-retry');
+          if (!btnRetry) {
+            btnRetry = document.createElement('button');
+            btnRetry.id = 'btn-pdf-retry';
+            btnRetry.type = 'button';
+            btnRetry.className = 'btn btn-pdf-retry';
+            btnRetry.textContent = t('final.retryLabel', '🔁 Enviar novamente');
 
-    const actionsHost =
-      root.querySelector('.final-acoes') ||
-      root.querySelector('.final-actions') ||
-      btnPdf.parentNode;
+            const actionsHost =
+              root.querySelector('.final-acoes') ||
+              root.querySelector('.final-actions') ||
+              btnPdf.parentNode;
 
-    if (actionsHost) actionsHost.appendChild(btnRetry);
+            if (actionsHost) actionsHost.appendChild(btnRetry);
 
-    btnRetry.addEventListener('click', baixarPdfComFeedback);
-  }
+            btnRetry.addEventListener('click', baixarPdfComFeedback);
+          }
 
-  btnRetry.disabled = false;
-  btnRetry.style.display = '';
-  setPdfStatus(root, '⚠ A solicitação está demorando. Você já pode tentar "Enviar novamente".', 'warn');
-}, 12000);
+          btnRetry.disabled = false;
+          btnRetry.style.display = '';
+          setPdfStatus(root, t('final.retryReady', '⚠ A solicitação está demorando. Você já pode tentar "Enviar novamente".'), null);
+        }, 12000);
 
-if (typeof setTypingDots === 'function') {
-  timer = setTypingDots(root, 'O Guia está forjando seu pergaminho...');
-} else {
-  setPdfStatus(root, '⏳ O Guia está forjando seu pergaminho...', 'warn');
-  timer = null;
-}
+        if (typeof setTypingDots === 'function') {
+          timer = setTypingDots(root, t('final.forging', 'O Guia está forjando seu pergaminho...'));
+        } else {
+          setPdfStatus(root, t('final.forging', '⏳ O Guia está forjando seu pergaminho...'), null);
+          timer = null;
+        }
 
-const payloadFinal = payload;
+        const payloadFinal = payload;
+        const result = await window.API.gerarPDFEHQ(payloadFinal);
 
-const result = await window.API.gerarPDFEHQ(payloadFinal);
+        if (timer) clearInterval(timer);
+        timer = null;
 
-    if (timer) clearInterval(timer);
-    timer = null;
+        if (!result || !result.ok) {
+          throw new Error('PDF inválido');
+        }
 
-    if (!result || !result.ok) {
-      throw new Error('PDF inválido');
+        setPdfStatus(root, t('final.pdfSuccess', '✅ Pergaminho gerado e baixado com sucesso!'), 'ok');
+
+        const btnRetry = root.querySelector('#btn-pdf-retry');
+        if (btnRetry) {
+          btnRetry.disabled = true;
+          btnRetry.style.display = 'none';
+        }
+      } catch (e) {
+        console.error('[FINAL][PDF] erro:', e);
+        setPdfStatus(root, t('final.pdfError', '❌ Erro ao gerar o PDF. Confira o console (Network/Console).'), 'err');
+      } finally {
+        if (timer && typeof clearInterval === 'function') clearInterval(timer);
+        if (retryTimer) clearTimeout(retryTimer);
+
+        btnPdf.dataset.loading = '0';
+        btnPdf.disabled = false;
+        btnBaixarSelfie.disabled = false;
+        btnPortal.disabled = false;
+        btnPdf.textContent = btnPdf.dataset.originalText || t('final.pdf', 'PDF');
+        btnPdf.classList.remove('is-loading');
+      }
     }
 
-    setPdfStatus(section, t('final.feedbackDone', '✅ Devolutiva final concluída. Agora você pode gerar o PDF ou baixar a SelfieCard.'), 'ok');
-
-    const btnRetry = root.querySelector('#btn-pdf-retry');
-    if (btnRetry) {
-      btnRetry.disabled = true;
-      btnRetry.style.display = 'none';
-    }
-  } catch (e) {
-    console.error('[FINAL][PDF] erro:', e);
-    setPdfStatus(root, '❌ Erro ao gerar o PDF. Confira o console (Network/Console).', 'err');
-  } finally {
-    if (timer && typeof clearInterval === 'function') clearInterval(timer);
-    if (retryTimer) clearTimeout(retryTimer);
-
-    btnPdf.dataset.loading = '0';
-    btnPdf.disabled = false;
-    btnBaixarSelfie.disabled = false;
-    btnPortal.disabled = false;
-    btnPdf.textContent = btnPdf.dataset.originalText || '✅ PDF';
-    btnPdf.classList.remove('is-loading');
-  }
-}
-
-    
     (function enforce3Buttons() {
       const keep = new Set(['btnPdf', 'btnBaixarSelfie', 'btnVoltarPortal']);
       [...actionsRoot.querySelectorAll('button')].forEach((btn) => {
@@ -1255,9 +1269,9 @@ const result = await window.API.gerarPDFEHQ(payloadFinal);
     if (!btnPortal.dataset.originalText) btnPortal.dataset.originalText = btnPortal.textContent.trim();
 
     if (!btnPdf.dataset.boundFinalPdf) {
-    btnPdf.dataset.boundFinalPdf = '1';
-    btnPdf.addEventListener('click', baixarPdfComFeedback);
-  }
+      btnPdf.dataset.boundFinalPdf = '1';
+      btnPdf.addEventListener('click', baixarPdfComFeedback);
+    }
 
     if (!btnBaixarSelfie.dataset.boundFinalSelfie) {
       btnBaixarSelfie.dataset.boundFinalSelfie = '1';
@@ -1272,7 +1286,7 @@ const result = await window.API.gerarPDFEHQ(payloadFinal);
         const img = payload.selfieCard;
 
         if (!img || String(img).trim().length < 80) {
-          setPdfStatus(root, '⚠️ SelfieCard ainda não está disponível.', 'err');
+          setPdfStatus(root, t('final.selfieUnavailable', '⚠️ SelfieCard ainda não está disponível.'), 'err');
           return;
         }
 
@@ -1288,10 +1302,10 @@ const result = await window.API.gerarPDFEHQ(payloadFinal);
           a.click();
           document.body.removeChild(a);
 
-          setPdfStatus(root, '✅ SelfieCard baixado com sucesso!', 'ok');
+          setPdfStatus(root, t('final.selfieDownloaded', '✅ SelfieCard baixado com sucesso!'), 'ok');
         } catch (e) {
           console.error('[FINAL][SELFIE] erro:', e);
-          setPdfStatus(root, '❌ Não consegui baixar a SelfieCard. Veja o console.', 'err');
+          setPdfStatus(root, t('final.selfieDownloadError', '❌ Não consegui baixar a SelfieCard. Veja o console.'), 'err');
         }
       });
     }
@@ -1311,78 +1325,67 @@ const result = await window.API.gerarPDFEHQ(payloadFinal);
   // ================================
   // SEQUÊNCIA FINAL
   // ================================
-async function startFinalSequence() {
-  if (started) return;
-  started = true;
+  async function startFinalSequence() {
+    if (started) return;
+    started = true;
 
-  try { speechSynthesis.cancel(); } catch {}
-  speechChain = Promise.resolve();
+    try { speechSynthesis.cancel(); } catch {}
+    speechChain = Promise.resolve();
 
-  const { section, titleEl, msgEl, botoes } = ensureFinalDOM();
-  if (!section || !titleEl || !msgEl) return;
+    const { section, titleEl, msgEl, botoes } = ensureFinalDOM();
+    if (!section || !titleEl || !msgEl) return;
 
-  setFinalButtonsBusy(section, true, {
-    thinkingText: 'Guia refletindo...'
-  });
-
-  try {
-    section.style.display = 'block';
-
-    const tituloOriginal =
-  titleEl.dataset.original ||
-  window.i18n?.t?.(titleEl.dataset.i18nText || 'final.title') ||
-  titleEl.dataset.text ||
-  titleEl.textContent.trim() ||
-  'Gratidão por Caminhar com Luz';
-
-    titleEl.dataset.original = tituloOriginal;
-    titleEl.textContent = '';
-    titleEl.style.opacity = 0;
-    titleEl.style.transform = 'translateY(-16px)';
-
-    const ps = msgEl.querySelectorAll('p');
-    ps.forEach((p) => {
-      const txt = p.dataset.original || p.textContent.trim();
-      p.dataset.original = txt;
-      p.textContent = '';
-      p.style.opacity = 0;
-      p.style.transform = 'translateY(10px)';
-      p.classList.remove('revealed');
+    setFinalButtonsBusy(section, true, {
+      thinkingText: t('final.reflecting', 'Guia refletindo...')
     });
 
-    section.classList.add('show');
-    await sleep(200);
+    try {
+      section.style.display = 'block';
 
-    titleEl.style.transition = 'all 0.9s ease';
-    titleEl.style.opacity = 1;
-    titleEl.style.transform = 'translateY(0)';
-   // título
-   await typeText(titleEl, tituloOriginal, 65, true);
-   await sleep(600);
+      const tituloOriginal = resolveTextFromEl(titleEl, 'Fim da Jornada');
+      titleEl.dataset.original = tituloOriginal;
+      titleEl.textContent = '';
+      titleEl.style.opacity = 0;
+      titleEl.style.transform = 'translateY(-16px)';
 
-   // PARÁGRAFOS
-   for (let i = 0; i < ps.length; i++) {
-  const p = ps[i];
-  const txt = p.dataset.original || '';
-  if (!txt) continue;
+      const ps = msgEl.querySelectorAll('p');
+      ps.forEach((p) => {
+        const txt = resolveTextFromEl(p, '');
+        p.dataset.original = txt;
+        p.textContent = '';
+        p.style.opacity = 0;
+        p.style.transform = 'translateY(10px)';
+        p.classList.remove('revealed');
+      });
 
-  p.style.transition = 'all 0.8s ease';
-  p.style.opacity = 1;
-  p.style.transform = 'translateY(0)';
+      section.classList.add('show');
+      await sleep(200);
 
-  await typeText(p, txt, 55, true);
-  p.classList.add('revealed');
+      titleEl.style.transition = 'all 0.9s ease';
+      titleEl.style.opacity = 1;
+      titleEl.style.transform = 'translateY(0)';
+      await typeText(titleEl, tituloOriginal, 65, true);
+      await sleep(600);
 
-  await sleep(300);
- }
+      for (let i = 0; i < ps.length; i++) {
+        const p = ps[i];
+        const txt = p.dataset.original || '';
+        if (!txt) continue;
 
-  // AGORA SIM liberar botões
-   setFinalButtonsBusy(section, false);
+        p.style.transition = 'all 0.8s ease';
+        p.style.opacity = 1;
+        p.style.transform = 'translateY(0)';
 
- } catch (err) {
-   console.error('[FINAL] Erro na sequência inicial:', err);
-   setFinalButtonsBusy(section, false);
-  }
+        await typeText(p, txt, 55, true);
+        p.classList.add('revealed');
+        await sleep(300);
+      }
+
+      setFinalButtonsBusy(section, false);
+    } catch (err) {
+      console.error('[FINAL] Erro na sequência inicial:', err);
+      setFinalButtonsBusy(section, false);
+    }
 
     if (botoes) {
       botoes.style.opacity = '0';
@@ -1395,24 +1398,25 @@ async function startFinalSequence() {
       botoes.classList.add('show');
       botoes.style.opacity = '1';
       botoes.style.transform = 'scale(1)';
+      botoes.style.pointerEvents = 'auto';
     }
 
     mountFinalPdfUI(section);
     unlockPortalButton(section);
-    lockFinalButtons(section, 'Guia pensando...');
+    lockFinalButtons(section);
 
     try {
-      setPdfStatus(section, 'O Guia está reunindo as chamas da sua jornada...', null);
+      setPdfStatus(section, t('final.gathering', 'O Guia está reunindo as chamas da sua jornada...'), null);
       const textoFinal = await renderFinalGuideFeedback(section);
 
       if (textoFinal) {
-        setPdfStatus(section, '✅ Devolutiva final concluída. Agora você pode gerar o PDF ou baixar a SelfieCard.', 'ok');
+        setPdfStatus(section, t('final.feedbackDone', '✅ Devolutiva final concluída. Agora você pode gerar o PDF ou baixar a SelfieCard.'), 'ok');
       } else {
         setPdfStatus(section, t('final.feedbackError', '⚠ Não consegui concluir a devolutiva final do Guia.'), 'err');
       }
     } catch (e) {
       console.error('[FINAL][DEVOLUTIVA FINAL] erro:', e);
-      setPdfStatus(section, '⚠ Não consegui concluir a devolutiva final do Guia.', 'err');
+      setPdfStatus(section, t('final.feedbackError', '⚠ Não consegui concluir a devolutiva final do Guia.'), 'err');
       unlockFinalButtons(section);
     }
 
@@ -1507,10 +1511,10 @@ async function startFinalSequence() {
   });
 
   document.addEventListener('click', (e) => {
-    const t = e.target;
-    if (!t) return;
+    const target = e.target;
+    if (!target) return;
 
-    if (t.matches?.('[data-action="finalizar"], [data-action="voltar-portal"], #btnFinalizar, #btnVoltarPortal')) {
+    if (target.matches?.('[data-action="finalizar"], [data-action="voltar-portal"], #btnFinalizar, #btnVoltarPortal')) {
       e.preventDefault();
       handleVoltarInicio();
     }
