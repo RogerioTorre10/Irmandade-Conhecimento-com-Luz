@@ -268,7 +268,7 @@
   }
 
   async function gerarPDFEHQ(payload) {
-  const safePayload = payload || {};
+  const safePayload = sanitizePdfPayload(payload || {});
 
   const fileName =
     (safePayload.nome || 'jornada')
@@ -280,16 +280,21 @@
 
   const PDF_PATHS = [
     '/jornada/essencial/pdf',
-    '/jornada-essencial/pdf',
+    '/jornada/pdf',
     '/pdf',
     '/gerar-pdf'
   ];
 
   for (const path of PDF_PATHS) {
     try {
+      console.log('[PDF] tentando:', API_PRIMARY + path);
+
       const { data } = await postJSON(API_PRIMARY, path, safePayload, 60000);
 
+      // ✅ Caso 1: PDF direto
       if (data instanceof Blob) {
+        console.log('[PDF] sucesso via blob:', path);
+
         const url = URL.createObjectURL(data);
         const a = document.createElement('a');
         a.href = url;
@@ -297,21 +302,26 @@
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
+
         setTimeout(() => URL.revokeObjectURL(url), 2000);
 
         return { ok: true };
       }
 
+      // ✅ Caso 2: URL retornada
       if (data && data.url) {
+        console.log('[PDF] sucesso via url:', path);
         window.open(data.url, '_blank');
         return { ok: true };
       }
 
     } catch (e) {
-      console.warn('[PDF] tentativa falhou:', path);
+      console.warn('[PDF] falhou:', path, e.message);
+      await sleep(400); // pequeno delay antes de tentar próximo
     }
   }
 
+  console.error('[PDF] nenhuma rota respondeu corretamente');
   return { ok: false };
 }
 
