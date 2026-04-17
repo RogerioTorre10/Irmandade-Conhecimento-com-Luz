@@ -1089,7 +1089,7 @@ window.buildFinalPayloadDiamante = buildFinalPayloadDiamante;
   null;
 
 if (!payload) {
-  setPdfStatus(root, '❌ Não foi possível montar o payload do PDF.', 'err');
+  setPdfStatus(root, t('final.selfieDownloadError', '❌ Não consegui baixar a SelfieCard. Veja o console.'), 'err');
   return;
 }
 
@@ -1181,7 +1181,7 @@ const result = await window.API.gerarPDFEHQ(payloadFinal);
       throw new Error('PDF inválido');
     }
 
-    setPdfStatus(root, '✅ Pergaminho gerado e baixado com sucesso!', 'ok');
+    setPdfStatus(section, t('final.feedbackDone', '✅ Devolutiva final concluída. Agora você pode gerar o PDF ou baixar a SelfieCard.'), 'ok');
 
     const btnRetry = root.querySelector('#btn-pdf-retry');
     if (btnRetry) {
@@ -1374,7 +1374,7 @@ async function startFinalSequence() {
       if (textoFinal) {
         setPdfStatus(section, '✅ Devolutiva final concluída. Agora você pode gerar o PDF ou baixar a SelfieCard.', 'ok');
       } else {
-        setPdfStatus(section, '⚠ Não consegui concluir a devolutiva final do Guia.', 'err');
+        setPdfStatus(section, t('final.feedbackError', '⚠ Não consegui concluir a devolutiva final do Guia.'), 'err');
       }
     } catch (e) {
       console.error('[FINAL][DEVOLUTIVA FINAL] erro:', e);
