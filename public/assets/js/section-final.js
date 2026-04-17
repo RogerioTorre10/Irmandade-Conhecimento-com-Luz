@@ -1291,9 +1291,11 @@ async function startFinalSequence() {
     section.style.display = 'block';
 
     const tituloOriginal =
-      titleEl.dataset.original ||
-      titleEl.textContent.trim() ||
-      'Gratidão por Caminhar com Luz';
+  titleEl.dataset.original ||
+  window.i18n?.t?.(titleEl.dataset.i18nText || 'final.title') ||
+  titleEl.dataset.text ||
+  titleEl.textContent.trim() ||
+  'Gratidão por Caminhar com Luz';
 
     titleEl.dataset.original = tituloOriginal;
     titleEl.textContent = '';
