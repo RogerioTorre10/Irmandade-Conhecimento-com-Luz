@@ -1060,7 +1060,7 @@ window.buildFinalPayloadDiamante = buildFinalPayloadDiamante;
   btnPdf.classList.add('is-loading');
 
   if (!window.API || typeof window.API.gerarPDFEHQ !== 'function') {
-    setPdfStatus(root, '⚠ API não está pronta. Verifique se /assets/js/api.js carregou.', 'err');
+    setPdfStatus(root, t('final.selfieUnavailable', '⚠️ SelfieCard ainda não está disponível.'), 'err');
     btnPdf.dataset.loading = '0';
     btnPdf.disabled = false;
     btnPdf.textContent = btnPdf.dataset.originalText || '✅ PDF';
