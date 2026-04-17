@@ -268,7 +268,7 @@ function buildFinalPdfPayload() {
 
         if (isBusy) {
           if (btn.id === 'btnBaixarSelfie') {
-            btn.textContent = 'Guia refletindo...';
+            btn.textContent = t('final.reflecting', 'Guia refletindo...');
           } else if (btn.id === 'btnPdf') {
             btn.textContent = thinkingText;
           }
