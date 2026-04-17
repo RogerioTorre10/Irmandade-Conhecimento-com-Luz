@@ -919,7 +919,7 @@ window.buildFinalPayloadDiamante = buildFinalPayloadDiamante;
       return texto;
     } catch (err) {
       console.error('[FINAL] Sequência final falhou:', err);
-      showFinalError(section, 'Não consegui concluir a devolutiva final do guia.');
+     showFinalError(section, t('final.feedbackError', 'Não consegui concluir a devolutiva final do guia.'));
       unlockFinalButtons(section);
       return null;
     }
