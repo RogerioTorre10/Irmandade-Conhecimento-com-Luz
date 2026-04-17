@@ -154,7 +154,7 @@
   "title": "End of the Journey",
   "p1": "Your answers have been received with honor by the Brotherhood.",
   "p2": "You have planted seeds of trust, courage, and light.",
-  "p3": "Keep moving forward. The journey never ends.",
+  "p3": "Keep walking. The journey never ends.",
   "p4": "Return whenever you need to rekindle your flame.",
   "p5": "You are the light. You are the change.",
   "pdf": "Download PDF",
@@ -166,8 +166,19 @@
   "reflecting": "Reflecting...",
   "gathering": "The Guide is gathering the flames of your journey...",
   "feedbackDone": "Final feedback completed. You can now generate the PDF or download the SelfieCard.",
-  "feedbackError": "I couldn't complete the Guide's final feedback.",
+  "feedbackError": "Could not complete the final guide feedback.",
   "selfieDownloaded": "SelfieCard downloaded successfully!",
-  "selfieDownloadError": "I couldn't download the SelfieCard. Check the console."
+  "selfieDownloadError": "Could not download the SelfieCard. Check the console.",
+  "apiUnavailable": "API is not ready. Check if /assets/js/api.js loaded.",
+  "payloadError": "Could not build PDF payload.",
+  "invalidName": "Invalid name. Please confirm your name before generating the PDF.",
+  "invalidGuide": "Guide not identified. Please select Lumen, Zion, or Arian before generating the PDF.",
+  "noAnswers": "No answers found. Complete the questions before generating the PDF.",
+  "pdfConnectionIssue": "Connection issues detected. If it takes too long, the \"Retry\" button will be enabled.",
+  "retryLabel": "Retry",
+  "retryReady": "The request is taking too long. You can try again.",
+  "forging": "The Guide is forging your parchment...",
+  "pdfSuccess": "Parchment generated and downloaded successfully!",
+  "pdfError": "Error generating PDF. Check console (Network/Console)."
   }
 }
