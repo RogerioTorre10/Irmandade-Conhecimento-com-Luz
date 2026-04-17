@@ -162,6 +162,12 @@
   "back": "Volver al Portal",
   "thinking": "Reflexionando...",
   "error": "Error al generar la devolución.",
-  "selfieUnavailable": "Selfie aún no disponible"
-}
+  "selfieUnavailable": "Selfie aún no disponible",
+  "reflecting": "Reflexionando...",
+  "gathering": "El Guía está reuniendo las llamas de tu jornada...",
+  "feedbackDone": "La devolución final ha sido completada. Ahora puedes generar el PDF o descargar la SelfieCard.",
+  "feedbackError": "No pude completar la devolución final del Guía.",
+  "selfieDownloaded": "¡SelfieCard descargada con éxito!",
+  "selfieDownloadError": "No pude descargar la SelfieCard. Revisa la consola."    
+ }
 }
