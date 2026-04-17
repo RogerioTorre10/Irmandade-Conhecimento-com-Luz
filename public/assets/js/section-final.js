@@ -1002,7 +1002,7 @@ window.buildFinalPayloadDiamante = buildFinalPayloadDiamante;
       status = document.createElement('div');
       status.id = 'finalPdfStatus';
       status.className = 'final-pdf-status';
-      status.textContent = 'O Guia está reunindo as chamas da sua jornada...';
+      status.textContent = t('final.gathering', 'O Guia está reunindo as chamas da sua jornada...');
       const actions = root.querySelector('.final-acoes');
       if (actions && actions.parentNode) {
         actions.parentNode.insertBefore(status, actions.nextSibling);
