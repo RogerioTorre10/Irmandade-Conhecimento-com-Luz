@@ -163,5 +163,11 @@
   "thinking": "Reflecting...",
   "error": "Error generating feedback.",
   "selfieUnavailable": "Selfie not available yet"
-}
+  "reflecting": "Reflecting...",
+  "gathering": "The Guide is gathering the flames of your journey...",
+  "feedbackDone": "Final feedback completed. You can now generate the PDF or download the SelfieCard.",
+  "feedbackError": "I couldn't complete the Guide's final feedback.",
+  "selfieDownloaded": "SelfieCard downloaded successfully!",
+  "selfieDownloadError": "I couldn't download the SelfieCard. Check the console."
+  }
 }
