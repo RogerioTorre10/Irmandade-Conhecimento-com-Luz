@@ -253,7 +253,7 @@ function buildFinalPdfPayload() {
 
   function setFinalButtonsBusy(section, isBusy, opts = {}) {
     const buttons = getFinalButtons(section);
-    const thinkingText = opts.thinkingText || 'Guia pensando...';
+    const thinkingText = opts.thinkingText || t('final.thinking', 'Guia pensando...');
 
     buttons.forEach((btn) => {
       try {
