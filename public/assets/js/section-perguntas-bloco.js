@@ -47,9 +47,161 @@
     mounted: false
   };
 
+  const I18N_UI = {
+    'pt-BR': {
+      guide_feedback_label: 'Devolutiva do Guia',
+      guide_reflecting: 'Guia refletindo...',
+      continue: 'Continuar',
+      retry: 'Tentar novamente',
+      write_answer_first: 'Escreva sua resposta antes de continuar.',
+      thinking_about_answer: 'Só um momento, vou refletir sobre sua resposta...',
+      incomplete_feedback:
+        'A devolutiva ainda não chegou completa. Toque em "Tentar novamente" para reenviar tua resposta ao guia.',
+      connection_oscillated:
+        'A conexão com o guia oscilou neste momento. Toque em "Tentar novamente" para buscar a devolutiva.',
+      block_closing: [
+        'PARABÉNS!!! Finalizamos o {blocoNome}. Estou recolhendo os sinais mais preciosos que você deixou nesta etapa...',
+        'Encerramos o {blocoNome}. Aguarde um instante: estou contemplando com carinho o sentido desta nossa travessia...',
+        'Que belo passo demos no {blocoNome}! Agora, reúno as chamas desta etapa para te devolver luz...',
+        'Concluímos o {blocoNome}. Estou observando cada fio para te devolver luz...',
+        'Etapa concluída: {blocoNome}. Recolho os ecos para te responder com toda a luz.'
+      ]
+    },
+
+    'en-US': {
+      guide_feedback_label: 'Guide Feedback',
+      guide_reflecting: 'Guide reflecting...',
+      continue: 'Continue',
+      retry: 'Try again',
+      write_answer_first: 'Write your answer before continuing.',
+      thinking_about_answer: 'Just a moment, I will reflect on your answer...',
+      incomplete_feedback:
+        'The feedback has not arrived completely yet. Tap "Try again" to resend your answer to the guide.',
+      connection_oscillated:
+        'The connection with the guide fluctuated at this moment. Tap "Try again" to retrieve the feedback.',
+      block_closing: [
+        'Congratulations! We have completed {blocoNome}. I am gathering the most precious signs from this stage...',
+        'We have finished {blocoNome}. Please wait a moment while I contemplate the meaning of this passage...',
+        'What a beautiful step we have taken in {blocoNome}! I am now gathering the flames of this stage to return light to you...',
+        'We have concluded {blocoNome}. I am observing each thread of this stage to return light and clarity...',
+        'Stage complete: {blocoNome}. I now gather its echoes to respond to you with light.'
+      ]
+    },
+
+    'es-ES': {
+      guide_feedback_label: 'Devolución del Guía',
+      guide_reflecting: 'Guía reflexionando...',
+      continue: 'Continuar',
+      retry: 'Intentar de nuevo',
+      write_answer_first: 'Escribe tu respuesta antes de continuar.',
+      thinking_about_answer: 'Solo un momento, voy a reflexionar sobre tu respuesta...',
+      incomplete_feedback:
+        'La devolución aún no ha llegado completa. Toca "Intentar de nuevo" para reenviar tu respuesta al guía.',
+      connection_oscillated:
+        'La conexión con el guía osciló en este momento. Toca "Intentar de nuevo" para buscar la devolución.',
+      block_closing: [
+        '¡Felicidades! Hemos terminado {blocoNome}. Estoy recogiendo las señales más preciosas de esta etapa...',
+        'Hemos cerrado {blocoNome}. Espera un momento: estoy contemplando con cariño el sentido de este paso...',
+        '¡Qué hermoso paso dimos en {blocoNome}! Ahora reúno las llamas de esta etapa para devolverte luz...',
+        'Hemos concluido {blocoNome}. Estoy observando cada hilo de esta etapa para devolverte luz y claridad...',
+        'Etapa concluida: {blocoNome}. Recojo ahora sus ecos para responderte con luz.'
+      ]
+    },
+
+    'fr-FR': {
+      guide_feedback_label: 'Retour du Guide',
+      guide_reflecting: 'Le guide réfléchit...',
+      continue: 'Continuer',
+      retry: 'Réessayer',
+      write_answer_first: 'Écrivez votre réponse avant de continuer.',
+      thinking_about_answer: 'Un instant, je vais réfléchir à votre réponse...',
+      incomplete_feedback:
+        'Le retour n’est pas encore arrivé complètement. Touchez « Réessayer » pour renvoyer votre réponse au guide.',
+      connection_oscillated:
+        'La connexion avec le guide a fluctué à cet instant. Touchez « Réessayer » pour récupérer le retour.',
+      block_closing: [
+        'Félicitations ! Nous avons terminé {blocoNome}. Je recueille les signes les plus précieux de cette étape...',
+        'Nous avons achevé {blocoNome}. Attendez un instant : je contemple avec soin le sens de ce passage...',
+        'Quel beau pas nous avons fait dans {blocoNome} ! Je rassemble maintenant les flammes de cette étape pour vous rendre de la lumière...',
+        'Nous avons conclu {blocoNome}. J’observe chaque fil de cette étape pour vous rendre lumière et clarté...',
+        'Étape terminée : {blocoNome}. J’en recueille maintenant les échos pour vous répondre avec lumière.'
+      ]
+    },
+
+    'de-DE': {
+      guide_feedback_label: 'Rückmeldung des Guides',
+      guide_reflecting: 'Der Guide reflektiert...',
+      continue: 'Weiter',
+      retry: 'Erneut versuchen',
+      write_answer_first: 'Schreiben Sie Ihre Antwort, bevor Sie fortfahren.',
+      thinking_about_answer: 'Einen Moment, ich werde über Ihre Antwort nachdenken...',
+      incomplete_feedback:
+        'Die Rückmeldung ist noch nicht vollständig angekommen. Tippen Sie auf „Erneut versuchen“, um Ihre Antwort erneut an den Guide zu senden.',
+      connection_oscillated:
+        'Die Verbindung mit dem Guide hat in diesem Moment geschwankt. Tippen Sie auf „Erneut versuchen“, um die Rückmeldung abzurufen.',
+      block_closing: [
+        'Glückwunsch! Wir haben {blocoNome} abgeschlossen. Ich sammle nun die wertvollsten Zeichen dieser Etappe...',
+        'Wir haben {blocoNome} beendet. Warten Sie einen Moment: Ich betrachte nun mit Sorgfalt den Sinn dieses Wegabschnitts...',
+        'Was für ein schöner Schritt in {blocoNome}! Ich sammle nun die Flammen dieser Etappe, um Ihnen Licht zurückzugeben...',
+        'Wir haben {blocoNome} abgeschlossen. Ich beobachte jeden Faden dieser Etappe, um Ihnen Licht und Klarheit zurückzugeben...',
+        'Etappe abgeschlossen: {blocoNome}. Ich sammle nun ihre Echos, um Ihnen mit Licht zu antworten.'
+      ]
+    },
+
+    'ja-JP': {
+      guide_feedback_label: 'ガイドからの返答',
+      guide_reflecting: 'ガイドが熟考しています...',
+      continue: '続ける',
+      retry: '再試行',
+      write_answer_first: '続ける前に回答を書いてください。',
+      thinking_about_answer: '少々お待ちください。あなたの答えについて考えています...',
+      incomplete_feedback:
+        '返答がまだ完全には届いていません。「再試行」を押して、ガイドにあなたの答えを再送してください。',
+      connection_oscillated:
+        'この瞬間、ガイドとの接続が不安定になりました。「再試行」を押して返答を取得してください。',
+      block_closing: [
+        '{blocoNome} が完了しました。この段階の大切な印を集めています...',
+        '{blocoNome} を終えました。少しお待ちください。この歩みの意味を丁寧に見つめています...',
+        '{blocoNome} で素晴らしい一歩を踏み出しました。今、この段階の炎を集めて光をお返しします...',
+        '{blocoNome} を締めくくりました。この段階の一つひとつの糸を見つめ、光と明晰さをお返しします...',
+        '段階完了: {blocoNome}。その響きを集め、光をもってお応えします。'
+      ]
+    },
+
+    'zh-CN': {
+      guide_feedback_label: '向导反馈',
+      guide_reflecting: '向导正在思索...',
+      continue: '继续',
+      retry: '重试',
+      write_answer_first: '请先写下你的回答，再继续。',
+      thinking_about_answer: '请稍候，我将思考你的回答...',
+      incomplete_feedback:
+        '反馈尚未完整到达。请点击“重试”以重新将你的回答发送给向导。',
+      connection_oscillated:
+        '此刻与向导的连接出现波动。请点击“重试”以获取反馈。',
+      block_closing: [
+        '恭喜！我们已完成 {blocoNome}。我正在收集这一阶段最珍贵的印记...',
+        '{blocoNome} 已结束。请稍候，我正在细心体会这一段旅程的意义...',
+        '我们在 {blocoNome} 中迈出了美好的一步！我现在正汇聚这一阶段的火焰，把光回赠给你...',
+        '{blocoNome} 已圆满结束。我正在观察这一阶段的每一条线索，把光与清晰带回给你...',
+        '阶段完成：{blocoNome}。我正在收集它的回响，并以光回应你。'
+      ]
+    }
+  };
+
   function log(...a) { console.log(MOD, ...a); }
   function warn(...a) { console.warn(MOD, ...a); }
   function err(...a) { console.error(MOD, ...a); }
+
+  function uiText(key, fallback = '') {
+    const lang = getLang();
+    const pack = I18N_UI[lang] || I18N_UI['pt-BR'];
+    return pack?.[key] ?? fallback;
+  }
+
+  function uiFormat(text, vars = {}) {
+    return String(text || '').replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? '');
+  }
 
   function getSectionFromEvent(detail) {
     if (detail?.node && detail.node.id) return detail.node;
@@ -160,7 +312,7 @@
       title.style.textShadow = `0 0 10px ${theme.soft}, 0 0 24px ${theme.strong}`;
     }
 
-    const question = section?.querySelector('#jp-question-typed, .jp-question-typed');
+    const question = section?.querySelector('#jp-question-typed, .jp-question-typed, #question-display');
     if (question) {
       question.style.color = theme.text;
       question.style.textShadow = `0 0 6px ${theme.soft}`;
@@ -181,25 +333,16 @@
     log('Tema do guia aplicado:', guia, theme.main);
   }
 
-function getQuestionText(bloco, qIndex = 0) {
-  try {
-    const pergunta = bloco?.questions?.[qIndex];
-    return String(pergunta?.label || 'Pergunta não encontrada').trim();
-  } catch (e) {
-    console.warn('[getQuestionText] erro:', e);
-    return 'Pergunta indisponível';
+  function getQuestionText(bloco, qIndex = 0) {
+    try {
+      const pergunta = bloco?.questions?.[qIndex];
+      return String(pergunta?.label || 'Pergunta não encontrada').trim();
+    } catch (e) {
+      console.warn('[getQuestionText] erro:', e);
+      return 'Pergunta indisponível';
+    }
   }
-}
 
-function getQuestionId(bloco, qIndex = 0) {
-  const pergunta = bloco?.questions?.[qIndex];
-  return pergunta?.id || `q${qIndex + 1}`;
-}
-
-function answerKey(bloco, qIndex = 0) {
-  return `jornada_resp_${bloco.id}_${getQuestionId(bloco, qIndex)}`;
-}
-  
   function getQuestionId(bloco, qIndex = 0) {
     const pergunta = bloco?.questions?.[qIndex];
     return pergunta?.id || `q${qIndex + 1}`;
@@ -219,80 +362,85 @@ function answerKey(bloco, qIndex = 0) {
     return localStorage.getItem(answerKey(bloco, qIndex)) || '';
   }
 
-async function setGuideResponse(text, kind = 'info') {
-  const wrap = document.getElementById('jp-ai-response-wrap');
-  const box = document.getElementById('jp-ai-response');
+  async function setGuideResponse(text, kind = 'info') {
+    const wrap = document.getElementById('jp-ai-response-wrap');
+    const box = document.getElementById('jp-ai-response');
+    const label = document.querySelector('.jp-ai-response-label');
 
-  if (!wrap || !box) return;
+    if (label) {
+      label.textContent = uiText('guide_feedback_label', 'Devolutiva do Guia');
+    }
 
-  const content = String(text || '').trim();
+    if (!wrap || !box) return;
 
-  if (!content) {
-    box.hidden = true;
+    const content = String(text || '').trim();
+
+    if (!content) {
+      box.hidden = true;
+      box.textContent = '';
+      box.innerHTML = '';
+      box.classList.remove('is-visible', 'is-revealing', 'oracle-ready');
+      wrap.dataset.kind = '';
+      wrap.dataset.responseText = '';
+      return;
+    }
+
+    wrap.dataset.kind = kind;
+    wrap.dataset.responseText = content;
+
+    box.hidden = false;
     box.textContent = '';
     box.innerHTML = '';
-    box.classList.remove('is-visible', 'is-revealing', 'oracle-ready');
-    wrap.dataset.kind = '';
-    wrap.dataset.responseText = '';
-    return;
-  }
+    box.classList.add('is-visible', 'is-revealing');
 
-  wrap.dataset.kind = kind;
-  wrap.dataset.responseText = content;
+    let ttsPromise = null;
 
-  box.hidden = false;
-  box.textContent = '';
-  box.innerHTML = '';
-  box.classList.add('is-visible', 'is-revealing');
-
-  let ttsPromise = null;
-
-  try {
-    if (typeof window.speakGuideText === 'function') {
-      ttsPromise = window.speakGuideText(content);
-    } else if (typeof speakQuestionOrGuideResponse === 'function') {
-      ttsPromise = speakQuestionOrGuideResponse(content);
-    } else if (typeof window.speakQuestionOrGuideResponse === 'function') {
-      ttsPromise = window.speakQuestionOrGuideResponse(content);
-    } else {
-      console.warn('[DEVOLUTIVA][TTS] nenhum motor de voz disponível.');
-    }
-  } catch (err) {
-    console.warn('[DEVOLUTIVA][TTS] falhou ao iniciar:', err);
-  }
-
-  const lines = content.split('\n').filter(Boolean);
-  if (!lines.length) lines.push(content);
-
-  for (let i = 0; i < lines.length; i++) {
-    const lineEl = document.createElement('div');
-    lineEl.className = 'ai-line oracle-line';
-    box.appendChild(lineEl);
-
-    const line = lines[i];
-    for (let j = 0; j <= line.length; j++) {
-      lineEl.textContent = line.slice(0, j);
-      await new Promise((r) => setTimeout(r, 16));
-    }
-
-    await new Promise((r) => setTimeout(r, 120));
-  }
-
-  if (ttsPromise && typeof ttsPromise.then === 'function') {
     try {
-      await ttsPromise;
+      if (typeof window.speakGuideText === 'function') {
+        ttsPromise = window.speakGuideText(content);
+      } else if (typeof speakQuestionOrGuideResponse === 'function') {
+        ttsPromise = speakQuestionOrGuideResponse(content);
+      } else if (typeof window.speakQuestionOrGuideResponse === 'function') {
+        ttsPromise = window.speakQuestionOrGuideResponse(content);
+      } else {
+        console.warn('[DEVOLUTIVA][TTS] nenhum motor de voz disponível.');
+      }
     } catch (err) {
-      console.warn('[DEVOLUTIVA][TTS] falhou durante execução:', err);
+      console.warn('[DEVOLUTIVA][TTS] falhou ao iniciar:', err);
     }
+
+    const lines = content.split('\n').filter(Boolean);
+    if (!lines.length) lines.push(content);
+
+    for (let i = 0; i < lines.length; i++) {
+      const lineEl = document.createElement('div');
+      lineEl.className = 'ai-line oracle-line';
+      box.appendChild(lineEl);
+
+      const line = lines[i];
+      for (let j = 0; j <= line.length; j++) {
+        lineEl.textContent = line.slice(0, j);
+        await new Promise((r) => setTimeout(r, 16));
+      }
+
+      await new Promise((r) => setTimeout(r, 120));
+    }
+
+    if (ttsPromise && typeof ttsPromise.then === 'function') {
+      try {
+        await ttsPromise;
+      } catch (err) {
+        console.warn('[DEVOLUTIVA][TTS] falhou durante execução:', err);
+      }
+    }
+
+    box.classList.remove('is-revealing');
+    box.classList.add('oracle-ready');
+
+    box.style.textShadow = '0 0 8px var(--guia-soft), 0 0 18px rgba(255,255,255,0.08)';
+    box.style.borderColor = 'var(--guia-main)';
   }
 
-  box.classList.remove('is-revealing');
-  box.classList.add('oracle-ready');
-
-  box.style.textShadow = '0 0 8px var(--guia-soft), 0 0 18px rgba(255,255,255,0.08)';
-  box.style.borderColor = 'var(--guia-main)';
-}
-  
   function getCurrentGuideResponseText() {
     const wrap = document.getElementById('jp-ai-response-wrap');
     const txt = wrap?.dataset?.responseText || '';
@@ -509,10 +657,11 @@ async function setGuideResponse(text, kind = 'info') {
   }
 
   function showMissingAnswerFeedback() {
+    const msg = uiText('write_answer_first', 'Escreva sua resposta antes de continuar.');
     if (typeof window.toast === 'function') {
-      window.toast('Escreva sua resposta antes de continuar.');
+      window.toast(msg);
     } else {
-      alert('Escreva sua resposta antes de continuar.');
+      alert(msg);
     }
   }
 
@@ -558,312 +707,344 @@ async function setGuideResponse(text, kind = 'info') {
     }
   }
 
-function getStoredBlockFeedbacks() {
-  try {
-    return JSON.parse(sessionStorage.getItem('JORNADA_DEVOLUTIVAS_BLOCO') || '[]');
-  } catch {
-    return [];
-  }
-}
-
-function setStoredBlockFeedbacks(items) {
-  try {
-    sessionStorage.setItem('JORNADA_DEVOLUTIVAS_BLOCO', JSON.stringify(items || []));
-  } catch {}
-}
-
-function getBlockQuestionsCount(bloco) {
-  if (!bloco) return 0;
-  if (Array.isArray(bloco.questions)) return bloco.questions.length;
-  if (Array.isArray(bloco.perguntas)) return bloco.perguntas.length;
-  return Number(bloco.totalQuestions || bloco.total || 0);
-}
-
-function getCurrentQuestionIndex(bloco) {
-  if (!bloco) return 0;
-
-  if (typeof bloco.currentIndex === 'number') return bloco.currentIndex;
-  if (typeof bloco.questionIndex === 'number') return bloco.questionIndex;
-  if (typeof bloco.idx === 'number') return bloco.idx;
-
-  const raw =
-    sessionStorage.getItem(`jp:${bloco.id}:idx`) ||
-    sessionStorage.getItem(`bloco:${bloco.id}:idx`) ||
-    '0';
-
-  return Number(raw || 0);
-}
-
-function isLastQuestionOfBlock(bloco) {
-  const total = getBlockQuestionsCount(bloco);
-  const current = getCurrentQuestionIndex(bloco);
-  return total > 0 && current >= total - 1;
-}
-
-function getAllAnswersFromBlock(bloco) {
-  const total = getBlockQuestionsCount(bloco);
-  const out = [];
-
-  for (let i = 0; i < total; i++) {
+  function getStoredBlockFeedbacks() {
     try {
-      const val = getAnswer(bloco, i);
-      const txt = String(val || '').trim();
-      if (txt) out.push(txt);
-    } catch {}
-  }
-
-  return out;
-}
-
-
-function countSentences(text) {
-  return String(text || '')
-    .split(/[.!?…]+/)
-    .map((s) => s.trim())
-    .filter(Boolean)
-    .length;
-}
-
-function isWeakFeedback(text, opts = {}) {
-  const minChars = Number(opts.minChars ?? 180);
-  const minSentences = Number(opts.minSentences ?? 3);
-  const txt = String(text || '').replace(/\s+/g, ' ').trim();
-
-  if (!txt) return true;
-  if (txt.length < minChars) return true;
-  if (countSentences(txt) < minSentences) return true;
-  if (!/[.!?…]$/.test(txt)) return true;
-  return false;
-}
-
-function buildFallbackFeedback({ guia, nome, blocoNome, resposta, pergunta }) {
-  const guide = normalizeGuide(guia || 'lumen');
-  const participant = String(nome || 'Caminhante').trim() || 'Caminhante';
-  const answer = String(resposta || '').trim();
-  const questionText = String(pergunta || '').trim();
-  const block = String(blocoNome || 'esta etapa').trim();
-
-  const fallbackPorGuia = {
-    lumen: `${participant}, sua resposta em ${block} revela um movimento sincero de percepção interior. Ao expressar "${answer || questionText || 'sua vivência'}", você deixa transparecer sensibilidade, honestidade e desejo de caminhar com mais consciência. Receba esta reflexão como um acolhimento: continue ouvindo sua verdade com serenidade, porque há luz no modo como você escolheu responder a esta etapa.`,
-    zion: `${participant}, o que você compartilhou em ${block} mostra presença, verdade e disposição para enxergar mais fundo. Ao dizer "${answer || questionText || 'sua vivência'}", você revela um posicionamento interno que merece respeito e continuidade. Leve esta resposta como um sinal de força: aquilo que começa em reflexão pode amadurecer em direção, clareza e propósito.`,
-    arion: `${participant}, sua resposta em ${block} carrega delicadeza e profundidade. Quando você expressa "${answer || questionText || 'sua vivência'}", percebemos um traço do seu mundo interior pedindo escuta, cuidado e crescimento. Que esta devolutiva te alcance com acolhimento e te ajude a seguir com mais presença, verdade e conexão com a luz que floresce dentro de você.`
-  };
-
-  return fallbackPorGuia[guide] || fallbackPorGuia.lumen;
-}
-
-function extractFeedbackText(resp) {
-  return String(
-    resp?.texto ||
-    resp?.devolutivaBloco ||
-    resp?.devolutiva ||
-    resp?.feedback ||
-    resp?.message ||
-    ''
-  ).trim();
-}
-
-async function requestGuideFeedbackWithFallback(params) {
-  const {
-    nome,
-    guia,
-    blocoNome,
-    respostas,
-    idioma,
-    pergunta,
-    resposta
-  } = params;
-
-  const guide = normalizeGuide(guia || 'lumen');
-  const fallbackText = buildFallbackFeedback({
-    guia: guide,
-    nome,
-    blocoNome,
-    resposta,
-    pergunta
-  });
-
-  if (!window.API) {
-    return { ok: true, texto: fallbackText, guiaUsado: 'lumen', fallbackUsed: true };
-  }
-
-  const bodyBase = {
-    nome,
-    bloco: blocoNome,
-    respostas: Array.isArray(respostas) ? respostas : [],
-    idioma,
-    pergunta,
-    resposta
-  };
-
-  const tentativas = [
-    { guia: guide, retry: false },
-    { guia: guide, retry: true }
-  ];
-
-  if (guide !== 'lumen') {
-    tentativas.push({ guia: 'lumen', retry: false, fallback: true });
-  }
-
-  let ultimoErro = null;
-
-  for (const tentativa of tentativas) {
-    try {
-      let raw = null;
-
-      if (Array.isArray(bodyBase.respostas) && bodyBase.respostas.length && typeof window.API.gerarDevolutivaBloco === 'function') {
-        raw = await window.API.gerarDevolutivaBloco({
-          nome,
-          guia: tentativa.guia,
-          bloco: blocoNome,
-          respostas: bodyBase.respostas,
-          idioma,
-          retry: tentativa.retry,
-          forceComplete: true,
-          minSentences: tentativa.guia === 'lumen' ? 4 : 3,
-          minChars: tentativa.guia === 'lumen' ? 220 : 180
-        });
-      } else if (typeof window.API.gerarDevolutiva === 'function') {
-        raw = await window.API.gerarDevolutiva({
-          nome,
-          guia: tentativa.guia,
-          bloco: blocoNome,
-          pergunta,
-          resposta,
-          idioma,
-          retry: tentativa.retry,
-          forceComplete: true,
-          minSentences: tentativa.guia === 'lumen' ? 4 : 3,
-          minChars: tentativa.guia === 'lumen' ? 220 : 180
-        });
-      }
-
-      const texto = extractFeedbackText(raw);
-      if (!texto) {
-        ultimoErro = new Error(`Resposta vazia para ${tentativa.guia}`);
-        continue;
-      }
-
-      if (isWeakFeedback(texto, {
-        minChars: tentativa.guia === 'lumen' ? 220 : 180,
-        minSentences: tentativa.guia === 'lumen' ? 4 : 3
-      })) {
-        ultimoErro = new Error(`Resposta fraca para ${tentativa.guia}`);
-        continue;
-      }
-
-      return {
-        ok: true,
-        texto: texto.trim(),
-        guiaUsado: tentativa.guia,
-        fallbackUsed: !!tentativa.fallback
-      };
-    } catch (err) {
-      ultimoErro = err;
-      console.warn('[DEVOLUTIVA][ROBUSTA] falha:', tentativa.guia, tentativa.retry ? 'retry' : 'primeira', err);
+      return JSON.parse(sessionStorage.getItem('JORNADA_DEVOLUTIVAS_BLOCO') || '[]');
+    } catch {
+      return [];
     }
   }
 
-  console.warn('[DEVOLUTIVA][ROBUSTA] usando fallback local:', ultimoErro);
-  return {
-    ok: true,
-    texto: fallbackText,
-    guiaUsado: 'lumen',
-    fallbackUsed: true
-  };
-}
+  function setStoredBlockFeedbacks(items) {
+    try {
+      sessionStorage.setItem('JORNADA_DEVOLUTIVAS_BLOCO', JSON.stringify(items || []));
+    } catch {}
+  }
 
-async function gerarDevolutivaDoBloco(bloco) {
-  const nome =
-    sessionStorage.getItem('jornada.nome') ||
-    localStorage.getItem('JORNADA_NOME') ||
-    localStorage.getItem('jc.nome') ||
-    'Participante';
+  function getBlockQuestionsCount(bloco) {
+    if (!bloco) return 0;
+    if (Array.isArray(bloco.questions)) return bloco.questions.length;
+    if (Array.isArray(bloco.perguntas)) return bloco.perguntas.length;
+    return Number(bloco.totalQuestions || bloco.total || 0);
+  }
 
-  const guia =
-    sessionStorage.getItem('jornada.guia') ||
-    localStorage.getItem('JORNADA_GUIA') ||
-    localStorage.getItem('jornada.guia') ||
-    document.body.dataset.guia ||
-    'lumen';
+  function getCurrentQuestionIndex(bloco) {
+    if (!bloco) return 0;
 
-  const idioma = document.documentElement.lang || getLang() || 'pt-BR';
-  const respostas = getAllAnswersFromBlock(bloco);
-  const blocoNome = bloco?.title || bloco?.id || 'Bloco';
+    if (typeof bloco.currentIndex === 'number') return bloco.currentIndex;
+    if (typeof bloco.questionIndex === 'number') return bloco.questionIndex;
+    if (typeof bloco.idx === 'number') return bloco.idx;
 
-  if (!respostas.length) {
+    const raw =
+      sessionStorage.getItem(`jp:${bloco.id}:idx`) ||
+      sessionStorage.getItem(`bloco:${bloco.id}:idx`) ||
+      '0';
+
+    return Number(raw || 0);
+  }
+
+  function isLastQuestionOfBlock(bloco) {
+    const total = getBlockQuestionsCount(bloco);
+    const current = getCurrentQuestionIndex(bloco);
+    return total > 0 && current >= total - 1;
+  }
+
+  function getAllAnswersFromBlock(bloco) {
+    const total = getBlockQuestionsCount(bloco);
+    const out = [];
+
+    for (let i = 0; i < total; i++) {
+      try {
+        const val = getAnswer(bloco, i);
+        const txt = String(val || '').trim();
+        if (txt) out.push(txt);
+      } catch {}
+    }
+
+    return out;
+  }
+
+  function countSentences(text) {
+    return String(text || '')
+      .split(/[.!?…]+/)
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .length;
+  }
+
+  function isWeakFeedback(text, opts = {}) {
+    const minChars = Number(opts.minChars ?? 180);
+    const minSentences = Number(opts.minSentences ?? 3);
+    const txt = String(text || '').replace(/\s+/g, ' ').trim();
+
+    if (!txt) return true;
+    if (txt.length < minChars) return true;
+    if (countSentences(txt) < minSentences) return true;
+    if (!/[.!?…]$/.test(txt)) return true;
+    return false;
+  }
+
+  function buildFallbackFeedback({ guia, nome, blocoNome, resposta, pergunta, idioma }) {
+    const guide = normalizeGuide(guia || 'lumen');
+    const participant = String(nome || 'Caminhante').trim() || 'Caminhante';
+    const answer = String(resposta || '').trim();
+    const questionText = String(pergunta || '').trim();
+    const block = String(blocoNome || 'esta etapa').trim();
+    const lang = idioma || getLang();
+
+    const fallbackPorGuia = {
+      'pt-BR': {
+        lumen: `${participant}, sua resposta em ${block} revela um movimento sincero de percepção interior. Ao expressar "${answer || questionText || 'sua vivência'}", você deixa transparecer sensibilidade, honestidade e desejo de caminhar com mais consciência. Receba esta reflexão como um acolhimento: continue ouvindo sua verdade com serenidade, porque há luz no modo como você escolheu responder a esta etapa.`,
+        zion: `${participant}, o que você compartilhou em ${block} mostra presença, verdade e disposição para enxergar mais fundo. Ao dizer "${answer || questionText || 'sua vivência'}", você revela um posicionamento interno que merece respeito e continuidade. Leve esta resposta como um sinal de força: aquilo que começa em reflexão pode amadurecer em direção, clareza e propósito.`,
+        arion: `${participant}, sua resposta em ${block} carrega delicadeza e profundidade. Quando você expressa "${answer || questionText || 'sua vivência'}", percebemos um traço do seu mundo interior pedindo escuta, cuidado e crescimento. Que esta devolutiva te alcance com acolhimento e te ajude a seguir com mais presença, verdade e conexão com a luz que floresce dentro de você.`
+      },
+
+      'en-US': {
+        lumen: `${participant}, your answer in ${block} reveals a sincere movement of inner perception. By expressing "${answer || questionText || 'your experience'}", you show sensitivity, honesty, and a desire to walk with greater awareness. Receive this reflection as an embrace: keep listening to your truth with serenity, because there is light in the way you chose to answer this stage.`,
+        zion: `${participant}, what you shared in ${block} shows presence, truth, and a willingness to look deeper. By saying "${answer || questionText || 'your experience'}", you reveal an inner stance that deserves respect and continuity. Take this response as a sign of strength: what begins in reflection can mature into direction, clarity, and purpose.`,
+        arion: `${participant}, your answer in ${block} carries delicacy and depth. When you express "${answer || questionText || 'your experience'}", we perceive a trace of your inner world asking for listening, care, and growth. May this feedback reach you with welcome and help you move forward with more presence, truth, and connection with the light blooming within you.`
+      },
+
+      'es-ES': {
+        lumen: `${participant}, tu respuesta en ${block} revela un movimiento sincero de percepción interior. Al expresar "${answer || questionText || 'tu vivencia'}", dejas ver sensibilidad, honestidad y deseo de caminar con mayor conciencia. Recibe esta reflexión como acogida: sigue escuchando tu verdad con serenidad, porque hay luz en la forma en que elegiste responder a esta etapa.`,
+        zion: `${participant}, lo que compartiste en ${block} muestra presencia, verdad y disposición para mirar más hondo. Al decir "${answer || questionText || 'tu vivencia'}", revelas una postura interior que merece respeto y continuidad. Toma esta respuesta como una señal de fuerza: lo que comienza en reflexión puede madurar en dirección, claridad y propósito.`,
+        arion: `${participant}, tu respuesta en ${block} lleva delicadeza y profundidad. Cuando expresas "${answer || questionText || 'tu vivencia'}", percibimos un rasgo de tu mundo interior que pide escucha, cuidado y crecimiento. Que esta devolución te alcance con acogida y te ayude a seguir con más presencia, verdad y conexión con la luz que florece dentro de ti.`
+      },
+
+      'fr-FR': {
+        lumen: `${participant}, votre réponse dans ${block} révèle un mouvement sincère de perception intérieure. En exprimant "${answer || questionText || 'votre vécu'}", vous laissez apparaître sensibilité, honnêteté et désir d’avancer avec plus de conscience. Recevez cette réflexion comme un accueil : continuez à écouter votre vérité avec sérénité, car il y a de la lumière dans la manière dont vous avez choisi de répondre à cette étape.`,
+        zion: `${participant}, ce que vous avez partagé dans ${block} montre présence, vérité et volonté de regarder plus profondément. En disant "${answer || questionText || 'votre vécu'}", vous révélez une posture intérieure qui mérite respect et continuité. Recevez cette réponse comme un signe de force : ce qui naît dans la réflexion peut mûrir en direction, clarté et sens.`,
+        arion: `${participant}, votre réponse dans ${block} porte délicatesse et profondeur. Lorsque vous exprimez "${answer || questionText || 'votre vécu'}", nous percevons une trace de votre monde intérieur appelant écoute, soin et croissance. Que ce retour vous atteigne avec accueil et vous aide à avancer avec plus de présence, de vérité et de connexion à la lumière qui fleurit en vous.`
+      },
+
+      'de-DE': {
+        lumen: `${participant}, Ihre Antwort in ${block} offenbart eine aufrichtige Bewegung innerer Wahrnehmung. Indem Sie "${answer || questionText || 'Ihr Erleben'}" ausdrücken, zeigen Sie Sensibilität, Ehrlichkeit und den Wunsch, mit mehr Bewusstheit weiterzugehen. Nehmen Sie diese Rückmeldung als ein Willkommen an: Hören Sie weiterhin mit Gelassenheit auf Ihre Wahrheit, denn in der Art, wie Sie diese Etappe beantwortet haben, liegt Licht.`,
+        zion: `${participant}, das, was Sie in ${block} geteilt haben, zeigt Präsenz, Wahrheit und die Bereitschaft, tiefer zu schauen. Indem Sie "${answer || questionText || 'Ihr Erleben'}" aussprechen, offenbaren Sie eine innere Haltung, die Respekt und Fortsetzung verdient. Nehmen Sie diese Antwort als Zeichen von Stärke: Was in Reflexion beginnt, kann zu Richtung, Klarheit und Sinn reifen.`,
+        arion: `${participant}, Ihre Antwort in ${block} trägt Feinheit und Tiefe. Wenn Sie "${answer || questionText || 'Ihr Erleben'}" ausdrücken, erkennen wir eine Spur Ihrer inneren Welt, die um Zuhören, Fürsorge und Wachstum bittet. Möge diese Rückmeldung Sie mit Willkommen erreichen und Ihnen helfen, mit mehr Präsenz, Wahrheit und Verbindung zu dem Licht weiterzugehen, das in Ihnen aufblüht.`
+      },
+
+      'ja-JP': {
+        lumen: `${participant}さん、${block} でのあなたの答えには、内なる気づきの誠実な動きが表れています。「${answer || questionText || 'あなたの体験'}」と表現したことから、感受性、誠実さ、そしてより深い意識をもって歩みたいという願いが伝わってきます。この返答をやさしい受容として受け取ってください。あなたがこの段階に答えたその在り方の中に、すでに光があります。`,
+        zion: `${participant}さん、${block} であなたが分かち合ったことには、存在感、真実、そしてより深く見つめようとする意志が表れています。「${answer || questionText || 'あなたの体験'}」と語ったことの中に、尊重され、育まれるべき内なる姿勢があります。この返答を力のしるしとして受け取ってください。省察から始まるものは、やがて方向性、明晰さ、そして意味へと育っていきます。`,
+        arion: `${participant}さん、${block} におけるあなたの答えには、繊細さと深さがあります。「${answer || questionText || 'あなたの体験'}」と表現したとき、私たちはあなたの内なる世界が、傾聴、いたわり、成長を求めていることを感じ取ります。この返答があたたかな受容として届き、あなたがより大きな存在感、真実、そして内に咲く光とのつながりをもって進めますように。`
+      },
+
+      'zh-CN': {
+        lumen: `${participant}，你在 ${block} 中的回答显露出一种真诚的内在觉察。当你表达“${answer || questionText || '你的经历'}”时，你展现了敏感、诚实，以及更有意识地前行的愿望。请把这段反馈当作一种温柔的接纳：继续平静地聆听你内心的真实，因为你回应这一阶段的方式本身就带着光。`,
+        zion: `${participant}，你在 ${block} 中分享的内容展现出临在、真实，以及愿意更深看见的姿态。当你说出“${answer || questionText || '你的经历'}”时，你流露出一种值得尊重并持续发展的内在立场。请把这段回应当作力量的记号：始于反思的东西，能够成长为方向、清晰与意义。`,
+        arion: `${participant}，你在 ${block} 中的回答带着细腻与深度。当你表达“${answer || questionText || '你的经历'}”时，我们看见你的内在世界正呼唤倾听、照顾与成长。愿这段反馈以温柔的接纳临到你，并帮助你以更多临在、真实，以及与内在之光的连接继续前行。`
+      }
+    };
+
+    const pack = fallbackPorGuia[lang] || fallbackPorGuia['pt-BR'];
+    return pack[guide] || pack.lumen;
+  }
+
+  function extractFeedbackText(resp) {
+    return String(
+      resp?.texto ||
+      resp?.devolutivaBloco ||
+      resp?.devolutiva ||
+      resp?.feedback ||
+      resp?.message ||
+      ''
+    ).trim();
+  }
+
+  async function requestGuideFeedbackWithFallback(params) {
+    const {
+      nome,
+      guia,
+      blocoNome,
+      respostas,
+      idioma,
+      pergunta,
+      resposta
+    } = params;
+
+    const guide = normalizeGuide(guia || 'lumen');
+    const fallbackText = buildFallbackFeedback({
+      guia: guide,
+      nome,
+      blocoNome,
+      resposta,
+      pergunta,
+      idioma
+    });
+
+    if (!window.API) {
+      return { ok: true, texto: fallbackText, guiaUsado: 'lumen', fallbackUsed: true };
+    }
+
+    const bodyBase = {
+      nome,
+      bloco: blocoNome,
+      respostas: Array.isArray(respostas) ? respostas : [],
+      idioma,
+      pergunta,
+      resposta
+    };
+
+    const tentativas = [
+      { guia: guide, retry: false },
+      { guia: guide, retry: true }
+    ];
+
+    if (guide !== 'lumen') {
+      tentativas.push({ guia: 'lumen', retry: false, fallback: true });
+    }
+
+    let ultimoErro = null;
+
+    for (const tentativa of tentativas) {
+      try {
+        let raw = null;
+
+        if (Array.isArray(bodyBase.respostas) && bodyBase.respostas.length && typeof window.API.gerarDevolutivaBloco === 'function') {
+          raw = await window.API.gerarDevolutivaBloco({
+            nome,
+            guia: tentativa.guia,
+            bloco: blocoNome,
+            respostas: bodyBase.respostas,
+            idioma,
+            retry: tentativa.retry,
+            forceComplete: true,
+            minSentences: tentativa.guia === 'lumen' ? 4 : 3,
+            minChars: tentativa.guia === 'lumen' ? 220 : 180
+          });
+        } else if (typeof window.API.gerarDevolutiva === 'function') {
+          raw = await window.API.gerarDevolutiva({
+            nome,
+            guia: tentativa.guia,
+            bloco: blocoNome,
+            pergunta,
+            resposta,
+            idioma,
+            retry: tentativa.retry,
+            forceComplete: true,
+            minSentences: tentativa.guia === 'lumen' ? 4 : 3,
+            minChars: tentativa.guia === 'lumen' ? 220 : 180
+          });
+        }
+
+        const texto = extractFeedbackText(raw);
+        if (!texto) {
+          ultimoErro = new Error(`Resposta vazia para ${tentativa.guia}`);
+          continue;
+        }
+
+        if (isWeakFeedback(texto, {
+          minChars: tentativa.guia === 'lumen' ? 220 : 180,
+          minSentences: tentativa.guia === 'lumen' ? 4 : 3
+        })) {
+          ultimoErro = new Error(`Resposta fraca para ${tentativa.guia}`);
+          continue;
+        }
+
+        return {
+          ok: true,
+          texto: texto.trim(),
+          guiaUsado: tentativa.guia,
+          fallbackUsed: !!tentativa.fallback
+        };
+      } catch (err) {
+        ultimoErro = err;
+        console.warn('[DEVOLUTIVA][ROBUSTA] falha:', tentativa.guia, tentativa.retry ? 'retry' : 'primeira', err);
+      }
+    }
+
+    console.warn('[DEVOLUTIVA][ROBUSTA] usando fallback local:', ultimoErro);
     return {
-      ok: false,
-      texto: ''
+      ok: true,
+      texto: fallbackText,
+      guiaUsado: 'lumen',
+      fallbackUsed: true
     };
   }
 
-  return requestGuideFeedbackWithFallback({
-    nome,
-    guia,
-    blocoNome,
-    respostas,
-    idioma,
-    pergunta: '',
-    resposta: respostas[respostas.length - 1] || ''
-  });
-}
+  async function gerarDevolutivaDoBloco(bloco) {
+    const nome =
+      sessionStorage.getItem('jornada.nome') ||
+      localStorage.getItem('JORNADA_NOME') ||
+      localStorage.getItem('jc.nome') ||
+      'Participante';
 
-  function getBlockClosingLead(bloco) {
-  const blocoNome = bloco?.title || bloco?.id || 'este bloco';
+    const guia =
+      sessionStorage.getItem('jornada.guia') ||
+      localStorage.getItem('JORNADA_GUIA') ||
+      localStorage.getItem('jornada.guia') ||
+      document.body.dataset.guia ||
+      'lumen';
 
-  const frases = [
-    `PARABÉNS!!! Finalizamos o ${blocoNome}. Estou recolhendo os sinais mais preciosos que você deixou nesta etapa...`,
-    `Encerramos o ${blocoNome}. Aguarde um instante: estou contemplando com carinho o sentido desta nossa travessia...`,
-    `Que belo passo demos no ${blocoNome}! Agora, reúno as chamas deste trecho para te devolver uma síntese viva e inspiradora...`,
-    `Concluímos o ${blocoNome}. Estou observando cada fio desta etapa para transformar suas respostas em direção e clareza...`,
-    `Etapa concluída: ${blocoNome}. Recolho agora os ecos deste bloco para te responder com toda a luz que você compartilhou...`
-];
+    const idioma = document.documentElement.lang || getLang() || 'pt-BR';
+    const respostas = getAllAnswersFromBlock(bloco);
+    const blocoNome = bloco?.title || bloco?.id || 'Bloco';
 
-  const idx =
-    typeof bloco?.index === 'number'
-      ? bloco.index % frases.length
-      : Math.floor(Math.random() * frases.length);
+    if (!respostas.length) {
+      return {
+        ok: false,
+        texto: ''
+      };
+    }
 
-  return frases[idx];
-}
-
-async function maybeHandleBlockClosure(section, bloco) {
-  if (!isLastQuestionOfBlock(bloco)) {
-    goNext(bloco);
-    return;
+    return requestGuideFeedbackWithFallback({
+      nome,
+      guia,
+      blocoNome,
+      respostas,
+      idioma,
+      pergunta: '',
+      resposta: respostas[respostas.length - 1] || ''
+    });
   }
 
-  try {
-    setContinueState(section, 'loading');
-    await setGuideResponse(getBlockClosingLead(bloco), 'info');
+  function getBlockClosingLead(bloco) {
+    const blocoNome = bloco?.title || bloco?.id || 'este bloco';
+    const frases = uiText('block_closing', I18N_UI['pt-BR'].block_closing);
 
-    const result = await gerarDevolutivaDoBloco(bloco);
+    const idx =
+      typeof bloco?.index === 'number'
+        ? bloco.index % frases.length
+        : Math.floor(Math.random() * frases.length);
 
-    if (result?.ok && result.texto) {
-      const existentes = getStoredBlockFeedbacks().filter((item) => item?.blocoId !== (bloco?.id || ''));
-      existentes.push({
-        blocoId: bloco?.id || '',
-        blocoTitulo: bloco?.title || bloco?.id || 'Bloco',
-        respostas: getAllAnswersFromBlock(bloco),
-        texto: result.texto,
-        guiaUsado: result.guiaUsado || normalizeGuide(document.body.dataset.guia || 'lumen')
-      });
-      setStoredBlockFeedbacks(existentes);
+    return uiFormat(frases[idx], { blocoNome });
+  }
 
-      await setGuideResponse(result.texto, result.fallbackUsed ? 'warn' : 'success');
+  async function maybeHandleBlockClosure(section, bloco) {
+    if (!isLastQuestionOfBlock(bloco)) {
       goNext(bloco);
       return;
     }
 
-    console.warn('[BLOCO] devolutiva não retornou conteúdo válido, seguindo com fallback de navegação.');
-    goNext(bloco);
-  } catch (e) {
-    console.warn('[BLOCO] erro ao gerar devolutiva do bloco:', e);
-    goNext(bloco);
-  }
-}
+    try {
+      setContinueState(section, 'loading');
+      await setGuideResponse(getBlockClosingLead(bloco), 'info');
 
+      const result = await gerarDevolutivaDoBloco(bloco);
+
+      if (result?.ok && result.texto) {
+        const existentes = getStoredBlockFeedbacks().filter((item) => item?.blocoId !== (bloco?.id || ''));
+        existentes.push({
+          blocoId: bloco?.id || '',
+          blocoTitulo: bloco?.title || bloco?.id || 'Bloco',
+          respostas: getAllAnswersFromBlock(bloco),
+          texto: result.texto,
+          guiaUsado: result.guiaUsado || normalizeGuide(document.body.dataset.guia || 'lumen')
+        });
+        setStoredBlockFeedbacks(existentes);
+
+        await setGuideResponse(result.texto, result.fallbackUsed ? 'warn' : 'success');
+        goNext(bloco);
+        return;
+      }
+
+      console.warn('[BLOCO] devolutiva não retornou conteúdo válido, seguindo com fallback de navegação.');
+      goNext(bloco);
+    } catch (e) {
+      console.warn('[BLOCO] erro ao gerar devolutiva do bloco:', e);
+      goNext(bloco);
+    }
+  }
 
   function setContinueState(section, state) {
     if (!section) return;
@@ -877,29 +1058,28 @@ async function maybeHandleBlockClosure(section, bloco) {
 
     if (state === 'loading') {
       btn.disabled = true;
-      btn.textContent = window.i18n?.t('feedback.loading', 'Guia refletindo...');
+      btn.textContent = uiText('guide_reflecting', 'Guia refletindo...');
       btn.classList.add('is-loading');
       return;
     }
 
     if (state === 'ready') {
       btn.disabled = false;
-      btn.textContent = window.i18n?.t('common.continue', 'Continuar');
+      btn.textContent = uiText('continue', 'Continuar');
       btn.classList.add('is-ready');
       return;
     }
 
     if (state === 'error') {
       btn.disabled = false;
-      btn.textContent = window.i18n?.t('common.retry', 'Tentar novamente');
+      btn.textContent = uiText('retry', 'Tentar novamente');
       btn.classList.add('is-error');
       return;
     }
 
     btn.disabled = false;
-    btn.textContent = 'Continuar';
+    btn.textContent = uiText('continue', 'Continuar');
   }
-
 
   function bindButtons(section, bloco, perguntaText) {
     const btnTTS = $('#jp-btn-falar', section);
@@ -917,60 +1097,60 @@ async function maybeHandleBlockClosure(section, bloco) {
       };
     }
 
-   if (btnMic) {
-  btnMic.onclick = async (ev) => {
-    ev.preventDefault();
+    if (btnMic) {
+      btnMic.onclick = async (ev) => {
+        ev.preventDefault();
 
-    const isRecording = btnMic.classList.contains('recording');
+        const isRecording = btnMic.classList.contains('recording');
 
-    if (isRecording) {
-      btnMic.classList.remove('recording');
+        if (isRecording) {
+          btnMic.classList.remove('recording');
 
-      try {
-        if (window.__REC__) {
-          window.__REC__.stop();
+          try {
+            if (window.__REC__) {
+              window.__REC__.stop();
+            }
+          } catch (e) {
+            console.warn('[MIC] erro ao parar reconhecimento:', e);
+          }
+
+          return;
         }
-      } catch (e) {
-        console.warn('[MIC] erro ao parar reconhecimento:', e);
-      }
 
-      return;
-    }
+        btnMic.classList.add('recording');
 
-    btnMic.classList.add('recording');
-
-    try {
-      triggerMic(textarea);
-    } catch (e) {
-      btnMic.classList.remove('recording');
-      console.warn('[MIC] erro ao iniciar:', e);
-    }
-
-    if (window.__REC__) {
-      const rec = window.__REC__;
-
-      rec.onend = (() => {
-        const old = rec.onend;
-        return function (...args) {
+        try {
+          triggerMic(textarea);
+        } catch (e) {
           btnMic.classList.remove('recording');
-          if (typeof old === 'function') {
-            try { old.apply(this, args); } catch {}
-          }
-        };
-      })();
+          console.warn('[MIC] erro ao iniciar:', e);
+        }
 
-      rec.onerror = (() => {
-        const old = rec.onerror;
-        return function (...args) {
-          btnMic.classList.remove('recording');
-          if (typeof old === 'function') {
-            try { old.apply(this, args); } catch {}
-          }
-        };
-      })();
+        if (window.__REC__) {
+          const rec = window.__REC__;
+
+          rec.onend = (() => {
+            const old = rec.onend;
+            return function (...args) {
+              btnMic.classList.remove('recording');
+              if (typeof old === 'function') {
+                try { old.apply(this, args); } catch {}
+              }
+            };
+          })();
+
+          rec.onerror = (() => {
+            const old = rec.onerror;
+            return function (...args) {
+              btnMic.classList.remove('recording');
+              if (typeof old === 'function') {
+                try { old.apply(this, args); } catch {}
+              }
+            };
+          })();
+        }
+      };
     }
-  };
-}
 
     if (btnApagar) {
       btnApagar.onclick = (ev) => {
@@ -986,13 +1166,11 @@ async function maybeHandleBlockClosure(section, bloco) {
 
         const state = section?.dataset?.continueState || 'idle';
 
-        // só avança se a devolutiva já estiver pronta
-       if (state === 'ready') {
-       await maybeHandleBlockClosure(section, bloco);
-       return;
-      }
+        if (state === 'ready') {
+          await maybeHandleBlockClosure(section, bloco);
+          return;
+        }
 
-        // evita clique duplo durante carregamento
         if (state === 'loading') {
           return;
         }
@@ -1007,7 +1185,10 @@ async function maybeHandleBlockClosure(section, bloco) {
 
         saveAnswer(bloco, 0, val);
         setContinueState(section, 'loading');
-        await setGuideResponse('Só um momento, vou refletir sobre sua resposta...', 'info');
+        await setGuideResponse(
+          uiText('thinking_about_answer', 'Só um momento, vou refletir sobre sua resposta...'),
+          'info'
+        );
 
         try {
           const guia =
@@ -1024,14 +1205,14 @@ async function maybeHandleBlockClosure(section, bloco) {
             'Participante';
 
           const result = await requestGuideFeedbackWithFallback({
-          nome,
-          guia,
-          blocoNome: bloco?.title || bloco?.id || 'Bloco',
-          respostas: [], // força modo PERGUNTA
-          idioma: document.documentElement.lang || getLang() || 'pt-BR',
-          pergunta: perguntaText,
-          resposta: val
-        });
+            nome,
+            guia,
+            blocoNome: bloco?.title || bloco?.id || 'Bloco',
+            respostas: [],
+            idioma: document.documentElement.lang || getLang() || 'pt-BR',
+            pergunta: perguntaText,
+            resposta: val
+          });
 
           if (result?.ok && result.texto) {
             await setGuideResponse(result.texto, result.fallbackUsed ? 'warn' : 'success');
@@ -1040,16 +1221,21 @@ async function maybeHandleBlockClosure(section, bloco) {
           }
 
           await setGuideResponse(
-            'A devolutiva ainda não chegou completa. Toque em "Tentar novamente" para reenviar tua resposta ao guia.',
+            uiText(
+              'incomplete_feedback',
+              'A devolutiva ainda não chegou completa. Toque em "Tentar novamente" para reenviar tua resposta ao guia.'
+            ),
             'warn'
           );
           setContinueState(section, 'error');
-
         } catch (e) {
           console.warn('Erro devolutiva IA', e);
 
           await setGuideResponse(
-            'A conexão com o guia oscilou neste momento. Toque em "Tentar novamente" para buscar a devolutiva.',
+            uiText(
+              'connection_oscillated',
+              'A conexão com o guia oscilou neste momento. Toque em "Tentar novamente" para buscar a devolutiva.'
+            ),
             'warn'
           );
           setContinueState(section, 'error');
@@ -1081,46 +1267,44 @@ async function maybeHandleBlockClosure(section, bloco) {
       $('.perguntas-title', section);
 
     if (titleEl) {
-    if (bloco.data_i18n && window.i18n?.t) {
-    titleEl.textContent = window.i18n.t(`blocks.${bloco.id}`, bloco.title);
-  } else {
-    titleEl.textContent = bloco.title || `Bloco ${(bloco.index ?? 0) + 1}`;
-  }
- }
-    
+      titleEl.textContent = String(
+        bloco?.title || `Bloco ${(bloco?.index ?? 0) + 1}`
+      ).trim();
+    }
+
     const questionEl =
-  $('#jp-question-typed', section) ||
-  $('.jp-question-typed', section) ||
-  $('#question-display', section);
+      $('#jp-question-typed', section) ||
+      $('.jp-question-typed', section) ||
+      $('#question-display', section);
 
-const textarea =
-  $('#jp-answer-input', section) ||
-  $('#answer-input', section) ||
-  $('textarea', section);
+    const textarea =
+      $('#jp-answer-input', section) ||
+      $('#answer-input', section) ||
+      $('textarea', section);
 
-const perguntaText = getQuestionText(bloco, 0);
+    const perguntaText = getQuestionText(bloco, 0);
 
-if (textarea) {
-  textarea.value = getAnswer(bloco, 0);
-  textarea.focus();
-  ensureMicAttached(textarea);
-}
+    if (textarea) {
+      textarea.value = getAnswer(bloco, 0);
+      textarea.focus();
+      ensureMicAttached(textarea);
+    }
 
-setGuideResponse('');
-setContinueState(section, 'idle');
-updateProgress(bloco);
-bindButtons(section, bloco, perguntaText);
+    setGuideResponse('');
+    setContinueState(section, 'idle');
+    updateProgress(bloco);
+    bindButtons(section, bloco, perguntaText);
 
-if (questionEl) {
-  questionEl.textContent = '';
-  questionEl.style.display = 'block';
-  questionEl.style.visibility = 'visible';
-  questionEl.style.opacity = '1';
-  questionEl.style.minHeight = '42px';
-  questionEl.setAttribute('data-typing', 'true');
+    if (questionEl) {
+      questionEl.textContent = '';
+      questionEl.style.display = 'block';
+      questionEl.style.visibility = 'visible';
+      questionEl.style.opacity = '1';
+      questionEl.style.minHeight = '42px';
+      questionEl.setAttribute('data-typing', 'true');
 
-  await typeQuestion(questionEl, perguntaText, 28, true);
-}
+      await typeQuestion(questionEl, perguntaText, 28, true);
+    }
 
     log('Bloco renderizado:', bloco.id);
   }
@@ -1141,7 +1325,6 @@ if (questionEl) {
     }
   });
 
-  // garante vozes carregadas para o TTS por guia
   try {
     if (window.speechSynthesis) {
       window.speechSynthesis.getVoices();
