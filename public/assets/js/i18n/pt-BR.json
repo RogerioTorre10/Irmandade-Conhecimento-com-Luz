@@ -164,6 +164,9 @@
     "p5": "Você é a luz. Você é a mudança.",
     "pdf": "Baixar PDF",
     "selfie": "Baixar SelfieCard",
-    "back": "Voltar ao Portal"
+    "back": "Voltar ao Portal",
+    "thinking": "Refletindo...",
+    "error": "Erro ao gerar devolutiva.",
+    "selfieUnavailable": "Selfie ainda não disponível"    
   }
 }
