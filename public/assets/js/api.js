@@ -281,50 +281,53 @@
   const PDF_PATHS = [
     '/jornada/essencial/pdf',
     '/jornada/pdf',
+    '/jornada-essencial/pdf',
     '/pdf',
     '/gerar-pdf'
   ];
 
+  let lastError = null;
+
   for (const path of PDF_PATHS) {
     try {
-      console.log('[PDF] tentando:', API_PRIMARY + path);
+      console.log('[PDF] tentando:', `${API_PRIMARY}${path}`);
 
-      const { data } = await postJSON(API_PRIMARY, path, safePayload, 60000);
+      const { data, response } = await postJSON(API_PRIMARY, path, safePayload, 60000);
 
-      // ✅ Caso 1: PDF direto
       if (data instanceof Blob) {
-        console.log('[PDF] sucesso via blob:', path);
-
-        const url = URL.createObjectURL(data);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fname;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-
-        setTimeout(() => URL.revokeObjectURL(url), 2000);
-
-        return { ok: true };
+        console.log('[PDF] sucesso via blob:', path, response?.status);
+        triggerDownload(data, fname);
+        return { ok: true, path };
       }
 
-      // ✅ Caso 2: URL retornada
-      if (data && data.url) {
-        console.log('[PDF] sucesso via url:', path);
+      if (data && typeof data === 'object' && data.url) {
+        console.log('[PDF] sucesso via url:', path, data.url);
         window.open(data.url, '_blank');
-        return { ok: true };
+        return { ok: true, path };
       }
 
+      if (data && typeof data === 'object' && data.ok && data.pdf_url) {
+        console.log('[PDF] sucesso via pdf_url:', path, data.pdf_url);
+        window.open(data.pdf_url, '_blank');
+        return { ok: true, path };
+      }
+
+      console.warn('[PDF] resposta sem blob/url:', path, data);
+      lastError = new Error(`Resposta inesperada em ${path}`);
     } catch (e) {
-      console.warn('[PDF] falhou:', path, e.message);
-      await sleep(400); // pequeno delay antes de tentar próximo
+      lastError = e;
+      console.warn('[PDF] tentativa falhou:', path, e?.message || e);
+      await sleep(300);
     }
   }
 
-  console.error('[PDF] nenhuma rota respondeu corretamente');
-  return { ok: false };
+  console.error('[PDF] nenhuma rota respondeu corretamente.', lastError);
+  return {
+    ok: false,
+    error: String(lastError?.message || 'Nenhuma rota de PDF respondeu corretamente.')
+  };
 }
-
+  
   async function gerarDevolutivaBase(payload, path) {
     try {
       const sanitized =
