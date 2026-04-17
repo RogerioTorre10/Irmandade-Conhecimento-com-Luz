@@ -151,14 +151,17 @@
     ]
   },
   "final": {
-    "title": "End of the Journey",
-    "p1": "Your answers were received with honor by the Brotherhood.",
-    "p2": "You planted seeds of trust, courage and light.",
-    "p3": "Keep walking. The journey never ends.",
-    "p4": "Come back whenever you need to rekindle your flame.",
-    "p5": "You are the light. You are the change.",
-    "pdf": "Download PDF",
-    "selfie": "Download SelfieCard",
-    "back": "Back to Portal"
-  }
+  "title": "End of the Journey",
+  "p1": "Your answers have been received with honor by the Brotherhood.",
+  "p2": "You have planted seeds of trust, courage, and light.",
+  "p3": "Keep moving forward. The journey never ends.",
+  "p4": "Return whenever you need to rekindle your flame.",
+  "p5": "You are the light. You are the change.",
+  "pdf": "Download PDF",
+  "selfie": "Download SelfieCard",
+  "back": "Back to Portal",
+  "thinking": "Reflecting...",
+  "error": "Error generating feedback.",
+  "selfieUnavailable": "Selfie not available yet"
+}
 }
