@@ -162,6 +162,12 @@
   "back": "Retour au Portail",
   "thinking": "Réflexion en cours...",
   "error": "Erreur lors de la génération du retour.",
-  "selfieUnavailable": "Selfie non disponible pour le moment"
-}
+  "selfieUnavailable": "Selfie non disponible pour le moment",
+  "reflecting": "Réflexion en cours...",
+  "gathering": "Le Guide rassemble les flammes de votre voyage...",
+  "feedbackDone": "Le retour final est terminé. Vous pouvez maintenant générer le PDF ou télécharger la SelfieCard.",
+  "feedbackError": "Je n'ai pas pu terminer le retour final du Guide.",
+  "selfieDownloaded": "SelfieCard téléchargée avec succès !",
+  "selfieDownloadError": "Je n'ai pas pu télécharger la SelfieCard. Vérifiez la console."
+  }
 }
