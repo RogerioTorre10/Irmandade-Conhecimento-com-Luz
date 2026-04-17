@@ -149,24 +149,35 @@
       "Etappe abgeschlossen: {blocoNome}. Ich sammle die Echos, um mit all dem Licht zu antworten, das Sie geteilt haben."
     ]
   },
-  "final": {
+ "final": {
   "title": "Ende der Reise",
-  "p1": "Deine Antworten wurden von der Bruderschaft ehrenvoll empfangen.",
+  "p1": "Deine Antworten wurden von der Bruderschaft mit Ehre empfangen.",
   "p2": "Du hast Samen von Vertrauen, Mut und Licht gesät.",
-  "p3": "Gehe weiter voran. Die Reise endet niemals.",
+  "p3": "Gehe weiter. Die Reise endet nie.",
   "p4": "Kehre zurück, wann immer du deine Flamme neu entfachen musst.",
   "p5": "Du bist das Licht. Du bist die Veränderung.",
   "pdf": "PDF herunterladen",
   "selfie": "SelfieCard herunterladen",
   "back": "Zurück zum Portal",
-  "thinking": "Am Nachdenken...",
-  "error": "Fehler beim Generieren der Auswertung.",
+  "thinking": "Reflektiere...",
+  "error": "Fehler beim Generieren der Rückmeldung.",
   "selfieUnavailable": "Selfie noch nicht verfügbar",
-  "reflecting": "Am Nachdenken...",
+  "reflecting": "Reflektiere...",
   "gathering": "Der Guide sammelt die Flammen deiner Reise...",
-  "feedbackDone": "Die abschließende Rückmeldung wurde abgeschlossen. Du kannst jetzt das PDF erstellen oder die SelfieCard herunterladen.",
-  "feedbackError": "Ich konnte die abschließende Rückmeldung des Guides nicht fertigstellen.",
+  "feedbackDone": "Abschlussfeedback fertig. Du kannst jetzt das PDF generieren oder die SelfieCard herunterladen.",
+  "feedbackError": "Das Abschlussfeedback konnte nicht erstellt werden.",
   "selfieDownloaded": "SelfieCard erfolgreich heruntergeladen!",
-  "selfieDownloadError": "Ich konnte die SelfieCard nicht herunterladen. Prüfe die Konsole."
+  "selfieDownloadError": "SelfieCard konnte nicht heruntergeladen werden.",
+  "apiUnavailable": "API ist nicht bereit. Prüfe /assets/js/api.js.",
+  "payloadError": "PDF-Payload konnte nicht erstellt werden.",
+  "invalidName": "Ungültiger Name. Bitte bestätigen.",
+  "invalidGuide": "Guide nicht erkannt. Wähle Lumen, Zion oder Arian.",
+  "noAnswers": "Keine Antworten vorhanden.",
+  "pdfConnectionIssue": "Verbindungsproblem erkannt.",
+  "retryLabel": "Erneut versuchen",
+  "retryReady": "Du kannst es erneut versuchen.",
+  "forging": "Der Guide erstellt dein Pergament...",
+  "pdfSuccess": "Pergament erfolgreich erstellt!",
+  "pdfError": "Fehler beim PDF."
   }
 }
