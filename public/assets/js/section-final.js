@@ -1056,7 +1056,7 @@ window.buildFinalPayloadDiamante = buildFinalPayloadDiamante;
 
   btnPdf.dataset.loading = '1';
   btnPdf.disabled = true;
-  btnPdf.textContent = 'Guia pensando...';
+  btnPdf.textContent = t('final.thinking', 'Guia pensando...');
   btnPdf.classList.add('is-loading');
 
   if (!window.API || typeof window.API.gerarPDFEHQ !== 'function') {
