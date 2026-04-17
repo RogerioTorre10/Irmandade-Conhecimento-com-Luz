@@ -35,6 +35,10 @@
     const l4 = document.documentElement?.lang;
     return (l1 || l2 || l3 || l4 || 'pt-BR').toString().trim();
   }
+  
+  function t(key, fallback = '') {
+  return window.i18n?.t?.(key) || fallback;
+}
 
   function getStorageKey() {
     return (
