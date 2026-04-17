@@ -83,3 +83,65 @@
     font-size: 13px;
   }
 }
+/* ===== FINAL — BOTÕES COM AURA DO GUIA ===== */
+#section-final .final-acoes .btn,
+#section-final .final-acoes button,
+#section-final .final-acoes a,
+#section-final #btnPdf,
+#section-final #btnBaixarSelfie,
+#section-final #btnVoltarPortal {
+  position: relative !important;
+  border: 1px solid var(--guia-strong) !important;
+  color: var(--guia-text) !important;
+  background:
+    linear-gradient(to bottom, rgba(255,255,255,0.08), rgba(0,0,0,0.24)) !important;
+  box-shadow:
+    0 0 10px var(--guia-soft),
+    0 0 24px color-mix(in srgb, var(--guia-main) 35%, transparent),
+    inset 0 0 10px rgba(255,255,255,0.04) !important;
+  text-shadow: 0 0 6px var(--guia-soft) !important;
+  transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease !important;
+}
+
+#section-final .final-acoes .btn:hover,
+#section-final .final-acoes button:hover,
+#section-final .final-acoes a:hover {
+  transform: translateY(-1px) scale(1.01) !important;
+  box-shadow:
+    0 0 14px var(--guia-soft),
+    0 0 30px color-mix(in srgb, var(--guia-main) 50%, transparent),
+    inset 0 0 12px rgba(255,255,255,0.06) !important;
+}
+
+#section-final .final-acoes .btn.is-busy,
+#section-final .final-acoes button.is-busy {
+  opacity: .62 !important;
+  filter: grayscale(.08) !important;
+}
+#section-final .final-pergaminho-wrapper,
+#section-final .final-panel,
+#section-final .j-panel-glow,
+#section-final .j-perg-v-inner,
+#section-final .final-wrap,
+#section-final .j-arcane-card,
+#section-final .pergaminho-content {
+  margin-left: auto !important;
+  margin-right: auto !important;
+  box-sizing: border-box !important;
+}
+
+#section-final .j-panel-glow,
+#section-final .final-panel {
+  width: min(92vw, 620px) !important;
+  max-width: 620px !important;
+}
+
+@media (min-width: 901px) {
+  #section-final {
+    padding-top: 18px !important;
+  }
+
+  #section-final .pergaminho-content {
+    padding: 18px 22px 14px !important;
+  }
+}
