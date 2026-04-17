@@ -167,6 +167,12 @@
     "back": "Voltar ao Portal",
     "thinking": "Refletindo...",
     "error": "Erro ao gerar devolutiva.",
-    "selfieUnavailable": "Selfie ainda não disponível"    
+    "selfieUnavailable": "Selfie ainda não disponível",
+    "reflecting": "Refletindo...",
+    "gathering": "O Guia está reunindo as chamas da sua jornada...",
+    "feedbackDone": "Devolutiva final concluída. Agora você pode gerar o PDF ou baixar a SelfieCard.",
+    "feedbackError": "Não consegui concluir a devolutiva final do Guia.",
+    "selfieDownloaded": "SelfieCard baixado com sucesso!",
+    "selfieDownloadError": "Não consegui baixar a SelfieCard. Veja o console."
   }
 }
