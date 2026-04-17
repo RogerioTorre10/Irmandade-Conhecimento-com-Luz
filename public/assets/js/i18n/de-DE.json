@@ -150,14 +150,17 @@
     ]
   },
   "final": {
-    "title": "Ende der Reise",
-    "p1": "Ihre Antworten wurden von der Bruderschaft mit Ehre empfangen.",
-    "p2": "Sie haben Samen des Vertrauens, des Mutes und des Lichts gepflanzt.",
-    "p3": "Gehen Sie weiter. Die Reise endet nie.",
-    "p4": "Kommen Sie zurück, wenn Sie Ihre Flamme neu entzünden möchten.",
-    "p5": "Sie sind das Licht. Sie sind die Veränderung.",
-    "pdf": "PDF herunterladen",
-    "selfie": "SelfieCard herunterladen",
-    "back": "Zum Portal zurück"
-  }
+  "title": "Ende der Reise",
+  "p1": "Deine Antworten wurden von der Bruderschaft ehrenvoll empfangen.",
+  "p2": "Du hast Samen von Vertrauen, Mut und Licht gesät.",
+  "p3": "Gehe weiter voran. Die Reise endet niemals.",
+  "p4": "Kehre zurück, wann immer du deine Flamme neu entfachen musst.",
+  "p5": "Du bist das Licht. Du bist die Veränderung.",
+  "pdf": "PDF herunterladen",
+  "selfie": "SelfieCard herunterladen",
+  "back": "Zurück zum Portal",
+  "thinking": "Am Nachdenken...",
+  "error": "Fehler beim Generieren der Auswertung.",
+  "selfieUnavailable": "Selfie noch nicht verfügbar"
+}
 }
