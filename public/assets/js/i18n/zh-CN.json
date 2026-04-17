@@ -162,6 +162,12 @@
   "back": "返回门户",
   "thinking": "正在思考...",
   "error": "生成反馈时出错",
-  "selfieUnavailable": "自拍尚未可用"
-}
+  "selfieUnavailable": "自拍尚未可用",
+  "reflecting": "正在思考...",
+  "gathering": "向导正在汇聚你旅程中的火焰...",
+  "feedbackDone": "最终反馈已完成。现在你可以生成 PDF 或下载 SelfieCard。",
+  "feedbackError": "我未能完成向导的最终反馈。",
+  "selfieDownloaded": "SelfieCard 下载成功！",
+  "selfieDownloadError": "我无法下载 SelfieCard。请检查控制台。"
+  }
 }
