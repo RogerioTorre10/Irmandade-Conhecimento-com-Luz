@@ -153,9 +153,9 @@
   "final": {
   "title": "Fin de la Jornada",
   "p1": "Tus respuestas han sido recibidas con honor por la Hermandad.",
-  "p2": "Has plantado semillas de confianza, valentía y luz.",
-  "p3": "Sigue adelante. La jornada nunca termina.",
-  "p4": "Regresa cuando necesites reavivar tu llama.",
+  "p2": "Has sembrado semillas de confianza, valentía y luz.",
+  "p3": "Sigue caminando. La jornada nunca termina.",
+  "p4": "Vuelve cuando necesites reavivar tu llama.",
   "p5": "Eres la luz. Eres el cambio.",
   "pdf": "Descargar PDF",
   "selfie": "Descargar SelfieCard",
@@ -165,9 +165,20 @@
   "selfieUnavailable": "Selfie aún no disponible",
   "reflecting": "Reflexionando...",
   "gathering": "El Guía está reuniendo las llamas de tu jornada...",
-  "feedbackDone": "La devolución final ha sido completada. Ahora puedes generar el PDF o descargar la SelfieCard.",
-  "feedbackError": "No pude completar la devolución final del Guía.",
+  "feedbackDone": "Devolución final completada. Ahora puedes generar el PDF o descargar la SelfieCard.",
+  "feedbackError": "No se pudo completar la devolución final del Guía.",
   "selfieDownloaded": "¡SelfieCard descargada con éxito!",
-  "selfieDownloadError": "No pude descargar la SelfieCard. Revisa la consola."    
+  "selfieDownloadError": "No se pudo descargar la SelfieCard. Consulta la consola.",
+  "apiUnavailable": "La API no está lista. Verifica si /assets/js/api.js cargó.",
+  "payloadError": "No se pudo construir el payload del PDF.",
+  "invalidName": "Nombre inválido. Confírmalo antes de generar el PDF.",
+  "invalidGuide": "Guía no identificado. Selecciona Lumen, Zion o Arian antes de generar el PDF.",
+  "noAnswers": "No hay respuestas. Completa las preguntas antes de generar el PDF.",
+  "pdfConnectionIssue": "Problemas de conexión. Si tarda demasiado, se habilitará \"Reintentar\".",
+  "retryLabel": "Reintentar",
+  "retryReady": "La solicitud está tardando demasiado. Puedes intentar nuevamente.",
+  "forging": "El Guía está forjando tu pergamino...",
+  "pdfSuccess": "¡Pergamino generado y descargado con éxito!",
+  "pdfError": "Error al generar el PDF. Consulta la consola."    
  }
 }
