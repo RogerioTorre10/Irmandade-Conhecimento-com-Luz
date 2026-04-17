@@ -162,6 +162,12 @@
   "back": "ポータルへ戻る",
   "thinking": "考えています...",
   "error": "フィードバックの生成中にエラーが発生しました",
-  "selfieUnavailable": "セルフィーはまだ利用できません"
-}
+  "selfieUnavailable": "セルフィーはまだ利用できません",
+  "reflecting": "考えています...",
+  "gathering": "ガイドがあなたの旅の炎を集めています...",
+  "feedbackDone": "最終フィードバックが完了しました。これでPDFを生成するか、SelfieCardをダウンロードできます。",
+  "feedbackError": "ガイドの最終フィードバックを完了できませんでした。",
+  "selfieDownloaded": "SelfieCardのダウンロードが完了しました！",
+  "selfieDownloadError": "SelfieCardをダウンロードできませんでした。コンソールを確認してください。"
+  }
 }
