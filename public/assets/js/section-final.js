@@ -735,18 +735,52 @@ window.buildFinalPayloadDiamante = buildFinalPayloadDiamante;
   }
 
   function buildGuideFallbackText(guiaRaw, nomeRaw) {
-    const guia = normalizeGuide(guiaRaw).id || 'lumen';
-    const nome = String(nomeRaw || 'Caminhante').trim() || 'Caminhante';
+  const guia = normalizeGuide(guiaRaw).id || 'lumen';
+  const nome = String(nomeRaw || 'Caminhante').trim() || 'Caminhante';
+  const lang = getActiveLang();
 
-    const fallbackPorGuia = {
-      lumen: `${nome}, sua jornada revelou sinais de sensibilidade, coragem e abertura interior. Cada resposta sua deixou marcas de verdade no pergaminho da alma. Continue avançando com fé, porque a luz que você procura também cresce dentro de você. Que esta travessia permaneça viva no seu coração e ilumine os próximos passos do seu caminho.`,
-      zion: `${nome}, você atravessou esta jornada com honestidade e presença. Houve reflexão, enfrentamento e busca real por sentido. O que foi despertado aqui não deve ficar parado: transforme percepção em passo, passo em caminho, caminho em propósito. Há força em sua travessia, e essa força merece seguir acesa com coragem.`,
-      arion: `${nome}, sua travessia demonstrou delicadeza, profundidade e desejo sincero de evolução. Em cada resposta houve um traço do seu mundo interior. Que esta experiência fortaleça sua conexão consigo, com sua verdade e com a luz que insiste em florescer dentro de você. Permita que esse amadurecimento siga com acolhimento, presença e esperança.`
-    };
+  const fallbackI18n = {
+    'pt-BR': {
+      lumen: `${nome}, sua jornada revelou sinais de sensibilidade, coragem e abertura interior...`,
+      zion: `${nome}, você atravessou esta jornada com honestidade e presença...`,
+      arion: `${nome}, sua travessia demonstrou delicadeza, profundidade e desejo sincero de evolução...`
+    },
+    'en-US': {
+      lumen: `${nome}, your journey revealed signs of sensitivity, courage, and inner openness...`,
+      zion: `${nome}, you crossed this journey with honesty and presence...`,
+      arion: `${nome}, your path revealed delicacy, depth, and a sincere desire to evolve...`
+    },
+    'es-ES': {
+      lumen: `${nome}, tu jornada reveló señales de sensibilidad, valentía y apertura interior...`,
+      zion: `${nome}, atravesaste esta jornada con honestidad y presencia...`,
+      arion: `${nome}, tu travesía mostró delicadeza, profundidad y un deseo sincero de evolucionar...`
+    },
+    'de-DE': {
+      lumen: `${nome}, deine Reise hat Zeichen von Sensibilität, Mut und innerer Offenheit offenbart...`,
+      zion: `${nome}, du bist diesen Weg mit Ehrlichkeit und Präsenz gegangen...`,
+      arion: `${nome}, dein Weg zeigte Feinfühligkeit, Tiefe und den aufrichtigen Wunsch nach Entwicklung...`
+    },
+    'fr-FR': {
+      lumen: `${nome}, votre voyage a révélé des signes de sensibilité, de courage et d’ouverture intérieure...`,
+      zion: `${nome}, vous avez traversé ce voyage avec honnêteté et présence...`,
+      arion: `${nome}, votre parcours a révélé délicatesse, profondeur et un désir sincère d’évoluer...`
+    },
+    'zh-CN': {
+      lumen: `${nome}，你的旅程展现出了敏感、勇气与内在敞开的迹象……`,
+      zion: `${nome}，你以真诚与临在走过了这段旅程……`,
+      arion: `${nome}，你的道路展现出细腻、深度，以及真诚成长的愿望……`
+    },
+    'ja-JP': {
+      lumen: `${nome}さん、あなたの旅は、繊細さ、勇気、そして内なる開きのしるしを示しました……`,
+      zion: `${nome}さん、あなたは誠実さと確かな存在感をもってこの旅を進みました……`,
+      arion: `${nome}さん、あなたの歩みは、繊細さ、深さ、そして真摯な成長への願いを示しました……`
+    }
+  };
 
-    return fallbackPorGuia[guia] || fallbackPorGuia.lumen;
-  }
-
+  const bag = fallbackI18n[lang] || fallbackI18n['pt-BR'];
+  return bag[guia] || bag.lumen;
+}
+  
   // ================================
   // DEVOLUTIVA FINAL
   // ================================
