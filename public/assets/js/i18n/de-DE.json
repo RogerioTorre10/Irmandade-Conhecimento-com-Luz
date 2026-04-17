@@ -161,6 +161,12 @@
   "back": "Zurück zum Portal",
   "thinking": "Am Nachdenken...",
   "error": "Fehler beim Generieren der Auswertung.",
-  "selfieUnavailable": "Selfie noch nicht verfügbar"
-}
+  "selfieUnavailable": "Selfie noch nicht verfügbar",
+  "reflecting": "Am Nachdenken...",
+  "gathering": "Der Guide sammelt die Flammen deiner Reise...",
+  "feedbackDone": "Die abschließende Rückmeldung wurde abgeschlossen. Du kannst jetzt das PDF erstellen oder die SelfieCard herunterladen.",
+  "feedbackError": "Ich konnte die abschließende Rückmeldung des Guides nicht fertigstellen.",
+  "selfieDownloaded": "SelfieCard erfolgreich heruntergeladen!",
+  "selfieDownloadError": "Ich konnte die SelfieCard nicht herunterladen. Prüfe die Konsole."
+  }
 }
