@@ -1,4 +1,4 @@
-// /assets/js/section-guia.js — v3.5 (lapidado)
+// /assets/js/section-guia.js — v3.6 (i18n blindado)
 // Guia: preview com áudio antes do nome; TTS da descrição após confirmar nome.
 
 (function () {
@@ -26,6 +26,19 @@
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const q = (sel, root = document) => root.querySelector(sel);
   const qa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+  // =====================================================
+  // I18N
+  // =====================================================
+  function tGuide(key, fallback = '', vars = {}) {
+    let txt = window.i18n?.t?.(key) || fallback;
+
+    txt = String(txt).replace(/\{\{\s*(\w+)\s*\}\}/g, (_, token) => {
+      return vars[token] != null ? String(vars[token]) : `{{${token}}}`;
+    });
+
+    return txt;
+  }
 
   // =====================================================
   // ESTADO
@@ -359,7 +372,7 @@
     return canonGuia(g) || 'lumen';
   }
 
- function pickVoiceForGuide(lang) {
+  function pickVoiceForGuide(lang) {
     const resolvedLang = lang || document.documentElement.lang || localStorage.getItem('i18n_lang') || 'pt-BR';
     const voices = window.speechSynthesis?.getVoices?.() || [];
     if (!voices.length) return null;
@@ -376,7 +389,7 @@
       'natural male', 'google português'
     ];
 
-    const langNorm = String(lang || 'pt-BR').toLowerCase();
+    const langNorm = String(resolvedLang || 'pt-BR').toLowerCase();
     const langShort = langNorm.slice(0, 2);
 
     const filtered = voices.filter(v =>
@@ -573,7 +586,14 @@
       btn.dataset.locked = '1';
       btn.dataset.nome = g.nome || '';
       btn.setAttribute('aria-disabled', 'true');
-      btn.setAttribute('aria-label', `Escolher o guia ${g.nome || ''}`);
+      btn.setAttribute(
+        'aria-label',
+        tGuide(
+          'guia.choose_guide_aria',
+          'Escolher o guia {{guia}}',
+          { guia: g.nome || '' }
+        )
+      );
       btn.classList.add('is-locked');
 
       const gid = btn.dataset.guia;
@@ -697,7 +717,15 @@
 
     armedId = guiaId;
 
-    showNotice(root, `Você escolheu ${label}. Clique novamente para confirmar.`, { speak: true });
+    showNotice(
+      root,
+      tGuide(
+        'guia.armed',
+        'Você escolheu {{guia}}. Clique novamente para confirmar.',
+        { guia: label }
+      ),
+      { speak: true }
+    );
 
     armTimer = setTimeout(() => {
       armedId = null;
@@ -708,7 +736,14 @@
         el.setAttribute('aria-pressed', 'false');
       });
 
-      showNotice(root, 'Tempo esgotado. Selecione o guia e clique novamente para confirmar.', { speak: true });
+      showNotice(
+        root,
+        tGuide(
+          'guia.timeout',
+          'Tempo esgotado. Selecione o guia e clique novamente para confirmar.'
+        ),
+        { speak: true }
+      );
     }, ARM_TIMEOUT_MS);
   }
 
@@ -843,9 +878,14 @@
 
       hideNotice(root);
     } catch {
-      showNotice(root, 'Não foi possível carregar os guias. Tente novamente mais tarde.', {
-        speak: false
-      });
+      showNotice(
+        root,
+        tGuide(
+          'guia.load_error',
+          'Não foi possível carregar os guias. Tente novamente mais tarde.'
+        ),
+        { speak: false }
+      );
       return;
     }
 
@@ -907,15 +947,14 @@
           nameConfirmedOnce = true;
 
           if (els.guiaTexto) {
-            const base = (
-              els.guiaTexto.dataset?.text ||
-              els.guiaTexto.textContent ||
-              'Escolha seu guia para a Jornada.'
+            const msg = tGuide(
+              'guia.subtitle',
+              'Olá, {{nome}}! Escolha seu guia para a Jornada.',
+              { nome: upperName }
             ).trim();
 
-            const msg = base.replace(/\{\{\s*(nome|name)\s*\}\}/gi, upperName);
-
             els.guiaTexto.textContent = '';
+            els.guiaTexto.dataset.text = msg;
             els.guiaTexto.dataset.spoken = '';
             await typeOnce(els.guiaTexto, msg, { speed: 38, speak: true });
 
