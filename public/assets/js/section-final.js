@@ -890,7 +890,7 @@ window.buildFinalPayloadDiamante = buildFinalPayloadDiamante;
     lockFinalButtons(section, 'Guia pensando...');
 
     try {
-      box.textContent = 'O Guia está reunindo as chamas da sua jornada...';
+      box.textContent = t('final.gathering', 'O Guia está reunindo as chamas da sua jornada...');
 
       const result = await fetchFinalGuideFeedback();
 
