@@ -554,14 +554,15 @@
     const dadosPessoais = getDadosPessoaisPayload();
 
     const payload = {
-      nome,
-      guia,
-      respostas,
-      blocos: buildPdfBlocksFromSession(),
-      selfieCard,
-      devolutivaFinal,
-      dadosPessoais
-    };
+    nome,
+    guia,
+    respostas,
+    blocos: buildPdfBlocksFromSession(),
+    selfieCard,
+    devolutivaFinal,
+    dadosPessoais,
+    idioma: getActiveLang()
+ };
 
     console.log('[FINAL][PAYLOAD NORMALIZED]', payload, '[GUIA]', guiaNorm);
     return payload;
