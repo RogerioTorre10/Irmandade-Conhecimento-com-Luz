@@ -515,32 +515,26 @@
   }
 
   function speakText(text) {
-    const clean = String(text || '').trim();
-    if (!clean) return Promise.resolve();
+  const clean = String(text || '').trim();
+  if (!clean) return Promise.resolve();
 
-    return new Promise((resolve) => {
-      try {
-        stopSpeaking();
-
-        const utter = new SpeechSynthesisUtterance(clean);
-        utter.lang = document.documentElement.lang || getLang() || 'pt-BR';
-        utter.rate = 0.92;
-        utter.pitch = 1;
-        utter.volume = 1;
-
-        const voice = pickVoiceForGuide();
-        if (voice) utter.voice = voice;
-
-        utter.onend = () => resolve();
-        utter.onerror = () => resolve();
-
-        window.speechSynthesis.speak(utter);
-      } catch (e) {
-        warn('TTS falhou:', e);
-        resolve();
-      }
+  if (window.JORNADA_VOICE?.speak) {
+    return window.JORNADA_VOICE.speak(clean, {
+      lang: document.documentElement.lang || getLang() || 'pt-BR',
+      guide: normalizeGuide(
+        sessionStorage.getItem('jornada.guia') ||
+        localStorage.getItem('JORNADA_GUIA') ||
+        document.body.dataset.guia ||
+        'lumen'
+      ),
+      rate: 0.94,
+      pitch: 1,
+      volume: 1
     });
   }
+
+  return Promise.resolve();
+}
 
   async function speakQuestionOrGuideResponse(perguntaText) {
     const guideText = getCurrentGuideResponseText();
