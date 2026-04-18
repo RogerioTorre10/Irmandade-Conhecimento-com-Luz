@@ -236,7 +236,7 @@
       }
 
       await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-
+    }
 for (const el of typingElements) {
   const text = getText(el);
   if (!text) continue;
@@ -278,8 +278,8 @@ for (const el of typingElements) {
 
   // pequena pausa entre blocos, para não parecer colado
   await new Promise((resolve) => setTimeout(resolve, el.classList.contains('intro-title') ? 180 : 120));
-}
 
+  
       window.__JC_TYPED_ONCE[sectionId] = true;
       console.log('[JC.applyTypingAndTTS] Concluído para:', sectionId);
     } catch (err) {
