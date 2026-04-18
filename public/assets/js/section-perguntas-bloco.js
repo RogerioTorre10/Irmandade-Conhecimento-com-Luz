@@ -650,15 +650,15 @@
         window.__REC__ = rec;
       }
 
-     window.__REC__.start();
+     window.__MIC_ACTIVE__ = true;
+     window.__MIC_INSTANCE__ = window.__REC__;
+     updateMicButtonState(true);
 
-    window.__MIC_ACTIVE__ = true;
-    window.__MIC_INSTANCE__ = window.__REC__;
-    updateMicButtonState(true);
-    } catch (e) {
+     window.__REC__.start();
+     } catch (e) {
       err('Erro ao iniciar microfone:', e);
-    }
-  }
+     }
+   }
 
   function showMissingAnswerFeedback() {
     const msg = uiText('write_answer_first', 'Escreva sua resposta antes de continuar.');
