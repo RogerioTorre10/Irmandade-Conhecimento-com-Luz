@@ -242,30 +242,35 @@ for (const el of typingElements) {
   if (!text) continue;
 
   el.dataset.text = text;
-  el.dataset.fullText = text;
-
-  // esconder completamente até o momento do typing
   el.textContent = '';
-  el.style.opacity = '0';
-  el.style.visibility = 'hidden';
 
-  await new Promise((resolve) => requestAnimationFrame(resolve));
+  const elementSpeed = Number(el.dataset.speed || 36);
+  const elementCursor = String(el.dataset.cursor || 'true') !== 'false';
+  const voiceKind =
+    el.dataset.voiceKind ||
+    root?.dataset?.voiceKind ||
+    (sectionId === 'section-intro' ? 'intro' :
+     sectionId === 'section-dados-pessoais' ? 'dados' :
+     sectionId?.startsWith('section-termos') ? 'terms' :
+     sectionId?.startsWith('section-perguntas') ? 'question' :
+     sectionId === 'section-final' ? 'final' :
+     'default');
 
-  // só agora libera visualmente
-  el.style.opacity = '1';
-  el.style.visibility = 'visible';
-
-  const speed = Number(el.dataset.speed) || (el.classList.contains('intro-title') ? 52 : 38);
-
-  if (typeof window.typeAndSpeak === 'function') {
-    await window.typeAndSpeak(el, text, speed, { forceReplay: true, cursor: true });
-  } else if (typeof window.runTyping === 'function') {
+  if (typeof window.runTyping === 'function') {
     await window.runTyping(el, text, () => {}, {
-      speed,
-      cursor: true,
-      forceReplay: true
+      speed: elementSpeed,
+      cursor: elementCursor
     });
   }
+
+  if (window.JORNADA_VOICE?.speakLive) {
+    await window.JORNADA_VOICE.speakLive(text, {
+      lang: document.documentElement.lang || window.i18n?.lang || 'pt-BR',
+      guide: document.body.dataset.guia || 'lumen',
+      kind: voiceKind
+    });
+  }
+}
 
   el.classList.remove('typing-active');
   el.classList.add('typing-done');
