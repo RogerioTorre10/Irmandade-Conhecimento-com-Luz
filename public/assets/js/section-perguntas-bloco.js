@@ -1165,49 +1165,55 @@
     }
 
     if (btnConfirm) {
-      btnConfirm.onclick = async (ev) => {
-        ev.preventDefault();
+     btnConfirm.onclick = async (ev) => {
+  ev.preventDefault();
 
-        const state = section?.dataset?.continueState || 'idle';
+  // desligar microfone antes de avançar
+  if (window.__MIC_ACTIVE__ && window.__MIC_INSTANCE__) {
+    try { window.__MIC_INSTANCE__.stop(); } catch {}
+    window.__MIC_ACTIVE__ = false;
+    updateMicButtonState(false);
+  }
 
-        if (state === 'ready') {
-          await maybeHandleBlockClosure(section, bloco);
-          return;
-        }
+  const state = section?.dataset?.continueState || 'idle';
 
-        if (state === 'loading') {
-          return;
-        }
+  if (state === 'ready') {
+    await maybeHandleBlockClosure(section, bloco);
+    return;
+  }
 
-        const val = String(textarea?.value || '').trim();
+  if (state === 'loading') {
+    return;
+  }
 
-        if (!val) {
-          showMissingAnswerFeedback();
-          textarea?.focus();
-          return;
-        }
+  const val = String(textarea?.value || '').trim();
 
-        saveAnswer(bloco, 0, val);
-        setContinueState(section, 'loading');
-        await setGuideResponse(
-          uiText('thinking_about_answer', 'Só um momento, vou refletir sobre sua resposta...'),
-          'info'
-        );
+  if (!val) {
+    showMissingAnswerFeedback();
+    textarea?.focus();
+    return;
+  }
 
-        try {
-          const guia =
-            sessionStorage.getItem('jornada.guia') ||
-            localStorage.getItem('JORNADA_GUIA') ||
-            localStorage.getItem('jornada.guia') ||
-            document.body.dataset.guia ||
-            'lumen';
+  saveAnswer(bloco, 0, val);
+  setContinueState(section, 'loading');
+  await setGuideResponse(
+    uiText('thinking_about_answer', 'Só um momento, vou refletir sobre sua resposta...'),
+    'info'
+  );
 
-          const nome =
-            sessionStorage.getItem('jornada.nome') ||
-            localStorage.getItem('JORNADA_NOME') ||
-            localStorage.getItem('jc.nome') ||
-            'Participante';
+  try {
+    const guia =
+      sessionStorage.getItem('jornada.guia') ||
+      localStorage.getItem('JORNADA_GUIA') ||
+      localStorage.getItem('jornada.guia') ||
+      document.body.dataset.guia ||
+      'lumen';
 
+    const nome =
+      sessionStorage.getItem('jornada.nome') ||
+      localStorage.getItem('JORNADA_NOME') ||
+      localStorage.getItem('jc.nome') ||
+      'Participante';
           const result = await requestGuideFeedbackWithFallback({
             nome,
             guia,
