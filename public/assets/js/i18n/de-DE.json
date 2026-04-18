@@ -97,7 +97,8 @@
 },
   "selfie": {
     "title": "Machen Sie Ihr Foto",
-    "instruction": "{nome}, halte das Handy etwas weiter weg und positioniere dein Gesicht. {guia} wird dich führen."    "preview": "Vorschau",
+    "instruction": "{nome}, halte das Handy etwas weiter weg und positioniere dein Gesicht. {guia} wird dich führen.",
+    "preview": "Vorschau",
     "capture": "Aufnehmen",
     "start": "Starten",
     "confirm": "Bestätigen",
