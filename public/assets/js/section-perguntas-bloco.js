@@ -1166,23 +1166,25 @@
       btnMic.onclick = async (ev) => {
         ev.preventDefault();
 
-        const isRecording = btnMic.classList.contains('recording');
+               const isRecording =
+          btnMic.classList.contains('recording') ||
+          window.__MIC_ACTIVE__ === true;
 
         if (isRecording) {
-          btnMic.classList.remove('recording');
-
           try {
-            if (window.__REC__) {
-              window.__REC__.stop();
-            }
+            if (window.__REC__) window.__REC__.stop();
+            if (window.JORNADA_MICRO?.stop) window.JORNADA_MICRO.stop();
           } catch (e) {
             console.warn('[MIC] erro ao parar reconhecimento:', e);
           }
 
+          window.__MIC_ACTIVE__ = false;
+          window.__MIC_INSTANCE__ = null;
+          updateMicButtonState(false);
           return;
         }
 
-        btnMic.classList.add('recording');
+        updateMicButtonState(true);
 
         try {
           triggerMic(textarea);
