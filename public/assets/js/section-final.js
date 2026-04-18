@@ -1364,6 +1364,7 @@
       titleEl.style.transition = 'all 0.9s ease';
       titleEl.style.opacity = 1;
       titleEl.style.transform = 'translateY(0)';
+      titleEl.textContent = '';
       await typeText(titleEl, tituloOriginal, 65, true);
       await sleep(600);
 
