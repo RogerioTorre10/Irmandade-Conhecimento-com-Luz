@@ -32,21 +32,19 @@
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
- function getText(el) {
-  if (!el) return '';
+  function getText(el) {
+    if (!el) return '';
+    const currentText = String(el.textContent || '').replace(/\s+/g, ' ').trim();
+    if (currentText) return currentText;
 
-  const currentText = String(el.textContent || '').replace(/\s+/g, ' ').trim();
-  if (currentText) return currentText;
-
-  const fromData =
-    el.dataset?.fullText ||
-    el.dataset?.text ||
-    el.getAttribute?.('data-text') ||
-    el.getAttribute?.('data-i18n-original') ||
-    '';
-
-  return String(fromData || '').replace(/\s+/g, ' ').trim();
-}
+    return String(
+      el.dataset?.fullText ||
+      el.dataset?.text ||
+      el.getAttribute?.('data-text') ||
+      el.getAttribute?.('data-i18n-original') ||
+      ''
+    ).replace(/\s+/g, ' ').trim();
+  }
 
   function isIntroLike(sectionId) {
     return ['section-intro', 'section-termos1', 'section-termos2'].includes(sectionId);
@@ -55,20 +53,16 @@
   function getTypingNodes(root) {
     if (!root) return [];
     return Array.from(
-      root.querySelectorAll(
-        '[data-typing="true"], .intro-title, .typing-text, .parchment-text-rough'
-      )
+      root.querySelectorAll('[data-typing="true"], .intro-title, .typing-text, .parchment-text-rough')
     ).filter(Boolean);
   }
 
   function cacheOriginalTypingText(root) {
     if (!root) return;
-
     getTypingNodes(root).forEach((el) => {
       const txt = String(el.textContent || '').replace(/\s+/g, ' ').trim();
       const dataText = String(el.dataset?.text || '').replace(/\s+/g, ' ').trim();
       const full = txt || dataText;
-
       if (full) {
         el.dataset.fullText = full;
         el.dataset.text = full;
@@ -78,14 +72,8 @@
 
   function resetTypingState(root) {
     if (!root) return;
-
     getTypingNodes(root).forEach((el) => {
-      const full =
-        el.dataset?.fullText ||
-        el.dataset?.text ||
-        el.getAttribute?.('data-text') ||
-        '';
-
+      const full = el.dataset?.fullText || el.dataset?.text || el.getAttribute?.('data-text') || '';
       el.classList.remove('typing-active', 'typing-done', 'type-done');
       el.removeAttribute('data-cursor');
       el.setAttribute('data-typing', 'true');
@@ -98,69 +86,52 @@
       const caret = el.querySelector?.('.typing-caret');
       if (caret) caret.remove();
 
-      if (full) {
-        el.textContent = String(full);
-      }
+      if (full) el.textContent = String(full);
     });
   }
 
   async function prepareTyping(root) {
-  if (!root) return;
+    if (!root) return;
+    cacheOriginalTypingText(root);
 
-  cacheOriginalTypingText(root);
+    getTypingNodes(root).forEach((el) => {
+      const full = el.dataset?.fullText || el.dataset?.text || el.getAttribute?.('data-text') || '';
+      el.classList.remove('typing-active', 'typing-done', 'type-done');
+      el.removeAttribute('data-cursor');
+      el.setAttribute('data-typing', 'true');
 
-  getTypingNodes(root).forEach((el) => {
-    const full =
-      el.dataset?.fullText ||
-      el.dataset?.text ||
-      el.getAttribute?.('data-text') ||
-      '';
+      delete el.dataset.typingDone;
+      delete el.dataset.typingSig;
+      delete el.dataset.typingLastSig;
+      delete el.dataset.typingLastAt;
 
-    el.classList.remove('typing-active', 'typing-done', 'type-done');
-    el.removeAttribute('data-cursor');
-    el.setAttribute('data-typing', 'true');
+      el.style.opacity = '0';
+      el.style.visibility = 'hidden';
 
-    delete el.dataset.typingDone;
-    delete el.dataset.typingSig;
-    delete el.dataset.typingLastSig;
-    delete el.dataset.typingLastAt;
+      if (full) el.textContent = full;
+    });
 
-    // IMPORTANTE: esconder antes do início real
-    el.style.opacity = '0';
-    el.style.visibility = 'hidden';
-
-    if (full) {
-      el.textContent = full;
-    }
-  });
-
-  void root.offsetWidth;
-  await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-}
+    void root.offsetWidth;
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  }
 
   async function waitForI18nReady(timeoutMs = 8000) {
     const start = Date.now();
-
     while (Date.now() - start < timeoutMs) {
       if (window.i18n?.waitForReady) {
         try {
           await window.i18n.waitForReady(timeoutMs);
           return true;
-        } catch {
-          // continua tentando
-        }
+        } catch {}
       }
-
       if (window.i18n?.apply) return true;
       await sleep(80);
     }
-
     return false;
   }
 
   async function applyI18nToSection(sectionId, section) {
     if (!section || !window.i18n?.apply) return;
-
     try {
       await waitForI18nReady(8000);
       window.i18n.apply(section);
@@ -176,12 +147,13 @@
           }
         });
 
-      console.log('[i18n] Tradução aplicada na seção carregada:', sectionId);
+      console.log('[i18n] Tradução aplicada na seção:', sectionId);
     } catch (err) {
       console.warn('[i18n] Falha ao aplicar em', sectionId, err);
     }
   }
 
+  // Sync guia tema
   (function syncGuiaTema() {
     try {
       const guia = (sessionStorage.getItem('jornada.guia') || '').toLowerCase();
@@ -205,15 +177,11 @@
     }
 
     console.log('[JC.applyTypingAndTTS] Iniciando para:', sectionId);
-
     window.__JC_IS_TYPING = true;
 
     try {
       let attempts = 0;
-      while (
-        (!window.runTyping || (!window.typeAndSpeak && !window.EffectCoordinator?.speak)) &&
-        attempts < 80
-      ) {
+      while ((!window.runTyping && !window.typeAndSpeak && !window.EffectCoordinator?.speak) && attempts < 80) {
         await sleep(80);
         attempts++;
       }
@@ -236,52 +204,51 @@
       }
 
       await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-    }
-for (const el of typingElements) {
-  const text = getText(el);
-  if (!text) continue;
 
-  el.dataset.text = text;
-  el.textContent = '';
+      // === FOR CORRIGIDO AQUI DENTRO ===
+      for (const el of typingElements) {
+        const text = getText(el);
+        if (!text) continue;
 
-  const elementSpeed = Number(el.dataset.speed || 36);
-  const elementCursor = String(el.dataset.cursor || 'true') !== 'false';
-  const voiceKind =
-    el.dataset.voiceKind ||
-    root?.dataset?.voiceKind ||
-    (sectionId === 'section-intro' ? 'intro' :
-     sectionId === 'section-dados-pessoais' ? 'dados' :
-     sectionId?.startsWith('section-termos') ? 'terms' :
-     sectionId?.startsWith('section-perguntas') ? 'question' :
-     sectionId === 'section-final' ? 'final' :
-     'default');
+        el.dataset.text = text;
+        el.textContent = '';
 
-  if (typeof window.runTyping === 'function') {
-    await window.runTyping(el, text, () => {}, {
-      speed: elementSpeed,
-      cursor: elementCursor
-    });
-  }
+        const elementSpeed = Number(el.dataset.speed || 36);
+        const elementCursor = String(el.dataset.cursor || 'true') !== 'false';
 
-  if (window.JORNADA_VOICE?.speakLive) {
-    await window.JORNADA_VOICE.speakLive(text, {
-      lang: document.documentElement.lang || window.i18n?.lang || 'pt-BR',
-      guide: document.body.dataset.guia || 'lumen',
-      kind: voiceKind
-    });
-  }
-}
+        const voiceKind = el.dataset.voiceKind ||
+          root?.dataset?.voiceKind ||
+          (sectionId === 'section-intro' ? 'intro' :
+           sectionId === 'section-dados-pessoais' ? 'dados' :
+           sectionId?.startsWith('section-termos') ? 'terms' :
+           sectionId?.startsWith('section-perguntas') ? 'question' :
+           sectionId === 'section-final' ? 'final' : 'default');
 
-  el.classList.remove('typing-active');
-  el.classList.add('typing-done');
-  el.removeAttribute('data-typing');
+        if (typeof window.runTyping === 'function') {
+          await window.runTyping(el, text, () => {}, {
+            speed: elementSpeed,
+            cursor: elementCursor
+          });
+        }
 
-  // pequena pausa entre blocos, para não parecer colado
-  await new Promise((resolve) => setTimeout(resolve, el.classList.contains('intro-title') ? 180 : 120));
+        if (window.JORNADA_VOICE?.speakLive) {
+          await window.JORNADA_VOICE.speakLive(text, {
+            lang: document.documentElement.lang || window.i18n?.lang || 'pt-BR',
+            guide: document.body.dataset.guia || 'lumen',
+            kind: voiceKind
+          });
+        }
 
-  
+        el.classList.remove('typing-active');
+        el.classList.add('typing-done');
+        el.removeAttribute('data-typing');
+
+        await new Promise((resolve) => setTimeout(resolve, el.classList.contains('intro-title') ? 180 : 120));
+      }
+
       window.__JC_TYPED_ONCE[sectionId] = true;
       console.log('[JC.applyTypingAndTTS] Concluído para:', sectionId);
+
     } catch (err) {
       console.error('[JC.applyTypingAndTTS] Erro:', sectionId, err);
       window.__JC_TYPED_ONCE[sectionId] = false;
@@ -324,8 +291,7 @@ for (const el of typingElements) {
 
       btn.addEventListener('mouseout', () => {
         btn.style.transform = 'scale(1)';
-        btn.style.boxShadow =
-          'inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6)';
+        btn.style.boxShadow = 'inset 0 3px 6px rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.6)';
       });
     });
   }
@@ -392,27 +358,16 @@ for (const el of typingElements) {
 
     try {
       const cleanId = sectionId.replace(/^section-/, '');
-      console.log('[JC.show] Carregando etapa:', cleanId);
-
       let section = await window.carregarEtapa(cleanId);
 
       if (section && section.id !== sectionId) {
         section.id = sectionId;
       }
 
-      try {
-        section = await waitForNode('#' + sectionId, 12000);
-        console.log('[JC.show] Seção detectada no DOM após carregar:', sectionId);
-      } catch (waitErr) {
-        console.warn('[JC.show] waitForNode falhou:', sectionId, waitErr);
-        console.log('[JC.show] Tentando carregar novamente...');
-        section = await window.carregarEtapa(cleanId);
-        if (section) section.id = sectionId;
-        section = await waitForNode('#' + sectionId, 8000);
-      }
+      section = await waitForNode('#' + sectionId, 12000);
 
       if (!section) {
-        throw new Error(`Seção ${sectionId} não encontrada no DOM após carregamento`);
+        throw new Error(`Seção ${sectionId} não encontrada`);
       }
 
       await applyI18nToSection(sectionId, section);
@@ -436,7 +391,6 @@ for (const el of typingElements) {
       const idx = sectionOrder.indexOf(sectionId);
       if (idx >= 0 && idx < sectionOrder.length - 1) {
         const next = sectionOrder[idx + 1];
-        console.warn('[JC.show] Avançando para próxima após falha:', next);
         show(next);
       }
     } finally {
@@ -444,71 +398,38 @@ for (const el of typingElements) {
     }
   }
 
- document.addEventListener('intro:language-confirmed', async (e) => {
-  const intro = document.getElementById('section-intro');
-  if (!intro) return;
+  // Evento de confirmação de idioma
+  document.addEventListener('intro:language-confirmed', async (e) => {
+    const intro = document.getElementById('section-intro');
+    if (!intro) return;
 
-  const lang = e?.detail?.lang || window.i18n?.currentLang || 'pt-BR';
-  console.log('[JC] intro:language-confirmed recebido para', lang);
+    const lang = e?.detail?.lang || window.i18n?.currentLang || 'pt-BR';
+    console.log('[JC] intro:language-confirmed recebido para', lang);
 
-  try {
-    window.__JC_TYPED_ONCE = window.__JC_TYPED_ONCE || {};
-    window.__JC_TYPED_ONCE['section-intro'] = false;
-    window.__JC_IS_TYPING = false;
+    try {
+      window.__JC_TYPED_ONCE = window.__JC_TYPED_ONCE || {};
+      window.__JC_TYPED_ONCE['section-intro'] = false;
+      window.__JC_IS_TYPING = false;
 
-    if (window.i18n?.waitForReady) {
-      await window.i18n.waitForReady(8000);
+      if (window.i18n?.waitForReady) await window.i18n.waitForReady(8000);
+      await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+      if (window.i18n?.apply) window.i18n.apply(intro);
+
+      await prepareTyping(intro);
+      await applyTypingAndTTS('section-intro', intro, { forceReplay: true });
+    } catch (err) {
+      console.warn('[JC] Falha ao reprocessar intro após idioma:', err);
     }
+  });
 
-    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
-
-    if (window.i18n?.apply) {
-      window.i18n.apply(intro);
-    }
-
-    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
-
-    intro.querySelectorAll('[data-typing="true"], .intro-title, .typing-text, .parchment-text-rough')
-      .forEach((el) => {
-        const text = String(el.textContent || '').replace(/\s+/g, ' ').trim();
-
-        delete el.dataset.typingDone;
-        delete el.dataset.typingSig;
-        delete el.dataset.typingLastSig;
-        delete el.dataset.typingLastAt;
-        delete el.dataset.fullText;
-        delete el.dataset.text;
-
-        el.classList.remove('typing-active', 'typing-done', 'type-done');
-        el.removeAttribute('data-cursor');
-
-        if (text) {
-          el.dataset.text = text;
-          el.dataset.fullText = text;
-          el.setAttribute('data-typing', 'true');
-        }
-      });
-
-   await prepareTyping(intro);
-   await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
-   await applyTypingAndTTS('section-intro', intro, { forceReplay: true });
-   } catch (err) {
-    console.warn('[JC] Falha ao reprocessar intro após troca de idioma:', err);
-  }
-});
-  
   function goNext() {
     if (isTransitioning) return;
-
     const current = window.JC.currentSection || 'section-intro';
     const idx = sectionOrder.indexOf(current);
     const next = sectionOrder[idx + 1];
-
-    if (next) {
-      show(next);
-    } else {
-      window.location.href = '/termos';
-    }
+    if (next) show(next);
+    else window.location.href = '/termos';
   }
 
   function setOrder(order) {
@@ -547,67 +468,19 @@ for (const el of typingElements) {
 
     isInitializing = false;
 
+    // Resets de sessão
     (function resetJornadaIfNewRun() {
       const runId = String(Date.now());
       const lastRun = sessionStorage.getItem('JORNADA_RUN_ID');
-
       if (!lastRun) {
         sessionStorage.setItem('JORNADA_RUN_ID', runId);
-
-        const keys = [
-          'JORNADA_GUIA',
-          'JORNADA_SELFIECARD',
-          'SELFIE_CARD',
-          '__SELFIECARD_DONE__',
-          'JORNADA_PROGRESS',
-          'JORNADA_RESPOSTAS',
-          'JORNADA_STATE_CACHE'
-        ];
-
-        keys.forEach((k) => {
-          try { sessionStorage.removeItem(k); } catch {}
-          try { localStorage.removeItem(k); } catch {}
+        const keys = ['JORNADA_GUIA', 'JORNADA_SELFIECARD', 'SELFIE_CARD', '__SELFIECARD_DONE__', 'JORNADA_PROGRESS', 'JORNADA_RESPOSTAS', 'JORNADA_STATE_CACHE'];
+        keys.forEach(k => {
+          try { sessionStorage.removeItem(k); localStorage.removeItem(k); } catch {}
         });
-
-        if (window.JORNADA_STATE) {
-          delete window.JORNADA_STATE.guia;
-          delete window.JORNADA_STATE.guiaSelecionado;
-          delete window.JORNADA_STATE.selfieCard;
-        }
-
         console.log('[RESET] Jornada resetada para novo run:', runId);
       }
     })();
-
-    (function resetRun() {
-      if (sessionStorage.getItem('JORNADA_RUN_RESET') === '1') return;
-      sessionStorage.setItem('JORNADA_RUN_RESET', '1');
-
-      ['JORNADA_GUIA', 'JORNADA_SELFIECARD', 'SELFIE_CARD', '__SELFIECARD_DONE__']
-        .forEach((k) => {
-          try { sessionStorage.removeItem(k); } catch {}
-        });
-
-      ['JORNADA_GUIA', 'JORNADA_SELFIECARD', 'SELFIE_CARD', '__SELFIECARD_DONE__']
-        .forEach((k) => {
-          try { localStorage.removeItem(k); } catch {}
-        });
-
-      window.JORNADA_STATE = {};
-      console.log('[RESET] run limpo');
-    })();
-
-    if (sessionStorage.getItem('JORNADA_NEW_RUN') !== '1') {
-      sessionStorage.setItem('JORNADA_NEW_RUN', '1');
-
-      ['JORNADA_GUIA', 'JORNADA_SELFIECARD', 'SELFIE_CARD', '__SELFIECARD_DONE__']
-        .forEach((k) => {
-          try { sessionStorage.removeItem(k); } catch {}
-        });
-
-      window.JORNADA_STATE = {};
-      console.log('[RESET] nova jornada limpa');
-    }
   }
 
   document.addEventListener('section:shown', async (e) => {
