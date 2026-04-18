@@ -586,6 +586,28 @@
     btn.addEventListener('touchcancel', rem);
   }
 
+    function updateMicButtonState(active) {
+    const btn =
+      document.getElementById('jp-btn-mic') ||
+      document.querySelector('#jp-btn-mic') ||
+      document.querySelector('.mic-btn');
+
+    if (!btn) return;
+
+    btn.classList.toggle('recording', !!active);
+    btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    btn.dataset.active = active ? '1' : '0';
+
+    // fallback visual caso o CSS vermelho dependa da classe
+    if (active) {
+      btn.style.background = '#b30000';
+      btn.style.boxShadow = '0 0 0 2px rgba(255,255,255,0.10), 0 0 14px rgba(255,0,0,0.45)';
+    } else {
+      btn.style.removeProperty('background');
+      btn.style.removeProperty('box-shadow');
+    }
+  }
+
   function ensureMicAttached(textarea) {
     if (!textarea) return;
 
@@ -601,28 +623,43 @@
     }
   }
 
-  function triggerMic(textarea) {
+    function triggerMic(textarea) {
     if (!textarea) return;
 
     ensureMicAttached(textarea);
 
     const localMicBtn =
-      textarea.parentElement?.querySelector('.mic-btn') ||
-      textarea.closest('.jp-answer-frame')?.querySelector('.mic-btn') ||
-      document.querySelector('.mic-btn');
-
-    if (localMicBtn) {
-      localMicBtn.click();
-      return;
-    }
+      document.getElementById('jp-btn-mic') ||
+      textarea.parentElement?.querySelector('.mic-btn, #jp-btn-mic') ||
+      textarea.closest('.jp-answer-frame')?.querySelector('.mic-btn, #jp-btn-mic') ||
+      document.querySelector('.mic-btn, #jp-btn-mic');
 
     try {
-      if (typeof window.startMic === 'function') return window.startMic();
-      if (typeof window.initSpeechRecognition === 'function') return window.initSpeechRecognition();
+      // se existir motor próprio da jornada, prioriza ele
+      if (window.JORNADA_MICRO?.start) {
+        window.__MIC_ACTIVE__ = true;
+        window.__MIC_INSTANCE__ = window.JORNADA_MICRO;
+        updateMicButtonState(true);
+        window.JORNADA_MICRO.start(textarea, { mode: 'append', lang: getLang() });
+        return;
+      }
+
+      if (typeof window.startMic === 'function') {
+        window.__MIC_ACTIVE__ = true;
+        updateMicButtonState(true);
+        return window.startMic();
+      }
+
+      if (typeof window.initSpeechRecognition === 'function') {
+        window.__MIC_ACTIVE__ = true;
+        updateMicButtonState(true);
+        return window.initSpeechRecognition();
+      }
 
       const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SR) {
         warn('SpeechRecognition não suportado.');
+        updateMicButtonState(false);
         return;
       }
 
@@ -631,12 +668,19 @@
         rec.lang = document.documentElement.lang || getLang() || 'pt-BR';
         rec.continuous = false;
         rec.interimResults = true;
+        rec.maxAlternatives = 1;
+
+        rec.onstart = () => {
+          window.__MIC_ACTIVE__ = true;
+          updateMicButtonState(true);
+        };
 
         rec.onresult = (ev) => {
           let finalTxt = '';
           for (let i = ev.resultIndex; i < ev.results.length; i++) {
             const res = ev.results[i];
             finalTxt += res[0].transcript || '';
+
             if (res.isFinal) {
               const prev = textarea.value.trim();
               textarea.value = prev ? (prev + ' ' + finalTxt.trim()) : finalTxt.trim();
@@ -646,19 +690,36 @@
           }
         };
 
-        rec.onerror = (e) => warn('MIC onerror:', e);
+        rec.onend = () => {
+          window.__MIC_ACTIVE__ = false;
+          window.__MIC_INSTANCE__ = null;
+          updateMicButtonState(false);
+        };
+
+        rec.onerror = (e) => {
+          warn('MIC onerror:', e);
+          window.__MIC_ACTIVE__ = false;
+          window.__MIC_INSTANCE__ = null;
+          updateMicButtonState(false);
+        };
+
         window.__REC__ = rec;
       }
 
-     window.__MIC_ACTIVE__ = true;
-     window.__MIC_INSTANCE__ = window.__REC__;
-     updateMicButtonState(true);
+      window.__MIC_ACTIVE__ = true;
+      window.__MIC_INSTANCE__ = window.__REC__;
+      updateMicButtonState(true);
 
-     window.__REC__.start();
-     } catch (e) {
+      // foco no textarea ajuda em alguns Androids
+      textarea.focus();
+      window.__REC__.start();
+    } catch (e) {
+      window.__MIC_ACTIVE__ = false;
+      window.__MIC_INSTANCE__ = null;
+      updateMicButtonState(false);
       err('Erro ao iniciar microfone:', e);
-     }
-   }
+    }
+  }
 
   function showMissingAnswerFeedback() {
     const msg = uiText('write_answer_first', 'Escreva sua resposta antes de continuar.');
