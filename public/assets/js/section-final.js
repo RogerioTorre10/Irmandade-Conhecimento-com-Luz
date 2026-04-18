@@ -1339,54 +1339,62 @@
       thinkingText: t('final.reflecting', 'Guia refletindo...')
     });
 
-    try {
-      section.style.display = 'block';
+   try {
+  section.style.display = 'block';
 
-      const tituloOriginal = resolveTextFromEl(titleEl, 'Fim da Jornada');
-      titleEl.dataset.original = tituloOriginal;
-      titleEl.textContent = '';
-      titleEl.style.opacity = 0;
-      titleEl.style.transform = 'translateY(-16px)';
+  const tituloOriginal = t(
+    'final.title',
+    titleEl?.dataset?.text ||
+    titleEl?.dataset?.original ||
+    titleEl?.textContent?.trim() ||
+    'Fim da Jornada'
+  ).trim();
 
-      const ps = msgEl.querySelectorAll('p');
-      ps.forEach((p) => {
-        const txt = resolveTextFromEl(p, '');
-        p.dataset.original = txt;
-        p.textContent = '';
-        p.style.opacity = 0;
-        p.style.transform = 'translateY(10px)';
-        p.classList.remove('revealed');
-      });
+  titleEl.dataset.original = tituloOriginal;
+  titleEl.dataset.text = tituloOriginal;
+  titleEl.textContent = tituloOriginal;
+  titleEl.style.opacity = 1;
+  titleEl.style.transform = 'translateY(0)';
 
-      section.classList.add('show');
-      await sleep(200);
+  const ps = msgEl.querySelectorAll('p');
+  ps.forEach((p) => {
+    const txt = resolveTextFromEl(p, '');
+    p.dataset.original = txt;
+    p.textContent = '';
+    p.style.opacity = 0;
+    p.style.transform = 'translateY(10px)';
+    p.classList.remove('revealed');
+  });
 
-      titleEl.style.transition = 'all 0.9s ease';
-      titleEl.style.opacity = 1;
-      titleEl.style.transform = 'translateY(0)';
-      titleEl.textContent = '';
-      await typeText(titleEl, tituloOriginal, 65, true);
-      await sleep(600);
+  section.classList.add('show');
+  await sleep(200);
 
-      for (let i = 0; i < ps.length; i++) {
-        const p = ps[i];
-        const txt = p.dataset.original || '';
-        if (!txt) continue;
+  titleEl.style.transition = 'all 0.9s ease';
+  titleEl.style.opacity = 1;
+  titleEl.style.transform = 'translateY(0)';
+  titleEl.textContent = '';
+  await typeText(titleEl, tituloOriginal, 65, true);
+  await sleep(600);
 
-        p.style.transition = 'all 0.8s ease';
-        p.style.opacity = 1;
-        p.style.transform = 'translateY(0)';
+  for (let i = 0; i < ps.length; i++) {
+    const p = ps[i];
+    const txt = p.dataset.original || '';
+    if (!txt) continue;
 
-        await typeText(p, txt, 55, true);
-        p.classList.add('revealed');
-        await sleep(300);
-      }
+    p.style.transition = 'all 0.8s ease';
+    p.style.opacity = 1;
+    p.style.transform = 'translateY(0)';
 
-      setFinalButtonsBusy(section, false);
-    } catch (err) {
-      console.error('[FINAL] Erro na sequência inicial:', err);
-      setFinalButtonsBusy(section, false);
-    }
+    await typeText(p, txt, 55, true);
+    p.classList.add('revealed');
+    await sleep(300);
+  }
+
+  setFinalButtonsBusy(section, false);
+} catch (err) {
+  console.error('[FINAL] Erro na sequência inicial:', err);
+  setFinalButtonsBusy(section, false);
+}
 
     if (botoes) {
       botoes.style.opacity = '0';
