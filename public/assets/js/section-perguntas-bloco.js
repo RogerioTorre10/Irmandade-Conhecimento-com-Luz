@@ -1417,6 +1417,19 @@
       return { ...State };
     }
   };
+  document.addEventListener('section:shown', (e) => {
+  const section = e.detail?.node;
+
+  if (!section || section.id !== 'section-dados-pessoais') return;
+
+  setTimeout(() => {
+    if (typeof window.applyTypingAndTTS === 'function') {
+      window.applyTypingAndTTS('section-dados-pessoais', section);
+    } else {
+      console.warn('[DADOS] applyTypingAndTTS não encontrado');
+    }
+  }, 120);
+});
 
   log('inicializado.');
 })(window, document);
