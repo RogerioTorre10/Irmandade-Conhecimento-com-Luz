@@ -830,6 +830,22 @@
     ensureVisible(root);
 
     const els = pick(root);
+    if (els.guiaTexto) {
+    const nomeAtual =
+    (els.nameInput?.value || sessionStorage.getItem('jornada.nome') || '').trim().toUpperCase();
+
+  if (nomeAtual) {
+    const forcedMsg = tGuide(
+      'guia.subtitle',
+      'Olá, {{nome}}! Escolha seu guia para a Jornada.',
+      { nome: nomeAtual }
+    ).trim();
+
+    els.guiaTexto.dataset.text = forcedMsg;
+    els.guiaTexto.dataset.original = forcedMsg;
+    els.guiaTexto.textContent = forcedMsg;
+  }
+}
     let guias = [];
     let guideButtons = [];
 
