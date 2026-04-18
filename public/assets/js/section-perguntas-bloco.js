@@ -650,7 +650,11 @@
         window.__REC__ = rec;
       }
 
-      window.__REC__.start();
+     window.__REC__.start();
+
+    window.__MIC_ACTIVE__ = true;
+    window.__MIC_INSTANCE__ = window.__REC__;
+    updateMicButtonState(true);
     } catch (e) {
       err('Erro ao iniciar microfone:', e);
     }
