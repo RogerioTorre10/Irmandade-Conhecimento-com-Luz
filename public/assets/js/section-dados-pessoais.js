@@ -70,16 +70,22 @@
     if (!data) return;
 
     const map = {
-      '#dp-nome': data.nomeCompleto,
-      '#dp-idade-faixa': data.idadeFaixa,
-      '#dp-cidade': data.cidade,
-      '#dp-estado': data.estado,
-      '#dp-estado-civil': data.estadoCivil,
-      '#dp-profissao': data.profissao,
-      '#dp-filhos': data.filhos,
-      '#dp-religiao': data.religiao,
-      '#dp-observacoes': data.observacoes
-    };
+  '#dp-nome': data.nomeCompleto,
+  '#dp-idade-faixa': data.idadeFaixa,
+  '#dp-cidade': data.cidade,
+  '#dp-estado': data.estado,
+  '#dp-estado-civil': data.estadoCivil,
+  '#dp-profissao': data.profissao,
+  '#dp-filhos': data.filhos,
+  '#dp-religiao': data.religiao,
+  '#dp-observacoes': data.observacoes,
+
+  // 🔥 PERSONALIDADE
+  '#dp-temperamento': data?.perfilPersonalidade?.temperamento,
+  '#dp-comportamento': data?.perfilPersonalidade?.comportamento,
+  '#dp-carater': data?.perfilPersonalidade?.carater,
+  '#dp-indole': data?.perfilPersonalidade?.indole
+};
 
     Object.entries(map).forEach(([sel, val]) => {
       const el = $(sel, root);
