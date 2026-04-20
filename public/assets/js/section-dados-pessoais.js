@@ -44,18 +44,27 @@
   }
 
   function collect(root) {
-    return {
-      nomeCompleto: ($('#dp-nome', root)?.value || '').trim(),
-      idadeFaixa: ($('#dp-idade-faixa', root)?.value || '').trim(),
-      cidade: ($('#dp-cidade', root)?.value || '').trim(),
-      estado: ($('#dp-estado', root)?.value || '').trim(),
-      estadoCivil: ($('#dp-estado-civil', root)?.value || '').trim(),
-      profissao: ($('#dp-profissao', root)?.value || '').trim(),
-      filhos: ($('#dp-filhos', root)?.value || '').trim(),
-      religiao: ($('#dp-religiao', root)?.value || '').trim(),
-      observacoes: ($('#dp-observacoes', root)?.value || '').trim()
-    };
-  }
+  return {
+    nomeCompleto: ($('#dp-nome', root)?.value || '').trim(),
+    idadeFaixa: ($('#dp-idade-faixa', root)?.value || '').trim(),
+    cidade: ($('#dp-cidade', root)?.value || '').trim(),
+    estado: ($('#dp-estado', root)?.value || '').trim(),
+    estadoCivil: ($('#dp-estado-civil', root)?.value || '').trim(),
+    profissao: ($('#dp-profissao', root)?.value || '').trim(),
+    filhos: ($('#dp-filhos', root)?.value || '').trim(),
+    religiao: ($('#dp-religiao', root)?.value || '').trim(),
+
+    // 🔥 NOVO BLOCO PERSONALIDADE
+    perfilPersonalidade: {
+      temperamento: ($('#dp-temperamento', root)?.value || '').trim(),
+      comportamento: ($('#dp-comportamento', root)?.value || '').trim(),
+      carater: ($('#dp-carater', root)?.value || '').trim(),
+      indole: ($('#dp-indole', root)?.value || '').trim()
+    },
+
+    observacoes: ($('#dp-observacoes', root)?.value || '').trim()
+  };
+}
 
   function hydrate(root, data) {
     if (!data) return;
