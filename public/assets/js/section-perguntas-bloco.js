@@ -547,24 +547,35 @@
     await speakText(perguntaText);
   }
 
-  async function typeQuestion(el, text, speed = 26, withVoice = true) {
-    if (!el) return;
+  async function typeQuestion(el, text, speed = 30, withVoice = true) {
+  if (!el) return;
 
-    const content = String(text || '').trim();
-    el.textContent = '';
-    el.classList.remove('typing-done');
+  const content = String(text || '').trim();
+  el.textContent = '';
+  el.classList.remove('typing-done');
 
-    const speechPromise = withVoice ? speakText(content) : Promise.resolve();
-
-    for (let i = 0; i <= content.length; i++) {
-      el.textContent = content.slice(0, i);
-      await new Promise((r) => setTimeout(r, speed));
-    }
-
+  if (withVoice && typeof window.typeAndSpeak === 'function') {
+    await window.typeAndSpeak(el, content, speed, {
+      cursor: true,
+      forceReplay: true
+    });
     el.classList.add('typing-done');
-    await speechPromise;
+    return;
   }
 
+  if (typeof window.runTyping === 'function') {
+    await window.runTyping(el, content, null, {
+      speed,
+      cursor: true,
+      forceReplay: true
+    });
+    el.classList.add('typing-done');
+    return;
+  }
+
+  el.textContent = content;
+  el.classList.add('typing-done');
+}
   function bindPressFx(btn) {
     if (!btn || btn.dataset.pressFxBound === '1') return;
     btn.dataset.pressFxBound = '1';
