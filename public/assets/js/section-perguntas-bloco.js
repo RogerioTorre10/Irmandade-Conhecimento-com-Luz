@@ -1075,41 +1075,42 @@ function buildDadosPessoaisPayload() {
   }
 
   async function gerarDevolutivaDoBloco(bloco) {
-    const nome =
-      sessionStorage.getItem('jornada.nome') ||
-      localStorage.getItem('JORNADA_NOME') ||
-      localStorage.getItem('jc.nome') ||
-      'Participante';
+  const nome =
+    sessionStorage.getItem('jornada.nome') ||
+    localStorage.getItem('JORNADA_NOME') ||
+    localStorage.getItem('jc.nome') ||
+    'Participante';
 
-    const guia =
-      sessionStorage.getItem('jornada.guia') ||
-      localStorage.getItem('JORNADA_GUIA') ||
-      localStorage.getItem('jornada.guia') ||
-      document.body.dataset.guia ||
-      'lumen';
+  const guia =
+    sessionStorage.getItem('jornada.guia') ||
+    localStorage.getItem('JORNADA_GUIA') ||
+    localStorage.getItem('jornada.guia') ||
+    document.body.dataset.guia ||
+    'lumen';
 
-    const idioma = document.documentElement.lang || getLang() || 'pt-BR';
-    const respostas = getAllAnswersFromBlock(bloco);
-    const blocoNome = bloco?.title || bloco?.id || 'Bloco';
+  const idioma = document.documentElement.lang || getLang() || 'pt-BR';
+  const respostas = getAllAnswersFromBlock(bloco);
+  const blocoNome = bloco?.title || bloco?.id || 'Bloco';
+  const dadosPessoais = buildDadosPessoaisPayload();
 
-    if (!respostas.length) {
-      return {
-        ok: false,
-        texto: ''
-      };
-    }
-
-   return requestGuideFeedbackWithFallback({
-     nome,
-     guia,
-     blocoNome,
-     respostas,
-     idioma,
-     pergunta: '',
-     resposta: respostas[respostas.length - 1] || '',
-     dadosPessoais
-   });
+  if (!respostas.length) {
+    return {
+      ok: false,
+      texto: ''
+    };
   }
+
+  return requestGuideFeedbackWithFallback({
+    nome,
+    guia,
+    blocoNome,
+    respostas,
+    idioma,
+    pergunta: '',
+    resposta: respostas[respostas.length - 1] || '',
+    dadosPessoais
+  });
+}
 
   function getBlockClosingLead(bloco) {
     const blocoNome = bloco?.title || bloco?.id || 'este bloco';
