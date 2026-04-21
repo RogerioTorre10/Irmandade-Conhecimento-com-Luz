@@ -879,17 +879,26 @@ function buildDadosPessoaisPayloadSafe() {
       .length;
   }
 
-  function isWeakFeedback(text, opts = {}) {
-    const minChars = Number(opts.minChars ?? 180);
-    const minSentences = Number(opts.minSentences ?? 3);
-    const txt = String(text || '').replace(/\s+/g, ' ').trim();
+  function isRespostaUtil(texto) {
+  const t = String(texto || '').replace(/\s+/g, ' ').trim();
+  if (!t) return false;
+  if (t.length < 40) return false;
+  return true;
+}
 
-    if (!txt) return true;
-    if (txt.length < minChars) return true;
-    if (countSentences(txt) < minSentences) return true;
-    if (!/[.!?…]$/.test(txt)) return true;
-    return false;
-  }
+function isWeakFeedback(text, opts = {}) {
+  const txt = String(text || '').replace(/\s+/g, ' ').trim();
+
+  if (!isRespostaUtil(txt)) return true;
+
+  const minChars = Number(opts.minChars ?? 40);
+  const minSentences = Number(opts.minSentences ?? 1);
+
+  if (txt.length < minChars) return true;
+  if (countSentences(txt) < minSentences) return true;
+
+  return false;
+}
 
   function buildFallbackFeedback({ guia, nome, blocoNome, resposta, pergunta, idioma }) {
     const guide = normalizeGuide(guia || 'lumen');
