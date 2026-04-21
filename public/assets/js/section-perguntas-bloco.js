@@ -1086,18 +1086,26 @@ function buildDadosPessoaisPayload() {
         }
 
         const texto = extractFeedbackText(raw);
-        if (!texto) {
-          ultimoErro = new Error(`Resposta vazia para ${tentativa.guia}`);
-          continue;
-        }
 
-        if (isWeakFeedback(texto, {
-          minChars: tentativa.guia === 'lumen' ? 220 : 180,
-          minSentences: tentativa.guia === 'lumen' ? 4 : 3
-        })) {
-          ultimoErro = new Error(`Resposta fraca para ${tentativa.guia}`);
-          continue;
-        }
+       console.log('[DEVOLUTIVA][ROBUSTA][RAW_RESULT]', {
+        tentativa,
+        raw,
+        texto,
+        tamanho: String(texto || '').trim().length
+      });
+
+     if (!isRespostaUtil(texto)) {
+       ultimoErro = new Error(`Resposta vazia para ${tentativa.guia}`);
+       continue;
+     }
+
+     if (isWeakFeedback(texto, {
+      minChars: 40,
+      minSentences: 1
+    })) {
+      ultimoErro = new Error(`Resposta fraca para ${tentativa.guia}`);
+      continue;
+    }
 
         return {
           ok: true,
