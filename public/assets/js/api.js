@@ -363,25 +363,34 @@
 
     console.log('[API][DEVOLUTIVA][RAW]', { path, data });
 
-    const texto =
-      data?.texto ||
-      data?.devolutiva ||
-      data?.devolutivaBloco ||
-      data?.devolutivaFinal ||
-      data?.feedback ||
-      data?.message ||
-      data?.content ||
-      data?.resultado ||
-      data?.reply ||
-      data?.response ||
-      '';
+ const texto =
+  data?.texto ||
+  data?.devolutiva ||
+  data?.devolutivaBloco ||
+  data?.devolutivaFinal ||
+  data?.feedback ||
+  data?.message ||
+  data?.content ||
+  data?.resultado ||
+  data?.reply ||
+  data?.response ||
+  '';
 
-    return {
-      ok: !!String(texto || '').trim(),
-      texto: String(texto || '').trim(),
-      guia: data?.guia || sanitized?.guia || 'lumen',
-      raw: data
-    };
+const textoFinal = String(texto || '').trim();
+
+console.log('[API][DEVOLUTIVA][TEXTO_EXTRAIDO]', {
+  path,
+  textoFinal,
+  tamanho: textoFinal.length,
+  data
+});
+
+return {
+  ok: !!textoFinal,
+  texto: textoFinal,
+  guia: data?.guia || sanitized?.guia || 'lumen',
+  raw: data
+};
   } catch (e) {
     console.warn('[API] erro devolutiva', {
       path,
