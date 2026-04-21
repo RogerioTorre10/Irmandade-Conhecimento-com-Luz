@@ -910,15 +910,50 @@
     ).trim();
   }
 
-  async function requestGuideFeedbackWithFallback(params) {
-    const {
+  function getDadosPessoaisState() {
+  try {
+    return (
+      window.JORNADA_STATE?.dadosPessoais ||
+      JSON.parse(sessionStorage.getItem('JORNADA_DADOS_PESSOAIS') || 'null') ||
+      JSON.parse(localStorage.getItem('JORNADA_DADOS_PESSOAIS') || 'null') ||
+      {}
+    );
+  } catch {
+    return {};
+  }
+}
+
+function buildDadosPessoaisPayload() {
+  const dp = getDadosPessoaisState() || {};
+  return {
+    nomeCompleto: String(dp.nomeCompleto || dp.nome || '').trim(),
+    idadeFaixa: String(dp.idadeFaixa || '').trim(),
+    cidade: String(dp.cidade || '').trim(),
+    estado: String(dp.estado || '').trim(),
+    estadoCivil: String(dp.estadoCivil || '').trim(),
+    profissao: String(dp.profissao || '').trim(),
+    filhos: String(dp.filhos || '').trim(),
+    religiao: String(dp.religiao || '').trim(),
+    observacoes: String(dp.observacoes || '').trim(),
+    perfilPersonalidade: {
+      temperamento: String(dp?.perfilPersonalidade?.temperamento || '').trim(),
+      comportamento: String(dp?.perfilPersonalidade?.comportamento || '').trim(),
+      carater: String(dp?.perfilPersonalidade?.carater || '').trim(),
+      indole: String(dp?.perfilPersonalidade?.indole || '').trim()
+    }
+  };
+}
+
+   async function requestGuideFeedbackWithFallback(params) {
+     const {
       nome,
       guia,
       blocoNome,
       respostas,
       idioma,
       pergunta,
-      resposta
+      resposta,
+      dadosPessoais
     } = params;
 
     const guide = normalizeGuide(guia || 'lumen');
@@ -941,7 +976,8 @@
       respostas: Array.isArray(respostas) ? respostas : [],
       idioma,
       pergunta,
-      resposta
+      resposta,
+      dadosPessoais: dadosPessoais || buildDadosPessoaisPayload()
     };
 
     const tentativas = [
@@ -966,6 +1002,7 @@
             bloco: blocoNome,
             respostas: bodyBase.respostas,
             idioma,
+            dadosPessoais: bodyBase.dadosPessoais,
             retry: tentativa.retry,
             forceComplete: true,
             minSentences: tentativa.guia === 'lumen' ? 4 : 3,
@@ -979,6 +1016,7 @@
             pergunta,
             resposta,
             idioma,
+            dadosPessoais: bodyBase.dadosPessoais,
             retry: tentativa.retry,
             forceComplete: true,
             minSentences: tentativa.guia === 'lumen' ? 4 : 3,
@@ -1245,6 +1283,8 @@
 
   const val = String(textarea?.value || '').trim();
 
+  const dadosPessoais = buildDadosPessoaisPayload();     
+
   if (!val) {
     showMissingAnswerFeedback();
     textarea?.focus();
@@ -1278,7 +1318,8 @@
             respostas: [],
             idioma: document.documentElement.lang || getLang() || 'pt-BR',
             pergunta: perguntaText,
-            resposta: val
+            resposta: val,
+            dadosPessoais
           });
 
           if (result?.ok && result.texto) {
