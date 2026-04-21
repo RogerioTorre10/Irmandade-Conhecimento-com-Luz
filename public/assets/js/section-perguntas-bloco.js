@@ -1452,10 +1452,11 @@ try {
       $('#answer-input', section) ||
       $('textarea', section);
 
-    const perguntaText = getQuestionText(bloco, 0);
+    const qIndex = getCurrentQuestionIndex();
+    const perguntaText = getQuestionText(bloco, qIndex);
 
     if (textarea) {
-      textarea.value = getAnswer(bloco, 0);
+      textarea.value = getAnswer(bloco, qIndex);
       textarea.focus();
       ensureMicAttached(textarea);
     }
