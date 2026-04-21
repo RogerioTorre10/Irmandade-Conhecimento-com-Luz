@@ -1088,15 +1088,16 @@ function buildDadosPessoaisPayload() {
       };
     }
 
-    return requestGuideFeedbackWithFallback({
-      nome,
-      guia,
-      blocoNome,
-      respostas,
-      idioma,
-      pergunta: '',
-      resposta: respostas[respostas.length - 1] || ''
-    });
+   return requestGuideFeedbackWithFallback({
+     nome,
+     guia,
+     blocoNome,
+     respostas,
+     idioma,
+     pergunta: '',
+     resposta: respostas[respostas.length - 1] || '',
+     dadosPessoais
+   });
   }
 
   function getBlockClosingLead(bloco) {
