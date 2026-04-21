@@ -243,8 +243,9 @@
       resposta: p.resposta || '',
       bloco: p.bloco || p.blocoId || '',
       guia: p.guia || '',
-      nome: p.nome || ''
-    });
+      nome: p.nome || '',
+      dadosPessoais: p.dadosPessoais || null
+  });
 
     window.__LAST_DEVOLUTIVA_PAYLOAD__ = p;
     return p;
