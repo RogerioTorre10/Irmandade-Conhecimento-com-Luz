@@ -1128,7 +1128,8 @@ function buildDadosPessoaisPayload() {
     const idioma = document.documentElement.lang || getLang() || 'pt-BR';
     const respostas = getAllAnswersFromBlock(bloco);
     const blocoNome = bloco?.title || bloco?.id || 'Bloco';
-
+    const dadosPessoais = buildDadosPessoaisPayloadSafe();
+    
     if (!respostas.length) {
       return {
         ok: false,
@@ -1139,13 +1140,15 @@ function buildDadosPessoaisPayload() {
    return requestGuideFeedbackWithFallback({
      nome,
      guia,
+     bloco: blocoNome,
      blocoNome,
+     blocoId: bloco?.id || '',
      respostas,
      idioma,
      pergunta: '',
      resposta: respostas[respostas.length - 1] || '',
      dadosPessoais
-   });
+    });    
   }
 
   function getBlockClosingLead(bloco) {
