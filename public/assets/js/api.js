@@ -353,37 +353,49 @@
 }
   
   async function gerarDevolutivaBase(payload, path) {
-    try {
-      const sanitized =
-        path === '/jornada/devolutiva'
-          ? sanitizePerguntaPayload(payload)
-          : sanitizeBlocoPayload(payload);
+  try {
+    const sanitized =
+      path === '/jornada/devolutiva'
+        ? sanitizePerguntaPayload(payload)
+        : sanitizeBlocoPayload(payload);
 
-      const { data } = await postJSON(API_PRIMARY, path, sanitized, 120000);
+    const { data } = await postJSON(API_PRIMARY, path, sanitized, 120000);
 
-console.log('[API][DEVOLUTIVA][RAW]', { path, data });
+    console.log('[API][DEVOLUTIVA][RAW]', { path, data });
 
-const texto =
-  data?.texto ||
-  data?.devolutiva ||
-  data?.devolutivaBloco ||
-  data?.devolutivaFinal ||
-  data?.feedback ||
-  data?.message ||
-  data?.content ||
-  data?.resultado ||
-  data?.reply ||
-  data?.response ||
-  '';
+    const texto =
+      data?.texto ||
+      data?.devolutiva ||
+      data?.devolutivaBloco ||
+      data?.devolutivaFinal ||
+      data?.feedback ||
+      data?.message ||
+      data?.content ||
+      data?.resultado ||
+      data?.reply ||
+      data?.response ||
+      '';
 
-return {
-  ok: !!String(texto || '').trim(),
-  texto: String(texto || '').trim(),
-  guia: data?.guia || sanitized?.guia || 'lumen',
-  raw: data
-};
-    }
+    return {
+      ok: !!String(texto || '').trim(),
+      texto: String(texto || '').trim(),
+      guia: data?.guia || sanitized?.guia || 'lumen',
+      raw: data
+    };
+  } catch (e) {
+    console.warn('[API] erro devolutiva', {
+      path,
+      message: e?.message,
+      status: e?.status,
+      body: e?.body
+    });
+
+    return {
+      ok: false,
+      error: String(e?.message || 'Erro desconhecido')
+    };
   }
+}
 
   function bindResetButton(selector = '[data-reset-jornada], #btn-voltar-portal, #btnVoltarPortal, #btn-voltar') {
     try {
