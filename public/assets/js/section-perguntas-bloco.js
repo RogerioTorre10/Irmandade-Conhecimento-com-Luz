@@ -1336,71 +1336,80 @@ function buildDadosPessoaisPayload() {
 
   const val = String(textarea?.value || '').trim();
 
-  const dadosPessoais = buildDadosPessoaisPayload();     
+  const qIndex = getCurrentQuestionIndex();
+const dadosPessoais = buildDadosPessoaisPayloadSafe();
 
-  if (!val) {
-    showMissingAnswerFeedback();
-    textarea?.focus();
+saveAnswer(bloco, qIndex, val);
+
+try {
+  localStorage.setItem('jornada_resposta_atual', val);
+} catch (_) {}
+
+try {
+  localStorage.setItem('jornada_dados_pessoais', JSON.stringify(dadosPessoais || {}));
+} catch (_) {}
+
+setContinueState(section, 'loading');
+await setGuideResponse(
+  uiText('thinking_about_answer', 'Só um momento, vou refletir sobre sua resposta...'),
+  'info'
+);
+
+try {
+  const guia =
+    sessionStorage.getItem('jornada.guia') ||
+    localStorage.getItem('JORNADA_GUIA') ||
+    localStorage.getItem('jornada.guia') ||
+    document.body.dataset.guia ||
+    'lumen';
+
+  const nome =
+    sessionStorage.getItem('jornada.nome') ||
+    localStorage.getItem('JORNADA_NOME') ||
+    localStorage.getItem('jc.nome') ||
+    'Participante';
+
+  const respostasBloco = getAllAnswersFromBlock(bloco);
+
+  const result = await requestGuideFeedbackWithFallback({
+    nome,
+    guia,
+    bloco: bloco?.title || bloco?.id || 'Bloco',
+    blocoNome: bloco?.title || bloco?.id || 'Bloco',
+    blocoId: bloco?.id || '',
+    respostas: respostasBloco,
+    idioma: document.documentElement.lang || getLang() || 'pt-BR',
+    pergunta: getQuestionText(bloco, qIndex),
+    resposta: val,
+    dadosPessoais
+  });
+
+  if (result?.ok && result.texto) {
+    await setGuideResponse(result.texto, result.fallbackUsed ? 'warn' : 'success');
+    setContinueState(section, 'ready');
     return;
   }
 
-  saveAnswer(bloco, 0, val);
-  setContinueState(section, 'loading');
   await setGuideResponse(
-    uiText('thinking_about_answer', 'Só um momento, vou refletir sobre sua resposta...'),
-    'info'
+    uiText(
+      'incomplete_feedback',
+      'A devolutiva ainda não chegou completa. Toque em "Tentar novamente" para reenviar tua resposta ao guia.'
+    ),
+    'warn'
   );
+  setContinueState(section, 'error');
+} catch (e) {
+  console.warn('Erro devolutiva IA', e);
 
-  try {
-    const guia =
-      sessionStorage.getItem('jornada.guia') ||
-      localStorage.getItem('JORNADA_GUIA') ||
-      localStorage.getItem('jornada.guia') ||
-      document.body.dataset.guia ||
-      'lumen';
-
-    const nome =
-      sessionStorage.getItem('jornada.nome') ||
-      localStorage.getItem('JORNADA_NOME') ||
-      localStorage.getItem('jc.nome') ||
-      'Participante';
-          const result = await requestGuideFeedbackWithFallback({
-            nome,
-            guia,
-            blocoNome: bloco?.title || bloco?.id || 'Bloco',
-            respostas: [],
-            idioma: document.documentElement.lang || getLang() || 'pt-BR',
-            pergunta: perguntaText,
-            resposta: val,
-            dadosPessoais
-          });
-
-          if (result?.ok && result.texto) {
-            await setGuideResponse(result.texto, result.fallbackUsed ? 'warn' : 'success');
-            setContinueState(section, 'ready');
-            return;
-          }
-
-          await setGuideResponse(
-            uiText(
-              'incomplete_feedback',
-              'A devolutiva ainda não chegou completa. Toque em "Tentar novamente" para reenviar tua resposta ao guia.'
-            ),
-            'warn'
-          );
-          setContinueState(section, 'error');
-        } catch (e) {
-          console.warn('Erro devolutiva IA', e);
-
-          await setGuideResponse(
-            uiText(
-              'connection_oscillated',
-              'A conexão com o guia oscilou neste momento. Toque em "Tentar novamente" para buscar a devolutiva.'
-            ),
-            'warn'
-          );
-          setContinueState(section, 'error');
-        }
+  await setGuideResponse(
+    uiText(
+      'connection_oscillated',
+      'A conexão com o guia oscilou neste momento. Toque em "Tentar novamente" para buscar a devolutiva.'
+    ),
+    'warn'
+  );
+  setContinueState(section, 'error');
+}
       };
     }
   }
