@@ -340,8 +340,15 @@
 
       return {
         ok: true,
-        texto: data?.devolutiva || data?.devolutivaBloco || '',
-        guia: data?.guia || sanitized?.guia || 'lumen'
+        texto:
+          data?.texto ||
+          data?.devolutiva ||
+          data?.devolutivaBloco ||
+          data?.feedback ||
+          data?.message ||
+          '',
+        guia: data?.guia || sanitized?.guia || 'lumen',
+        raw: data
       };
 
     } catch (e) {
