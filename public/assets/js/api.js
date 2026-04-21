@@ -207,89 +207,66 @@
   }
 
   function sanitizePerguntaPayload(payload) {
-  const p = { ...(payload || {}) };
+    const p = { ...(payload || {}) };
 
-  let respostaAtual = '';
-  if (typeof p.resposta === 'string' && p.resposta.trim()) {
-    respostaAtual = p.resposta.trim();
-  } else if (typeof p.answer === 'string' && p.answer.trim()) {
-    respostaAtual = p.answer.trim();
-  } else if (typeof p.respostaAtual === 'string' && p.respostaAtual.trim()) {
-    respostaAtual = p.respostaAtual.trim();
-  }
-
-  if (!respostaAtual) {
-    const draftStorage =
-      sessionStorage.getItem('jornada_resposta_atual') ||
-      localStorage.getItem('jornada_resposta_atual') ||
-      '';
-    if (draftStorage && draftStorage.trim()) {
-      respostaAtual = draftStorage.trim();
+    let respostaAtual = '';
+    if (typeof p.resposta === 'string' && p.resposta.trim()) {
+      respostaAtual = p.resposta.trim();
+    } else if (typeof p.answer === 'string' && p.answer.trim()) {
+      respostaAtual = p.answer.trim();
+    } else if (typeof p.respostaAtual === 'string' && p.respostaAtual.trim()) {
+      respostaAtual = p.respostaAtual.trim();
     }
-  }
 
-  delete p.answers;
-  delete p.answer;
-  delete p.respostasAnteriores;
-  delete p.respostas_bloco;
-  delete p.allAnswers;
-  delete p.historicoRespostas;
+    if (!respostaAtual) {
+      const draftStorage =
+        sessionStorage.getItem('jornada_resposta_atual') ||
+        localStorage.getItem('jornada_resposta_atual') ||
+        '';
 
-  p.resposta = respostaAtual;
-  p.bloco = p.bloco || p.blocoNome || p.blocoId || '';
-  p.blocoNome = p.blocoNome || p.bloco || p.blocoId || '';
+      if (draftStorage && draftStorage.trim()) {
+        respostaAtual = draftStorage.trim();
+      }
+    }
 
-  if (!p.dadosPessoais || typeof p.dadosPessoais !== 'object') {
-    p.dadosPessoais =
-      safeGetJSON('jornada_dados_pessoais', null) ||
-      safeGetJSON('JORNADA_DADOS', null) ||
-      null;
-  }
+    delete p.respostas;
+    delete p.answers;
+    delete p.respostasAnteriores;
+    delete p.respostas_bloco;
+    delete p.allAnswers;
+    delete p.historicoRespostas;
 
-  console.log('[API][DEVOLUTIVA][PAYLOAD_SANITIZADO]', {
-    pergunta: p.pergunta || '',
-    resposta: p.resposta || '',
-    bloco: p.bloco || '',
-    blocoNome: p.blocoNome || '',
-    guia: p.guia || '',
-    nome: p.nome || '',
-    dadosPessoais: p.dadosPessoais || null
+    p.resposta = respostaAtual;
+
+    console.log('[API][DEVOLUTIVA][PAYLOAD_SANITIZADO]', {
+      pergunta: p.pergunta || '',
+      resposta: p.resposta || '',
+      bloco: p.bloco || p.blocoId || '',
+      guia: p.guia || '',
+      nome: p.nome || '',
+      dadosPessoais: p.dadosPessoais || null
   });
 
-  window.__LAST_DEVOLUTIVA_PAYLOAD__ = p;
-  return p;
-}
+    window.__LAST_DEVOLUTIVA_PAYLOAD__ = p;
+    return p;
+  }
 
   function sanitizeBlocoPayload(payload) {
-  const p = { ...(payload || {}) };
+    const p = { ...(payload || {}) };
 
-  if (!Array.isArray(p.respostas)) {
-    const respostasStorage =
-      safeGetJSON('jornada_respostas', null) ||
-      safeGetJSON('JORNADA_RESPOSTAS', null);
+    if (!Array.isArray(p.respostas)) {
+      const respostasStorage =
+        safeGetJSON('jornada_respostas', null) ||
+        safeGetJSON('JORNADA_RESPOSTAS', null);
 
-    if (Array.isArray(respostasStorage) && respostasStorage.length) {
-      p.respostas = respostasStorage;
-    } else {
-      p.respostas = [];
+      if (Array.isArray(respostasStorage) && respostasStorage.length) {
+        p.respostas = respostasStorage;
+      }
     }
+
+    window.__LAST_BLOCK_PAYLOAD__ = p;
+    return p;
   }
-
-  p.bloco = p.bloco || p.blocoNome || p.blocoId || '';
-  p.blocoNome = p.blocoNome || p.bloco || p.blocoId || '';
-
-  if (!p.dadosPessoais || typeof p.dadosPessoais !== 'object') {
-    p.dadosPessoais =
-      safeGetJSON('jornada_dados_pessoais', null) ||
-      safeGetJSON('JORNADA_DADOS', null) ||
-      null;
-  }
-
-  console.log('[API][BLOCO][PAYLOAD_SANITIZADO]', p);
-
-  window.__LAST_BLOCK_PAYLOAD__ = p;
-  return p;
-}
 
   async function gerarPDFEHQ(payload) {
   const safePayload = sanitizePdfPayload(payload || {});
@@ -353,58 +330,41 @@
 }
   
   async function gerarDevolutivaBase(payload, path) {
-  try {
-    const sanitized =
-      path === '/jornada/devolutiva'
-        ? sanitizePerguntaPayload(payload)
-        : sanitizeBlocoPayload(payload);
+    try {
+      const sanitized =
+        path === '/jornada/devolutiva'
+          ? sanitizePerguntaPayload(payload)
+          : sanitizeBlocoPayload(payload);
 
-    const { data } = await postJSON(API_PRIMARY, path, sanitized, 120000);
+      const { data } = await postJSON(API_PRIMARY, path, sanitized, 120000);
 
-    console.log('[API][DEVOLUTIVA][RAW]', { path, data });
+      return {
+        ok: true,
+        texto:
+          data?.texto ||
+          data?.devolutiva ||
+          data?.devolutivaBloco ||
+          data?.feedback ||
+          data?.message ||
+          '',
+        guia: data?.guia || sanitized?.guia || 'lumen',
+        raw: data
+      };
 
- const texto =
-  data?.texto ||
-  data?.devolutiva ||
-  data?.devolutivaBloco ||
-  data?.devolutivaFinal ||
-  data?.feedback ||
-  data?.message ||
-  data?.content ||
-  data?.resultado ||
-  data?.reply ||
-  data?.response ||
-  '';
+    } catch (e) {
+      console.warn('[API] erro devolutiva', {
+        path,
+        message: e?.message,
+        status: e?.status,
+        body: e?.body
+      });
 
-const textoFinal = String(texto || '').trim();
-
-console.log('[API][DEVOLUTIVA][TEXTO_EXTRAIDO]', {
-  path,
-  textoFinal,
-  tamanho: textoFinal.length,
-  data
-});
-
-return {
-  ok: !!textoFinal,
-  texto: textoFinal,
-  guia: data?.guia || sanitized?.guia || 'lumen',
-  raw: data
-};
-  } catch (e) {
-    console.warn('[API] erro devolutiva', {
-      path,
-      message: e?.message,
-      status: e?.status,
-      body: e?.body
-    });
-
-    return {
-      ok: false,
-      error: String(e?.message || 'Erro desconhecido')
-    };
+      return {
+        ok: false,
+        error: String(e?.message || 'Erro desconhecido')
+      };
+    }
   }
-}
 
   function bindResetButton(selector = '[data-reset-jornada], #btn-voltar-portal, #btnVoltarPortal, #btn-voltar') {
     try {
