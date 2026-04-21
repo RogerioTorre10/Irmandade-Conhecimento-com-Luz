@@ -238,54 +238,6 @@
     return window.JORNADA_PAPER_QA.getBlockBySection(sectionId, getLang());
   }
 
-  function getCurrentQuestionIndex() {
-  return Number.isInteger(State.questionIndex) ? State.questionIndex : 0;
-}
-
-function normalizeDadosPessoaisShape(raw) {
-  const src = raw && typeof raw === 'object' ? raw : {};
-
-  const perfilPersonalidade =
-    src.perfilPersonalidade ||
-    src.personalidade ||
-    '';
-
-  const eixoExistencial =
-    src.eixoExistencial ||
-    src.eixo_existencial ||
-    '';
-
-  const conscienciaExpandida =
-    src.conscienciaExpandida ||
-    src.analiseExpandida ||
-    src.consciencia_expandida ||
-    '';
-
-  return {
-    ...src,
-    perfilPersonalidade,
-    eixoExistencial,
-    conscienciaExpandida
-  };
-}
-
-function buildDadosPessoaisPayloadSafe() {
-  try {
-    if (typeof buildDadosPessoaisPayload === 'function') {
-      return normalizeDadosPessoaisShape(buildDadosPessoaisPayload() || {});
-    }
-  } catch (e) {
-    console.warn('[DADOS_PESSOAIS] buildDadosPessoaisPayload falhou:', e);
-  }
-
-  const local =
-    JSON.parse(localStorage.getItem('jornada_dados_pessoais') || 'null') ||
-    JSON.parse(localStorage.getItem('JORNADA_DADOS') || 'null') ||
-    {};
-
-  return normalizeDadosPessoaisShape(local);
-}
-
   function normalizeGuide(raw) {
     const x = String(raw || '').trim().toLowerCase();
     if (!x) return 'lumen';
@@ -879,26 +831,17 @@ function buildDadosPessoaisPayloadSafe() {
       .length;
   }
 
-  function isRespostaUtil(texto) {
-  const t = String(texto || '').replace(/\s+/g, ' ').trim();
-  if (!t) return false;
-  if (t.length < 40) return false;
-  return true;
-}
+  function isWeakFeedback(text, opts = {}) {
+    const minChars = Number(opts.minChars ?? 180);
+    const minSentences = Number(opts.minSentences ?? 3);
+    const txt = String(text || '').replace(/\s+/g, ' ').trim();
 
-function isWeakFeedback(text, opts = {}) {
-  const txt = String(text || '').replace(/\s+/g, ' ').trim();
-
-  if (!isRespostaUtil(txt)) return true;
-
-  const minChars = Number(opts.minChars ?? 40);
-  const minSentences = Number(opts.minSentences ?? 1);
-
-  if (txt.length < minChars) return true;
-  if (countSentences(txt) < minSentences) return true;
-
-  return false;
-}
+    if (!txt) return true;
+    if (txt.length < minChars) return true;
+    if (countSentences(txt) < minSentences) return true;
+    if (!/[.!?…]$/.test(txt)) return true;
+    return false;
+  }
 
   function buildFallbackFeedback({ guia, nome, blocoNome, resposta, pergunta, idioma }) {
     const guide = normalizeGuide(guia || 'lumen');
@@ -1086,26 +1029,18 @@ function buildDadosPessoaisPayload() {
         }
 
         const texto = extractFeedbackText(raw);
+        if (!texto) {
+          ultimoErro = new Error(`Resposta vazia para ${tentativa.guia}`);
+          continue;
+        }
 
-       console.log('[DEVOLUTIVA][ROBUSTA][RAW_RESULT]', {
-        tentativa,
-        raw,
-        texto,
-        tamanho: String(texto || '').trim().length
-      });
-
-     if (!isRespostaUtil(texto)) {
-       ultimoErro = new Error(`Resposta vazia para ${tentativa.guia}`);
-       continue;
-     }
-
-     if (isWeakFeedback(texto, {
-      minChars: 40,
-      minSentences: 1
-    })) {
-      ultimoErro = new Error(`Resposta fraca para ${tentativa.guia}`);
-      continue;
-    }
+        if (isWeakFeedback(texto, {
+          minChars: tentativa.guia === 'lumen' ? 220 : 180,
+          minSentences: tentativa.guia === 'lumen' ? 4 : 3
+        })) {
+          ultimoErro = new Error(`Resposta fraca para ${tentativa.guia}`);
+          continue;
+        }
 
         return {
           ok: true,
@@ -1145,8 +1080,7 @@ function buildDadosPessoaisPayload() {
     const idioma = document.documentElement.lang || getLang() || 'pt-BR';
     const respostas = getAllAnswersFromBlock(bloco);
     const blocoNome = bloco?.title || bloco?.id || 'Bloco';
-    const dadosPessoais = buildDadosPessoaisPayloadSafe();
-    
+
     if (!respostas.length) {
       return {
         ok: false,
@@ -1157,15 +1091,13 @@ function buildDadosPessoaisPayload() {
    return requestGuideFeedbackWithFallback({
      nome,
      guia,
-     bloco: blocoNome,
      blocoNome,
-     blocoId: bloco?.id || '',
      respostas,
      idioma,
      pergunta: '',
      resposta: respostas[respostas.length - 1] || '',
      dadosPessoais
-    });    
+   });
   }
 
   function getBlockClosingLead(bloco) {
@@ -1356,80 +1288,71 @@ function buildDadosPessoaisPayload() {
 
   const val = String(textarea?.value || '').trim();
 
-  const qIndex = getCurrentQuestionIndex();
-const dadosPessoais = buildDadosPessoaisPayloadSafe();
+  const dadosPessoais = buildDadosPessoaisPayload();     
 
-saveAnswer(bloco, qIndex, val);
-
-try {
-  localStorage.setItem('jornada_resposta_atual', val);
-} catch (_) {}
-
-try {
-  localStorage.setItem('jornada_dados_pessoais', JSON.stringify(dadosPessoais || {}));
-} catch (_) {}
-
-setContinueState(section, 'loading');
-await setGuideResponse(
-  uiText('thinking_about_answer', 'Só um momento, vou refletir sobre sua resposta...'),
-  'info'
-);
-
-try {
-  const guia =
-    sessionStorage.getItem('jornada.guia') ||
-    localStorage.getItem('JORNADA_GUIA') ||
-    localStorage.getItem('jornada.guia') ||
-    document.body.dataset.guia ||
-    'lumen';
-
-  const nome =
-    sessionStorage.getItem('jornada.nome') ||
-    localStorage.getItem('JORNADA_NOME') ||
-    localStorage.getItem('jc.nome') ||
-    'Participante';
-
-  const respostasBloco = getAllAnswersFromBlock(bloco);
-
-  const result = await requestGuideFeedbackWithFallback({
-    nome,
-    guia,
-    bloco: bloco?.title || bloco?.id || 'Bloco',
-    blocoNome: bloco?.title || bloco?.id || 'Bloco',
-    blocoId: bloco?.id || '',
-    respostas: respostasBloco,
-    idioma: document.documentElement.lang || getLang() || 'pt-BR',
-    pergunta: getQuestionText(bloco, qIndex),
-    resposta: val,
-    dadosPessoais
-  });
-
-  if (result?.ok && result.texto) {
-    await setGuideResponse(result.texto, result.fallbackUsed ? 'warn' : 'success');
-    setContinueState(section, 'ready');
+  if (!val) {
+    showMissingAnswerFeedback();
+    textarea?.focus();
     return;
   }
 
+  saveAnswer(bloco, 0, val);
+  setContinueState(section, 'loading');
   await setGuideResponse(
-    uiText(
-      'incomplete_feedback',
-      'A devolutiva ainda não chegou completa. Toque em "Tentar novamente" para reenviar tua resposta ao guia.'
-    ),
-    'warn'
+    uiText('thinking_about_answer', 'Só um momento, vou refletir sobre sua resposta...'),
+    'info'
   );
-  setContinueState(section, 'error');
-} catch (e) {
-  console.warn('Erro devolutiva IA', e);
 
-  await setGuideResponse(
-    uiText(
-      'connection_oscillated',
-      'A conexão com o guia oscilou neste momento. Toque em "Tentar novamente" para buscar a devolutiva.'
-    ),
-    'warn'
-  );
-  setContinueState(section, 'error');
-}
+  try {
+    const guia =
+      sessionStorage.getItem('jornada.guia') ||
+      localStorage.getItem('JORNADA_GUIA') ||
+      localStorage.getItem('jornada.guia') ||
+      document.body.dataset.guia ||
+      'lumen';
+
+    const nome =
+      sessionStorage.getItem('jornada.nome') ||
+      localStorage.getItem('JORNADA_NOME') ||
+      localStorage.getItem('jc.nome') ||
+      'Participante';
+          const result = await requestGuideFeedbackWithFallback({
+            nome,
+            guia,
+            blocoNome: bloco?.title || bloco?.id || 'Bloco',
+            respostas: [],
+            idioma: document.documentElement.lang || getLang() || 'pt-BR',
+            pergunta: perguntaText,
+            resposta: val,
+            dadosPessoais
+          });
+
+          if (result?.ok && result.texto) {
+            await setGuideResponse(result.texto, result.fallbackUsed ? 'warn' : 'success');
+            setContinueState(section, 'ready');
+            return;
+          }
+
+          await setGuideResponse(
+            uiText(
+              'incomplete_feedback',
+              'A devolutiva ainda não chegou completa. Toque em "Tentar novamente" para reenviar tua resposta ao guia.'
+            ),
+            'warn'
+          );
+          setContinueState(section, 'error');
+        } catch (e) {
+          console.warn('Erro devolutiva IA', e);
+
+          await setGuideResponse(
+            uiText(
+              'connection_oscillated',
+              'A conexão com o guia oscilou neste momento. Toque em "Tentar novamente" para buscar a devolutiva.'
+            ),
+            'warn'
+          );
+          setContinueState(section, 'error');
+        }
       };
     }
   }
@@ -1446,7 +1369,7 @@ try {
 
     State.sectionId = sectionId;
     State.bloco = bloco;
-    State.questionIndex = Number.isInteger(State.questionIndex) ? State.questionIndex : 0;
+    State.questionIndex = 0;
     State.mounted = true;
 
     applyGuiaTheme(section);
@@ -1472,11 +1395,10 @@ try {
       $('#answer-input', section) ||
       $('textarea', section);
 
-    const qIndex = getCurrentQuestionIndex();
-    const perguntaText = getQuestionText(bloco, qIndex);
+    const perguntaText = getQuestionText(bloco, 0);
 
     if (textarea) {
-      textarea.value = getAnswer(bloco, qIndex);
+      textarea.value = getAnswer(bloco, 0);
       textarea.focus();
       ensureMicAttached(textarea);
     }
