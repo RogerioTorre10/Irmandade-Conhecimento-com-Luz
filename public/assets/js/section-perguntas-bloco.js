@@ -940,6 +940,10 @@ function buildDadosPessoaisPayload() {
       comportamento: String(dp?.perfilPersonalidade?.comportamento || '').trim(),
       carater: String(dp?.perfilPersonalidade?.carater || '').trim(),
       indole: String(dp?.perfilPersonalidade?.indole || '').trim()
+    },
+    eixoExistencial: {
+      vazio: String(dp?.eixoExistencial?.vazio || '').trim(),
+      pleno: String(dp?.eixoExistencial?.pleno || '').trim()
     }
   };
 }
