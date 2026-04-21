@@ -1426,7 +1426,7 @@ try {
 
     State.sectionId = sectionId;
     State.bloco = bloco;
-    State.questionIndex = 0;
+    State.questionIndex = Number.isInteger(State.questionIndex) ? State.questionIndex : 0;
     State.mounted = true;
 
     applyGuiaTheme(section);
