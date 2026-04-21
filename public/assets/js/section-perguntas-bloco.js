@@ -238,6 +238,54 @@
     return window.JORNADA_PAPER_QA.getBlockBySection(sectionId, getLang());
   }
 
+  function getCurrentQuestionIndex() {
+  return Number.isInteger(State.questionIndex) ? State.questionIndex : 0;
+}
+
+function normalizeDadosPessoaisShape(raw) {
+  const src = raw && typeof raw === 'object' ? raw : {};
+
+  const perfilPersonalidade =
+    src.perfilPersonalidade ||
+    src.personalidade ||
+    '';
+
+  const eixoExistencial =
+    src.eixoExistencial ||
+    src.eixo_existencial ||
+    '';
+
+  const conscienciaExpandida =
+    src.conscienciaExpandida ||
+    src.analiseExpandida ||
+    src.consciencia_expandida ||
+    '';
+
+  return {
+    ...src,
+    perfilPersonalidade,
+    eixoExistencial,
+    conscienciaExpandida
+  };
+}
+
+function buildDadosPessoaisPayloadSafe() {
+  try {
+    if (typeof buildDadosPessoaisPayload === 'function') {
+      return normalizeDadosPessoaisShape(buildDadosPessoaisPayload() || {});
+    }
+  } catch (e) {
+    console.warn('[DADOS_PESSOAIS] buildDadosPessoaisPayload falhou:', e);
+  }
+
+  const local =
+    JSON.parse(localStorage.getItem('jornada_dados_pessoais') || 'null') ||
+    JSON.parse(localStorage.getItem('JORNADA_DADOS') || 'null') ||
+    {};
+
+  return normalizeDadosPessoaisShape(local);
+}
+
   function normalizeGuide(raw) {
     const x = String(raw || '').trim().toLowerCase();
     if (!x) return 'lumen';
