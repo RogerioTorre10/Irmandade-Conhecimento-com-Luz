@@ -207,66 +207,89 @@
   }
 
   function sanitizePerguntaPayload(payload) {
-    const p = { ...(payload || {}) };
+  const p = { ...(payload || {}) };
 
-    let respostaAtual = '';
-    if (typeof p.resposta === 'string' && p.resposta.trim()) {
-      respostaAtual = p.resposta.trim();
-    } else if (typeof p.answer === 'string' && p.answer.trim()) {
-      respostaAtual = p.answer.trim();
-    } else if (typeof p.respostaAtual === 'string' && p.respostaAtual.trim()) {
-      respostaAtual = p.respostaAtual.trim();
+  let respostaAtual = '';
+  if (typeof p.resposta === 'string' && p.resposta.trim()) {
+    respostaAtual = p.resposta.trim();
+  } else if (typeof p.answer === 'string' && p.answer.trim()) {
+    respostaAtual = p.answer.trim();
+  } else if (typeof p.respostaAtual === 'string' && p.respostaAtual.trim()) {
+    respostaAtual = p.respostaAtual.trim();
+  }
+
+  if (!respostaAtual) {
+    const draftStorage =
+      sessionStorage.getItem('jornada_resposta_atual') ||
+      localStorage.getItem('jornada_resposta_atual') ||
+      '';
+    if (draftStorage && draftStorage.trim()) {
+      respostaAtual = draftStorage.trim();
     }
+  }
 
-    if (!respostaAtual) {
-      const draftStorage =
-        sessionStorage.getItem('jornada_resposta_atual') ||
-        localStorage.getItem('jornada_resposta_atual') ||
-        '';
+  delete p.answers;
+  delete p.answer;
+  delete p.respostasAnteriores;
+  delete p.respostas_bloco;
+  delete p.allAnswers;
+  delete p.historicoRespostas;
 
-      if (draftStorage && draftStorage.trim()) {
-        respostaAtual = draftStorage.trim();
-      }
-    }
+  p.resposta = respostaAtual;
+  p.bloco = p.bloco || p.blocoNome || p.blocoId || '';
+  p.blocoNome = p.blocoNome || p.bloco || p.blocoId || '';
 
-    delete p.respostas;
-    delete p.answers;
-    delete p.respostasAnteriores;
-    delete p.respostas_bloco;
-    delete p.allAnswers;
-    delete p.historicoRespostas;
+  if (!p.dadosPessoais || typeof p.dadosPessoais !== 'object') {
+    p.dadosPessoais =
+      safeGetJSON('jornada_dados_pessoais', null) ||
+      safeGetJSON('JORNADA_DADOS', null) ||
+      null;
+  }
 
-    p.resposta = respostaAtual;
-
-    console.log('[API][DEVOLUTIVA][PAYLOAD_SANITIZADO]', {
-      pergunta: p.pergunta || '',
-      resposta: p.resposta || '',
-      bloco: p.bloco || p.blocoId || '',
-      guia: p.guia || '',
-      nome: p.nome || '',
-      dadosPessoais: p.dadosPessoais || null
+  console.log('[API][DEVOLUTIVA][PAYLOAD_SANITIZADO]', {
+    pergunta: p.pergunta || '',
+    resposta: p.resposta || '',
+    bloco: p.bloco || '',
+    blocoNome: p.blocoNome || '',
+    guia: p.guia || '',
+    nome: p.nome || '',
+    dadosPessoais: p.dadosPessoais || null
   });
 
-    window.__LAST_DEVOLUTIVA_PAYLOAD__ = p;
-    return p;
-  }
+  window.__LAST_DEVOLUTIVA_PAYLOAD__ = p;
+  return p;
+}
 
   function sanitizeBlocoPayload(payload) {
-    const p = { ...(payload || {}) };
+  const p = { ...(payload || {}) };
 
-    if (!Array.isArray(p.respostas)) {
-      const respostasStorage =
-        safeGetJSON('jornada_respostas', null) ||
-        safeGetJSON('JORNADA_RESPOSTAS', null);
+  if (!Array.isArray(p.respostas)) {
+    const respostasStorage =
+      safeGetJSON('jornada_respostas', null) ||
+      safeGetJSON('JORNADA_RESPOSTAS', null);
 
-      if (Array.isArray(respostasStorage) && respostasStorage.length) {
-        p.respostas = respostasStorage;
-      }
+    if (Array.isArray(respostasStorage) && respostasStorage.length) {
+      p.respostas = respostasStorage;
+    } else {
+      p.respostas = [];
     }
-
-    window.__LAST_BLOCK_PAYLOAD__ = p;
-    return p;
   }
+
+  p.bloco = p.bloco || p.blocoNome || p.blocoId || '';
+  p.blocoNome = p.blocoNome || p.bloco || p.blocoId || '';
+
+  if (!p.dadosPessoais || typeof p.dadosPessoais !== 'object') {
+    p.dadosPessoais =
+      safeGetJSON('jornada_dados_pessoais', null) ||
+      safeGetJSON('JORNADA_DADOS', null) ||
+      null;
+  }
+
+  console.log('[API][BLOCO][PAYLOAD_SANITIZADO]', p);
+
+  window.__LAST_BLOCK_PAYLOAD__ = p;
+  return p;
+}
 
   async function gerarPDFEHQ(payload) {
   const safePayload = sanitizePdfPayload(payload || {});
