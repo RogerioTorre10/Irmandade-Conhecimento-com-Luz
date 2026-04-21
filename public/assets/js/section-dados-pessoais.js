@@ -44,53 +44,33 @@
   }
 
   function collect(root) {
-  return {
-    nomeCompleto: ($('#dp-nome', root)?.value || '').trim(),
-    idadeFaixa: ($('#dp-idade-faixa', root)?.value || '').trim(),
-    cidade: ($('#dp-cidade', root)?.value || '').trim(),
-    estado: ($('#dp-estado', root)?.value || '').trim(),
-    estadoCivil: ($('#dp-estado-civil', root)?.value || '').trim(),
-    profissao: ($('#dp-profissao', root)?.value || '').trim(),
-    filhos: ($('#dp-filhos', root)?.value || '').trim(),
-    religiao: ($('#dp-religiao', root)?.value || '').trim(),
-
-    // 🔥 NOVO BLOCO PERSONALIDADE
-    perfilPersonalidade: {
-      temperamento: ($('#dp-temperamento', root)?.value || '').trim(),
-      comportamento: ($('#dp-comportamento', root)?.value || '').trim(),
-      carater: ($('#dp-carater', root)?.value || '').trim(),
-      indole: ($('#dp-indole', root)?.value || '').trim()
-    },
-
-    eixoExistencial: {
-    vazio: String(($('#dp-vazio-existencial', root)?.value || '')).trim(),
-    pleno: String(($('#dp-pleno-existencial', root)?.value || '')).trim()
-   },
-
-    observacoes: ($('#dp-observacoes', root)?.value || '').trim()
-  };
-}
+    return {
+      nomeCompleto: ($('#dp-nome', root)?.value || '').trim(),
+      idadeFaixa: ($('#dp-idade-faixa', root)?.value || '').trim(),
+      cidade: ($('#dp-cidade', root)?.value || '').trim(),
+      estado: ($('#dp-estado', root)?.value || '').trim(),
+      estadoCivil: ($('#dp-estado-civil', root)?.value || '').trim(),
+      profissao: ($('#dp-profissao', root)?.value || '').trim(),
+      filhos: ($('#dp-filhos', root)?.value || '').trim(),
+      religiao: ($('#dp-religiao', root)?.value || '').trim(),
+      observacoes: ($('#dp-observacoes', root)?.value || '').trim()
+    };
+  }
 
   function hydrate(root, data) {
     if (!data) return;
 
     const map = {
-  '#dp-nome': data.nomeCompleto,
-  '#dp-idade-faixa': data.idadeFaixa,
-  '#dp-cidade': data.cidade,
-  '#dp-estado': data.estado,
-  '#dp-estado-civil': data.estadoCivil,
-  '#dp-profissao': data.profissao,
-  '#dp-filhos': data.filhos,
-  '#dp-religiao': data.religiao,
-  '#dp-observacoes': data.observacoes,
-
-  // 🔥 PERSONALIDADE
-  '#dp-temperamento': data?.perfilPersonalidade?.temperamento,
-  '#dp-comportamento': data?.perfilPersonalidade?.comportamento,
-  '#dp-carater': data?.perfilPersonalidade?.carater,
-  '#dp-indole': data?.perfilPersonalidade?.indole
-};
+      '#dp-nome': data.nomeCompleto,
+      '#dp-idade-faixa': data.idadeFaixa,
+      '#dp-cidade': data.cidade,
+      '#dp-estado': data.estado,
+      '#dp-estado-civil': data.estadoCivil,
+      '#dp-profissao': data.profissao,
+      '#dp-filhos': data.filhos,
+      '#dp-religiao': data.religiao,
+      '#dp-observacoes': data.observacoes
+    };
 
     Object.entries(map).forEach(([sel, val]) => {
       const el = $(sel, root);
