@@ -207,48 +207,50 @@
 
       // === FOR CORRIGIDO AQUI DENTRO ===
       for (const el of typingElements) {
-        const text = getText(el);
-        if (!text) continue;
+  const text = getText(el);
+  if (!text) continue;
 
-        el.dataset.text = text;
-        el.textContent = '';
+  el.dataset.text = text;
+  el.textContent = '';
 
-        const elementSpeed = Number(el.dataset.speed || 36);
-        const elementCursor = String(el.dataset.cursor || 'true') !== 'false';
+  const elementSpeed = Number(el.dataset.speed || 36);
+  const elementCursor = String(el.dataset.cursor || 'true') !== 'false';
+  const voiceKind =
+    el.dataset.voiceKind ||
+    root?.dataset?.voiceKind ||
+    (sectionId === 'section-intro' ? 'intro' :
+     sectionId === 'section-dados-pessoais' ? 'dados' :
+     sectionId?.startsWith('section-termos') ? 'terms' :
+     sectionId?.startsWith('section-perguntas') ? 'question' :
+     sectionId === 'section-final' ? 'final' :
+     'default');
 
-        const voiceKind = el.dataset.voiceKind ||
-          root?.dataset?.voiceKind ||
-          (sectionId === 'section-intro' ? 'intro' :
-           sectionId === 'section-dados-pessoais' ? 'dados' :
-           sectionId?.startsWith('section-termos') ? 'terms' :
-           sectionId?.startsWith('section-perguntas') ? 'question' :
-           sectionId === 'section-final' ? 'final' : 'default');
+  if (typeof window.runTyping === 'function') {
+    await window.runTyping(el, text, () => {}, {
+      speed: elementSpeed,
+      cursor: elementCursor
+    });
+  }
 
-        if (typeof window.runTyping === 'function') {
-          await window.runTyping(el, text, () => {}, {
-            speed: elementSpeed,
-            cursor: elementCursor
-          });
-        }
+  if (window.JORNADA_VOICE?.speakLive) {
+    await window.JORNADA_VOICE.speakLive(text, {
+      lang: document.documentElement.lang || window.i18n?.lang || 'pt-BR',
+      guide: document.body.dataset.guia || 'lumen',
+      kind: voiceKind
+    });
+  }
+}
 
-        if (window.JORNADA_VOICE?.speakLive) {
-          await window.JORNADA_VOICE.speakLive(text, {
-            lang: document.documentElement.lang || window.i18n?.lang || 'pt-BR',
-            guide: document.body.dataset.guia || 'lumen',
-            kind: voiceKind
-          });
-        }
+  el.classList.remove('typing-active');
+  el.classList.add('typing-done');
+  el.removeAttribute('data-typing');
 
-        el.classList.remove('typing-active');
-        el.classList.add('typing-done');
-        el.removeAttribute('data-typing');
+  // pequena pausa entre blocos, para não parecer colado
+  await new Promise((resolve) => setTimeout(resolve, el.classList.contains('intro-title') ? 180 : 120));
 
-        await new Promise((resolve) => setTimeout(resolve, el.classList.contains('intro-title') ? 180 : 120));
-      }
-
+  
       window.__JC_TYPED_ONCE[sectionId] = true;
       console.log('[JC.applyTypingAndTTS] Concluído para:', sectionId);
-
     } catch (err) {
       console.error('[JC.applyTypingAndTTS] Erro:', sectionId, err);
       window.__JC_TYPED_ONCE[sectionId] = false;
