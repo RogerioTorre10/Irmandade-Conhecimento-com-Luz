@@ -518,6 +518,15 @@
   const clean = String(text || '').trim();
   if (!clean) return Promise.resolve();
 
+  if (window.EffectCoordinator?.speak) {
+    window.EffectCoordinator.speak(clean, {
+      rate: 0.94,
+      pitch: 1,
+      volume: 1
+    });
+    return Promise.resolve();
+  }
+
   if (window.JORNADA_VOICE?.speak) {
     return window.JORNADA_VOICE.speak(clean, {
       lang: document.documentElement.lang || getLang() || 'pt-BR',
