@@ -62,6 +62,11 @@
       indole: ($('#dp-indole', root)?.value || '').trim()
     },
 
+    eixoExistencial: {
+    vazio: ($('#dp-vazio-existencial', root)?.value || '').trim(),
+    pleno: ($('#dp-pleno-existencial', root)?.value || '').trim()
+  };
+
     observacoes: ($('#dp-observacoes', root)?.value || '').trim()
   };
 }
