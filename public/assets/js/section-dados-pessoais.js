@@ -63,9 +63,9 @@
     },
 
     eixoExistencial: {
-    vazio: ($('#dp-vazio-existencial', root)?.value || '').trim(),
-    pleno: ($('#dp-pleno-existencial', root)?.value || '').trim()
-  };
+    vazio: String(($('#dp-vazio-existencial', root)?.value || '')).trim(),
+    pleno: String(($('#dp-pleno-existencial', root)?.value || '')).trim()
+   },
 
     observacoes: ($('#dp-observacoes', root)?.value || '').trim()
   };
