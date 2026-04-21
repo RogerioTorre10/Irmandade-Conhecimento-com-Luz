@@ -361,31 +361,27 @@
 
       const { data } = await postJSON(API_PRIMARY, path, sanitized, 120000);
 
-      return {
-        ok: true,
-        texto:
-          data?.texto ||
-          data?.devolutiva ||
-          data?.devolutivaBloco ||
-          data?.feedback ||
-          data?.message ||
-          '',
-        guia: data?.guia || sanitized?.guia || 'lumen',
-        raw: data
-      };
+console.log('[API][DEVOLUTIVA][RAW]', { path, data });
 
-    } catch (e) {
-      console.warn('[API] erro devolutiva', {
-        path,
-        message: e?.message,
-        status: e?.status,
-        body: e?.body
-      });
+const texto =
+  data?.texto ||
+  data?.devolutiva ||
+  data?.devolutivaBloco ||
+  data?.devolutivaFinal ||
+  data?.feedback ||
+  data?.message ||
+  data?.content ||
+  data?.resultado ||
+  data?.reply ||
+  data?.response ||
+  '';
 
-      return {
-        ok: false,
-        error: String(e?.message || 'Erro desconhecido')
-      };
+return {
+  ok: !!String(texto || '').trim(),
+  texto: String(texto || '').trim(),
+  guia: data?.guia || sanitized?.guia || 'lumen',
+  raw: data
+};
     }
   }
 
