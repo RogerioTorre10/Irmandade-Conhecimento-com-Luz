@@ -497,11 +497,11 @@
     const femaleHints = ['female', 'woman', 'maria', 'luciana', 'helena', 'samantha', 'victoria', 'google português do brasil'];
     const maleHints = ['male', 'man', 'paulo', 'daniel', 'ricardo', 'jorge', 'google português'];
 
-    if (guide === 'lumen') {
+    if (guide === 'lumen' || guide === 'arian') {
       return list.find(v => femaleHints.some(h => String(v.name || '').toLowerCase().includes(h))) || list[0] || null;
     }
 
-    if (guide === 'zion' || guide === 'arian') {
+    if (guide === 'zion') {
       return list.find(v => maleHints.some(h => String(v.name || '').toLowerCase().includes(h))) || list[0] || null;
     }
 
