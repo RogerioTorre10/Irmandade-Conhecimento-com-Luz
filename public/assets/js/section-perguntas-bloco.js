@@ -1177,40 +1177,35 @@ function buildDadosPessoaisPayload() {
   }
 
   async function maybeHandleBlockClosure(section, bloco) {
-    if (!isLastQuestionOfBlock(bloco)) {
-      goNext(bloco);
+  if (!isLastQuestionOfBlock(bloco)) {
+    goNext(bloco);
+    return;
+  }
+
+  try {
+    setContinueState(section, 'loading');
+
+    await setGuideResponse(getBlockClosingLead(bloco), 'info');
+
+    const result = await gerarDevolutivaDoBloco(bloco);
+    const textoFinal = String(result?.texto || '').trim();
+
+    if (!textoFinal) {
+      setContinueState(section, 'retry');
       return;
     }
 
-    try {
-      setContinueState(section, 'loading');
-      await setGuideResponse(getBlockClosingLead(bloco), 'info');
+    await setGuideResponse(textoFinal, result?.fallbackUsed ? 'warning' : 'success');
 
-      const result = await gerarDevolutivaDoBloco(bloco);
+    /* segura a tela por alguns segundos para o usuário ver a devolutiva */
+    await new Promise((r) => setTimeout(r, 3200));
 
-      if (result?.ok && result.texto) {
-        const existentes = getStoredBlockFeedbacks().filter((item) => item?.blocoId !== (bloco?.id || ''));
-        existentes.push({
-          blocoId: bloco?.id || '',
-          blocoTitulo: bloco?.title || bloco?.id || 'Bloco',
-          respostas: getAllAnswersFromBlock(bloco),
-          texto: result.texto,
-          guiaUsado: result.guiaUsado || normalizeGuide(document.body.dataset.guia || 'lumen')
-        });
-        setStoredBlockFeedbacks(existentes);
-
-        await setGuideResponse(result.texto, result.fallbackUsed ? 'warn' : 'success');
-        goNext(bloco);
-        return;
-      }
-
-      console.warn('[BLOCO] devolutiva não retornou conteúdo válido, seguindo com fallback de navegação.');
-      goNext(bloco);
-    } catch (e) {
-      console.warn('[BLOCO] erro ao gerar devolutiva do bloco:', e);
-      goNext(bloco);
-    }
+    goNext(bloco);
+  } catch (e) {
+    console.error('[BLOCO] erro ao gerar devolutiva do bloco:', e);
+    setContinueState(section, 'retry');
   }
+}
 
   function setContinueState(section, state) {
     if (!section) return;
