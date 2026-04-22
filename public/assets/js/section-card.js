@@ -8,7 +8,7 @@
   const VIDEO_SRC = '/assets/videos/filme-0-ao-encontro-da-jornada.mp4';
 
   const CARD_BG = {
-    arion: '/assets/img/irmandade-quarteto-bg-arian.png',
+    arian: '/assets/img/irmandade-quarteto-bg-arian.png',
     lumen: '/assets/img/irmandade-quarteto-bg-lumen.png',
     zion: '/assets/img/irmandade-quarteto-bg-zion.png'
   };
@@ -23,7 +23,7 @@
     if (!s) return '';
     if (s.includes('lumen')) return 'lumen';
     if (s.includes('zion')) return 'zion';
-    if (s.includes('arion') || s.includes('arian')) return 'arion';
+    if (s.includes('arian')) return 'arian';
     return s;
   }
 
@@ -31,7 +31,7 @@
     const g = canonGuia(id);
     return g === 'lumen' ? 'Lumen'
       : g === 'zion' ? 'Zion'
-      : g === 'arion' ? 'Arion'
+      : g === 'arian' ? 'Arian'
       : (id ? String(id) : '');
   }
 
@@ -102,7 +102,7 @@
       g1 = 'rgba(0,170,255,0.90)';
       g2 = 'rgba(255,214,91,0.70)';
     }
-    if (guia === 'arion') {
+    if (guia === 'arian') {
       main = '#ff00ff';
       g1 = 'rgba(255,120,255,0.95)';
       g2 = 'rgba(255,180,255,0.80)';
