@@ -638,8 +638,7 @@
 
       if (texto && !texto.classList.contains('typed')) {
         const guiaNomeMap = {
-          arion: 'Arion',
-          arian: 'Arion',
+          arian: 'Arian',
           lumen: 'Lumen',
           zion: 'Zion'
         };
@@ -756,7 +755,7 @@
         main = '#00aaff';
         g1 = 'rgba(0,170,255,0.90)';
         g2 = 'rgba(255,214,91,0.70)';
-      } else if (guia === 'arian' || guia === 'arion') {
+      } else if (guia === 'arian') {
         main = '#ff00ff';
         g1 = 'rgba(255,120,255,0.95)';
         g2 = 'rgba(255,180,255,0.80)';
