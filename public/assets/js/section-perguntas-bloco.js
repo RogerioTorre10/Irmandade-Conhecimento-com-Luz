@@ -1072,8 +1072,8 @@ function buildDadosPessoaisPayload() {
             dadosPessoais: bodyBase.dadosPessoais,
             retry: tentativa.retry,
             forceComplete: true,
-            minSentences: tentativa.guia === 'lumen' ? 4 : 3,
-            minChars: tentativa.guia === 'lumen' ? 220 : 180
+            minSentences: tentativa.guia === 'lumen' ? 3 : 2,
+            minChars: tentativa.guia === 'lumen' ? 160 : 120
           });
         } else if (typeof window.API.gerarDevolutiva === 'function') {
           raw = await window.API.gerarDevolutiva({
@@ -1086,8 +1086,8 @@ function buildDadosPessoaisPayload() {
             dadosPessoais: bodyBase.dadosPessoais,
             retry: tentativa.retry,
             forceComplete: true,
-            minSentences: tentativa.guia === 'lumen' ? 4 : 3,
-            minChars: tentativa.guia === 'lumen' ? 220 : 180
+            minSentences: tentativa.guia === 'lumen' ? 3 : 2,
+            minChars: tentativa.guia === 'lumen' ? 160 : 120
           });
         }
 
@@ -1098,8 +1098,8 @@ function buildDadosPessoaisPayload() {
         }
 
         if (isWeakFeedback(texto, {
-          minChars: tentativa.guia === 'lumen' ? 220 : 180,
-          minSentences: tentativa.guia === 'lumen' ? 4 : 3
+          minChars: tentativa.guia === 'lumen' ? 160 : 120,
+          minSentences: tentativa.guia === 'lumen' ? 3 : 2
         })) {
           ultimoErro = new Error(`Resposta fraca para ${tentativa.guia}`);
           continue;
