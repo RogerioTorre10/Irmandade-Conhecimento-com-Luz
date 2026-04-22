@@ -1515,7 +1515,7 @@ function buildDadosPessoaisPayload() {
     }
   } catch {}
 
-    window.JORNADA_PERGUNTAS_BLOCO = {
+      window.JORNADA_PERGUNTAS_BLOCO = {
     setGuideResponse,
     rerender() {
       const section = getCurrentSection();
