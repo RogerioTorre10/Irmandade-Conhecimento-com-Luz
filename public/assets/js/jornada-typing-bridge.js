@@ -68,9 +68,9 @@
     'lumen'
   ).trim().toLowerCase();
 
-  if (raw === 'ariane') return 'arion';
-  if (raw === 'arian') return 'arion';
-  if (raw.includes('arion')) return 'arion';
+  if (raw === 'arion') return 'arian';
+  if (raw === 'ariane') return 'arian';
+  if (raw.includes('arian') || raw.includes('arion')) return 'arian';
   if (raw.includes('zion')) return 'zion';
   if (raw.includes('lumen')) return 'lumen';
 
@@ -84,9 +84,7 @@
   const GUIDE_VOICE_PROFILE = {
    zion:  { gender: 'male',   style: 'imperial' },
    lumen: { gender: 'female', style: 'bright' },
-   arian: { gender: 'female', style: 'counselor' },
-   ariane:{ gender: 'female', style: 'counselor' },
-   arion: { gender: 'female', style: 'counselor' }
+   arian: { gender: 'female', style: 'counselor' }   
  };
 
   function __loadVoicesNow() {
