@@ -501,7 +501,7 @@
       return list.find(v => femaleHints.some(h => String(v.name || '').toLowerCase().includes(h))) || list[0] || null;
     }
 
-    if (guide === 'zion' || guide === 'arion') {
+    if (guide === 'zion' || guide === 'arian') {
       return list.find(v => maleHints.some(h => String(v.name || '').toLowerCase().includes(h))) || list[0] || null;
     }
 
@@ -917,43 +917,43 @@
       'pt-BR': {
         lumen: `${participant}, sua resposta em ${block} revela um movimento sincero de percepção interior. Ao expressar "${answer || questionText || 'sua vivência'}", você deixa transparecer sensibilidade, honestidade e desejo de caminhar com mais consciência. Receba esta reflexão como um acolhimento: continue ouvindo sua verdade com serenidade, porque há luz no modo como você escolheu responder a esta etapa.`,
         zion: `${participant}, o que você compartilhou em ${block} mostra presença, verdade e disposição para enxergar mais fundo. Ao dizer "${answer || questionText || 'sua vivência'}", você revela um posicionamento interno que merece respeito e continuidade. Leve esta resposta como um sinal de força: aquilo que começa em reflexão pode amadurecer em direção, clareza e propósito.`,
-        arion: `${participant}, sua resposta em ${block} carrega delicadeza e profundidade. Quando você expressa "${answer || questionText || 'sua vivência'}", percebemos um traço do seu mundo interior pedindo escuta, cuidado e crescimento. Que esta devolutiva te alcance com acolhimento e te ajude a seguir com mais presença, verdade e conexão com a luz que floresce dentro de você.`
+        arian: `${participant}, sua resposta em ${block} carrega delicadeza e profundidade. Quando você expressa "${answer || questionText || 'sua vivência'}", percebemos um traço do seu mundo interior pedindo escuta, cuidado e crescimento. Que esta devolutiva te alcance com acolhimento e te ajude a seguir com mais presença, verdade e conexão com a luz que floresce dentro de você.`
       },
 
       'en-US': {
         lumen: `${participant}, your answer in ${block} reveals a sincere movement of inner perception. By expressing "${answer || questionText || 'your experience'}", you show sensitivity, honesty, and a desire to walk with greater awareness. Receive this reflection as an embrace: keep listening to your truth with serenity, because there is light in the way you chose to answer this stage.`,
         zion: `${participant}, what you shared in ${block} shows presence, truth, and a willingness to look deeper. By saying "${answer || questionText || 'your experience'}", you reveal an inner stance that deserves respect and continuity. Take this response as a sign of strength: what begins in reflection can mature into direction, clarity, and purpose.`,
-        arion: `${participant}, your answer in ${block} carries delicacy and depth. When you express "${answer || questionText || 'your experience'}", we perceive a trace of your inner world asking for listening, care, and growth. May this feedback reach you with welcome and help you move forward with more presence, truth, and connection with the light blooming within you.`
+        arian: `${participant}, your answer in ${block} carries delicacy and depth. When you express "${answer || questionText || 'your experience'}", we perceive a trace of your inner world asking for listening, care, and growth. May this feedback reach you with welcome and help you move forward with more presence, truth, and connection with the light blooming within you.`
       },
 
       'es-ES': {
         lumen: `${participant}, tu respuesta en ${block} revela un movimiento sincero de percepción interior. Al expresar "${answer || questionText || 'tu vivencia'}", dejas ver sensibilidad, honestidad y deseo de caminar con mayor conciencia. Recibe esta reflexión como acogida: sigue escuchando tu verdad con serenidad, porque hay luz en la forma en que elegiste responder a esta etapa.`,
         zion: `${participant}, lo que compartiste en ${block} muestra presencia, verdad y disposición para mirar más hondo. Al decir "${answer || questionText || 'tu vivencia'}", revelas una postura interior que merece respeto y continuidad. Toma esta respuesta como una señal de fuerza: lo que comienza en reflexión puede madurar en dirección, claridad y propósito.`,
-        arion: `${participant}, tu respuesta en ${block} lleva delicadeza y profundidad. Cuando expresas "${answer || questionText || 'tu vivencia'}", percibimos un rasgo de tu mundo interior que pide escucha, cuidado y crecimiento. Que esta devolución te alcance con acogida y te ayude a seguir con más presencia, verdad y conexión con la luz que florece dentro de ti.`
+        arian: `${participant}, tu respuesta en ${block} lleva delicadeza y profundidad. Cuando expresas "${answer || questionText || 'tu vivencia'}", percibimos un rasgo de tu mundo interior que pide escucha, cuidado y crecimiento. Que esta devolución te alcance con acogida y te ayude a seguir con más presencia, verdad y conexión con la luz que florece dentro de ti.`
       },
 
       'fr-FR': {
         lumen: `${participant}, votre réponse dans ${block} révèle un mouvement sincère de perception intérieure. En exprimant "${answer || questionText || 'votre vécu'}", vous laissez apparaître sensibilité, honnêteté et désir d’avancer avec plus de conscience. Recevez cette réflexion comme un accueil : continuez à écouter votre vérité avec sérénité, car il y a de la lumière dans la manière dont vous avez choisi de répondre à cette étape.`,
         zion: `${participant}, ce que vous avez partagé dans ${block} montre présence, vérité et volonté de regarder plus profondément. En disant "${answer || questionText || 'votre vécu'}", vous révélez une posture intérieure qui mérite respect et continuité. Recevez cette réponse comme un signe de force : ce qui naît dans la réflexion peut mûrir en direction, clarté et sens.`,
-        arion: `${participant}, votre réponse dans ${block} porte délicatesse et profondeur. Lorsque vous exprimez "${answer || questionText || 'votre vécu'}", nous percevons une trace de votre monde intérieur appelant écoute, soin et croissance. Que ce retour vous atteigne avec accueil et vous aide à avancer avec plus de présence, de vérité et de connexion à la lumière qui fleurit en vous.`
+        arian: `${participant}, votre réponse dans ${block} porte délicatesse et profondeur. Lorsque vous exprimez "${answer || questionText || 'votre vécu'}", nous percevons une trace de votre monde intérieur appelant écoute, soin et croissance. Que ce retour vous atteigne avec accueil et vous aide à avancer avec plus de présence, de vérité et de connexion à la lumière qui fleurit en vous.`
       },
 
       'de-DE': {
         lumen: `${participant}, Ihre Antwort in ${block} offenbart eine aufrichtige Bewegung innerer Wahrnehmung. Indem Sie "${answer || questionText || 'Ihr Erleben'}" ausdrücken, zeigen Sie Sensibilität, Ehrlichkeit und den Wunsch, mit mehr Bewusstheit weiterzugehen. Nehmen Sie diese Rückmeldung als ein Willkommen an: Hören Sie weiterhin mit Gelassenheit auf Ihre Wahrheit, denn in der Art, wie Sie diese Etappe beantwortet haben, liegt Licht.`,
         zion: `${participant}, das, was Sie in ${block} geteilt haben, zeigt Präsenz, Wahrheit und die Bereitschaft, tiefer zu schauen. Indem Sie "${answer || questionText || 'Ihr Erleben'}" aussprechen, offenbaren Sie eine innere Haltung, die Respekt und Fortsetzung verdient. Nehmen Sie diese Antwort als Zeichen von Stärke: Was in Reflexion beginnt, kann zu Richtung, Klarheit und Sinn reifen.`,
-        arion: `${participant}, Ihre Antwort in ${block} trägt Feinheit und Tiefe. Wenn Sie "${answer || questionText || 'Ihr Erleben'}" ausdrücken, erkennen wir eine Spur Ihrer inneren Welt, die um Zuhören, Fürsorge und Wachstum bittet. Möge diese Rückmeldung Sie mit Willkommen erreichen und Ihnen helfen, mit mehr Präsenz, Wahrheit und Verbindung zu dem Licht weiterzugehen, das in Ihnen aufblüht.`
+        arian: `${participant}, Ihre Antwort in ${block} trägt Feinheit und Tiefe. Wenn Sie "${answer || questionText || 'Ihr Erleben'}" ausdrücken, erkennen wir eine Spur Ihrer inneren Welt, die um Zuhören, Fürsorge und Wachstum bittet. Möge diese Rückmeldung Sie mit Willkommen erreichen und Ihnen helfen, mit mehr Präsenz, Wahrheit und Verbindung zu dem Licht weiterzugehen, das in Ihnen aufblüht.`
       },
 
       'ja-JP': {
         lumen: `${participant}さん、${block} でのあなたの答えには、内なる気づきの誠実な動きが表れています。「${answer || questionText || 'あなたの体験'}」と表現したことから、感受性、誠実さ、そしてより深い意識をもって歩みたいという願いが伝わってきます。この返答をやさしい受容として受け取ってください。あなたがこの段階に答えたその在り方の中に、すでに光があります。`,
         zion: `${participant}さん、${block} であなたが分かち合ったことには、存在感、真実、そしてより深く見つめようとする意志が表れています。「${answer || questionText || 'あなたの体験'}」と語ったことの中に、尊重され、育まれるべき内なる姿勢があります。この返答を力のしるしとして受け取ってください。省察から始まるものは、やがて方向性、明晰さ、そして意味へと育っていきます。`,
-        arion: `${participant}さん、${block} におけるあなたの答えには、繊細さと深さがあります。「${answer || questionText || 'あなたの体験'}」と表現したとき、私たちはあなたの内なる世界が、傾聴、いたわり、成長を求めていることを感じ取ります。この返答があたたかな受容として届き、あなたがより大きな存在感、真実、そして内に咲く光とのつながりをもって進めますように。`
+        arian: `${participant}さん、${block} におけるあなたの答えには、繊細さと深さがあります。「${answer || questionText || 'あなたの体験'}」と表現したとき、私たちはあなたの内なる世界が、傾聴、いたわり、成長を求めていることを感じ取ります。この返答があたたかな受容として届き、あなたがより大きな存在感、真実、そして内に咲く光とのつながりをもって進めますように。`
       },
 
       'zh-CN': {
         lumen: `${participant}，你在 ${block} 中的回答显露出一种真诚的内在觉察。当你表达“${answer || questionText || '你的经历'}”时，你展现了敏感、诚实，以及更有意识地前行的愿望。请把这段反馈当作一种温柔的接纳：继续平静地聆听你内心的真实，因为你回应这一阶段的方式本身就带着光。`,
         zion: `${participant}，你在 ${block} 中分享的内容展现出临在、真实，以及愿意更深看见的姿态。当你说出“${answer || questionText || '你的经历'}”时，你流露出一种值得尊重并持续发展的内在立场。请把这段回应当作力量的记号：始于反思的东西，能够成长为方向、清晰与意义。`,
-        arion: `${participant}，你在 ${block} 中的回答带着细腻与深度。当你表达“${answer || questionText || '你的经历'}”时，我们看见你的内在世界正呼唤倾听、照顾与成长。愿这段反馈以温柔的接纳临到你，并帮助你以更多临在、真实，以及与内在之光的连接继续前行。`
+        arian: `${participant}，你在 ${block} 中的回答带着细腻与深度。当你表达“${answer || questionText || '你的经历'}”时，我们看见你的内在世界正呼唤倾听、照顾与成长。愿这段反馈以温柔的接纳临到你，并帮助你以更多临在、真实，以及与内在之光的连接继续前行。`
       }
     };
 
