@@ -1112,17 +1112,26 @@ function buildDadosPessoaisPayload() {
         };
       } catch (err) {
         ultimoErro = err;
-        console.warn('[DEVOLUTIVA][ROBUSTA] falha:', tentativa.guia, tentativa.retry ? 'retry' : 'primeira', err);
-      }
-    }
+      console.error('[DEVOLUTIVA][ROBUSTA] usando fallback local:', ultimoErro);
 
-    console.warn('[DEVOLUTIVA][ROBUSTA] usando fallback local:', ultimoErro);
-    return {
-      ok: true,
-      texto: fallbackText,
-      guiaUsado: 'lumen',
-      fallbackUsed: true
-    };
+      const fallbackText = buildFallbackFeedback({
+        guia,
+        nome,
+        blocoNome,
+        resposta,
+        pergunta,
+        idioma
+      });
+
+      console.log('[DEVOLUTIVA][FALLBACK_LOCAL] Texto gerado:', fallbackText.substring(0, 140) + '...');
+
+      return {
+        ok: true,
+        texto: fallbackText,
+        guia: 'lumen',
+        fallbackUsed: true,
+        source: 'frontend_local_fallback'
+      };
   }
 
   async function gerarDevolutivaDoBloco(bloco) {
