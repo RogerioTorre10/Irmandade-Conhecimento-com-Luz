@@ -1156,7 +1156,8 @@ function buildDadosPessoaisPayload() {
   if (!respostas.length) {
     return {
       ok: false,
-      texto: ''
+      texto: '',
+      source: 'empty_block_answers'
     };
   }
 
@@ -1171,7 +1172,7 @@ function buildDadosPessoaisPayload() {
     dadosPessoais
   });
 }
-
+      
   function getBlockClosingLead(bloco) {
     const blocoNome = bloco?.title || bloco?.id || 'este bloco';
     const frases = uiText('block_closing', I18N_UI['pt-BR'].block_closing);
