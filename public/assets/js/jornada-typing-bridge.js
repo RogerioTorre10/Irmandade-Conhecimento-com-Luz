@@ -68,8 +68,6 @@
     'lumen'
   ).trim().toLowerCase();
 
-  if (raw === 'arion') return 'arian';
-  if (raw === 'ariane') return 'arian';
   if (raw.includes('arian') || raw.includes('arion')) return 'arian';
   if (raw.includes('zion')) return 'zion';
   if (raw.includes('lumen')) return 'lumen';
