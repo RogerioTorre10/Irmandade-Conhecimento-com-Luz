@@ -74,11 +74,12 @@
   const __voiceCache = new Map();
 
   const GUIDE_VOICE_PROFILE = {
-    zion: { gender: 'male', style: 'imperial' },
-    lumen: { gender: 'female', style: 'bright' },
-    arian: { gender: 'female', style: 'counselor' },
-    ariane: { gender: 'female', style: 'counselor' }
-  };
+   zion:  { gender: 'male',   style: 'imperial' },
+   lumen: { gender: 'female', style: 'bright' },
+   arian: { gender: 'female', style: 'counselor' },
+   ariane:{ gender: 'female', style: 'counselor' },
+   arion: { gender: 'female', style: 'counselor' }
+ };
 
   function __loadVoicesNow() {
     try {
