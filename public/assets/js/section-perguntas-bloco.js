@@ -434,6 +434,7 @@ async function setGuideResponse(text, kind = 'info') {
     box.style.borderColor = 'var(--guia-main)';
 
     return true;
+}
 
 function getCurrentGuideResponseText() {
   const wrap = document.getElementById('jp-ai-response-wrap');
