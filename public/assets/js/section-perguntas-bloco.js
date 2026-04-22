@@ -419,19 +419,21 @@ async function setGuideResponse(text, kind = 'info') {
     await new Promise((r) => setTimeout(r, 120));
   }
 
-  if (ttsPromise && typeof ttsPromise.then === 'function') {
-    try {
-      await ttsPromise;
-    } catch (err) {
-      console.warn('[DEVOLUTIVA][TTS] falhou durante execução:', err);
+      if (ttsPromise && typeof ttsPromise.then === 'function') {
+      try {
+        await ttsPromise;
+      } catch (err) {
+        console.warn('[DEVOLUTIVA][TTS] falhou durante execução:', err);
+      }
     }
-  }
 
-  box.classList.remove('is-revealing');
-  box.classList.add('oracle-ready');
-  box.style.textShadow = '0 0 8px var(--guia-soft), 0 0 18px rgba(255,255,255,0.08)';
-  box.style.borderColor = 'var(--guia-main)';
-}
+    box.classList.remove('is-revealing');
+    box.classList.add('oracle-ready');
+
+    box.style.textShadow = '0 0 8px var(--guia-soft), 0 0 18px rgba(255,255,255,0.08)';
+    box.style.borderColor = 'var(--guia-main)';
+
+    return true;
 
 function getCurrentGuideResponseText() {
   const wrap = document.getElementById('jp-ai-response-wrap');
