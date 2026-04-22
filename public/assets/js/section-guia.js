@@ -64,7 +64,7 @@
     if (!s) return '';
     if (s.includes('lumen')) return 'lumen';
     if (s.includes('zion')) return 'zion';
-    if (s.includes('arian') || s.includes('arion')) return 'arian';
+    if (s.includes('arian') return 'arian';
     return '';
   }
 
