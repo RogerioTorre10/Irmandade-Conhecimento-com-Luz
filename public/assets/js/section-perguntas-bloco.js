@@ -1367,7 +1367,7 @@ function bindButtons(section, bloco, perguntaText) {
     }
   };
 }
-
+}
 async function renderBloco(section) {
   const sectionId = getSectionId(section);
   if (!sectionId || !sectionId.startsWith('section-perguntas-')) return;
