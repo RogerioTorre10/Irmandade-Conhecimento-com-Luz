@@ -1262,7 +1262,12 @@ function bindButtons(section, bloco, perguntaText) {
     btnConfirm.onclick = async (ev) => {
       ev.preventDefault();
 
-      if (window.__MIC_ACTIVE__ && window.__MIC_INSTANCE__) {
+     // 🔒 TRAVA ANTIDUPLO CLIQUE
+     if (btnConfirm.dataset.busy === '1') return;
+     btnConfirm.dataset.busy = '1';
+     btnConfirm.disabled = true;
+
+  if (window.__MIC_ACTIVE__ && window.__MIC_INSTANCE__) {
         try { window.__MIC_INSTANCE__.stop(); } catch {}
         window.__MIC_ACTIVE__ = false;
         updateMicButtonState(false);
