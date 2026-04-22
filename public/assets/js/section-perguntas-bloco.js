@@ -1521,19 +1521,18 @@ function buildDadosPessoaisPayload() {
       return { ...State };
     }
   };
-  document.addEventListener('section:shown', (e) => {
+  document.addEventListener('section:shown', async (e) => {
   const section = e.detail?.node;
-
   if (!section || section.id !== 'section-dados-pessoais') return;
 
-  setTimeout(() => {
-    if (typeof window.applyTypingAndTTS === 'function') {
-      window.applyTypingAndTTS('section-dados-pessoais', section);
-    } else {
-      console.warn('[DADOS] applyTypingAndTTS não encontrado');
-    }
-  }, 120);
-});
+  await new Promise((r) => setTimeout(r, 180));
 
+  if (typeof window.applyTypingAndTTS === 'function') {
+    await window.applyTypingAndTTS('section-dados-pessoais', section, { forceReplay: true });
+  } else {
+    console.warn('[DADOS] applyTypingAndTTS não encontrado');
+  }
+});
+  
   log('inicializado.');
 })(window, document);
