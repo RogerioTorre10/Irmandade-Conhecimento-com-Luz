@@ -239,14 +239,15 @@
   }
 
   function normalizeGuide(raw) {
-    const x = String(raw || '').trim().toLowerCase();
-    if (!x) return 'lumen';
-    if (x === 'arian') return 'arion';
-    if (x.includes('lumen')) return 'lumen';
-    if (x.includes('zion')) return 'zion';
-    if (x.includes('arion') || x.includes('arian')) return 'arion';
-    return x;
-  }
+  const x = String(raw || '').trim().toLowerCase();
+  if (!x) return 'lumen';
+  if (x === 'arion') return 'arian';
+  if (x === 'ariane') return 'arian';
+  if (x.includes('lumen')) return 'lumen';
+  if (x.includes('zion')) return 'zion';
+  if (x.includes('arian') || x.includes('arion')) return 'arian';
+  return x;
+}
 
   function applyGuiaTheme(section) {
     const guiaRaw =
@@ -263,31 +264,25 @@
     if (section) section.dataset.guia = guia;
 
     const themeMap = {
-      lumen: {
-        main: '#00c781',
-        soft: 'rgba(0,199,129,0.28)',
-        strong: 'rgba(0,199,129,0.62)',
-        text: '#e8fff7'
-      },
-      zion: {
-        main: '#59c8ff',
-        soft: 'rgba(89,200,255,0.28)',
-        strong: 'rgba(89,200,255,0.62)',
-        text: '#eefaff'
-      },
-      arian: {
-        main: '#ff4fd8',
-        soft: 'rgba(255,79,216,0.28)',
-        strong: 'rgba(255,79,216,0.62)',
-        text: '#fff0fb'
-      },
-      arion: {
-        main: '#ff4fd8',
-        soft: 'rgba(255,79,216,0.28)',
-        strong: 'rgba(255,79,216,0.62)',
-        text: '#fff0fb'
-      }
-    };
+  lumen: {
+    main: '#00c781',
+    soft: 'rgba(0,199,129,0.28)',
+    strong: 'rgba(0,199,129,0.62)',
+    text: '#e8fff7'
+  },
+  zion: {
+    main: '#59c8ff',
+    soft: 'rgba(89,200,255,0.28)',
+    strong: 'rgba(89,200,255,0.62)',
+    text: '#eefaff'
+  },
+  arian: {
+    main: '#ff4fd8',
+    soft: 'rgba(255,79,216,0.28)',
+    strong: 'rgba(255,79,216,0.62)',
+    text: '#fff0fb'
+  }
+};
 
     const theme = themeMap[guia] || themeMap.lumen;
     const root = document.documentElement;
