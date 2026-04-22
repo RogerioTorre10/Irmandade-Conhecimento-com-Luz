@@ -188,7 +188,7 @@
 
       await prepareTyping(root);
 
-      const typingElements = root.querySelectorAll('[data-typing="true"]');
+      const typingElements = root.querySelectorAll('[data-typing="true"], .typing-text, .intro-title, .parchment-text-rough');
       if (!typingElements.length) {
         console.warn('[JC.applyTypingAndTTS] Nenhum [data-typing] em:', sectionId);
         return;
