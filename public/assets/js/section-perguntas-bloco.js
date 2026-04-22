@@ -1129,19 +1129,34 @@ async function maybeHandleBlockClosure(section, bloco) {
 
   try {
     setContinueState(section, 'loading');
-    await setGuideResponse(getBlockClosingLead(bloco), 'info');
 
+    // 1) frase introdutória do fechamento
+    const lead = getBlockClosingLead(bloco);
+    if (lead) {
+      await setGuideResponse(lead, 'info');
+      await new Promise((r) => setTimeout(r, 600));
+    }
+
+    // 2) devolutiva real do bloco
     const result = await gerarDevolutivaDoBloco(bloco);
     const textoFinal = String(result?.texto || '').trim();
 
     if (!textoFinal) {
+      console.warn('[BLOCO] devolutiva do bloco vazia');
       setContinueState(section, 'retry');
       return;
     }
 
-    await setGuideResponse(textoFinal, result?.fallbackUsed ? 'warning' : 'success');
+    await setGuideResponse(
+      textoFinal,
+      result?.fallbackUsed ? 'warning' : 'success'
+    );
 
-    await new Promise((r) => setTimeout(r, 3200));
+    console.log('[BLOCO] devolutiva concluída. source=', result?.source || 'desconhecida');
+
+    // 3) pequena folga visual após leitura/efeito
+    await new Promise((r) => setTimeout(r, 1400));
+
     goNext(bloco);
   } catch (e) {
     console.error('[BLOCO] erro ao gerar devolutiva do bloco:', e);
