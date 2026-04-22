@@ -515,31 +515,81 @@
   }
 
   function speakText(text) {
-  const clean = String(text || '').trim();
+  const clean = String(text || '').replace(/\s+/g, ' ').trim();
   if (!clean) return Promise.resolve();
 
+  const guideRaw =
+    sessionStorage.getItem('jornada.guia') ||
+    sessionStorage.getItem('jornada.guide') ||
+    localStorage.getItem('JORNADA_GUIA') ||
+    localStorage.getItem('jornada.guia') ||
+    localStorage.getItem('jornada.guide') ||
+    document.body.dataset.guia ||
+    window.currentGuide ||
+    'lumen';
+
+  const guide = normalizeGuide(guideRaw);
+  const lang = document.documentElement.lang || getLang() || 'pt-BR';
+
+  // Mantém tudo sincronizado para o bridge e para o restante da jornada
+  try {
+    document.body.dataset.guia = guide;
+    document.documentElement.dataset.guia = guide;
+    sessionStorage.setItem('jornada.guia', guide);
+    localStorage.setItem('jornada.guia', guide);
+    window.currentGuide = guide;
+  } catch {}
+
+  // Motor central preferido
   if (window.EffectCoordinator?.speak) {
-    window.EffectCoordinator.speak(clean, {
-      rate: 0.94,
-      pitch: 1,
-      volume: 1
-    });
-    return Promise.resolve();
+    try {
+      window.EffectCoordinator.speak(clean, {
+        guide,
+        lang,
+        rate: guide === 'zion' ? 0.92 : 0.98,
+        pitch: guide === 'zion' ? 0.82 : 1.08,
+        volume: 1
+      });
+      return Promise.resolve();
+    } catch (e) {
+      console.warn('[speakText] EffectCoordinator falhou:', e);
+    }
   }
 
+  // Fallback compatível com o restante da jornada
   if (window.JORNADA_VOICE?.speak) {
-    return window.JORNADA_VOICE.speak(clean, {
-      lang: document.documentElement.lang || getLang() || 'pt-BR',
-      guide: normalizeGuide(
-        sessionStorage.getItem('jornada.guia') ||
-        localStorage.getItem('JORNADA_GUIA') ||
-        document.body.dataset.guia ||
-        'lumen'
-      ),
-      rate: 0.94,
-      pitch: 1,
-      volume: 1
-    });
+    try {
+      return window.JORNADA_VOICE.speak(clean, {
+        lang,
+        guide,
+        rate: guide === 'zion' ? 0.92 : 0.98,
+        pitch: guide === 'zion' ? 0.82 : 1.08,
+        volume: 1
+      });
+    } catch (e) {
+      console.warn('[speakText] JORNADA_VOICE falhou:', e);
+    }
+  }
+
+  // Último fallback nativo do navegador
+  if ('speechSynthesis' in window) {
+    try {
+      speechSynthesis.cancel();
+
+      const utt = new SpeechSynthesisUtterance(clean);
+      utt.lang = lang;
+      utt.rate = guide === 'zion' ? 0.92 : 0.98;
+      utt.pitch = guide === 'zion' ? 0.82 : 1.08;
+      utt.volume = 1;
+
+      return new Promise((resolve) => {
+        utt.onend = () => resolve();
+        utt.onerror = () => resolve();
+        speechSynthesis.speak(utt);
+      });
+    } catch (e) {
+      console.warn('[speakText] fallback nativo falhou:', e);
+    }
   }
 
   return Promise.resolve();
