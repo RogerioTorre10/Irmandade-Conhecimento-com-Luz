@@ -59,14 +59,17 @@
   // =====================================================
   // HELPERS
   // =====================================================
-  function canonGuia(v) {
-    const s = String(v || '').trim().toLowerCase();
-    if (!s) return '';
-    if (s.includes('lumen')) return 'lumen';
-    if (s.includes('zion')) return 'zion';
-    if (s.includes('arian') return 'arian';
-    return '';
-  }
+  function canonGuia(u) {
+  const s = String(u || '').trim().toLowerCase();
+
+  if (!s) return 'lumen';
+
+  if (s.includes('lumen')) return 'lumen';
+  if (s.includes('zion')) return 'zion';
+  if (s.includes('arian')) return 'arian';
+
+  return 'lumen'; // fallback seguro
+}
 
   function ensureVisible(el) {
     if (!el) return;
