@@ -57,17 +57,25 @@
   }
 
   function getGuideNow() {
-    return String(
-      sessionStorage.getItem('jornada.guide') ||
-      sessionStorage.getItem('guiaEscolhido') ||
-      sessionStorage.getItem('jornada.guia') ||
-      localStorage.getItem('jornada.guide') ||
-      localStorage.getItem('guiaEscolhido') ||
-      localStorage.getItem('jornada.guia') ||
-      window.currentGuide ||
-      'lumen'
-    ).trim().toLowerCase();
-  }
+  const raw = String(
+    sessionStorage.getItem('jornada.guide') ||
+    sessionStorage.getItem('guiaEscolhido') ||
+    sessionStorage.getItem('jornada.guia') ||
+    localStorage.getItem('jornada.guide') ||
+    localStorage.getItem('guiaEscolhido') ||
+    localStorage.getItem('jornada.guia') ||
+    window.currentGuide ||
+    'lumen'
+  ).trim().toLowerCase();
+
+  if (raw === 'ariane') return 'arion';
+  if (raw === 'arian') return 'arion';
+  if (raw.includes('arion')) return 'arion';
+  if (raw.includes('zion')) return 'zion';
+  if (raw.includes('lumen')) return 'lumen';
+
+  return raw || 'lumen';
+}
 
   let __voices = [];
   let __voicesPromise = null;
