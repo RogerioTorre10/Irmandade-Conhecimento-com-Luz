@@ -1230,6 +1230,7 @@ function bindButtons(section, bloco, perguntaText) {
   if (btnTTS) {
     btnTTS.onclick = async (ev) => {
       ev.preventDefault();
+      stopSpeaking();
       await speakQuestionOrGuideResponse(perguntaText);
     };
   }
