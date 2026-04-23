@@ -1365,6 +1365,32 @@ function bindButtons(section, bloco, perguntaText) {
         result?.fallbackUsed ? 'warning' : 'success'
       );
 
+            const blocoId = bloco?.id || '';
+      const existentes = getStoredBlockFeedbacks().filter(
+        (item) => item?.blocoId !== blocoId
+      );
+
+      const anterior =
+        getStoredBlockFeedbacks().find((item) => item?.blocoId === blocoId) || {};
+
+      existentes.push({
+        blocoId,
+        blocoTitulo: bloco?.title || bloco?.id || 'Bloco',
+        respostas: [val],
+        devolutiva: anterior?.devolutiva || '',
+        perguntas: [
+          {
+            pergunta: getQuestionText(bloco, 0),
+            resposta: val,
+            devolutiva: texto
+          }
+        ],
+        guiaUsado: result?.guiaUsado || normalizeGuide(guia),
+        source: result?.source || 'desconhecida'
+      });
+
+      setStoredBlockFeedbacks(existentes);      
+
       setContinueState(section, 'ready');
     } catch (err) {
       console.error('[PERGUNTAS_BLOCO] erro no confirmar:', err);
@@ -1375,7 +1401,7 @@ function bindButtons(section, bloco, perguntaText) {
           'A conexão com o guia oscilou neste momento. Toque em "Tentar novamente" para buscar a devolutiva.'
         ),
         'warn'
-      );
+      ); 
 
       setContinueState(section, 'error');
     } finally {
