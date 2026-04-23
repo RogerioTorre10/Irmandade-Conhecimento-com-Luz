@@ -1371,7 +1371,7 @@ function bindButtons(section, bloco, perguntaText) {
         result?.fallbackUsed ? 'warning' : 'success'
       );
 
-            const blocoId = bloco?.id || '';
+      const blocoId = bloco?.id || '';
       const existentes = getStoredBlockFeedbacks().filter(
         (item) => item?.blocoId !== blocoId
       );
