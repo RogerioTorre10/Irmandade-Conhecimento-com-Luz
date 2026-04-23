@@ -389,16 +389,11 @@ async function setGuideResponse(text, kind = 'info') {
 
   let ttsPromise = null;
 
+    let ttsPromise = null;
+
   try {
-    if (typeof window.speakGuideText === 'function') {
-      ttsPromise = window.speakGuideText(content);
-    } else if (typeof speakQuestionOrGuideResponse === 'function') {
-      ttsPromise = speakQuestionOrGuideResponse(content);
-    } else if (typeof window.speakQuestionOrGuideResponse === 'function') {
-      ttsPromise = window.speakQuestionOrGuideResponse(content);
-    } else {
-      console.warn('[DEVOLUTIVA][TTS] nenhum motor de voz disponível.');
-    }
+    stopSpeaking(); // mata qualquer fala anterior antes de iniciar nova
+    ttsPromise = speakText(content);
   } catch (err) {
     console.warn('[DEVOLUTIVA][TTS] falhou ao iniciar:', err);
   }
