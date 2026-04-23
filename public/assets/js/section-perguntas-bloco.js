@@ -387,10 +387,10 @@ async function setGuideResponse(text, kind = 'info') {
   box.innerHTML = '';
   box.classList.add('is-visible', 'is-revealing');
 
-  let ttsPromise = null; 
+  let ttsPromise = null;
 
   try {
-    stopSpeaking(); // mata qualquer fala anterior antes de iniciar nova
+    stopSpeaking();
     ttsPromise = speakText(content);
   } catch (err) {
     console.warn('[DEVOLUTIVA][TTS] falhou ao iniciar:', err);
