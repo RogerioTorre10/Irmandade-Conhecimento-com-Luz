@@ -162,14 +162,15 @@
   }
 
   function buildPdfBlocksFromSession() {
-    const feedbacks = getStoredBlockFeedbacks();
+  const feedbacks = getStoredBlockFeedbacks();
 
-    return feedbacks.map((item) => ({
-      titulo: item?.blocoTitulo || item?.blocoId || 'Bloco',
-      respostas: Array.isArray(item?.respostas) ? item.respostas : [],
-      devolutiva: String(item?.texto || '').trim()
-    }));
-  }
+  return feedbacks.map((item) => ({
+    titulo: item?.blocoTitulo || item?.blocoId || 'Bloco',
+    respostas: Array.isArray(item?.respostas) ? item.respostas : [],
+    devolutiva: String(item?.devolutiva || item?.texto || '').trim(),
+    perguntas: Array.isArray(item?.perguntas) ? item.perguntas : []
+  }));
+}
 
   function getStoredFinalFeedback() {
     return String(
