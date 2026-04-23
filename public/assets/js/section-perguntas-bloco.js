@@ -1133,14 +1133,12 @@ async function maybeHandleBlockClosure(section, bloco) {
   try {
     setContinueState(section, 'loading');
 
-    // 1) frase introdutória do fechamento
     const lead = getBlockClosingLead(bloco);
     if (lead) {
       await setGuideResponse(lead, 'info');
-      await new Promise((r) => setTimeout(r, 600));
+      await new Promise((r) => setTimeout(r, 700));
     }
 
-    // 2) devolutiva real do bloco
     const result = await gerarDevolutivaDoBloco(bloco);
     const textoFinal = String(result?.texto || '').trim();
 
@@ -1150,6 +1148,22 @@ async function maybeHandleBlockClosure(section, bloco) {
       return;
     }
 
+    // salva para a etapa final / PDF
+    const existentes = getStoredBlockFeedbacks().filter(
+      (item) => item?.blocoId !== (bloco?.id || '')
+    );
+
+    existentes.push({
+      blocoId: bloco?.id || '',
+      blocoTitulo: bloco?.title || bloco?.id || 'Bloco',
+      respostas: getAllAnswersFromBlock(bloco),
+      devolutiva: textoFinal,
+      guiaUsado: result?.guiaUsado || normalizeGuide(document.body.dataset.guia || 'lumen'),
+      source: result?.source || 'desconhecida'
+    });
+
+    setStoredBlockFeedbacks(existentes);
+
     await setGuideResponse(
       textoFinal,
       result?.fallbackUsed ? 'warning' : 'success'
@@ -1157,8 +1171,7 @@ async function maybeHandleBlockClosure(section, bloco) {
 
     console.log('[BLOCO] devolutiva concluída. source=', result?.source || 'desconhecida');
 
-    // 3) pequena folga visual após leitura/efeito
-    await new Promise((r) => setTimeout(r, 1400));
+    await new Promise((r) => setTimeout(r, 1800));
 
     goNext(bloco);
   } catch (e) {
