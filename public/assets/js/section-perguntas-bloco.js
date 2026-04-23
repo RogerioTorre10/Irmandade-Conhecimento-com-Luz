@@ -536,21 +536,7 @@ function speakText(text) {
     window.currentGuide = guide;
   } catch {}
 
-  if (window.EffectCoordinator?.speak) {
-    try {
-      window.EffectCoordinator.speak(clean, {
-        guide,
-        lang,
-        rate: guide === 'zion' ? 0.92 : 0.98,
-        pitch: guide === 'zion' ? 0.82 : 1.08,
-        volume: 1
-      });
-      return Promise.resolve();
-    } catch (e) {
-      console.warn('[speakText] EffectCoordinator falhou:', e);
-    }
-  }
-
+  // 1) Preferir o motor que já retorna promise real
   if (window.JORNADA_VOICE?.speak) {
     try {
       return window.JORNADA_VOICE.speak(clean, {
@@ -565,14 +551,36 @@ function speakText(text) {
     }
   }
 
+  // 2) Se usar EffectCoordinator, só aceite se ele devolver thenable
+  if (window.EffectCoordinator?.speak) {
+    try {
+      const result = window.EffectCoordinator.speak(clean, {
+        guide,
+        lang,
+        rate: guide === 'zion' ? 0.92 : 0.98,
+        pitch: guide === 'zion' ? 0.82 : 1.08,
+        volume: 1
+      });
+
+      if (result && typeof result.then === 'function') {
+        return result;
+      }
+    } catch (e) {
+      console.warn('[speakText] EffectCoordinator falhou:', e);
+    }
+  }
+
+  // 3) Fallback nativo
   if ('speechSynthesis' in window) {
     try {
       speechSynthesis.cancel();
+
       const utt = new SpeechSynthesisUtterance(clean);
       utt.lang = lang;
       utt.rate = guide === 'zion' ? 0.92 : 0.98;
       utt.pitch = guide === 'zion' ? 0.82 : 1.08;
       utt.volume = 1;
+
       return new Promise((resolve) => {
         utt.onend = () => resolve();
         utt.onerror = () => resolve();
