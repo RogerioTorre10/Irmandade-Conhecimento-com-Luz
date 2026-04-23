@@ -508,83 +508,40 @@ function speakText(text) {
   const clean = String(text || '').replace(/\s+/g, ' ').trim();
   if (!clean) return Promise.resolve();
 
-  const guideRaw =
+  const guide = normalizeGuide(
     sessionStorage.getItem('jornada.guia') ||
-    sessionStorage.getItem('jornada.guide') ||
     localStorage.getItem('JORNADA_GUIA') ||
     localStorage.getItem('jornada.guia') ||
-    localStorage.getItem('jornada.guide') ||
     document.body.dataset.guia ||
     window.currentGuide ||
-    'lumen';
+    'lumen'
+  );
 
-  const guide = normalizeGuide(guideRaw);
   const lang = document.documentElement.lang || getLang() || 'pt-BR';
 
+  if (!('speechSynthesis' in window)) return Promise.resolve();
+
   try {
-    document.body.dataset.guia = guide;
-    document.documentElement.dataset.guia = guide;
-    sessionStorage.setItem('jornada.guia', guide);
-    localStorage.setItem('jornada.guia', guide);
-    window.currentGuide = guide;
-  } catch {}
+    speechSynthesis.cancel();
 
-  // 1) Preferir o motor que já retorna promise real
-  if (window.JORNADA_VOICE?.speak) {
-    try {
-      return window.JORNADA_VOICE.speak(clean, {
-        lang,
-        guide,
-        rate: guide === 'zion' ? 0.92 : 0.98,
-        pitch: guide === 'zion' ? 0.82 : 1.08,
-        volume: 1
-      });
-    } catch (e) {
-      console.warn('[speakText] JORNADA_VOICE falhou:', e);
-    }
+    const utt = new SpeechSynthesisUtterance(clean);
+    utt.lang = lang;
+    utt.rate = guide === 'zion' ? 0.92 : 0.98;
+    utt.pitch = guide === 'zion' ? 0.82 : 1.12;
+    utt.volume = 1;
+
+    const voice = pickVoiceForGuide();
+    if (voice) utt.voice = voice;
+
+    return new Promise((resolve) => {
+      utt.onend = resolve;
+      utt.onerror = resolve;
+      speechSynthesis.speak(utt);
+    });
+  } catch (e) {
+    console.warn('[speakText] falhou:', e);
+    return Promise.resolve();
   }
-
-  // 2) Se usar EffectCoordinator, só aceite se ele devolver thenable
-  if (window.EffectCoordinator?.speak) {
-    try {
-      const result = window.EffectCoordinator.speak(clean, {
-        guide,
-        lang,
-        rate: guide === 'zion' ? 0.92 : 0.98,
-        pitch: guide === 'zion' ? 0.82 : 1.08,
-        volume: 1
-      });
-
-      if (result && typeof result.then === 'function') {
-        return result;
-      }
-    } catch (e) {
-      console.warn('[speakText] EffectCoordinator falhou:', e);
-    }
-  }
-
-  // 3) Fallback nativo
-  if ('speechSynthesis' in window) {
-    try {
-      speechSynthesis.cancel();
-
-      const utt = new SpeechSynthesisUtterance(clean);
-      utt.lang = lang;
-      utt.rate = guide === 'zion' ? 0.92 : 0.98;
-      utt.pitch = guide === 'zion' ? 0.82 : 1.08;
-      utt.volume = 1;
-
-      return new Promise((resolve) => {
-        utt.onend = () => resolve();
-        utt.onerror = () => resolve();
-        speechSynthesis.speak(utt);
-      });
-    } catch (e) {
-      console.warn('[speakText] fallback nativo falhou:', e);
-    }
-  }
-
-  return Promise.resolve();
 }
 
 async function speakQuestionOrGuideResponse(perguntaText) {
