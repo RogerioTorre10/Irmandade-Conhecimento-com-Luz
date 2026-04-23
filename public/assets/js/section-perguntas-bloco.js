@@ -1472,18 +1472,5 @@ window.JORNADA_PERGUNTAS_BLOCO = {
   }
 };
 
-document.addEventListener('section:shown', async (e) => {
-  const section = e.detail?.node;
-  if (!section || section.id !== 'section-dados-pessoais') return;
-
-  await new Promise((r) => setTimeout(r, 180));
-
-  if (typeof window.applyTypingAndTTS === 'function') {
-    await window.applyTypingAndTTS('section-dados-pessoais', section, { forceReplay: true });
-  } else {
-    console.warn('[DADOS] applyTypingAndTTS não encontrado');
-  }
-});
-
 log('inicializado.');
 })(window, document);
