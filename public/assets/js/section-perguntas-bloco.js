@@ -1156,16 +1156,22 @@ async function maybeHandleBlockClosure(section, bloco) {
       (item) => item?.blocoId !== (bloco?.id || '')
     );
 
-    existentes.push({
-      blocoId: bloco?.id || '',
+    const blocoId = bloco?.id || '';
+    const anteriores = getStoredBlockFeedbacks();
+    const atual = anteriores.find((item) => item?.blocoId === blocoId) || {};
+    const outros = anteriores.filter((item) => item?.blocoId !== blocoId);
+
+    outros.push({
+      blocoId,
       blocoTitulo: bloco?.title || bloco?.id || 'Bloco',
       respostas: getAllAnswersFromBlock(bloco),
       devolutiva: textoFinal,
+      perguntas: Array.isArray(atual?.perguntas) ? atual.perguntas : [],
       guiaUsado: result?.guiaUsado || normalizeGuide(document.body.dataset.guia || 'lumen'),
       source: result?.source || 'desconhecida'
     });
 
-    setStoredBlockFeedbacks(existentes);
+    setStoredBlockFeedbacks(outros);
 
     await setGuideResponse(
       textoFinal,
