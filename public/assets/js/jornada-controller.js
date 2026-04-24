@@ -501,15 +501,14 @@
   window.JC.currentSection = sectionId;
   attachButtonEvents(sectionId, node);
 
-  if (
-    (isIntroLike(sectionId) || sectionId === 'section-dados-pessoais' || sectionId === 'section-final')
-    && sectionId !== lastShownSection
-  ) {
-    await applyI18nToSection(sectionId, node);
-    await prepareTyping(node);
-    await applyTypingAndTTS(sectionId, node, { forceReplay: true });
-  }
-});
+ if (
+  (isIntroLike(sectionId) || sectionId === 'section-dados-pessoais' || sectionId === 'section-final')
+  && sectionId !== lastShownSection
+) {
+  await applyI18nToSection(sectionId, node);
+  await prepareTyping(node);
+  await applyTypingAndTTS(sectionId, node, { forceReplay: true });
+}
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init, { once: true });
