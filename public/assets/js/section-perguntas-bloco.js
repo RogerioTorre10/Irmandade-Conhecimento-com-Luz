@@ -844,8 +844,8 @@ function buildFallbackFeedback({ guia, nome, blocoNome, resposta, pergunta, idio
   const answer = String(resposta || '').trim();
   const questionText = String(pergunta || '').trim();
   const block = String(blocoNome || 'esta etapa').trim();
-  const lang = idioma || getLang();
-
+  const lang = getLang() || idioma || 'pt-BR';
+  
   const fallbackPorGuia = {
     'pt-BR': {
       lumen: `${participant}, sua resposta em ${block} revela um movimento sincero de percepção interior. Ao expressar "${answer || questionText || 'sua vivência'}", você deixa transparecer sensibilidade, honestidade e desejo de caminhar com mais consciência. Receba esta reflexão como um acolhimento: continue ouvindo sua verdade com serenidade, porque há luz no modo como você escolheu responder a esta etapa.`,
