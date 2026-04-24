@@ -501,8 +501,12 @@
   window.JC.currentSection = sectionId;
   attachButtonEvents(sectionId, node);
 
- if (
-  (isIntroLike(sectionId) || sectionId === 'section-dados-pessoais' || sectionId === 'section-final')
+  if (
+  (
+    isIntroLike(sectionId) ||
+    sectionId === 'section-dados-pessoais' ||
+    sectionId === 'section-final'
+  )
   && sectionId !== lastShownSection
 ) {
   await applyI18nToSection(sectionId, node);
