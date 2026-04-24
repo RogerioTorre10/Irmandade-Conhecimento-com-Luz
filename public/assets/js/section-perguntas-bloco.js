@@ -929,106 +929,113 @@ async function requestGuideFeedbackWithFallback(params) {
     dadosPessoais
   } = params;
 
-  const guide = normalizeGuide(guia || 'lumen');
+  const guiaNorm = normalizeGuide(guia || 'lumen');
+  const lang = getLang() || idioma || 'pt-BR';
+
+  const body = {
+    nome: nome || 'Participante',
+    guia: guiaNorm,
+    bloco: blocoNome || 'Bloco',
+    respostas: Array.isArray(respostas) ? respostas : [],
+    idioma: lang,
+    pergunta: pergunta || '',
+    resposta: resposta || '',
+    dadosPessoais: dadosPessoais || {}
+  };
+
+  console.log('[DEVOLUTIVA][API][REQUEST]', {
+    guia: guiaNorm,
+    idioma: lang,
+    bloco: body.bloco,
+    pergunta: body.pergunta,
+    resposta: body.resposta
+  });
+
+  const endpoints = [
+    '/api/jornada/devolutiva',
+    '/jornada/devolutiva'
+  ];
+
+  let ultimoErro = null;
+
+  for (const endpoint of endpoints) {
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      const raw = await res.text();
+
+      let data = null;
+      try {
+        data = raw ? JSON.parse(raw) : null;
+      } catch {
+        data = null;
+      }
+
+      console.log('[DEVOLUTIVA][API][RESPONSE]', {
+        endpoint,
+        status: res.status,
+        ok: res.ok,
+        provider: data?.provider || data?.source || data?.guia,
+        fallback: data?.fallback || data?.fallbackUsed,
+        rawPreview: raw?.slice?.(0, 300)
+      });
+
+      if (!res.ok) {
+        ultimoErro = new Error(`HTTP ${res.status} em ${endpoint}`);
+        continue;
+      }
+
+      const texto = String(
+        data?.texto ||
+        data?.devolutivaFinal ||
+        data?.devolutiva ||
+        ''
+      ).trim();
+
+      const provider = data?.provider || data?.source || 'backend_unknown';
+      const fallbackUsed = Boolean(data?.fallback || data?.fallbackUsed);
+
+      if (texto && texto.length >= 80) {
+        return {
+          ok: true,
+          texto,
+          guiaUsado: data?.guia || guiaNorm,
+          fallbackUsed,
+          source: provider,
+          provider
+        };
+      }
+
+      ultimoErro = new Error(`Resposta vazia/fraca em ${endpoint}`);
+    } catch (e) {
+      ultimoErro = e;
+      console.error('[DEVOLUTIVA][API][ERRO]', endpoint, e);
+    }
+  }
+
+  console.error('[DEVOLUTIVA][ROBUSTA] todos endpoints falharam:', ultimoErro);
+
   const fallbackText = buildFallbackFeedback({
-    guia: guide,
+    guia: guiaNorm,
     nome,
     blocoNome,
     resposta,
     pergunta,
-    idioma
+    idioma: lang
   });
 
-  if (!window.API) {
-    return { ok: true, texto: fallbackText, guiaUsado: 'lumen', fallbackUsed: true };
-  }
-
-  const bodyBase = {
-    nome,
-    bloco: blocoNome,
-    respostas: Array.isArray(respostas) ? respostas : [],
-    idioma,
-    pergunta,
-    resposta,
-    dadosPessoais: dadosPessoais || buildDadosPessoaisPayload()
-  };
-
-  const tentativas = [
-    { guia: guide, retry: false },
-    { guia: guide, retry: true }
-  ];
-
-  if (guide !== 'lumen') {
-    tentativas.push({ guia: 'lumen', retry: false, fallback: true });
-  }
-
-  let ultimoErro = null;
-
-  for (const tentativa of tentativas) {
-    try {
-      let raw = null;
-
-      if (Array.isArray(bodyBase.respostas) && bodyBase.respostas.length && typeof window.API.gerarDevolutivaBloco === 'function') {
-        raw = await window.API.gerarDevolutivaBloco({
-          nome,
-          guia: tentativa.guia,
-          bloco: blocoNome,
-          respostas: bodyBase.respostas,
-          idioma,
-          dadosPessoais: bodyBase.dadosPessoais,
-          retry: tentativa.retry,
-          forceComplete: true,
-          minSentences: tentativa.guia === 'lumen' ? 3 : 2,
-          minChars: tentativa.guia === 'lumen' ? 160 : 120
-        });
-      } else if (typeof window.API.gerarDevolutiva === 'function') {
-        raw = await window.API.gerarDevolutiva({
-          nome,
-          guia: tentativa.guia,
-          bloco: blocoNome,
-          pergunta,
-          resposta,
-          idioma,
-          dadosPessoais: bodyBase.dadosPessoais,
-          retry: tentativa.retry,
-          forceComplete: true,
-          minSentences: tentativa.guia === 'lumen' ? 3 : 2,
-          minChars: tentativa.guia === 'lumen' ? 160 : 120
-        });
-      }
-
-      const texto = extractFeedbackText(raw);
-      if (!texto) {
-        ultimoErro = new Error(`Resposta vazia para ${tentativa.guia}`);
-        continue;
-      }
-
-      if (isWeakFeedback(texto, {
-        minChars: tentativa.guia === 'lumen' ? 160 : 120,
-        minSentences: tentativa.guia === 'lumen' ? 3 : 2
-      })) {
-        ultimoErro = new Error(`Resposta fraca para ${tentativa.guia}`);
-        continue;
-      }
-
-      return {
-        ok: true,
-        texto: texto.trim(),
-        guiaUsado: tentativa.guia,
-        fallbackUsed: !!tentativa.fallback
-      };
-    } catch (e) {
-      ultimoErro = e;
-    }
-  }
-
-  console.error('[DEVOLUTIVA][ROBUSTA] usando fallback local:', ultimoErro);
   return {
     ok: true,
     texto: fallbackText,
-    guia: 'lumen',
+    guiaUsado: guiaNorm,
     fallbackUsed: true,
-    source: 'frontend_local_fallback'
+    source: 'frontend_local_fallback',
+    provider: 'frontend_local_fallback',
+    error: String(ultimoErro?.message || ultimoErro || '')
   };
 }
 
