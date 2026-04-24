@@ -1040,17 +1040,17 @@ async function gerarDevolutivaDoBloco(bloco) {
     'Participante';
 
   const guia =
-    sessionStorage.getItem('jornada.guia') ||
-    localStorage.getItem('JORNADA_GUIA') ||
-    localStorage.getItem('jornada.guia') ||
-    document.body.dataset.guia ||
-    'lumen';
+  sessionStorage.getItem('jornada.guia') ||
+  localStorage.getItem('JORNADA_GUIA') ||
+  localStorage.getItem('jornada.guia') ||
+  document.body.dataset.guia ||
+  'lumen';
 
-  const idioma: getLang() || document.documentElement.lang || 'pt-BR',
+  const idioma = getLang() || document.documentElement.lang || 'pt-BR';
   const respostas = getAllAnswersFromBlock(bloco);
   const blocoNome = bloco?.title || bloco?.id || 'Bloco';
   const dadosPessoais = buildDadosPessoaisPayload();
-
+  
   if (!respostas.length) {
     return {
       ok: false,
