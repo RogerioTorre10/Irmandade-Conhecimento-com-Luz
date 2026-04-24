@@ -961,9 +961,7 @@ async function requestGuideFeedbackWithFallback(params) {
   'https://lumen-backend-api.onrender.com/api'
 ).replace(/\/$/, '');
 
-const endpoints = [
-  `${API_BASE}/jornada/devolutiva`
-];
+const res = await fetch(`${API_BASE}/jornada/devolutiva-bloco`, {
 
   let ultimoErro = null;
 
