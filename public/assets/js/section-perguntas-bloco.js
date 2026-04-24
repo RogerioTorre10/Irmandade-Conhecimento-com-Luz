@@ -1046,7 +1046,7 @@ async function gerarDevolutivaDoBloco(bloco) {
     document.body.dataset.guia ||
     'lumen';
 
-  idioma: getLang() || document.documentElement.lang || 'pt-BR',
+  const idioma: getLang() || document.documentElement.lang || 'pt-BR',
   const respostas = getAllAnswersFromBlock(bloco);
   const blocoNome = bloco?.title || bloco?.id || 'Bloco';
   const dadosPessoais = buildDadosPessoaisPayload();
