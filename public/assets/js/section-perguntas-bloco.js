@@ -861,6 +861,11 @@ function buildFallbackFeedback({ guia, nome, blocoNome, resposta, pergunta, idio
       lumen: `${participant}, tu respuesta en ${block} revela un movimiento sincero de percepción interior. Al expresar "${answer || questionText || 'tu vivencia'}", dejas ver sensibilidad, honestidad y deseo de caminar con mayor conciencia. Recibe esta reflexión como acogida: sigue escuchando tu verdad con serenidad, porque hay luz en la forma en que elegiste responder a esta etapa.`,
       zion: `${participant}, lo que compartiste en ${block} muestra presencia, verdad y disposición para mirar más hondo. Al decir "${answer || questionText || 'tu vivencia'}", revelas una postura interior que merece respeto y continuidad. Toma esta respuesta como una señal de fuerza: lo que comienza en reflexión puede madurar en dirección, claridad y propósito.`,
       arian: `${participant}, tu respuesta en ${block} lleva delicadeza y profundidad. Cuando expresas "${answer || questionText || 'tu vivencia'}", percibimos un rasgo de tu mundo interior que pide escucha, cuidado y crecimiento. Que esta devolución te alcance con acogida y te ayude a seguir con más presencia, verdad y conexión con la luz que florece dentro de ti.`
+    },
+    'zh-CN': {
+      lumen: `${participant}，你的回答透露出一种真诚的觉察。请继续带着这份诚实前行，因为它会成为转化的力量。`,
+      zion: `${participant}，你的回答显示出内在的力量。下一步，是把这份觉察化为具体行动。`,
+      arian: `${participant}，你的回答中有一种深层的智慧。愿它以宁静与清晰引导你。`
     }
   };
 
