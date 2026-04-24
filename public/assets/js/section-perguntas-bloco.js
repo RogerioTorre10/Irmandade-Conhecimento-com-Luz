@@ -1046,7 +1046,7 @@ async function gerarDevolutivaDoBloco(bloco) {
     document.body.dataset.guia ||
     'lumen';
 
-  const idioma = document.documentElement.lang || getLang() || 'pt-BR';
+  idioma: getLang() || document.documentElement.lang || 'pt-BR',
   const respostas = getAllAnswersFromBlock(bloco);
   const blocoNome = bloco?.title || bloco?.id || 'Bloco';
   const dadosPessoais = buildDadosPessoaisPayload();
@@ -1301,7 +1301,7 @@ function bindButtons(section, bloco, perguntaText) {
         guia,
         blocoNome: bloco?.title || bloco?.id || 'Bloco',
         respostas: [val],
-        idioma: document.documentElement.lang || getLang() || 'pt-BR',
+        idioma: getLang() || document.documentElement.lang || 'pt-BR',
         pergunta: getQuestionText(bloco, 0),
         resposta: val,
         dadosPessoais
