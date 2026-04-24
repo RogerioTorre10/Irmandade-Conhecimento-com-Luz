@@ -956,10 +956,14 @@ async function requestGuideFeedbackWithFallback(params) {
     resposta: body.resposta
   });
 
-  const endpoints = [
-    '/api/jornada/devolutiva',
-    '/jornada/devolutiva'
-  ];
+  const API_BASE = String(
+  window.APP_CONFIG?.API_BASE ||
+  'https://lumen-backend-api.onrender.com/api'
+).replace(/\/$/, '');
+
+const endpoints = [
+  `${API_BASE}/jornada/devolutiva`
+];
 
   let ultimoErro = null;
 
