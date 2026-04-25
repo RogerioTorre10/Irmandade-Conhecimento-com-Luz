@@ -961,68 +961,70 @@ async function requestGuideFeedbackWithFallback(params) {
   'https://lumen-backend-api.onrender.com/api'
 ).replace(/\/$/, '');
 
-const res = await fetch(`${API_BASE}/jornada/devolutiva-bloco`, {
+const endpoints = [
+  `${API_BASE}/jornada/devolutiva-bloco`
+];
 
-  let ultimoErro = null;
+let ultimoErro = null;
 
-  for (const endpoint of endpoints) {
+for (const endpoint of endpoints) {
+  try {
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+
+    const raw = await res.text();
+
+    let data = null;
     try {
-      const res = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-
-      const raw = await res.text();
-
-      let data = null;
-      try {
-        data = raw ? JSON.parse(raw) : null;
-      } catch {
-        data = null;
-      }
-
-      console.log('[DEVOLUTIVA][API][RESPONSE]', {
-        endpoint,
-        status: res.status,
-        ok: res.ok,
-        provider: data?.provider || data?.source || data?.guia,
-        fallback: data?.fallback || data?.fallbackUsed,
-        rawPreview: raw?.slice?.(0, 300)
-      });
-
-      if (!res.ok) {
-        ultimoErro = new Error(`HTTP ${res.status} em ${endpoint}`);
-        continue;
-      }
-
-      const texto = String(
-        data?.texto ||
-        data?.devolutivaFinal ||
-        data?.devolutiva ||
-        ''
-      ).trim();
-
-      const provider = data?.provider || data?.source || 'backend_unknown';
-      const fallbackUsed = Boolean(data?.fallback || data?.fallbackUsed);
-
-      if (texto && texto.length >= 80) {
-        return {
-          ok: true,
-          texto,
-          guiaUsado: data?.guia || guiaNorm,
-          fallbackUsed,
-          source: provider,
-          provider
-        };
-      }
-
-      ultimoErro = new Error(`Resposta vazia/fraca em ${endpoint}`);
-    } catch (e) {
-      ultimoErro = e;
-      console.error('[DEVOLUTIVA][API][ERRO]', endpoint, e);
+      data = raw ? JSON.parse(raw) : null;
+    } catch {
+      data = null;
     }
+
+    console.log('[DEVOLUTIVA][API][RESPONSE]', {
+      endpoint,
+      status: res.status,
+      ok: res.ok,
+      provider: data?.provider || data?.source || data?.guia,
+      fallback: data?.fallback || data?.fallbackUsed,
+      rawPreview: raw?.slice?.(0, 300)
+    });
+
+    if (!res.ok) {
+      ultimoErro = new Error(`HTTP ${res.status} em ${endpoint}`);
+      continue;
+    }
+
+    const texto = String(
+      data?.texto ||
+      data?.devolutivaFinal ||
+      data?.devolutiva ||
+      ''
+    ).trim();
+
+    const provider = data?.provider || data?.source || 'backend_unknown';
+    const fallbackUsed = Boolean(data?.fallback || data?.fallbackUsed);
+
+    if (texto && texto.length >= 80) {
+      return {
+        ok: true,
+        texto,
+        guiaUsado: data?.guia || guiaNorm,
+        fallbackUsed,
+        source: provider,
+        provider
+      };
+    }
+
+    ultimoErro = new Error(`Resposta vazia/fraca em ${endpoint}`);
+  } catch (e) {
+    ultimoErro = e;
+    console.error('[DEVOLUTIVA][API][ERRO]', endpoint, e);
   }
+}
 
   console.error('[DEVOLUTIVA][ROBUSTA] todos endpoints falharam:', ultimoErro);
 
