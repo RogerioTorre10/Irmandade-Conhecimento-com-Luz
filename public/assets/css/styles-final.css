@@ -154,62 +154,62 @@
    BOTÕES PEDRA - FINAL
 ================================ */
 #section-final .final-acoes button {
-  background: url('/assets/img/textura-de-pedra.jpg') center/cover no-repeat;
-  color: #f5e6c8;
-  border: 1px solid rgba(212, 175, 55, 0.4);
-  border-radius: 10px;
-  padding: 10px 16px;
-  font-family: 'Cardo', serif;
-  font-size: 0.95rem;
-  letter-spacing: 0.5px;
+  background: url('/assets/img/textura-de-pedra.jpg') center/cover no-repeat !important;
+  color: #f5e6c8 !important;
+  border: 1px solid rgba(212, 175, 55, 0.4) !important;
+  border-radius: 10px !important;
+  padding: 10px 16px !important;
+  font-family: 'Cardo', serif !important;
+  font-size: 0.95rem !important;
+  letter-spacing: 0.5px !important;
   box-shadow:
     inset 0 0 8px rgba(0,0,0,0.6),
-    0 0 6px rgba(212,175,55,0.2);
-  transition: all 0.25s ease;
+    0 0 6px rgba(212,175,55,0.2) !important;
+  transition: all 0.25s ease !important;
 }
 
 /* hover */
 #section-final .final-acoes button:hover {
-  transform: translateY(-1px);
+  transform: translateY(-1px) !important;
   box-shadow:
     inset 0 0 10px rgba(0,0,0,0.7),
-    0 0 12px var(--theme-main-color, #d4af37);
+    0 0 12px var(--theme-main-color, #d4af37) !important;
 }
 
 /* ativo */
 #section-final .final-acoes button:active {
-  transform: scale(0.96);
+  transform: scale(0.96) !important;
 }
 
 /* foco */
 #section-final .final-acoes button:focus {
   outline: none;
   box-shadow:
-    0 0 12px var(--theme-main-color, #d4af37);
+    0 0 12px var(--theme-main-color, #d4af37) !important;
 }
 
 #section-final .final-guide-feedback {
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 80, 230, 0.45) rgba(0, 0, 0, 0.18);
+  scrollbar-color: rgba(255, 80, 230, 0.45) rgba(0, 0, 0, 0.18) !important;
 }
 
 #section-final .final-guide-feedback::-webkit-scrollbar {
-  width: 6px;
+  width: 6px !important;
 }
 
 #section-final .final-guide-feedback::-webkit-scrollbar-track {
   background: rgba(0, 0, 0, 0.18);
-  border-radius: 999px;
+  border-radius: 999px !important;
 }
 
 #section-final .final-guide-feedback::-webkit-scrollbar-thumb {
-  background: rgba(255, 80, 230, 0.45);
-  border-radius: 999px;
-  box-shadow: 0 0 6px rgba(255, 80, 230, 0.35);
+  background: rgba(255, 80, 230, 0.45) !important;
+  border-radius: 999px !important;
+  box-shadow: 0 0 6px rgba(255, 80, 230, 0.35) !important;
 }
 
 #section-final .final-guide-feedback::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 80, 230, 0.7);
+  background: rgba(255, 80, 230, 0.7) !important;
 }
 
 @media (max-width: 600px) {
