@@ -1352,11 +1352,14 @@
     'Fim da Jornada'
   ).trim();
 
-  titleEl.dataset.original = tituloOriginal;
-  titleEl.dataset.text = tituloOriginal;
-  titleEl.textContent = tituloOriginal;
-  titleEl.style.opacity = 1;
-  titleEl.style.transform = 'translateY(0)';
+titleEl.dataset.original = tituloOriginal;
+titleEl.dataset.text = tituloOriginal;
+titleEl.textContent = tituloOriginal;
+titleEl.style.opacity = 1;
+titleEl.style.transform = 'translateY(0)';
+titleEl.setAttribute('data-typing', 'true');
+titleEl.setAttribute('data-no-i18n', 'true');
+titleEl.removeAttribute('data-i18n');
 
   const ps = msgEl.querySelectorAll('p');
   ps.forEach((p) => {
