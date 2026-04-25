@@ -783,7 +783,7 @@
       'fr-FR': {
         lumen: `${nome}, votre voyage a révélé des signes de sensibilité, de courage et d’ouverture intérieure. Chaque réponse a laissé des traces de vérité sur le parchemin de l’âme. Continuez d’avancer avec foi, car la lumière que vous cherchez grandit aussi en vous.`,
         zion: `${nome}, vous avez traversé ce voyage avec honnêteté et présence. Ce qui s’est éveillé ici ne doit pas rester immobile. Transformez la perception en pas, le pas en chemin, et le chemin en mission.`,
-        arion: `${nome}, votre parcours a révélé délicatesse, profondeur et un désir sincère d’évoluer. Permettez à cette expérience de renforcer votre lien avec votre vérité et avec la lumière qui fleurit en vous.`
+        arian: `${nome}, votre parcours a révélé délicatesse, profondeur et un désir sincère d’évoluer. Permettez à cette expérience de renforcer votre lien avec votre vérité et avec la lumière qui fleurit en vous.`
       },
       'zh-CN': {
         lumen: `${nome}，你的旅程展现出了敏感、勇气与内在敞开的迹象。你的每一个回答，都在灵魂的羊皮卷上留下了真实的印记。请继续怀着信念前行，因为你所寻找的光，也正在你内心生长。`,
@@ -1471,13 +1471,7 @@ titleEl.removeAttribute('data-i18n');
         main: '#ff4fd8',
         soft: 'rgba(255,79,216,0.28)',
         strong: 'rgba(255,79,216,0.62)',
-        text: '#fff0fb'
-      },
-      arion: {
-        main: '#ff4fd8',
-        soft: 'rgba(255,79,216,0.28)',
-        strong: 'rgba(255,79,216,0.62)',
-        text: '#fff0fb'
+        text: '#fff0fb'      
       }
     };
 
