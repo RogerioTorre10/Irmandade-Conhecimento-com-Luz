@@ -5,7 +5,7 @@
  * - Integra devolutiva final do Guia
  * - PDF só libera após devolutiva final
  * - Mantém PDF + SelfieCard + Portal
- * - Fallback automático para Lumen quando Zion/Arion falharem
+ * - Fallback automático para Lumen quando Zion/Arian falharem
  * - I18N blindado
  */
 
