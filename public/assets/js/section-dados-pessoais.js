@@ -202,6 +202,42 @@
     return Promise.resolve();
   }
 
+  function iniciarLeituraDadosPessoais(root) {
+  const el =
+    root.querySelector('.intro-text') ||
+    root.querySelector('#dp-subtitle') ||
+    root.querySelector('p');
+
+  if (!el) return;
+
+  const texto = el.dataset.text || el.textContent.trim();
+  if (!texto) return;
+
+  // 🚫 evita leitura durante vídeo
+  if (window.JORNADA_TRANSICAO_ATIVA) {
+    window.addEventListener("jornada:transicao:end", () => {
+      iniciarLeituraDadosPessoais(root);
+    }, { once: true });
+    return;
+  }
+
+  // ✅ usa bridge (padrão da jornada)
+  if (window.JornadaTypingBridge?.typeAndSpeak) {
+    window.JornadaTypingBridge.typeAndSpeak(el, texto, {
+      lang: window.i18n?.getLang?.() || "pt-BR"
+    });
+    return;
+  }
+
+  // fallback simples
+  if (window.speechSynthesis) {
+    const u = new SpeechSynthesisUtterance(texto);
+    u.lang = window.i18n?.getLang?.() || "pt-BR";
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(u);
+  }
+}
+
   async function initHeader(root) {
     const title = $('#dp-title', root) || $('h1[data-i18n-text="dados.title"]', root);
     const subtitle = $('#dp-subtitle', root) || $('p[data-i18n-text="dados.subtitle"]', root);
