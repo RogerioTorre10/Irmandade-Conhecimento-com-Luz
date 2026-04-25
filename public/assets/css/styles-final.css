@@ -188,6 +188,29 @@
     0 0 12px var(--theme-main-color, #d4af37);
 }
 
+#section-final .final-guide-feedback {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 80, 230, 0.45) rgba(0, 0, 0, 0.18);
+}
+
+#section-final .final-guide-feedback::-webkit-scrollbar {
+  width: 6px;
+}
+
+#section-final .final-guide-feedback::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.18);
+  border-radius: 999px;
+}
+
+#section-final .final-guide-feedback::-webkit-scrollbar-thumb {
+  background: rgba(255, 80, 230, 0.45);
+  border-radius: 999px;
+  box-shadow: 0 0 6px rgba(255, 80, 230, 0.35);
+}
+
+#section-final .final-guide-feedback::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 80, 230, 0.7);
+}
 
 @media (max-width: 600px) {
   #section-final {
