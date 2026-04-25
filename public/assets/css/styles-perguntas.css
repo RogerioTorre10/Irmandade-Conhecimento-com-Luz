@@ -587,11 +587,11 @@ body[data-guia="lumen"] #section-perguntas-sintese {
 }
 
 /* Arion */
-body[data-guia="arion"] #section-perguntas-raizes,
-body[data-guia="arion"] #section-perguntas-reflexoes,
-body[data-guia="arion"] #section-perguntas-crescimento,
-body[data-guia="arion"] #section-perguntas-integracao,
-body[data-guia="arion"] #section-perguntas-sintese {
+body[data-guia="arian"] #section-perguntas-raizes,
+body[data-guia="arian"] #section-perguntas-reflexoes,
+body[data-guia="arian"] #section-perguntas-crescimento,
+body[data-guia="arian"] #section-perguntas-integracao,
+body[data-guia="arian"] #section-perguntas-sintese {
   --guia-main:   #6dc8ff;
   --guia-soft:   rgba(109, 200, 255, 0.30);
   --guia-strong: rgba(109, 200, 255, 0.66);
