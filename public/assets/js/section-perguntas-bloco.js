@@ -241,8 +241,7 @@ function getBlocoAtual(sectionId) {
 function normalizeGuide(raw) {
   const x = String(raw || '').trim().toLowerCase();
   if (!x) return 'lumen';
-  if (x === 'arion' || x === 'ariane') return 'arian';
-  if (x.includes('arian') || x.includes('arion')) return 'arian';
+  if (x.includes('arian')) return 'arian';
   if (x.includes('zion')) return 'zion';
   if (x.includes('lumen')) return 'lumen';
   return 'lumen';
