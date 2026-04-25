@@ -315,6 +315,10 @@
     bind(root);
     await initHeader(root);
 
+    setTimeout(() => {
+    iniciarLeituraDadosPessoais(root);
+  }, 400);
+
     log('inicializado com sucesso');
   }
 
