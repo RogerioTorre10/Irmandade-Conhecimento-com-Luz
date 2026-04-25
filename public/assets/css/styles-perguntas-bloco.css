@@ -655,11 +655,6 @@ body[data-guia="lumen"] #section-perguntas-sintese {
   --guia-text: #efffde;
 }
 
-body[data-guia="arion"] #section-perguntas-raizes,
-body[data-guia="arion"] #section-perguntas-reflexoes,
-body[data-guia="arion"] #section-perguntas-crescimento,
-body[data-guia="arion"] #section-perguntas-integracao,
-body[data-guia="arion"] #section-perguntas-sintese,
 body[data-guia="arian"] #section-perguntas-raizes,
 body[data-guia="arian"] #section-perguntas-reflexoes,
 body[data-guia="arian"] #section-perguntas-crescimento,
