@@ -20,7 +20,7 @@
 }
 
 /* sections antigas — sem invadir a intro */
-#section-final{
+#section{
   max-width: 600px;
   min-height: 80vh;
   margin: 0 auto;
@@ -37,13 +37,13 @@
   overflow: hidden;
 }
 
-#section-final.pergaminho-v::before{
+#section.pergaminho-v::before{
   background-image: url('/assets/img/pergaminho-rasgado-vert.png') !important;
   background-size: cover;
   min-height: 80vh;
 }
 
-#section-perguntas.pergaminho-h::before,
+#section.pergaminho-h::before,
 #section-wizard.pergaminho-h::before{
   background-image: url('/assets/img/pergaminho-rasgado-horiz.png') !important;
   background-size: cover;
@@ -53,7 +53,7 @@
 /* texto legado */
 
 #section-wizard #q-text,
-#section-final p{
+#section p{
   display: block;
   margin-bottom: 8px;
   font-family: 'BerkshireSwash', cursive;
@@ -67,7 +67,7 @@
 }
 
 #section-wizard h2,
-#section-final h2{
+#section h2{
   margin-bottom: 10px;
   font-size: 18px;
   color: #fff;
@@ -110,24 +110,24 @@
 }
 
 /* esconder apenas onde o fluxo antigo exige */
-#section-final .parchment-title-rough,
-#section-final .parchment-text-rough{
+#section .parchment-title-rough,
+#section .parchment-text-rough{
   display: none;
   opacity: 0;
   visibility: hidden;
 }
 
-#section-final .parchment-title-rough.typing-active,
-#section-final .parchment-title-rough.typing-done,
-#section-final .parchment-text-rough.typing-active,
-#section-final .parchment-text-rough.typing-done{
+#section.parchment-title-rough.typing-active,
+#section.parchment-title-rough.typing-done,
+#section.parchment-text-rough.typing-active,
+#section.parchment-text-rough.typing-done{
   display: block;
   opacity: 1;
   visibility: visible;
   text-align: left;
 }
 
-.section-final .parchment-inner-rough{
+.section.parchment-inner-rough{
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -147,12 +147,12 @@
   visibility: visible;
 }
 
-#section-final .parchment-actions-rough{
+#section.parchment-actions-rough{
   position: sticky;
   bottom: 0;
 }
 
-.section-final .parchment-actions-rough{
+.section.parchment-actions-rough{
   display: flex;
   opacity: 1;
   visibility: visible;
@@ -170,14 +170,14 @@
 }
 
 /* seção guia — base */
-.section-guia-header-moldura{
+.section-header-moldura{
   position: relative;
   z-index: 10;
   padding: 30px 40px 20px;
   text-align: center;
 }
 
-.section-guia-name-input label{
+.section-name-input label{
   display: block;
   width: fit-content;
   margin: 0 auto 10px;
@@ -190,7 +190,7 @@
   font-variant: small-caps;
 }
 
-.section-guia-name-input input{
+.section-name-input input{
   width: 65%;
   max-width: 250px;
   margin: 0 auto;
@@ -212,7 +212,7 @@
   color: #fff;
 }
 
-.section-guia-name-input.on-pergaminho{
+.section-name-input.on-pergaminho{
   display: flex;
   justify-content: center;
   margin: 6px 0 14px;
