@@ -365,8 +365,8 @@
       return { id: 'zion', nome: 'Zion' };
     }
 
-    if (x === 'arion' || x === 'arian' || x === 'guia-arion' || x === 'guia_arion' || x === 'guia-arian' || x === 'guia_arian') {
-      return { id: 'arion', nome: 'Arion' };
+    if (x === 'arian' || x === 'guia-arian' || x === 'guia_arian' || x === 'arian-1') {
+      return { id: 'arian', nome: 'Arian' };
     }
 
     if (!x || x === 'guia' || x === 'guide' || x === 'selected' || x === 'selecionado') {
@@ -635,7 +635,7 @@
         );
       }
 
-      if (guide === 'arian' || guide === 'arion') {
+      if (guide === 'arian') {
         return (
           findByHints(preferredLangVoices, femaleHints) ||
           findByHints(langVoices, femaleHints) ||
@@ -684,7 +684,7 @@
         utter.rate = 0.92;
       }
 
-      if (guide === 'arian' || guide === 'arion') {
+      if (guide === 'arian') {
         utter.pitch = 1.12;
         utter.rate = 0.95;
       }
@@ -763,22 +763,22 @@
       'pt-BR': {
         lumen: `${nome}, sua jornada revelou sinais de sensibilidade, coragem e abertura interior. Cada resposta sua deixou marcas de verdade no pergaminho da alma. Continue avançando com fé, porque a luz que você procura também cresce dentro de você.`,
         zion: `${nome}, você atravessou esta jornada com honestidade e presença. O que foi despertado aqui não deve ficar parado. Transforme percepção em passo, passo em caminho, caminho em propósito.`,
-        arion: `${nome}, sua travessia demonstrou delicadeza, profundidade e desejo sincero de evolução. Permita que essa experiência fortaleça sua conexão com sua verdade e com a luz que floresce dentro de você.`
+        arian: `${nome}, sua travessia demonstrou delicadeza, profundidade e desejo sincero de evolução. Permita que essa experiência fortaleça sua conexão com sua verdade e com a luz que floresce dentro de você.`
       },
       'en-US': {
         lumen: `${nome}, your journey revealed signs of sensitivity, courage, and inner openness. Each answer left traces of truth on the parchment of your soul. Keep moving forward with faith, because the light you seek is also growing within you.`,
         zion: `${nome}, you crossed this journey with honesty and presence. What was awakened here must not remain still. Turn perception into step, step into path, and path into purpose.`,
-        arion: `${nome}, your path revealed delicacy, depth, and a sincere desire to evolve. Let this experience strengthen your connection with your truth and with the light blooming within you.`
+        arian: `${nome}, your path revealed delicacy, depth, and a sincere desire to evolve. Let this experience strengthen your connection with your truth and with the light blooming within you.`
       },
       'es-ES': {
         lumen: `${nome}, tu jornada reveló señales de sensibilidad, valentía y apertura interior. Cada respuesta dejó marcas de verdad en el pergamino del alma. Sigue avanzando con fe, porque la luz que buscas también está creciendo dentro de ti.`,
         zion: `${nome}, atravesaste esta jornada con honestidad y presencia. Lo que despertó aquí no debe quedarse quieto. Convierte la percepción en paso, el paso en camino y el camino en propósito.`,
-        arion: `${nome}, tu travesía mostró delicadeza, profundidad y un deseo sincero de evolucionar. Permite que esta experiencia fortalezca tu conexión con tu verdad y con la luz que florece dentro de ti.`
+        arian: `${nome}, tu travesía mostró delicadeza, profundidad y un deseo sincero de evolucionar. Permite que esta experiencia fortalezca tu conexión con tu verdad y con la luz que florece dentro de ti.`
       },
       'de-DE': {
         lumen: `${nome}, deine Reise offenbarte Zeichen von Sensibilität, Mut und innerer Offenheit. Jede Antwort hinterließ Spuren der Wahrheit auf dem Pergament deiner Seele. Geh mit Vertrauen weiter, denn das Licht, das du suchst, wächst auch in dir.`,
         zion: `${nome}, du bist diesen Weg mit Ehrlichkeit und Präsenz gegangen. Was hier geweckt wurde, darf nicht stillstehen. Verwandle Wahrnehmung in einen Schritt, den Schritt in einen Weg und den Weg in Bestimmung.`,
-        arion: `${nome}, dein Weg zeigte Feinfühligkeit, Tiefe und einen aufrichtigen Wunsch nach Entwicklung. Lass diese Erfahrung deine Verbindung zu deiner Wahrheit und zu dem Licht stärken, das in dir aufblüht.`
+        arian: `${nome}, dein Weg zeigte Feinfühligkeit, Tiefe und einen aufrichtigen Wunsch nach Entwicklung. Lass diese Erfahrung deine Verbindung zu deiner Wahrheit und zu dem Licht stärken, das in dir aufblüht.`
       },
       'fr-FR': {
         lumen: `${nome}, votre voyage a révélé des signes de sensibilité, de courage et d’ouverture intérieure. Chaque réponse a laissé des traces de vérité sur le parchemin de l’âme. Continuez d’avancer avec foi, car la lumière que vous cherchez grandit aussi en vous.`,
@@ -788,12 +788,12 @@
       'zh-CN': {
         lumen: `${nome}，你的旅程展现出了敏感、勇气与内在敞开的迹象。你的每一个回答，都在灵魂的羊皮卷上留下了真实的印记。请继续怀着信念前行，因为你所寻找的光，也正在你内心生长。`,
         zion: `${nome}，你以真诚与临在走过了这段旅程。在这里被唤醒的东西，不应停滞不前。让感知化为脚步，让脚步化为道路，让道路化为使命。`,
-        arion: `${nome}，你的道路展现出细腻、深度，以及真诚成长的愿望。愿这段经历加深你与真实自我、以及内心之光的连接。`
+        arian: `${nome}，你的道路展现出细腻、深度，以及真诚成长的愿望。愿这段经历加深你与真实自我、以及内心之光的连接。`
       },
       'ja-JP': {
         lumen: `${nome}さん、あなたの旅は、繊細さ、勇気、そして内なる開きのしるしを示しました。あなたの答えの一つひとつが、魂の羊皮紙に真実の跡を残しました。どうか信じて前へ進んでください。あなたが探している光は、あなたの内側でも育っています。`,
         zion: `${nome}さん、あなたは誠実さと確かな存在感をもってこの旅を進みました。ここで目覚めたものを止めてはいけません。気づきを一歩に、一歩を道に、そして道を使命へと変えてください。`,
-        arion: `${nome}さん、あなたの歩みは、繊細さ、深さ、そして真摯な成長への願いを示しました。この体験が、あなた自身の真実と、内に咲く光とのつながりをさらに強めますように。`
+        arian: `${nome}さん、あなたの歩みは、繊細さ、深さ、そして真摯な成長への願いを示しました。この体験が、あなた自身の真実と、内に咲く光とのつながりをさらに強めますように。`
       }
     };
 
