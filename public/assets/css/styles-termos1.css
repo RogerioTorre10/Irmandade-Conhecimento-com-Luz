@@ -491,21 +491,19 @@
   }
 }
 
-/* =============================================
-   FIX DEFINITIVO AURA — sobrescreve conflitos
-   ============================================= */
+/* ============================================
+   FIX DEFINITIVO AURA TERMOS — cole no final
+   ============================================ */
 
-/* Corrige o ::before do painel externo */
 #section-termos1 .j-panel-glow::before {
   position: absolute !important;
 }
 
-/* Corrige overflow que corta o glow */
 #section-termos1 .j-perg-v-inner {
   overflow: visible !important;
 }
 
-/* Corrige o ::before da aura nos elementos tipados */
+/* O ::before da aura PRECISA ser absolute */
 #section-termos1 [data-typing="true"].typing-active::before,
 #section-termos1 [data-typing="true"].typing-done::before,
 #section-termos1 [data-typing="true"].type-done::before,
@@ -518,16 +516,17 @@
   z-index: -1 !important;
 }
 
-/* Corrige o li da lista para aceitar a aura */
-#section-termos1 .termos-lista-rough > li[data-typing="true"] {
+/* Garante que li com typing-done não perde a aura */
+#section-termos1 .termos-lista-rough > li[data-typing="true"].typing-done,
+#section-termos1 .termos-lista-rough > li[data-typing="true"].type-done {
   display: inline-block !important;
-  width: auto !important;
+  width: fit-content !important;
   max-width: 100% !important;
   clear: none !important;
   position: relative !important;
+  isolation: isolate !important;
 }
 
-/* Mantém a lista em coluna mesmo com li inline-block */
 #section-termos1 .termos-lista-rough {
   display: flex !important;
   flex-direction: column !important;
