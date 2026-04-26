@@ -178,11 +178,12 @@
 #section-termos1 [data-typing="true"].typing-done::before,
 #section-termos1 [data-typing="true"].type-done::before {
   content: "";
-  position: relative !important;
+  position: absolute !important;
   inset: -4px -6px;
   border-radius: 14px;
   pointer-events: none;
   z-index: -1;
+
   background: radial-gradient(
     ellipse at center,
     rgba(255, 220, 120, 0.10) 0%,
