@@ -168,16 +168,17 @@
     ambient.loop = true;
     ambient.preload = 'auto';
 
-    Object.assign(ambient.style, {
-      position: 'absolute',
-      inset: '0',
-      width: '100%',
-      height: '100%',
-      objectFit: 'cover',
-      filter: 'blur(18px) brightness(0.7)',
-      transform: 'scale(1.08)',
-      opacity: '0.9'
-    });
+   Object.assign(ambient.style, {
+    position: 'fixed',
+    inset: '0',
+    width: '100vw',
+    height: '100vh',
+    objectFit: 'cover',
+    filter: 'blur(28px) brightness(0.72) saturate(1.25)',
+    transform: 'scale(1.18)',
+    opacity: '0.9',
+    zIndex: '1'
+   });
 
     // Vídeo principal
     const video = document.createElement('video');
@@ -189,13 +190,15 @@
     video.muted = true;
     video.preload = 'auto';
 
-    Object.assign(video.style, {
-      position: 'absolute',
-      inset: '0',
-      width: '100%',
-      height: '100%',
-      objectFit: 'cover'
-    });
+   Object.assign(frame.style, {
+    position: 'relative',
+    display: 'block',
+    maxWidth: '96vw',
+    maxHeight: '96vh',
+    borderRadius: '18px',
+    overflow: 'hidden',
+    zIndex: '2'
+   });
 
     // Botão pular
     const skip = document.createElement('button');
