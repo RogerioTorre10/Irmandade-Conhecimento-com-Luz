@@ -41,7 +41,7 @@
 
 #section-termos2 .j-panel-glow::before {
   content: "";
-  position: relative !important;
+  position: absolute !important;
   inset: 0;
   border-radius: inherit;
   pointer-events: none;
@@ -53,7 +53,7 @@
 
 #section-termos2 .j-perg-v-inner {
   position: relative !important;
-  overflow: hidden !important;
+  overflow: visible !important;
   z-index: 4 !important;
 }
 
@@ -178,7 +178,7 @@
 #section-termos2 [data-typing="true"].typing-done::before,
 #section-termos2 [data-typing="true"].type-done::before {
   content: "";
-  position: relative !important;
+  position: absolute !important;
   inset: -4px -6px;
   border-radius: 14px;
   pointer-events: none;
@@ -431,7 +431,7 @@
 
 #section-termos2 [data-typing="true"].speaking-active::before {
   content: "";
-  position: absolute;
+  position: absolute !important;
   inset: -4px -6px;
   border-radius: 14px;
   pointer-events: none;
