@@ -490,44 +490,56 @@
   }
 }
 
-/* ============================================
-   FIX DEFINITIVO AURA TERMOS — cole no final
-   ============================================ */
+/* =========================================
+   TERMOS — AURA FIXA BLINDADA
+   Não depende só de typing-done
+   ========================================= */
 
-#section-termos2 .j-panel-glow::before {
-  position: absolute !important;
+#section-termos2 [data-typing="true"] {
+  position: relative !important;
+  isolation: isolate !important;
+  text-shadow:
+    0 0 6px rgba(255, 230, 120, 0.72),
+    0 0 14px rgba(255, 210, 90, 0.38),
+    0 0 22px rgba(255, 170, 40, 0.22) !important;
 }
 
-#section-termos2 .j-perg-v-inner {
-  overflow: visible !important;
-}
-
-/* O ::before da aura PRECISA ser absolute */
-#section-termos2 [data-typing="true"].typing-active::before,
-#section-termos2 [data-typing="true"].typing-done::before,
-#section-termos2 [data-typing="true"].type-done::before,
-#section-termos2 [data-typing="true"].speaking-active::before {
-  position: absolute !important;
+#section-termos2 [data-typing="true"]::before {
   content: "" !important;
+  position: absolute !important;
   inset: -4px -6px !important;
   border-radius: 14px !important;
   pointer-events: none !important;
   z-index: -1 !important;
+
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 220, 120, 0.075) 0%,
+    rgba(255, 180, 60, 0.035) 55%,
+    transparent 100%
+  ) !important;
+
+  box-shadow:
+    0 0 8px rgba(255, 220, 120, 0.14),
+    0 0 18px rgba(255, 180, 60, 0.10) !important;
 }
 
-/* Garante que li com typing-done não perde a aura */
-#section-termos2 .termos-lista-rough > li[data-typing="true"].typing-done,
-#section-termos2 .termos-lista-rough > li[data-typing="true"].type-done {
-  display: inline-block !important;
-  width: fit-content !important;
-  max-width: 100% !important;
-  clear: none !important;
-  position: relative !important;
-  isolation: isolate !important;
+#section-termos2 [data-typing="true"].typing-active {
+  text-shadow:
+    0 0 7px rgba(255, 235, 150, 0.95),
+    0 0 16px rgba(255, 215, 90, 0.75),
+    0 0 26px rgba(255, 170, 40, 0.48) !important;
 }
 
-#section-termos2 .termos-lista-rough {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: flex-start !important;
+#section-termos2 [data-typing="true"].typing-active::before {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 220, 120, 0.14) 0%,
+    rgba(255, 180, 60, 0.07) 55%,
+    transparent 100%
+  ) !important;
+
+  box-shadow:
+    0 0 12px rgba(255, 220, 120, 0.26),
+    0 0 26px rgba(255, 180, 60, 0.18) !important;
 }
