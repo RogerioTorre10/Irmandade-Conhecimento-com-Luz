@@ -234,7 +234,7 @@
 #section-intro .intro-title.typing-active::before,
 #section-intro .parchment-text-rough.typing-active::before {
   content: '';
-  position: absolute;
+  position: absolute !important;
   inset: -8px -12px;
   border-radius: 14px;
   pointer-events: none;
@@ -279,7 +279,7 @@
 #section-intro [data-typing="true"].typing-done::before,
 #section-intro [data-typing="true"].type-done::before {
   content: '';
-  position: absolute;
+  position: absolute !important;
   inset: -6px -10px;
   border-radius: 14px;
   pointer-events: none;
