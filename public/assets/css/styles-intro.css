@@ -157,7 +157,7 @@
 
 #section-intro .j-panel-glow::before {
   content: '';
-  position: absolute;
+  position: absolute !important;
   pointer-events: none;
   z-index: 1;
   inset: 0;
@@ -578,7 +578,7 @@
 
 .btn-stone:hover:not(:disabled)::before {
   content: '';
-  position: absolute;
+  position: absolute !important;
   top: 0; left: 0;
   width: 60%; height: 200%;
   background: linear-gradient(
@@ -628,7 +628,7 @@
 
 #section-intro [data-typing="true"].speaking-active::before {
   content: "";
-  position: absolute;
+  position: absolute !important;
   inset: -4px -6px;
   border-radius: 14px;
   pointer-events: none;
