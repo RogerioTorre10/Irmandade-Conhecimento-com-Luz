@@ -175,6 +175,9 @@
 
   cursor: pointer;
 }
+#section-final .final-acoes button {
+  transform: scale(1) !important;
+}
 
 #section-final .final-acoes button:hover,
 .section-final .final-acoes button:hover {
@@ -185,6 +188,9 @@
     0 0 20px rgba(212, 175, 55, 0.7),
     0 0 40px rgba(212, 175, 55, 0.4),
     inset 0 0 12px rgba(0, 0, 0, 0.5);
+}
+#section-final .final-acoes button:hover {
+  transform: scale(1.05) !important;
 }
 
 #section-final .final-guide-feedback {
