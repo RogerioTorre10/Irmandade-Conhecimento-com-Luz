@@ -402,27 +402,14 @@
 /* =========================================
    SENHA — AURA TAMBÉM DURANTE A FALA
    ========================================= */
-#section-termos1 .termos-lista-rough li [data-typing="true"],
-#section-termos1 .parchment-text-rough[data-typing="true"] {
-  display: inline-block !important;
-  width: fit-content !important;
-  max-width: 100% !important;
-  position: relative !important;
-  z-index: 2 !important;
-  isolation: isolate !important;
-  padding: 4px 10px !important;
-  border-radius: 14px !important;
-}
-
-#section-termos1 .termos-lista-rough li {
-  background: transparent !important;
-}
-
 #section-termos1 .termos-lista-rough li[data-typing="true"] {
   display: inline-block !important;
   width: fit-content !important;
+  max-width: 100% !important;
+  clear: none !important;
+  padding: 4px 10px !important;
+  border-radius: 14px !important;
 }
-
 
 #section-termos1 [data-typing="true"].speaking-active {
   background: radial-gradient(
