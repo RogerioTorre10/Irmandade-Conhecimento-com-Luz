@@ -406,8 +406,18 @@
       });
     }
 
-    window.JCTermos2.state.ready = true;
-    console.log('[JCTermos2] pronto — i18n aplicado, typing com aura, fallback sincronizado, voz alinhada e transição preservada');
+    document
+    .querySelectorAll('#section-termos2 [data-typing="true"]')
+    .forEach((el) => {
+      el.classList.remove('typing-active');
+      el.classList.add('typing-done');
+      el.dataset.typingDone = '1';
+      el.style.opacity = '1';
+      el.style.visibility = 'visible';
+    });
+
+   window.JCTermos2.state.ready = true;
+   console.log('[JCTermos2] pronto — i18n aplicado, typing com aura, fallback sincronizado, voz alinhada e transição preservada');
   }
 
   function onSectionShown(evt) {
