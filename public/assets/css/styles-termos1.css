@@ -526,6 +526,68 @@
   position: relative !important;
   isolation: isolate !important;
 }
+/* =========================================
+   HARMONIZAÇÃO COM SECTION-SENHA
+   ========================================= */
+
+/* Título mais equilibrado */
+#section-termos1 .termos1-title,
+#section-termos1 .section-title {
+  font-size: clamp(28px, 5.2vw, 36px) !important;
+  letter-spacing: 1.2px;
+  margin: 12px 0 18px !important;
+}
+
+/* Aura mais forte e consistente com senha */
+#section-termos1 [data-typing="true"].typing-active,
+#section-termos1 [data-typing="true"].speaking-active {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 220, 120, 0.18) 0%,
+    rgba(255, 190, 70, 0.09) 48%,
+    transparent 100%
+  ) !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 220, 120, 0.25),
+    0 0 14px rgba(255, 220, 120, 0.22),
+    0 0 28px rgba(255, 180, 60, 0.16),
+    inset 0 0 12px rgba(255, 240, 180, 0.06) !important;
+  text-shadow:
+    0 0 8px rgba(255, 230, 120, 0.95),
+    0 0 16px rgba(255, 210, 90, 0.75),
+    0 0 24px rgba(255, 170, 40, 0.45) !important;
+  animation: termosAuraPulse 1.7s ease-in-out infinite;
+}
+
+/* Botão com textura mais forte (igual senha) */
+#section-termos1 .btn-stone,
+#section-termos1 .nextBtn {
+  background:
+    linear-gradient(to bottom, #a0a0a0, #808080),
+    var(--stone-img) center/cover !important;
+  background-blend-mode: overlay;
+  border: 2px solid #4a4a4a !important;
+  min-height: 54px !important;
+  font-size: 15px !important;
+}
+
+/* Scroll mobile mais fluido */
+@media (max-width: 768px) {
+  #section-termos1 .j-arcane-card {
+    flex: 1 1 auto !important;
+    overflow-y: auto !important;
+    max-height: calc(100vh - 180px) !important;
+    padding-bottom: 20px !important;
+  }
+
+  #section-termos1 .footer-actions {
+    position: sticky !important;
+    bottom: 0 !important;
+    background: linear-gradient(to top, rgba(0,0,0,0.92), transparent) !important;
+    padding: 16px 0 12px !important;
+    z-index: 10 !important;
+  }
+}
 
 #section-termos1 .termos-lista-rough {
   display: flex !important;
