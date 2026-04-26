@@ -130,32 +130,32 @@
     overlay.className = 'jp-video-overlay';
     overlay.setAttribute('role', 'dialog');
 
-    Object.assign(ambient.style, {
-    position: 'fixed',
-    inset: '0',
-    width: '100vw',
-    height: '100vh',
-    objectFit: 'cover',
-    filter: 'blur(28px) brightness(0.72) saturate(1.25)',
-    transform: 'scale(1.18)',
-    opacity: '0.9',
-    zIndex: '1'
-   });
-    
+    Object.assign(overlay.style, {
+      position: 'fixed',
+      inset: '0',
+      width: '100vw',
+      height: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: 'rgba(0,0,0,0.88)',
+      zIndex: '2147483647',
+      overflow: 'hidden'
+    });
+
     // Frame central
     const frame = document.createElement('div');
     frame.id = 'vt-frame';
     frame.className = 'jp-video-frame';
 
     Object.assign(frame.style, {
-    position: 'relative',
-    display: 'block',
-    maxWidth: '96vw',
-    maxHeight: '96vh',
-    borderRadius: '18px',
-    overflow: 'hidden',
-    zIndex: '2'
-   });
+      position: 'relative',
+      display: 'block',
+      maxWidth: '96vw',
+      maxHeight: '96vh',
+      borderRadius: '18px',
+      overflow: 'hidden'
+    });
 
     // Vídeo ambiente
     const ambient = document.createElement('video');
@@ -168,17 +168,16 @@
     ambient.loop = true;
     ambient.preload = 'auto';
 
-   Object.assign(ambient.style, {
-    position: 'fixed',
-    inset: '0',
-    width: '100vw',
-    height: '100vh',
-    objectFit: 'cover',
-    filter: 'blur(28px) brightness(0.72) saturate(1.25)',
-    transform: 'scale(1.18)',
-    opacity: '0.9',
-    zIndex: '1'
-   });
+    Object.assign(ambient.style, {
+      position: 'absolute',
+      inset: '0',
+      width: '100%',
+      height: '100%',
+      objectFit: 'cover',
+      filter: 'blur(18px) brightness(0.7)',
+      transform: 'scale(1.08)',
+      opacity: '0.9'
+    });
 
     // Vídeo principal
     const video = document.createElement('video');
@@ -190,15 +189,13 @@
     video.muted = true;
     video.preload = 'auto';
 
-   Object.assign(frame.style, {
-    position: 'relative',
-    display: 'block',
-    maxWidth: '96vw',
-    maxHeight: '96vh',
-    borderRadius: '18px',
-    overflow: 'hidden',
-    zIndex: '2'
-   });
+    Object.assign(video.style, {
+      position: 'absolute',
+      inset: '0',
+      width: '100%',
+      height: '100%',
+      objectFit: 'cover'
+    });
 
     // Botão pular
     const skip = document.createElement('button');
