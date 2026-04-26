@@ -1105,6 +1105,8 @@
 
       if (btnPdf.dataset.loading === '1') return;
       if (btnPdf.disabled) return;
+      if (window.__PDF_FINAL_EM_GERACAO__) return;
+      window.__PDF_FINAL_EM_GERACAO__ = true;
 
       btnPdf.dataset.loading = '1';
       btnPdf.disabled = true;
@@ -1253,6 +1255,8 @@
       } finally {
         if (timer && typeof clearInterval === 'function') clearInterval(timer);
         if (retryTimer) clearTimeout(retryTimer);
+
+        window.__PDF_FINAL_EM_GERACAO__ = false;
 
         btnPdf.dataset.loading = '0';
         btnPdf.disabled = false;
