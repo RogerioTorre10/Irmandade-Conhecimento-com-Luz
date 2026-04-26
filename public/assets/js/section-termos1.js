@@ -513,9 +513,18 @@
       });
     }
 
+    document
+     .querySelectorAll('#section-termos1 [data-typing="true"]')
+     .forEach((el) => {
+       el.classList.remove('typing-active');
+       el.classList.add('typing-done');
+       el.dataset.typingDone = '1';
+       el.style.opacity = '1';
+       el.style.visibility = 'visible';
+     });
+
     window.JCTermos1.state.ready = true;
     console.log('[JCTermos1] pronto — início pós-transição validado, typing, aura, i18n e voz aplicados');
-  }
 
   function onSectionShown(evt) {
     const { sectionId, node } = evt?.detail || {};
