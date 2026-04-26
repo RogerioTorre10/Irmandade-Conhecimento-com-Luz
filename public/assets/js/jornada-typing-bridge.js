@@ -348,10 +348,11 @@
       }
       @keyframes blink { 50% { opacity: 0; } }
 
+      [data-typing="true"] { position: relative; }
       [data-typing="true"] { opacity: 0; transition: opacity 0.1s; }
       .typing-done[data-typing],
       .typing-done { opacity: 1 !important; }
-      .typing-active { opacity: 1 !important; }
+      .typing-active { opacity: 1 !important; }      
     `;
     document.head.appendChild(st);
   })();
