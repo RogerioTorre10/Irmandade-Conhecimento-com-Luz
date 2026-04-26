@@ -1228,9 +1228,17 @@
         if (timer) clearInterval(timer);
         timer = null;
 
+        // 🔒 trava anti-PDF fantasma
         if (!result || !result.ok) {
-          throw new Error('PDF inválido');
+        console.error('[FINAL][PDF] resultado inválido:', result);
+        throw new Error('PDF inválido ou não confirmado pela API');
         }
+
+        // 🔒 se a API devolver blob/tamanho, valida também
+        if (result.blob && result.blob.size && result.blob.size < 1500) {
+        console.error('[FINAL][PDF] blob pequeno/corrompido:', result.blob.size);
+        throw new Error('PDF vazio ou corrompido');
+       }
 
         setPdfStatus(root, t('final.pdfSuccess', '✅ Pergaminho gerado e baixado com sucesso!'), 'ok');
 
