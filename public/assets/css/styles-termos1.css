@@ -491,41 +491,6 @@
   }
 }
 
-/* ============================================
-   FIX DEFINITIVO AURA TERMOS — cole no final
-   ============================================ */
-
-#section-termos1 .j-panel-glow::before {
-  position: absolute !important;
-}
-
-#section-termos1 .j-perg-v-inner {
-  overflow: visible !important;
-}
-
-/* O ::before da aura PRECISA ser absolute */
-#section-termos1 [data-typing="true"].typing-active::before,
-#section-termos1 [data-typing="true"].typing-done::before,
-#section-termos1 [data-typing="true"].type-done::before,
-#section-termos1 [data-typing="true"].speaking-active::before {
-  position: absolute !important;
-  content: "" !important;
-  inset: -4px -6px !important;
-  border-radius: 14px !important;
-  pointer-events: none !important;
-  z-index: -1 !important;
-}
-
-/* Garante que li com typing-done não perde a aura */
-#section-termos1 .termos-lista-rough > li[data-typing="true"].typing-done,
-#section-termos1 .termos-lista-rough > li[data-typing="true"].type-done {
-  display: inline-block !important;
-  width: fit-content !important;
-  max-width: 100% !important;
-  clear: none !important;
-  position: relative !important;
-  isolation: isolate !important;
-}
 /* =========================================
    HARMONIZAÇÃO COM SECTION-SENHA
    ========================================= */
