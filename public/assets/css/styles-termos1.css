@@ -490,3 +490,46 @@
     border-radius: 10px;
   }
 }
+
+/* =============================================
+   FIX DEFINITIVO AURA — sobrescreve conflitos
+   ============================================= */
+
+/* Corrige o ::before do painel externo */
+#section-termos1 .j-panel-glow::before {
+  position: absolute !important;
+}
+
+/* Corrige overflow que corta o glow */
+#section-termos1 .j-perg-v-inner {
+  overflow: visible !important;
+}
+
+/* Corrige o ::before da aura nos elementos tipados */
+#section-termos1 [data-typing="true"].typing-active::before,
+#section-termos1 [data-typing="true"].typing-done::before,
+#section-termos1 [data-typing="true"].type-done::before,
+#section-termos1 [data-typing="true"].speaking-active::before {
+  position: absolute !important;
+  content: "" !important;
+  inset: -4px -6px !important;
+  border-radius: 14px !important;
+  pointer-events: none !important;
+  z-index: -1 !important;
+}
+
+/* Corrige o li da lista para aceitar a aura */
+#section-termos1 .termos-lista-rough > li[data-typing="true"] {
+  display: inline-block !important;
+  width: auto !important;
+  max-width: 100% !important;
+  clear: none !important;
+  position: relative !important;
+}
+
+/* Mantém a lista em coluna mesmo com li inline-block */
+#section-termos1 .termos-lista-rough {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+}
