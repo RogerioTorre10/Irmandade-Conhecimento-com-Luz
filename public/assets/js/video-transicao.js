@@ -130,32 +130,32 @@
     overlay.className = 'jp-video-overlay';
     overlay.setAttribute('role', 'dialog');
 
-    Object.assign(overlay.style, {
-      position: 'fixed',
-      inset: '0',
-      width: '100vw',
-      height: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: 'rgba(0,0,0,0.88)',
-      zIndex: '2147483647',
-      overflow: 'hidden'
-    });
-
+    Object.assign(ambient.style, {
+    position: 'fixed',
+    inset: '0',
+    width: '100vw',
+    height: '100vh',
+    objectFit: 'cover',
+    filter: 'blur(28px) brightness(0.72) saturate(1.25)',
+    transform: 'scale(1.18)',
+    opacity: '0.9',
+    zIndex: '1'
+   });
+    
     // Frame central
     const frame = document.createElement('div');
     frame.id = 'vt-frame';
     frame.className = 'jp-video-frame';
 
     Object.assign(frame.style, {
-      position: 'relative',
-      display: 'block',
-      maxWidth: '96vw',
-      maxHeight: '96vh',
-      borderRadius: '18px',
-      overflow: 'hidden'
-    });
+    position: 'relative',
+    display: 'block',
+    maxWidth: '96vw',
+    maxHeight: '96vh',
+    borderRadius: '18px',
+    overflow: 'hidden',
+    zIndex: '2'
+   });
 
     // Vídeo ambiente
     const ambient = document.createElement('video');
