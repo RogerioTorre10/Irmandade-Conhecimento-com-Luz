@@ -352,8 +352,36 @@
       .typing-done[data-typing],
       .typing-done { opacity: 1 !important; }
       .typing-active { opacity: 1 !important; }
-      [data-typing="true"] { position: relative; }
+      [data-typing="true"].typing-done,
+      [data-typing="true"].type-done {
+        position: relative;
+        opacity: 1 !important;
+        text-shadow:
+          0 0 6px rgba(255, 230, 120, 0.85),
+          0 0 14px rgba(255, 210, 90, 0.55),
+          0 0 22px rgba(255, 170, 40, 0.30);
+      }
+
+      [data-typing="true"].typing-done::before,
+      [data-typing="true"].type-done::before {
+        content: "";
+        position: absolute;
+        inset: -4px -6px;
+        border-radius: 14px;
+        pointer-events: none;
+        z-index: -1;
+        background: radial-gradient(
+          ellipse at center,
+          rgba(255, 220, 120, 0.08) 0%,
+          rgba(255, 180, 60, 0.04) 55%,
+          transparent 100%
+        );
+        box-shadow:
+          0 0 8px rgba(255, 220, 120, 0.20),
+          0 0 18px rgba(255, 180, 60, 0.16);
+      } 
     `;
+    
     document.head.appendChild(st);
   })();
 
