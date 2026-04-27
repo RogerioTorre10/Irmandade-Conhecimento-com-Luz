@@ -292,6 +292,8 @@
   for (const path of PDF_PATHS) {
     try {
       console.log('[PDF] tentando:', `${API_PRIMARY}${path}`);
+      
+      await sleep(400);
 
       const { data, response } = await postJSON(API_PRIMARY, path, safePayload, 60000);
 
