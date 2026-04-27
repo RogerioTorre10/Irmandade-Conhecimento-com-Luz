@@ -297,27 +297,33 @@
 
       const { data, response } = await postJSON(API_PRIMARY, path, safePayload, 60000);
 
-      if (data instanceof Blob) {
-        const size = data.size || 0;
+  if (data instanceof Blob) {
+    const size = data.size || 0;
+    const type = String(data.type || '').toLowerCase();
 
-        console.log('[PDF] recebido blob:', path, 'size:', size);
+    console.log('[PDF] blob recebido:', {
+      path,
+      status: response?.status,
+      type,
+      size
+  });
 
-      // 🔒 TRAVA PRINCIPAL
-      if (!size || size < 3000) {
-       console.error('[PDF] BLOQUEADO - PDF vazio ou muito pequeno:', size);
-       lastError = new Error('PDF vazio ou incompleto');
-       continue; // tenta próxima rota
-      }
+  if (!size || size < 15000 || !type.includes('pdf')) {
+    console.error('[PDF] bloqueado: blob inválido ou incompleto', { size, type, path });
+    lastError = new Error(`PDF incompleto em ${path}. Size=${size}`);
+    await sleep(900);
+    continue;
+  }
 
-       console.log('[PDF] válido, iniciando download...');
-       triggerDownload(data, fname);
+  triggerDownload(data, fname);
 
-       return {
-       ok: true,
-       path,
-       size
-      };
-     }
+  return {
+    ok: true,
+    path,
+    blob: data,
+    size
+  };
+}
 
       if (data && typeof data === 'object' && data.url) {
         console.log('[PDF] sucesso via url:', path, data.url);
