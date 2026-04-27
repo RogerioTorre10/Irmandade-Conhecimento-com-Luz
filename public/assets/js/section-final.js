@@ -1237,8 +1237,10 @@
         }
 
         // 🔒 se a API devolver blob/tamanho, valida também
-        if (result.blob && result.blob.size && result.blob.size < 1500) {
-        console.error('[FINAL][PDF] blob pequeno/corrompido:', result.blob.size);
+        const pdfSize = result?.size || result?.blob?.size || 0;
+
+        if (!pdfSize || pdfSize < 3000) {
+        console.error('[FINAL][PDF] tamanho inválido:', pdfSize, result);
         throw new Error('PDF vazio ou corrompido');
        }
 
