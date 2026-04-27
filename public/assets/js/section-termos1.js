@@ -525,7 +525,8 @@
 
     window.JCTermos1.state.ready = true;
     console.log('[JCTermos1] pronto — início pós-transição validado, typing, aura, i18n e voz aplicados');
-
+  }
+  
   function onSectionShown(evt) {
     const { sectionId, node } = evt?.detail || {};
     if (sectionId !== SECTION_ID) return;
