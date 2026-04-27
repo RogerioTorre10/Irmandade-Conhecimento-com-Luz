@@ -86,7 +86,13 @@
       '#dp-profissao': data.profissao,
       '#dp-filhos': data.filhos,
       '#dp-religiao': data.religiao,
-      '#dp-observacoes': data.observacoes
+      '#dp-observacoes': data.observacoes,
+      '#dp-temperamento': data.temperamento || data.perfilPersonalidade?.temperamento,
+      '#dp-comportamento': data.comportamento || data.perfilPersonalidade?.comportamento,
+      '#dp-carater': data.carater || data.perfilPersonalidade?.carater,
+      '#dp-indole': data.indole || data.perfilPersonalidade?.indole,
+      '#dp-vazio-existencial': data.vazioExistencial || data.perfilPersonalidade?.vazioExistencial,
+      '#dp-pleno-existencial': data.plenoExistencial || data.perfilPersonalidade?.plenoExistencial
     };
 
     Object.entries(map).forEach(([sel, val]) => {
