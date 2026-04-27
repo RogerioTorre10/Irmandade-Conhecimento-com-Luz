@@ -134,6 +134,36 @@
       text-shadow:
       0 0 8px rgba(255, 230, 140, 0.85),
       0 0 18px rgba(212, 175, 55, 0.55) !important;
+    }
+    
+    #section-final .final-acoes button,
+    #section-final .btn-pdf,
+    #section-final .btn-selfie,
+    #section-final .btn-portal {
+      background:
+        linear-gradient(to bottom, rgba(180,180,180,.45), rgba(70,70,70,.75)),
+        url('/assets/img/textura-de-pedra.jpg') center/cover !important;
+      background-blend-mode: overlay !important;
+      border: 2px solid #4a4a4a !important;
+      color: #f9e7c2 !important;
+      text-shadow: 1px 1px 3px rgba(0,0,0,.8) !important;
+      box-shadow:
+        inset 0 3px 6px rgba(0,0,0,.45),
+        0 6px 12px rgba(0,0,0,.55),
+        0 0 12px rgba(212,175,55,.28) !important;
+      transition: transform .22s ease, filter .22s ease, box-shadow .22s ease !important;
+    }
+
+    #section-final .final-acoes button:hover:not(:disabled),
+    #section-final .btn-pdf:hover:not(:disabled),
+    #section-final .btn-selfie:hover:not(:disabled),
+    #section-final .btn-portal:hover:not(:disabled) {
+      transform: scale(1.045) !important;
+      filter: brightness(1.15) !important;
+      box-shadow:
+       inset 0 3px 6px rgba(0,0,0,.45),
+       0 0 18px rgba(212,175,55,.58),
+       0 0 32px rgba(212,175,55,.32) !important;
     }    
     `;
     
