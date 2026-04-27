@@ -983,15 +983,40 @@
   // DOM
   // ================================
   function ensureFinalDOM() {
-    const section = document.getElementById(SECTION_ID);
-    if (!section) return {};
+  const section = document.getElementById(SECTION_ID);
+  if (!section) return {};
 
-    const titleEl = section.querySelector('#final-title');
-    const msgEl = section.querySelector('#final-message');
-    const botoes = section.querySelector('.final-acoes');
+  let titleEl = section.querySelector('#final-title');
 
-    return { section, titleEl, msgEl, botoes };
+  if (!titleEl) {
+    titleEl = document.createElement('h1');
+    titleEl.id = 'final-title';
+    titleEl.className = 'final-title';
+    titleEl.setAttribute('data-typing', 'true');
+    titleEl.setAttribute('data-no-i18n', 'true');
+    titleEl.dataset.text = t('final.title', 'Fim da Jornada');
+
+    const firstChild = section.firstElementChild;
+    if (firstChild) {
+      section.insertBefore(titleEl, firstChild);
+    } else {
+      section.appendChild(titleEl);
+    }
   }
+
+  let msgEl = section.querySelector('#final-message');
+
+  if (!msgEl) {
+    msgEl = document.createElement('div');
+    msgEl.id = 'final-message';
+    msgEl.className = 'final-message';
+    section.appendChild(msgEl);
+  }
+
+  const botoes = section.querySelector('.final-acoes');
+
+  return { section, titleEl, msgEl, botoes };
+}
 
   function unlockPortalButton(section) {
     if (!section) return;
