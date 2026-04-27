@@ -119,7 +119,24 @@
       opacity: .55 !important;
       filter: grayscale(.15);
     }
+    
+    #section-final #final-title,
+    #section-final .final-title {
+      display: block !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      text-align: center !important;
+      color: var(--guia-main, #d4af37) !important;
+      font-family: 'ManufacturingConsent', serif !important;
+      font-size: clamp(30px, 5vw, 48px) !important;
+      line-height: 1.1 !important;
+      margin: 18px auto 16px !important;
+      text-shadow:
+      0 0 8px rgba(255, 230, 140, 0.85),
+      0 0 18px rgba(212, 175, 55, 0.55) !important;
+    }    
     `;
+    
     const style = document.createElement('style');
     style.id = 'final-pdf-magic-style';
     style.textContent = css;
