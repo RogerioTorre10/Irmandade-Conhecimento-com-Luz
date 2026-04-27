@@ -1119,6 +1119,7 @@
         btnPdf.disabled = false;
         btnPdf.textContent = btnPdf.dataset.originalText || t('final.pdf', 'PDF');
         btnPdf.classList.remove('is-loading');
+        window.__PDF_FINAL_EM_GERACAO__ = false;
         return;
       }
 
