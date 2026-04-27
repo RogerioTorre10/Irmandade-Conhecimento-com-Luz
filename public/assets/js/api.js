@@ -296,10 +296,26 @@
       const { data, response } = await postJSON(API_PRIMARY, path, safePayload, 60000);
 
       if (data instanceof Blob) {
-        console.log('[PDF] sucesso via blob:', path, response?.status);
-        triggerDownload(data, fname);
-        return { ok: true, path };
+        const size = data.size || 0;
+
+        console.log('[PDF] recebido blob:', path, 'size:', size);
+
+      // 🔒 TRAVA PRINCIPAL
+      if (!size || size < 3000) {
+       console.error('[PDF] BLOQUEADO - PDF vazio ou muito pequeno:', size);
+       lastError = new Error('PDF vazio ou incompleto');
+       continue; // tenta próxima rota
       }
+
+       console.log('[PDF] válido, iniciando download...');
+       triggerDownload(data, fname);
+
+       return {
+       ok: true,
+       path,
+       size
+      };
+     }
 
       if (data && typeof data === 'object' && data.url) {
         console.log('[PDF] sucesso via url:', path, data.url);
