@@ -217,11 +217,11 @@
       border: '0',
       cursor: 'pointer'
     });
-
-    frame.appendChild(ambient);
-    frame.appendChild(video);
+    
+    frame.appendChild(video);    
     frame.appendChild(skip);
 
+    overlay.appendChild(ambient);
     overlay.appendChild(frame);
     document.documentElement.appendChild(overlay);
 
