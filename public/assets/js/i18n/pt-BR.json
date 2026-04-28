@@ -141,7 +141,8 @@
     "filhos": "Filhos",
     "filhos_nao": "Não",
     "filhos_sim": "Sim",
-    "obs": "Algo importante que deseja compartilhar?"
+    "obs": "Algo importante que deseja compartilhar?",
+    
   "dadosPerfil": {
     "titulo": "Perfil de Personalidade",
     "temperamentoLabel": "Temperamento",
