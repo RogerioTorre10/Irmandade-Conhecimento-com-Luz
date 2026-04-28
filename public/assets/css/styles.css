@@ -348,3 +348,25 @@ footer,
   right: 14px !important;
   z-index: 10 !important;
 }
+/* VIDEO TRANSITION - AMBIENT BLUR FORTE */
+#vt-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147483647 !important;
+}
+
+#vt-ambient {
+  filter: blur(32px) brightness(0.65) saturate(1.3) !important;
+  transform: scale(1.15) !important;
+  opacity: 0.92 !important;
+  z-index: 1 !important;
+}
+
+#vt-frame {
+  box-shadow: 0 0 80px rgba(0,0,0,0.95) !important;
+  border: 1px solid rgba(255,215,0,0.3) !important;
+}
+
+#vt-video {
+  z-index: 3 !important;
+}
