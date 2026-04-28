@@ -730,63 +730,7 @@ body[data-guia="arian"] .perguntas-controls .btn-perguntas {
    VIDEO TRANSIÇÃO — CINEMA BLINDADO
    ========================================= */
 
-#vt-overlay {
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  overflow: hidden !important;
-  z-index: 2147483647 !important;
-  background: rgba(0, 0, 0, 0.92) !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
 
-#vt-ambient {
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  object-fit: cover !important;
-  filter: blur(30px) brightness(0.55) saturate(1.25) !important;
-  transform: scale(1.22) !important;
-  opacity: 0.88 !important;
-  z-index: 1 !important;
-  pointer-events: none !important;
-}
-
-#vt-frame {
-  position: relative !important;
-  z-index: 5 !important;
-  width: min(96vw, 1280px) !important;
-  height: min(82vh, 720px) !important;
-  max-width: 96vw !important;
-  max-height: 82vh !important;
-  overflow: hidden !important;
-  border-radius: 18px !important;
-  box-shadow:
-    0 0 0 2px rgba(212, 175, 55, 0.85),
-    0 0 42px rgba(212, 175, 55, 0.55) !important;
-  background: #000 !important;
-}
-
-#vt-frame video:not(#vt-ambient) {
-  position: absolute !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: contain !important;
-  z-index: 6 !important;
-  background: #000 !important;
-}
-
-#vt-skip {
-  position: absolute !important;
-  top: 14px !important;
-  right: 14px !important;
-  z-index: 10 !important;
-}
 
 /* ===========================================================
    ANIMAÇÕES
