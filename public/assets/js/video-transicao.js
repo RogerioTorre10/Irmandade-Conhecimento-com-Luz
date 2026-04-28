@@ -223,7 +223,7 @@
 
     overlay.appendChild(ambient);
     overlay.appendChild(frame);
-    document.documentElement.appendChild(overlay);
+    document.body.appendChild(overlay);    
 
     requestAnimationFrame(() => overlay.classList.add('show'));
 
