@@ -151,48 +151,6 @@
   }
 }
 
-/* ===============================
-   BOTÕES PEDRA - FINAL
-================================ */
-#section-final .final-acoes button,
-.section-final .final-acoes button {
-  background-image:
-    linear-gradient(145deg, rgba(255,255,255,0.12), rgba(0,0,0,0.35)),
-    url("/assets/img/textura-de-pedra.jpg");
-  background-size: cover;
-  background-position: center;
-
-  border: 1px solid rgba(212, 175, 55, 0.75);
-
-  box-shadow:
-    0 0 12px rgba(212, 175, 55, 0.35),
-    inset 0 0 10px rgba(0, 0, 0, 0.45);
-
-  transition:
-    transform 0.22s ease,
-    box-shadow 0.22s ease,
-    filter 0.22s ease;
-
-  cursor: pointer;
-}
-#section-final .final-acoes button {
-  transform: scale(1) !important;
-}
-
-#section-final .final-acoes button:hover,
-.section-final .final-acoes button:hover {
-  transform: scale(1.05);
-  filter: brightness(1.15);
-
-  box-shadow:
-    0 0 20px rgba(212, 175, 55, 0.7),
-    0 0 40px rgba(212, 175, 55, 0.4),
-    inset 0 0 12px rgba(0, 0, 0, 0.5);
-}
-#section-final .final-acoes button:hover {
-  transform: scale(1.05) !important;
-}
-
 #section-final .final-guide-feedback {
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 80, 230, 0.45) rgba(0, 0, 0, 0.18) !important;
