@@ -308,10 +308,10 @@
       size
   });
 
-  if (!size || size < 15000 || !type.includes('pdf')) {
+  if (!size || size < 50000 || !type.includes('pdf')) {
     console.error('[PDF] bloqueado: blob inválido ou incompleto', { size, type, path });
     lastError = new Error(`PDF incompleto em ${path}. Size=${size}`);
-    await sleep(900);
+    await sleep(1500);
     continue;
   }
 
