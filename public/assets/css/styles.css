@@ -231,34 +231,6 @@
   border-image: url('/assets/img/moldura-medieval-espinhos.png') 60 fill stretch;
   border-radius: 2px;
 }
-#vt-overlay::before,
-#vt-overlay::after,
-#global-video-overlay::before,
-#global-video-overlay::after {
-  content: "";
-  position: fixed;
-  left: 0;
-  width: 100vw;
-  height: 18vh;
-  z-index: 2147483647;
-  pointer-events: none;
-  background-image: url("/assets/img/pergaminho-rasgado-vert.png");
-  background-size: cover;
-  background-position: center;
-  filter: blur(14px);
-  opacity: 0.55;
-  transform: scale(1.08);
-}
-
-#vt-overlay::before,
-#global-video-overlay::before {
-  top: -4vh;
-}
-
-#vt-overlay::after,
-#global-video-overlay::after {
-  bottom: -4vh;
-}
 
 #vt-frame,
 #global-video-overlay .jp-video-frame {
