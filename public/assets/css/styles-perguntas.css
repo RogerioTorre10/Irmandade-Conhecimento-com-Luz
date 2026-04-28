@@ -668,47 +668,6 @@ body[data-guia="arian"] .perguntas-controls .btn-perguntas {
   box-shadow: 0 6px 18px rgba(0,0,0,0.6), 0 0 25px rgba(255,0,255,0.8) !important;
 }
 
-
-/* ============================
-   VÍDEO DE TRANSIÇÃO
-   ============================ */
-
-#videoOverlay,
-.video-overlay {
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  display: none !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
-  background: rgba(0, 0, 0, 0.98) !important;
-  z-index: 2147483646 !important;
-  pointer-events: none !important;
-}
-
-#videoOverlay.is-on,
-.video-overlay.is-on {
-  display: block !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  pointer-events: auto !important;
-}
-
-#videoOverlay video,
-.video-overlay video,
-#videoTransicao {
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  object-fit: cover !important;
-  object-position: center !important;
-  background: #000 !important;
-  display: block !important;
-}
-
-
 /* ============================
    ANIMAÇÕES (uma de cada)
    ============================ */
