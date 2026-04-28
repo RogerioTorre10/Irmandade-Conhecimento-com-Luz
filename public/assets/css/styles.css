@@ -286,3 +286,27 @@ footer,
       0 0 38px rgba(212, 175, 55, 0.45);
   }
 }
+#videoOverlay::before,
+#videoOverlay::after {
+  content: "";
+  position: fixed;
+  left: 0;
+  width: 100%;
+  height: 18vh;
+  z-index: 2;
+  pointer-events: none;
+  background-image: var(--vt-blur-img, url("/assets/img/pergaminho-rasgado-vert.png"));
+  background-size: cover;
+  background-position: center;
+  filter: blur(14px);
+  opacity: 0.55;
+  transform: scale(1.08);
+}
+
+#videoOverlay::before {
+  top: -4vh;
+}
+
+#videoOverlay::after {
+  bottom: -4vh;
+}
