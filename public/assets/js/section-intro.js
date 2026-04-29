@@ -306,7 +306,7 @@
       delete el.dataset.text;
 
       el.classList.remove('typing-active', 'typing-done', 'type-done');
-      el.removeAttribute('data-cursor');
+      el.setAttribute('data-cursor', 'true');
     });
 
   console.log('[IntroLang] Cache de typing limpo após troca de idioma.');
