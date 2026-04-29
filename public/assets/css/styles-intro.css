@@ -640,3 +640,11 @@
     transparent 100%
   );
 }
+
+#section-intro [data-typing="true"].typing-done,
+#section-intro [data-typing="true"].type-done {
+  text-shadow:
+    0 0 6px rgba(255, 230, 120, 0.85),
+    0 0 14px rgba(255, 210, 90, 0.55),
+    0 0 24px rgba(255, 170, 40, 0.35) !important;
+}
