@@ -151,7 +151,7 @@
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      background: 'rgba(0,0,0,0.92)',
+      background: 'rgba(0,0,0,0.35)',
       zIndex: '2147483647',
       overflow: 'hidden',
       opacity: '1',
@@ -170,14 +170,15 @@
 
     Object.assign(ambient.style, {
       position: 'fixed',
-      inset: '0',
+      top: '0',
+      left: '0',
       width: '100vw',
       height: '100vh',
       objectFit: 'cover',
-      filter: 'blur(34px) brightness(0.58) saturate(1.35)',
-      transform: 'scale(1.24)',
-      opacity: '0.92',
-      zIndex: '1',
+      filter: 'blur(28px) brightness(0.75) saturate(1.35)',
+      transform: 'scale(1.25)',
+      opacity: '1',
+      zIndex: '2',
       pointerEvents: 'none'
     });
 
@@ -206,7 +207,7 @@
       borderRadius: '18px',
       overflow: 'hidden',
       zIndex: '5',
-      background: '#000',
+      background: 'rgba(0,0,0,0.55)',
       boxShadow:
         '0 0 0 2px rgba(212,175,55,0.85), 0 0 44px rgba(212,175,55,0.45), 0 0 80px rgba(0,0,0,0.9)'
     });
