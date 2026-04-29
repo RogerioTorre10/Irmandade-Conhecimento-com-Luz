@@ -431,10 +431,6 @@
     bindIntroAdvance(root);
 
     console.log('[Intro] Idioma confirmado. Typing será conduzido pelo controller global.');
-
-    setTimeout(() => fixarAuraIntro(root), 1800);
-    setTimeout(() => fixarAuraIntro(root), 3600);
-    setTimeout(() => fixarAuraIntro(root), 6200);
   }
 
   function bind() {
