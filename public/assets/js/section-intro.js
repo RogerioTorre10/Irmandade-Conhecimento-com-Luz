@@ -395,24 +395,7 @@
       playIntroTransitionToTermos1();
     });
   }
-
-  function fixarAuraIntro(root) {
-  const scope = root || getRoot();
-  if (!scope) return;
-
-  scope.querySelectorAll('[data-typing="true"], .intro-title, .typing-text, .parchment-text-rough')
-    .forEach((el) => {
-      el.classList.remove('typing-active');
-      el.classList.add('typing-done');
-      el.classList.add('type-done');
-      el.dataset.typingDone = '1';
-      el.style.opacity = '1';
-      el.style.visibility = 'visible';
-      el.style.position = el.style.position || 'relative';
-    });
-
-  console.log('[Intro] Áurea final fixada.');
-}
+ 
 
   async function init(root) {
     if (!root) return;
