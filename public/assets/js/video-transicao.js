@@ -134,6 +134,10 @@
     document.documentElement.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
 
+    document.getElementById('videoOverlay')?.remove();
+    document.getElementById('global-video-overlay')?.remove();
+    document.getElementById('vt-overlay')?.remove();
+
     const overlay = document.createElement('div');
     overlay.id = 'vt-overlay';
     overlay.className = 'jp-video-overlay';
