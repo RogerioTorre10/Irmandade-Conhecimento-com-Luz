@@ -1,20 +1,21 @@
-// /assets/js/video-transicao.js — PORTAL DOURADO + GLAMOUR + LIMELIGHT (versão final cinematográfica)
+// /assets/js/video-transicao.js — PORTAL DOURADO + AMBIENT BLUR FULLSCREEN BLINDADO
 (function () {
   'use strict';
 
   const NS = '[VIDEO_TRANSICAO]';
-  const log  = (...a) => console.log(NS, ...a);
+  const log = (...a) => console.log(NS, ...a);
   const warn = (...a) => console.warn(NS, ...a);
 
   let isPlaying = false;
-  let cleaned   = false;
 
-  // ----------------------------- UTILIDADES -----------------------------
   const isMp4 = (src) => /\.mp4(\?|#|$)/i.test(src || '');
 
   const resolveHref = (src) => {
-    try { return new URL(src, window.location.origin).href; }
-    catch { return src; }
+    try {
+      return new URL(src, window.location.origin).href;
+    } catch {
+      return src;
+    }
   };
 
   function navigateTo(nextSectionId) {
@@ -35,73 +36,130 @@
     return (...args) => {
       if (done) return;
       done = true;
-      try { fn(...args); } catch (e) { warn('Erro no safeOnce:', e); }
+      try {
+        fn(...args);
+      } catch (e) {
+        warn('Erro no safeOnce:', e);
+      }
     };
   }
 
   function onKeydown(e) {
     if (e.key === 'Escape') {
       log('Vídeo pulado pelo usuário (Esc)');
-      const overlay = document.getElementById('vt-overlay');
-      cleanup(overlay);
+      cleanup();
     }
   }
 
-  // Ajusta moldura à proporção real do vídeo (sem fullscreen nativo)
   function fitFrameToVideo(frame, video) {
-    const vw = window.innerWidth  * 0.96;
-    const vh = window.innerHeight * 0.96;
+    if (!frame || !video) return;
 
-    // fallback inicial (16:9) se metadata ainda não carregou
-    const w = video.videoWidth  || 16;
-    const h = video.videoHeight ||  9;
+    const vw = window.innerWidth * 0.94;
+    const vh = window.innerHeight * 0.74;
 
+    const w = video.videoWidth || 16;
+    const h = video.videoHeight || 9;
     const ar = w / h;
 
-    let width, height;
+    let width;
+    let height;
+
     if (vw / ar <= vh) {
-      width  = vw;
+      width = vw;
       height = vw / ar;
     } else {
       height = vh;
-      width  = vh * ar;
+      width = vh * ar;
     }
 
-    frame.style.width  = Math.round(width)  + 'px';
+    frame.style.width = Math.round(width) + 'px';
     frame.style.height = Math.round(height) + 'px';
   }
 
-  // ---------------------------- LIMPEZA --------------------------------
-  function cleanup(overlay) {
-    if (cleaned) return;
-    cleaned = true;
-
+  function cleanup() {
     try {
-      document.removeEventListener('keydown', onKeydown, true);
-      window.__TRANSITION_LOCK = false;
-      document.dispatchEvent(new CustomEvent('transition:ended'));
-      document.documentElement.style.overflow = '';
-      if (overlay?.parentNode) overlay.parentNode.removeChild(overlay);
-    } catch {}
+      const overlay = document.getElementById('vt-overlay');
+      const frame = document.getElementById('vt-frame');
+      const video = document.getElementById('vt-video');
+      const ambient = document.getElementById('vt-ambient');
+      const veil = document.getElementById('vt-veil');
 
-    isPlaying = false;
-    log('Overlay removido e estado resetado');
+      try {
+        if (video) {
+          video.pause();
+          video.removeAttribute('src');
+          video.load();
+        }
+      } catch (_) {}
+
+      try {
+        if (ambient) {
+          ambient.pause();
+          ambient.removeAttribute('src');
+          ambient.load();
+        }
+      } catch (_) {}
+
+      try { video?.remove(); } catch (_) {}
+      try { ambient?.remove(); } catch (_) {}
+      try { veil?.remove(); } catch (_) {}
+      try { frame?.remove(); } catch (_) {}
+      try { overlay?.remove(); } catch (_) {}
+
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+
+      document.removeEventListener('keydown', onKeydown, true);
+
+      window.__TRANSITION_LOCK = false;
+      window.JORNADA_TRANSICAO_ATIVA = false;
+      isPlaying = false;
+
+      document.dispatchEvent(new CustomEvent('transition:ended'));
+      window.dispatchEvent(new CustomEvent('jornada:transicao:end'));
+
+      log('Overlay removido e estado resetado');
+    } catch (e) {
+      warn('Erro no cleanup:', e);
+    }
   }
 
-  // -------------------------- PORTAL DOURADO ---------------------------
   function buildPortal() {
-    // Overlay escuro
+    cleanup();
+
+    window.__TRANSITION_LOCK = true;
+    window.JORNADA_TRANSICAO_ATIVA = true;
+    window.dispatchEvent(new CustomEvent('jornada:transicao:start'));
+
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+
+    document.getElementById('videoOverlay')?.remove();
+    document.getElementById('global-video-overlay')?.remove();
+    document.getElementById('vt-overlay')?.remove();
+
     const overlay = document.createElement('div');
     overlay.id = 'vt-overlay';
     overlay.className = 'jp-video-overlay';
     overlay.setAttribute('role', 'dialog');
 
-    // Moldura dourada
-    const frame = document.createElement('div');
-    frame.className = 'jp-video-frame';
+    Object.assign(overlay.style, {
+      position: 'fixed',
+      inset: '0',
+      width: '100vw',
+      height: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: 'rgba(0,0,0,0.35)',
+      zIndex: '2147483647',
+      overflow: 'hidden',
+      opacity: '1',
+      transition: 'opacity 600ms ease'
+    });
 
-    // Vídeo ambiente (limelight)
     const ambient = document.createElement('video');
+    ambient.id = 'vt-ambient';
     ambient.className = 'jp-video-ambient';
     ambient.playsInline = true;
     ambient.autoplay = false;
@@ -110,41 +168,106 @@
     ambient.loop = true;
     ambient.preload = 'auto';
 
-    // Vídeo principal (cenário completo)
+    Object.assign(ambient.style, {
+      position: 'fixed',
+      top: '0',
+      left: '0',
+      width: '100vw',
+      height: '100vh',
+      objectFit: 'cover',
+      filter: 'blur(28px) brightness(0.75) saturate(1.35)',
+      transform: 'scale(1.25)',
+      opacity: '1',
+      zIndex: '2',
+      pointerEvents: 'none'
+    });
+
+    const veil = document.createElement('div');
+    veil.id = 'vt-veil';
+    Object.assign(veil.style, {
+      position: 'fixed',
+      inset: '0',
+      zIndex: '2',
+      pointerEvents: 'none',
+      background:
+        'radial-gradient(circle at center, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.32) 58%, rgba(0,0,0,0.72) 100%)'
+    });
+
+    const frame = document.createElement('div');
+    frame.id = 'vt-frame';
+    frame.className = 'jp-video-frame';
+
+    Object.assign(frame.style, {
+      position: 'relative',
+      display: 'block',
+      width: 'min(94vw, 1180px)',
+      height: 'min(74vh, 660px)',
+      maxWidth: '94vw',
+      maxHeight: '74vh',
+      borderRadius: '18px',
+      overflow: 'hidden',
+      zIndex: '5',
+      background: 'rgba(0,0,0,0.55)',
+      boxShadow:
+        '0 0 0 2px rgba(212,175,55,0.85), 0 0 44px rgba(212,175,55,0.45), 0 0 80px rgba(0,0,0,0.9)'
+    });
+
     const video = document.createElement('video');
     video.id = 'vt-video';
+    video.className = 'jp-video-main';
     video.playsInline = true;
     video.autoplay = false;
     video.controls = false;
-    video.muted = true;       // autoplay confiável
+    video.muted = true;
     video.preload = 'auto';
 
-    // Injeta vídeos dentro da moldura
-    frame.appendChild(ambient); // fundo primeiro
-    frame.appendChild(video);   // principal por cima
+    Object.assign(video.style, {
+      position: 'absolute',
+      inset: '0',
+      width: '100%',
+      height: '100%',
+      objectFit: 'contain',
+      zIndex: '6',
+      background: '#000'
+    });
 
-    // Botão “Pular”
     const skip = document.createElement('button');
+    skip.id = 'vt-skip';
     skip.textContent = 'Pular';
     skip.setAttribute('aria-label', 'Pular vídeo');
     skip.className = 'jp-video-skip';
+
+    Object.assign(skip.style, {
+      position: 'absolute',
+      top: '14px',
+      right: '14px',
+      zIndex: '10',
+      padding: '8px 14px',
+      borderRadius: '999px',
+      border: '1px solid rgba(255,215,0,0.85)',
+      cursor: 'pointer',
+      background: 'rgba(0,0,0,0.72)',
+      color: '#ffd700',
+      boxShadow: '0 0 14px rgba(255,215,0,0.32)'
+    });
+
+    frame.appendChild(video);
     frame.appendChild(skip);
 
-    // Adiciona frame e overlay no body
+    overlay.appendChild(ambient);
+    overlay.appendChild(veil);
     overlay.appendChild(frame);
+
     document.body.appendChild(overlay);
 
-    // Glamour: portal aparece suave
     requestAnimationFrame(() => overlay.classList.add('show'));
 
     return { overlay, frame, video, ambient, skip };
   }
 
-  // ------------------------- PLAYER PRINCIPAL ---------------------------
   function playTransitionVideo(src, nextSectionId) {
     log('Recebido src:', src, 'nextSectionId:', nextSectionId);
 
-    // Se não for MP4 → navega direto
     if (!src || !isMp4(src)) {
       warn('Fonte não é MP4 (ou ausente). Pulando player e navegando direto…');
       navigateTo(nextSectionId);
@@ -157,71 +280,79 @@
     }
 
     isPlaying = true;
-    cleaned = false;
 
-    // Glamour: some a página antes do filme
     document.body.classList.remove('vt-fade-in');
     document.body.classList.add('vt-fade-out');
 
-    // 🔒 trava transições e cancela TTS
-    window.__TRANSITION_LOCK = true;
-    document.dispatchEvent(new CustomEvent('transition:started'));
     try { window.speechSynthesis?.cancel(); } catch {}
-    document.documentElement.style.overflow = 'hidden';
 
     const href = resolveHref(src);
     log('Vídeo resolvido para:', href);
 
     const { overlay, frame, video, ambient, skip } = buildPortal();
 
-    // fallback imediato para evitar "barra dourada"
     fitFrameToVideo(frame, { videoWidth: 16, videoHeight: 9 });
 
-    // Ajuste responsivo do frame ao vídeo
     const onResize = () => fitFrameToVideo(frame, video);
     window.addEventListener('resize', onResize);
 
     const finishAndGo = safeOnce(() => {
       window.removeEventListener('resize', onResize);
-      try { ambient.pause(); } catch {}
 
-      // Glamour: portal sai suave
+      try { ambient.pause(); } catch (_) {}
+
       overlay.classList.remove('show');
       overlay.classList.add('hide');
+      overlay.style.opacity = '0';
 
       setTimeout(() => {
-        cleanup(overlay);
         navigateTo(nextSectionId);
 
-        // Glamour: nova página entra suave
-        document.body.classList.remove('vt-fade-out');
-        document.body.classList.add('vt-fade-in');
-        setTimeout(() => document.body.classList.remove('vt-fade-in'), 650);
-      }, 360);
+        requestAnimationFrame(() => {
+          cleanup();
+          document.body.classList.remove('vt-fade-out');
+          document.body.classList.add('vt-fade-in');
+          setTimeout(() => document.body.classList.remove('vt-fade-in'), 650);
+        });
+      }, 620);
     });
 
     skip.addEventListener('click', finishAndGo);
+
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) finishAndGo();
     });
+
     document.addEventListener('keydown', onKeydown, true);
 
-    // EVENTOS
-    const onCanPlay = safeOnce(() => {
-      log('Vídeo carregado, iniciando reprodução:', href);
+    const tryPlayBoth = async () => {
+      try { ambient.currentTime = 0; } catch (_) {}
+      try { video.currentTime = 0; } catch (_) {}
 
-      // moldura abraça proporção real
-      try { fitFrameToVideo(frame, video); } catch {}
+      try {
+        await ambient.play();
+        log('Ambient tocando.');
+      } catch (err) {
+        warn('Falha ao tocar ambient:', err?.message || err);
+      }
 
-      // toca fundo + principal
-      ambient.play().catch(()=>{});
-      video.play().catch(err => {
-        warn('Falha ao dar play (autoplay?):', err);
+      try {
+        await video.play();
+        log('Vídeo principal tocando.');
+      } catch (err) {
+        warn('Falha ao tocar vídeo principal:', err?.message || err);
         video.muted = true;
         ambient.muted = true;
-        ambient.play().catch(()=>{});
-        video.play().catch(() => warn('Play ainda bloqueado.'));
-      });
+
+        try { await ambient.play(); } catch (_) {}
+        try { await video.play(); } catch (_) {}
+      }
+    };
+
+    const onCanPlay = safeOnce(() => {
+      log('Vídeo carregado, iniciando reprodução:', href);
+      try { fitFrameToVideo(frame, video); } catch (_) {}
+      tryPlayBoth();
     });
 
     const onEnded = safeOnce(() => {
@@ -240,16 +371,28 @@
     video.addEventListener('ended', onEnded, { once: true });
     video.addEventListener('error', onError, { once: true });
 
-    // Cache-buster para evitar travas de Range/codec
     const finalSrc = href + (href.includes('?') ? '&' : '?') + 't=' + Date.now();
+
     video.src = finalSrc;
     ambient.src = finalSrc;
 
     video.load();
     ambient.load();
+
+    setTimeout(() => {
+      if (!video.paused) return;
+      warn('Fallback play acionado.');
+      tryPlayBoth();
+    }, 800);
+
+    setTimeout(() => {
+      if (isPlaying) {
+        warn('Timeout de segurança da transição.');
+        finishAndGo();
+      }
+    }, 18000);
   }
 
-  // ----------------- API PÚBLICA -----------------
   window.playTransitionVideo = playTransitionVideo;
 
   window.playTransition = function (nextSectionId) {
@@ -257,4 +400,47 @@
     navigateTo(nextSectionId);
   };
 
+  (function ensurePlayBlockTransition() {
+    if (typeof window.playBlockTransition === 'function') return;
+
+    if (typeof window.playTransitionVideo !== 'function') {
+      warn('playTransitionVideo não disponível; playBlockTransition não instalado.');
+      window.playBlockTransition = function (_videoSrc, done) {
+        if (typeof done === 'function') done();
+      };
+      return;
+    }
+
+    window.playBlockTransition = function (videoSrc, done) {
+      let called = false;
+
+      const finish = () => {
+        if (called) return;
+        called = true;
+        if (typeof done === 'function') done();
+      };
+
+      const onEnded = () => {
+        document.removeEventListener('transition:ended', onEnded, true);
+        finish();
+      };
+
+      document.addEventListener('transition:ended', onEnded, true);
+
+      try {
+        window.playTransitionVideo(videoSrc, null);
+      } catch (e) {
+        document.removeEventListener('transition:ended', onEnded, true);
+        warn('Falha ao iniciar playTransitionVideo:', e);
+        finish();
+      }
+
+      setTimeout(() => {
+        document.removeEventListener('transition:ended', onEnded, true);
+        finish();
+      }, 19000);
+    };
+
+    log('playBlockTransition instalado (runner de blocos).');
+  })();
 })();
