@@ -72,74 +72,157 @@
   }
 
   // ---------------------------- LIMPEZA --------------------------------
-  function cleanup(overlay) {
-    if (cleaned) return;
-    cleaned = true;
+ function cleanup() {
+  try {
+    const overlay = document.getElementById('vt-overlay');
+    const video = document.getElementById('vt-video');
+    const ambient = document.getElementById('vt-ambient');
+    const frame = document.getElementById('vt-frame');
 
-    try {
-      document.removeEventListener('keydown', onKeydown, true);
-      window.__TRANSITION_LOCK = false;
-      document.dispatchEvent(new CustomEvent('transition:ended'));
-      document.documentElement.style.overflow = '';
-      if (overlay?.parentNode) overlay.parentNode.removeChild(overlay);
-    } catch {}
+    try { if (video) { video.pause(); video.removeAttribute('src'); video.load(); } } catch (e) {}
+    try { if (ambient) { ambient.pause(); ambient.removeAttribute('src'); ambient.load(); } } catch (e) {}
 
-    isPlaying = false;
+    try { video?.remove(); } catch (e) {}
+    try { ambient?.remove(); } catch (e) {}
+    try { frame?.remove(); } catch (e) {}
+    try { overlay?.remove(); } catch (e) {}
+
+    document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
+
     log('Overlay removido e estado resetado');
+  } catch (e) {
+    warn('Erro no cleanup:', e);
   }
+}
 
   // -------------------------- PORTAL DOURADO ---------------------------
-  function buildPortal() {
-    // Overlay escuro
-    const overlay = document.createElement('div');
-    overlay.id = 'vt-overlay';
-    overlay.className = 'jp-video-overlay';
-    overlay.setAttribute('role', 'dialog');
+function buildPortal() {
+  // Overlay escuro (FULLSCREEN de verdade, independente de CSS externo)
+  const overlay = document.createElement('div');
+  overlay.id = 'vt-overlay';
+  overlay.className = 'jp-video-overlay';
+  overlay.setAttribute('role', 'dialog');
 
-    // Moldura dourada
-    const frame = document.createElement('div');
-    frame.className = 'jp-video-frame';
+  Object.assign(overlay.style, {
+    position: 'fixed',
+    inset: '0',
+    width: '100vw',
+    height: '100vh',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    background: 'rgba(0,0,0,0.88)',
+    zIndex: '2147483647',        // acima de tudo
+    overflow: 'hidden'
+  });
 
-    // Vídeo ambiente (limelight)
-    const ambient = document.createElement('video');
-    ambient.className = 'jp-video-ambient';
-    ambient.playsInline = true;
-    ambient.autoplay = false;
-    ambient.controls = false;
-    ambient.muted = true;
-    ambient.loop = true;
-    ambient.preload = 'auto';
+  // Moldura dourada (container central)
+  const frame = document.createElement('div');
+  frame.className = 'jp-video-frame';
 
-    // Vídeo principal (cenário completo)
-    const video = document.createElement('video');
-    video.id = 'vt-video';
-    video.playsInline = true;
-    video.autoplay = false;
-    video.controls = false;
-    video.muted = true;       // autoplay confiável
-    video.preload = 'auto';
+  Object.assign(frame.style, {
+    position: 'relative',
+    display: 'block',
+    maxWidth: '96vw',
+    maxHeight: '96vh',
+    borderRadius: '18px',
+    overflow: 'hidden'
+  });
 
-    // Injeta vídeos dentro da moldura
-    frame.appendChild(ambient); // fundo primeiro
-    frame.appendChild(video);   // principal por cima
+  // Vídeo ambiente (limelight)
+  const ambient = document.createElement('video');
+  ambient.className = 'jp-video-ambient';
+  ambient.playsInline = true;
+  ambient.autoplay = false;
+  ambient.controls = false;
+  ambient.muted = true;
+  ambient.loop = true;
+  ambient.preload = 'auto';
 
-    // Botão “Pular”
+  Object.assign(ambient.style, {
+    position: 'absolute',
+    inset: '0',
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    filter: 'blur(18px) brightness(0.7)',
+    transform: 'scale(1.08)',
+    opacity: '0.9'
+  });
+
+  // Vídeo principal
+   const video = document.createElement('video');
+   video.id = 'vt-video';
+
+let globalOverlay = document.getElementById('vt-overlay');
+
+if (!globalOverlay) {
+  globalOverlay = document.createElement('div');
+  globalOverlay.id = 'vt-overlay';
+
+  Object.assign(globalOverlay.style, {
+    position: 'fixed',
+    top: '0',
+    left: '0',
+    width: '100vw',
+    height: '100vh',
+    background: 'black',
+    zIndex: '999999',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  });
+
+  document.body.appendChild(globalOverlay);
+}
+    
+   video.playsInline = true;
+   video.autoplay = false;
+   video.controls = false;
+   video.muted = true;
+   video.preload = 'auto';
+
+  Object.assign(video.style, {
+    position: 'absolute',
+    inset: '0',
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover'
+  });
+
+    frame.appendChild(ambient);
+    frame.appendChild(video);
+    globalOverlay.appendChild(frame);
+
+  // Botão “Pular”
     const skip = document.createElement('button');
     skip.textContent = 'Pular';
     skip.setAttribute('aria-label', 'Pular vídeo');
     skip.className = 'jp-video-skip';
-    frame.appendChild(skip);
 
-    // Adiciona frame e overlay no body
-    overlay.appendChild(frame);
-    document.body.appendChild(overlay);
+  Object.assign(skip.style, {
+    position: 'absolute',
+    top: '14px',
+    right: '14px',
+    zIndex: '3',
+    padding: '8px 14px',
+    borderRadius: '999px',
+    border: '0',
+    cursor: 'pointer'
+  });
 
-    // Glamour: portal aparece suave
-    requestAnimationFrame(() => overlay.classList.add('show'));
+  frame.appendChild(skip);
 
-    return { overlay, frame, video, ambient, skip };
-  }
+  // Anexa no body por último (garante que fica acima)
+  overlay.appendChild(frame);
+  document.documentElement.appendChild(overlay);
+  
+  // Glamour: portal aparece suave (mantém seu CSS se existir)
+  requestAnimationFrame(() => overlay.classList.add('show'));
 
+  return { overlay, frame, video, ambient, skip };
+}
   // ------------------------- PLAYER PRINCIPAL ---------------------------
   function playTransitionVideo(src, nextSectionId) {
     log('Recebido src:', src, 'nextSectionId:', nextSectionId);
@@ -256,5 +339,83 @@
     log('Transição simples (sem vídeo) para:', nextSectionId);
     navigateTo(nextSectionId);
   };
+  /* ======================================================================================
+ * BLOCO: Runner global para transição ENTRE BLOCOS (section-perguntas)
+ * - Garante window.playBlockTransition(videoSrc, done)
+ * - Reusa o motor do video-transicao.js (playTransitionVideo) sem navegar (nextSectionId = null)
+ * ====================================================================================== */
+(function ensurePlayBlockTransition() {
+  // se já existe e é função, não mexe
+  if (typeof window.playBlockTransition === 'function') return;
+
+  // precisamos do motor do video-transicao.js
+  if (typeof window.playTransitionVideo !== 'function') {
+    console.warn('[VIDEO_TRANSICAO] playTransitionVideo não disponível; playBlockTransition não instalado.');
+    // fallback “no-op” para não quebrar fluxo
+    window.playBlockTransition = function (_videoSrc, done) {
+      if (typeof done === 'function') done();
+    };
+    return;
+  }
+
+  // instala com blindagem (sem quebrar se alguém travou a prop)
+  const install = function () {
+    window.playBlockTransition = function (videoSrc, done) {
+      let called = false;
+
+      const finish = () => {
+        if (called) return;
+        called = true;
+        if (typeof done === 'function') done();
+      };
+
+      // garante que finaliza quando a transição realmente “encerra”
+      const onEnded = () => {
+        document.removeEventListener('transition:ended', onEnded, true);
+        finish();
+      };
+
+      document.addEventListener('transition:ended', onEnded, true);
+
+      try {
+        // roda o vídeo SEM navegar (nextSectionId = null)
+        window.playTransitionVideo(videoSrc, null);
+      } catch (e) {
+        document.removeEventListener('transition:ended', onEnded, true);
+        console.warn('[VIDEO_TRANSICAO] Falha ao iniciar playTransitionVideo:', e);
+        finish();
+      }
+
+      // segurança: se por algum motivo o evento não vier, não trava
+      setTimeout(() => {
+        document.removeEventListener('transition:ended', onEnded, true);
+        finish();
+      }, 12000);
+    };
+
+    console.log('[VIDEO_TRANSICAO] playBlockTransition instalado (runner de blocos).');
+  };
+
+  try {
+    // tenta instalar com defineProperty (mais estável contra overwrite acidental)
+    Object.defineProperty(window, 'playBlockTransition', {
+      value: undefined,
+      writable: true,
+      configurable: true,
+      enumerable: true
+    });
+    install();
+  } catch (_) {
+    // se a propriedade estiver “travada”, faz atribuição simples (ou fallback no-op)
+    try {
+      install();
+    } catch (e2) {
+      console.warn('[VIDEO_TRANSICAO] Não foi possível instalar playBlockTransition:', e2);
+      window.playBlockTransition = function (_videoSrc, done) {
+        if (typeof done === 'function') done();
+      };
+    }
+  }
+})();
 
 })();
