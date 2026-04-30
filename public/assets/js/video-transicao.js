@@ -1,4 +1,4 @@
-// /assets/js/video-transicao.js — PORTAL ARCANUM FULL + LIMELIGHT (FINAL)
+// /assets/js/video-transicao.js — PORTAL DOURADO + GLAMOUR + LIMELIGHT (versão final cinematográfica)
 (function () {
   'use strict';
 
@@ -7,12 +7,11 @@
   const warn = (...a) => console.warn(NS, ...a);
 
   let isPlaying = false;
-  let cleaned = false;
-// trava scroll do ROOT durante a transição (evita “vazar” e evita pulo)
-let prevScroll = null;
+  let cleaned   = false;
 
   // ----------------------------- UTILIDADES -----------------------------
   const isMp4 = (src) => /\.mp4(\?|#|$)/i.test(src || '');
+
   const resolveHref = (src) => {
     try { return new URL(src, window.location.origin).href; }
     catch { return src; }
@@ -48,6 +47,30 @@ let prevScroll = null;
     }
   }
 
+  // Ajusta moldura à proporção real do vídeo (sem fullscreen nativo)
+  function fitFrameToVideo(frame, video) {
+    const vw = window.innerWidth  * 0.96;
+    const vh = window.innerHeight * 0.96;
+
+    // fallback inicial (16:9) se metadata ainda não carregou
+    const w = video.videoWidth  || 16;
+    const h = video.videoHeight ||  9;
+
+    const ar = w / h;
+
+    let width, height;
+    if (vw / ar <= vh) {
+      width  = vw;
+      height = vw / ar;
+    } else {
+      height = vh;
+      width  = vh * ar;
+    }
+
+    frame.style.width  = Math.round(width)  + 'px';
+    frame.style.height = Math.round(height) + 'px';
+  }
+
   // ---------------------------- LIMPEZA --------------------------------
   function cleanup(overlay) {
     if (cleaned) return;
@@ -57,23 +80,7 @@ let prevScroll = null;
       document.removeEventListener('keydown', onKeydown, true);
       window.__TRANSITION_LOCK = false;
       document.dispatchEvent(new CustomEvent('transition:ended'));
-// restaura travas de scroll (se houver)
-if (prevScroll) {
-  document.body.style.position = prevScroll.bodyPosition || '';
-  document.body.style.top = prevScroll.bodyTop || '';
-  document.body.style.width = prevScroll.bodyWidth || '';
-  document.body.style.height = prevScroll.bodyHeight || '';
-  document.body.style.overflow = prevScroll.bodyOverflow || '';
-
-  document.documentElement.style.overflow = prevScroll.htmlOverflow || '';
-  document.documentElement.style.height = prevScroll.htmlHeight || '';
-
-  // volta para o scroll exato
-  window.scrollTo(0, prevScroll.scrollY || 0);
-  prevScroll = null;
-} else {
-  document.documentElement.style.overflow = '';
-}
+      document.documentElement.style.overflow = '';
       if (overlay?.parentNode) overlay.parentNode.removeChild(overlay);
     } catch {}
 
@@ -81,78 +88,53 @@ if (prevScroll) {
     log('Overlay removido e estado resetado');
   }
 
-  // -------------------------- PORTAL ARCANUM ---------------------------
-  function buildOverlay() {
+  // -------------------------- PORTAL DOURADO ---------------------------
+  function buildPortal() {
+    // Overlay escuro
     const overlay = document.createElement('div');
     overlay.id = 'vt-overlay';
     overlay.className = 'jp-video-overlay';
     overlay.setAttribute('role', 'dialog');
 
+    // Moldura dourada
     const frame = document.createElement('div');
     frame.className = 'jp-video-frame';
 
-    // vídeo principal (miolo)
-    const video = document.createElement('video');
-    video.id = 'vt-video';
-    video.playsInline = true;
-    video.autoplay = false;
-    video.controls = false;
-    video.muted = true;
-    video.preload = 'auto';
-    video.className = 'jp-video-core';
-
-    // “reflexo” desfocado pra preencher topo/baixo
+    // Vídeo ambiente (limelight)
     const ambient = document.createElement('video');
     ambient.className = 'jp-video-ambient';
     ambient.playsInline = true;
     ambient.autoplay = false;
     ambient.controls = false;
     ambient.muted = true;
+    ambient.loop = true;
     ambient.preload = 'auto';
 
-    // botão pular
-    // força fullscreen real (blindagem contra CSS externo)
-const S = (el, prop, val) => el.style.setProperty(prop, val, 'important');
+    // Vídeo principal (cenário completo)
+    const video = document.createElement('video');
+    video.id = 'vt-video';
+    video.playsInline = true;
+    video.autoplay = false;
+    video.controls = false;
+    video.muted = true;       // autoplay confiável
+    video.preload = 'auto';
 
-S(overlay, 'position', 'fixed');
-S(overlay, 'inset', '0');
-S(overlay, 'width', '100vw');
-S(overlay, 'height', '100vh');
-S(overlay, 'z-index', '2147483647');
-S(overlay, 'background', '#000');
-S(overlay, 'pointer-events', 'auto');
+    // Injeta vídeos dentro da moldura
+    frame.appendChild(ambient); // fundo primeiro
+    frame.appendChild(video);   // principal por cima
 
-S(frame, 'position', 'absolute');
-S(frame, 'inset', '0');
-S(frame, 'width', '100%');
-S(frame, 'height', '100%');
-
-S(video, 'position', 'absolute');
-S(video, 'inset', '0');
-S(video, 'width', '100%');
-S(video, 'height', '100%');
-S(video, 'object-fit', 'cover');
-S(video, 'object-position', 'center');
-
-S(ambient, 'position', 'absolute');
-S(ambient, 'inset', '0');
-S(ambient, 'width', '100%');
-S(ambient, 'height', '100%');
-S(ambient, 'object-fit', 'cover');
-S(ambient, 'object-position', 'center');
-
+    // Botão “Pular”
     const skip = document.createElement('button');
     skip.textContent = 'Pular';
     skip.setAttribute('aria-label', 'Pular vídeo');
     skip.className = 'jp-video-skip';
-
-    frame.appendChild(ambient);
-    frame.appendChild(video);
     frame.appendChild(skip);
+
+    // Adiciona frame e overlay no body
     overlay.appendChild(frame);
     document.body.appendChild(overlay);
 
-    // glamour fade-in do portal
+    // Glamour: portal aparece suave
     requestAnimationFrame(() => overlay.classList.add('show'));
 
     return { overlay, frame, video, ambient, skip };
@@ -162,6 +144,7 @@ S(ambient, 'object-position', 'center');
   function playTransitionVideo(src, nextSectionId) {
     log('Recebido src:', src, 'nextSectionId:', nextSectionId);
 
+    // Se não for MP4 → navega direto
     if (!src || !isMp4(src)) {
       warn('Fonte não é MP4 (ou ausente). Pulando player e navegando direto…');
       navigateTo(nextSectionId);
@@ -174,28 +157,6 @@ S(ambient, 'object-position', 'center');
     }
 
     isPlaying = true;
-
-// trava scroll do ROOT (evita “vazar” e evita pulo)
-const scrollY = window.scrollY || window.pageYOffset || 0;
-prevScroll = {
-  scrollY,
-  htmlOverflow: document.documentElement.style.overflow,
-  htmlHeight: document.documentElement.style.height,
-  bodyOverflow: document.body.style.overflow,
-  bodyPosition: document.body.style.position,
-  bodyTop: document.body.style.top,
-  bodyWidth: document.body.style.width,
-  bodyHeight: document.body.style.height
-};
-
-document.documentElement.style.overflow = 'hidden';
-document.documentElement.style.height = '100%';
-
-document.body.style.overflow = 'hidden';
-document.body.style.position = 'fixed';
-document.body.style.top = `-${scrollY}px`;
-document.body.style.width = '100%';
-document.body.style.height = '100%';
     cleaned = false;
 
     // Glamour: some a página antes do filme
@@ -206,66 +167,37 @@ document.body.style.height = '100%';
     window.__TRANSITION_LOCK = true;
     document.dispatchEvent(new CustomEvent('transition:started'));
     try { window.speechSynthesis?.cancel(); } catch {}
+    document.documentElement.style.overflow = 'hidden';
 
     const href = resolveHref(src);
     log('Vídeo resolvido para:', href);
 
-    const { overlay, video, ambient, skip } = buildOverlay();
+    const { overlay, frame, video, ambient, skip } = buildPortal();
 
-    // Cache-buster (mesmo src pros dois)
-    const finalSrc = href + (href.includes('?') ? '&' : '?') + 't=' + Date.now();
-    video.src = finalSrc;
-    ambient.src = finalSrc;
+    // fallback imediato para evitar "barra dourada"
+    fitFrameToVideo(frame, { videoWidth: 16, videoHeight: 9 });
 
-    // ---------------- EVENTOS (SÓ 1 onCanPlay!) ----------------
-    const onCanPlay = safeOnce(() => {
-      log('Vídeo carregado, iniciando reprodução:', finalSrc);
-
-      // limelight: cor do guia no overlay (se já escolhido)
-      try {
-        const g =
-          window.JC?.state?.guia ||
-          window.selectedGuide ||
-          localStorage.getItem('guiaEscolhido');
-        if (g) overlay.setAttribute('data-guia', g);
-      } catch {}
-
-      // luz viva enquanto toca
-      try { window.Luz?.startPulse({ min: 1, max: 1.5, speed: 120 }); } catch {}
-
-      // play core + reflexo
-      video.play().catch(err => {
-        warn('Falha ao dar play (autoplay?):', err);
-        video.muted = true;
-        video.play().catch(() => warn('Play ainda bloqueado.'));
-      });
-      ambient.play().catch(() => {});
-    });
+    // Ajuste responsivo do frame ao vídeo
+    const onResize = () => fitFrameToVideo(frame, video);
+    window.addEventListener('resize', onResize);
 
     const finishAndGo = safeOnce(() => {
+      window.removeEventListener('resize', onResize);
+      try { ambient.pause(); } catch {}
+
+      // Glamour: portal sai suave
       overlay.classList.remove('show');
       overlay.classList.add('hide');
 
       setTimeout(() => {
-        try { window.Luz?.stopPulse(); } catch {}
         cleanup(overlay);
         navigateTo(nextSectionId);
 
-        // glamour fade-in na página nova
+        // Glamour: nova página entra suave
         document.body.classList.remove('vt-fade-out');
         document.body.classList.add('vt-fade-in');
         setTimeout(() => document.body.classList.remove('vt-fade-in'), 650);
       }, 360);
-    });
-
-    const onEnded = safeOnce(() => {
-      log('Vídeo finalizado:', finalSrc);
-      finishAndGo();
-    });
-
-    const onError = safeOnce((ev) => {
-      warn('Erro ao carregar vídeo:', finalSrc, ev);
-      finishAndGo();
     });
 
     skip.addEventListener('click', finishAndGo);
@@ -274,10 +206,44 @@ document.body.style.height = '100%';
     });
     document.addEventListener('keydown', onKeydown, true);
 
+    // EVENTOS
+    const onCanPlay = safeOnce(() => {
+      log('Vídeo carregado, iniciando reprodução:', href);
+
+      // moldura abraça proporção real
+      try { fitFrameToVideo(frame, video); } catch {}
+
+      // toca fundo + principal
+      ambient.play().catch(()=>{});
+      video.play().catch(err => {
+        warn('Falha ao dar play (autoplay?):', err);
+        video.muted = true;
+        ambient.muted = true;
+        ambient.play().catch(()=>{});
+        video.play().catch(() => warn('Play ainda bloqueado.'));
+      });
+    });
+
+    const onEnded = safeOnce(() => {
+      log('Vídeo finalizado:', href);
+      finishAndGo();
+    });
+
+    const onError = safeOnce((ev) => {
+      warn('Erro ao carregar vídeo:', href, ev);
+      finishAndGo();
+    });
+
+    video.addEventListener('loadedmetadata', () => fitFrameToVideo(frame, video), { once: true });
     video.addEventListener('canplaythrough', onCanPlay, { once: true });
     video.addEventListener('loadeddata', onCanPlay, { once: true });
     video.addEventListener('ended', onEnded, { once: true });
     video.addEventListener('error', onError, { once: true });
+
+    // Cache-buster para evitar travas de Range/codec
+    const finalSrc = href + (href.includes('?') ? '&' : '?') + 't=' + Date.now();
+    video.src = finalSrc;
+    ambient.src = finalSrc;
 
     video.load();
     ambient.load();
@@ -290,4 +256,5 @@ document.body.style.height = '100%';
     log('Transição simples (sem vídeo) para:', nextSectionId);
     navigateTo(nextSectionId);
   };
+
 })();
