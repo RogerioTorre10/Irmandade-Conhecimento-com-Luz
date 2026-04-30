@@ -1,21 +1,20 @@
-// /assets/js/video-transicao.js — PORTAL DOURADO + AMBIENT BLUR FULLSCREEN BLINDADO
+// /assets/js/video-transicao.js — PORTAL DOURADO + GLAMOUR + LIMELIGHT (versão final cinematográfica)
 (function () {
   'use strict';
 
   const NS = '[VIDEO_TRANSICAO]';
-  const log = (...a) => console.log(NS, ...a);
+  const log  = (...a) => console.log(NS, ...a);
   const warn = (...a) => console.warn(NS, ...a);
 
   let isPlaying = false;
+  let cleaned   = false;
 
+  // ----------------------------- UTILIDADES -----------------------------
   const isMp4 = (src) => /\.mp4(\?|#|$)/i.test(src || '');
 
   const resolveHref = (src) => {
-    try {
-      return new URL(src, window.location.origin).href;
-    } catch {
-      return src;
-    }
+    try { return new URL(src, window.location.origin).href; }
+    catch { return src; }
   };
 
   function navigateTo(nextSectionId) {
@@ -36,203 +35,116 @@
     return (...args) => {
       if (done) return;
       done = true;
-      try {
-        fn(...args);
-      } catch (e) {
-        warn('Erro no safeOnce:', e);
-      }
+      try { fn(...args); } catch (e) { warn('Erro no safeOnce:', e); }
     };
   }
 
   function onKeydown(e) {
     if (e.key === 'Escape') {
       log('Vídeo pulado pelo usuário (Esc)');
-      cleanup();
+      const overlay = document.getElementById('vt-overlay');
+      cleanup(overlay);
     }
   }
 
+  // Ajusta moldura à proporção real do vídeo (sem fullscreen nativo)
   function fitFrameToVideo(frame, video) {
-    if (!frame || !video) return;
+    const vw = window.innerWidth  * 0.96;
+    const vh = window.innerHeight * 0.96;
 
-    const vw = window.innerWidth * 0.94;
-    const vh = window.innerHeight * 0.74;
+    // fallback inicial (16:9) se metadata ainda não carregou
+    const w = video.videoWidth  || 16;
+    const h = video.videoHeight ||  9;
 
-    const w = video.videoWidth || 16;
-    const h = video.videoHeight || 9;
     const ar = w / h;
 
-    let width;
-    let height;
-
+    let width, height;
     if (vw / ar <= vh) {
-      width = vw;
+      width  = vw;
       height = vw / ar;
     } else {
       height = vh;
-      width = vh * ar;
+      width  = vh * ar;
     }
 
-    frame.style.width = Math.round(width) + 'px';
+    frame.style.width  = Math.round(width)  + 'px';
     frame.style.height = Math.round(height) + 'px';
   }
 
-  function cleanup() {
+  // ---------------------------- LIMPEZA --------------------------------
+  function cleanup(overlay) {
+    if (cleaned) return;
+    cleaned = true;
+
     try {
-      const overlay = document.getElementById('vt-overlay');
-      const frame = document.getElementById('vt-frame');
-      const video = document.getElementById('vt-video');
-      const ambient = document.getElementById('vt-ambient');
-      const veil = document.getElementById('vt-veil');
-
-      try {
-        if (video) {
-          video.pause();
-          video.removeAttribute('src');
-          video.load();
-        }
-      } catch (_) {}
-
-      try {
-        if (ambient) {
-          ambient.pause();
-          ambient.removeAttribute('src');
-          ambient.load();
-        }
-      } catch (_) {}
-
-      try { video?.remove(); } catch (_) {}
-      try { ambient?.remove(); } catch (_) {}
-      try { veil?.remove(); } catch (_) {}
-      try { frame?.remove(); } catch (_) {}
-      try { overlay?.remove(); } catch (_) {}
-
-      document.body.style.overflow = '';
-      document.documentElement.style.overflow = '';
-
       document.removeEventListener('keydown', onKeydown, true);
-
       window.__TRANSITION_LOCK = false;
-      window.JORNADA_TRANSICAO_ATIVA = false;
-      isPlaying = false;
-
       document.dispatchEvent(new CustomEvent('transition:ended'));
-      window.dispatchEvent(new CustomEvent('jornada:transicao:end'));
+      document.documentElement.style.overflow = '';
+      if (overlay?.parentNode) overlay.parentNode.removeChild(overlay);
+    } catch {}
 
-      log('Overlay removido e estado resetado');
-    } catch (e) {
-      warn('Erro no cleanup:', e);
-    }
+    isPlaying = false;
+    log('Overlay removido e estado resetado');
   }
 
+  // -------------------------- PORTAL DOURADO ---------------------------
   function buildPortal() {
-  const overlay = document.createElement('div');
-  overlay.id = 'vt-overlay';
-  overlay.className = 'jp-video-overlay';
-  overlay.setAttribute('role', 'dialog');
+    // Overlay escuro
+    const overlay = document.createElement('div');
+    overlay.id = 'vt-overlay';
+    overlay.className = 'jp-video-overlay';
+    overlay.setAttribute('role', 'dialog');
 
-  Object.assign(overlay.style, {
-    position: 'fixed',
-    inset: '0',
-    width: '100vw',
-    height: '100vh',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    background: 'rgba(0,0,0,0.92)',
-    zIndex: '2147483647',
-    overflow: 'hidden'
-  });
+    // Moldura dourada
+    const frame = document.createElement('div');
+    frame.className = 'jp-video-frame';
 
-  const ambient = document.createElement('video');
-  ambient.id = 'vt-ambient';
-  ambient.className = 'jp-video-ambient';
-  ambient.playsInline = true;
-  ambient.autoplay = false;
-  ambient.controls = false;
-  ambient.muted = true;
-  ambient.loop = true;
-  ambient.preload = 'auto';
+    // Vídeo ambiente (limelight)
+    const ambient = document.createElement('video');
+    ambient.className = 'jp-video-ambient';
+    ambient.playsInline = true;
+    ambient.autoplay = false;
+    ambient.controls = false;
+    ambient.muted = true;
+    ambient.loop = true;
+    ambient.preload = 'auto';
 
-  Object.assign(ambient.style, {
-  position: 'fixed',
-  top: '0',
-  left: '0',
-  width: '100vw',
-  height: '100vh',
-  objectFit: 'cover',
-  filter: 'blur(28px) brightness(0.75) saturate(1.35)',
-  transform: 'scale(1.25)',
-  opacity: '1',
-  zIndex: '2',
-  pointerEvents: 'none'
-});
+    // Vídeo principal (cenário completo)
+    const video = document.createElement('video');
+    video.id = 'vt-video';
+    video.playsInline = true;
+    video.autoplay = false;
+    video.controls = false;
+    video.muted = true;       // autoplay confiável
+    video.preload = 'auto';
 
-  const frame = document.createElement('div');
-  frame.id = 'vt-frame';
-  frame.className = 'jp-video-frame';
+    // Injeta vídeos dentro da moldura
+    frame.appendChild(ambient); // fundo primeiro
+    frame.appendChild(video);   // principal por cima
 
-  Object.assign(frame.style, {
-    position: 'relative',
-    display: 'block',
-    maxWidth: '96vw',
-    maxHeight: '96vh',
-    borderRadius: '18px',
-    overflow: 'hidden',
-    background: 'rgba(0,0,0,0.55)',
-    boxShadow: '0 0 0 2px rgba(212,175,55,.82), 0 0 42px rgba(212,175,55,.45)',
-    zIndex: '5'
-  });
+    // Botão “Pular”
+    const skip = document.createElement('button');
+    skip.textContent = 'Pular';
+    skip.setAttribute('aria-label', 'Pular vídeo');
+    skip.className = 'jp-video-skip';
+    frame.appendChild(skip);
 
-  const video = document.createElement('video');
-  video.id = 'vt-video';
-  video.className = 'jp-video-main';
-  video.playsInline = true;
-  video.autoplay = false;
-  video.controls = false;
-  video.muted = true;
-  video.preload = 'auto';
+    // Adiciona frame e overlay no body
+    overlay.appendChild(frame);
+    document.body.appendChild(overlay);
 
-  Object.assign(video.style, {
-    position: 'absolute',
-    inset: '0',
-    width: '100%',
-    height: '100%',
-    objectFit: 'contain',
-    background: '#000',
-    zIndex: '6'
-  });
+    // Glamour: portal aparece suave
+    requestAnimationFrame(() => overlay.classList.add('show'));
 
-  const skip = document.createElement('button');
-  skip.textContent = 'Pular';
-  skip.setAttribute('aria-label', 'Pular vídeo');
-  skip.className = 'jp-video-skip';
+    return { overlay, frame, video, ambient, skip };
+  }
 
-  Object.assign(skip.style, {
-    position: 'absolute',
-    top: '14px',
-    right: '14px',
-    zIndex: '10',
-    padding: '8px 14px',
-    borderRadius: '999px',
-    border: '0',
-    cursor: 'pointer'
-  });
-
-  frame.appendChild(video);
-  frame.appendChild(skip);
-
-  overlay.appendChild(ambient);
-  overlay.appendChild(frame);
-  document.body.appendChild(overlay);
-
-  requestAnimationFrame(() => overlay.classList.add('show'));
-
-  return { overlay, frame, video, ambient, skip };
-}
-
+  // ------------------------- PLAYER PRINCIPAL ---------------------------
   function playTransitionVideo(src, nextSectionId) {
     log('Recebido src:', src, 'nextSectionId:', nextSectionId);
 
+    // Se não for MP4 → navega direto
     if (!src || !isMp4(src)) {
       warn('Fonte não é MP4 (ou ausente). Pulando player e navegando direto…');
       navigateTo(nextSectionId);
@@ -245,79 +157,71 @@
     }
 
     isPlaying = true;
+    cleaned = false;
 
+    // Glamour: some a página antes do filme
     document.body.classList.remove('vt-fade-in');
     document.body.classList.add('vt-fade-out');
 
+    // 🔒 trava transições e cancela TTS
+    window.__TRANSITION_LOCK = true;
+    document.dispatchEvent(new CustomEvent('transition:started'));
     try { window.speechSynthesis?.cancel(); } catch {}
+    document.documentElement.style.overflow = 'hidden';
 
     const href = resolveHref(src);
     log('Vídeo resolvido para:', href);
 
     const { overlay, frame, video, ambient, skip } = buildPortal();
 
+    // fallback imediato para evitar "barra dourada"
     fitFrameToVideo(frame, { videoWidth: 16, videoHeight: 9 });
 
+    // Ajuste responsivo do frame ao vídeo
     const onResize = () => fitFrameToVideo(frame, video);
     window.addEventListener('resize', onResize);
 
     const finishAndGo = safeOnce(() => {
       window.removeEventListener('resize', onResize);
+      try { ambient.pause(); } catch {}
 
-      try { ambient.pause(); } catch (_) {}
-
+      // Glamour: portal sai suave
       overlay.classList.remove('show');
       overlay.classList.add('hide');
-      overlay.style.opacity = '0';
 
       setTimeout(() => {
+        cleanup(overlay);
         navigateTo(nextSectionId);
 
-        requestAnimationFrame(() => {
-          cleanup();
-          document.body.classList.remove('vt-fade-out');
-          document.body.classList.add('vt-fade-in');
-          setTimeout(() => document.body.classList.remove('vt-fade-in'), 650);
-        });
-      }, 620);
+        // Glamour: nova página entra suave
+        document.body.classList.remove('vt-fade-out');
+        document.body.classList.add('vt-fade-in');
+        setTimeout(() => document.body.classList.remove('vt-fade-in'), 650);
+      }, 360);
     });
 
     skip.addEventListener('click', finishAndGo);
-
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) finishAndGo();
     });
-
     document.addEventListener('keydown', onKeydown, true);
 
-    const tryPlayBoth = async () => {
-      try { ambient.currentTime = 0; } catch (_) {}
-      try { video.currentTime = 0; } catch (_) {}
-
-      try {
-        await ambient.play();
-        log('Ambient tocando.');
-      } catch (err) {
-        warn('Falha ao tocar ambient:', err?.message || err);
-      }
-
-      try {
-        await video.play();
-        log('Vídeo principal tocando.');
-      } catch (err) {
-        warn('Falha ao tocar vídeo principal:', err?.message || err);
-        video.muted = true;
-        ambient.muted = true;
-
-        try { await ambient.play(); } catch (_) {}
-        try { await video.play(); } catch (_) {}
-      }
-    };
-
+    // EVENTOS
     const onCanPlay = safeOnce(() => {
       log('Vídeo carregado, iniciando reprodução:', href);
-      try { fitFrameToVideo(frame, video); } catch (_) {}
-      tryPlayBoth();
+
+      // moldura abraça proporção real
+      try { fitFrameToVideo(frame, video); } catch {}
+
+      // toca fundo + principal
+      ambient.play().catch(()=>{});
+      video.play().catch(err => {
+        warn('Falha ao dar play (autoplay?):', err);
+        video.muted = true;
+        ambient.muted = true;
+        ambient.play().catch(()=>{});
+        video.play().catch(() => warn('Play ainda bloqueado.'));
+      });
     });
 
     const onEnded = safeOnce(() => {
@@ -336,28 +240,16 @@
     video.addEventListener('ended', onEnded, { once: true });
     video.addEventListener('error', onError, { once: true });
 
+    // Cache-buster para evitar travas de Range/codec
     const finalSrc = href + (href.includes('?') ? '&' : '?') + 't=' + Date.now();
-
     video.src = finalSrc;
     ambient.src = finalSrc;
 
     video.load();
     ambient.load();
-
-    setTimeout(() => {
-      if (!video.paused) return;
-      warn('Fallback play acionado.');
-      tryPlayBoth();
-    }, 800);
-
-    setTimeout(() => {
-      if (isPlaying) {
-        warn('Timeout de segurança da transição.');
-        finishAndGo();
-      }
-    }, 18000);
   }
 
+  // ----------------- API PÚBLICA -----------------
   window.playTransitionVideo = playTransitionVideo;
 
   window.playTransition = function (nextSectionId) {
@@ -365,47 +257,4 @@
     navigateTo(nextSectionId);
   };
 
-  (function ensurePlayBlockTransition() {
-    if (typeof window.playBlockTransition === 'function') return;
-
-    if (typeof window.playTransitionVideo !== 'function') {
-      warn('playTransitionVideo não disponível; playBlockTransition não instalado.');
-      window.playBlockTransition = function (_videoSrc, done) {
-        if (typeof done === 'function') done();
-      };
-      return;
-    }
-
-    window.playBlockTransition = function (videoSrc, done) {
-      let called = false;
-
-      const finish = () => {
-        if (called) return;
-        called = true;
-        if (typeof done === 'function') done();
-      };
-
-      const onEnded = () => {
-        document.removeEventListener('transition:ended', onEnded, true);
-        finish();
-      };
-
-      document.addEventListener('transition:ended', onEnded, true);
-
-      try {
-        window.playTransitionVideo(videoSrc, null);
-      } catch (e) {
-        document.removeEventListener('transition:ended', onEnded, true);
-        warn('Falha ao iniciar playTransitionVideo:', e);
-        finish();
-      }
-
-      setTimeout(() => {
-        document.removeEventListener('transition:ended', onEnded, true);
-        finish();
-      }, 19000);
-    };
-
-    log('playBlockTransition instalado (runner de blocos).');
-  })();
 })();
