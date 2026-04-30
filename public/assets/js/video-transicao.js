@@ -138,7 +138,7 @@
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    background: 'rgba(0,0,0,0.88)',
+    background: 'rgba(0,0,0,0.92)',
     zIndex: '2147483647',
     overflow: 'hidden'
   });
@@ -154,17 +154,18 @@
   ambient.preload = 'auto';
 
   Object.assign(ambient.style, {
-    position: 'fixed',
-    inset: '0',
-    width: '100vw',
-    height: '100vh',
-    objectFit: 'cover',
-    filter: 'blur(30px) brightness(0.58) saturate(1.22)',
-    transform: 'scale(1.20)',
-    opacity: '0.92',
-    zIndex: '1',
-    pointerEvents: 'none'
-  });
+  position: 'fixed',
+  top: '0',
+  left: '0',
+  width: '100vw',
+  height: '100vh',
+  objectFit: 'cover',
+  filter: 'blur(28px) brightness(0.75) saturate(1.35)',
+  transform: 'scale(1.25)',
+  opacity: '1',
+  zIndex: '2',
+  pointerEvents: 'none'
+});
 
   const frame = document.createElement('div');
   frame.id = 'vt-frame';
@@ -177,7 +178,7 @@
     maxHeight: '96vh',
     borderRadius: '18px',
     overflow: 'hidden',
-    background: '#000',
+    background: 'rgba(0,0,0,0.55)',
     boxShadow: '0 0 0 2px rgba(212,175,55,.82), 0 0 42px rgba(212,175,55,.45)',
     zIndex: '5'
   });
