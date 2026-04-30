@@ -232,12 +232,6 @@
   border-radius: 2px;
 }
 
-#vt-frame,
-#global-video-overlay .jp-video-frame {
-  position: relative;
-  z-index: 2147483647;
-}
-
 .jornada-footer,
 .section-footer,
 footer,
@@ -291,33 +285,36 @@ footer,
    VIDEO TRANSIÇÃO — CINEMA BLINDADO
    ========================================= */
 
-#vt-overlay {
+#vt-overlay,
+.jp-video-overlay {
   position: fixed !important;
   inset: 0 !important;
   width: 100vw !important;
   height: 100vh !important;
   overflow: hidden !important;
-  z-index: 2147483647 !important;
-  background: rgba(0, 0, 0, 0.92) !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+  background: rgba(0, 0, 0, 0.88) !important;
+  z-index: 2147483647 !important;
 }
 
-#vt-ambient {
+#vt-ambient,
+.jp-video-ambient {
   position: fixed !important;
   inset: 0 !important;
   width: 100vw !important;
   height: 100vh !important;
   object-fit: cover !important;
-  filter: blur(30px) brightness(0.55) saturate(1.25) !important;
-  transform: scale(1.22) !important;
-  opacity: 0.88 !important;
+  filter: blur(30px) brightness(0.58) saturate(1.22) !important;
+  transform: scale(1.20) !important;
+  opacity: 0.92 !important;
   z-index: 1 !important;
   pointer-events: none !important;
 }
 
-#vt-frame {
+#vt-frame,
+.jp-video-frame {
   position: relative !important;
   z-index: 5 !important;
   width: min(96vw, 1280px) !important;
@@ -326,47 +323,28 @@ footer,
   max-height: 82vh !important;
   overflow: hidden !important;
   border-radius: 18px !important;
-  box-shadow:
-    0 0 0 2px rgba(212, 175, 55, 0.85),
-    0 0 42px rgba(212, 175, 55, 0.55) !important;
   background: #000 !important;
+  box-shadow:
+    0 0 0 2px rgba(212, 175, 55, 0.82),
+    0 0 42px rgba(212, 175, 55, 0.45) !important;
 }
 
+#vt-video,
+.jp-video-main,
 #vt-frame video:not(#vt-ambient) {
   position: absolute !important;
   inset: 0 !important;
   width: 100% !important;
   height: 100% !important;
   object-fit: contain !important;
-  z-index: 6 !important;
   background: #000 !important;
+  z-index: 6 !important;
 }
 
-#vt-skip {
+#vt-skip,
+.jp-video-skip {
   position: absolute !important;
   top: 14px !important;
   right: 14px !important;
   z-index: 10 !important;
-}
-/* VIDEO TRANSITION - AMBIENT BLUR FORTE */
-#vt-overlay {
-  position: fixed !important;
-  inset: 0 !important;
-  z-index: 2147483647 !important;
-}
-
-#vt-ambient {
-  filter: blur(32px) brightness(0.65) saturate(1.3) !important;
-  transform: scale(1.15) !important;
-  opacity: 0.92 !important;
-  z-index: 1 !important;
-}
-
-#vt-frame {
-  box-shadow: 0 0 80px rgba(0,0,0,0.95) !important;
-  border: 1px solid rgba(255,215,0,0.3) !important;
-}
-
-#vt-video {
-  z-index: 3 !important;
 }
