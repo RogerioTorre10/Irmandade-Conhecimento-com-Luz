@@ -138,7 +138,7 @@
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    background: 'rgba(0,0,0,0.92)',
+    background: 'transparent',
     zIndex: '2147483647',
     overflow: 'hidden'
   });
@@ -178,7 +178,7 @@
     maxHeight: '96vh',
     borderRadius: '18px',
     overflow: 'hidden',
-    background: 'rgba(0,0,0,0.55)',
+    background: 'transparent',
     boxShadow: '0 0 0 2px rgba(212,175,55,.82), 0 0 42px rgba(212,175,55,.45)',
     zIndex: '5'
   });
@@ -198,7 +198,7 @@
     width: '100%',
     height: '100%',
     objectFit: 'cover',
-    background: '#000',
+    background: 'transparent',
     zIndex: '6'
   });
 
