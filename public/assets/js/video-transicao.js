@@ -57,7 +57,7 @@
   const isMobile = window.innerWidth <= 768;
 
   const vw = window.innerWidth * (isMobile ? 0.96 : 0.94);
-  const vh = window.innerHeight * (isMobile ? 0.26 : 0.64);
+  const vh = window.innerHeight * (isMobile ? 0.34 : 0.64);
 
   const w = video.videoWidth || 16;
   const h = video.videoHeight || 9;
@@ -74,7 +74,7 @@
   frame.style.width = Math.round(width) + 'px';
   frame.style.height = Math.round(height) + 'px';
   frame.style.maxWidth = '96vw';
-  frame.style.maxHeight = isMobile ? '28vh' : '72vh';
+  frame.style.maxHeight = isMobile ? '36vh' : '72vh';
 }
 
   function cleanup() {
