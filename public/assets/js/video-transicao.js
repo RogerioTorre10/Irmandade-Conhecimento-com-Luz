@@ -325,28 +325,39 @@
     document.addEventListener('keydown', onKeydown, true);
 
     const tryPlayBoth = async () => {
-      try { ambient.currentTime = 0; } catch (_) {}
-      try { video.currentTime = 0; } catch (_) {}
+  try { ambient.currentTime = 0; } catch (_) {}
+  try { frameAmbient.currentTime = 0; } catch (_) {}
+  try { video.currentTime = 0; } catch (_) {}
 
-      try {
-        await ambient.play();
-        log('Ambient tocando.');
-      } catch (err) {
-        warn('Falha ao tocar ambient:', err?.message || err);
-      }
+  try {
+    await ambient.play();
+    log('Ambient tocando.');
+  } catch (err) {
+    warn('Falha ao tocar ambient:', err?.message || err);
+  }
 
-      try {
-        await video.play();
-        log('Vídeo principal tocando.');
-      } catch (err) {
-        warn('Falha ao tocar vídeo principal:', err?.message || err);
-        video.muted = true;
-        ambient.muted = true;
+  try {
+    await frameAmbient.play();
+    log('Frame ambient tocando.');
+  } catch (err) {
+    warn('Falha ao tocar frame ambient:', err?.message || err);
+  }
 
-        try { await ambient.play(); } catch (_) {}
-        try { await video.play(); } catch (_) {}
-      }
-    };
+  try {
+    await video.play();
+    log('Vídeo principal tocando.');
+  } catch (err) {
+    warn('Falha ao tocar vídeo principal:', err?.message || err);
+
+    video.muted = true;
+    ambient.muted = true;
+    frameAmbient.muted = true;
+
+    try { await ambient.play(); } catch (_) {}
+    try { await frameAmbient.play(); } catch (_) {}
+    try { await video.play(); } catch (_) {}
+  }
+};
 
     const onCanPlay = safeOnce(() => {
       log('Vídeo carregado, iniciando reprodução:', href);
