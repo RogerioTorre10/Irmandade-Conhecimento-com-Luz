@@ -264,7 +264,7 @@
 
   requestAnimationFrame(() => overlay.classList.add('show'));
 
-  return { overlay, frame, video, ambient, skip };
+  return { overlay, frame, video, ambient, frameAmbient, skip };
 }
   
   function playTransitionVideo(src, nextSectionId) {
@@ -291,7 +291,7 @@
     const href = resolveHref(src);
     log('Vídeo resolvido para:', href);
 
-    const { overlay, frame, video, ambient, skip } = buildPortal();
+    const { overlay, frame, video, ambient, frameAmbient, skip } = buildPortal();
 
     fitFrameToVideo(frame, { videoWidth: 16, videoHeight: 9 });
 
