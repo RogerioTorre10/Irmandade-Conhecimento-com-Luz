@@ -249,8 +249,7 @@
     cursor: 'pointer',
     boxShadow: '0 0 14px rgba(255,215,0,0.32)'
   });
-
-  frame.appendChild(frameAmbient);
+  
   frame.appendChild(video);
   frame.appendChild(skip);
 
