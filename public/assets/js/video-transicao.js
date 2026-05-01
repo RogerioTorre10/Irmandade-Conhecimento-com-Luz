@@ -55,7 +55,7 @@
     if (!frame || !video) return;
 
     const vw = window.innerWidth * 0.94;
-    const vh = window.innerHeight * 0.74;
+    const vh = window.innerHeight * 0.58;
 
     const w = video.videoWidth || 16;
     const h = video.videoHeight || 9;
@@ -197,7 +197,7 @@
     inset: '0',
     width: '100%',
     height: '100%',
-    objectFit: 'contain',
+    objectFit: 'cover',
     background: '#000',
     zIndex: '6'
   });
