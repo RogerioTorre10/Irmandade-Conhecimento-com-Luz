@@ -185,7 +185,7 @@
     maxHeight: '82vh',
     borderRadius: '18px',
     overflow: 'hidden',
-    background: 'rgba(0,0,0,0.45)',
+    background: 'transparent'
     boxShadow:
       '0 0 0 2px rgba(212,175,55,.82), 0 0 42px rgba(212,175,55,.45)',
     zIndex: '5'
