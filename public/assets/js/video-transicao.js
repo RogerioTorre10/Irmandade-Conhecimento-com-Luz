@@ -55,7 +55,7 @@
     if (!frame || !video) return;
 
     const vw = window.innerWidth * 0.94;
-    const vh = window.innerHeight * 0.38;
+    const vh = window.innerHeight * 0.28;
 
     const w = video.videoWidth || 16;
     const h = video.videoHeight || 9;
