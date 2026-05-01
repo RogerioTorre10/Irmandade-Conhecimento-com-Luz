@@ -305,6 +305,7 @@ footer,
   transform: scale(1.22) !important;
   opacity: 1 !important;
   z-index: 1 !important;
+  background: transparent !important;
   pointer-events: none !important;
 }
 
@@ -317,7 +318,7 @@ footer,
   max-height: 82vh !important;
   overflow: hidden !important;
   border-radius: 18px !important;
-  background: transparent !important;
+  
 }
 
 #vt-video {
@@ -325,7 +326,7 @@ footer,
   inset: 0 !important;
   width: 100% !important;
   height: 100% !important;
-  object-fit: contain !important;
+  object-fit: cover !important;
   background: transparent !important;
   z-index: 6 !important;
 }
