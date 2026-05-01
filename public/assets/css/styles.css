@@ -290,7 +290,7 @@ footer,
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  background: rgba(0, 0, 0, 0.35) !important;
+  background: transparent !important;
   overflow: hidden !important;
   z-index: 2147483647 !important;
 }
@@ -317,7 +317,7 @@ footer,
   max-height: 82vh !important;
   overflow: hidden !important;
   border-radius: 18px !important;
-  background: rgba(0, 0, 0, 0.45) !important;
+  background: transparent !important;
 }
 
 #vt-video {
