@@ -190,15 +190,12 @@
       '0 0 0 2px rgba(212,175,55,.82), 0 0 42px rgba(212,175,55,.45)',
     zIndex: '5'
   });
-    
+
   const frameAmbient = document.createElement('video');
     frameAmbient.id = 'vt-frame-ambient';
-    frameAmbient.className = 'vt-video-frame-ambient';
-    frameAmbient.playsInline = true;
-    frameAmbient.autoplay = false;
-    frameAmbient.controls = false;
     frameAmbient.muted = true;
     frameAmbient.loop = true;
+    frameAmbient.playsInline = true;
     frameAmbient.preload = 'auto';
 
   Object.assign(frameAmbient.style, {
@@ -212,16 +209,16 @@
     opacity: '0.85',
     zIndex: '4',
     pointerEvents: 'none'
-  });
+  });   
 
   const video = document.createElement('video');
-    video.id = 'vt-video';
-    video.className = 'vt-video-main';
-    video.playsInline = true;
-    video.autoplay = false;
-    video.controls = false;
-    video.muted = true;
-    video.preload = 'auto';
+  video.id = 'vt-video';
+  video.className = 'vt-video-main';
+  video.playsInline = true;
+  video.autoplay = false;
+  video.controls = false;
+  video.muted = true;
+  video.preload = 'auto';
 
   Object.assign(video.style, {
     position: 'absolute',
@@ -264,7 +261,7 @@
 
   requestAnimationFrame(() => overlay.classList.add('show'));
 
-  return { overlay, frame, video, ambient, frameAmbient, skip };
+  return { overlay, frame, video, ambient, skip };
 }
   
   function playTransitionVideo(src, nextSectionId) {
@@ -291,7 +288,7 @@
     const href = resolveHref(src);
     log('Vídeo resolvido para:', href);
 
-    const { overlay, frame, video, ambient, frameAmbient, skip } = buildPortal();
+    const { overlay, frame, video, ambient, skip } = buildPortal();
 
     fitFrameToVideo(frame, { videoWidth: 16, videoHeight: 9 });
 
@@ -328,39 +325,28 @@
     document.addEventListener('keydown', onKeydown, true);
 
     const tryPlayBoth = async () => {
-  try { ambient.currentTime = 0; } catch (_) {}
-  try { frameAmbient.currentTime = 0; } catch (_) {}
-  try { video.currentTime = 0; } catch (_) {}
+      try { ambient.currentTime = 0; } catch (_) {}
+      try { video.currentTime = 0; } catch (_) {}
 
-  try {
-    await ambient.play();
-    log('Ambient tocando.');
-  } catch (err) {
-    warn('Falha ao tocar ambient:', err?.message || err);
-  }
+      try {
+        await ambient.play();
+        log('Ambient tocando.');
+      } catch (err) {
+        warn('Falha ao tocar ambient:', err?.message || err);
+      }
 
-  try {
-    await frameAmbient.play();
-    log('Frame ambient tocando.');
-  } catch (err) {
-    warn('Falha ao tocar frame ambient:', err?.message || err);
-  }
+      try {
+        await video.play();
+        log('Vídeo principal tocando.');
+      } catch (err) {
+        warn('Falha ao tocar vídeo principal:', err?.message || err);
+        video.muted = true;
+        ambient.muted = true;
 
-  try {
-    await video.play();
-    log('Vídeo principal tocando.');
-  } catch (err) {
-    warn('Falha ao tocar vídeo principal:', err?.message || err);
-
-    video.muted = true;
-    ambient.muted = true;
-    frameAmbient.muted = true;
-
-    try { await ambient.play(); } catch (_) {}
-    try { await frameAmbient.play(); } catch (_) {}
-    try { await video.play(); } catch (_) {}
-  }
-};
+        try { await ambient.play(); } catch (_) {}
+        try { await video.play(); } catch (_) {}
+      }
+    };
 
     const onCanPlay = safeOnce(() => {
       log('Vídeo carregado, iniciando reprodução:', href);
@@ -388,11 +374,9 @@
 
     video.src = finalSrc;
     ambient.src = finalSrc;
-    frameAmbient.src = finalSrc;
 
     video.load();
     ambient.load();
-    frameAmbient.load();
 
     setTimeout(() => {
       if (!video.paused) return;
