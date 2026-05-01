@@ -309,16 +309,20 @@ footer,
   pointer-events: none !important;
 }
 
-#vt-frame {
+#vt-frame,
+.vt-video-frame {
   position: relative !important;
   z-index: 5 !important;
-  width: min(96vw, 1280px) !important;
-  height: min(82vh, 720px) !important;
-  max-width: 96vw !important;
-  max-height: 82vh !important;
+  width: auto !important;
+  height: auto !important;
+  max-width: 98vw !important;
+  max-height: 72vh !important;
   overflow: hidden !important;
   border-radius: 18px !important;
-  
+  background: transparent !important;
+  box-shadow:
+    0 0 0 2px rgba(212,175,55,.82),
+    0 0 32px rgba(212,175,55,.35) !important;
 }
 
 #vt-video {
@@ -336,4 +340,21 @@ footer,
   top: 14px !important;
   right: 14px !important;
   z-index: 10 !important;
+}
+
+@media (max-width: 767px) {
+  #vt-frame,
+  .vt-video-frame {
+    max-width: 98vw !important;
+    max-height: 56vh !important;
+    border-radius: 16px !important;
+  }
+
+  #vt-skip,
+  .vt-video-skip {
+    top: 10px !important;
+    right: 10px !important;
+    padding: 7px 12px !important;
+    font-size: 13px !important;
+  }
 }
