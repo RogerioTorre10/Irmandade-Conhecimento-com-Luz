@@ -52,29 +52,30 @@
   }
 
   function fitFrameToVideo(frame, video) {
-    if (!frame || !video) return;
+  if (!frame || !video) return;
 
-    const vw = window.innerWidth * 0.94;
-    const vh = window.innerHeight * 0.28;
+  const isMobile = window.innerWidth <= 768;
 
-    const w = video.videoWidth || 16;
-    const h = video.videoHeight || 9;
-    const ar = w / h;
+  const vw = window.innerWidth * (isMobile ? 0.96 : 0.94);
+  const vh = window.innerHeight * (isMobile ? 0.26 : 0.64);
 
-    let width;
-    let height;
+  const w = video.videoWidth || 16;
+  const h = video.videoHeight || 9;
+  const ar = w / h;
 
-    if (vw / ar <= vh) {
-      width = vw;
-      height = vw / ar;
-    } else {
-      height = vh;
-      width = vh * ar;
-    }
+  let width = vw;
+  let height = width / ar;
 
-    frame.style.width = Math.round(width) + 'px';
-    frame.style.height = Math.round(height) + 'px';
+  if (height > vh) {
+    height = vh;
+    width = height * ar;
   }
+
+  frame.style.width = Math.round(width) + 'px';
+  frame.style.height = Math.round(height) + 'px';
+  frame.style.maxWidth = '96vw';
+  frame.style.maxHeight = isMobile ? '28vh' : '72vh';
+}
 
   function cleanup() {
     try {
