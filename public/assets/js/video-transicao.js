@@ -388,9 +388,11 @@
 
     video.src = finalSrc;
     ambient.src = finalSrc;
+    frameAmbient.src = finalSrc;
 
     video.load();
     ambient.load();
+    frameAmbient.load();
 
     setTimeout(() => {
       if (!video.paused) return;
