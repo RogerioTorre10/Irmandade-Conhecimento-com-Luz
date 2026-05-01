@@ -282,7 +282,8 @@ footer,
 }
 
 /* VIDEO TRANSIÇÃO — AMBIENT BLUR BLINDADO */
-#vt-overlay {
+#vt-overlay,
+.vt-video-overlay {
   position: fixed !important;
   inset: 0 !important;
   width: 100vw !important;
@@ -295,7 +296,8 @@ footer,
   z-index: 2147483647 !important;
 }
 
-#vt-ambient {
+#vt-ambient,
+.vt-video-ambient {
   position: fixed !important;
   inset: 0 !important;
   width: 100vw !important;
@@ -305,7 +307,6 @@ footer,
   transform: scale(1.22) !important;
   opacity: 1 !important;
   z-index: 1 !important;
-  background: transparent !important;
   pointer-events: none !important;
 }
 
@@ -313,19 +314,21 @@ footer,
 .vt-video-frame {
   position: relative !important;
   z-index: 5 !important;
-  width: auto !important;
-  height: auto !important;
-  max-width: 98vw !important;
-  max-height: 72vh !important;
+  min-width: 220px !important;
+  min-height: 140px !important;
+  width: 96vw !important;
+  max-width: 1280px !important;
+  aspect-ratio: 16 / 9 !important;
   overflow: hidden !important;
   border-radius: 18px !important;
-  background: transparent !important;
+  background: rgba(0, 0, 0, 0.12) !important;
   box-shadow:
     0 0 0 2px rgba(212,175,55,.82),
     0 0 32px rgba(212,175,55,.35) !important;
 }
 
-#vt-video {
+#vt-video,
+.vt-video-main {
   position: absolute !important;
   inset: 0 !important;
   width: 100% !important;
@@ -333,9 +336,13 @@ footer,
   object-fit: cover !important;
   background: transparent !important;
   z-index: 6 !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
-#vt-skip {
+#vt-skip,
+.vt-video-skip {
   position: absolute !important;
   top: 14px !important;
   right: 14px !important;
@@ -345,16 +352,10 @@ footer,
 @media (max-width: 767px) {
   #vt-frame,
   .vt-video-frame {
+    width: 98vw !important;
     max-width: 98vw !important;
-    max-height: 56vh !important;
+    min-height: 180px !important;
+    aspect-ratio: 16 / 9 !important;
     border-radius: 16px !important;
-  }
-
-  #vt-skip,
-  .vt-video-skip {
-    top: 10px !important;
-    right: 10px !important;
-    padding: 7px 12px !important;
-    font-size: 13px !important;
   }
 }
