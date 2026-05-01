@@ -190,12 +190,15 @@
       '0 0 0 2px rgba(212,175,55,.82), 0 0 42px rgba(212,175,55,.45)',
     zIndex: '5'
   });
-
+    
   const frameAmbient = document.createElement('video');
     frameAmbient.id = 'vt-frame-ambient';
+    frameAmbient.className = 'vt-video-frame-ambient';
+    frameAmbient.playsInline = true;
+    frameAmbient.autoplay = false;
+    frameAmbient.controls = false;
     frameAmbient.muted = true;
     frameAmbient.loop = true;
-    frameAmbient.playsInline = true;
     frameAmbient.preload = 'auto';
 
   Object.assign(frameAmbient.style, {
@@ -209,16 +212,16 @@
     opacity: '0.85',
     zIndex: '4',
     pointerEvents: 'none'
-  });   
+  });
 
   const video = document.createElement('video');
-  video.id = 'vt-video';
-  video.className = 'vt-video-main';
-  video.playsInline = true;
-  video.autoplay = false;
-  video.controls = false;
-  video.muted = true;
-  video.preload = 'auto';
+    video.id = 'vt-video';
+    video.className = 'vt-video-main';
+    video.playsInline = true;
+    video.autoplay = false;
+    video.controls = false;
+    video.muted = true;
+    video.preload = 'auto';
 
   Object.assign(video.style, {
     position: 'absolute',
