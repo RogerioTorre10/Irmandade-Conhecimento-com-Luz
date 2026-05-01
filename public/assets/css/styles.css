@@ -339,7 +339,7 @@ footer,
 @media (max-width: 768px) {
   #vt-frame {
     height: auto !important;
-    max-height: 28vh !important;
+    max-height: 78vh !important;
   }
 
   #vt-video {
