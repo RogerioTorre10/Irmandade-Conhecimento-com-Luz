@@ -125,9 +125,13 @@
   }
 
   function buildPortal() {
+  document.getElementById('videoOverlay')?.remove();
+  document.getElementById('global-video-overlay')?.remove();
+  document.getElementById('vt-overlay')?.remove();
+
   const overlay = document.createElement('div');
   overlay.id = 'vt-overlay';
-  overlay.className = 'jp-video-overlay';
+  overlay.className = 'vt-video-overlay';
   overlay.setAttribute('role', 'dialog');
 
   Object.assign(overlay.style, {
@@ -138,14 +142,16 @@
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    background: 'transparent',
+    background: 'rgba(0,0,0,0.35)',
     zIndex: '2147483647',
-    overflow: 'hidden'
+    overflow: 'hidden',
+    opacity: '1',
+    transition: 'opacity 600ms ease'
   });
 
   const ambient = document.createElement('video');
   ambient.id = 'vt-ambient';
-  ambient.className = 'jp-video-ambient';
+  ambient.className = 'vt-video-ambient';
   ambient.playsInline = true;
   ambient.autoplay = false;
   ambient.controls = false;
@@ -154,38 +160,40 @@
   ambient.preload = 'auto';
 
   Object.assign(ambient.style, {
-  position: 'fixed',
-  top: '0',
-  left: '0',
-  width: '100vw',
-  height: '100vh',
-  objectFit: 'cover',
-  filter: 'blur(28px) brightness(0.75) saturate(1.35)',
-  transform: 'scale(1.25)',
-  opacity: '1',
-  zIndex: '2',
-  pointerEvents: 'none'
-});
+    position: 'fixed',
+    inset: '0',
+    width: '100vw',
+    height: '100vh',
+    objectFit: 'cover',
+    filter: 'blur(30px) brightness(0.78) saturate(1.28)',
+    transform: 'scale(1.22)',
+    opacity: '1',
+    zIndex: '1',
+    pointerEvents: 'none'
+  });
 
   const frame = document.createElement('div');
   frame.id = 'vt-frame';
-  frame.className = 'jp-video-frame';
+  frame.className = 'vt-video-frame';
 
   Object.assign(frame.style, {
     position: 'relative',
     display: 'block',
+    width: 'min(96vw, 1280px)',
+    height: 'min(82vh, 720px)',
     maxWidth: '96vw',
-    maxHeight: '96vh',
+    maxHeight: '82vh',
     borderRadius: '18px',
     overflow: 'hidden',
-    background: 'transparent',
-    boxShadow: '0 0 0 2px rgba(212,175,55,.82), 0 0 42px rgba(212,175,55,.45)',
+    background: 'rgba(0,0,0,0.45)',
+    boxShadow:
+      '0 0 0 2px rgba(212,175,55,.82), 0 0 42px rgba(212,175,55,.45)',
     zIndex: '5'
   });
 
   const video = document.createElement('video');
   video.id = 'vt-video';
-  video.className = 'jp-video-main';
+  video.className = 'vt-video-main';
   video.playsInline = true;
   video.autoplay = false;
   video.controls = false;
@@ -197,15 +205,16 @@
     inset: '0',
     width: '100%',
     height: '100%',
-    objectFit: 'cover',
+    objectFit: 'contain',
     background: 'transparent',
     zIndex: '6'
   });
 
   const skip = document.createElement('button');
+  skip.id = 'vt-skip';
   skip.textContent = 'Pular';
   skip.setAttribute('aria-label', 'Pular vídeo');
-  skip.className = 'jp-video-skip';
+  skip.className = 'vt-video-skip';
 
   Object.assign(skip.style, {
     position: 'absolute',
@@ -214,8 +223,11 @@
     zIndex: '10',
     padding: '8px 14px',
     borderRadius: '999px',
-    border: '0',
-    cursor: 'pointer'
+    border: '1px solid rgba(255,215,0,0.85)',
+    background: 'rgba(0,0,0,0.72)',
+    color: '#ffd700',
+    cursor: 'pointer',
+    boxShadow: '0 0 14px rgba(255,215,0,0.32)'
   });
 
   frame.appendChild(video);
@@ -223,6 +235,7 @@
 
   overlay.appendChild(ambient);
   overlay.appendChild(frame);
+
   document.body.appendChild(overlay);
 
   requestAnimationFrame(() => overlay.classList.add('show'));
