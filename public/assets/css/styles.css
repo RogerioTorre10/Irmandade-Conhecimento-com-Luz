@@ -336,13 +336,3 @@ footer,
   right: 14px !important;
   z-index: 10 !important;
 }
-@media (max-width: 768px) {
-  #vt-frame {
-    height: auto !important;
-    max-height: 78vh !important;
-  }
-
-  #vt-video {
-    object-fit: cover !important;
-  }
-}
