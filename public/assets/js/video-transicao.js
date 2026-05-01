@@ -191,6 +191,26 @@
     zIndex: '5'
   });
 
+  const frameAmbient = document.createElement('video');
+    frameAmbient.id = 'vt-frame-ambient';
+    frameAmbient.muted = true;
+    frameAmbient.loop = true;
+    frameAmbient.playsInline = true;
+    frameAmbient.preload = 'auto';
+
+  Object.assign(frameAmbient.style, {
+    position: 'absolute',
+    inset: '0',
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    filter: 'blur(22px) brightness(0.65) saturate(1.25)',
+    transform: 'scale(1.16)',
+    opacity: '0.85',
+    zIndex: '4',
+    pointerEvents: 'none'
+  });   
+
   const video = document.createElement('video');
   video.id = 'vt-video';
   video.className = 'vt-video-main';
@@ -230,6 +250,7 @@
     boxShadow: '0 0 14px rgba(255,215,0,0.32)'
   });
 
+  frame.appendChild(frameAmbient);
   frame.appendChild(video);
   frame.appendChild(skip);
 
