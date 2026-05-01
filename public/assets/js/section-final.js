@@ -932,16 +932,16 @@
           idioma: getActiveLang(),
           retry: isRetry,
           forceComplete: true,
-          minSentences: guiaId === 'lumen' ? 4 : 3,
-          minChars: guiaId === 'lumen' ? 220 : 180
+          minSentences: guiaId === 'lumen' ? 8 : 6,
+          minChars: guiaId === 'lumen' ? 900 : 700
         };
 
         console.log('[FINAL][DEVOLUTIVA] tentando com guia:', guiaId, { retry: isRetry });
         const texto = await postFinalFeedback(body);
 
         if (isWeakFeedback(texto, {
-          minChars: guiaId === 'lumen' ? 220 : 180,
-          minSentences: guiaId === 'lumen' ? 4 : 3
+          minChars: guiaId === 'lumen' ? 900 : 780,
+          minSentences: guiaId === 'lumen' ? 8 : 6
         })) {
           ultimoErro = new Error(`Devolutiva curta ou incompleta para ${guiaId}`);
           console.warn('[FINAL][DEVOLUTIVA] resposta fraca, tentando próxima camada:', guiaId);
