@@ -883,43 +883,49 @@ function buildFinalSynthesisPayload() {
   // DEVOLUTIVA FINAL
   // ================================
   async function postFinalFeedback(body) {
-    const apiBase =
-      window.API?.PRIMARY ||
-      window.API_BASE ||
-      window.APP_CONFIG?.API_BASE ||
-      '/api';
+  const apiBase =
+    window.API?.PRIMARY ||
+    window.API_BASE ||
+    window.APP_CONFIG?.API_BASE ||
+    '/api';
 
-    const base = String(apiBase).replace(/\/$/, '');
-    const url = base.endsWith('/api')
-      ? `${base}/jornada/devolutiva-final`
-      : `${base}/api/jornada/devolutiva-final`;
+  const base = String(apiBase).replace(/\/$/, '');
+  const url = base.endsWith('/api')
+    ? `${base}/jornada/devolutiva-final`
+    : `${base}/api/jornada/devolutiva-final`;
 
-    const resp = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
+  const resp = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
 
-    const data = await resp.json().catch(() => ({}));
+  const data = await resp.json().catch(() => ({}));
 
-    if (!resp.ok || data?.ok === false) {
-      throw new Error(data?.detail || data?.message || data?.error || `HTTP ${resp.status}`);
-    }
-
-    const texto = String(
-      data?.devolutivaFinal ||
-      data?.texto ||
-      data?.text ||
-      data?.message ||
-      ''
-    ).trim();
-
-    if (!texto) {
-      throw new Error('Resposta vazia da devolutiva final');
-    }
-
-    return texto;
+  if (!resp.ok || data?.ok === false) {
+    throw new Error(data?.detail || data?.message || data?.error || `HTTP ${resp.status}`);
   }
+
+  const texto = String(
+    data?.devolutivaFinal ||
+    data?.texto ||
+    data?.text ||
+    data?.message ||
+    ''
+  ).trim();
+
+  if (!texto) {
+    throw new Error('Resposta vazia da devolutiva final');
+  }
+
+  return {
+    texto,
+    provider: String(data?.provider || data?.source || data?.guia || '').trim().toLowerCase(),
+    guia: String(data?.guia || '').trim().toLowerCase(),
+    fallbackUsed: Boolean(data?.fallback || data?.fallbackUsed),
+    raw: data
+  };
+}
 
   async function fetchFinalGuideFeedback() {
     const payload = buildFinalPayloadDiamante();
