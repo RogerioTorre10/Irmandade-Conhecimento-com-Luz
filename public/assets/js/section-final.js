@@ -218,6 +218,35 @@
     perguntas: Array.isArray(item?.perguntas) ? item.perguntas : []
   }));
 }
+  
+function buildBlockSynthesisText(blocos = []) {
+  if (!Array.isArray(blocos) || !blocos.length) return '';
+
+  return blocos
+    .map((bloco, index) => {
+      const titulo = String(bloco?.titulo || `Bloco ${index + 1}`).trim();
+      const respostas = Array.isArray(bloco?.respostas)
+        ? bloco.respostas.map((r) => String(r || '').trim()).filter(Boolean)
+        : [];
+      const devolutiva = String(bloco?.devolutiva || '').trim();
+
+      return [
+        `${index + 1}. ${titulo}`,
+        respostas.length ? `Respostas: ${respostas.join(' | ')}` : '',
+        devolutiva ? `Síntese do bloco: ${devolutiva}` : ''
+      ].filter(Boolean).join('\n');
+    })
+    .join('\n\n');
+}
+
+function buildFinalSynthesisPayload() {
+  const blocos = buildPdfBlocksFromSession();
+  return {
+    blocos,
+    sinteseBlocos: buildBlockSynthesisText(blocos)
+  };
+}
+  
 
   function getStoredFinalFeedback() {
     return String(
@@ -600,17 +629,19 @@
     const selfieCard = readSelfieCardFromEverywhere(s);
     const devolutivaFinal = getStoredFinalFeedback();
     const dadosPessoais = getDadosPessoaisPayload();
+    const blocosData = buildFinalSynthesisPayload();
 
     const payload = {
-    nome,
-    guia,
-    respostas,
-    blocos: buildPdfBlocksFromSession(),
-    selfieCard,
-    devolutivaFinal,
-    dadosPessoais,
-    idioma: getActiveLang()
- };
+     nome,
+     guia,
+     respostas,
+     blocos: blocosData.blocos,
+     sinteseBlocos: blocosData.sinteseBlocos,
+     selfieCard,
+     devolutivaFinal,
+     dadosPessoais,
+     idioma: getActiveLang()
+   };
 
     console.log('[FINAL][PAYLOAD NORMALIZED]', payload, '[GUIA]', guiaNorm);
     return payload;
