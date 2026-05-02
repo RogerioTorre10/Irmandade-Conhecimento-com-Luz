@@ -137,6 +137,11 @@
     }
     
     #section-final .final-acoes button,
+    #section-final .final-acoes a,
+    #section-final #btnPdf,
+    #section-final #btnBaixarSelfie,
+    #section-final #btnVoltarPortal,
+    #section-final .btn,
     #section-final .btn-pdf,
     #section-final .btn-selfie,
     #section-final .btn-portal {
@@ -148,10 +153,9 @@
       color: #f9e7c2 !important;
       text-shadow: 1px 1px 3px rgba(0,0,0,.8) !important;
       box-shadow:
-        inset 0 3px 6px rgba(0,0,0,.45),
-        0 6px 12px rgba(0,0,0,.55),
-        0 0 12px rgba(212,175,55,.28) !important;
-      transition: transform .22s ease, filter .22s ease, box-shadow .22s ease !important;
+       inset 0 3px 6px rgba(0,0,0,.45),
+       0 6px 12px rgba(0,0,0,.55),
+       0 0 12px rgba(212,175,55,.28) !important;
     }
 
     #section-final .final-acoes button:hover:not(:disabled),
