@@ -921,7 +921,7 @@ function buildDadosPessoaisPayload() {
   };
 }
 
-async function requestGuideFeedbackWithFallback(params, retry = 0) {
+async function requestGuideFeedbackWithFallback(params) {
   const {
     nome,
     guia,
@@ -947,105 +947,128 @@ async function requestGuideFeedbackWithFallback(params, retry = 0) {
     dadosPessoais: dadosPessoais || {}
   };
 
+  console.log('[DEVOLUTIVA][API][REQUEST]', {
+    guia: guiaNorm,
+    idioma: lang,
+    bloco: body.bloco,
+    pergunta: body.pergunta,
+    resposta: body.resposta
+  });
+
   const API_BASE = String(
     window.APP_CONFIG?.API_BASE ||
     'https://lumen-backend-api.onrender.com/api'
   ).replace(/\/$/, '');
 
-  const endpoint = `${API_BASE}/jornada/devolutiva-bloco`;
+  const endpoints = [
+    `${API_BASE}/jornada/devolutiva-bloco`
+  ];
 
-  try {
-    console.log('[API REQUEST]', guiaNorm);
+  let ultimoErro = null;
 
-    const res = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(body)
-    });
-
-    const raw = await res.text();
-
-    let data = null;
-
+  for (const endpoint of endpoints) {
     try {
-      data = raw ? JSON.parse(raw) : null;
-    } catch {
-      data = null;
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      const raw = await res.text();
+
+      let data = null;
+      try {
+        data = raw ? JSON.parse(raw) : null;
+      } catch {
+        data = null;
+      }
+
+      console.log('[DEVOLUTIVA][API][RESPONSE]', {
+        endpoint,
+        status: res.status,
+        ok: res.ok,
+        provider: data?.provider || data?.source || data?.guia,
+        fallback: data?.fallback || data?.fallbackUsed,
+        rawPreview: raw?.slice?.(0, 300)
+      });
+
+      if (!res.ok) {
+        ultimoErro = new Error(`HTTP ${res.status} em ${endpoint}`);
+        continue;
+      }
+
+      const texto = String(
+        data?.texto ||
+        data?.devolutivaFinal ||
+        data?.devolutiva ||
+        ''
+      ).trim();
+
+      const providerNorm = normalizeGuide(
+        data?.provider || data?.source || data?.guia || guiaNorm
+      );
+
+      const fallbackUsed = Boolean(data?.fallback || data?.fallbackUsed);
+
+      if (!texto) {
+        ultimoErro = new Error(`Texto vazio em ${endpoint}`);
+        continue;
+      }
+
+      if (texto.length < 80) {
+        ultimoErro = new Error(`Resposta vazia/fraca em ${endpoint}`);
+        continue;
+      }
+
+      const providerDivergente = providerNorm !== guiaNorm;
+
+      if (providerDivergente) {
+        console.warn('[PROVIDER ALERT]', {
+          solicitado: guiaNorm,
+          retornado: providerNorm,
+          fallback: fallbackUsed
+        });
+      }
+
+      return {
+        ok: true,
+        texto,
+        guiaUsado: providerNorm,
+        guiaSolicitado: guiaNorm,
+        fallbackUsed,
+        provider: providerNorm,
+        providerDivergente,
+        source: data?.source || data?.provider || data?.guia || endpoint,
+        auditOnly: providerDivergente && !fallbackUsed
+      };
+    } catch (error) {
+      ultimoErro = error;
+      console.error('[ERRO API]', error);
     }
+  }
 
-    const texto = extractFeedbackText(data);
+  console.error('[DEVOLUTIVA][ROBUSTA] todos endpoints falharam:', ultimoErro);
 
-    const providerRaw = String(
-      data?.provider ||
-      data?.source ||
-      data?.guia ||
-      ''
-    ).trim().toLowerCase();
-
-    const providerNorm = normalizeGuide(providerRaw || guiaNorm);
-
-    const fallbackUsed = Boolean(
-      data?.fallback ||
-      data?.fallbackUsed
-    );
-
-    const weak = isWeakFeedback(texto, {
-      minChars: 140,
-      minSentences: 2
-    });
-
-    console.log('[API RESPONSE]', {
-      solicitado: guiaNorm,
-      retornado: providerNorm,
-      fallback: fallbackUsed,
-      weak
-    });
-
-    if (!res.ok) {
-      throw new Error(`HTTP ${res.status}`);
-    }
-
-    if (!texto) {
-      throw new Error('Texto vazio');
-    }
-
-    const providerInvalido =
-      fallbackUsed ||
-      providerNorm !== guiaNorm ||
-      weak;
-
-    if (providerInvalido) {
-  console.warn('[PROVIDER AUDIT]', {
-    solicitado: guiaNorm,
-    retornado: providerNorm,
-    fallback: fallbackUsed,
-    weak
+  const fallbackText = buildFallbackFeedback({
+    guia: guiaNorm,
+    nome,
+    blocoNome,
+    resposta,
+    pergunta,
+    idioma: lang
   });
 
   return {
     ok: true,
-    texto,
-    guiaUsado: providerNorm,
+    texto: fallbackText,
+    guiaUsado: guiaNorm,
     guiaSolicitado: guiaNorm,
-    fallbackUsed,
-    provider: providerNorm,
-    providerMismatch: providerNorm !== guiaNorm,
-    auditOnly: true
+    fallbackUsed: true,
+    provider: 'frontend_local_fallback',
+    providerDivergente: false,
+    source: 'frontend_local_fallback',
+    error: String(ultimoErro?.message || ultimoErro || '')
   };
-  } catch (error) {
-    console.error('[ERRO API]', error);
-
-    return {
-      ok: false,
-      texto: '',
-      guiaUsado: guiaNorm,
-      fallbackUsed: true,
-      provider: 'invalid_provider',
-      error: error.message
-    };
-  }
 }
 
 async function gerarDevolutivaDoBloco(bloco) {
