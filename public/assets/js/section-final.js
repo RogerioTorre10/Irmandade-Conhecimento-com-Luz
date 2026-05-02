@@ -1045,17 +1045,17 @@ function buildFinalSynthesisPayload() {
       box.textContent = '';
       await typeText(box, texto, 22, true);
 
-      window.__JORNADA_DEVOLUTIVA_FINAL__ = texto;
-      sessionStorage.setItem('JORNADA_DEVOLUTIVA_FINAL', texto);
+      window.__GUIA_FINAL_EFETIVO__ =
+      result.guiaUsado ||
+      result.provider ||
+      normalizeGuide(getGuiaFinal()).id ||
+     'lumen';
 
-      window.__GUIA_FINAL_EFETIVO__ = result.guiaUsado || normalizeGuide(getGuideFinal()).id || 'lumen';
-      sessionStorage.setItem('JORNADA_GUIA_FINAL_EFETIVO', window.__GUIA_FINAL_EFETIVO__);
-      console.warn('[FINAL] Lumen assumiu e concluiu a devolutiva.');
-      } else {
-        window.__GUIA_FINAL_EFETIVO__ = result.guiaUsado || 'lumen';
-        sessionStorage.setItem('JORNADA_GUIA_FINAL_EFETIVO', result.guiaUsado || 'lumen');
-      }
-
+     sessionStorage.setItem(
+     'JORNADA_GUIA_FINAL_EFETIVO',
+     window.__GUIA_FINAL_EFETIVO__
+    );
+      
       unlockFinalButtons(section);
       return texto;
     } catch (err) {
