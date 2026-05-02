@@ -1044,10 +1044,9 @@ function buildFinalSynthesisPayload() {
       window.__JORNADA_DEVOLUTIVA_FINAL__ = texto;
       sessionStorage.setItem('JORNADA_DEVOLUTIVA_FINAL', texto);
 
-      if (result.fallbackUsed && result.guiaUsado === 'lumen') {
-        window.__GUIA_FINAL_EFETIVO__ = 'lumen';
-        sessionStorage.setItem('JORNADA_GUIA_FINAL_EFETIVO', 'lumen');
-        console.warn('[FINAL] Lumen assumiu e concluiu a devolutiva.');
+      window.__GUIA_FINAL_EFETIVO__ = result.guiaUsado || normalizeGuide(getGuideFinal()).id || 'lumen';
+      sessionStorage.setItem('JORNADA_GUIA_FINAL_EFETIVO', window.__GUIA_FINAL_EFETIVO__);
+      console.warn('[FINAL] Lumen assumiu e concluiu a devolutiva.');
       } else {
         window.__GUIA_FINAL_EFETIVO__ = result.guiaUsado || 'lumen';
         sessionStorage.setItem('JORNADA_GUIA_FINAL_EFETIVO', result.guiaUsado || 'lumen');
