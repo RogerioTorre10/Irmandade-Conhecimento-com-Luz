@@ -1017,30 +1017,23 @@ async function requestGuideFeedbackWithFallback(params, retry = 0) {
       weak;
 
     if (providerInvalido) {
-      console.warn('[RETRY PROVIDER]', providerNorm);
+  console.warn('[PROVIDER AUDIT]', {
+    solicitado: guiaNorm,
+    retornado: providerNorm,
+    fallback: fallbackUsed,
+    weak
+  });
 
-      if (retry < 1) {
-        await new Promise(r => setTimeout(r, 1500));
-
-        return requestGuideFeedbackWithFallback(
-          params,
-          retry + 1
-        );
-      }
-
-      throw new Error(
-        `Provider inválido após retry: ${providerNorm}`
-      );
-    }
-
-    return {
-      ok: true,
-      texto,
-      guiaUsado: providerNorm,
-      fallbackUsed: false,
-      provider: providerNorm
-    };
-
+  return {
+    ok: true,
+    texto,
+    guiaUsado: providerNorm,
+    guiaSolicitado: guiaNorm,
+    fallbackUsed,
+    provider: providerNorm,
+    providerMismatch: providerNorm !== guiaNorm,
+    auditOnly: true
+  };
   } catch (error) {
     console.error('[ERRO API]', error);
 
