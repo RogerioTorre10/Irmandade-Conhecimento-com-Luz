@@ -921,7 +921,7 @@ function buildDadosPessoaisPayload() {
   };
 }
 
-async function requestGuideFeedbackWithFallback(params) {
+async function requestGuideFeedbackWithFallback(params, retry = 0) {
   const {
     nome,
     guia,
@@ -947,104 +947,112 @@ async function requestGuideFeedbackWithFallback(params) {
     dadosPessoais: dadosPessoais || {}
   };
 
-  console.log('[DEVOLUTIVA][API][REQUEST]', {
-    guia: guiaNorm,
-    idioma: lang,
-    bloco: body.bloco,
-    pergunta: body.pergunta,
-    resposta: body.resposta
-  });
-
   const API_BASE = String(
-  window.APP_CONFIG?.API_BASE ||
-  'https://lumen-backend-api.onrender.com/api'
-).replace(/\/$/, '');
+    window.APP_CONFIG?.API_BASE ||
+    'https://lumen-backend-api.onrender.com/api'
+  ).replace(/\/$/, '');
 
-const endpoints = [
-  `${API_BASE}/jornada/devolutiva-bloco`
-];
+  const endpoint = `${API_BASE}/jornada/devolutiva-bloco`;
 
-let ultimoErro = null;
-
-for (const endpoint of endpoints) {
   try {
+    console.log('[API REQUEST]', guiaNorm);
+
     const res = await fetch(endpoint, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify(body)
     });
 
     const raw = await res.text();
 
     let data = null;
+
     try {
       data = raw ? JSON.parse(raw) : null;
     } catch {
       data = null;
     }
 
-    console.log('[DEVOLUTIVA][API][RESPONSE]', {
-      endpoint,
-      status: res.status,
-      ok: res.ok,
-      provider: data?.provider || data?.source || data?.guia,
-      fallback: data?.fallback || data?.fallbackUsed,
-      rawPreview: raw?.slice?.(0, 300)
+    const texto = extractFeedbackText(data);
+
+    const providerRaw = String(
+      data?.provider ||
+      data?.source ||
+      data?.guia ||
+      ''
+    ).trim().toLowerCase();
+
+    const providerNorm = normalizeGuide(providerRaw || guiaNorm);
+
+    const fallbackUsed = Boolean(
+      data?.fallback ||
+      data?.fallbackUsed
+    );
+
+    const weak = isWeakFeedback(texto, {
+      minChars: 140,
+      minSentences: 2
+    });
+
+    console.log('[API RESPONSE]', {
+      solicitado: guiaNorm,
+      retornado: providerNorm,
+      fallback: fallbackUsed,
+      weak
     });
 
     if (!res.ok) {
-      ultimoErro = new Error(`HTTP ${res.status} em ${endpoint}`);
-      continue;
+      throw new Error(`HTTP ${res.status}`);
     }
 
-    const texto = String(
-      data?.texto ||
-      data?.devolutivaFinal ||
-      data?.devolutiva ||
-      ''
-    ).trim();
-
-    const provider = data?.provider || data?.source || 'backend_unknown';
-    const fallbackUsed = Boolean(data?.fallback || data?.fallbackUsed);
-
-    if (texto && texto.length >= 80) {
-      return {
-        ok: true,
-        texto,
-        guiaUsado: data?.guia || guiaNorm,
-        fallbackUsed,
-        source: provider,
-        provider
-      };
+    if (!texto) {
+      throw new Error('Texto vazio');
     }
 
-    ultimoErro = new Error(`Resposta vazia/fraca em ${endpoint}`);
-  } catch (e) {
-    ultimoErro = e;
-    console.error('[DEVOLUTIVA][API][ERRO]', endpoint, e);
+    const providerInvalido =
+      fallbackUsed ||
+      providerNorm !== guiaNorm ||
+      weak;
+
+    if (providerInvalido) {
+      console.warn('[RETRY PROVIDER]', providerNorm);
+
+      if (retry < 1) {
+        await new Promise(r => setTimeout(r, 1500));
+
+        return requestGuideFeedbackWithFallback(
+          params,
+          retry + 1
+        );
+      }
+
+      throw new Error(
+        `Provider inválido após retry: ${providerNorm}`
+      );
+    }
+
+    return {
+      ok: true,
+      texto,
+      guiaUsado: providerNorm,
+      fallbackUsed: false,
+      provider: providerNorm
+    };
+
+  } catch (error) {
+    console.error('[ERRO API]', error);
+
+    return {
+      ok: false,
+      texto: '',
+      guiaUsado: guiaNorm,
+      fallbackUsed: true,
+      provider: 'invalid_provider',
+      error: error.message
+    };
   }
-}
-
-  console.error('[DEVOLUTIVA][ROBUSTA] todos endpoints falharam:', ultimoErro);
-
-  const fallbackText = buildFallbackFeedback({
-    guia: guiaNorm,
-    nome,
-    blocoNome,
-    resposta,
-    pergunta,
-    idioma: lang
-  });
-
-  return {
-    ok: true,
-    texto: fallbackText,
-    guiaUsado: guiaNorm,
-    fallbackUsed: true,
-    source: 'frontend_local_fallback',
-    provider: 'frontend_local_fallback',
-    error: String(ultimoErro?.message || ultimoErro || '')
-  };
 }
 
 async function gerarDevolutivaDoBloco(bloco) {
