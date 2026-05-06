@@ -68,7 +68,7 @@ app.get("*", async (req, res, next) => {
     return next();
   }
 
-  const fallbackPath = path.join(STATIC_DIR, "jornada-conhecimento-com-luz1.html");
+  const fallbackPath = path.join(STATIC_DIR, "jornada-conhecimento-com-luz.html");
   try {
     await fs.access(fallbackPath);
     res.sendFile(fallbackPath);
