@@ -330,8 +330,12 @@ function buildFinalSynthesisPayload() {
       respostas,
       blocos,
       selfieCard,
-      devolutivaFinal
-    };
+      devolutivaFinal,
+      devolutiva_final: devolutivaFinal,
+      mensagemFinal: devolutivaFinal,
+      textoFinal: devolutivaFinal,
+      idioma: getActiveLang()
+     };
   }
 
   function getFinalButtons(section) {
