@@ -932,77 +932,27 @@ function buildFinalSynthesisPayload() {
 }
 
   async function fetchFinalGuideFeedback() {
-    const payload = buildFinalPayloadDiamante();
+  const payload = buildFinalPayloadDiamante();
 
-    const respostas = Array.isArray(payload?.respostas)
-      ? payload.respostas.filter(Boolean)
-      : [];
+  const respostas = Array.isArray(payload?.respostas)
+    ? payload.respostas.filter(Boolean)
+    : [];
 
-    const devolutivas = collectIntermediateFeedbacks();
-    const guiaOriginal = normalizeGuide(payload?.guia || 'lumen').id || 'lumen';
-    const nome = String(payload?.nome || 'Caminhante').trim() || 'Caminhante';
-    const fallbackText = buildGuideFallbackText(guiaOriginal, nome);
+  const devolutivas = Array.isArray(payload?.blocos)
+    ? payload.blocos
+        .map((b) => String(b?.devolutiva || '').trim())
+        .filter(Boolean)
+    : collectIntermediateFeedbacks();
 
-    if (!respostas.length && !devolutivas.length) {
-      return {
-        ok: true,
-        text: fallbackText,
-        guiaUsado: 'lumen',
-        guiaOriginal,
-        fallbackUsed: true
-      };
-    }
+  const guiaOriginal = normalizeGuide(payload?.guia || 'lumen').id || 'lumen';
+  const nome = String(payload?.nome || 'Caminhante').trim() || 'Caminhante';
+  const fallbackText = buildGuideFallbackText(guiaOriginal, nome);
 
-    const guiasParaTentar = [guiaOriginal, guiaOriginal];
-    if (guiaOriginal !== 'lumen') {
-      guiasParaTentar.push('lumen');
-    }
+  const blocos = Array.isArray(payload?.blocos) ? payload.blocos : [];
+  const sinteseBlocos = String(payload?.sinteseBlocos || '').trim();
+  const dadosPessoais = payload?.dadosPessoais || {};
 
-    let ultimoErro = null;
-
-    for (let idx = 0; idx < guiasParaTentar.length; idx++) {
-      const guiaId = guiasParaTentar[idx];
-      const isRetry = idx === 1 && guiaId === guiaOriginal;
-
-      try {
-        const body = {
-          nome,
-          guia: guiaId,
-          respostas,
-          devolutivas,
-          idioma: getActiveLang(),
-          retry: isRetry,
-          forceComplete: true,
-          minSentences: guiaId === 'lumen' ? 8 : 6,
-          minChars: guiaId === 'lumen' ? 900 : 700
-        };
-
-        console.log('[FINAL][DEVOLUTIVA] tentando com guia:', guiaId, { retry: isRetry });
-        const texto = await postFinalFeedback(body);
-
-        if (isWeakFeedback(texto, {
-          minChars: guiaId === 'lumen' ? 900 : 780,
-          minSentences: guiaId === 'lumen' ? 8 : 6
-        })) {
-          ultimoErro = new Error(`Devolutiva curta ou incompleta para ${guiaId}`);
-          console.warn('[FINAL][DEVOLUTIVA] resposta fraca, tentando próxima camada:', guiaId);
-          continue;
-        }
-
-        return {
-          ok: true,
-          text: texto.trim(),
-          guiaUsado: guiaId,
-          guiaOriginal,
-          fallbackUsed: guiaId !== guiaOriginal
-        };
-      } catch (err) {
-        ultimoErro = err;
-        console.error(`[FINAL][DEVOLUTIVA] falha com ${guiaId}:`, err);
-      }
-    }
-
-    console.warn('[FINAL] usando fallback local após falhas:', ultimoErro);
+  if (!respostas.length && !devolutivas.length && !blocos.length) {
     return {
       ok: true,
       text: fallbackText,
@@ -1011,6 +961,72 @@ function buildFinalSynthesisPayload() {
       fallbackUsed: true
     };
   }
+
+  const guiasParaTentar = [guiaOriginal, guiaOriginal];
+
+  if (guiaOriginal !== 'lumen') {
+    guiasParaTentar.push('lumen');
+  }
+
+  let ultimoErro = null;
+
+  for (let idx = 0; idx < guiasParaTentar.length; idx++) {
+    const guiaId = guiasParaTentar[idx];
+    const isRetry = idx === 1 && guiaId === guiaOriginal;
+
+    try {
+      const body = {
+        nome,
+        guia: guiaId,
+        respostas,
+        devolutivas,
+        blocos,
+        sinteseBlocos,
+        dadosPessoais,
+        idioma: getActiveLang(),
+        retry: isRetry,
+        forceComplete: true,
+        minSentences: guiaId === 'lumen' ? 8 : 7,
+        minChars: guiaId === 'lumen' ? 1000 : 850
+      };
+
+      console.log('[FINAL][DEVOLUTIVA] tentando com guia:', guiaId, body);
+
+      const result = await postFinalFeedback(body);
+      const texto = String(result?.texto || '').trim();
+
+      if (isWeakFeedback(texto, {
+        minChars: guiaId === 'lumen' ? 900 : 780,
+        minSentences: guiaId === 'lumen' ? 8 : 6
+      })) {
+        ultimoErro = new Error(`Devolutiva curta ou incompleta para ${guiaId}`);
+        console.warn('[FINAL][DEVOLUTIVA] resposta fraca, tentando próxima camada:', guiaId, texto);
+        continue;
+      }
+
+      return {
+        ok: true,
+        text: texto,
+        guiaUsado: result?.guia || result?.provider || guiaId,
+        guiaOriginal,
+        fallbackUsed: Boolean(result?.fallbackUsed || guiaId !== guiaOriginal)
+      };
+    } catch (err) {
+      ultimoErro = err;
+      console.error(`[FINAL][DEVOLUTIVA] falha com ${guiaId}:`, err);
+    }
+  }
+
+  console.warn('[FINAL] usando fallback local após falhas:', ultimoErro);
+
+  return {
+    ok: true,
+    text: fallbackText,
+    guiaUsado: 'lumen',
+    guiaOriginal,
+    fallbackUsed: true
+  };
+}
 
   async function renderFinalGuideFeedback(section) {
     if (!section) return null;
