@@ -1056,7 +1056,11 @@ function buildFinalSynthesisPayload() {
         throw new Error(result?.error || 'Falha ao gerar devolutiva final');
       }
 
-      const texto = result.text;
+      const texto = String(result.text || '').trim();
+
+      window.__JORNADA_DEVOLUTIVA_FINAL__ = texto;
+      sessionStorage.setItem('JORNADA_DEVOLUTIVA_FINAL', texto);
+      localStorage.setItem('JORNADA_DEVOLUTIVA_FINAL', texto);
 
       box.textContent = '';
       await typeText(box, texto, 22, true);
