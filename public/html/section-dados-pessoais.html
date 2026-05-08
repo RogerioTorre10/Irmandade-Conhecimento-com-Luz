@@ -36,42 +36,44 @@
             <input id="dp-profissao" type="text" data-i18n-placeholder="dados.profissao" placeholder="Profissão / área" />
             <input id="dp-religiao" type="text" data-i18n-placeholder="dados.religiao" placeholder="Religião / espiritualidade" />
           </div>
+          
+         <div class="dados-linha-tripla dados-selects-principais">
 
-          <div class="dados-linha-tripla">
-            <div class="dp-field">
-              <label for="dp-idade-faixa" data-i18n="dados.idade">Faixa etária</label>
-              <select id="dp-idade-faixa">
-                <option value="">Selecione</option>
-                <option value="Até 17" data-i18n="dados.idade1">Até 17</option>
-                <option value="18 a 24" data-i18n="dados.idade2">18 a 24</option>
-                <option value="25 a 34" data-i18n="dados.idade3">25 a 34</option>
-                <option value="35 a 44" data-i18n="dados.idade4">35 a 44</option>
-                <option value="45 a 59" data-i18n="dados.idade5">45 a 59</option>
-                <option value="60+" data-i18n="dados.idade6">60+</option>
-              </select>
-            </div>
+  <div class="dp-field">
+    <label for="dp-idade-faixa" data-i18n="dados.idade">Faixa etária</label>
+    <select id="dp-idade-faixa" name="idadeFaixa" class="dp-select">
+      <option value="">Selecione</option>
+      <option value="Até 17" data-i18n="dados.idade1">Até 17</option>
+      <option value="18 a 24" data-i18n="dados.idade2">18 a 24</option>
+      <option value="25 a 34" data-i18n="dados.idade3">25 a 34</option>
+      <option value="35 a 44" data-i18n="dados.idade4">35 a 44</option>
+      <option value="45 a 59" data-i18n="dados.idade5">45 a 59</option>
+      <option value="60+" data-i18n="dados.idade6">60+</option>
+    </select>
+  </div>
 
-            <div class="dp-field">
-              <label for="dp-estado-civil" data-i18n="dados.estado_civil">Estado civil</label>
-              <select id="dp-estado-civil">
-                <option value="">Selecione</option>
-                <option value="Solteiro(a)" data-i18n="dados.ec1">Solteiro(a)</option>
-                <option value="Casado(a)" data-i18n="dados.ec2">Casado(a)</option>
-                <option value="Divorciado(a)" data-i18n="dados.ec3">Divorciado(a)</option>
-                <option value="Viúvo(a)" data-i18n="dados.ec4">Viúvo(a)</option>
-                <option value="Outro" data-i18n="dados.ec5">Outro</option>
-              </select>
-            </div>
+  <div class="dp-field">
+    <label for="dp-estado-civil" data-i18n="dados.estado_civil">Estado civil</label>
+    <select id="dp-estado-civil" name="estadoCivil" class="dp-select">
+      <option value="">Selecione</option>
+      <option value="Solteiro(a)" data-i18n="dados.ec1">Solteiro(a)</option>
+      <option value="Casado(a)" data-i18n="dados.ec2">Casado(a)</option>
+      <option value="Divorciado(a)" data-i18n="dados.ec3">Divorciado(a)</option>
+      <option value="Viúvo(a)" data-i18n="dados.ec4">Viúvo(a)</option>
+      <option value="Outro" data-i18n="dados.ec5">Outro</option>
+    </select>
+  </div>
 
-            <div class="dp-field">
-              <label for="dp-filhos" data-i18n="dados.filhos">Filhos</label>
-              <select id="dp-filhos">
-                <option value="">Selecione</option>
-                <option value="Não" data-i18n="dados.filhos_nao">Não</option>
-                <option value="Sim" data-i18n="dados.filhos_sim">Sim</option>
-              </select>
-            </div>
-          </div>
+  <div class="dp-field">
+    <label for="dp-filhos" data-i18n="dados.filhos">Filhos</label>
+    <select id="dp-filhos" name="filhos" class="dp-select">
+      <option value="">Selecione</option>
+      <option value="Não" data-i18n="dados.filhos_nao">Não</option>
+      <option value="Sim" data-i18n="dados.filhos_sim">Sim</option>
+    </select>
+  </div>
+
+</div>
 
           <h2 class="subtitulo-bloco" data-i18n="dados.dadosPerfil.titulo">
             Perfil de Personalidade
