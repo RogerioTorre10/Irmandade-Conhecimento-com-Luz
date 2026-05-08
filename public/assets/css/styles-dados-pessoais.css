@@ -484,3 +484,35 @@ body {
     appearance: menulist !important;
   }
 }
+
+/* =====================================================
+   FIX ESTADO CIVIL / FILHOS — MOBILE
+===================================================== */
+
+#section-dados-pessoais .dados-selects-principais {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr 1fr !important;
+  gap: 10px !important;
+  width: 100% !important;
+  overflow: visible !important;
+}
+
+#section-dados-pessoais .dp-field,
+#section-dados-pessoais .dp-select {
+  position: relative !important;
+  z-index: 50 !important;
+  pointer-events: auto !important;
+}
+
+@media (max-width: 768px) {
+  #section-dados-pessoais .dados-selects-principais {
+    grid-template-columns: 1fr !important;
+  }
+
+  #section-dados-pessoais .dp-select {
+    min-height: 54px !important;
+    touch-action: auto !important;
+    -webkit-appearance: menulist-button !important;
+    appearance: menulist-button !important;
+  }
+}
