@@ -376,46 +376,76 @@ body {
 }
 
 /* =====================================================
-   FIX MOBILE — CAMPOS SELECT / IDADE / DROPDOWN
-   section-dados-pessoais
+   FIX DEFINITIVO MOBILE — DADOS PESSOAIS
+   mantém scroll no card e libera selects
 ===================================================== */
 
 @media (max-width: 768px) {
-  #section-dados-pessoais,
-  #section-dados-pessoais .j-panel-glow,
-  #section-dados-pessoais .j-perg-v-inner,
-  #section-dados-pessoais .j-arcane-card,
-  #section-dados-pessoais .pergaminho-content,
-  #section-dados-pessoais .form-grid {
-    overflow: visible !important;
+  html,
+  body {
+    overflow-x: hidden !important;
+    overflow-y: hidden !important;
+    height: 100% !important;
   }
 
   #section-dados-pessoais {
+    height: 100dvh !important;
     min-height: 100dvh !important;
-    height: auto !important;
-    touch-action: manipulation !important;
+    overflow: hidden !important;
+    padding: 12px 10px !important;
+    touch-action: pan-y !important;
   }
 
-  #section-dados-pessoais select,
+  #section-dados-pessoais .j-panel-glow,
+  #section-dados-pessoais .j-perg-v-inner {
+    height: 100% !important;
+    max-height: 100% !important;
+    overflow: hidden !important;
+  }
+
+  /* ESTE é o único lugar que deve rolar */
+  #section-dados-pessoais .j-arcane-card {
+    height: calc(100dvh - 24px) !important;
+    max-height: calc(100dvh - 24px) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    overscroll-behavior: contain !important;
+    padding-right: 6px !important;
+  }
+
+  #section-dados-pessoais .pergaminho-content,
+  #section-dados-pessoais .form-grid {
+    overflow: visible !important;
+    max-height: none !important;
+    padding-bottom: 90px !important;
+  }
+
   #section-dados-pessoais input,
+  #section-dados-pessoais select,
   #section-dados-pessoais textarea,
   #section-dados-pessoais button {
     position: relative !important;
-    z-index: 20 !important;
+    z-index: 30 !important;
     pointer-events: auto !important;
     touch-action: manipulation !important;
   }
 
   #section-dados-pessoais select {
+    display: block !important;
     appearance: auto !important;
     -webkit-appearance: menulist !important;
-    background-color: rgba(10, 6, 2, 0.88) !important;
+    min-height: 48px !important;
+    font-size: 16px !important;
   }
 
   #section-dados-pessoais::before,
   #section-dados-pessoais::after,
   #section-dados-pessoais .j-panel-glow::before,
   #section-dados-pessoais .j-panel-glow::after,
+  #section-dados-pessoais .j-perg-v-inner::before,
+  #section-dados-pessoais .j-perg-v-inner::after,
   #section-dados-pessoais .j-arcane-card::before,
   #section-dados-pessoais .j-arcane-card::after {
     pointer-events: none !important;
