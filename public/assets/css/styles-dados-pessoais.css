@@ -451,44 +451,36 @@ body {
     pointer-events: none !important;
   }
 }
-/* =====================================================
-   FIX SELECT MOBILE — DADOS PESSOAIS
-   libera toque/lista nativa dos selects
-===================================================== */
+
+#section-dados-pessoais .dp-field {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  position: relative !important;
+  z-index: 5 !important;
+}
+
+#section-dados-pessoais .dp-field > label {
+  display: block !important;
+  width: 100% !important;
+  color: #f3ead7 !important;
+  font-size: 0.95rem !important;
+  line-height: 1.25 !important;
+}
+
+#section-dados-pessoais .dp-field > select {
+  width: 100% !important;
+  position: relative !important;
+  z-index: 10 !important;
+  pointer-events: auto !important;
+}
 
 @media (max-width: 768px) {
   #section-dados-pessoais select {
-    position: relative !important;
-    z-index: 9999 !important;
-    pointer-events: auto !important;
     touch-action: auto !important;
-
-    display: block !important;
-    width: 100% !important;
-    min-height: 52px !important;
-
-    appearance: menulist !important;
     -webkit-appearance: menulist !important;
-
-    background-color: rgba(5, 8, 18, 0.96) !important;
-    color: #f6f2e8 !important;
-  }
-
-  #section-dados-pessoais select option {
-    background: #111827 !important;
-    color: #ffffff !important;
-    font-size: 16px !important;
-  }
-
-  #section-dados-pessoais label,
-  #section-dados-pessoais .form-grid-personalidade label {
-    position: relative !important;
-    z-index: 9998 !important;
-    pointer-events: auto !important;
-  }
-
-  #section-dados-pessoais .j-arcane-card {
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch !important;
+    appearance: menulist !important;
   }
 }
