@@ -451,3 +451,44 @@ body {
     pointer-events: none !important;
   }
 }
+/* =====================================================
+   FIX SELECT MOBILE — DADOS PESSOAIS
+   libera toque/lista nativa dos selects
+===================================================== */
+
+@media (max-width: 768px) {
+  #section-dados-pessoais select {
+    position: relative !important;
+    z-index: 9999 !important;
+    pointer-events: auto !important;
+    touch-action: auto !important;
+
+    display: block !important;
+    width: 100% !important;
+    min-height: 52px !important;
+
+    appearance: menulist !important;
+    -webkit-appearance: menulist !important;
+
+    background-color: rgba(5, 8, 18, 0.96) !important;
+    color: #f6f2e8 !important;
+  }
+
+  #section-dados-pessoais select option {
+    background: #111827 !important;
+    color: #ffffff !important;
+    font-size: 16px !important;
+  }
+
+  #section-dados-pessoais label,
+  #section-dados-pessoais .form-grid-personalidade label {
+    position: relative !important;
+    z-index: 9998 !important;
+    pointer-events: auto !important;
+  }
+
+  #section-dados-pessoais .j-arcane-card {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+}
