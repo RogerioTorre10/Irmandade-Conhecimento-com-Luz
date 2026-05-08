@@ -374,3 +374,50 @@ body {
 .form-grid-personalidade select {
   margin-top: 4px;
 }
+
+/* =====================================================
+   FIX MOBILE — CAMPOS SELECT / IDADE / DROPDOWN
+   section-dados-pessoais
+===================================================== */
+
+@media (max-width: 768px) {
+  #section-dados-pessoais,
+  #section-dados-pessoais .j-panel-glow,
+  #section-dados-pessoais .j-perg-v-inner,
+  #section-dados-pessoais .j-arcane-card,
+  #section-dados-pessoais .pergaminho-content,
+  #section-dados-pessoais .form-grid {
+    overflow: visible !important;
+  }
+
+  #section-dados-pessoais {
+    min-height: 100dvh !important;
+    height: auto !important;
+    touch-action: manipulation !important;
+  }
+
+  #section-dados-pessoais select,
+  #section-dados-pessoais input,
+  #section-dados-pessoais textarea,
+  #section-dados-pessoais button {
+    position: relative !important;
+    z-index: 20 !important;
+    pointer-events: auto !important;
+    touch-action: manipulation !important;
+  }
+
+  #section-dados-pessoais select {
+    appearance: auto !important;
+    -webkit-appearance: menulist !important;
+    background-color: rgba(10, 6, 2, 0.88) !important;
+  }
+
+  #section-dados-pessoais::before,
+  #section-dados-pessoais::after,
+  #section-dados-pessoais .j-panel-glow::before,
+  #section-dados-pessoais .j-panel-glow::after,
+  #section-dados-pessoais .j-arcane-card::before,
+  #section-dados-pessoais .j-arcane-card::after {
+    pointer-events: none !important;
+  }
+}
