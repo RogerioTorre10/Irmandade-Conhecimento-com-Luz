@@ -336,73 +336,72 @@
     max-height: calc(100vh - 40px);
   }
 }
-/* =====================================================
-   FIX SELECT MOBILE — adicionar ao FINAL de
-   styles-dados-pessoais.css
-   
-   Neutraliza transform/filter/backdrop-filter dos
-   arquivos globais (j-panel-glow.css, brilho-texturas.css)
-   que criam stacking context e prendem o picker nativo
-   do iOS/Android em todos os selects exceto o primeiro.
-   ===================================================== */
+/* =========================================================
+   FIX DEFINITIVO SELECT MOBILE
+   Remove contextos que bloqueiam picker nativo iOS/Android
+========================================================= */
 
-/* Neutraliza efeitos visuais nos ancestrais diretos dos selects
-   dentro da section — mantém visual mas libera o picker nativo */
-#section-dados-pessoais .j-panel-glow,
-#section-dados-pessoais .dados-painel,
-#section-dados-pessoais .j-perg-v-inner {
-  transform: none !important;
-  filter: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  will-change: auto !important;
-  perspective: none !important;
-  isolation: auto !important;
-}
+@media (max-width: 768px) {
 
-/* O card que rola também não pode ter transform ativo */
-#section-dados-pessoais .j-arcane-card {
-  transform: none !important;
-  filter: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  will-change: auto !important;
-  perspective: none !important;
-  isolation: auto !important;
-}
+  /* seção principal */
+  #section-dados-pessoais,
+  #section-dados-pessoais .j-panel-glow,
+  #section-dados-pessoais .j-perg-v-inner,
+  #section-dados-pessoais .j-arcane-card,
+  #section-dados-pessoais .pergaminho-content,
+  #section-dados-pessoais .form-grid,
+  #section-dados-pessoais .form-grid-personalidade,
+  #section-dados-pessoais .dados-linha-tripla {
+    
+    transform: none !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    will-change: auto !important;
+    perspective: none !important;
+    isolation: auto !important;
+  }
 
-/* Conteúdo interno também limpo */
-#section-dados-pessoais .pergaminho-content,
-#section-dados-pessoais .form-grid,
-#section-dados-pessoais .form-grid-personalidade,
-#section-dados-pessoais .dados-linha-tripla,
-#section-dados-pessoais .dp-field {
-  transform: none !important;
-  filter: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  will-change: auto !important;
-  isolation: auto !important;
-}
+  /* pseudo elementos decorativos não podem bloquear toque */
+  #section-dados-pessoais::before,
+  #section-dados-pessoais::after,
+  #section-dados-pessoais .j-panel-glow::before,
+  #section-dados-pessoais .j-panel-glow::after,
+  #section-dados-pessoais .j-perg-v-inner::before,
+  #section-dados-pessoais .j-perg-v-inner::after,
+  #section-dados-pessoais .j-arcane-card::before,
+  #section-dados-pessoais .j-arcane-card::after,
+  #section-dados-pessoais .dados-painel::before,
+  #section-dados-pessoais .dados-painel::after {
+    pointer-events: none !important;
+    z-index: 0 !important;
+  }
 
-/* Garante que os selects sejam sempre clicáveis/tocáveis */
-#section-dados-pessoais select,
-#section-dados-pessoais .dp-select {
-  pointer-events: auto !important;
-  touch-action: manipulation !important;
-  position: relative !important;
-  z-index: 100 !important;
-}
+  /* garante que os selects fiquem acima */
+  #section-dados-pessoais select,
+  #section-dados-pessoais .dp-select {
+    position: relative !important;
+    z-index: 999 !important;
+    pointer-events: auto !important;
+    touch-action: manipulation !important;
 
-/* Pseudo-elementos decorativos (brilhos, halos) não bloqueiam toque */
-#section-dados-pessoais .j-panel-glow::before,
-#section-dados-pessoais .j-panel-glow::after,
-#section-dados-pessoais .j-perg-v-inner::before,
-#section-dados-pessoais .j-perg-v-inner::after,
-#section-dados-pessoais .j-arcane-card::before,
-#section-dados-pessoais .j-arcane-card::after,
-#section-dados-pessoais .dados-painel::before,
-#section-dados-pessoais .dados-painel::after {
-  pointer-events: none !important;
-  z-index: 0 !important;
+    min-height: 48px !important;
+    font-size: 16px !important;
+
+    appearance: menulist !important;
+    -webkit-appearance: menulist !important;
+  }
+
+  /* mobile empilhado */
+  #section-dados-pessoais .dados-linha-tripla,
+  #section-dados-pessoais .form-grid-personalidade {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* scroll continua funcionando */
+  #section-dados-pessoais .j-arcane-card {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
 }
