@@ -36,44 +36,44 @@
             <input id="dp-profissao" type="text" data-i18n-placeholder="dados.profissao" placeholder="Profissão / área" />
             <input id="dp-religiao" type="text" data-i18n-placeholder="dados.religiao" placeholder="Religião / espiritualidade" />
           </div>
-          
-         <div class="dados-linha-tripla dados-selects-principais">
 
-  <div class="dp-field">
-    <label for="dp-idade-faixa" data-i18n="dados.idade">Faixa etária</label>
-    <select id="dp-idade-faixa" name="idadeFaixa" class="dp-select">
-      <option value="">Selecione</option>
-      <option value="Até 17" data-i18n="dados.idade1">Até 17</option>
-      <option value="18 a 24" data-i18n="dados.idade2">18 a 24</option>
-      <option value="25 a 34" data-i18n="dados.idade3">25 a 34</option>
-      <option value="35 a 44" data-i18n="dados.idade4">35 a 44</option>
-      <option value="45 a 59" data-i18n="dados.idade5">45 a 59</option>
-      <option value="60+" data-i18n="dados.idade6">60+</option>
-    </select>
-  </div>
+          <div class="dados-linha-tripla dados-selects-principais">
 
-  <div class="dp-field">
-    <label for="dp-estado-civil" data-i18n="dados.estado_civil">Estado civil</label>
-    <select id="dp-estado-civil" name="estadoCivil" class="dp-select">
-      <option value="">Selecione</option>
-      <option value="Solteiro(a)" data-i18n="dados.ec1">Solteiro(a)</option>
-      <option value="Casado(a)" data-i18n="dados.ec2">Casado(a)</option>
-      <option value="Divorciado(a)" data-i18n="dados.ec3">Divorciado(a)</option>
-      <option value="Viúvo(a)" data-i18n="dados.ec4">Viúvo(a)</option>
-      <option value="Outro" data-i18n="dados.ec5">Outro</option>
-    </select>
-  </div>
+            <label class="field-group-full">
+              <span data-i18n="dados.idade">Faixa etária</span>
+              <select id="dp-idade-faixa" name="idadeFaixa" class="dp-select">
+                <option value="">Selecione</option>
+                <option value="Até 17" data-i18n="dados.idade1">Até 17</option>
+                <option value="18 a 24" data-i18n="dados.idade2">18 a 24</option>
+                <option value="25 a 34" data-i18n="dados.idade3">25 a 34</option>
+                <option value="35 a 44" data-i18n="dados.idade4">35 a 44</option>
+                <option value="45 a 59" data-i18n="dados.idade5">45 a 59</option>
+                <option value="60+" data-i18n="dados.idade6">60+</option>
+              </select>
+            </label>
 
-  <div class="dp-field">
-    <label for="dp-filhos" data-i18n="dados.filhos">Filhos</label>
-    <select id="dp-filhos" name="filhos" class="dp-select">
-      <option value="">Selecione</option>
-      <option value="Não" data-i18n="dados.filhos_nao">Não</option>
-      <option value="Sim" data-i18n="dados.filhos_sim">Sim</option>
-    </select>
-  </div>
+            <label class="field-group-full">
+              <span data-i18n="dados.estado_civil">Estado civil</span>
+              <select id="dp-estado-civil" name="estadoCivil" class="dp-select">
+                <option value="">Selecione</option>
+                <option value="Solteiro(a)" data-i18n="dados.ec1">Solteiro(a)</option>
+                <option value="Casado(a)" data-i18n="dados.ec2">Casado(a)</option>
+                <option value="Divorciado(a)" data-i18n="dados.ec3">Divorciado(a)</option>
+                <option value="Viúvo(a)" data-i18n="dados.ec4">Viúvo(a)</option>
+                <option value="Outro" data-i18n="dados.ec5">Outro</option>
+              </select>
+            </label>
 
-</div>
+            <label class="field-group-full">
+              <span data-i18n="dados.filhos">Filhos</span>
+              <select id="dp-filhos" name="filhos" class="dp-select">
+                <option value="">Selecione</option>
+                <option value="Não" data-i18n="dados.filhos_nao">Não</option>
+                <option value="Sim" data-i18n="dados.filhos_sim">Sim</option>
+              </select>
+            </label>
+
+          </div>
 
           <h2 class="subtitulo-bloco" data-i18n="dados.dadosPerfil.titulo">
             Perfil de Personalidade
@@ -81,9 +81,9 @@
 
           <div class="form-grid form-grid-personalidade">
 
-            <div class="dp-field">
-              <label for="dp-temperamento" data-i18n="dados.dadosPerfil.temperamentoLabel">Temperamento</label>
-              <select id="dp-temperamento">
+            <label class="field-group-full">
+              <span data-i18n="dados.dadosPerfil.temperamentoLabel">Temperamento</span>
+              <select id="dp-temperamento" name="temperamento" class="dp-select">
                 <option value="" data-i18n="dados.dadosPerfil.selecione">Selecione</option>
                 <option value="Explosivo" data-i18n="dados.dadosPerfil.temperamento.explosivo">Explosivo</option>
                 <option value="Impulsivo" data-i18n="dados.dadosPerfil.temperamento.impulsivo">Impulsivo</option>
@@ -100,11 +100,11 @@
                 <option value="Emotivo" data-i18n="dados.dadosPerfil.temperamento.emotivo">Emotivo</option>
                 <option value="Mutável" data-i18n="dados.dadosPerfil.temperamento.mutavel">Mutável</option>
               </select>
-            </div>
+            </label>
 
-            <div class="dp-field">
-              <label for="dp-comportamento" data-i18n="dados.dadosPerfil.comportamentoLabel">Comportamento</label>
-              <select id="dp-comportamento">
+            <label class="field-group-full">
+              <span data-i18n="dados.dadosPerfil.comportamentoLabel">Comportamento</span>
+              <select id="dp-comportamento" name="comportamento" class="dp-select">
                 <option value="" data-i18n="dados.dadosPerfil.selecione">Selecione</option>
                 <option value="Agressivo" data-i18n="dados.dadosPerfil.comportamento.agressivo">Agressivo</option>
                 <option value="Rígido" data-i18n="dados.dadosPerfil.comportamento.rigido">Rígido</option>
@@ -124,11 +124,11 @@
                 <option value="Meticuloso" data-i18n="dados.dadosPerfil.comportamento.meticuloso">Meticuloso</option>
                 <option value="Observador" data-i18n="dados.dadosPerfil.comportamento.observador">Observador</option>
               </select>
-            </div>
+            </label>
 
-            <div class="dp-field">
-              <label for="dp-carater" data-i18n="dados.dadosPerfil.caraterLabel">Caráter</label>
-              <select id="dp-carater">
+            <label class="field-group-full">
+              <span data-i18n="dados.dadosPerfil.caraterLabel">Caráter</span>
+              <select id="dp-carater" name="carater" class="dp-select">
                 <option value="" data-i18n="dados.dadosPerfil.selecione">Selecione</option>
                 <option value="Firme" data-i18n="dados.dadosPerfil.carater.firme">Firme</option>
                 <option value="Forte" data-i18n="dados.dadosPerfil.carater.forte">Forte</option>
@@ -147,11 +147,11 @@
                 <option value="Confiável" data-i18n="dados.dadosPerfil.carater.confiavel">Confiável</option>
                 <option value="Responsável" data-i18n="dados.dadosPerfil.carater.responsavel">Responsável</option>
               </select>
-            </div>
+            </label>
 
-            <div class="dp-field">
-              <label for="dp-indole" data-i18n="dados.dadosPerfil.indoleLabel">Índole</label>
-              <select id="dp-indole">
+            <label class="field-group-full">
+              <span data-i18n="dados.dadosPerfil.indoleLabel">Índole</span>
+              <select id="dp-indole" name="indole" class="dp-select">
                 <option value="" data-i18n="dados.dadosPerfil.selecione">Selecione</option>
                 <option value="Boa" data-i18n="dados.dadosPerfil.indole.boa">Boa</option>
                 <option value="Generosa" data-i18n="dados.dadosPerfil.indole.generosa">Generosa</option>
@@ -169,11 +169,11 @@
                 <option value="Corrompida" data-i18n="dados.dadosPerfil.indole.corrompida">Corrompida</option>
                 <option value="Autoritária" data-i18n="dados.dadosPerfil.indole.autoritaria">Autoritária</option>
               </select>
-            </div>
+            </label>
 
-            <div class="dp-field">
-              <label for="dp-vazio-existencial" data-i18n="dados.dadosPerfil.vazioLabel">Vazio Existencial</label>
-              <select id="dp-vazio-existencial">
+            <label class="field-group-full">
+              <span data-i18n="dados.dadosPerfil.vazioLabel">Vazio Existencial</span>
+              <select id="dp-vazio-existencial" name="vazioExistencial" class="dp-select">
                 <option value="" data-i18n="dados.dadosPerfil.selecione">Selecione</option>
                 <option value="apatia" data-i18n="dados.dadosPerfil.vazio.apatia">apatia</option>
                 <option value="mediocridade" data-i18n="dados.dadosPerfil.vazio.mediocridade">mediocridade</option>
@@ -193,11 +193,11 @@
                 <option value="inutilidade" data-i18n="dados.dadosPerfil.vazio.inutilidade">inutilidade</option>
                 <option value="infantilidade" data-i18n="dados.dadosPerfil.vazio.infantilidade">infantilidade</option>
               </select>
-            </div>
+            </label>
 
-            <div class="dp-field">
-              <label for="dp-pleno-existencial" data-i18n="dados.dadosPerfil.plenoLabel">Pleno Existencial</label>
-              <select id="dp-pleno-existencial">
+            <label class="field-group-full">
+              <span data-i18n="dados.dadosPerfil.plenoLabel">Pleno Existencial</span>
+              <select id="dp-pleno-existencial" name="plenoExistencial" class="dp-select">
                 <option value="" data-i18n="dados.dadosPerfil.selecione">Selecione</option>
                 <option value="propósito" data-i18n="dados.dadosPerfil.pleno.proposito">propósito</option>
                 <option value="excelência" data-i18n="dados.dadosPerfil.pleno.excelencia">excelência</option>
@@ -217,7 +217,7 @@
                 <option value="utilidade" data-i18n="dados.dadosPerfil.pleno.utilidade">utilidade</option>
                 <option value="maturidade" data-i18n="dados.dadosPerfil.pleno.maturidade">maturidade</option>
               </select>
-            </div>
+            </label>
 
           </div>
 
