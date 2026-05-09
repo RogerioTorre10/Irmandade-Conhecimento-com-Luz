@@ -29,224 +29,233 @@
             data-text="Preencha os dados para enriquecer sua devolutiva."
           >Preencha os dados para enriquecer sua devolutiva.</p>
 
+          <!-- Campos de texto -->
           <div class="form-grid">
-            <input id="dp-nome" type="text" data-i18n-placeholder="dados.nome" placeholder="Nome completo" />
-            <input id="dp-cidade" type="text" data-i18n-placeholder="dados.cidade" placeholder="Cidade" />
-            <input id="dp-estado" type="text" data-i18n-placeholder="dados.estado" placeholder="Estado" />
-            <input id="dp-profissao" type="text" data-i18n-placeholder="dados.profissao" placeholder="Profissão / área" />
-            <input id="dp-religiao" type="text" data-i18n-placeholder="dados.religiao" placeholder="Religião / espiritualidade" />
+            <input id="dp-nome"
+                   type="text"
+                   data-i18n-placeholder="dados.nome"
+                   placeholder="Nome completo" />
+
+            <input id="dp-cidade"
+                   type="text"
+                   data-i18n-placeholder="dados.cidade"
+                   placeholder="Cidade" />
+
+            <input id="dp-estado"
+                   type="text"
+                   data-i18n-placeholder="dados.estado"
+                   placeholder="Estado" />
+
+            <input id="dp-profissao"
+                   type="text"
+                   data-i18n-placeholder="dados.profissao"
+                   placeholder="Profissão / área" />
+
+            <input id="dp-religiao"
+                   type="text"
+                   data-i18n-placeholder="dados.religiao"
+                   placeholder="Religião / espiritualidade" />
           </div>
 
-          <div class="dados-linha-tripla dados-selects-principais">
+          <!-- Selects rápidos: faixa etária / estado civil / filhos -->
+          <div class="dados-linha-tripla">
 
-            <label class="field-group-full">
-              <span data-i18n="dados.idade">Faixa etária</span>
-              <select id="dp-idade-faixa" name="idadeFaixa" class="dp-select">
-                <option value="">Selecione</option>
-                <option value="Até 17" data-i18n="dados.idade1">Até 17</option>
-                <option value="18 a 24" data-i18n="dados.idade2">18 a 24</option>
-                <option value="25 a 34" data-i18n="dados.idade3">25 a 34</option>
-                <option value="35 a 44" data-i18n="dados.idade4">35 a 44</option>
-                <option value="45 a 59" data-i18n="dados.idade5">45 a 59</option>
-                <option value="60+" data-i18n="dados.idade6">60+</option>
-              </select>
-            </label>
+            <select id="dp-idade-faixa" class="dp-select">
+              <option value="" data-i18n="dados.idade">Faixa etária</option>
+              <option value="Até 17"  data-i18n="dados.idade1">Até 17</option>
+              <option value="18 a 24" data-i18n="dados.idade2">18 a 24</option>
+              <option value="25 a 34" data-i18n="dados.idade3">25 a 34</option>
+              <option value="35 a 44" data-i18n="dados.idade4">35 a 44</option>
+              <option value="45 a 59" data-i18n="dados.idade5">45 a 59</option>
+              <option value="60+"     data-i18n="dados.idade6">60+</option>
+            </select>
 
-            <label class="field-group-full">
-              <span data-i18n="dados.estado_civil">Estado civil</span>
-              <select id="dp-estado-civil" name="estadoCivil" class="dp-select">
-                <option value="">Selecione</option>
-                <option value="Solteiro(a)" data-i18n="dados.ec1">Solteiro(a)</option>
-                <option value="Casado(a)" data-i18n="dados.ec2">Casado(a)</option>
-                <option value="Divorciado(a)" data-i18n="dados.ec3">Divorciado(a)</option>
-                <option value="Viúvo(a)" data-i18n="dados.ec4">Viúvo(a)</option>
-                <option value="Outro" data-i18n="dados.ec5">Outro</option>
-              </select>
-            </label>
+            <select id="dp-estado-civil" class="dp-select">
+              <option value=""              data-i18n="dados.estado_civil">Estado civil</option>
+              <option value="Solteiro(a)"   data-i18n="dados.ec1">Solteiro(a)</option>
+              <option value="Casado(a)"     data-i18n="dados.ec2">Casado(a)</option>
+              <option value="Divorciado(a)" data-i18n="dados.ec3">Divorciado(a)</option>
+              <option value="Viúvo(a)"      data-i18n="dados.ec4">Viúvo(a)</option>
+              <option value="Outro"         data-i18n="dados.ec5">Outro</option>
+            </select>
 
-            <label class="field-group-full">
-              <span data-i18n="dados.filhos">Filhos</span>
-              <select id="dp-filhos" name="filhos" class="dp-select">
-                <option value="">Selecione</option>
-                <option value="Não" data-i18n="dados.filhos_nao">Não</option>
-                <option value="Sim" data-i18n="dados.filhos_sim">Sim</option>
-              </select>
-            </label>
+            <select id="dp-filhos" class="dp-select">
+              <option value=""    data-i18n="dados.filhos">Filhos</option>
+              <option value="Não" data-i18n="dados.filhos_nao">Não</option>
+              <option value="Sim" data-i18n="dados.filhos_sim">Sim</option>
+            </select>
 
           </div>
 
-          <h2 class="subtitulo-bloco" data-i18n="dados.dadosPerfil.titulo">
-            Perfil de Personalidade
-          </h2>
+          <!-- Perfil de Personalidade -->
+          <h2 class="subtitulo-bloco" data-i18n="dados.dadosPerfil.titulo">Perfil de Personalidade</h2>
 
           <div class="form-grid form-grid-personalidade">
 
-            <label class="field-group-full">
-              <span data-i18n="dados.dadosPerfil.temperamentoLabel">Temperamento</span>
-              <select id="dp-temperamento" name="temperamento" class="dp-select">
+            <!-- Temperamento -->
+            <label class="dp-field">
+              <span class="dp-label" data-i18n="dados.dadosPerfil.temperamentoLabel">Temperamento</span>
+              <select id="dp-temperamento" class="dp-select">
                 <option value="" data-i18n="dados.dadosPerfil.selecione">Selecione</option>
-                <option value="Explosivo" data-i18n="dados.dadosPerfil.temperamento.explosivo">Explosivo</option>
-                <option value="Impulsivo" data-i18n="dados.dadosPerfil.temperamento.impulsivo">Impulsivo</option>
-                <option value="Ansioso" data-i18n="dados.dadosPerfil.temperamento.ansioso">Ansioso</option>
-                <option value="Nervoso" data-i18n="dados.dadosPerfil.temperamento.nervoso">Nervoso</option>
-                <option value="Calmo" data-i18n="dados.dadosPerfil.temperamento.calmo">Calmo</option>
-                <option value="Passivo" data-i18n="dados.dadosPerfil.temperamento.passivo">Passivo</option>
-                <option value="Sensível" data-i18n="dados.dadosPerfil.temperamento.sensivel">Sensível</option>
-                <option value="Intenso" data-i18n="dados.dadosPerfil.temperamento.intenso">Intenso</option>
+                <option value="Explosivo"   data-i18n="dados.dadosPerfil.temperamento.explosivo">Explosivo</option>
+                <option value="Impulsivo"   data-i18n="dados.dadosPerfil.temperamento.impulsivo">Impulsivo</option>
+                <option value="Ansioso"     data-i18n="dados.dadosPerfil.temperamento.ansioso">Ansioso</option>
+                <option value="Nervoso"     data-i18n="dados.dadosPerfil.temperamento.nervoso">Nervoso</option>
+                <option value="Calmo"       data-i18n="dados.dadosPerfil.temperamento.calmo">Calmo</option>
+                <option value="Passivo"     data-i18n="dados.dadosPerfil.temperamento.passivo">Passivo</option>
+                <option value="Sensível"    data-i18n="dados.dadosPerfil.temperamento.sensivel">Sensível</option>
+                <option value="Intenso"     data-i18n="dados.dadosPerfil.temperamento.intenso">Intenso</option>
                 <option value="Equilibrado" data-i18n="dados.dadosPerfil.temperamento.equilibrado">Equilibrado</option>
-                <option value="Irritável" data-i18n="dados.dadosPerfil.temperamento.irritavel">Irritável</option>
-                <option value="Pacífico" data-i18n="dados.dadosPerfil.temperamento.pacifico">Pacífico</option>
-                <option value="Hesitante" data-i18n="dados.dadosPerfil.temperamento.hesitante">Hesitante</option>
-                <option value="Emotivo" data-i18n="dados.dadosPerfil.temperamento.emotivo">Emotivo</option>
-                <option value="Mutável" data-i18n="dados.dadosPerfil.temperamento.mutavel">Mutável</option>
+                <option value="Irritável"   data-i18n="dados.dadosPerfil.temperamento.irritavel">Irritável</option>
+                <option value="Pacífico"    data-i18n="dados.dadosPerfil.temperamento.pacifico">Pacífico</option>
+                <option value="Hesitante"   data-i18n="dados.dadosPerfil.temperamento.hesitante">Hesitante</option>
+                <option value="Emotivo"     data-i18n="dados.dadosPerfil.temperamento.emotivo">Emotivo</option>
+                <option value="Mutável"     data-i18n="dados.dadosPerfil.temperamento.mutavel">Mutável</option>
               </select>
             </label>
 
-            <label class="field-group-full">
-              <span data-i18n="dados.dadosPerfil.comportamentoLabel">Comportamento</span>
-              <select id="dp-comportamento" name="comportamento" class="dp-select">
+            <!-- Comportamento -->
+            <label class="dp-field">
+              <span class="dp-label" data-i18n="dados.dadosPerfil.comportamentoLabel">Comportamento</span>
+              <select id="dp-comportamento" class="dp-select">
                 <option value="" data-i18n="dados.dadosPerfil.selecione">Selecione</option>
-                <option value="Agressivo" data-i18n="dados.dadosPerfil.comportamento.agressivo">Agressivo</option>
-                <option value="Rígido" data-i18n="dados.dadosPerfil.comportamento.rigido">Rígido</option>
-                <option value="Flexível" data-i18n="dados.dadosPerfil.comportamento.flexivel">Flexível</option>
-                <option value="Confuso" data-i18n="dados.dadosPerfil.comportamento.confuso">Confuso</option>
-                <option value="Ambíguo" data-i18n="dados.dadosPerfil.comportamento.ambiguo">Ambíguo</option>
-                <option value="Inseguro" data-i18n="dados.dadosPerfil.comportamento.inseguro">Inseguro</option>
-                <option value="Seguro" data-i18n="dados.dadosPerfil.comportamento.seguro">Seguro</option>
-                <option value="Sociável" data-i18n="dados.dadosPerfil.comportamento.sociavel">Sociável</option>
-                <option value="Isolado" data-i18n="dados.dadosPerfil.comportamento.isolado">Isolado</option>
-                <option value="Proativo" data-i18n="dados.dadosPerfil.comportamento.proativo">Proativo</option>
-                <option value="Reativo" data-i18n="dados.dadosPerfil.comportamento.reativo">Reativo</option>
+                <option value="Agressivo"     data-i18n="dados.dadosPerfil.comportamento.agressivo">Agressivo</option>
+                <option value="Rígido"        data-i18n="dados.dadosPerfil.comportamento.rigido">Rígido</option>
+                <option value="Flexível"      data-i18n="dados.dadosPerfil.comportamento.flexivel">Flexível</option>
+                <option value="Confuso"       data-i18n="dados.dadosPerfil.comportamento.confuso">Confuso</option>
+                <option value="Ambíguo"       data-i18n="dados.dadosPerfil.comportamento.ambiguo">Ambíguo</option>
+                <option value="Inseguro"      data-i18n="dados.dadosPerfil.comportamento.inseguro">Inseguro</option>
+                <option value="Seguro"        data-i18n="dados.dadosPerfil.comportamento.seguro">Seguro</option>
+                <option value="Sociável"      data-i18n="dados.dadosPerfil.comportamento.sociavel">Sociável</option>
+                <option value="Isolado"       data-i18n="dados.dadosPerfil.comportamento.isolado">Isolado</option>
+                <option value="Proativo"      data-i18n="dados.dadosPerfil.comportamento.proativo">Proativo</option>
+                <option value="Reativo"       data-i18n="dados.dadosPerfil.comportamento.reativo">Reativo</option>
                 <option value="Desorganizado" data-i18n="dados.dadosPerfil.comportamento.desorganizado">Desorganizado</option>
-                <option value="Reservado" data-i18n="dados.dadosPerfil.comportamento.reservado">Reservado</option>
-                <option value="Invasor" data-i18n="dados.dadosPerfil.comportamento.invasor">Invasor</option>
-                <option value="Imprevisível" data-i18n="dados.dadosPerfil.comportamento.imprevisivel">Imprevisível</option>
-                <option value="Meticuloso" data-i18n="dados.dadosPerfil.comportamento.meticuloso">Meticuloso</option>
-                <option value="Observador" data-i18n="dados.dadosPerfil.comportamento.observador">Observador</option>
+                <option value="Reservado"     data-i18n="dados.dadosPerfil.comportamento.reservado">Reservado</option>
+                <option value="Invasor"       data-i18n="dados.dadosPerfil.comportamento.invasor">Invasor</option>
+                <option value="Imprevisível"  data-i18n="dados.dadosPerfil.comportamento.imprevisivel">Imprevisível</option>
+                <option value="Meticuloso"    data-i18n="dados.dadosPerfil.comportamento.meticuloso">Meticuloso</option>
+                <option value="Observador"    data-i18n="dados.dadosPerfil.comportamento.observador">Observador</option>
               </select>
             </label>
 
-            <label class="field-group-full">
-              <span data-i18n="dados.dadosPerfil.caraterLabel">Caráter</span>
-              <select id="dp-carater" name="carater" class="dp-select">
+            <!-- Caráter -->
+            <label class="dp-field">
+              <span class="dp-label" data-i18n="dados.dadosPerfil.caraterLabel">Caráter</span>
+              <select id="dp-carater" class="dp-select">
                 <option value="" data-i18n="dados.dadosPerfil.selecione">Selecione</option>
-                <option value="Firme" data-i18n="dados.dadosPerfil.carater.firme">Firme</option>
-                <option value="Forte" data-i18n="dados.dadosPerfil.carater.forte">Forte</option>
-                <option value="Justo" data-i18n="dados.dadosPerfil.carater.justo">Justo</option>
-                <option value="Honesto" data-i18n="dados.dadosPerfil.carater.honesto">Honesto</option>
-                <option value="Íntegro" data-i18n="dados.dadosPerfil.carater.integro">Íntegro</option>
-                <option value="Duro" data-i18n="dados.dadosPerfil.carater.duro">Duro</option>
-                <option value="Frágil" data-i18n="dados.dadosPerfil.carater.fragil">Frágil</option>
-                <option value="Volátil" data-i18n="dados.dadosPerfil.carater.volatil">Volátil</option>
-                <option value="Determinado" data-i18n="dados.dadosPerfil.carater.determinado">Determinado</option>
+                <option value="Firme"        data-i18n="dados.dadosPerfil.carater.firme">Firme</option>
+                <option value="Forte"        data-i18n="dados.dadosPerfil.carater.forte">Forte</option>
+                <option value="Justo"        data-i18n="dados.dadosPerfil.carater.justo">Justo</option>
+                <option value="Honesto"      data-i18n="dados.dadosPerfil.carater.honesto">Honesto</option>
+                <option value="Íntegro"      data-i18n="dados.dadosPerfil.carater.integro">Íntegro</option>
+                <option value="Duro"         data-i18n="dados.dadosPerfil.carater.duro">Duro</option>
+                <option value="Frágil"       data-i18n="dados.dadosPerfil.carater.fragil">Frágil</option>
+                <option value="Volátil"      data-i18n="dados.dadosPerfil.carater.volatil">Volátil</option>
+                <option value="Determinado"  data-i18n="dados.dadosPerfil.carater.determinado">Determinado</option>
                 <option value="Perseverante" data-i18n="dados.dadosPerfil.carater.perseverante">Perseverante</option>
-                <option value="Corrompível" data-i18n="dados.dadosPerfil.carater.corrompivel">Corrompível</option>
-                <option value="Ético" data-i18n="dados.dadosPerfil.carater.etico">Ético</option>
-                <option value="Incoerente" data-i18n="dados.dadosPerfil.carater.incoerente">Incoerente</option>
-                <option value="Leal" data-i18n="dados.dadosPerfil.carater.leal">Leal</option>
-                <option value="Confiável" data-i18n="dados.dadosPerfil.carater.confiavel">Confiável</option>
-                <option value="Responsável" data-i18n="dados.dadosPerfil.carater.responsavel">Responsável</option>
+                <option value="Corrompível"  data-i18n="dados.dadosPerfil.carater.corrompivel">Corrompível</option>
+                <option value="Ético"        data-i18n="dados.dadosPerfil.carater.etico">Ético</option>
+                <option value="Incoerente"   data-i18n="dados.dadosPerfil.carater.incoerente">Incoerente</option>
+                <option value="Leal"         data-i18n="dados.dadosPerfil.carater.leal">Leal</option>
+                <option value="Confiável"    data-i18n="dados.dadosPerfil.carater.confiavel">Confiável</option>
+                <option value="Responsável"  data-i18n="dados.dadosPerfil.carater.responsavel">Responsável</option>
               </select>
             </label>
 
-            <label class="field-group-full">
-              <span data-i18n="dados.dadosPerfil.indoleLabel">Índole</span>
-              <select id="dp-indole" name="indole" class="dp-select">
+            <!-- Índole -->
+            <label class="dp-field">
+              <span class="dp-label" data-i18n="dados.dadosPerfil.indoleLabel">Índole</span>
+              <select id="dp-indole" class="dp-select">
                 <option value="" data-i18n="dados.dadosPerfil.selecione">Selecione</option>
-                <option value="Boa" data-i18n="dados.dadosPerfil.indole.boa">Boa</option>
-                <option value="Generosa" data-i18n="dados.dadosPerfil.indole.generosa">Generosa</option>
-                <option value="Empática" data-i18n="dados.dadosPerfil.indole.empatica">Empática</option>
-                <option value="Solidária" data-i18n="dados.dadosPerfil.indole.solidaria">Solidária</option>
-                <option value="Neutra" data-i18n="dados.dadosPerfil.indole.neutra">Neutra</option>
-                <option value="Egoísta" data-i18n="dados.dadosPerfil.indole.egoista">Egoísta</option>
-                <option value="Fria" data-i18n="dados.dadosPerfil.indole.fria">Fria</option>
-                <option value="Calculista" data-i18n="dados.dadosPerfil.indole.calculista">Calculista</option>
+                <option value="Boa"          data-i18n="dados.dadosPerfil.indole.boa">Boa</option>
+                <option value="Generosa"     data-i18n="dados.dadosPerfil.indole.generosa">Generosa</option>
+                <option value="Empática"     data-i18n="dados.dadosPerfil.indole.empatica">Empática</option>
+                <option value="Solidária"    data-i18n="dados.dadosPerfil.indole.solidaria">Solidária</option>
+                <option value="Neutra"       data-i18n="dados.dadosPerfil.indole.neutra">Neutra</option>
+                <option value="Egoísta"      data-i18n="dados.dadosPerfil.indole.egoista">Egoísta</option>
+                <option value="Fria"         data-i18n="dados.dadosPerfil.indole.fria">Fria</option>
+                <option value="Calculista"   data-i18n="dados.dadosPerfil.indole.calculista">Calculista</option>
                 <option value="Manipuladora" data-i18n="dados.dadosPerfil.indole.manipuladora">Manipuladora</option>
-                <option value="Falsa" data-i18n="dados.dadosPerfil.indole.falsa">Falsa</option>
-                <option value="Cruel" data-i18n="dados.dadosPerfil.indole.cruel">Cruel</option>
-                <option value="Perversa" data-i18n="dados.dadosPerfil.indole.perversa">Perversa</option>
-                <option value="Medíocre" data-i18n="dados.dadosPerfil.indole.mediocre">Medíocre</option>
-                <option value="Corrompida" data-i18n="dados.dadosPerfil.indole.corrompida">Corrompida</option>
-                <option value="Autoritária" data-i18n="dados.dadosPerfil.indole.autoritaria">Autoritária</option>
+                <option value="Falsa"        data-i18n="dados.dadosPerfil.indole.falsa">Falsa</option>
+                <option value="Cruel"        data-i18n="dados.dadosPerfil.indole.cruel">Cruel</option>
+                <option value="Perversa"     data-i18n="dados.dadosPerfil.indole.perversa">Perversa</option>
+                <option value="Medíocre"     data-i18n="dados.dadosPerfil.indole.mediocre">Medíocre</option>
+                <option value="Corrompida"   data-i18n="dados.dadosPerfil.indole.corrompida">Corrompida</option>
+                <option value="Autoritária"  data-i18n="dados.dadosPerfil.indole.autoritaria">Autoritária</option>
               </select>
             </label>
 
-            <label class="field-group-full">
-              <span data-i18n="dados.dadosPerfil.vazioLabel">Vazio Existencial</span>
-              <select id="dp-vazio-existencial" name="vazioExistencial" class="dp-select">
+            <!-- Vazio Existencial — largura total -->
+            <label class="dp-field dp-field--full">
+              <span class="dp-label" data-i18n="dados.dadosPerfil.vazioLabel">Vazio Existencial</span>
+              <select id="dp-vazio-existencial" class="dp-select">
                 <option value="" data-i18n="dados.dadosPerfil.selecione">Selecione</option>
-                <option value="apatia" data-i18n="dados.dadosPerfil.vazio.apatia">apatia</option>
-                <option value="mediocridade" data-i18n="dados.dadosPerfil.vazio.mediocridade">mediocridade</option>
-                <option value="amargura" data-i18n="dados.dadosPerfil.vazio.amargura">amargura</option>
-                <option value="tédio" data-i18n="dados.dadosPerfil.vazio.tedio">tédio</option>
-                <option value="solidão" data-i18n="dados.dadosPerfil.vazio.solidao">solidão</option>
-                <option value="frustração" data-i18n="dados.dadosPerfil.vazio.frustracao">frustração</option>
-                <option value="arrependimento" data-i18n="dados.dadosPerfil.vazio.arrependimento">arrependimento</option>
-                <option value="rancor" data-i18n="dados.dadosPerfil.vazio.rancor">rancor</option>
-                <option value="mágoa" data-i18n="dados.dadosPerfil.vazio.magoa">mágoa</option>
-                <option value="nojo" data-i18n="dados.dadosPerfil.vazio.nojo">nojo</option>
-                <option value="inveja" data-i18n="dados.dadosPerfil.vazio.inveja">inveja</option>
-                <option value="cobiça" data-i18n="dados.dadosPerfil.vazio.cobica">cobiça</option>
-                <option value="avareza" data-i18n="dados.dadosPerfil.vazio.avareza">avareza</option>
-                <option value="idiotice" data-i18n="dados.dadosPerfil.vazio.idiotice">idiotice</option>
-                <option value="irresponsabilidade" data-i18n="dados.dadosPerfil.vazio.irresponsabilidade">irresponsabilidade</option>
-                <option value="inutilidade" data-i18n="dados.dadosPerfil.vazio.inutilidade">inutilidade</option>
-                <option value="infantilidade" data-i18n="dados.dadosPerfil.vazio.infantilidade">infantilidade</option>
+                <option value="apatia"              data-i18n="dados.dadosPerfil.vazio.apatia">apatia</option>
+                <option value="mediocridade"        data-i18n="dados.dadosPerfil.vazio.mediocridade">mediocridade</option>
+                <option value="amargura"            data-i18n="dados.dadosPerfil.vazio.amargura">amargura</option>
+                <option value="tédio"               data-i18n="dados.dadosPerfil.vazio.tedio">tédio</option>
+                <option value="solidão"             data-i18n="dados.dadosPerfil.vazio.solidao">solidão</option>
+                <option value="frustração"          data-i18n="dados.dadosPerfil.vazio.frustracao">frustração</option>
+                <option value="arrependimento"      data-i18n="dados.dadosPerfil.vazio.arrependimento">arrependimento</option>
+                <option value="rancor"              data-i18n="dados.dadosPerfil.vazio.rancor">rancor</option>
+                <option value="mágoa"               data-i18n="dados.dadosPerfil.vazio.magoa">mágoa</option>
+                <option value="nojo"                data-i18n="dados.dadosPerfil.vazio.nojo">nojo</option>
+                <option value="inveja"              data-i18n="dados.dadosPerfil.vazio.inveja">inveja</option>
+                <option value="cobiça"              data-i18n="dados.dadosPerfil.vazio.cobica">cobiça</option>
+                <option value="avareza"             data-i18n="dados.dadosPerfil.vazio.avareza">avareza</option>
+                <option value="idiotice"            data-i18n="dados.dadosPerfil.vazio.idiotice">idiotice</option>
+                <option value="irresponsabilidade"  data-i18n="dados.dadosPerfil.vazio.irresponsabilidade">irresponsabilidade</option>
+                <option value="inutilidade"         data-i18n="dados.dadosPerfil.vazio.inutilidade">inutilidade</option>
+                <option value="infantilidade"       data-i18n="dados.dadosPerfil.vazio.infantilidade">infantilidade</option>
               </select>
             </label>
 
-            <label class="field-group-full">
-              <span data-i18n="dados.dadosPerfil.plenoLabel">Pleno Existencial</span>
-              <select id="dp-pleno-existencial" name="plenoExistencial" class="dp-select">
+            <!-- Pleno Existencial — largura total -->
+            <label class="dp-field dp-field--full">
+              <span class="dp-label" data-i18n="dados.dadosPerfil.plenoLabel">Pleno Existencial</span>
+              <select id="dp-pleno-existencial" class="dp-select">
                 <option value="" data-i18n="dados.dadosPerfil.selecione">Selecione</option>
-                <option value="propósito" data-i18n="dados.dadosPerfil.pleno.proposito">propósito</option>
-                <option value="excelência" data-i18n="dados.dadosPerfil.pleno.excelencia">excelência</option>
-                <option value="doçura" data-i18n="dados.dadosPerfil.pleno.docura">doçura</option>
-                <option value="entusiasmo" data-i18n="dados.dadosPerfil.pleno.entusiasmo">entusiasmo</option>
-                <option value="comunhão" data-i18n="dados.dadosPerfil.pleno.comunhao">comunhão</option>
-                <option value="realização" data-i18n="dados.dadosPerfil.pleno.realizacao">realização</option>
-                <option value="reconciliação" data-i18n="dados.dadosPerfil.pleno.reconciliacao">reconciliação</option>
-                <option value="perdão" data-i18n="dados.dadosPerfil.pleno.perdao">perdão</option>
-                <option value="serenidade" data-i18n="dados.dadosPerfil.pleno.serenidade">serenidade</option>
-                <option value="apreço" data-i18n="dados.dadosPerfil.pleno.apreco">apreço</option>
-                <option value="admiração" data-i18n="dados.dadosPerfil.pleno.admiracao">admiração</option>
-                <option value="contentamento" data-i18n="dados.dadosPerfil.pleno.contentamento">contentamento</option>
-                <option value="generosidade" data-i18n="dados.dadosPerfil.pleno.generosidade">generosidade</option>
-                <option value="sabedoria" data-i18n="dados.dadosPerfil.pleno.sabedoria">sabedoria</option>
+                <option value="propósito"        data-i18n="dados.dadosPerfil.pleno.proposito">propósito</option>
+                <option value="excelência"       data-i18n="dados.dadosPerfil.pleno.excelencia">excelência</option>
+                <option value="doçura"           data-i18n="dados.dadosPerfil.pleno.docura">doçura</option>
+                <option value="entusiasmo"       data-i18n="dados.dadosPerfil.pleno.entusiasmo">entusiasmo</option>
+                <option value="comunhão"         data-i18n="dados.dadosPerfil.pleno.comunhao">comunhão</option>
+                <option value="realização"       data-i18n="dados.dadosPerfil.pleno.realizacao">realização</option>
+                <option value="reconciliação"    data-i18n="dados.dadosPerfil.pleno.reconciliacao">reconciliação</option>
+                <option value="perdão"           data-i18n="dados.dadosPerfil.pleno.perdao">perdão</option>
+                <option value="serenidade"       data-i18n="dados.dadosPerfil.pleno.serenidade">serenidade</option>
+                <option value="apreço"           data-i18n="dados.dadosPerfil.pleno.apreco">apreço</option>
+                <option value="admiração"        data-i18n="dados.dadosPerfil.pleno.admiracao">admiração</option>
+                <option value="contentamento"    data-i18n="dados.dadosPerfil.pleno.contentamento">contentamento</option>
+                <option value="generosidade"     data-i18n="dados.dadosPerfil.pleno.generosidade">generosidade</option>
+                <option value="sabedoria"        data-i18n="dados.dadosPerfil.pleno.sabedoria">sabedoria</option>
                 <option value="responsabilidade" data-i18n="dados.dadosPerfil.pleno.responsabilidade">responsabilidade</option>
-                <option value="utilidade" data-i18n="dados.dadosPerfil.pleno.utilidade">utilidade</option>
-                <option value="maturidade" data-i18n="dados.dadosPerfil.pleno.maturidade">maturidade</option>
+                <option value="utilidade"        data-i18n="dados.dadosPerfil.pleno.utilidade">utilidade</option>
+                <option value="maturidade"       data-i18n="dados.dadosPerfil.pleno.maturidade">maturidade</option>
               </select>
             </label>
 
-          </div>
+          </div><!-- /form-grid-personalidade -->
 
-          <textarea
-            id="dp-observacoes"
-            rows="4"
-            data-i18n-placeholder="dados.obs"
-            placeholder="Algo importante que deseja compartilhar?"
-          ></textarea>
+          <textarea id="dp-observacoes"
+                    rows="4"
+                    data-i18n-placeholder="dados.obs"
+                    placeholder="Algo importante que deseja compartilhar?"></textarea>
 
           <div class="final-acoes">
-            <button
-              id="btn-dp-continuar"
-              type="button"
-              class="btn btn-stone"
-              data-i18n="common.continue"
-            >
+            <button id="btn-dp-continuar"
+                    type="button"
+                    class="btn btn-stone"
+                    data-i18n="common.continue">
               Continuar
             </button>
           </div>
 
-          <div
-            id="dados-pessoais-status"
-            class="status-box"
-            style="display:none;"
-          ></div>
+          <div id="dados-pessoais-status" class="status-box" style="display:none;"></div>
 
-        </div>
-      </div>
-    </div>
-  </div>
+        </div><!-- /pergaminho-content -->
+      </div><!-- /j-arcane-card -->
+    </div><!-- /j-perg-v-inner -->
+  </div><!-- /j-panel-glow -->
 </section>
