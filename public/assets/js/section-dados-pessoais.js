@@ -194,103 +194,150 @@
   }
 
   function runType(el, text, speed = 36) {
-    if (!el) return Promise.resolve();
+  if (!el) return Promise.resolve();
 
-    el.textContent = '';
-    el.classList.remove('typing-done', 'type-done');
-    el.classList.add('typing-active');
+  const content = String(text || '').trim();
 
-    if (typeof window.typeWriter === 'function') {
-      window.typeWriter(el, text, speed);
-      setTimeout(() => {
-        el.classList.remove('typing-active');
-        el.classList.add('typing-done');
-      }, Math.max(400, text.length * speed + 80));
-      return Promise.resolve();
-    }
+  el.textContent = '';
+  el.classList.remove('typing-done', 'type-done');
+  el.classList.add('typing-active');
+
+  return new Promise((resolve) => {
+    let done = false;
+
+    const finish = () => {
+      if (done) return;
+      done = true;
+      el.textContent = content;
+      el.classList.remove('typing-active');
+      el.classList.add('typing-done', 'type-done');
+      resolve();
+    };
 
     if (typeof window.runTyping === 'function') {
-      return new Promise((resolve) => {
-        window.runTyping(el, text, () => {
-          el.classList.remove('typing-active');
-          el.classList.add('typing-done');
-          resolve();
-        }, { speed, cursor: true });
-      });
+      try {
+        window.runTyping(
+          el,
+          content,
+          finish,
+          { speed, cursor: true }
+        );
+
+        setTimeout(finish, Math.max(600, content.length * speed + 500));
+        return;
+      } catch (e) {
+        console.warn(`[${MOD}] runTyping falhou:`, e);
+      }
     }
 
-    el.textContent = text;
-    el.classList.remove('typing-active');
-    el.classList.add('typing-done');
+    if (typeof window.typeWriter === 'function') {
+      try {
+        window.typeWriter(el, content, speed);
+        setTimeout(finish, Math.max(600, content.length * speed + 500));
+        return;
+      } catch (e) {
+        console.warn(`[${MOD}] typeWriter falhou:`, e);
+      }
+    }
+
+    let i = 0;
+
+    const tick = () => {
+      if (i <= content.length) {
+        el.textContent = content.slice(0, i);
+        i++;
+        setTimeout(tick, speed);
+      } else {
+        finish();
+      }
+    };
+
+    tick();
+  });
+}
+
+  function iniciarLeituraDadosPessoais(root, textoManual = '') {
+  const texto = String(
+    textoManual ||
+    root?.querySelector('#dp-subtitle')?.dataset?.text ||
+    root?.querySelector('#dp-subtitle')?.textContent ||
+    ''
+  ).trim();
+
+  if (!texto) return Promise.resolve();
+
+  if (window.JORNADA_TRANSICAO_ATIVA) {
+    return new Promise((resolve) => {
+      window.addEventListener('jornada:transicao:end', () => {
+        iniciarLeituraDadosPessoais(root, texto).then(resolve);
+      }, { once: true });
+    });
+  }
+
+  if (!('speechSynthesis' in window)) {
     return Promise.resolve();
   }
 
-  function iniciarLeituraDadosPessoais(root) {
-  const el =
-    root.querySelector('.intro-text') ||
-    root.querySelector('#dp-subtitle') ||
-    root.querySelector('p');
+  return new Promise((resolve) => {
+    try {
+      const u = new SpeechSynthesisUtterance(texto);
+      u.lang =
+        window.i18n?.getLang?.() ||
+        window.i18n?.currentLang ||
+        document.documentElement.lang ||
+        'pt-BR';
 
-  if (!el) return;
+      u.rate = 0.92;
+      u.pitch = 1.03;
+      u.volume = 1;
 
-  const texto = el.dataset.text || el.textContent.trim();
-  if (!texto) return;
+      u.onend = resolve;
+      u.onerror = resolve;
 
-  // 🚫 evita leitura durante vídeo
-  if (window.JORNADA_TRANSICAO_ATIVA) {
-    window.addEventListener("jornada:transicao:end", () => {
-      iniciarLeituraDadosPessoais(root);
-    }, { once: true });
-    return;
-  }
-
-  // ✅ usa bridge (padrão da jornada)
-  if (window.JornadaTypingBridge?.typeAndSpeak) {
-    window.JornadaTypingBridge.typeAndSpeak(el, texto, {
-      lang: window.i18n?.getLang?.() || "pt-BR"
-    });
-    return;
-  }
-
-  // fallback simples
-  if (window.speechSynthesis) {
-    const u = new SpeechSynthesisUtterance(texto);
-    u.lang = window.i18n?.getLang?.() || "pt-BR";
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(u);
-  }
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(u);
+    } catch {
+      resolve();
+    }
+  });
 }
 
   async function initHeader(root) {
-    const title = $('#dp-title', root) || $('h1[data-i18n-text="dados.title"]', root);
-    const subtitle = $('#dp-subtitle', root) || $('p[data-i18n-text="dados.subtitle"]', root);
+  const title = $('#dp-title', root) || $('h1[data-i18n-text="dados.title"]', root);
+  const subtitle = $('#dp-subtitle', root) || $('p[data-i18n-text="dados.subtitle"]', root);
 
-    if (title && !title.classList.contains('typed')) {
-      const txt =
-        window.i18n?.t?.('dados.title') ||
-        title.dataset.text ||
-        'Dados Pessoais';
+  if (title && !title.classList.contains('typed')) {
+    const txt =
+      window.i18n?.t?.('dados.title') ||
+      title.dataset.text ||
+      'Dados Pessoais';
 
-      title.dataset.text = txt;
-      title.style.width = '100%';
-      title.style.minHeight = '40px';
-      await runType(title, txt, Number(title.dataset.speed || 38));
-      title.classList.add('typed');
-    }
+    title.dataset.text = txt;
+    title.style.width = '100%';
+    title.style.minHeight = '40px';
 
-    if (subtitle && !subtitle.classList.contains('typed')) {
-      const txt =
-        window.i18n?.t?.('dados.subtitle') ||
-        subtitle.dataset.text ||
-        'Preencha os dados para enriquecer sua devolutiva.';
+    await runType(title, txt, Number(title.dataset.speed || 38));
+    await iniciarLeituraDadosPessoais(root, txt);
 
-      subtitle.dataset.text = txt;
-      subtitle.style.width = '100%';
-      subtitle.style.minHeight = '44px';
-      await runType(subtitle, txt, Number(subtitle.dataset.speed || 30));
-      subtitle.classList.add('typed');
-    }
+    title.classList.add('typed');
   }
+
+  if (subtitle && !subtitle.classList.contains('typed')) {
+    const txt =
+      window.i18n?.t?.('dados.subtitle') ||
+      subtitle.dataset.text ||
+      'Preencha os dados para enriquecer sua devolutiva.';
+
+    subtitle.dataset.text = txt;
+    subtitle.style.width = '100%';
+    subtitle.style.minHeight = '44px';
+
+    await runType(subtitle, txt, Number(subtitle.dataset.speed || 30));
+    await iniciarLeituraDadosPessoais(root, txt);
+
+    subtitle.classList.add('typed');
+  }
+}
 
   function bind(root) {
     if (root.__DADOS_PESSOAIS_BINDED__) return;
@@ -331,19 +378,15 @@
   }
 
   async function init(root) {
-    if (!root) return;
+  if (!root) return;
 
-    applyI18nToFields(root);
-    hydrate(root, loadData());
-    bind(root);
-    await initHeader(root);
+  applyI18nToFields(root);
+  hydrate(root, loadData());
+  bind(root);
+  await initHeader(root);
 
-    setTimeout(() => {
-    iniciarLeituraDadosPessoais(root);
-  }, 400);
-
-    log('inicializado com sucesso');
-  }
+  log('inicializado com sucesso');
+}
 
   document.addEventListener('sectionLoaded', (e) => {
     const section = e?.detail?.section;
