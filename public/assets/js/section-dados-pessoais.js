@@ -339,6 +339,90 @@
   }
 }
 
+  function bindMobileSelectSheet(root) {
+  if (!root || root.dataset.dpSelectSheetBound === '1') return;
+  root.dataset.dpSelectSheetBound = '1';
+
+  const isMobile = () => window.matchMedia('(max-width: 768px)').matches;
+
+  function closeSheet() {
+    document.querySelectorAll('.dp-select-sheet').forEach(el => el.remove());
+  }
+
+  function openSheet(select) {
+    closeSheet();
+
+    const sheet = document.createElement('div');
+    sheet.className = 'dp-select-sheet';
+
+    const panel = document.createElement('div');
+    panel.className = 'dp-select-panel';
+
+    const title = document.createElement('div');
+    title.className = 'dp-select-title';
+    title.textContent =
+      select.closest('label')?.querySelector('span')?.textContent?.trim() ||
+      'Escolha uma opção';
+
+    const list = document.createElement('div');
+    list.className = 'dp-select-list';
+
+    Array.from(select.options).forEach((opt) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'dp-select-option';
+      btn.textContent = opt.textContent || opt.value || '—';
+
+      if (opt.selected) btn.classList.add('is-selected');
+
+      btn.addEventListener('click', () => {
+        select.value = opt.value;
+        select.dispatchEvent(new Event('input', { bubbles: true }));
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+        closeSheet();
+      });
+
+      list.appendChild(btn);
+    });
+
+    const cancel = document.createElement('button');
+    cancel.type = 'button';
+    cancel.className = 'dp-select-cancel';
+    cancel.textContent = 'Cancelar';
+    cancel.addEventListener('click', closeSheet);
+
+    panel.appendChild(title);
+    panel.appendChild(list);
+    panel.appendChild(cancel);
+    sheet.appendChild(panel);
+
+    sheet.addEventListener('click', (ev) => {
+      if (ev.target === sheet) closeSheet();
+    });
+
+    document.body.appendChild(sheet);
+  }
+
+  root.querySelectorAll('select').forEach((select) => {
+    if (select.dataset.mobileSheet === '1') return;
+    select.dataset.mobileSheet = '1';
+
+    select.addEventListener('touchend', (ev) => {
+      if (!isMobile()) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      openSheet(select);
+    }, { passive: false });
+
+    select.addEventListener('click', (ev) => {
+      if (!isMobile()) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      openSheet(select);
+    });
+  });
+}
+
   function bind(root) {
     if (root.__DADOS_PESSOAIS_BINDED__) return;
     root.__DADOS_PESSOAIS_BINDED__ = true;
@@ -374,6 +458,7 @@
       });
     }
 
+    bindMobileSelectSheet(root);
     aplicarEfeitoBotao(root);
   }
 
