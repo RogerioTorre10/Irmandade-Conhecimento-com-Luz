@@ -175,28 +175,33 @@
     pointerEvents: 'none'
   });
 
-  // DEPOIS — altura calculada por aspecto, responsiva ao mobile
-  const _isMobile = window.innerWidth < 768;
-  const _vw = window.innerWidth * (_isMobile ? 0.96 : 0.94);
-  const _maxH = window.innerHeight * (_isMobile ? 0.52 : 0.72); // 52vh no mobile
-  const _ar = 16 / 9;
-  let _fw = _vw;
-  let _fh = _fw / _ar;
-  if (_fh > _maxH) { _fh = _maxH; _fw = _fh * _ar; }
+  // primeiro cria o frame
+const frame = document.createElement('div');
+frame.id = 'vt-frame';
+frame.className = 'vt-video-frame';
 
-  Object.assign(frame.style, {
-    position: 'relative',
-    display: 'block',
-    width: `${Math.round(_fw)}px`,
-    height: `${Math.round(_fh)}px`,
-    maxWidth: _isMobile ? '96vw' : '94vw',
-    maxHeight: _isMobile ? '52vh' : '72vh',  // ← era 82vh, agora 52vh no mobile
-    borderRadius: '18px',
-    overflow: 'hidden',
-    background: 'rgba(0,0,0,0.45)',
-    boxShadow: '0 0 0 2px rgba(212,175,55,.82), 0 0 42px rgba(212,175,55,.45)',
-    zIndex: '5'
-  });
+// AGORA sim calcula as dimensões (depois do frame existir)
+const _isMobile = window.innerWidth < 768;
+const _vw = window.innerWidth * (_isMobile ? 0.96 : 0.94);
+const _maxH = window.innerHeight * (_isMobile ? 0.52 : 0.72);
+const _ar = 16 / 9;
+let _fw = _vw;
+let _fh = _fw / _ar;
+if (_fh > _maxH) { _fh = _maxH; _fw = _fh * _ar; }
+
+Object.assign(frame.style, {
+  position: 'relative',
+  display: 'block',
+  width: `${Math.round(_fw)}px`,
+  height: `${Math.round(_fh)}px`,
+  maxWidth: _isMobile ? '96vw' : '94vw',
+  maxHeight: _isMobile ? '52vh' : '72vh',
+  borderRadius: '18px',
+  overflow: 'hidden',
+  background: 'rgba(0,0,0,0.45)',
+  boxShadow: '0 0 0 2px rgba(212,175,55,.82), 0 0 42px rgba(212,175,55,.45)',
+  zIndex: '5'
+});
 
   const video = document.createElement('video');
   video.id = 'vt-video';
