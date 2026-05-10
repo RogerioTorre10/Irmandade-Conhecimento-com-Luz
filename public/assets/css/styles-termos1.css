@@ -544,3 +544,59 @@
     0 0 12px rgba(255, 220, 120, 0.26),
     0 0 26px rgba(255, 180, 60, 0.18) !important;
 }
+/* =========================================================
+   FIX — section-termos cresce igual à section-senha
+   ========================================================= */
+
+#section-termos1 {
+  align-items: center !important;
+  padding: 20px 16px !important;
+}
+
+#section-termos1 .j-panel-glow {
+  width: min(520px, 92vw) !important;
+  max-width: 520px !important;          /* senha usa ~520px */
+  padding: 24px 20px !important;        /* mais espaço interno */
+  height: auto !important;
+  min-height: unset !important;
+}
+
+#section-termos1 .j-arcane-card {
+  padding: 20px 18px !important;        /* respiro interno maior */
+  height: auto !important;
+  min-height: unset !important;
+}
+
+#section-termos1 .termos1-title,
+#section-termos1 .section-title {
+  font-size: clamp(28px, 5vw, 38px) !important;  /* título maior */
+  margin-bottom: 16px !important;
+}
+
+#section-termos1 .parchment-text-rough,
+#section-termos1 .termos-lista-rough > li {
+  font-size: 14px !important;           /* texto levemente maior */
+  line-height: 1.65 !important;
+  padding: 4px 10px !important;
+}
+
+#section-termos1 .footer-actions,
+#section-termos1 .parchment-actions-rough {
+  margin-top: 28px !important;
+  padding-bottom: 8px !important;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  #section-termos1 .j-panel-glow {
+    max-height: 90dvh !important;
+    width: calc(100vw - 24px) !important;
+    padding: 20px 16px !important;
+  }
+
+  #section-termos1 .j-arcane-card {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    padding: 16px 14px !important;
+  }
+}
