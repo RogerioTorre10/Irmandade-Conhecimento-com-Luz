@@ -648,63 +648,7 @@
     0 0 14px rgba(255, 210, 90, 0.55),
     0 0 24px rgba(255, 170, 40, 0.35) !important;
 }
-/* =========================================================
-   FIX — j-arcane-card cresce igual à section-termos
-   ========================================================= */
 
-/* Geral: card preto sem altura forçada */
-#section-intro .j-arcane-card {
-  padding: 20px 18px !important;
-  height: auto !important;
-  min-height: unset !important;
-  margin-top: -18px !important;
-  margin-bottom: 0 !important;
-}
-
-/* Painel externo: mesmas dimensões da termos */
-#section-intro .j-panel-glow {
-  padding: 24px 20px !important;
-  width: min(520px, 92vw) !important;
-  max-width: 520px !important;
-  height: auto !important;
-  min-height: unset !important;
-}
-
-/* Mobile: remove o translateY(-80px) que sobe e recorta o painel */
-@media (max-width: 600px) {
-  #section-intro .j-panel-glow {
-    transform: none !important;
-    -webkit-transform: none !important;
-    width: calc(100vw - 32px) !important;
-    max-width: 440px !important;
-    padding: 24px 18px 32px !important;
-    margin: 0 auto !important;
-    height: auto !important;
-    min-height: unset !important;
-    overflow: visible !important;
-  }
-
-  #section-intro .j-arcane-card {
-    height: auto !important;
-    min-height: unset !important;
-    overflow: visible !important;
-    padding: 16px 14px !important;
-    margin-top: -10px !important;
-    margin-bottom: 0 !important;
-  }
-
-  #section-intro {
-    padding: 20px 0 40px !important;
-    align-items: center !important;
-  }
-}
-
-/* Desktop: remove o transform que desloca o painel */
-@media (min-width: 900px) {
-  #section-intro .j-panel-glow {
-    transform: none !important;
-    top: 0 !important;
-  }
 /* =========================================================
    FIX — j-arcane-card da intro com altura mínima
    igual à section-termos (independente do conteúdo)
