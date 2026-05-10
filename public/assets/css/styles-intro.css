@@ -705,7 +705,39 @@
     transform: none !important;
     top: 0 !important;
   }
+/* =========================================================
+   FIX — j-arcane-card da intro com altura mínima
+   igual à section-termos (independente do conteúdo)
+   ========================================================= */
 
+#section-intro .j-arcane-card {
+  min-height: 340px !important;   /* altura base do card preto */
+  height: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  #section-intro .j-arcane-card {
+    min-height: 320px !important;
+    flex: 1 !important;           /* cresce junto com o j-panel-glow */
+  }
+
+  #section-intro .j-panel-glow {
+    display: flex !important;
+    flex-direction: column !important;
+    max-height: 88dvh !important;
+    height: auto !important;
+  }
+
+  /* Empurra o botão para o fundo do card */
+  #section-intro .parchment-actions-rough {
+    margin-top: auto !important;
+    padding-bottom: 8px !important;
+  }
+}
   #section-intro .j-perg-v-inner {
     transform: none !important;
     top: 0 !important;
