@@ -550,7 +550,6 @@
 
 @media (max-width: 768px) {
   #section-termos1,
-  #section-termos2,
   #section-termos {
     min-height: 100dvh !important;
     height: auto !important;
@@ -562,7 +561,6 @@
   }
 
   #section-termos1 .j-panel-glow,
-  #section-termos2 .j-panel-glow,
   #section-termos .j-panel-glow {
     width: min(94vw, 430px) !important;
     max-width: 430px !important;
@@ -573,7 +571,6 @@
   }
 
   #section-termos1 .j-perg-v-inner,
-  #section-termos2 .j-perg-v-inner,
   #section-termos .j-perg-v-inner {
     width: 100% !important;
     min-height: 92dvh !important;
@@ -585,7 +582,6 @@
   }
 
   #section-termos1 .j-arcane-card,
-  #section-termos2 .j-arcane-card,
   #section-termos .j-arcane-card {
     width: 84% !important;
     max-width: 330px !important;
@@ -598,7 +594,6 @@
   }
 
   #section-termos1 .pergaminho-content,
-  #section-termos2 .pergaminho-content,
   #section-termos .pergaminho-content {
     min-height: auto !important;
     padding-bottom: 14px !important;
@@ -606,7 +601,6 @@
   }
 
   #section-termos1 h1,
-  #section-termos2 h1,
   #section-termos h1 {
     font-size: clamp(1.15rem, 5vw, 1.55rem) !important;
     margin-bottom: 18px !important;
@@ -614,17 +608,14 @@
   }
 
   #section-termos1 p,
-  #section-termos2 p,
   #section-termos p,
   #section-termos1 li,
-  #section-termos2 li,
   #section-termos li {
     font-size: clamp(0.75rem, 3vw, 0.92rem) !important;
     line-height: 1.52 !important;
   }
 
   #section-termos1 button,
-  #section-termos2 button,
   #section-termos button {
     min-height: 44px !important;
     margin-top: 14px !important;
