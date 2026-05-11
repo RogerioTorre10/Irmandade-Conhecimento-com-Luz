@@ -183,7 +183,7 @@ frame.className = 'vt-video-frame';
 // AGORA sim calcula as dimensões (depois do frame existir)
 const _isMobile = window.innerWidth < 768;
 const _vw = window.innerWidth * (_isMobile ? 0.96 : 0.94);
-const _maxH = window.innerHeight * (_isMobile ? 0.60 : 0.72);
+const _maxH = window.innerHeight * (_isMobile ? 0.70 : 0.72);
 const _ar = 16 / 9;
 let _fw = _vw;
 let _fh = _fw / _ar;
