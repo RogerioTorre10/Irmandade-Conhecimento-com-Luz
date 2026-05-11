@@ -545,87 +545,88 @@
     0 0 26px rgba(255, 180, 60, 0.18) !important;
 }
 /* =====================================================
-   TERMOS — PROPORÇÃO SENHA SEM SCROLL EXTERNO
+   TERMOS — PADRÃO VISUAL IGUAL À SECTION SENHA
 ===================================================== */
 
 @media (max-width: 768px) {
-  html,
-  body {
-    overflow-x: hidden !important;
-  }
-  
   #section-termos1,
+  #section-termos2,
   #section-termos {
     min-height: 100dvh !important;
-    height: 100dvh !important;
-    max-height: 100dvh !important;
-    padding: 8px 10px !important;
-    overflow: hidden !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-  
-  #section-termos1 .j-panel-glow,
-  #section-termos .j-panel-glow {
-    width: min(94vw, 430px) !important;
-    height: calc(100dvh - 16px) !important;
-    max-height: calc(100dvh - 16px) !important;
-    margin: 0 auto !important;
-    overflow: hidden !important;
-  }
-  
-  #section-termos1 .j-perg-v-inner,
-  #section-termos .j-perg-v-inner {
-    width: 100% !important;
-    height: 100% !important;
-    overflow: hidden !important;
-    background-size: 100% 100% !important;
-    background-position: center center !important;
-  }
-  
-  #section-termos1 .j-arcane-card,
-  #section-termos .j-arcane-card {
-    width: 82% !important;
-    max-width: 330px !important;
-    height: 56dvh !important;
-    max-height: 56dvh !important;
-    margin: 7dvh auto 0 !important;
-    padding: 24px 16px 18px !important;
+    height: auto !important;
+    padding: 0 10px 24px !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
-    -webkit-overflow-scrolling: touch !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
   }
-  
+
+  #section-termos1 .j-panel-glow,
+  #section-termos2 .j-panel-glow,
+  #section-termos .j-panel-glow {
+    width: min(94vw, 430px) !important;
+    max-width: 430px !important;
+    min-height: 92dvh !important;
+    height: auto !important;
+    margin: 72px auto 24px !important;
+    overflow: visible !important;
+  }
+
+  #section-termos1 .j-perg-v-inner,
+  #section-termos2 .j-perg-v-inner,
+  #section-termos .j-perg-v-inner {
+    width: 100% !important;
+    min-height: 92dvh !important;
+    height: auto !important;
+    background-size: 100% 100% !important;
+    background-position: center top !important;
+    overflow: visible !important;
+    padding: 72px 0 110px !important;
+  }
+
+  #section-termos1 .j-arcane-card,
+  #section-termos2 .j-arcane-card,
+  #section-termos .j-arcane-card {
+    width: 84% !important;
+    max-width: 330px !important;
+    min-height: 52dvh !important;
+    height: auto !important;
+    max-height: none !important;
+    margin: 0 auto !important;
+    padding: 26px 18px 22px !important;
+    overflow: visible !important;
+  }
+
   #section-termos1 .pergaminho-content,
+  #section-termos2 .pergaminho-content,
   #section-termos .pergaminho-content {
     min-height: auto !important;
-    padding-bottom: 12px !important;
+    padding-bottom: 14px !important;
+    overflow: visible !important;
   }
-  
+
   #section-termos1 h1,
+  #section-termos2 h1,
   #section-termos h1 {
-    font-size: clamp(1.05rem, 4.6vw, 1.45rem) !important;
-    margin-bottom: 14px !important;
+    font-size: clamp(1.15rem, 5vw, 1.55rem) !important;
+    margin-bottom: 18px !important;
+    text-align: center !important;
   }
-  
+
   #section-termos1 p,
+  #section-termos2 p,
   #section-termos p,
   #section-termos1 li,
+  #section-termos2 li,
   #section-termos li {
-    font-size: clamp(0.72rem, 2.9vw, 0.88rem) !important;
-    line-height: 1.46 !important;
+    font-size: clamp(0.75rem, 3vw, 0.92rem) !important;
+    line-height: 1.52 !important;
   }
-  
+
   #section-termos1 button,
+  #section-termos2 button,
   #section-termos button {
-    min-height: 42px !important;
-    margin-top: 10px !important;
-  }
-  
-  #section-termos1 + footer,
-  #section-termos + footer,
-  body:has(#section-termos1) .site-footer,
-  body:has(#section-termos) .site-footer {
-    display: none !important;
+    min-height: 44px !important;
+    margin-top: 14px !important;
   }
 }
