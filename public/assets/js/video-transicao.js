@@ -195,7 +195,7 @@ Object.assign(frame.style, {
   width: `${Math.round(_fw)}px`,
   height: `${Math.round(_fh)}px`,
   maxWidth: _isMobile ? '96vw' : '94vw',
-  maxHeight: _isMobile ? '52vh' : '72vh',
+  maxHeight: _isMobile ? '70vh' : '72vh',
   borderRadius: '18px',
   overflow: 'hidden',
   background: 'rgba(0,0,0,0.45)',
