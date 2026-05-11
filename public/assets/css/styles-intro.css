@@ -630,8 +630,8 @@
   #section-intro .j-arcane-card {
     width: 84% !important;
     max-width: 330px !important;
-    min-height: 52dvh !important;
-    height: auto !important;
+    min-height: 58dvh !important;
+    height: 60dvh !important;
     max-height: none !important;
     margin: 0 auto !important;
     padding: 26px 18px 22px !important;
@@ -665,4 +665,18 @@
   body:has(#section-intro) .site-footer {
     padding-bottom: 10px !important;
   }
+   
+  display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+
+    padding-top: 34px !important;
+    padding-bottom: 28px !important;
+  }
+
+  #section-intro .parchment-actions-rough {
+    margin-top: auto !important;
+    padding-bottom: 10px !important;
+  }
+   
 }
