@@ -454,59 +454,6 @@
 }
 
 /* ============================
-   MOBILE (≤ 600px)
-   ============================ */
-
-@media (max-width: 600px) {
-
-  #section-intro {
-    padding: 8px 0 140px !important;
-    overflow: hidden !important;
-    min-height: 100vh !important;
-  }
-
-  #section-intro .j-panel-glow {
-    width: calc(100vw - 32px) !important;
-    max-width: 440px !important;
-    margin: 0 auto !important;
-    padding: 24px 18px 44px !important;
-    border-radius: 20px !important;
-    box-sizing: border-box !important;
-    transform: translateY(-80px) translateZ(0) !important;
-    -webkit-transform: translateY(-80px) translateZ(0) !important;
-    overflow: hidden !important;
-  }
-
-  #section-intro .j-perg-v-inner {
-    padding: 0 10px !important;
-    box-sizing: border-box !important;
-    overflow: visible !important;
-  }
-
-  #section-intro .intro-title {
-    font-size: 26px !important;
-    margin: 4px 0 16px !important;
-    line-height: 1.1 !important;
-    padding: 0 6px !important;
-  }
-
-  #section-intro .intro-title.typing-active::before {
-    inset: -6px -8px;
-    border-radius: 12px;
-  }
-
-  #section-intro .parchment-text-rough {
-    font-size: 13px !important;
-    line-height: 1.6 !important;
-  }
-
-  #section-intro .parchment-actions-rough {
-    margin-top: 28px !important;
-    justify-content: center !important;
-  }
-}
-
-/* ============================
    VARIÁVEIS E BOTÕES (btn-stone)
    ============================ */
 
@@ -648,44 +595,6 @@
     0 0 14px rgba(255, 210, 90, 0.55),
     0 0 24px rgba(255, 170, 40, 0.35) !important;
 }
-
-/* =========================================================
-   FIX — j-arcane-card da intro com altura mínima
-   igual à section-termos (independente do conteúdo)
-   ========================================================= */
-
-#section-intro .j-arcane-card {
-  min-height: 340px !important;   /* altura base do card preto */
-  height: auto !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: space-between !important;
-}
-
-/* Mobile */
-@media (max-width: 768px) {
-  #section-intro .j-arcane-card {
-    min-height: 320px !important;
-    flex: 1 !important;           /* cresce junto com o j-panel-glow */
-  }
-
-  #section-intro .j-panel-glow {
-    display: flex !important;
-    flex-direction: column !important;
-    max-height: 88dvh !important;
-    height: auto !important;
-  }
-
-  /* Empurra o botão para o fundo do card */
-  #section-intro .parchment-actions-rough {
-    margin-top: auto !important;
-    padding-bottom: 8px !important;
-  }
-}
-  #section-intro .j-perg-v-inner {
-    transform: none !important;
-    top: 0 !important;
-  }
 
 /* =====================================================
    INTRO MOBILE — PROPORÇÃO IGUAL SENHA
