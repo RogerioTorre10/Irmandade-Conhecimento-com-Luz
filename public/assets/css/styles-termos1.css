@@ -544,59 +544,66 @@
     0 0 12px rgba(255, 220, 120, 0.26),
     0 0 26px rgba(255, 180, 60, 0.18) !important;
 }
-/* =========================================================
-   FIX — section-termos cresce igual à section-senha
-   ========================================================= */
+/* =====================================================
+   TERMOS — PROPORÇÃO IGUAL À SECTION SENHA
+===================================================== */
 
-#section-termos1 {
-  align-items: center !important;
-  padding: 20px 16px !important;
-}
-
-#section-termos1 .j-panel-glow {
-  width: min(520px, 92vw) !important;
-  max-width: 520px !important;          /* senha usa ~520px */
-  padding: 24px 20px !important;        /* mais espaço interno */
-  height: auto !important;
-  min-height: unset !important;
-}
-
-#section-termos1 .j-arcane-card {
-  padding: 20px 18px !important;        /* respiro interno maior */
-  height: auto !important;
-  min-height: unset !important;
-}
-
-#section-termos1 .termos1-title,
-#section-termos1 .section-title {
-  font-size: clamp(28px, 5vw, 38px) !important;  /* título maior */
-  margin-bottom: 16px !important;
-}
-
-#section-termos1 .parchment-text-rough,
-#section-termos1 .termos-lista-rough > li {
-  font-size: 14px !important;           /* texto levemente maior */
-  line-height: 1.65 !important;
-  padding: 4px 10px !important;
-}
-
-#section-termos1 .footer-actions,
-#section-termos1 .parchment-actions-rough {
-  margin-top: 28px !important;
-  padding-bottom: 8px !important;
-}
-
-/* Mobile */
 @media (max-width: 768px) {
-  #section-termos1 .j-panel-glow {
-    max-height: 90dvh !important;
-    width: calc(100vw - 24px) !important;
-    padding: 20px 16px !important;
+  #section-termos1 {
+    min-height: 100dvh !important;
+    height: 100dvh !important;
+    padding: 10px 10px !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    overflow: hidden !important;
   }
-
+  
+  #section-termos2 .j-panel-glow {
+    width: min(94vw, 430px) !important;
+    max-width: 430px !important;
+    height: calc(100dvh - 20px) !important;
+    max-height: calc(100dvh - 20px) !important;
+    margin: 0 auto !important;
+  }
+  
+  #section-termos1 .j-perg-v-inner {
+    width: 100% !important;
+    height: 100% !important;
+  }
+  
   #section-termos1 .j-arcane-card {
-    flex: 1 !important;
+    width: 86% !important;
+    max-width: 330px !important;
+    min-height: 56dvh !important;
+    max-height: 64dvh !important;
+    margin: 8.5dvh auto 0 !important;
+    padding: 26px 18px 22px !important;
     overflow-y: auto !important;
-    padding: 16px 14px !important;
+    overflow-x: hidden !important;
+  }
+  
+  #section-termos1 .pergaminho-content {
+    min-height: auto !important;
+    padding-bottom: 18px !important;
+  }
+  
+  #section-termos1 h1 {
+    font-size: clamp(1.15rem, 5vw, 1.6rem) !important;
+    margin-bottom: 18px !important;
+    text-align: center !important;
+  }
+  
+  #section-termos1 p,  
+  #section-termos1 li {
+    font-size: clamp(0.78rem, 3.1vw, 0.95rem) !important;
+    line-height: 1.55 !important;
+  }
+  
+  #section-termos1 .final-acoes {
+    margin-top: 18px !important;
+  }   
+  
+  #section-termos1 button {
+    min-height: 46px !important;
   }
 }
