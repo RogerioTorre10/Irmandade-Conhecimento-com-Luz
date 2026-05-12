@@ -780,5 +780,51 @@ if (showCursor) element.appendChild(caret);
     speechSynthesis.speak(utt);
   };
 
+  // =========================================================
+// GUARDA DE TRANSIÇÃO — segura typing/fala durante o vídeo
+// =========================================================
+(function installTransitionGuard() {
+  const _origTypeAndSpeak = window.typeAndSpeak;
+  const _origRunTyping    = window.runTyping;
+
+  // Aguarda fim da transição se estiver ativa, senão executa direto
+  function waitTransitionThen(fn) {
+    if (!window.JORNADA_TRANSICAO_ATIVA) {
+      return fn();
+    }
+
+    typingLog('Transição ativa — typing em espera…');
+
+    return new Promise((resolve) => {
+      const onEnd = () => {
+        document.removeEventListener('transition:ended',      onEnd, true);
+        window.removeEventListener('jornada:transicao:end',   onEnd, true);
+        // pequena pausa para a página renderizar antes de digitar
+        setTimeout(() => resolve(fn()), 150);
+      };
+
+      document.addEventListener('transition:ended',    onEnd, { once: true, capture: true });
+      window.addEventListener('jornada:transicao:end', onEnd, { once: true, capture: true });
+
+      // Segurança: se o evento nunca chegar, libera após 20s
+      setTimeout(() => {
+        document.removeEventListener('transition:ended',    onEnd, true);
+        window.removeEventListener('jornada:transicao:end', onEnd, true);
+        resolve(fn());
+      }, 20000);
+    });
+  }
+
+  window.typeAndSpeak = function (element, text, speed, options) {
+    return waitTransitionThen(() => _origTypeAndSpeak(element, text, speed, options));
+  };
+
+  window.runTyping = function (element, text, callback, options) {
+    return waitTransitionThen(() => _origRunTyping(element, text, callback, options));
+  };
+
+  typingLog('TransitionGuard instalado — typing aguarda fim do vídeo.');
+})();
+
   typingLog('TypingBridge pronto');
 })(window);
