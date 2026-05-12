@@ -51,7 +51,7 @@
     inset 0 0 18px rgba(255, 230, 150, 0.12);
 }
 
-#section-termos1 .j-perg-v-inner {
+#section-intro .j-perg-v-inner {
   position: relative !important;
   overflow: visible !important;
   z-index: 4 !important;
@@ -69,14 +69,14 @@
    ========================================================= */
 
 #section-intro .parchment-inner-rough,
-#section-intro .termos-wrap,
-#section-intro #termos1 {
+#section-intro .intro-wrap,
+#section-intro #intro {
   position: relative !important;;
   text-align: left !important;
   overflow: hidden !important;
 }
 
-#section-intro #termos1 {
+#section-intro #intro {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -87,7 +87,7 @@
    TÍTULO
    ========================================================= */
 
-#section-intro .termos1-title,
+#section-intro .intro-title,
 #section-intro .section-title {
   position: relative !important;
   display: block;
@@ -111,7 +111,7 @@
    ========================================================= */
 
 #section-intro .parchment-text-rough,
-#section-intro .termos-lista-rough > li {
+#section-intro .intro-lista-rough > li {
   position: relative !important;
   display: inline-block !important;
   width: fit-content !important;
