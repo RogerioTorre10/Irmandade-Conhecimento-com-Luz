@@ -58,20 +58,12 @@
 }
 
 #section-intro .j-arcane-card {
-  position: relative !important;
-  overflow: hidden !important;
-  border-radius: 24px !important;
-  margin: 0 auto !important;
-  min-height: 470px !important;
-  height: 470px !important;
-  max-height: none !important;
-  width: 84% !important;
-  max-width: 390px !important;
   display: flex !important;
   flex-direction: column !important;
   justify-content: flex-start !important;
-
-  padding: 42px 28px 30px !important; 
+  height: 470px !important;
+  min-height: 470px !important;
+  overflow: hidden !important;
  }
 
 #section-intro .parchment-actions-rough {
@@ -86,10 +78,9 @@
 #section-intro .parchment-inner-rough,
 #section-intro .intro-wrap,
 #section-intro #intro {
-  position: relative !important;;
-  text-align: left !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;        /* ← essencial para flex funcionar */
   overflow: hidden !important;
-  flex: 1 !important; 
 }
 
 #section-intro #intro {
@@ -260,11 +251,12 @@
 
 #section-intro .footer-actions,
 #section-intro .parchment-actions-rough {
+  flex-shrink: 0 !important;       /* ← não encolhe */
   margin-top: auto !important;
-  padding-top: 16px !important;
-  padding-bottom: 12px !important;
+  padding-top: 12px !important;
+  padding-bottom: 10px !important;
   display: flex !important;
-  justify-content: center !important;  
+  justify-content: center !important;
 }
 
 #section-intro .btn-stone,
@@ -493,6 +485,9 @@
     -webkit-overflow-scrolling: touch !important;
     padding-right: 8px !important;
     margin: 0 auto !important;
+    height: auto !important;
+    min-height: 380px !important;
+    flex: 0 0 auto !important; 
   }
 
   /* garante espaço pro botão */
