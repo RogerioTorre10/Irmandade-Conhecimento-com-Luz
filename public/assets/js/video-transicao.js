@@ -270,7 +270,8 @@ Object.assign(frame.style, {
     }
 
     isPlaying = true;
-
+    window.JORNADA_TRANSICAO_ATIVA = true;  
+    
     document.body.classList.remove('vt-fade-in');
     document.body.classList.add('vt-fade-out');
 
