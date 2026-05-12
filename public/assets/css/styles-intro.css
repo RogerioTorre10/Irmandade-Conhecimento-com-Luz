@@ -61,7 +61,7 @@
   position: relative !important;
   overflow: hidden !important;
   border-radius: 24px !important;
-  margin: 0 !important;
+  margin: 0 auto !important;
   min-height: 470px !important;
   height: 470px !important;
   max-height: none !important;
@@ -128,8 +128,8 @@
 #section-intro .parchment-text-rough,
 #section-intro .intro-lista-rough > li {
   position: relative !important;
-  display: inline-block !important;
-  width: fit-content !important;
+  display: block !important;
+  width: 100% !important;
   max-width: 100% !important;
   margin: 0 !important;
   padding: 3px 8px !important;
@@ -232,6 +232,10 @@
   list-style: none !important;
   margin: 2px 0 0 !important;
   padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  width: 100% !important;  
 }
 
 #section-intro .intro-lista-rough > li,
@@ -485,6 +489,7 @@
     overflow-x: hidden !important;
     -webkit-overflow-scrolling: touch !important;
     padding-right: 8px !important;
+    margin: 0 auto !important;
   }
 
   /* garante espaço pro botão */
