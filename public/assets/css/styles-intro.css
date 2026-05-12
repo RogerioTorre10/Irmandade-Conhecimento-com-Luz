@@ -643,3 +643,46 @@
     margin-top: 14px !important;
   }
 }
+
+/* =========================================================
+   FIX DEFINITIVO — botão na base inferior do card
+   ========================================================= */
+
+/* O card DEVE ser flex-column com altura fixa para o margin-top:auto funcionar */
+#section-intro .j-arcane-card {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  height: 470px !important;
+  min-height: 470px !important;
+  overflow: hidden !important;
+}
+
+/* O miolo ocupa todo o espaço disponível */
+#section-intro .parchment-inner-rough,
+#section-intro .intro-wrap,
+#section-intro #intro {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;        /* ← essencial para flex funcionar */
+  overflow: hidden !important;
+}
+
+/* Botão empurrado para o fundo */
+#section-intro .parchment-actions-rough,
+#section-intro .footer-actions {
+  flex-shrink: 0 !important;       /* ← não encolhe */
+  margin-top: auto !important;
+  padding-top: 12px !important;
+  padding-bottom: 10px !important;
+  display: flex !important;
+  justify-content: center !important;
+}
+
+/* Mobile: card com altura mínima também definida */
+@media (max-width: 768px) {
+  #section-intro .j-arcane-card {
+    height: auto !important;
+    min-height: 380px !important;
+    flex: 0 0 auto !important;     /* ← sai do flex:1 que quebrava o layout */
+  }
+}
