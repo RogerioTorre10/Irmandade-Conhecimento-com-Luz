@@ -1,5 +1,5 @@
 /* =========================================================
-   STYLES-TERMOS1 — LIMPO E ESTÁVEL
+   STYLES-intro — LIMPO E ESTÁVEL
    ========================================================= */
 
 :root {
@@ -98,7 +98,7 @@
   font-family: 'ManufacturingConsent', sans-serif;
   font-size: clamp(26px, 4vw, 34px);
   line-height: 1.15;
-  color: var(--termos-gold);
+  color: var(--intro-gold);
   text-shadow:
     0 0 6px rgba(255, 215, 0, 0.45),
     0 0 14px rgba(255, 180, 60, 0.22);
@@ -125,7 +125,7 @@
   line-height: 1.55 !important;
   font-family: 'BerkshireSwash', cursive !important;
   font-size: 13px !important;
-  color: var(--termos-gold) !important;
+  color: var(--intro-gold) !important;
   background: transparent !important;
   isolation: isolate !important;
   z-index: 2 !important;
@@ -146,7 +146,7 @@
   border-radius: 2px;
   background: linear-gradient(180deg, #ffe08a 0%, #ffbf3b 100%);
   box-shadow: 0 0 6px rgba(255, 210, 100, 0.9);
-  animation: termosCaretBlink 1s steps(1, end) infinite;
+  animation: introCaretBlink 1s steps(1, end) infinite;
 }
 
 #section-intro [data-typing="true"].typing-done::after,
@@ -171,7 +171,7 @@
     0 0 6px rgba(255, 230, 120, 0.95),
     0 0 12px rgba(255, 210, 90, 0.72),
     0 0 20px rgba(255, 170, 40, 0.36) !important;
-  animation: termosAuraPulse 1.6s ease-in-out infinite;
+  animation: introAuraPulse 1.6s ease-in-out infinite;
 }
 
 #section-intro [data-typing="true"].typing-active::before,
@@ -212,14 +212,14 @@
    LISTA SEM BULLET
    ========================================================= */
 
-#section-intro .termos-lista-rough,
+#section-intro .intro-lista-rough,
 #section-intro ul {
   list-style: none !important;
   margin: 2px 0 0 !important;
   padding: 0 !important;
 }
 
-#section-intro .termos-lista-rough > li,
+#section-intro .intro-lista-rough > li,
 #section-intro ul > li {
   list-style: none !important;
   margin: 0 !important;
@@ -299,12 +299,12 @@
    ANIMAÇÕES
    ========================================================= */
 
-@keyframes termosCaretBlink {
+@keyframes introCaretBlink {
   0%, 45% { opacity: 0.95; }
   50%, 100% { opacity: 0; }
 }
 
-@keyframes termosAuraPulse {
+@keyframes introAuraPulse {
   0% {
     box-shadow:
       0 0 0 1px rgba(255, 220, 120, 0.16),
@@ -350,14 +350,14 @@
     border-radius: 20px !important;
   }
 
-  #section-intro .termos1-title,
+  #section-intro .intro-title,
   #section-intro .section-title {
     font-size: 26px !important;
     margin-bottom: 14px !important;
   }
 
   #section-intro .parchment-text-rough,
-  #section-intro .termos-lista-rough > li {
+  #section-intro .intro-lista-rough > li {
     font-size: 13px !important;
     line-height: 1.6 !important;
     padding: 3px 6px !important;
@@ -375,34 +375,34 @@
    ========================================= */
 
 /* garante que cada item comece em nova linha */
-#section-intro .termos-lista-rough > li {
+#section-intro .intro-lista-rough > li {
   display: block !important;
   width: 100% !important;
   clear: both !important;
 }
 
 /* força quebra de linha no conteúdo interno */
-#section-intro .termos-lista-rough > li[data-typing="true"] {
+#section-intro .intro-lista-rough > li[data-typing="true"] {
   white-space: normal !important;
   word-break: break-word !important;
   overflow-wrap: break-word !important;
 }
 
 /* 👇 evita que o typing tente encaixar na linha anterior */
-#section-intro .termos-lista-rough {
+#section-intro .intro-lista-rough {
   display: flex !important;
   flex-direction: column !important;
   align-items: flex-start !important;
 }
 
 /* opcional: pequeno espaçamento entre linhas */
-#section-intro .termos-lista-rough > li + li {
+#section-intro .intro-lista-rough > li + li {
   margin-top: 2px !important;
 }
 /* =========================================
    SENHA — AURA TAMBÉM DURANTE A FALA
    ========================================= */
-#section-intro .termos-lista-rough li[data-typing="true"] {
+#section-intro .intro-lista-rough li[data-typing="true"] {
   display: inline-block !important;
   width: fit-content !important;
   max-width: 100% !important;
@@ -445,7 +445,7 @@
   );
 }
 /* =========================================
-   SCROLL MOBILE TERMOS — SOLUÇÃO OFICIAL
+   SCROLL MOBILE intro— SOLUÇÃO OFICIAL
    ========================================= */
 
 @media (max-width: 768px) {
@@ -492,7 +492,7 @@
 }
 
 /* =========================================
-   TERMOS — AURA FIXA BLINDADA
+   intro — AURA FIXA BLINDADA
    Não depende só de typing-done
    ========================================= */
 
@@ -545,7 +545,7 @@
     0 0 26px rgba(255, 180, 60, 0.18) !important;
 }
 /* =====================================================
-   TERMOS — PADRÃO VISUAL IGUAL À SECTION SENHA
+   intro — PADRÃO VISUAL IGUAL À SECTION SENHA
 ===================================================== */
 
 @media (max-width: 768px) {
