@@ -89,6 +89,7 @@
   position: relative !important;;
   text-align: left !important;
   overflow: hidden !important;
+  flex: 1 !important; 
 }
 
 #section-intro #intro {
@@ -259,9 +260,11 @@
 
 #section-intro .footer-actions,
 #section-intro .parchment-actions-rough {
-  display: flex;
-  justify-content: center;
-  margin-top: 22px;
+  margin-top: auto !important;
+  padding-top: 16px !important;
+  padding-bottom: 12px !important;
+  display: flex !important;
+  justify-content: center !important;  
 }
 
 #section-intro .btn-stone,
