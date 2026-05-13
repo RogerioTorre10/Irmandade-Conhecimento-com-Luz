@@ -404,23 +404,29 @@
   }
 
   root.querySelectorAll('select').forEach((select) => {
-    if (select.dataset.mobileSheet === '1') return;
-    select.dataset.mobileSheet = '1';
+  if (select.dataset.mobileSheet === '1') return;
+  select.dataset.mobileSheet = '1';
 
-    select.addEventListener('touchend', (ev) => {
-      if (!isMobile()) return;
-      ev.preventDefault();
-      ev.stopPropagation();
-      openSheet(select);
-    }, { passive: false });
+  const abrirCustom = (ev) => {
+    ev.preventDefault();
+    ev.stopPropagation();
 
-    select.addEventListener('click', (ev) => {
-      if (!isMobile()) return;
-      ev.preventDefault();
-      ev.stopPropagation();
-      openSheet(select);
-    });
-  });
+    try {
+      select.blur();
+    } catch {}
+
+    openSheet(select);
+  };
+
+  select.addEventListener('pointerdown', abrirCustom, { passive: false });
+  select.addEventListener('mousedown', abrirCustom, { passive: false });
+  select.addEventListener('touchstart', abrirCustom, { passive: false });
+
+  select.addEventListener('click', (ev) => {
+    ev.preventDefault();
+    ev.stopPropagation();
+  }, { passive: false });
+});
 }
 
   function bind(root) {
