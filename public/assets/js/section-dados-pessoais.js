@@ -343,7 +343,7 @@
   if (!root || root.dataset.dpSelectSheetBound === '1') return;
   root.dataset.dpSelectSheetBound = '1';
 
-  const isMobile = () => window.matchMedia('(max-width: 768px)').matches;
+  const isMobile = () => true;
 
   function closeSheet() {
     document.querySelectorAll('.dp-select-sheet').forEach(el => el.remove());
