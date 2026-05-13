@@ -1063,6 +1063,34 @@ function buildFinalSynthesisPayload() {
   };
 }
 
+function removerFinalDuplicado(texto) {
+  let txt = String(texto || '').replace(/\s+/g, ' ').trim();
+  if (!txt) return '';
+
+  // Remove repetição exata das últimas 1 a 3 frases
+  for (let qtd = 3; qtd >= 1; qtd--) {
+    const frases = txt.match(/[^.!?…]+[.!?…]+/g) || [];
+    if (frases.length < qtd * 2) continue;
+
+    const fim = frases.slice(-qtd).join(' ').replace(/\s+/g, ' ').trim();
+    const antes = frases.slice(-qtd * 2, -qtd).join(' ').replace(/\s+/g, ' ').trim();
+
+    if (fim && antes && fim.toLowerCase() === antes.toLowerCase()) {
+      txt = frases.slice(0, -qtd).join(' ').replace(/\s+/g, ' ').trim();
+    }
+  }
+
+  // Remove duplicações de blocos longos finais
+  const metade = Math.floor(txt.length / 2);
+  const tail = txt.slice(metade).trim();
+
+  if (tail.length > 80 && txt.slice(0, metade).includes(tail)) {
+    txt = txt.replace(tail, '').trim();
+  }
+
+  return txt;
+}
+  
   async function renderFinalGuideFeedback(section) {
     if (!section) return null;
 
@@ -1091,7 +1119,7 @@ function buildFinalSynthesisPayload() {
         throw new Error(result?.error || 'Falha ao gerar devolutiva final');
       }
 
-      const texto = String(result.text || '').trim();
+      const texto = removerFinalDuplicado(result.text);      
 
       window.__JORNADA_DEVOLUTIVA_FINAL__ = texto;
       sessionStorage.setItem('JORNADA_DEVOLUTIVA_FINAL', texto);
