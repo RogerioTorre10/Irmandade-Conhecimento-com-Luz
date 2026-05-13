@@ -632,41 +632,44 @@ function ensureMicAttached(textarea) {
 
 function triggerMic(textarea) {
   if (!textarea) return;
-
   ensureMicAttached(textarea);
 
+  // Preferência: usar JORNADA_MICRO (já corrigido com continuous:true)
+  if (window.JORNADA_MICRO?.attach) {
+    try {
+      // attach retorna a instância com .start/.stop
+      const instance = window.__MIC_INSTANCE_BLOCO__ ||
+        (() => {
+          const inst = window.JORNADA_MICRO.attach(textarea, { mode: 'append', lang: getLang() });
+          window.__MIC_INSTANCE_BLOCO__ = inst;
+          return inst;
+        })();
+
+      if (instance?.start) {
+        instance.start();
+        window.__MIC_ACTIVE__ = true;
+        window.__MIC_INSTANCE__ = instance;
+        updateMicButtonState(true);
+        return;
+      }
+    } catch (e) {
+      warn('Falha ao usar JORNADA_MICRO:', e);
+    }
+  }
+
+  // Fallback: SpeechRecognition próprio com continuous:true
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    warn('SpeechRecognition não suportado.');
+    updateMicButtonState(false);
+    return;
+  }
+
   try {
-    if (window.JORNADA_MICRO?.start) {
-      window.__MIC_ACTIVE__ = true;
-      window.__MIC_INSTANCE__ = window.JORNADA_MICRO;
-      updateMicButtonState(true);
-      window.JORNADA_MICRO.start(textarea, { mode: 'append', lang: getLang() });
-      return;
-    }
-
-    if (typeof window.startMic === 'function') {
-      window.__MIC_ACTIVE__ = true;
-      updateMicButtonState(true);
-      return window.startMic();
-    }
-
-    if (typeof window.initSpeechRecognition === 'function') {
-      window.__MIC_ACTIVE__ = true;
-      updateMicButtonState(true);
-      return window.initSpeechRecognition();
-    }
-
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) {
-      warn('SpeechRecognition não suportado.');
-      updateMicButtonState(false);
-      return;
-    }
-
     if (!window.__REC__) {
       const rec = new SR();
       rec.lang = document.documentElement.lang || getLang() || 'pt-BR';
-      rec.continuous = false;
+      rec.continuous = true;        // ← CORRIGIDO
       rec.interimResults = true;
       rec.maxAlternatives = 1;
 
@@ -676,30 +679,42 @@ function triggerMic(textarea) {
       };
 
       rec.onresult = (ev) => {
-        let finalTxt = '';
         for (let i = ev.resultIndex; i < ev.results.length; i++) {
           const res = ev.results[i];
-          finalTxt += res[0].transcript || '';
           if (res.isFinal) {
             const prev = textarea.value.trim();
-            textarea.value = prev ? (prev + ' ' + finalTxt.trim()) : finalTxt.trim();
+            const novo = res[0].transcript.trim();
+            textarea.value = prev ? (prev + ' ' + novo) : novo;
             textarea.dispatchEvent(new Event('input', { bubbles: true }));
-            finalTxt = '';
           }
         }
       };
 
-      rec.onend = () => {
-        window.__MIC_ACTIVE__ = false;
-        window.__MIC_INSTANCE__ = null;
-        updateMicButtonState(false);
-      };
-
       rec.onerror = (e) => {
+        // no-speech no mobile é normal — reinicia se ainda ativo
+        if (e?.error === 'no-speech') {
+          if (window.__MIC_ACTIVE__) {
+            try { rec.start(); } catch (_) {}
+          }
+          return;
+        }
         warn('MIC onerror:', e);
         window.__MIC_ACTIVE__ = false;
         window.__MIC_INSTANCE__ = null;
+        window.__REC__ = null;
         updateMicButtonState(false);
+      };
+
+      rec.onend = () => {
+        // Reinicia automaticamente enquanto __MIC_ACTIVE__ for true
+        if (window.__MIC_ACTIVE__) {
+          try { rec.start(); } catch (_) {
+            window.__MIC_ACTIVE__ = false;
+            window.__MIC_INSTANCE__ = null;
+            window.__REC__ = null;
+            updateMicButtonState(false);
+          }
+        }
       };
 
       window.__REC__ = rec;
@@ -710,9 +725,11 @@ function triggerMic(textarea) {
     updateMicButtonState(true);
     textarea.focus();
     window.__REC__.start();
+
   } catch (e) {
     window.__MIC_ACTIVE__ = false;
     window.__MIC_INSTANCE__ = null;
+    window.__REC__ = null;
     updateMicButtonState(false);
     err('Erro ao iniciar microfone:', e);
   }
