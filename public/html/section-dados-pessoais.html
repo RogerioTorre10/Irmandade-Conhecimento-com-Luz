@@ -1,261 +1,510 @@
-<link rel="stylesheet" href="/assets/css/styles-base.css">
-<link rel="stylesheet" href="/assets/css/brilho-texturas.css">
-<link rel="stylesheet" href="/assets/css/j-panel-glow.css">
-<link rel="stylesheet" href="/assets/css/styles-dados-pessoais.css">
+<section id="section-dados-pessoais" class="jornada-section" aria-label="Dados Pessoais" hidden>
 
-<section id="section-dados-pessoais" class="section section-dados-pessoais">
-  <div class="j-panel-glow dados-painel">
-    <div class="j-perg-v-inner">
-      <div class="j-arcane-card">
-        <div class="pergaminho-content">
+  <div class="dp-container">
 
-          <h1
-            id="dp-title"
-            class="typing-text"
-            data-typing="true"
-            data-cursor="true"
-            data-speed="40"
-            data-i18n-text="dados.title"
-            data-text="Dados Pessoais"
-          >Dados Pessoais</h1>
+    <!-- Cabeçalho -->
+    <div class="dp-header">
+      <h1 id="dp-title" class="dp-title" data-i18n-text="dados.title">Dados Pessoais</h1>
+      <p id="dp-subtitle" class="dp-subtitle" data-i18n-text="dados.subtitle">
+        Preencha os dados para enriquecer sua devolutiva.
+      </p>
+    </div>
 
-          <p
-            id="dp-subtitle"
-            class="intro-text"
-            data-typing="true"
-            data-cursor="true"
-            data-speed="38"
-            data-i18n-text="dados.subtitle"
-            data-text="Preencha os dados para enriquecer sua devolutiva."
-          >Preencha os dados para enriquecer sua devolutiva.</p>
+    <form id="dp-form" class="dp-form" novalidate autocomplete="off">
 
-          <!-- Campos de texto -->
-          <div class="form-grid">
-            <input id="dp-nome"
-                   type="text"
-                   data-i18n-placeholder="dados.nome"
-                   placeholder="Nome completo" />
+      <!-- Nome -->
+      <div class="dp-field-group">
+        <label for="dp-nome" data-i18n="dados.nome">Nome completo</label>
+        <input
+          type="text"
+          id="dp-nome"
+          name="nomeCompleto"
+          class="dp-input"
+          data-i18n-placeholder="dados.nome_placeholder"
+          placeholder="Seu nome completo"
+          autocomplete="off"
+        />
+      </div>
 
-            <input id="dp-cidade"
-                   type="text"
-                   data-i18n-placeholder="dados.cidade"
-                   placeholder="Cidade" />
+      <!-- Idade -->
+      <div class="dp-field-group">
+        <label for="dp-idade-faixa" data-i18n="dados.idade">Faixa etária</label>
+        <div class="dp-custom-select" data-for="dp-idade-faixa">
+          <button type="button" class="dp-cs-trigger" aria-haspopup="listbox" aria-expanded="false">
+            <span class="dp-cs-label" data-i18n-placeholder="dados.selecione">Selecione</span>
+            <span class="dp-cs-arrow">▾</span>
+          </button>
+          <ul class="dp-cs-list" role="listbox" hidden>
+            <li role="option" data-value="Menos de 18">Menos de 18</li>
+            <li role="option" data-value="18 a 24">18 a 24</li>
+            <li role="option" data-value="25 a 34">25 a 34</li>
+            <li role="option" data-value="35 a 44">35 a 44</li>
+            <li role="option" data-value="45 a 59">45 a 59</li>
+            <li role="option" data-value="60 ou mais">60 ou mais</li>
+          </ul>
+          <select id="dp-idade-faixa" aria-hidden="true" tabindex="-1" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;overflow:hidden;"></select>
+        </div>
+      </div>
 
-            <input id="dp-estado"
-                   type="text"
-                   data-i18n-placeholder="dados.estado"
-                   placeholder="Estado" />
+      <!-- Cidade / Estado (lado a lado) -->
+      <div class="dp-field-row">
+        <div class="dp-field-group">
+          <label for="dp-cidade" data-i18n="dados.cidade">Cidade</label>
+          <input
+            type="text"
+            id="dp-cidade"
+            name="cidade"
+            class="dp-input"
+            data-i18n-placeholder="dados.cidade_placeholder"
+            placeholder="Sua cidade"
+            autocomplete="off"
+          />
+        </div>
+        <div class="dp-field-group">
+          <label for="dp-estado" data-i18n="dados.estado">Estado</label>
+          <input
+            type="text"
+            id="dp-estado"
+            name="estado"
+            class="dp-input"
+            maxlength="2"
+            data-i18n-placeholder="dados.estado_placeholder"
+            placeholder="UF"
+            autocomplete="off"
+          />
+        </div>
+      </div>
 
-            <input id="dp-profissao"
-                   type="text"
-                   data-i18n-placeholder="dados.profissao"
-                   placeholder="Profissão / área" />
+      <!-- Estado Civil -->
+      <div class="dp-field-group">
+        <label for="dp-estado-civil" data-i18n="dados.estado_civil">Estado civil</label>
+        <div class="dp-custom-select" data-for="dp-estado-civil">
+          <button type="button" class="dp-cs-trigger" aria-haspopup="listbox" aria-expanded="false">
+            <span class="dp-cs-label" data-i18n-placeholder="dados.selecione">Selecione</span>
+            <span class="dp-cs-arrow">▾</span>
+          </button>
+          <ul class="dp-cs-list" role="listbox" hidden>
+            <li role="option" data-value="Solteiro(a)">Solteiro(a)</li>
+            <li role="option" data-value="Casado(a)">Casado(a)</li>
+            <li role="option" data-value="União estável">União estável</li>
+            <li role="option" data-value="Divorciado(a)">Divorciado(a)</li>
+            <li role="option" data-value="Viúvo(a)">Viúvo(a)</li>
+            <li role="option" data-value="Separado(a)">Separado(a)</li>
+          </ul>
+          <select id="dp-estado-civil" aria-hidden="true" tabindex="-1" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;overflow:hidden;"></select>
+        </div>
+      </div>
 
-            <input id="dp-religiao"
-                   type="text"
-                   data-i18n-placeholder="dados.religiao"
-                   placeholder="Religião / espiritualidade" />
-          </div>
+      <!-- Profissão -->
+      <div class="dp-field-group">
+        <label for="dp-profissao" data-i18n="dados.profissao">Profissão</label>
+        <input
+          type="text"
+          id="dp-profissao"
+          name="profissao"
+          class="dp-input"
+          data-i18n-placeholder="dados.profissao_placeholder"
+          placeholder="Sua profissão"
+          autocomplete="off"
+        />
+      </div>
 
-          <!-- Selects rápidos: faixa etária / estado civil / filhos -->
-          <div class="dados-linha-tripla">
+      <!-- Filhos -->
+      <div class="dp-field-group">
+        <label for="dp-filhos" data-i18n="dados.filhos">Tem filhos?</label>
+        <div class="dp-custom-select" data-for="dp-filhos">
+          <button type="button" class="dp-cs-trigger" aria-haspopup="listbox" aria-expanded="false">
+            <span class="dp-cs-label" data-i18n-placeholder="dados.selecione">Selecione</span>
+            <span class="dp-cs-arrow">▾</span>
+          </button>
+          <ul class="dp-cs-list" role="listbox" hidden>
+            <li role="option" data-value="Não tenho filhos">Não tenho filhos</li>
+            <li role="option" data-value="1 filho(a)">1 filho(a)</li>
+            <li role="option" data-value="2 filhos(as)">2 filhos(as)</li>
+            <li role="option" data-value="3 filhos(as)">3 filhos(as)</li>
+            <li role="option" data-value="4 ou mais filhos">4 ou mais filhos</li>
+          </ul>
+          <select id="dp-filhos" aria-hidden="true" tabindex="-1" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;overflow:hidden;"></select>
+        </div>
+      </div>
 
-            <select id="dp-idade-faixa" class="dp-select">
-              <option value="" data-i18n="dados.idade">Faixa etária</option>
-              <option value="Até 17"  data-i18n="dados.idade1">Até 17</option>
-              <option value="18 a 24" data-i18n="dados.idade2">18 a 24</option>
-              <option value="25 a 34" data-i18n="dados.idade3">25 a 34</option>
-              <option value="35 a 44" data-i18n="dados.idade4">35 a 44</option>
-              <option value="45 a 59" data-i18n="dados.idade5">45 a 59</option>
-              <option value="60+"     data-i18n="dados.idade6">60+</option>
-            </select>
+      <!-- Religião -->
+      <div class="dp-field-group">
+        <label for="dp-religiao" data-i18n="dados.religiao">Religião / Espiritualidade</label>
+        <div class="dp-custom-select" data-for="dp-religiao">
+          <button type="button" class="dp-cs-trigger" aria-haspopup="listbox" aria-expanded="false">
+            <span class="dp-cs-label" data-i18n-placeholder="dados.selecione">Selecione</span>
+            <span class="dp-cs-arrow">▾</span>
+          </button>
+          <ul class="dp-cs-list" role="listbox" hidden>
+            <li role="option" data-value="Sem religião">Sem religião</li>
+            <li role="option" data-value="Agnóstico(a)">Agnóstico(a)</li>
+            <li role="option" data-value="Ateu(a)">Ateu(a)</li>
+            <li role="option" data-value="Católico(a)">Católico(a)</li>
+            <li role="option" data-value="Evangélico(a)">Evangélico(a)</li>
+            <li role="option" data-value="Espírita">Espírita</li>
+            <li role="option" data-value="Umbanda / Candomblé">Umbanda / Candomblé</li>
+            <li role="option" data-value="Budismo">Budismo</li>
+            <li role="option" data-value="Islamismo">Islamismo</li>
+            <li role="option" data-value="Judaísmo">Judaísmo</li>
+            <li role="option" data-value="Espiritualidade própria">Espiritualidade própria</li>
+            <li role="option" data-value="Outra">Outra</li>
+          </ul>
+          <select id="dp-religiao" aria-hidden="true" tabindex="-1" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;overflow:hidden;"></select>
+        </div>
+      </div>
 
-            <select id="dp-estado-civil" class="dp-select">
-              <option value=""              data-i18n="dados.estado_civil">Estado civil</option>
-              <option value="Solteiro(a)"   data-i18n="dados.ec1">Solteiro(a)</option>
-              <option value="Casado(a)"     data-i18n="dados.ec2">Casado(a)</option>
-              <option value="Divorciado(a)" data-i18n="dados.ec3">Divorciado(a)</option>
-              <option value="Viúvo(a)"      data-i18n="dados.ec4">Viúvo(a)</option>
-              <option value="Outro"         data-i18n="dados.ec5">Outro</option>
-            </select>
+      <!-- Divider -->
+      <div class="dp-divider">
+        <span data-i18n="dados.perfil_titulo">Perfil de personalidade</span>
+      </div>
 
-            <select id="dp-filhos" class="dp-select">
-              <option value=""    data-i18n="dados.filhos">Filhos</option>
-              <option value="Não" data-i18n="dados.filhos_nao">Não</option>
-              <option value="Sim" data-i18n="dados.filhos_sim">Sim</option>
-            </select>
+      <!-- Temperamento -->
+      <div class="dp-field-group">
+        <label for="dp-temperamento" data-i18n="dados.temperamento">Como você descreveria sua natureza?</label>
+        <div class="dp-custom-select" data-for="dp-temperamento">
+          <button type="button" class="dp-cs-trigger" aria-haspopup="listbox" aria-expanded="false">
+            <span class="dp-cs-label" data-i18n-placeholder="dados.selecione">Selecione</span>
+            <span class="dp-cs-arrow">▾</span>
+          </button>
+          <ul class="dp-cs-list" role="listbox" hidden>
+            <li role="option" data-value="Boa">Boa</li>
+            <li role="option" data-value="Generosa">Generosa</li>
+            <li role="option" data-value="Empática">Empática</li>
+            <li role="option" data-value="Solidária">Solidária</li>
+            <li role="option" data-value="Neutra">Neutra</li>
+            <li role="option" data-value="Egoísta">Egoísta</li>
+            <li role="option" data-value="Fria">Fria</li>
+            <li role="option" data-value="Calculista">Calculista</li>
+            <li role="option" data-value="Manipuladora">Manipuladora</li>
+            <li role="option" data-value="Falsa">Falsa</li>
+            <li role="option" data-value="Cruel">Cruel</li>
+            <li role="option" data-value="Perversa">Perversa</li>
+            <li role="option" data-value="Medíocre">Medíocre</li>
+            <li role="option" data-value="Corrompida">Corrompida</li>
+            <li role="option" data-value="Autoritária">Autoritária</li>
+          </ul>
+          <select id="dp-temperamento" aria-hidden="true" tabindex="-1" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;overflow:hidden;"></select>
+        </div>
+      </div>
 
-          </div>
+      <!-- Comportamento -->
+      <div class="dp-field-group">
+        <label for="dp-comportamento" data-i18n="dados.comportamento">Como você age com as pessoas?</label>
+        <div class="dp-custom-select" data-for="dp-comportamento">
+          <button type="button" class="dp-cs-trigger" aria-haspopup="listbox" aria-expanded="false">
+            <span class="dp-cs-label" data-i18n-placeholder="dados.selecione">Selecione</span>
+            <span class="dp-cs-arrow">▾</span>
+          </button>
+          <ul class="dp-cs-list" role="listbox" hidden>
+            <li role="option" data-value="Amável">Amável</li>
+            <li role="option" data-value="Respeitoso(a)">Respeitoso(a)</li>
+            <li role="option" data-value="Atencioso(a)">Atencioso(a)</li>
+            <li role="option" data-value="Indiferente">Indiferente</li>
+            <li role="option" data-value="Distante">Distante</li>
+            <li role="option" data-value="Agressivo(a)">Agressivo(a)</li>
+            <li role="option" data-value="Controlador(a)">Controlador(a)</li>
+            <li role="option" data-value="Manipulador(a)">Manipulador(a)</li>
+            <li role="option" data-value="Abusivo(a)">Abusivo(a)</li>
+          </ul>
+          <select id="dp-comportamento" aria-hidden="true" tabindex="-1" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;overflow:hidden;"></select>
+        </div>
+      </div>
 
-          <!-- Perfil de Personalidade -->
-          <h2 class="subtitulo-bloco" data-i18n="dados.dadosPerfil.titulo">Perfil de Personalidade</h2>
+      <!-- Caráter -->
+      <div class="dp-field-group">
+        <label for="dp-carater" data-i18n="dados.carater">Como você avalia seu caráter?</label>
+        <div class="dp-custom-select" data-for="dp-carater">
+          <button type="button" class="dp-cs-trigger" aria-haspopup="listbox" aria-expanded="false">
+            <span class="dp-cs-label" data-i18n-placeholder="dados.selecione">Selecione</span>
+            <span class="dp-cs-arrow">▾</span>
+          </button>
+          <ul class="dp-cs-list" role="listbox" hidden>
+            <li role="option" data-value="Íntegro(a)">Íntegro(a)</li>
+            <li role="option" data-value="Honesto(a)">Honesto(a)</li>
+            <li role="option" data-value="Leal">Leal</li>
+            <li role="option" data-value="Justo(a)">Justo(a)</li>
+            <li role="option" data-value="Impulsivo(a)">Impulsivo(a)</li>
+            <li role="option" data-value="Instável">Instável</li>
+            <li role="option" data-value="Desonesto(a)">Desonesto(a)</li>
+            <li role="option" data-value="Desleal">Desleal</li>
+            <li role="option" data-value="Corrompido(a)">Corrompido(a)</li>
+          </ul>
+          <select id="dp-carater" aria-hidden="true" tabindex="-1" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;overflow:hidden;"></select>
+        </div>
+      </div>
 
-          <div class="form-grid form-grid-personalidade">
+      <!-- Índole -->
+      <div class="dp-field-group">
+        <label for="dp-indole" data-i18n="dados.indole">Como você se percebe interiormente?</label>
+        <div class="dp-custom-select" data-for="dp-indole">
+          <button type="button" class="dp-cs-trigger" aria-haspopup="listbox" aria-expanded="false">
+            <span class="dp-cs-label" data-i18n-placeholder="dados.selecione">Selecione</span>
+            <span class="dp-cs-arrow">▾</span>
+          </button>
+          <ul class="dp-cs-list" role="listbox" hidden>
+            <li role="option" data-value="Pacífico(a)">Pacífico(a)</li>
+            <li role="option" data-value="Compassivo(a)">Compassivo(a)</li>
+            <li role="option" data-value="Generoso(a)">Generoso(a)</li>
+            <li role="option" data-value="Resiliente">Resiliente</li>
+            <li role="option" data-value="Ansioso(a)">Ansioso(a)</li>
+            <li role="option" data-value="Inseguro(a)">Inseguro(a)</li>
+            <li role="option" data-value="Rancoroso(a)">Rancoroso(a)</li>
+            <li role="option" data-value="Vingativo(a)">Vingativo(a)</li>
+            <li role="option" data-value="Invejoso(a)">Invejoso(a)</li>
+          </ul>
+          <select id="dp-indole" aria-hidden="true" tabindex="-1" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;overflow:hidden;"></select>
+        </div>
+      </div>
 
-            <!-- Temperamento -->
-            <label class="dp-field">
-              <span class="dp-label" data-i18n="dados.dadosPerfil.temperamentoLabel">Temperamento</span>
-              <select id="dp-temperamento" class="dp-select">
-                <option value="" data-i18n="dados.dadosPerfil.selecione">Selecione</option>
-                <option value="Explosivo"   data-i18n="dados.dadosPerfil.temperamento.explosivo">Explosivo</option>
-                <option value="Impulsivo"   data-i18n="dados.dadosPerfil.temperamento.impulsivo">Impulsivo</option>
-                <option value="Ansioso"     data-i18n="dados.dadosPerfil.temperamento.ansioso">Ansioso</option>
-                <option value="Nervoso"     data-i18n="dados.dadosPerfil.temperamento.nervoso">Nervoso</option>
-                <option value="Calmo"       data-i18n="dados.dadosPerfil.temperamento.calmo">Calmo</option>
-                <option value="Passivo"     data-i18n="dados.dadosPerfil.temperamento.passivo">Passivo</option>
-                <option value="Sensível"    data-i18n="dados.dadosPerfil.temperamento.sensivel">Sensível</option>
-                <option value="Intenso"     data-i18n="dados.dadosPerfil.temperamento.intenso">Intenso</option>
-                <option value="Equilibrado" data-i18n="dados.dadosPerfil.temperamento.equilibrado">Equilibrado</option>
-                <option value="Irritável"   data-i18n="dados.dadosPerfil.temperamento.irritavel">Irritável</option>
-                <option value="Pacífico"    data-i18n="dados.dadosPerfil.temperamento.pacifico">Pacífico</option>
-                <option value="Hesitante"   data-i18n="dados.dadosPerfil.temperamento.hesitante">Hesitante</option>
-                <option value="Emotivo"     data-i18n="dados.dadosPerfil.temperamento.emotivo">Emotivo</option>
-                <option value="Mutável"     data-i18n="dados.dadosPerfil.temperamento.mutavel">Mutável</option>
-              </select>
-            </label>
+      <!-- Divider Eixo Existencial -->
+      <div class="dp-divider">
+        <span data-i18n="dados.eixo_titulo">Eixo existencial</span>
+      </div>
 
-            <!-- Comportamento -->
-            <label class="dp-field">
-              <span class="dp-label" data-i18n="dados.dadosPerfil.comportamentoLabel">Comportamento</span>
-              <select id="dp-comportamento" class="dp-select">
-                <option value="" data-i18n="dados.dadosPerfil.selecione">Selecione</option>
-                <option value="Agressivo"     data-i18n="dados.dadosPerfil.comportamento.agressivo">Agressivo</option>
-                <option value="Rígido"        data-i18n="dados.dadosPerfil.comportamento.rigido">Rígido</option>
-                <option value="Flexível"      data-i18n="dados.dadosPerfil.comportamento.flexivel">Flexível</option>
-                <option value="Confuso"       data-i18n="dados.dadosPerfil.comportamento.confuso">Confuso</option>
-                <option value="Ambíguo"       data-i18n="dados.dadosPerfil.comportamento.ambiguo">Ambíguo</option>
-                <option value="Inseguro"      data-i18n="dados.dadosPerfil.comportamento.inseguro">Inseguro</option>
-                <option value="Seguro"        data-i18n="dados.dadosPerfil.comportamento.seguro">Seguro</option>
-                <option value="Sociável"      data-i18n="dados.dadosPerfil.comportamento.sociavel">Sociável</option>
-                <option value="Isolado"       data-i18n="dados.dadosPerfil.comportamento.isolado">Isolado</option>
-                <option value="Proativo"      data-i18n="dados.dadosPerfil.comportamento.proativo">Proativo</option>
-                <option value="Reativo"       data-i18n="dados.dadosPerfil.comportamento.reativo">Reativo</option>
-                <option value="Desorganizado" data-i18n="dados.dadosPerfil.comportamento.desorganizado">Desorganizado</option>
-                <option value="Reservado"     data-i18n="dados.dadosPerfil.comportamento.reservado">Reservado</option>
-                <option value="Invasor"       data-i18n="dados.dadosPerfil.comportamento.invasor">Invasor</option>
-                <option value="Imprevisível"  data-i18n="dados.dadosPerfil.comportamento.imprevisivel">Imprevisível</option>
-                <option value="Meticuloso"    data-i18n="dados.dadosPerfil.comportamento.meticuloso">Meticuloso</option>
-                <option value="Observador"    data-i18n="dados.dadosPerfil.comportamento.observador">Observador</option>
-              </select>
-            </label>
+      <!-- Vazio existencial -->
+      <div class="dp-field-group">
+        <label for="dp-vazio-existencial" data-i18n="dados.vazio">O que mais te faz sentir vazio(a)?</label>
+        <input
+          type="text"
+          id="dp-vazio-existencial"
+          name="vazioExistencial"
+          class="dp-input"
+          data-i18n-placeholder="dados.vazio_placeholder"
+          placeholder="Ex: falta de propósito, solidão..."
+          autocomplete="off"
+        />
+      </div>
 
-            <!-- Caráter -->
-            <label class="dp-field">
-              <span class="dp-label" data-i18n="dados.dadosPerfil.caraterLabel">Caráter</span>
-              <select id="dp-carater" class="dp-select">
-                <option value="" data-i18n="dados.dadosPerfil.selecione">Selecione</option>
-                <option value="Firme"        data-i18n="dados.dadosPerfil.carater.firme">Firme</option>
-                <option value="Forte"        data-i18n="dados.dadosPerfil.carater.forte">Forte</option>
-                <option value="Justo"        data-i18n="dados.dadosPerfil.carater.justo">Justo</option>
-                <option value="Honesto"      data-i18n="dados.dadosPerfil.carater.honesto">Honesto</option>
-                <option value="Íntegro"      data-i18n="dados.dadosPerfil.carater.integro">Íntegro</option>
-                <option value="Duro"         data-i18n="dados.dadosPerfil.carater.duro">Duro</option>
-                <option value="Frágil"       data-i18n="dados.dadosPerfil.carater.fragil">Frágil</option>
-                <option value="Volátil"      data-i18n="dados.dadosPerfil.carater.volatil">Volátil</option>
-                <option value="Determinado"  data-i18n="dados.dadosPerfil.carater.determinado">Determinado</option>
-                <option value="Perseverante" data-i18n="dados.dadosPerfil.carater.perseverante">Perseverante</option>
-                <option value="Corrompível"  data-i18n="dados.dadosPerfil.carater.corrompivel">Corrompível</option>
-                <option value="Ético"        data-i18n="dados.dadosPerfil.carater.etico">Ético</option>
-                <option value="Incoerente"   data-i18n="dados.dadosPerfil.carater.incoerente">Incoerente</option>
-                <option value="Leal"         data-i18n="dados.dadosPerfil.carater.leal">Leal</option>
-                <option value="Confiável"    data-i18n="dados.dadosPerfil.carater.confiavel">Confiável</option>
-                <option value="Responsável"  data-i18n="dados.dadosPerfil.carater.responsavel">Responsável</option>
-              </select>
-            </label>
+      <!-- Pleno existencial -->
+      <div class="dp-field-group">
+        <label for="dp-pleno-existencial" data-i18n="dados.pleno">O que te faz sentir pleno(a)?</label>
+        <input
+          type="text"
+          id="dp-pleno-existencial"
+          name="plenoExistencial"
+          class="dp-input"
+          data-i18n-placeholder="dados.pleno_placeholder"
+          placeholder="Ex: conexão, criatividade, fé..."
+          autocomplete="off"
+        />
+      </div>
 
-            <!-- Índole -->
-            <label class="dp-field">
-              <span class="dp-label" data-i18n="dados.dadosPerfil.indoleLabel">Índole</span>
-              <select id="dp-indole" class="dp-select">
-                <option value="" data-i18n="dados.dadosPerfil.selecione">Selecione</option>
-                <option value="Boa"          data-i18n="dados.dadosPerfil.indole.boa">Boa</option>
-                <option value="Generosa"     data-i18n="dados.dadosPerfil.indole.generosa">Generosa</option>
-                <option value="Empática"     data-i18n="dados.dadosPerfil.indole.empatica">Empática</option>
-                <option value="Solidária"    data-i18n="dados.dadosPerfil.indole.solidaria">Solidária</option>
-                <option value="Neutra"       data-i18n="dados.dadosPerfil.indole.neutra">Neutra</option>
-                <option value="Egoísta"      data-i18n="dados.dadosPerfil.indole.egoista">Egoísta</option>
-                <option value="Fria"         data-i18n="dados.dadosPerfil.indole.fria">Fria</option>
-                <option value="Calculista"   data-i18n="dados.dadosPerfil.indole.calculista">Calculista</option>
-                <option value="Manipuladora" data-i18n="dados.dadosPerfil.indole.manipuladora">Manipuladora</option>
-                <option value="Falsa"        data-i18n="dados.dadosPerfil.indole.falsa">Falsa</option>
-                <option value="Cruel"        data-i18n="dados.dadosPerfil.indole.cruel">Cruel</option>
-                <option value="Perversa"     data-i18n="dados.dadosPerfil.indole.perversa">Perversa</option>
-                <option value="Medíocre"     data-i18n="dados.dadosPerfil.indole.mediocre">Medíocre</option>
-                <option value="Corrompida"   data-i18n="dados.dadosPerfil.indole.corrompida">Corrompida</option>
-                <option value="Autoritária"  data-i18n="dados.dadosPerfil.indole.autoritaria">Autoritária</option>
-              </select>
-            </label>
+      <!-- Observações -->
+      <div class="dp-field-group">
+        <label for="dp-observacoes" data-i18n="dados.observacoes">Algo que queira compartilhar? (opcional)</label>
+        <textarea
+          id="dp-observacoes"
+          name="observacoes"
+          class="dp-input dp-textarea"
+          rows="3"
+          data-i18n-placeholder="dados.observacoes_placeholder"
+          placeholder="Contexto adicional que possa enriquecer sua jornada..."
+        ></textarea>
+      </div>
 
-            <!-- Vazio Existencial — largura total -->
-            <label class="dp-field dp-field--full">
-              <span class="dp-label" data-i18n="dados.dadosPerfil.vazioLabel">Vazio Existencial</span>
-              <select id="dp-vazio-existencial" class="dp-select">
-                <option value="" data-i18n="dados.dadosPerfil.selecione">Selecione</option>
-                <option value="apatia"              data-i18n="dados.dadosPerfil.vazio.apatia">apatia</option>
-                <option value="mediocridade"        data-i18n="dados.dadosPerfil.vazio.mediocridade">mediocridade</option>
-                <option value="amargura"            data-i18n="dados.dadosPerfil.vazio.amargura">amargura</option>
-                <option value="tédio"               data-i18n="dados.dadosPerfil.vazio.tedio">tédio</option>
-                <option value="solidão"             data-i18n="dados.dadosPerfil.vazio.solidao">solidão</option>
-                <option value="frustração"          data-i18n="dados.dadosPerfil.vazio.frustracao">frustração</option>
-                <option value="arrependimento"      data-i18n="dados.dadosPerfil.vazio.arrependimento">arrependimento</option>
-                <option value="rancor"              data-i18n="dados.dadosPerfil.vazio.rancor">rancor</option>
-                <option value="mágoa"               data-i18n="dados.dadosPerfil.vazio.magoa">mágoa</option>
-                <option value="nojo"                data-i18n="dados.dadosPerfil.vazio.nojo">nojo</option>
-                <option value="inveja"              data-i18n="dados.dadosPerfil.vazio.inveja">inveja</option>
-                <option value="cobiça"              data-i18n="dados.dadosPerfil.vazio.cobica">cobiça</option>
-                <option value="avareza"             data-i18n="dados.dadosPerfil.vazio.avareza">avareza</option>
-                <option value="idiotice"            data-i18n="dados.dadosPerfil.vazio.idiotice">idiotice</option>
-                <option value="irresponsabilidade"  data-i18n="dados.dadosPerfil.vazio.irresponsabilidade">irresponsabilidade</option>
-                <option value="inutilidade"         data-i18n="dados.dadosPerfil.vazio.inutilidade">inutilidade</option>
-                <option value="infantilidade"       data-i18n="dados.dadosPerfil.vazio.infantilidade">infantilidade</option>
-              </select>
-            </label>
+      <!-- Status -->
+      <div id="dados-pessoais-status" class="dp-status" style="display:none;" aria-live="polite"></div>
 
-            <!-- Pleno Existencial — largura total -->
-            <label class="dp-field dp-field--full">
-              <span class="dp-label" data-i18n="dados.dadosPerfil.plenoLabel">Pleno Existencial</span>
-              <select id="dp-pleno-existencial" class="dp-select">
-                <option value="" data-i18n="dados.dadosPerfil.selecione">Selecione</option>
-                <option value="propósito"        data-i18n="dados.dadosPerfil.pleno.proposito">propósito</option>
-                <option value="excelência"       data-i18n="dados.dadosPerfil.pleno.excelencia">excelência</option>
-                <option value="doçura"           data-i18n="dados.dadosPerfil.pleno.docura">doçura</option>
-                <option value="entusiasmo"       data-i18n="dados.dadosPerfil.pleno.entusiasmo">entusiasmo</option>
-                <option value="comunhão"         data-i18n="dados.dadosPerfil.pleno.comunhao">comunhão</option>
-                <option value="realização"       data-i18n="dados.dadosPerfil.pleno.realizacao">realização</option>
-                <option value="reconciliação"    data-i18n="dados.dadosPerfil.pleno.reconciliacao">reconciliação</option>
-                <option value="perdão"           data-i18n="dados.dadosPerfil.pleno.perdao">perdão</option>
-                <option value="serenidade"       data-i18n="dados.dadosPerfil.pleno.serenidade">serenidade</option>
-                <option value="apreço"           data-i18n="dados.dadosPerfil.pleno.apreco">apreço</option>
-                <option value="admiração"        data-i18n="dados.dadosPerfil.pleno.admiracao">admiração</option>
-                <option value="contentamento"    data-i18n="dados.dadosPerfil.pleno.contentamento">contentamento</option>
-                <option value="generosidade"     data-i18n="dados.dadosPerfil.pleno.generosidade">generosidade</option>
-                <option value="sabedoria"        data-i18n="dados.dadosPerfil.pleno.sabedoria">sabedoria</option>
-                <option value="responsabilidade" data-i18n="dados.dadosPerfil.pleno.responsabilidade">responsabilidade</option>
-                <option value="utilidade"        data-i18n="dados.dadosPerfil.pleno.utilidade">utilidade</option>
-                <option value="maturidade"       data-i18n="dados.dadosPerfil.pleno.maturidade">maturidade</option>
-              </select>
-            </label>
+      <!-- Botão continuar -->
+      <button type="button" id="btn-dp-continuar" class="dp-btn-continuar" data-i18n="dados.continuar">
+        Continuar
+      </button>
 
-          </div><!-- /form-grid-personalidade -->
+    </form>
+  </div>
 
-          <textarea id="dp-observacoes"
-                    rows="4"
-                    data-i18n-placeholder="dados.obs"
-                    placeholder="Algo importante que deseja compartilhar?"></textarea>
+  <!-- =====================================================================
+       CUSTOM SELECT ENGINE — inline, sem dependência de CSS externo
+       ===================================================================== -->
+  <style>
+    /* Wrapper — âncora para o absolute da lista */
+    .dp-custom-select {
+      position: relative;
+      width: 100%;
+    }
 
-          <div class="final-acoes">
-            <button id="btn-dp-continuar"
-                    type="button"
-                    class="btn btn-stone"
-                    data-i18n="common.continue">
-              Continuar
-            </button>
-          </div>
+    /* Trigger button */
+    .dp-cs-trigger {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 8px;
+      color: #fff;
+      cursor: pointer;
+      text-align: left;
+      font-size: 0.95rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .dp-cs-trigger:focus-visible {
+      outline: 2px solid var(--guia-main, #00c781);
+      outline-offset: 2px;
+    }
+    .dp-custom-select.is-open .dp-cs-trigger {
+      border-color: var(--guia-main, #00c781);
+      box-shadow: 0 0 0 2px rgba(0, 199, 129, 0.2);
+    }
+    .dp-cs-arrow {
+      transition: transform 0.2s;
+      flex-shrink: 0;
+      margin-left: 8px;
+    }
+    .dp-custom-select.is-open .dp-cs-arrow {
+      transform: rotate(180deg);
+    }
 
-          <div id="dados-pessoais-status" class="status-box" style="display:none;"></div>
+    /* Lista dropdown — NUNCA tem width fixo que quebre no resize */
+    .dp-cs-list {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;        /* estica até a borda direita do wrapper */
+      background: #12121f;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      overflow-y: auto;
+      z-index: 99999;
+      list-style: none;
+      padding: 4px 0;
+      margin: 0;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      box-sizing: border-box;
+    }
+    .dp-cs-list[hidden] { display: none !important; }
 
-        </div><!-- /pergaminho-content -->
-      </div><!-- /j-arcane-card -->
-    </div><!-- /j-perg-v-inner -->
-  </div><!-- /j-panel-glow -->
+    .dp-cs-list li {
+      padding: 10px 16px;
+      cursor: pointer;
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 0.92rem;
+      transition: background 0.15s;
+    }
+    .dp-cs-list li:hover {
+      background: rgba(255, 255, 255, 0.07);
+    }
+    .dp-cs-list li.is-selected {
+      color: var(--guia-main, #00c781);
+      font-weight: 600;
+    }
+  </style>
+
+  <script>
+    (function () {
+      'use strict';
+
+      function initCustomSelects(root) {
+        root.querySelectorAll('.dp-custom-select').forEach(function (wrap) {
+          if (wrap.dataset.csReady === '1') return;
+          wrap.dataset.csReady = '1';
+
+          var trigger    = wrap.querySelector('.dp-cs-trigger');
+          var label      = wrap.querySelector('.dp-cs-label');
+          var list       = wrap.querySelector('.dp-cs-list');
+          var nativeSel  = wrap.querySelector('select');
+
+          if (!trigger || !list) return;
+
+          function open() {
+            // Fecha todos os outros abertos primeiro
+            root.querySelectorAll('.dp-custom-select.is-open').forEach(function (other) {
+              if (other !== wrap) {
+                other.classList.remove('is-open');
+                var otherList = other.querySelector('.dp-cs-list');
+                var otherTrigger = other.querySelector('.dp-cs-trigger');
+                if (otherList) otherList.hidden = true;
+                if (otherTrigger) otherTrigger.setAttribute('aria-expanded', 'false');
+              }
+            });
+
+            list.hidden = false;
+            trigger.setAttribute('aria-expanded', 'true');
+            wrap.classList.add('is-open');
+
+            // Ajusta max-height com base no espaço disponível abaixo
+            var rect = wrap.getBoundingClientRect();
+            var spaceBelow = window.innerHeight - rect.bottom - 8;
+            list.style.maxHeight = Math.max(120, Math.min(260, spaceBelow)) + 'px';
+          }
+
+          function close() {
+            list.hidden = true;
+            trigger.setAttribute('aria-expanded', 'false');
+            wrap.classList.remove('is-open');
+          }
+
+          trigger.addEventListener('click', function (e) {
+            e.stopPropagation();
+            wrap.classList.contains('is-open') ? close() : open();
+          });
+
+          list.querySelectorAll('li').forEach(function (li) {
+            li.addEventListener('click', function (e) {
+              e.stopPropagation();
+              var val = li.dataset.value || li.textContent.trim();
+
+              // Desmarca todas as opções
+              list.querySelectorAll('li').forEach(function (x) {
+                x.classList.remove('is-selected');
+              });
+              // Marca a escolhida em verde
+              li.classList.add('is-selected');
+
+              // Atualiza label do trigger em verde
+              label.textContent = val;
+              label.style.color = 'var(--guia-main, #00c781)';
+
+              // Sincroniza o <select> nativo (lido pelo section-dados-pessoais.js via #id)
+              if (nativeSel) {
+                var opt = nativeSel.querySelector('option[value="' + val + '"]');
+                if (!opt) {
+                  opt = document.createElement('option');
+                  opt.value = val;
+                  opt.textContent = val;
+                  nativeSel.appendChild(opt);
+                }
+                nativeSel.value = val;
+                nativeSel.dispatchEvent(new Event('change', { bubbles: true }));
+                nativeSel.dispatchEvent(new Event('input',  { bubbles: true }));
+              }
+
+              close();
+            });
+          });
+
+          // Fecha ao clicar fora do componente
+          document.addEventListener('click', function (e) {
+            if (!wrap.contains(e.target)) close();
+          });
+
+          // Fecha no resize — resolve o bug do DevTools / mobile
+          window.addEventListener('resize', close, { passive: true });
+        });
+      }
+
+      // Inicializa quando a section é exibida
+      document.addEventListener('section:shown', function (e) {
+        var node = e && e.detail && e.detail.node;
+        if (node && node.id === 'section-dados-pessoais') {
+          initCustomSelects(node);
+        }
+      });
+
+      document.addEventListener('sectionLoaded', function (e) {
+        var section = e && e.detail && e.detail.section;
+        if (section && section.id === 'section-dados-pessoais') {
+          initCustomSelects(section);
+        }
+      });
+
+      document.addEventListener('DOMContentLoaded', function () {
+        var root = document.getElementById('section-dados-pessoais');
+        if (root) initCustomSelects(root);
+      });
+    })();
+  </script>
+
 </section>
