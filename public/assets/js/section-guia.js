@@ -837,17 +837,13 @@
     const nomeAtual =
     (els.nameInput?.value || sessionStorage.getItem('jornada.nome') || '').trim().toUpperCase();
 
-  if (nomeAtual) {
-    const forcedMsg = tGuide(
-      'guia.subtitle',
-      'Olá, {{nome}}! Escolha seu guia para a Jornada.',
-      { nome: nomeAtual }
-    ).trim();
-
-    els.guiaTexto.dataset.text = forcedMsg;
-    els.guiaTexto.dataset.original = forcedMsg;
-    els.guiaTexto.textContent = forcedMsg;
-  }
+  if (els.guiaTexto) {
+  els.guiaTexto.dataset.text = '';
+  els.guiaTexto.dataset.original = '';
+  els.guiaTexto.dataset.spoken = '';
+  els.guiaTexto.textContent = '';
+  els.guiaTexto.style.display = 'none';
+  els.guiaTexto.classList.add('is-hidden');
 }
     let guias = [];
     let guideButtons = [];
@@ -973,6 +969,9 @@
       'Olá, {{nome}}! Escolha seu guia para a Jornada.',
       { nome: upperNameSafe }
     ).trim();
+
+    els.guiaTexto.style.display = '';
+    els.guiaTexto.classList.remove('is-hidden');
 
     els.guiaTexto.dataset.text = msg;
     els.guiaTexto.dataset.original = msg;
