@@ -615,6 +615,36 @@ function buildFinalSynthesisPayload() {
     }
   }
 
+  function buildDadosPessoaisFinalSilencioso(raw = {}) {
+  const d = raw && typeof raw === 'object' ? raw : {};
+
+  const perfil = d.perfilPersonalidade || {};
+  const leitura = d.motor_personalidade || d.leitura_motor_personalidade || {};
+
+  return {
+    religiao: d.religiao || d.espiritualidade || '',
+
+    perfilPersonalidade: {
+      temperamento: perfil.temperamento || d.temperamento || '',
+      comportamento: perfil.comportamento || d.comportamento || '',
+      carater: perfil.carater || d.carater || '',
+      indole: perfil.indole || d.indole || '',
+      vazioExistencial: perfil.vazioExistencial || d.vazioExistencial || '',
+      plenoExistencial: perfil.plenoExistencial || d.plenoExistencial || ''
+    },
+
+    motor_personalidade: leitura,
+
+    regraDeUso: [
+      'Use estes dados apenas como contexto silencioso.',
+      'Não cite idade, cidade, estado, profissão, aposentadoria, estado civil ou filhos.',
+      'Não cite temperamento, comportamento, caráter, índole, Tânatos, Eros ou percentuais literalmente.',
+      'Transforme tudo em percepção emocional indireta.',
+      'A devolutiva final deve sintetizar principalmente as devolutivas dos blocos.'
+    ].join(' ')
+  };
+}
+
   // ================================
   // PAYLOAD FINAL
   // ================================
@@ -636,7 +666,8 @@ function buildFinalSynthesisPayload() {
 
     const selfieCard = readSelfieCardFromEverywhere(s);
     const devolutivaFinal = getStoredFinalFeedback();
-    const dadosPessoais = getDadosPessoaisPayload();
+    const dadosPessoaisRaw = getDadosPessoaisPayload();
+    const dadosPessoais = buildDadosPessoaisFinalSilencioso(dadosPessoaisRaw);
     const blocosData = buildFinalSynthesisPayload();
 
     const payload = {
@@ -954,8 +985,8 @@ function buildFinalSynthesisPayload() {
 
   const blocos = Array.isArray(payload?.blocos) ? payload.blocos : [];
   const sinteseBlocos = String(payload?.sinteseBlocos || '').trim();
-  const dadosPessoais = payload?.dadosPessoais || {};
-
+  const dadosPessoais = buildDadosPessoaisFinalSilencioso(payload?.dadosPessoais || {});
+    
   if (!respostas.length && !devolutivas.length && !blocos.length) {
     return {
       ok: true,
