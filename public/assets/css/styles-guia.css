@@ -143,6 +143,10 @@ body[data-guia-hover="arian"] {
   box-sizing: border-box;
 }
 
+#section-guia .is-hidden {
+  display: none !important;
+}
+
 /* ======================================================
    AURA DO TYPING
    ====================================================== */
