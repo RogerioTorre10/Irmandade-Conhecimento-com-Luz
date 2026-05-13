@@ -1253,37 +1253,38 @@ function bindButtons(section, bloco, perguntaText) {
   }
 
   if (btnMic) {
-    btnMic.onclick = async (ev) => {
-      ev.preventDefault();
+  btnMic.onclick = (ev) => {
+    ev.preventDefault();
 
-      const isRecording =
-        btnMic.classList.contains('recording') ||
-        window.__MIC_ACTIVE__ === true;
+    const isRecording =
+      btnMic.classList.contains('recording') ||
+      window.__MIC_ACTIVE__ === true;
 
-      if (isRecording) {
-        try {
-          if (window.__REC__) window.__REC__.stop();
-          if (window.JORNADA_MICRO?.stop) window.JORNADA_MICRO.stop();
-        } catch (e) {
-          console.warn('[MIC] erro ao parar reconhecimento:', e);
-        }
-
-        window.__MIC_ACTIVE__ = false;
-        window.__MIC_INSTANCE__ = null;
-        updateMicButtonState(false);
-        return;
-      }
-
-      updateMicButtonState(true);
-
+    if (isRecording) {
+      // Para definitivamente — seta false ANTES do stop para onend não reiniciar
+      window.__MIC_ACTIVE__ = false;
       try {
-        triggerMic(textarea);
+        if (window.__REC__) { window.__REC__.stop(); window.__REC__ = null; }
+        if (window.__MIC_INSTANCE_BLOCO__?.stop) window.__MIC_INSTANCE_BLOCO__.stop();
+        if (window.JORNADA_MICRO?.stop) window.JORNADA_MICRO.stop();
       } catch (e) {
-        btnMic.classList.remove('recording');
-        console.warn('[MIC] erro ao iniciar:', e);
+        console.warn('[MIC] erro ao parar:', e);
       }
-    };
-  }
+      window.__MIC_INSTANCE__ = null;
+      updateMicButtonState(false);
+      return;
+    }
+
+    // Inicia
+    updateMicButtonState(true);
+    try {
+      triggerMic(textarea);
+    } catch (e) {
+      btnMic.classList.remove('recording');
+      console.warn('[MIC] erro ao iniciar:', e);
+    }
+  };
+}
 
   if (btnApagar) {
     btnApagar.onclick = (ev) => {
