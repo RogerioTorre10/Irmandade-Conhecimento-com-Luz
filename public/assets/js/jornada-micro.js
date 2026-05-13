@@ -85,45 +85,60 @@
     let rec = null, listening = false;
 
     function buildRecognizer() {
-      const r = new SR();
-      r.lang = opts.lang || detectLang();
-      r.interimResults = true;
-      r.continuous = false;
+  const r = new SR();
+  r.lang = opts.lang || detectLang();
+  r.interimResults = true;
+  r.continuous = true; // ← MOBILE: mantém ouvindo até o usuário parar
 
-      r.onresult = (e) => {
-        let finalTxt = '';
-        for (let i = e.resultIndex; i < e.results.length; i++) {
-          const res = e.results[i];
-          finalTxt += res[0].transcript;
-          if (res.isFinal) {
-            const prev = ta.value.trim();
-            ta.value = (mode === 'replace')
-              ? finalTxt.trim()
-              : (prev ? (prev + ' ' + finalTxt.trim()) : finalTxt.trim());
-            finalTxt = '';
-            ta.dispatchEvent(new Event('input', { bubbles: true }));
-          }
-        }
-      };
+  let interimBuffer = '';
 
-      r.onerror = (ev) => {
-        listening = false;
-        btn.classList.remove('rec');
-        if (ev && ev.error === 'not-allowed') ensureToast('Permissão do microfone negada.');
-        else if (ev && ev.error === 'no-speech') ensureToast('Nenhuma fala detectada.');
-        else ensureToast('Erro no reconhecimento de voz.');
-      };
-
-      r.onend = () => {
-        listening = false;
-        btn.classList.remove('rec');
-        if (opts.autoRestart && btn.dataset.hold === '1') {
-          try { r.start(); listening = true; btn.classList.add('rec'); } catch {}
-        }
-      };
-
-      return r;
+  r.onresult = (e) => {
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const res = e.results[i];
+      if (res.isFinal) {
+        const prev = ta.value.trim();
+        const newText = res[0].transcript.trim();
+        ta.value = (mode === 'replace')
+          ? newText
+          : (prev ? prev + ' ' + newText : newText);
+        interim = '';
+        ta.dispatchEvent(new Event('input', { bubbles: true }));
+      } else {
+        interim += res[0].transcript;
+      }
     }
+    // Mostra texto interim no placeholder enquanto fala
+    if (interim) ta.setAttribute('placeholder', interim);
+    else ta.removeAttribute('placeholder');
+  };
+
+  r.onerror = (ev) => {
+    // 'no-speech' no mobile é normal — reinicia silenciosamente
+    if (ev?.error === 'no-speech') {
+      if (listening) {
+        try { r.start(); } catch (_) {}
+      }
+      return;
+    }
+    listening = false;
+    btn.classList.remove('rec');
+    if (ev?.error === 'not-allowed') ensureToast('Permissão do microfone negada.');
+    else ensureToast('Erro no reconhecimento de voz.');
+  };
+
+  r.onend = () => {
+    // Reinicia automaticamente enquanto o usuário não clicar para parar
+    if (listening) {
+      try { r.start(); } catch (_) {
+        listening = false;
+        btn.classList.remove('rec');
+      }
+    }
+  };
+
+  return r;
+}
 
     function toggle() {
       try {
@@ -141,6 +156,7 @@
       } catch {}
     }
 
+
     btn.addEventListener('click', (ev) => {
       ev.preventDefault();
       toggle();
@@ -151,19 +167,6 @@
         e.preventDefault();
         toggle();
       }
-    });
-
-    btn.addEventListener('mousedown', () => {
-      btn.dataset.hold = '1';
-      if (!listening) toggle();
-    });
-    btn.addEventListener('mouseup', () => {
-      btn.dataset.hold = '0';
-      if (listening) toggle();
-    });
-    btn.addEventListener('mouseleave', () => {
-      btn.dataset.hold = '0';
-      if (listening) toggle();
     });
 
     document.getElementById('language-select')?.addEventListener('change', () => {
