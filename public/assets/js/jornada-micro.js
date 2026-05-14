@@ -134,15 +134,21 @@
     return;
   }
 
+  // mantém a luz vermelha acesa enquanto o usuário não desligar
+  updateMicButtonState(true);
+
   const restartDelay = (isIOS || isSafari) ? 300 : 80;
 
   setTimeout(() => {
     try {
       if (window.__MIC_ACTIVE__) {
+        updateMicButtonState(true);
         r.start();
       }
     } catch (e) {
       console.warn('[MIC] falha ao reiniciar reconhecimento:', e);
+
+      // só apaga se realmente perdeu o reconhecimento
       window.__MIC_ACTIVE__ = false;
       updateMicButtonState(false);
     }
