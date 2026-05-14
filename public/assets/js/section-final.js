@@ -1062,7 +1062,8 @@ function buildFinalSynthesisPayload() {
       };
     } catch (err) {
       ultimoErro = err;
-      console.error(`[FINAL][DEVOLUTIVA] falha com ${guiaId}:`, err);
+      window.__FINAL_DEVOLUTIVA_RUNNING__ = false;
+      console.error('[FINAL] Sequência final falhou:', err);
     }
   }
 
