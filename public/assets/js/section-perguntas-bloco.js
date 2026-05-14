@@ -738,14 +738,15 @@ function triggerMic(textarea) {
       stopMicHard();
     };
 
-    rec.onend = () => {
-  if (!window.__MIC_ACTIVE__) {
-    stopMicHard();
+   rec.onend = () => {
+    if (!window.__MIC_ACTIVE__) {
+    updateMicButtonState(false);
     return;
   }
 
-  // mantém botão vermelho
   updateMicButtonState(true);
+
+  const delay = /iphone|ipad|ipod/i.test(navigator.userAgent) ? 700 : 350;
 
   setTimeout(() => {
     try {
@@ -754,15 +755,15 @@ function triggerMic(textarea) {
         rec.start();
       }
     } catch (e) {
-      console.warn('[MIC] reinício ignorado:', e);
+      console.warn('[MIC] reinício aguardando:', e);
 
       if (window.__MIC_ACTIVE__) {
         updateMicButtonState(true);
       } else {
-        stopMicHard();
+        updateMicButtonState(false);
       }
     }
-  }, useContinuous ? 350 : 700);
+  }, delay);
 };
 
   const isMobileFocus = /iphone|ipad|ipod|android/i.test(navigator.userAgent);
