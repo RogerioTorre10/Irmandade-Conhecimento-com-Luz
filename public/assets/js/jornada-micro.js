@@ -128,18 +128,26 @@
     else ensureToast('Erro no reconhecimento de voz.');
   };
 
-  r.onend = () => {
-    // Reinicia automaticamente enquanto o usuário não clicar para parar
-    if (listening) {
-      try { r.start(); } catch (_) {
-        listening = false;
-        btn.classList.remove('rec');
-      }
-    }
-  };
+  r.onend = function () {
+  if (!window.__MIC_ACTIVE__) {
+    updateMicButtonState(false);
+    return;
+  }
 
-  return r;
-}
+  const restartDelay = (isIOS || isSafari) ? 300 : 80;
+
+  setTimeout(() => {
+    try {
+      if (window.__MIC_ACTIVE__) {
+        r.start();
+      }
+    } catch (e) {
+      console.warn('[MIC] falha ao reiniciar reconhecimento:', e);
+      window.__MIC_ACTIVE__ = false;
+      updateMicButtonState(false);
+    }
+  }, restartDelay);
+};
 
     function toggle() {
       try {
