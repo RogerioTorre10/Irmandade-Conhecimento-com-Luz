@@ -1246,28 +1246,41 @@ function removerFinalDuplicado(texto) {
   // VOLTAR AO PORTAL
   // ================================
   function handleVoltarInicio() {
-    if (finalReturning) return;
-    finalReturning = true;
+  if (finalReturning) return;
+  finalReturning = true;
 
-    const src = FINAL_MOVIE;
+  const src = FINAL_MOVIE;
 
-    if (typeof window.playVideo === 'function') {
-      window.playVideo(src, {
-        useGoldBorder: true,
-        pulse: true,
-        onEnded: () => { window.location.href = HOME_URL; }
+  // usa o mesmo overlay de transição dos outros vídeos,
+  // com fundo ambiente/desfocado
+  if (typeof window.playTransitionVideo === 'function') {
+    try {
+      window.playTransitionVideo(src, () => {
+        window.location.href = HOME_URL;
       });
-      return;
+    } catch (e) {
+      console.warn('[FINAL] playTransitionVideo falhou:', e);
+      setTimeout(() => {
+        window.location.href = HOME_URL;
+      }, 16000);
     }
-
-    if (typeof window.playTransitionVideo === 'function') {
-      window.playTransitionVideo(src, null);
-      setTimeout(() => { window.location.href = HOME_URL; }, 16000);
-      return;
-    }
-
-    window.location.href = HOME_URL;
+    return;
   }
+
+  // fallback antigo, caso o sistema de transição não esteja disponível
+  if (typeof window.playVideo === 'function') {
+    window.playVideo(src, {
+      useGoldBorder: true,
+      pulse: true,
+      onEnded: () => {
+        window.location.href = HOME_URL;
+      }
+    });
+    return;
+  }
+
+  window.location.href = HOME_URL;
+}
 
   // ================================
   // UI DE BOTÕES FINAL
