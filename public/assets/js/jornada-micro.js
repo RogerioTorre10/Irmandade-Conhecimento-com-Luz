@@ -94,25 +94,60 @@
      let interimBuffer = '';
 
   r.onresult = (e) => {
-    let interim = '';
-    for (let i = e.resultIndex; i < e.results.length; i++) {
-      const res = e.results[i];
-      if (res.isFinal) {
-        const prev = ta.value.trim();
-        const newText = res[0].transcript.trim();
-        ta.value = (mode === 'replace')
-          ? newText
-          : (prev ? prev + ' ' + newText : newText);
-        interim = '';
-        ta.dispatchEvent(new Event('input', { bubbles: true }));
-      } else {
-        interim += res[0].transcript;
+  let interim = '';
+
+  for (let i = e.resultIndex; i < e.results.length; i++) {
+    const res = e.results[i];
+    const transcript = String(res?.[0]?.transcript || '').replace(/\s+/g, ' ').trim();
+
+    if (!transcript) continue;
+
+    if (res.isFinal) {
+      const mode = String(opts.mode || 'append').toLowerCase();
+      const prev = String(ta.value || '').trim();
+      const now = Date.now();
+
+      const lastFinal = String(window.__MIC_LAST_FINAL_TEXT__ || '').replace(/\s+/g, ' ').trim();
+      const lastAt = Number(window.__MIC_LAST_FINAL_AT__ || 0);
+
+      // Bloqueia repetição idêntica enviada várias vezes pelo mobile
+      if (
+        lastFinal &&
+        transcript.toLowerCase() === lastFinal.toLowerCase() &&
+        now - lastAt < 3000
+      ) {
+        console.warn('[MIC] trecho final duplicado ignorado:', transcript);
+        continue;
       }
+
+      // Bloqueia se o textarea já termina com o mesmo trecho
+      if (
+        prev &&
+        prev.toLowerCase().endsWith(transcript.toLowerCase())
+      ) {
+        console.warn('[MIC] trecho já existente no final:', transcript);
+        continue;
+      }
+
+      window.__MIC_LAST_FINAL_TEXT__ = transcript;
+      window.__MIC_LAST_FINAL_AT__ = now;
+
+      ta.value = mode === 'replace'
+        ? transcript
+        : (prev ? `${prev} ${transcript}` : transcript);
+
+      ta.dispatchEvent(new Event('input', { bubbles: true }));
+    } else {
+      interim = transcript;
     }
-    // Mostra texto interim no placeholder enquanto fala
-    if (interim) ta.setAttribute('placeholder', interim);
-    else ta.removeAttribute('placeholder');
-  };
+  }
+
+  if (interim) {
+    ta.setAttribute('placeholder', interim);
+  } else {
+    ta.removeAttribute('placeholder');
+  }
+};
 
   r.onerror = (ev) => {
     // 'no-speech' no mobile é normal — reinicia silenciosamente
