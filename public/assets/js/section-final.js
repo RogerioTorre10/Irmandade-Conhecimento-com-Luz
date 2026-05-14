@@ -1062,7 +1062,6 @@ function buildFinalSynthesisPayload() {
       };
     } catch (err) {
       ultimoErro = err;
-      window.__FINAL_DEVOLUTIVA_RUNNING__ = false;
       console.error('[FINAL] Sequência final falhou:', err);
     }
   }
@@ -1170,13 +1169,18 @@ function removerFinalDuplicado(texto) {
     );
       
       unlockFinalButtons(section);
+
+      window.__FINAL_DEVOLUTIVA_RUNNING__ = false;
+      window.__FINAL_DEVOLUTIVA_DONE__ = true;
+
       return texto;
     } catch (err) {
+      window.__FINAL_DEVOLUTIVA_RUNNING__ = false;
       console.error('[FINAL] Sequência final falhou:', err);
       showFinalError(section, t('final.feedbackError', 'Não consegui concluir a devolutiva final do guia.'));
       unlockFinalButtons(section);
       return null;
-    }
+}
   }
 
   // ================================
