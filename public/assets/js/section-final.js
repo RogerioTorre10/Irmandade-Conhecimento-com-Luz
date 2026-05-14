@@ -848,6 +848,20 @@ function buildFinalSynthesisPayload() {
     await sleep(200);
   }
 
+  function normalizarReferenciasBiblicasParaVoz(texto) {
+  if (!texto) return '';
+
+  return String(texto).replace(
+    /\b([1-3]?\s?[A-ZÁÉÍÓÚÂÊÔÃÕÇ][A-Za-zÀ-ÿ]+(?:\s+[A-ZÁÉÍÓÚÂÊÔÃÕÇ][A-Za-zÀ-ÿ]+)*)\s+(\d{1,3}):(\d{1,3})(?:-(\d{1,3}))?/g,
+    function (_, livro, capitulo, versiculo, versiculoFim) {
+      if (versiculoFim) {
+        return `${livro} capítulo ${capitulo}, versículos ${versiculo} a ${versiculoFim}`;
+      }
+      return `${livro} capítulo ${capitulo}, versículo ${versiculo}`;
+    }
+  );
+}
+
   // ================================
   // ROBUSTEZ DE DEVOLUTIVA
   // ================================
