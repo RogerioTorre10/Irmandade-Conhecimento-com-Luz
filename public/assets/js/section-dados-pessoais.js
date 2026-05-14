@@ -32,6 +32,36 @@
     }
   }
 
+  let touchStartY = 0;
+  let touchMoved = false;
+
+  document.addEventListener('touchstart', (e) => {
+    touchStartY = e.touches?.[0]?.clientY || 0;
+    touchMoved = false;
+  }, { passive: true });
+
+  document.addEventListener('touchmove', (e) => {
+    const y = e.touches?.[0]?.clientY || 0;
+
+  if (Math.abs(y - touchStartY) > 10) {
+    touchMoved = true;
+  }
+  }, { passive: true });
+
+  document.addEventListener('click', (e) => {
+   if (!touchMoved) return;
+
+  const trigger = e.target.closest?.(
+    '.select-trigger, .dropdown-trigger, [data-select-trigger], .campo-opcao, .choice, button'
+  );
+
+  if (trigger) {
+    e.preventDefault();
+    e.stopPropagation();
+    touchMoved = false;
+   }
+  }, true);
+
   function saveData(data) {
     try {
       sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data || {}));
