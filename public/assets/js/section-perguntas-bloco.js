@@ -755,7 +755,11 @@ function triggerMic(textarea) {
       }, useContinuous ? 350 : 700);
     };
 
-    textarea.focus();
+    const isMobileFocus = /iphone|ipad|ipod|android/i.test(navigator.userAgent);
+
+    if (!isMobileFocus) {
+     textarea.focus();
+    }
 
     setTimeout(() => {
       try {
