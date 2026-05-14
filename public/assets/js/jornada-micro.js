@@ -85,12 +85,13 @@
     let rec = null, listening = false;
 
     function buildRecognizer() {
-  const r = new SR();
-  r.lang = opts.lang || detectLang();
-  r.interimResults = true;
-  r.continuous = true; // ← MOBILE: mantém ouvindo até o usuário parar
-
-  let interimBuffer = '';
+     const r = new SR();
+     r.lang = opts.lang || detectLang();
+     r.interimResults = true;
+     const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+     r.continuous = !(isIOS || isSafari);
+     let interimBuffer = '';
 
   r.onresult = (e) => {
     let interim = '';
