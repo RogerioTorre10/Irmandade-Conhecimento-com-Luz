@@ -765,22 +765,22 @@ function triggerMic(textarea) {
   }, useContinuous ? 350 : 700);
 };
 
-    const isMobileFocus = /iphone|ipad|ipod|android/i.test(navigator.userAgent);
+  const isMobileFocus = /iphone|ipad|ipod|android/i.test(navigator.userAgent);
 
-    if (!isMobileFocus) {
-     textarea.focus();
-    }
+  if (!isMobileFocus) {
+    textarea.focus();
+  }
 
-    setTimeout(() => {
-      try {
-        if (window.__MIC_ACTIVE__ && window.__REC__ === rec) {
-          rec.start();
-        }
-      } catch (e) {
-        warn('[MIC] falha ao iniciar:', e);
-        stopMicHard();
+  setTimeout(() => {
+    try {
+      if (window.__MIC_ACTIVE__ && window.__REC__ === rec) {
+        rec.start();
       }
-    }, 120);
+    } catch (e) {
+      warn('[MIC] falha ao iniciar:', e);
+      stopMicHard();
+    }
+  }, 120);
 
     updateMicButtonState(true);
 
