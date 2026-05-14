@@ -1347,35 +1347,37 @@ function bindButtons(section, bloco, perguntaText) {
     btnConfirm.dataset.busy = '1';
     btnConfirm.disabled = true;
 
-    // DESLIGA MICROFONE AO CLICAR EM CONTINUAR
- window.__MIC_ACTIVE__ = false;
-
  try {
-   if (window.__REC__) {
-     window.__REC__.stop();
-     window.__REC__ = null;
-   }
 
-   if (window.__MIC_INSTANCE__) {
-     window.__MIC_INSTANCE__.stop();
-     window.__MIC_INSTANCE__ = null;
-   }
+   // DESLIGA MICROFONE AO CLICAR EM CONTINUAR
+    window.__MIC_ACTIVE__ = false;
 
-   if (window.__MIC_INSTANCE_BLOCO__?.stop) {
-     window.__MIC_INSTANCE_BLOCO__.stop();
-     window.__MIC_INSTANCE_BLOCO__ = null;
-   }
+   try {
+     if (window.__REC__) {
+       window.__REC__.stop();
+       window.__REC__ = null;
+     }
 
-   if (window.JORNADA_MICRO?.stop) {
-     window.JORNADA_MICRO.stop();
-   }
-   } catch (e) {
-     console.warn('[MIC] erro ao desligar ao continuar:', e);
-   }
+    if (window.__MIC_INSTANCE__) {
+      window.__MIC_INSTANCE__.stop();
+      window.__MIC_INSTANCE__ = null;
+    }
 
-   updateMicButtonState(false);
+    if (window.__MIC_INSTANCE_BLOCO__?.stop) {
+      window.__MIC_INSTANCE_BLOCO__.stop();
+      window.__MIC_INSTANCE_BLOCO__ = null;
+    }
 
-      const state = section?.dataset?.continueState || 'idle';
+    if (window.JORNADA_MICRO?.stop) {
+      window.JORNADA_MICRO.stop();
+    }
+  } catch (e) {
+    console.warn('[MIC] erro ao desligar ao continuar:', e);
+  }
+
+  updateMicButtonState(false);
+
+  const state = section?.dataset?.continueState || 'idle';
 
       if (state === 'ready') {
         await maybeHandleBlockClosure(section, bloco);
