@@ -634,30 +634,6 @@ function triggerMic(textarea) {
   if (!textarea) return;
   ensureMicAttached(textarea);
 
-  // Preferência: usar JORNADA_MICRO (já corrigido com continuous:true)
-  if (window.JORNADA_MICRO?.attach) {
-    try {
-      // attach retorna a instância com .start/.stop
-      const instance = window.__MIC_INSTANCE_BLOCO__ ||
-        (() => {
-          const inst = window.JORNADA_MICRO.attach(textarea, { mode: 'append', lang: getLang() });
-          window.__MIC_INSTANCE_BLOCO__ = inst;
-          return inst;
-        })();
-
-      if (instance?.start) {
-        instance.start();
-        window.__MIC_ACTIVE__ = true;
-        window.__MIC_INSTANCE__ = instance;
-        updateMicButtonState(true);
-        return;
-      }
-    } catch (e) {
-      warn('Falha ao usar JORNADA_MICRO:', e);
-    }
-  }
-
-  // Fallback: SpeechRecognition próprio com continuous:true
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) {
     warn('SpeechRecognition não suportado.');
@@ -665,12 +641,17 @@ function triggerMic(textarea) {
     return;
   }
 
+  // iOS Safari NÃO suporta continuous:true — detecta e usa false com reinício manual
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+  const useContinuous = !(isIOS || isSafari);
+
   try {
     if (!window.__REC__) {
       const rec = new SR();
       rec.lang = document.documentElement.lang || getLang() || 'pt-BR';
-      rec.continuous = true;        // ← CORRIGIDO
-      rec.interimResults = true;
+      rec.continuous      = useContinuous;
+      rec.interimResults  = true;
       rec.maxAlternatives = 1;
 
       rec.onstart = () => {
@@ -690,15 +671,30 @@ function triggerMic(textarea) {
         }
       };
 
-      rec.onerror = (e) => {
-        // no-speech no mobile é normal — reinicia se ainda ativo
-        if (e?.error === 'no-speech') {
+      rec.onerror = (ev) => {
+        const code = ev?.error || '';
+
+        // no-speech: silêncio detectado — reinicia se ainda ativo
+        if (code === 'no-speech') {
           if (window.__MIC_ACTIVE__) {
             try { rec.start(); } catch (_) {}
           }
           return;
         }
-        warn('MIC onerror:', e);
+
+        // Permissão negada
+        if (code === 'not-allowed' || code === 'service-not-allowed') {
+          window.__MIC_ACTIVE__ = false;
+          window.__REC__ = null;
+          updateMicButtonState(false);
+          if (typeof window.toast === 'function') {
+            window.toast('🎤 Permissão do microfone negada. Verifique as configurações do navegador.');
+          }
+          return;
+        }
+
+        // Outros erros — encerra
+        warn('MIC onerror:', code);
         window.__MIC_ACTIVE__ = false;
         window.__MIC_INSTANCE__ = null;
         window.__REC__ = null;
@@ -706,15 +702,31 @@ function triggerMic(textarea) {
       };
 
       rec.onend = () => {
-        // Reinicia automaticamente enquanto __MIC_ACTIVE__ for true
-        if (window.__MIC_ACTIVE__) {
-          try { rec.start(); } catch (_) {
-            window.__MIC_ACTIVE__ = false;
-            window.__MIC_INSTANCE__ = null;
-            window.__REC__ = null;
-            updateMicButtonState(false);
-          }
+        // continuous:true — reinicia se ainda ativo
+        if (useContinuous && window.__MIC_ACTIVE__) {
+          try { rec.start(); return; } catch (_) {}
         }
+        // iOS/Safari — reinicia também enquanto ativo
+        if (!useContinuous && window.__MIC_ACTIVE__) {
+          try {
+            // pequena pausa obrigatória no iOS antes de reiniciar
+            setTimeout(() => {
+              if (window.__MIC_ACTIVE__) {
+                try { rec.start(); } catch (_) {
+                  window.__MIC_ACTIVE__ = false;
+                  window.__REC__ = null;
+                  updateMicButtonState(false);
+                }
+              }
+            }, 300);
+            return;
+          } catch (_) {}
+        }
+        // Se chegou aqui, encerrou normalmente
+        window.__MIC_ACTIVE__ = false;
+        window.__MIC_INSTANCE__ = null;
+        window.__REC__ = null;
+        updateMicButtonState(false);
       };
 
       window.__REC__ = rec;
@@ -734,7 +746,6 @@ function triggerMic(textarea) {
     err('Erro ao iniciar microfone:', e);
   }
 }
-
 function showMissingAnswerFeedback() {
   const msg = uiText('write_answer_first', 'Escreva sua resposta antes de continuar.');
   if (typeof window.toast === 'function') {
