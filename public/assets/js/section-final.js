@@ -1106,7 +1106,15 @@ function removerFinalDuplicado(texto) {
 }
   
   async function renderFinalGuideFeedback(section) {
-    if (!section) return null;
+
+  if (window.__FINAL_DEVOLUTIVA_RUNNING__) {
+    console.warn('[FINAL] leitura duplicada bloqueada');
+    return null;
+  }
+
+  window.__FINAL_DEVOLUTIVA_RUNNING__ = true;
+
+  if (!section) return null;
 
     let box = section.querySelector('#finalGuideFeedback');
     if (!box) {
