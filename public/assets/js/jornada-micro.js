@@ -81,6 +81,7 @@
       btn.title = 'Reconhecimento de voz não suportado neste navegador';
       return;
     }
+  }
 
     let rec = null, listening = false;
 
