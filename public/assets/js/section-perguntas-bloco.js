@@ -1347,12 +1347,33 @@ function bindButtons(section, bloco, perguntaText) {
     btnConfirm.dataset.busy = '1';
     btnConfirm.disabled = true;
 
-    try {
-      if (window.__MIC_ACTIVE__ && window.__MIC_INSTANCE__) {
-        try { window.__MIC_INSTANCE__.stop(); } catch {}
-        window.__MIC_ACTIVE__ = false;
-        updateMicButtonState(false);
-      }
+    // DESLIGA MICROFONE AO CLICAR EM CONTINUAR
+ window.__MIC_ACTIVE__ = false;
+
+ try {
+   if (window.__REC__) {
+     window.__REC__.stop();
+     window.__REC__ = null;
+   }
+
+   if (window.__MIC_INSTANCE__) {
+     window.__MIC_INSTANCE__.stop();
+     window.__MIC_INSTANCE__ = null;
+   }
+
+   if (window.__MIC_INSTANCE_BLOCO__?.stop) {
+     window.__MIC_INSTANCE_BLOCO__.stop();
+     window.__MIC_INSTANCE_BLOCO__ = null;
+   }
+
+   if (window.JORNADA_MICRO?.stop) {
+     window.JORNADA_MICRO.stop();
+   }
+   } catch (e) {
+     console.warn('[MIC] erro ao desligar ao continuar:', e);
+   }
+
+   updateMicButtonState(false);
 
       const state = section?.dataset?.continueState || 'idle';
 
