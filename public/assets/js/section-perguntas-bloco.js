@@ -708,21 +708,23 @@ function triggerMic(textarea) {
     rec.onerror = (ev) => {
       const code = ev?.error || '';
 
-      if (code === 'no-speech' || code === 'audio-capture') {
-        warn('[MIC] silêncio ou captura falhou:', code);
+    if (code === 'no-speech') {
+      console.warn('[MIC] silêncio detectado — aguardando usuário continuar falando');
 
-        if (window.__MIC_ACTIVE__) {
-          setTimeout(() => {
-            try {
-              if (window.__MIC_ACTIVE__ && window.__REC__ === rec) {
-                rec.start();
-              }
-            } catch (_) {}
-          }, 600);
-        }
+     // mantém botão vermelho ligado
+     updateMicButtonState(true);
+     return;
+  }
 
-        return;
-      }
+  if (code === 'audio-capture') {
+    console.warn('[MIC] problema temporário de captura');
+
+  if (window.__MIC_ACTIVE__) {
+    updateMicButtonState(true);
+  }
+
+  return;
+ }
 
       if (code === 'not-allowed' || code === 'service-not-allowed') {
         stopMicHard();
