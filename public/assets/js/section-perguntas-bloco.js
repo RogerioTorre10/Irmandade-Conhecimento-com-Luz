@@ -635,117 +635,151 @@ function triggerMic(textarea) {
   ensureMicAttached(textarea);
 
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
   if (!SR) {
-    warn('SpeechRecognition não suportado.');
+    warn('SpeechRecognition não suportado neste navegador.');
     updateMicButtonState(false);
     return;
   }
 
-  // iOS Safari NÃO suporta continuous:true — detecta e usa false com reinício manual
-  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+  const ua = navigator.userAgent || '';
+  const isIOS = /iphone|ipad|ipod/i.test(ua);
+  const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
   const useContinuous = !(isIOS || isSafari);
 
+  function stopMicHard() {
+    window.__MIC_ACTIVE__ = false;
+    window.__MIC_STARTING__ = false;
+    updateMicButtonState(false);
+
+    try {
+      if (window.__REC__) {
+        window.__REC__.onend = null;
+        window.__REC__.stop();
+      }
+    } catch (_) {}
+
+    window.__REC__ = null;
+    window.__MIC_INSTANCE__ = null;
+  }
+
   try {
-    if (!window.__REC__) {
-      const rec = new SR();
-      rec.lang = document.documentElement.lang || getLang() || 'pt-BR';
-      rec.continuous      = useContinuous;
-      rec.interimResults  = true;
-      rec.maxAlternatives = 1;
-
-      rec.onstart = () => {
-        window.__MIC_ACTIVE__ = true;
-        updateMicButtonState(true);
-      };
-
-      rec.onresult = (ev) => {
-        for (let i = ev.resultIndex; i < ev.results.length; i++) {
-          const res = ev.results[i];
-          if (res.isFinal) {
-            const prev = textarea.value.trim();
-            const novo = res[0].transcript.trim();
-            textarea.value = prev ? (prev + ' ' + novo) : novo;
-            textarea.dispatchEvent(new Event('input', { bubbles: true }));
-          }
-        }
-      };
-
-      rec.onerror = (ev) => {
-        const code = ev?.error || '';
-
-        // no-speech: silêncio detectado — reinicia se ainda ativo
-        if (code === 'no-speech') {
-          if (window.__MIC_ACTIVE__) {
-            try { rec.start(); } catch (_) {}
-          }
-          return;
-        }
-
-        // Permissão negada
-        if (code === 'not-allowed' || code === 'service-not-allowed') {
-          window.__MIC_ACTIVE__ = false;
-          window.__REC__ = null;
-          updateMicButtonState(false);
-          if (typeof window.toast === 'function') {
-            window.toast('🎤 Permissão do microfone negada. Verifique as configurações do navegador.');
-          }
-          return;
-        }
-
-        // Outros erros — encerra
-        warn('MIC onerror:', code);
-        window.__MIC_ACTIVE__ = false;
-        window.__MIC_INSTANCE__ = null;
-        window.__REC__ = null;
-        updateMicButtonState(false);
-      };
-
-      rec.onend = () => {
-        // continuous:true — reinicia se ainda ativo
-        if (useContinuous && window.__MIC_ACTIVE__) {
-          try { rec.start(); return; } catch (_) {}
-        }
-        // iOS/Safari — reinicia também enquanto ativo
-        if (!useContinuous && window.__MIC_ACTIVE__) {
-          try {
-            // pequena pausa obrigatória no iOS antes de reiniciar
-            setTimeout(() => {
-              if (window.__MIC_ACTIVE__) {
-                try { rec.start(); } catch (_) {
-                  window.__MIC_ACTIVE__ = false;
-                  window.__REC__ = null;
-                  updateMicButtonState(false);
-                }
-              }
-            }, 300);
-            return;
-          } catch (_) {}
-        }
-        // Se chegou aqui, encerrou normalmente
-        window.__MIC_ACTIVE__ = false;
-        window.__MIC_INSTANCE__ = null;
-        window.__REC__ = null;
-        updateMicButtonState(false);
-      };
-
-      window.__REC__ = rec;
+    if (window.__MIC_ACTIVE__) {
+      stopMicHard();
+      return;
     }
 
+    const rec = new SR();
+
+    rec.lang = document.documentElement.lang || getLang() || 'pt-BR';
+    rec.continuous = useContinuous;
+    rec.interimResults = true;
+    rec.maxAlternatives = 1;
+
+    window.__REC__ = rec;
+    window.__MIC_INSTANCE__ = rec;
     window.__MIC_ACTIVE__ = true;
-    window.__MIC_INSTANCE__ = window.__REC__;
-    updateMicButtonState(true);
+    window.__MIC_STARTING__ = true;
+
+    rec.onstart = () => {
+      window.__MIC_STARTING__ = false;
+      window.__MIC_ACTIVE__ = true;
+      updateMicButtonState(true);
+    };
+
+    rec.onresult = (ev) => {
+      let finalText = '';
+
+      for (let i = ev.resultIndex; i < ev.results.length; i++) {
+        const res = ev.results[i];
+        if (res.isFinal && res[0]?.transcript) {
+          finalText += ' ' + res[0].transcript.trim();
+        }
+      }
+
+      finalText = finalText.trim();
+      if (!finalText) return;
+
+      const prev = textarea.value.trim();
+      textarea.value = prev ? `${prev} ${finalText}` : finalText;
+      textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    };
+
+    rec.onerror = (ev) => {
+      const code = ev?.error || '';
+
+      if (code === 'no-speech' || code === 'audio-capture') {
+        warn('[MIC] silêncio ou captura falhou:', code);
+
+        if (window.__MIC_ACTIVE__) {
+          setTimeout(() => {
+            try {
+              if (window.__MIC_ACTIVE__ && window.__REC__ === rec) {
+                rec.start();
+              }
+            } catch (_) {}
+          }, 600);
+        }
+
+        return;
+      }
+
+      if (code === 'not-allowed' || code === 'service-not-allowed') {
+        stopMicHard();
+
+        if (typeof window.toast === 'function') {
+          window.toast('🎤 Permissão do microfone negada. Ative o microfone no navegador.');
+        }
+
+        return;
+      }
+
+      warn('[MIC] erro:', code);
+      stopMicHard();
+    };
+
+    rec.onend = () => {
+      if (!window.__MIC_ACTIVE__) {
+        stopMicHard();
+        return;
+      }
+
+      setTimeout(() => {
+        try {
+          if (window.__MIC_ACTIVE__ && window.__REC__ === rec) {
+            rec.start();
+          }
+        } catch (_) {
+          stopMicHard();
+        }
+      }, useContinuous ? 350 : 700);
+    };
+
     textarea.focus();
-    window.__REC__.start();
+
+    setTimeout(() => {
+      try {
+        if (window.__MIC_ACTIVE__ && window.__REC__ === rec) {
+          rec.start();
+        }
+      } catch (e) {
+        warn('[MIC] falha ao iniciar:', e);
+        stopMicHard();
+      }
+    }, 120);
+
+    updateMicButtonState(true);
 
   } catch (e) {
+    warn('[MIC] erro geral ao iniciar:', e);
     window.__MIC_ACTIVE__ = false;
-    window.__MIC_INSTANCE__ = null;
+    window.__MIC_STARTING__ = false;
     window.__REC__ = null;
+    window.__MIC_INSTANCE__ = null;
     updateMicButtonState(false);
-    err('Erro ao iniciar microfone:', e);
   }
 }
+  
 function showMissingAnswerFeedback() {
   const msg = uiText('write_answer_first', 'Escreva sua resposta antes de continuar.');
   if (typeof window.toast === 'function') {
