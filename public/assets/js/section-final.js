@@ -1140,7 +1140,14 @@ function removerFinalDuplicado(texto) {
       localStorage.setItem('JORNADA_DEVOLUTIVA_FINAL', texto);
 
       box.textContent = '';
-      await typeText(box, texto, 22, true);
+
+      /* texto visual permanece original */
+      await typeText(box, texto, 22, false);
+
+      /* voz recebe texto tratado */
+      const textoParaVoz = normalizarReferenciasBiblicasParaVoz(texto);
+
+      await queueSpeak(textoParaVoz);
 
       window.__GUIA_FINAL_EFETIVO__ =
       result.guiaUsado ||
