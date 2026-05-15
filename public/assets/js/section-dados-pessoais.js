@@ -289,8 +289,8 @@
   function iniciarLeituraDadosPessoais(root, textoManual = '') {
   const texto = String(
     textoManual ||
-    root?.querySelector('#dp-subtitle')?.dataset?.text ||
-    root?.querySelector('#dp-subtitle')?.textContent ||
+    root?.querySelector?.('#dp-subtitle')?.dataset?.text ||
+    root?.querySelector?.('#dp-subtitle')?.textContent ||
     ''
   ).trim();
 
@@ -311,6 +311,7 @@
   return new Promise((resolve) => {
     try {
       const u = new SpeechSynthesisUtterance(texto);
+
       u.lang =
         window.i18n?.getLang?.() ||
         window.i18n?.currentLang ||
@@ -324,12 +325,10 @@
       u.onend = resolve;
       u.onerror = resolve;
 
-      // usa o motor oficial da jornada
-      try {
-        if (window.EffectCoordinator?.speak) {
-          window.EffectCoordinator.speak(texto);
-          resolve();
-          return;
+      if (window.EffectCoordinator?.speak) {
+        window.EffectCoordinator.speak(texto);
+        resolve();
+        return;
       }
 
       window.speechSynthesis.cancel();
@@ -339,6 +338,8 @@
       console.warn('[DADOS] falha na leitura:', e);
       resolve();
     }
+  });
+}
 
   async function initHeader(root) {
   const title = $('#dp-title', root) || $('h1[data-i18n-text="dados.title"]', root);
