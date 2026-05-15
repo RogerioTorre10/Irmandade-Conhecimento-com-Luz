@@ -1251,21 +1251,16 @@ function removerFinalDuplicado(texto) {
 
   const src = FINAL_MOVIE;
 
-  // usa o mesmo overlay de transição dos outros vídeos,
-  // com fundo ambiente/desfocado
-  if (typeof window.playTransitionVideo === 'function') {
-    try {
-      window.playTransitionVideo(src, () => {
-        window.location.href = HOME_URL;
-      });
-    } catch (e) {
-      console.warn('[FINAL] playTransitionVideo falhou:', e);
-      setTimeout(() => {
-        window.location.href = HOME_URL;
-      }, 16000);
+  if (typeof window.playVideo === 'function') {
+  window.playVideo(src, {
+    useGoldBorder: true,
+    pulse: true,
+    onEnded: () => {
+      window.location.href = HOME_URL;
     }
-    return;
-  }
+  });
+  return;
+}
 
   // fallback antigo, caso o sistema de transição não esteja disponível
   if (typeof window.playVideo === 'function') {
