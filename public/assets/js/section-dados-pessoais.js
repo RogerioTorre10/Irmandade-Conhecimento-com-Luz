@@ -324,13 +324,21 @@
       u.onend = resolve;
       u.onerror = resolve;
 
-      window.speechSynthesis.cancel();
-      window.speechSynthesis.speak(u);
-    } catch {
-      resolve();
-    }
-  });
-}
+  // usa o motor oficial da jornada (respeita guia escolhido)
+  if (window.JORNADA_VOICE?.speak) {
+    resolve(window.JORNADA_VOICE.speak(texto));
+    return;
+  }
+
+  // fallback secundário
+  if (window.EffectCoordinator?.speak) {
+    resolve(window.EffectCoordinator.speak(texto));
+    return;
+  }
+
+  // fallback final nativo
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
 
   async function initHeader(root) {
   const title = $('#dp-title', root) || $('h1[data-i18n-text="dados.title"]', root);
