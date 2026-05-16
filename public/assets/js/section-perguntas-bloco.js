@@ -1349,7 +1349,10 @@ function bindButtons(section, bloco, perguntaText) {
 
     if (isRecording) {
       // Para definitivamente — seta false ANTES do stop para onend não reiniciar
-      window.__MIC_ACTIVE__ = false;
+       window.__MIC_WANT__ = false;
+       window.__MIC_ACTIVE__ = false;
+       clearTimeout(window.__MIC_RESTART_TIMER__);
+
       try {
         if (window.__REC__) { window.__REC__.stop(); window.__REC__ = null; }
         if (window.__MIC_INSTANCE_BLOCO__?.stop) window.__MIC_INSTANCE_BLOCO__.stop();
