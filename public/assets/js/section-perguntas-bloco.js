@@ -645,46 +645,65 @@ function triggerMic(textarea) {
   const ua = navigator.userAgent || '';
   const isIOS = /iphone|ipad|ipod/i.test(ua);
   const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
-  const useContinuous = !(isIOS || isSafari);
+  const isMobile = /iphone|ipad|ipod|android/i.test(ua);
 
-  function stopMicHard() {
-    window.__MIC_ACTIVE__ = false;
-    window.__MIC_STARTING__ = false;
-    updateMicButtonState(false);
-
-    try {
-      if (window.__REC__) {
-        window.__REC__.onend = null;
-        window.__REC__.stop();
-      }
-    } catch (_) {}
-
+  function safeStopCurrent() {
+    try { window.__REC__?.abort?.(); } catch (_) {}
+    try { window.__REC__?.stop?.(); } catch (_) {}
     window.__REC__ = null;
     window.__MIC_INSTANCE__ = null;
   }
 
-  try {
-    if (window.__MIC_ACTIVE__) {
-      stopMicHard();
+  function appendFinalText(finalText) {
+    const texto = String(finalText || '').replace(/\s+/g, ' ').trim();
+    if (!texto) return;
+
+    const now = Date.now();
+    const lastText = String(window.__MIC_LAST_FINAL_TEXT__ || '').replace(/\s+/g, ' ').trim();
+    const lastAt = Number(window.__MIC_LAST_FINAL_AT__ || 0);
+    const prev = String(textarea.value || '').trim();
+
+    if (
+      lastText &&
+      texto.toLowerCase() === lastText.toLowerCase() &&
+      now - lastAt < 3500
+    ) {
+      console.warn('[MIC] trecho duplicado ignorado:', texto);
       return;
     }
+
+    if (prev && prev.toLowerCase().endsWith(texto.toLowerCase())) {
+      console.warn('[MIC] trecho já existe no final:', texto);
+      return;
+    }
+
+    window.__MIC_LAST_FINAL_TEXT__ = texto;
+    window.__MIC_LAST_FINAL_AT__ = now;
+
+    textarea.value = prev ? `${prev} ${texto}` : texto;
+    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+
+  function createAndStart() {
+    if (window.__MIC_WANT__ !== true) return;
+
+    safeStopCurrent();
 
     const rec = new SR();
 
     rec.lang = document.documentElement.lang || getLang() || 'pt-BR';
-    rec.continuous = useContinuous;
+    rec.continuous = !(isIOS || isSafari);
     rec.interimResults = true;
     rec.maxAlternatives = 1;
 
     window.__REC__ = rec;
     window.__MIC_INSTANCE__ = rec;
-    window.__MIC_ACTIVE__ = true;
-    window.__MIC_STARTING__ = true;
 
     rec.onstart = () => {
-      window.__MIC_STARTING__ = false;
       window.__MIC_ACTIVE__ = true;
+      window.__MIC_WANT__ = true;
       updateMicButtonState(true);
+      console.log('[MIC] iniciado');
     };
 
     rec.onresult = (ev) => {
@@ -697,37 +716,18 @@ function triggerMic(textarea) {
         }
       }
 
-      finalText = finalText.trim();
-      if (!finalText) return;
-
-      const prev = textarea.value.trim();
-      textarea.value = prev ? `${prev} ${finalText}` : finalText;
-      textarea.dispatchEvent(new Event('input', { bubbles: true }));
+      appendFinalText(finalText);
     };
 
     rec.onerror = (ev) => {
       const code = ev?.error || '';
-
-    if (code === 'no-speech') {
-      console.warn('[MIC] silêncio detectado — aguardando usuário continuar falando');
-
-     // mantém botão vermelho ligado
-     updateMicButtonState(true);
-     return;
-  }
-
-  if (code === 'audio-capture') {
-    console.warn('[MIC] problema temporário de captura');
-
-  if (window.__MIC_ACTIVE__) {
-    updateMicButtonState(true);
-  }
-
-  return;
- }
+      console.warn('[MIC] erro:', code);
 
       if (code === 'not-allowed' || code === 'service-not-allowed') {
-        stopMicHard();
+        window.__MIC_WANT__ = false;
+        window.__MIC_ACTIVE__ = false;
+        safeStopCurrent();
+        updateMicButtonState(false);
 
         if (typeof window.toast === 'function') {
           window.toast('🎤 Permissão do microfone negada. Ative o microfone no navegador.');
@@ -736,65 +736,90 @@ function triggerMic(textarea) {
         return;
       }
 
-      warn('[MIC] erro:', code);
-      stopMicHard();
+      if (code === 'aborted') return;
+
+      // no-speech, audio-capture e pausas não desligam o botão
+      if (window.__MIC_WANT__) {
+        updateMicButtonState(true);
+      }
     };
 
-   rec.onend = () => {
-    if (!window.__MIC_ACTIVE__) {
+    rec.onend = () => {
+      window.__MIC_ACTIVE__ = false;
+      window.__MIC_INSTANCE__ = null;
+
+      if (window.__MIC_WANT__ !== true) {
+        safeStopCurrent();
+        updateMicButtonState(false);
+        return;
+      }
+
+      updateMicButtonState(true);
+
+      const delay = (isIOS || isSafari) ? 700 : 350;
+
+      clearTimeout(window.__MIC_RESTART_TIMER__);
+      window.__MIC_RESTART_TIMER__ = setTimeout(() => {
+        if (window.__MIC_WANT__ !== true) {
+          safeStopCurrent();
+          updateMicButtonState(false);
+          return;
+        }
+
+        try {
+          updateMicButtonState(true);
+          rec.start();
+        } catch (e) {
+          console.warn('[MIC] reinício falhou, recriando:', e);
+
+          if (window.__MIC_WANT__ === true) {
+            createAndStart();
+          } else {
+            safeStopCurrent();
+            updateMicButtonState(false);
+          }
+        }
+      }, delay);
+    };
+
+    try {
+      window.__MIC_WANT__ = true;
+      window.__MIC_ACTIVE__ = true;
+      updateMicButtonState(true);
+
+      if (!isMobile) {
+        textarea.focus();
+      }
+
+      rec.start();
+    } catch (e) {
+      console.warn('[MIC] falha ao iniciar:', e);
+
+      if (window.__MIC_WANT__ === true) {
+        setTimeout(createAndStart, isIOS || isSafari ? 700 : 350);
+      } else {
+        safeStopCurrent();
+        updateMicButtonState(false);
+      }
+    }
+  }
+
+  // Segundo clique no botão: desliga de verdade
+  if (window.__MIC_WANT__ === true) {
+    window.__MIC_WANT__ = false;
+    window.__MIC_ACTIVE__ = false;
+
+    clearTimeout(window.__MIC_RESTART_TIMER__);
+    safeStopCurrent();
     updateMicButtonState(false);
     return;
   }
 
+  // Primeiro clique: liga e permanece ligado até usuário desligar
+  window.__MIC_WANT__ = true;
+  window.__MIC_ACTIVE__ = true;
   updateMicButtonState(true);
-
-  const delay = /iphone|ipad|ipod/i.test(navigator.userAgent) ? 700 : 350;
-
-  setTimeout(() => {
-    try {
-      if (window.__MIC_ACTIVE__ && window.__REC__ === rec) {
-        updateMicButtonState(true);
-        rec.start();
-      }
-    } catch (e) {
-      console.warn('[MIC] reinício aguardando:', e);
-
-      if (window.__MIC_ACTIVE__) {
-        updateMicButtonState(true);
-      } else {
-        updateMicButtonState(false);
-      }
-    }
-  }, delay);
-};
-
-  const isMobileFocus = /iphone|ipad|ipod|android/i.test(navigator.userAgent);
-
-  if (!isMobileFocus) {
-    textarea.focus();
-  }
-
-  setTimeout(() => {
-    try {
-      if (window.__MIC_ACTIVE__ && window.__REC__ === rec) {
-        rec.start();
-      }
-    } catch (e) {
-      warn('[MIC] falha ao iniciar:', e);
-      stopMicHard();
-    }
-  }, 120);
-
-    updateMicButtonState(true);
-
-  } catch (e) {
-    warn('[MIC] erro geral ao iniciar:', e);
-    window.__MIC_ACTIVE__ = false;
-    window.__MIC_STARTING__ = false;
-    window.__REC__ = null;
-    window.__MIC_INSTANCE__ = null;
-    updateMicButtonState(false);
-  }
+  createAndStart();
 }
   
 function showMissingAnswerFeedback() {
