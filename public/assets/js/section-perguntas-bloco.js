@@ -647,11 +647,21 @@ function triggerMic(textarea) {
   const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
   const isMobile = /iphone|ipad|ipod|android/i.test(ua);
 
-  function safeStopCurrent() {
-    try { window.__REC__?.abort?.(); } catch (_) {}
-    try { window.__REC__?.stop?.(); } catch (_) {}
+  function resetMicRefs() {
     window.__REC__ = null;
     window.__MIC_INSTANCE__ = null;
+  }
+
+  function stopMicByUser() {
+    window.__MIC_WANT__ = false;
+    window.__MIC_ACTIVE__ = false;
+    clearTimeout(window.__MIC_RESTART_TIMER__);
+
+    try { window.__REC__?.stop?.(); } catch (_) {}
+    try { window.__MIC_INSTANCE__?.stop?.(); } catch (_) {}
+
+    resetMicRefs();
+    updateMicButtonState(false);
   }
 
   function appendFinalText(finalText) {
@@ -663,11 +673,7 @@ function triggerMic(textarea) {
     const lastAt = Number(window.__MIC_LAST_FINAL_AT__ || 0);
     const prev = String(textarea.value || '').trim();
 
-    if (
-      lastText &&
-      texto.toLowerCase() === lastText.toLowerCase() &&
-      now - lastAt < 3500
-    ) {
+    if (lastText && texto.toLowerCase() === lastText.toLowerCase() && now - lastAt < 3500) {
       console.warn('[MIC] trecho duplicado ignorado:', texto);
       return;
     }
@@ -687,7 +693,7 @@ function triggerMic(textarea) {
   function createAndStart() {
     if (window.__MIC_WANT__ !== true) return;
 
-    safeStopCurrent();
+    resetMicRefs();
 
     const rec = new SR();
 
@@ -724,32 +730,26 @@ function triggerMic(textarea) {
       console.warn('[MIC] erro:', code);
 
       if (code === 'not-allowed' || code === 'service-not-allowed') {
-        window.__MIC_WANT__ = false;
-        window.__MIC_ACTIVE__ = false;
-        safeStopCurrent();
-        updateMicButtonState(false);
+        stopMicByUser();
 
         if (typeof window.toast === 'function') {
           window.toast('🎤 Permissão do microfone negada. Ative o microfone no navegador.');
         }
-
         return;
       }
 
       if (code === 'aborted') return;
 
-      // no-speech, audio-capture e pausas não desligam o botão
-      if (window.__MIC_WANT__) {
+      if (window.__MIC_WANT__ === true) {
         updateMicButtonState(true);
       }
     };
 
     rec.onend = () => {
       window.__MIC_ACTIVE__ = false;
-      window.__MIC_INSTANCE__ = null;
 
       if (window.__MIC_WANT__ !== true) {
-        safeStopCurrent();
+        resetMicRefs();
         updateMicButtonState(false);
         return;
       }
@@ -761,7 +761,7 @@ function triggerMic(textarea) {
       clearTimeout(window.__MIC_RESTART_TIMER__);
       window.__MIC_RESTART_TIMER__ = setTimeout(() => {
         if (window.__MIC_WANT__ !== true) {
-          safeStopCurrent();
+          resetMicRefs();
           updateMicButtonState(false);
           return;
         }
@@ -771,13 +771,7 @@ function triggerMic(textarea) {
           rec.start();
         } catch (e) {
           console.warn('[MIC] reinício falhou, recriando:', e);
-
-          if (window.__MIC_WANT__ === true) {
-            createAndStart();
-          } else {
-            safeStopCurrent();
-            updateMicButtonState(false);
-          }
+          if (window.__MIC_WANT__ === true) createAndStart();
         }
       }, delay);
     };
@@ -787,9 +781,7 @@ function triggerMic(textarea) {
       window.__MIC_ACTIVE__ = true;
       updateMicButtonState(true);
 
-      if (!isMobile) {
-        textarea.focus();
-      }
+      if (!isMobile) textarea.focus();
 
       rec.start();
     } catch (e) {
@@ -798,24 +790,16 @@ function triggerMic(textarea) {
       if (window.__MIC_WANT__ === true) {
         setTimeout(createAndStart, isIOS || isSafari ? 700 : 350);
       } else {
-        safeStopCurrent();
-        updateMicButtonState(false);
+        stopMicByUser();
       }
     }
   }
 
-  // Segundo clique no botão: desliga de verdade
   if (window.__MIC_WANT__ === true) {
-    window.__MIC_WANT__ = false;
-    window.__MIC_ACTIVE__ = false;
-
-    clearTimeout(window.__MIC_RESTART_TIMER__);
-    safeStopCurrent();
-    updateMicButtonState(false);
+    stopMicByUser();
     return;
   }
 
-  // Primeiro clique: liga e permanece ligado até usuário desligar
   window.__MIC_WANT__ = true;
   window.__MIC_ACTIVE__ = true;
   updateMicButtonState(true);
