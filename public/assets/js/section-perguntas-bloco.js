@@ -607,15 +607,16 @@ function updateMicButtonState(active) {
   btn.dataset.active = active ? '1' : '0';
 
   if (active) {
-  btn.style.setProperty('background', '#b30000', 'important');
-  btn.style.setProperty(
-    'box-shadow',
-    '0 0 2px rgba(255,255,255,0.10), 0 0 14px rgba(255,0,0,0.45)',
-    'important'
-  );
-} else {
-  btn.style.removeProperty('background');
-  btn.style.removeProperty('box-shadow');
+    btn.style.setProperty('background', '#b30000', 'important');
+    btn.style.setProperty(
+      'box-shadow',
+      '0 0 2px rgba(255,255,255,0.10), 0 0 14px rgba(255,0,0,0.45)',
+      'important'
+    );
+  } else {
+    btn.style.removeProperty('background');
+    btn.style.removeProperty('box-shadow');
+  }
 }
 
 function ensureMicAttached(textarea) {
