@@ -621,16 +621,10 @@ function updateMicButtonState(active) {
 function ensureMicAttached(textarea) {
   if (!textarea) return;
 
-  if (window.JORNADA_MICRO?.attach) {
-    try {
-      if (textarea.dataset.micReady !== '1') {
-        window.JORNADA_MICRO.attach(textarea, { mode: 'append', lang: getLang() });
-        textarea.dataset.micReady = '1';
-      }
-    } catch (e) {
-      warn('Falha ao acoplar JORNADA_MICRO:', e);
-    }
-  }
+  // DESATIVADO:
+  // triggerMic() agora é o único controlador do microfone
+  // evita conflito com window.JORNADA_MICRO.attach()
+  return;
 }
 
 function triggerMic(textarea) {
