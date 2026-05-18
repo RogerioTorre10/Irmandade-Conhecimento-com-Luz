@@ -1251,15 +1251,29 @@ function removerFinalDuplicado(texto) {
 
   const src = FINAL_MOVIE;
 
-  if (typeof window.playVideo === 'function') {
-  window.playVideo(src, {
-    useGoldBorder: true,
-    pulse: true,
-    onEnded: () => {
+  if (typeof window.playBlockTransition === 'function') {
+    window.playBlockTransition(src, null, {
+      useGoldBorder: true,
+      pulse: true,
+      ambientBlur: true,
+      onEnd: () => {
+        window.location.href = HOME_URL;
+      }
+    });
+    return;
+  }
+
+  if (typeof window.playTransitionVideo === 'function') {
+    window.playTransitionVideo(src, null);
+
+    setTimeout(() => {
       window.location.href = HOME_URL;
-    }
-  });
-  return;
+    }, 9000);
+
+    return;
+  }
+
+  window.location.href = HOME_URL;
 }
 
   // fallback antigo, caso o sistema de transição não esteja disponível
