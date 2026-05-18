@@ -663,30 +663,60 @@ function triggerMic(textarea) {
   }
 
   function appendFinalText(finalText) {
-    const texto = String(finalText || '').replace(/\s+/g, ' ').trim();
-    if (!texto) return;
+  const texto = String(finalText || '').replace(/\s+/g, ' ').trim();
+  if (!texto) return;
 
-    const now = Date.now();
-    const lastText = String(window.__MIC_LAST_FINAL_TEXT__ || '').replace(/\s+/g, ' ').trim();
-    const lastAt = Number(window.__MIC_LAST_FINAL_AT__ || 0);
-    const prev = String(textarea.value || '').trim();
+  const now = Date.now();
+  const prev = String(textarea.value || '').replace(/\s+/g, ' ').trim();
 
-    if (lastText && texto.toLowerCase() === lastText.toLowerCase() && now - lastAt < 3500) {
-      console.warn('[MIC] trecho duplicado ignorado:', texto);
-      return;
-    }
+  const lastText = String(window.__MIC_LAST_FINAL_TEXT__ || '')
+    .replace(/\s+/g, ' ')
+    .trim();
 
-    if (prev && prev.toLowerCase().endsWith(texto.toLowerCase())) {
-      console.warn('[MIC] trecho já existe no final:', texto);
-      return;
-    }
+  const lastAt = Number(window.__MIC_LAST_FINAL_AT__ || 0);
 
-    window.__MIC_LAST_FINAL_TEXT__ = texto;
-    window.__MIC_LAST_FINAL_AT__ = now;
-
-    textarea.value = prev ? `${prev} ${texto}` : texto;
-    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+  // evita repetir o mesmo trecho várias vezes em poucos segundos
+  if (
+    lastText &&
+    texto.toLowerCase() === lastText.toLowerCase() &&
+    now - lastAt < 6000
+  ) {
+    console.warn('[MIC] trecho duplicado ignorado:', texto);
+    return;
   }
+
+  // evita duplicar se o campo já termina com o mesmo trecho
+  const prevLower = prev.toLowerCase();
+  const textoLower = texto.toLowerCase();
+
+  if (
+    prevLower === textoLower ||
+    prevLower.endsWith(' ' + textoLower) ||
+    prevLower.endsWith(textoLower)
+  ) {
+    console.warn('[MIC] trecho já existe no final:', texto);
+    return;
+  }
+
+  // evita caso: "luz luz luz" dentro do próprio retorno
+  const palavras = texto.split(' ');
+  if (palavras.length > 1) {
+    const todasIguais = palavras.every(
+      (p) => p.toLowerCase() === palavras[0].toLowerCase()
+    );
+
+    if (todasIguais) {
+      console.warn('[MIC] repetição interna ignorada:', texto);
+      return;
+    }
+  }
+
+  window.__MIC_LAST_FINAL_TEXT__ = texto;
+  window.__MIC_LAST_FINAL_AT__ = now;
+
+  textarea.value = prev ? `${prev} ${texto}` : texto;
+  textarea.dispatchEvent(new Event('input', { bubbles: true }));
+}
 
   function createAndStart() {
     if (window.__MIC_WANT__ !== true) return;
