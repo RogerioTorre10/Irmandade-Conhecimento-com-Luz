@@ -438,14 +438,6 @@
   if (!root || root.dataset.dpSelectSheetBound === '1') return;
   root.dataset.dpSelectSheetBound = '1';
 
-  const isMobile = /iphone|ipad|ipod|android/i.test(navigator.userAgent);
-  if (!isMobile) return;
-
-  let touchStartY = 0;
-  let moved = false;
-  let lastTapSelect = null;
-  let lastTapTime = 0;
-
   function closeSheet() {
     document.querySelectorAll('.dp-select-sheet').forEach(el => el.remove());
   }
@@ -508,45 +500,40 @@
     if (select.dataset.mobileSheet === '1') return;
     select.dataset.mobileSheet = '1';
 
+    let touchStartY = 0;
+    let touchMoved = false;
+
     select.addEventListener('touchstart', (ev) => {
       touchStartY = ev.touches?.[0]?.clientY || 0;
-      moved = false;
+      touchMoved = false;
     }, { passive: true });
 
     select.addEventListener('touchmove', (ev) => {
       const y = ev.touches?.[0]?.clientY || 0;
-      if (Math.abs(y - touchStartY) > 8) {
-        moved = true;
+      if (Math.abs(y - touchStartY) > 12) {
+        touchMoved = true;
       }
     }, { passive: true });
 
-    select.addEventListener('click', (ev) => {
+    const abrirCustom = (ev) => {
+      if (touchMoved) {
+        touchMoved = false;
+        return;
+      }
+
       ev.preventDefault();
       ev.stopPropagation();
 
-      if (moved) {
-        moved = false;
-        return;
-      }
-
-      const jaTemValor = String(select.value || '').trim().length > 0;
-      const now = Date.now();
-      const doubleTap =
-        lastTapSelect === select &&
-        now - lastTapTime < 450;
-
-      lastTapSelect = select;
-      lastTapTime = now;
-
-      if (jaTemValor && !doubleTap) {
-        if (typeof window.toast === 'function') {
-          window.toast('Toque duas vezes para alterar este campo.');
-        }
-        return;
-      }
+      try {
+        select.blur();
+      } catch {}
 
       openSheet(select);
-    }, { passive: false });
+    };
+
+    select.addEventListener('pointerdown', abrirCustom, { passive: false });
+    select.addEventListener('mousedown', abrirCustom, { passive: false });
+    select.addEventListener('click', abrirCustom, { passive: false });
   });
 }
 
