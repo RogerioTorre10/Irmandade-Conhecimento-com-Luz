@@ -851,16 +851,37 @@
     const topBox = root.querySelector('.guia-options-top');
     const bottomBox = root.querySelector('.guia-options-bottom');
 
-    // nome em maiúsculo
-    if (els.nameInput && !els.nameInput.dataset.upperBound) {
-      els.nameInput.dataset.upperBound = '1';
-      els.nameInput.addEventListener('input', () => {
-        const start = els.nameInput.selectionStart;
-        const end = els.nameInput.selectionEnd;
-        els.nameInput.value = (els.nameInput.value || '').toUpperCase();
-        try { els.nameInput.setSelectionRange(start, end); } catch {}
-      });
-    }
+    els.nameInput.addEventListener('input', () => {
+  const start = els.nameInput.selectionStart;
+  const end = els.nameInput.selectionEnd;
+
+  let value = els.nameInput.value || '';
+
+  // aceita apenas letras + acentos + espaço
+  value = value.replace(/[^A-Za-zÀ-ÿ\s]/g, '');
+
+  // remove espaços duplicados
+  value = value.replace(/\s+/g, ' ').trimStart();
+
+  // divide os nomes
+  let partes = value.split(' ').filter(Boolean);
+
+  // mantém no máximo 2 nomes
+  if (partes.length > 2) {
+    partes = partes.slice(0, 2);
+  }
+
+  // limita tamanho de cada nome (segurança extra)
+  partes = partes.map(nome => nome.slice(0, 20));
+
+  value = partes.join(' ').toUpperCase();
+
+  els.nameInput.value = value;
+
+  try {
+    els.nameInput.setSelectionRange(start, end);
+  } catch {}
+});
 
     // garante botão confirmar visível no JS também
     if (els.confirmBtn) {
