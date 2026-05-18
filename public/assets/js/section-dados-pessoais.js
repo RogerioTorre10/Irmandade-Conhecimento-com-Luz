@@ -438,7 +438,13 @@
   if (!root || root.dataset.dpSelectSheetBound === '1') return;
   root.dataset.dpSelectSheetBound = '1';
 
-  const isMobile = () => true;
+  const isMobile = /iphone|ipad|ipod|android/i.test(navigator.userAgent);
+  if (!isMobile) return;
+
+  let touchStartY = 0;
+  let moved = false;
+  let lastTapSelect = null;
+  let lastTapTime = 0;
 
   function closeSheet() {
     document.querySelectorAll('.dp-select-sheet').forEach(el => el.remove());
@@ -499,29 +505,49 @@
   }
 
   root.querySelectorAll('select').forEach((select) => {
-  if (select.dataset.mobileSheet === '1') return;
-  select.dataset.mobileSheet = '1';
+    if (select.dataset.mobileSheet === '1') return;
+    select.dataset.mobileSheet = '1';
 
-  const abrirCustom = (ev) => {
-    ev.preventDefault();
-    ev.stopPropagation();
+    select.addEventListener('touchstart', (ev) => {
+      touchStartY = ev.touches?.[0]?.clientY || 0;
+      moved = false;
+    }, { passive: true });
 
-    try {
-      select.blur();
-    } catch {}
+    select.addEventListener('touchmove', (ev) => {
+      const y = ev.touches?.[0]?.clientY || 0;
+      if (Math.abs(y - touchStartY) > 8) {
+        moved = true;
+      }
+    }, { passive: true });
 
-    openSheet(select);
-  };
+    select.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
 
-  select.addEventListener('pointerdown', abrirCustom, { passive: false });
-  select.addEventListener('mousedown', abrirCustom, { passive: false });
-  select.addEventListener('touchstart', abrirCustom, { passive: false });
+      if (moved) {
+        moved = false;
+        return;
+      }
 
-  select.addEventListener('click', (ev) => {
-    ev.preventDefault();
-    ev.stopPropagation();
-  }, { passive: false });
-});
+      const jaTemValor = String(select.value || '').trim().length > 0;
+      const now = Date.now();
+      const doubleTap =
+        lastTapSelect === select &&
+        now - lastTapTime < 450;
+
+      lastTapSelect = select;
+      lastTapTime = now;
+
+      if (jaTemValor && !doubleTap) {
+        if (typeof window.toast === 'function') {
+          window.toast('Toque duas vezes para alterar este campo.');
+        }
+        return;
+      }
+
+      openSheet(select);
+    }, { passive: false });
+  });
 }
 
   function bind(root) {
