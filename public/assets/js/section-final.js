@@ -1273,10 +1273,6 @@ function removerFinalDuplicado(texto) {
     return;
   }
 
-  window.location.href = HOME_URL;
-}
-
-  // fallback antigo, caso o sistema de transição não esteja disponível
   if (typeof window.playVideo === 'function') {
     window.playVideo(src, {
       useGoldBorder: true,
@@ -1290,7 +1286,6 @@ function removerFinalDuplicado(texto) {
 
   window.location.href = HOME_URL;
 }
-
   // ================================
   // UI DE BOTÕES FINAL
   // ================================
