@@ -667,7 +667,8 @@ function triggerMic(textarea) {
   if (!texto) return;
 
   const now = Date.now();
-  const prev = String(textarea.value || '').replace(/\s+/g, ' ').trim();
+  const prevOriginal = String(textarea.value || '').trim();
+  const prev = prevOriginal.replace(/\s+/g, ' ').trim();
 
   const lastText = String(window.__MIC_LAST_FINAL_TEXT__ || '')
     .replace(/\s+/g, ' ')
@@ -675,46 +676,26 @@ function triggerMic(textarea) {
 
   const lastAt = Number(window.__MIC_LAST_FINAL_AT__ || 0);
 
-  // evita repetir o mesmo trecho várias vezes em poucos segundos
-  if (
-    lastText &&
-    texto.toLowerCase() === lastText.toLowerCase() &&
-    now - lastAt < 6000
-  ) {
-    console.warn('[MIC] trecho duplicado ignorado:', texto);
-    return;
-  }
-
-  // evita duplicar se o campo já termina com o mesmo trecho
-  const prevLower = prev.toLowerCase();
   const textoLower = texto.toLowerCase();
+  const lastLower = lastText.toLowerCase();
+  const prevLower = prev.toLowerCase();
 
-  if (
-    prevLower === textoLower ||
-    prevLower.endsWith(' ' + textoLower) ||
-    prevLower.endsWith(textoLower)
-  ) {
-    console.warn('[MIC] trecho já existe no final:', texto);
+  // bloqueia só repetição idêntica muito recente
+  if (lastLower && textoLower === lastLower && now - lastAt < 2500) {
+    console.warn('[MIC] duplicado recente ignorado:', texto);
     return;
   }
 
-  // evita caso: "luz luz luz" dentro do próprio retorno
-  const palavras = texto.split(' ');
-  if (palavras.length > 1) {
-    const todasIguais = palavras.every(
-      (p) => p.toLowerCase() === palavras[0].toLowerCase()
-    );
-
-    if (todasIguais) {
-      console.warn('[MIC] repetição interna ignorada:', texto);
-      return;
-    }
+  // bloqueia só quando o campo já termina com o trecho completo
+  if (prevLower && prevLower.endsWith(' ' + textoLower)) {
+    console.warn('[MIC] já existe no final:', texto);
+    return;
   }
 
   window.__MIC_LAST_FINAL_TEXT__ = texto;
   window.__MIC_LAST_FINAL_AT__ = now;
 
-  textarea.value = prev ? `${prev} ${texto}` : texto;
+  textarea.value = prevOriginal ? `${prevOriginal} ${texto}` : texto;
   textarea.dispatchEvent(new Event('input', { bubbles: true }));
 }
 
