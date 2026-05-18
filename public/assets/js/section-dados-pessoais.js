@@ -31,18 +31,7 @@
       return {};
     }
   } 
-
-  const trigger = e.target.closest?.(
-    '.select-trigger, .dropdown-trigger, [data-select-trigger], .campo-opcao, .choice, button'
-  );
-
-  if (trigger) {
-    e.preventDefault();
-    e.stopPropagation();
-    touchMoved = false;
-   }
-  }, true);
-
+  
   function saveData(data) {
     try {
       sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data || {}));
@@ -538,5 +527,5 @@
   document.addEventListener('DOMContentLoaded', () => {
     const root = document.getElementById(SECTION_ID);
     if (root) init(root);
-  });
-})();
+ }
+});
