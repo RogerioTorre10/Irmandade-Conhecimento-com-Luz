@@ -1431,6 +1431,20 @@ if (btnApagar) {
       const val = String(textarea.value || '').trim();
       const dadosPessoais = buildDadosPessoaisPayload();
 
+   // trava absoluta: encerra microfone antes de qualquer fala/devolutiva do guia
+   window.__MIC_WANT__ = false;
+   window.__MIC_ACTIVE__ = false;
+   clearTimeout(window.__MIC_RESTART_TIMER__);
+
+   try { window.__REC__?.stop?.(); } catch (_) {}
+   try { window.__MIC_INSTANCE__?.stop?.(); } catch (_) {}
+
+   window.__REC__ = null;
+   window.__MIC_INSTANCE__ = null;
+
+   updateMicButtonState(false);
+   
+
       if (!val) {
         showMissingAnswerFeedback();
         textarea?.focus();
