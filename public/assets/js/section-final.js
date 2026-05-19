@@ -1251,25 +1251,21 @@ function removerFinalDuplicado(texto) {
 
   const src = FINAL_MOVIE;
 
+  const goPortal = () => {
+    window.location.href = HOME_URL;
+  };
+
   if (typeof window.playBlockTransition === 'function') {
-    window.playBlockTransition(src, null, {
+    window.playBlockTransition(src, 'portal', {
       useGoldBorder: true,
       pulse: true,
       ambientBlur: true,
-      onEnd: () => {
-        window.location.href = HOME_URL;
-      }
+      onEnd: goPortal,
+      onEnded: goPortal,
+      nextSectionId: 'portal'
     });
-    return;
-  }
 
-  if (typeof window.playTransitionVideo === 'function') {
-    window.playTransitionVideo(src, null);
-
-    setTimeout(() => {
-      window.location.href = HOME_URL;
-    }, 9000);
-
+    setTimeout(goPortal, 16000);
     return;
   }
 
@@ -1277,14 +1273,16 @@ function removerFinalDuplicado(texto) {
     window.playVideo(src, {
       useGoldBorder: true,
       pulse: true,
-      onEnded: () => {
-        window.location.href = HOME_URL;
-      }
+      ambientBlur: true,
+      onEnded: goPortal,
+      onEnd: goPortal
     });
+
+    setTimeout(goPortal, 16000);
     return;
   }
 
-  window.location.href = HOME_URL;
+  goPortal();
 }
   // ================================
   // UI DE BOTÕES FINAL
