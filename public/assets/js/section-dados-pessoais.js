@@ -434,26 +434,30 @@
     }, { passive: true });
 
     const abrirCustom = (ev) => {
-      if (touchMoved) {
-        touchMoved = false;
-        return;
-      }
+     if (touchMoved) {
+     touchMoved = false;
+     return;
+   }
 
+    ev.preventDefault();
+    ev.stopPropagation();
+
+    try {
+      select.blur();
+    } catch {}
+
+    setTimeout(() => {
+      openSheet(select);
+    }, 80);
+   };
+
+    select.addEventListener('touchend', abrirCustom, { passive: false });
+    select.addEventListener('click', (ev) => {
       ev.preventDefault();
       ev.stopPropagation();
-
-      try {
-        select.blur();
-      } catch {}
-
-      openSheet(select);
-    };
-
-    select.addEventListener('pointerdown', abrirCustom, { passive: false });
-    select.addEventListener('mousedown', abrirCustom, { passive: false });
-    select.addEventListener('click', abrirCustom, { passive: false });
-  });
-}
+    }, { passive: false });
+   });
+  }
 
   function bind(root) {
     if (root.__DADOS_PESSOAIS_BINDED__) return;
