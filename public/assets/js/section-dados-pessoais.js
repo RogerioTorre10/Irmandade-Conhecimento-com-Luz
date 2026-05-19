@@ -404,8 +404,12 @@
     sheet.appendChild(panel);
 
     sheet.addEventListener('click', (ev) => {
-      if (ev.target === sheet) closeSheet();
-    });
+     ev.stopPropagation();
+
+     if (ev.target === sheet) {
+     closeSheet();
+    }
+  });
 
     document.body.appendChild(sheet);
   }
