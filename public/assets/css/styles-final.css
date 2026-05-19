@@ -184,10 +184,14 @@
   }
 
   #section-final .j-panel-glow {
-    width: min(92vw, 500px) !important;
-    margin: 0 auto !important;
-    transform: translateX(-4px);
-  }
+  width: min(92vw, 500px) !important;
+  max-width: 500px !important;
+
+  margin-left: auto !important;
+  margin-right: auto !important;
+
+  transform: translateX(-6px) !important;
+}
 }
 /* ================================
    FINAL → DATILOGRAFIA ESQUERDA → DIREITA
