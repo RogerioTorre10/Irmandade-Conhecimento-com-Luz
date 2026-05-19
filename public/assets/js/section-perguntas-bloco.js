@@ -752,17 +752,31 @@ function triggerMic(textarea) {
     };
 
     rec.onresult = (ev) => {
+     try {
       let finalText = '';
 
-      for (let i = ev.resultIndex; i < ev.results.length; i++) {
-        const res = ev.results[i];
-        if (res.isFinal && res[0]?.transcript) {
-          finalText += ' ' + res[0].transcript.trim();
-        }
-      }
+    for (let i = ev.resultIndex; i < ev.results.length; i++) {
+      const result = ev.results[i];
+      if (!result || !result[0]) continue;
 
-      appendFinalText(finalText);
-    };
+      const transcript = String(result[0].transcript || '').trim();
+      if (!transcript) continue;
+
+      if (result.isFinal) {
+        finalText += ' ' + transcript;
+      }
+    }
+
+    finalText = finalText.replace(/\s+/g, ' ').trim();
+    if (!finalText) return;
+
+    appendFinalText(finalText);
+
+    console.log('[MIC] texto final recebido:', finalText);
+  } catch (err) {
+    console.warn('[MIC] falha no onresult:', err);
+  }
+};
 
     rec.onerror = (ev) => {
       const code = ev?.error || '';
