@@ -670,35 +670,65 @@ function triggerMic(textarea) {
   const prevOriginal = String(textarea.value || '').trim();
   const prev = prevOriginal.replace(/\s+/g, ' ').trim();
 
+  const textoLower = texto.toLowerCase();
+  const prevLower = prev.toLowerCase();
+
   const lastText = String(window.__MIC_LAST_FINAL_TEXT__ || '')
     .replace(/\s+/g, ' ')
-    .trim();
+    .trim()
+    .toLowerCase();
 
   const lastAt = Number(window.__MIC_LAST_FINAL_AT__ || 0);
 
-  const textoLower = texto.toLowerCase();
-  const lastLower = lastText.toLowerCase();
-  const prevLower = prev.toLowerCase();
-
-  // bloqueia só repetição idêntica muito recente
-  if (lastLower && textoLower === lastLower && now - lastAt < 2500) {
-    console.warn('[MIC] duplicado recente ignorado:', texto);
+  // bloqueia repetição idêntica recente
+  if (lastText && textoLower === lastText && now - lastAt < 5000) {
+    console.warn('[MIC] duplicado idêntico ignorado:', texto);
     return;
   }
 
-  // bloqueia só quando o campo já termina com o trecho completo
-  if (prevLower && prevLower.endsWith(' ' + textoLower)) {
-    console.warn('[MIC] já existe no final:', texto);
+  // bloqueia quando o texto novo já está no final do campo
+  if (prevLower && prevLower.endsWith(textoLower)) {
+    console.warn('[MIC] trecho já existe no final:', texto);
+    return;
+  }
+
+  // corrige sobreposição parcial:
+  // exemplo: prev termina com "brilho que nunca se"
+  // e novo vem "brilho que nunca se apaga"
+  let appendText = texto;
+
+  if (prevLower && textoLower) {
+    const prevWords = prev.split(' ');
+    const newWords = texto.split(' ');
+
+    let overlap = 0;
+    const maxOverlap = Math.min(prevWords.length, newWords.length);
+
+    for (let i = 1; i <= maxOverlap; i++) {
+      const tail = prevWords.slice(-i).join(' ').toLowerCase();
+      const head = newWords.slice(0, i).join(' ').toLowerCase();
+
+      if (tail === head) {
+        overlap = i;
+      }
+    }
+
+    if (overlap > 0) {
+      appendText = newWords.slice(overlap).join(' ').trim();
+    }
+  }
+
+  if (!appendText) {
+    console.warn('[MIC] nada novo para anexar:', texto);
     return;
   }
 
   window.__MIC_LAST_FINAL_TEXT__ = texto;
   window.__MIC_LAST_FINAL_AT__ = now;
 
-  textarea.value = prevOriginal ? `${prevOriginal} ${texto}` : texto;
+  textarea.value = prevOriginal ? `${prevOriginal} ${appendText}` : appendText;
   textarea.dispatchEvent(new Event('input', { bubbles: true }));
 }
-
   function createAndStart() {
     if (window.__MIC_WANT__ !== true) return;
 
