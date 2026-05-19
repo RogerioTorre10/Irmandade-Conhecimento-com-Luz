@@ -525,7 +525,7 @@
   });
 
   document.addEventListener('DOMContentLoaded', () => {
-    const root = document.getElementById(SECTION_ID);
-    if (root) init(root);
- }
+  const root = document.getElementById(SECTION_ID);
+  if (root) init(root);
 });
+})();
