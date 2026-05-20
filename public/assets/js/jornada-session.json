@@ -1,0 +1,6 @@
+{
+  "_comentario": "Arquivo de controle de sessões da Jornada Essencial. Gerenciado pelo backend jornada_session_manager.py. Não editar manualmente, exceto suporte técnico.",
+  "_versao": "2.0",
+  "_seq": 0,
+  "sessoes": []
+}
