@@ -1,256 +1,392 @@
-/* =========================
-   JORNADA_MICRO (Web Speech) — compat com UI existente
-   - attach(textarea[, opts])
-   - attachAll([scope, opts])
-   - opts: { mode:'append'|'replace', lang:'pt-BR'|'en-US'|'es-ES', autoRestart:false }
-   ========================= */
-(function (window) {
+/* /assets/js/jornada-micro.js
+ * Motor único de microfone da Jornada Conhecimento com Luz
+ * API pública:
+ * - JORNADA_MICRO.attach(textarea, opts)
+ * - JORNADA_MICRO.toggle(textarea, opts)
+ * - JORNADA_MICRO.start(textarea, opts)
+ * - JORNADA_MICRO.stop()
+ * - JORNADA_MICRO.isActive()
+ */
+(function (window, document) {
   'use strict';
 
-  if (window.JORNADA_MICRO) return;
+  const MOD = '[JORNADA_MICRO]';
 
-  (function ensureStyle() {
-    if (document.getElementById('mic-style')) return;
-    const css = `
-      .mic-btn {
-        position: absolute;
-        right: 8px;
-        bottom: 8px;
-        width: 36px;
-        height: 36px;
-        border-radius: 999px;
-        border: 1px solid rgba(255,255,255,.18);
-        background: rgba(0,0,0,.28);
-        color: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        font-size: 18px;
-      }
-      .mic-btn[disabled] { opacity: .4; cursor: not-allowed; }
-      .mic-btn.rec {
-        box-shadow: 0 0 0 3px rgba(255,0,0,.25);
-        animation: micpulse 1s ease-in-out infinite;
-      }
-      @keyframes micpulse { 0% { transform: scale(1); } 50% { transform: scale(1.06); } 100% { transform: scale(1); } }
-      .has-mic { padding-right: 44px !important; }
-    `;
-    const st = document.createElement('style');
-    st.id = 'mic-style';
-    st.textContent = css;
-    document.head.appendChild(st);
-  })();
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-  function detectLang() {
-    const sel = document.getElementById('language-select');
-    const v = (sel && sel.value) || window.LANG || localStorage.getItem('JORNADA_LANG') || 'pt-BR';
-    const l = String(v).toLowerCase();
-    return l.startsWith('en') ? 'en-US' : l.startsWith('es') ? 'es-ES' : 'pt-BR';
-  }
-
-  function ensureToast(msg) {
-    try { (window.toast || ((m) => alert(m)))(msg); } catch {}
-  }
-
-  function attach(el, opts = {}) {
-    const ta = (typeof el === 'string') ? document.querySelector(el) : el;
-    if (!ta) return;
-
-    const mode = opts.mode || 'append';
-
-    const fromBlock = ta.closest('.j-pergunta') || ta.parentElement || document;
-    const existing = fromBlock.querySelector('[data-action="start-mic"], .btn-mic');
-    const host = ta.parentElement || fromBlock;
-    if (host && !host.style.position) host.style.position = 'relative';
-
-    const btn = existing || (() => {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'mic-btn';
-      b.title = 'Falar (Ctrl+M)';
-      b.innerHTML = 'microphone';
-      host.appendChild(b);
-      ta.classList.add('has-mic');
-      return b;
-    })();
-
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) {
-      btn.disabled = true;
-      btn.title = 'Reconhecimento de voz não suportado neste navegador';
-      return;
-    }
-  }
-
-    let rec = null, listening = false;
-
-    function buildRecognizer() {
-     const r = new SR();
-     r.lang = opts.lang || detectLang();
-     r.interimResults = true;
-     const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-     r.continuous = !(isIOS || isSafari);
-     let interimBuffer = '';
-
-  r.onresult = (e) => {
-  let interim = '';
-
-  for (let i = e.resultIndex; i < e.results.length; i++) {
-    const res = e.results[i];
-    const transcript = String(res?.[0]?.transcript || '').replace(/\s+/g, ' ').trim();
-
-    if (!transcript) continue;
-
-    if (res.isFinal) {
-      const mode = String(opts.mode || 'append').toLowerCase();
-      const prev = String(ta.value || '').trim();
-      const now = Date.now();
-
-      const lastFinal = String(window.__MIC_LAST_FINAL_TEXT__ || '').replace(/\s+/g, ' ').trim();
-      const lastAt = Number(window.__MIC_LAST_FINAL_AT__ || 0);
-
-      // Bloqueia repetição idêntica enviada várias vezes pelo mobile
-      if (
-        lastFinal &&
-        transcript.toLowerCase() === lastFinal.toLowerCase() &&
-        now - lastAt < 3000
-      ) {
-        console.warn('[MIC] trecho final duplicado ignorado:', transcript);
-        continue;
-      }
-
-      // Bloqueia se o textarea já termina com o mesmo trecho
-      if (
-        prev &&
-        prev.toLowerCase().endsWith(transcript.toLowerCase())
-      ) {
-        console.warn('[MIC] trecho já existente no final:', transcript);
-        continue;
-      }
-
-      window.__MIC_LAST_FINAL_TEXT__ = transcript;
-      window.__MIC_LAST_FINAL_AT__ = now;
-
-      ta.value = mode === 'replace'
-        ? transcript
-        : (prev ? `${prev} ${transcript}` : transcript);
-
-      ta.dispatchEvent(new Event('input', { bubbles: true }));
-    } else {
-      interim = transcript;
-    }
-  }
-
-  if (interim) {
-    ta.setAttribute('placeholder', interim);
-  } else {
-    ta.removeAttribute('placeholder');
-  }
-};
-
-  r.onerror = (ev) => {
-    // 'no-speech' no mobile é normal — reinicia silenciosamente
-    if (ev?.error === 'no-speech') {
-      if (listening) {
-        try { r.start(); } catch (_) {}
-      }
-      return;
-    }
-    listening = false;
-    btn.classList.remove('rec');
-    if (ev?.error === 'not-allowed') ensureToast('Permissão do microfone negada.');
-    else ensureToast('Erro no reconhecimento de voz.');
+  const state = {
+    rec: null,
+    textarea: null,
+    button: null,
+    opts: {},
+    restartTimer: null,
+    lastText: '',
+    lastAt: 0,
+    starting: false
   };
 
-  r.onend = function () {
-  if (!window.__MIC_ACTIVE__) {
-    updateMicButtonState(false);
-    return;
+  function log(...args) {
+    console.log(MOD, ...args);
   }
 
-  // mantém a luz vermelha acesa enquanto o usuário não desligar
-  updateMicButtonState(true);
+  function warn(...args) {
+    console.warn(MOD, ...args);
+  }
 
-  const restartDelay = (isIOS || isSafari) ? 300 : 80;
+  function getLang() {
+    return (
+      window.i18n?.lang ||
+      window.i18n?.currentLang ||
+      document.documentElement.lang ||
+      sessionStorage.getItem('jornada.lang') ||
+      localStorage.getItem('JORNADA_LANG') ||
+      'pt-BR'
+    );
+  }
 
-  setTimeout(() => {
-    try {
-      if (window.__MIC_ACTIVE__) {
-        updateMicButtonState(true);
-        r.start();
-      }
-    } catch (e) {
-      console.warn('[MIC] falha ao reiniciar reconhecimento:', e);
+  function isMobile() {
+    return /iphone|ipad|ipod|android/i.test(navigator.userAgent || '');
+  }
 
-      // só apaga se realmente perdeu o reconhecimento
-      window.__MIC_ACTIVE__ = false;
-      updateMicButtonState(false);
+  function isIOS() {
+    return /iphone|ipad|ipod/i.test(navigator.userAgent || '');
+  }
+
+  function isSafari() {
+    const ua = navigator.userAgent || '';
+    return /^((?!chrome|android).)*safari/i.test(ua);
+  }
+
+  function setButton(active) {
+    const btn =
+      state.button ||
+      document.getElementById('jp-btn-mic') ||
+      document.querySelector('[data-action="mic"], .jp-mic-btn, .mic-btn');
+
+    if (!btn) return;
+
+    btn.classList.toggle('recording', !!active);
+    btn.classList.toggle('rec', !!active);
+    btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    btn.dataset.active = active ? '1' : '0';
+
+    if (active) {
+      btn.style.setProperty('background', '#b30000', 'important');
+      btn.style.setProperty(
+        'box-shadow',
+        '0 0 2px rgba(255,255,255,0.10), 0 0 14px rgba(255,0,0,0.45)',
+        'important'
+      );
+      btn.style.setProperty('color', '#fff', 'important');
+    } else {
+      btn.style.removeProperty('background');
+      btn.style.removeProperty('box-shadow');
+      btn.style.removeProperty('color');
     }
-  }, restartDelay);
-};
+  }
 
-    function toggle() {
-      try {
-        if (!rec) rec = buildRecognizer();
-        rec.lang = opts.lang || detectLang();
-        if (listening) {
-          rec.stop();
-          listening = false;
-          btn.classList.remove('rec');
-        } else {
-          rec.start();
-          listening = true;
-          btn.classList.add('rec');
+  function clearRestart() {
+    clearTimeout(state.restartTimer);
+    state.restartTimer = null;
+    clearTimeout(window.__MIC_RESTART_TIMER__);
+    window.__MIC_RESTART_TIMER__ = null;
+  }
+
+  function resetRefs() {
+    state.rec = null;
+    window.__REC__ = null;
+    window.__MIC_INSTANCE__ = null;
+  }
+
+  function markStopped() {
+    window.__MIC_WANT__ = false;
+    window.__MIC_ACTIVE__ = false;
+    state.starting = false;
+    clearRestart();
+    resetRefs();
+    setButton(false);
+  }
+
+  function normalizeText(text) {
+    return String(text || '').replace(/\s+/g, ' ').trim();
+  }
+
+  function appendFinalText(text) {
+    const ta = state.textarea;
+    if (!ta) return;
+
+    const finalText = normalizeText(text);
+    if (!finalText) return;
+
+    const now = Date.now();
+    const prevOriginal = String(ta.value || '').trim();
+    const prev = normalizeText(prevOriginal);
+
+    const finalLower = finalText.toLowerCase();
+    const prevLower = prev.toLowerCase();
+    const lastLower = normalizeText(state.lastText || window.__MIC_LAST_FINAL_TEXT__ || '').toLowerCase();
+    const lastAt = Number(state.lastAt || window.__MIC_LAST_FINAL_AT__ || 0);
+
+    if (lastLower && finalLower === lastLower && now - lastAt < 3500) {
+      warn('trecho duplicado ignorado:', finalText);
+      return;
+    }
+
+    if (prevLower && prevLower.endsWith(finalLower)) {
+      warn('trecho já existe no final:', finalText);
+      return;
+    }
+
+    let appendText = finalText;
+
+    if (prev && finalText) {
+      const prevWords = prev.split(' ');
+      const newWords = finalText.split(' ');
+      let overlap = 0;
+
+      for (let size = Math.min(prevWords.length, newWords.length); size >= 1; size--) {
+        const tail = prevWords.slice(-size).join(' ').toLowerCase();
+        const head = newWords.slice(0, size).join(' ').toLowerCase();
+
+        if (tail === head) {
+          overlap = size;
+          break;
         }
-      } catch {}
+      }
+
+      if (overlap > 0) {
+        appendText = newWords.slice(overlap).join(' ').trim();
+      }
     }
 
+    if (!appendText) return;
 
-    btn.addEventListener('click', (ev) => {
-      ev.preventDefault();
-      toggle();
-    });
+    state.lastText = finalText;
+    state.lastAt = now;
+    window.__MIC_LAST_FINAL_TEXT__ = finalText;
+    window.__MIC_LAST_FINAL_AT__ = now;
 
-    ta.addEventListener('keydown', (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'm') {
-        e.preventDefault();
-        toggle();
+    ta.value = prevOriginal ? `${prevOriginal} ${appendText}` : appendText;
+    ta.dispatchEvent(new Event('input', { bubbles: true }));
+
+    log('texto anexado:', appendText);
+  }
+
+  function buildRecognizer() {
+    if (!SR) return null;
+
+    const rec = new SR();
+
+    rec.lang = state.opts.lang || getLang() || 'pt-BR';
+    rec.continuous = !(isIOS() || isSafari());
+    rec.interimResults = true;
+    rec.maxAlternatives = 1;
+
+    rec.onstart = () => {
+      state.starting = false;
+      window.__MIC_WANT__ = true;
+      window.__MIC_ACTIVE__ = true;
+      window.__REC__ = rec;
+      window.__MIC_INSTANCE__ = rec;
+      setButton(true);
+      log('iniciado');
+    };
+
+    rec.onresult = (ev) => {
+      try {
+        let finalText = '';
+
+        for (let i = ev.resultIndex; i < ev.results.length; i++) {
+          const result = ev.results[i];
+          if (!result || !result[0]) continue;
+
+          const transcript = normalizeText(result[0].transcript);
+          if (!transcript) continue;
+
+          if (result.isFinal) {
+            finalText += ' ' + transcript;
+          }
+        }
+
+        finalText = normalizeText(finalText);
+        if (finalText) appendFinalText(finalText);
+      } catch (e) {
+        warn('falha no onresult:', e);
       }
-    });
+    };
 
-    document.getElementById('language-select')?.addEventListener('change', () => {
-      if (rec) rec.lang = detectLang();
-    });
+    rec.onerror = (ev) => {
+      const code = ev?.error || '';
+      warn('erro:', code);
 
-    window.addEventListener('beforeunload', () => {
-      try { rec && rec.stop(); } catch {}
-    });
+      if (code === 'not-allowed' || code === 'service-not-allowed') {
+        markStopped();
+        if (typeof window.toast === 'function') {
+          window.toast('🎤 Permissão do microfone negada. Ative o microfone no navegador.');
+        }
+        return;
+      }
+
+      if (code === 'aborted') return;
+
+      if (window.__MIC_WANT__ === true) {
+        setButton(true);
+      }
+    };
+
+    rec.onend = () => {
+      window.__MIC_ACTIVE__ = false;
+
+      if (window.__MIC_WANT__ !== true) {
+        markStopped();
+        return;
+      }
+
+      setButton(true);
+
+      const delay = (isIOS() || isSafari()) ? 700 : 350;
+
+      clearRestart();
+      state.restartTimer = setTimeout(() => {
+        if (window.__MIC_WANT__ !== true) {
+          markStopped();
+          return;
+        }
+
+        try {
+          setButton(true);
+          state.starting = true;
+          rec.start();
+        } catch (e) {
+          warn('reinício falhou, recriando:', e);
+
+          if (window.__MIC_WANT__ === true) {
+            state.rec = null;
+            start(state.textarea, state.opts);
+          }
+        }
+      }, delay);
+
+      window.__MIC_RESTART_TIMER__ = state.restartTimer;
+    };
+
+    return rec;
+  }
+
+  function start(textarea, opts = {}) {
+    if (!SR) {
+      warn('SpeechRecognition não suportado neste navegador.');
+      setButton(false);
+      return;
+    }
+
+    const ta = typeof textarea === 'string' ? document.querySelector(textarea) : textarea;
+    if (!ta) {
+      warn('textarea não encontrado.');
+      return;
+    }
+
+    state.textarea = ta;
+    state.opts = opts || {};
+    state.button =
+      opts.button ||
+      document.getElementById('jp-btn-mic') ||
+      document.querySelector('[data-action="mic"], .jp-mic-btn, .mic-btn');
+
+    window.__MIC_WANT__ = true;
+    window.__MIC_ACTIVE__ = true;
+    state.starting = true;
+    setButton(true);
+
+    clearRestart();
+
+    try {
+      if (state.rec) {
+        try { state.rec.stop(); } catch (_) {}
+      }
+    } catch (_) {}
+
+    state.rec = buildRecognizer();
+    window.__REC__ = state.rec;
+    window.__MIC_INSTANCE__ = state.rec;
+
+    try {
+      if (!isMobile()) {
+        ta.focus();
+      }
+
+      state.rec.start();
+    } catch (e) {
+      warn('falha ao iniciar:', e);
+
+      const delay = (isIOS() || isSafari()) ? 700 : 350;
+
+      state.restartTimer = setTimeout(() => {
+        if (window.__MIC_WANT__ === true) {
+          start(state.textarea, state.opts);
+        }
+      }, delay);
+
+      window.__MIC_RESTART_TIMER__ = state.restartTimer;
+    }
+  }
+
+  function stop() {
+    window.__MIC_WANT__ = false;
+    window.__MIC_ACTIVE__ = false;
+    state.starting = false;
+    clearRestart();
+
+    try { state.rec?.stop?.(); } catch (_) {}
+    try { window.__REC__?.stop?.(); } catch (_) {}
+    try { window.__MIC_INSTANCE__?.stop?.(); } catch (_) {}
+
+    resetRefs();
+    setButton(false);
+    log('parado');
+  }
+
+  function toggle(textarea, opts = {}) {
+    if (window.__MIC_WANT__ === true || window.__MIC_ACTIVE__ === true) {
+      stop();
+      return;
+    }
+
+    start(textarea, opts);
+  }
+
+  function attach(textarea, opts = {}) {
+    const ta = typeof textarea === 'string' ? document.querySelector(textarea) : textarea;
+    if (!ta) return null;
+
+    ta.dataset.micReady = '1';
 
     return {
-      start: () => {
-        if (!rec) rec = buildRecognizer();
-        rec.start();
-        listening = true;
-        btn.classList.add('rec');
-      },
-      stop: () => {
-        try { if (rec && listening) rec.stop(); } catch {}
-      },
-      button: btn
+      start: () => start(ta, opts),
+      stop,
+      toggle: () => toggle(ta, opts)
     };
   }
 
   function attachAll(scope = document, opts = {}) {
-    const taSel = '#section-perguntas .j-pergunta textarea, .j-pergunta textarea, textarea';
-    scope.querySelectorAll(taSel).forEach(ta => {
+    const root = scope || document;
+    root.querySelectorAll('textarea').forEach((ta) => {
       if (ta.dataset.micReady === '1') return;
-      attach(ta, Object.assign({ mode: 'append', lang: detectLang() }, opts));
-      ta.dataset.micReady = '1';
+      attach(ta, opts);
     });
   }
 
-  window.JORNADA_MICRO = { attach, attachAll };
+  window.JORNADA_MICRO = {
+    attach,
+    attachAll,
+    start,
+    stop,
+    toggle,
+    isActive() {
+      return window.__MIC_WANT__ === true || window.__MIC_ACTIVE__ === true;
+    },
+    _state: state
+  };
 
-})(window);
+  log('pronto');
+})(window, document);
