@@ -326,8 +326,9 @@
     title.style.width = '100%';
     title.style.minHeight = '40px';
 
-    await runType(title, txt, Number(title.dataset.speed || 38));
+    await runType(title, txt, Number(title.dataset.speed || 40));
     await iniciarLeituraDadosPessoais(root, txt);
+    await new Promise((r) => setTimeout(r, 400));
     
     title.classList.add('typed');
   }
@@ -342,8 +343,9 @@
     subtitle.style.width = '100%';
     subtitle.style.minHeight = '44px';
 
-    await runType(subtitle, txt, Number(subtitle.dataset.speed || 40));
+    await runType(subtitle, txt, Number(subtitle.dataset.speed || 42));
     await iniciarLeituraDadosPessoais(root, txt);
+    await new Promise((r) => setTimeout(r, 400));
 
     subtitle.classList.add('typed');
   }
