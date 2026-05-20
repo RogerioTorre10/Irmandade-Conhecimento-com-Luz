@@ -1309,132 +1309,145 @@ function bindButtons(section, bloco, perguntaText) {
   }
 
   if (btnMic) {
-  btnMic.onclick = (ev) => {
-    ev.preventDefault();
-    ev.stopPropagation();
+    btnMic.onclick = (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
 
-    triggerMic(textarea);
-  };
-}
-
-if (btnApagar) {
-  btnApagar.onclick = (ev) => {
-    ev.preventDefault();
-    clearAnswerUI();
-    setContinueState(section, 'idle');
-  };
-}
-
- if (btnConfirm) {
-  btnConfirm.onclick = async (ev) => {
-    ev.preventDefault();
-
-    if (btnConfirm.dataset.busy === '1') return;
-    btnConfirm.dataset.busy = '1';
-    btnConfirm.disabled = true;
-
- try {
-
-   // DESLIGA MICROFONE AO CLICAR EM CONTINUAR
-    window.__MIC_ACTIVE__ = false;
-
-   try {
-     if (window.__REC__) {
-       window.__REC__.stop();
-       window.__REC__ = null;
-     }
-
-    if (window.__MIC_INSTANCE__) {
-      window.__MIC_INSTANCE__.stop();
-      window.__MIC_INSTANCE__ = null;
-    }
-
-    if (window.__MIC_INSTANCE_BLOCO__?.stop) {
-      window.__MIC_INSTANCE_BLOCO__.stop();
-      window.__MIC_INSTANCE_BLOCO__ = null;
-    }
-
-    if (window.JORNADA_MICRO?.stop) {
-      window.JORNADA_MICRO.stop();
-    }
-  } catch (e) {
-    console.warn('[MIC] erro ao desligar ao continuar:', e);
+      window.JORNADA_MICRO?.toggle?.(textarea, {
+        mode: 'append',
+        lang: getLang(),
+        button: btnMic
+      });
+    };
   }
 
-  updateMicButtonState(false);
+  if (btnApagar) {
+    btnApagar.onclick = (ev) => {
+      ev.preventDefault();
 
-  const state = section?.dataset?.continueState || 'idle';
+      window.JORNADA_MICRO?.stop?.();
 
-      if (state === 'ready') {
-        await maybeHandleBlockClosure(section, bloco);
-        return;
-      }
+      clearAnswerUI();
+      setContinueState(section, 'idle');
+    };
+  }
 
-      if (state === 'loading') {
-        return;
-      }
+  if (btnConfirm) {
+    btnConfirm.onclick = async (ev) => {
+      ev.preventDefault();
 
-      const val = String(textarea.value || '').trim();
-      const dadosPessoais = buildDadosPessoaisPayload();
+      if (btnConfirm.dataset.busy === '1') return;
 
-   // trava absoluta: encerra microfone antes de qualquer fala/devolutiva do guia
-   window.__MIC_WANT__ = false;
-   window.__MIC_ACTIVE__ = false;
-   clearTimeout(window.__MIC_RESTART_TIMER__);
+      btnConfirm.dataset.busy = '1';
+      btnConfirm.disabled = true;
 
-   try { window.__REC__?.stop?.(); } catch (_) {}
-   try { window.__MIC_INSTANCE__?.stop?.(); } catch (_) {}
+      window.JORNADA_MICRO?.stop?.();
 
-   window.__REC__ = null;
-   window.__MIC_INSTANCE__ = null;
+      try {
+        const state = section?.dataset?.continueState || 'idle';
 
-   updateMicButtonState(false);
-   
+        if (state === 'ready') {
+          await maybeHandleBlockClosure(section, bloco);
+          return;
+        }
 
-      if (!val) {
-        showMissingAnswerFeedback();
-        textarea?.focus();
-        return;
-      }
+        if (state === 'loading') {
+          return;
+        }
 
-      saveAnswer(bloco, 0, val);
-      setContinueState(section, 'loading');
+        const val = String(textarea?.value || '').trim();
+        const dadosPessoais = buildDadosPessoaisPayload();
 
-      await setGuideResponse(
-        uiText(
-          'thinking_about_answer',
-          'Só um momento, vou refletir sobre sua resposta...'
-        ),
-        'info'
-      );
+        if (!val) {
+          showMissingAnswerFeedback();
+          textarea?.focus();
+          return;
+        }
 
-      const guia =
-        sessionStorage.getItem('jornada.guia') ||
-        localStorage.getItem('JORNADA_GUIA') ||
-        localStorage.getItem('jornada.guia') ||
-        document.body.dataset.guia ||
-        'lumen';
+        saveAnswer(bloco, 0, val);
+        setContinueState(section, 'loading');
 
-      const nome =
-        sessionStorage.getItem('jornada.nome') ||
-        localStorage.getItem('JORNADA_NOME') ||
-        localStorage.getItem('jc.nome') ||
-        'Participante';
+        await setGuideResponse(
+          uiText(
+            'thinking_about_answer',
+            'Só um momento, vou refletir sobre sua resposta...'
+          ),
+          'info'
+        );
 
-      const result = await requestGuideFeedbackWithFallback({
-        nome,
-        guia,
-        blocoNome: bloco?.title || bloco?.id || 'Bloco',
-        respostas: [val],
-        idioma: getLang() || document.documentElement.lang || 'pt-BR',
-        pergunta: getQuestionText(bloco, 0),
-        resposta: val,
-        dadosPessoais
-      });
+        const guia =
+          sessionStorage.getItem('jornada.guia') ||
+          localStorage.getItem('JORNADA_GUIA') ||
+          localStorage.getItem('jornada.guia') ||
+          document.body.dataset.guia ||
+          'lumen';
 
-      const texto = String(result?.texto || '').trim();
+        const nome =
+          sessionStorage.getItem('jornada.nome') ||
+          localStorage.getItem('JORNADA_NOME') ||
+          localStorage.getItem('jc.nome') ||
+          'Participante';
 
-      if (!texto) {
+        const result = await requestGuideFeedbackWithFallback({
+          nome,
+          guia,
+          blocoNome: bloco?.title || bloco?.id || 'Bloco',
+          respostas: [val],
+          idioma: getLang() || document.documentElement.lang || 'pt-BR',
+          pergunta: getQuestionText(bloco, 0),
+          resposta: val,
+          dadosPessoais
+        });
+
+        const texto = String(result?.texto || '').trim();
+
+        if (!texto) {
+          await setGuideResponse(
+            uiText(
+              'connection_oscillated',
+              'A conexão com o guia oscilou neste momento. Toque em "Tentar novamente" para buscar a devolutiva.'
+            ),
+            'warn'
+          );
+          setContinueState(section, 'error');
+          return;
+        }
+
+        await setGuideResponse(
+          texto,
+          result?.fallbackUsed ? 'warning' : 'success'
+        );
+
+        const blocoId = bloco?.id || '';
+        const existentes = getStoredBlockFeedbacks().filter(
+          (item) => item?.blocoId !== blocoId
+        );
+
+        const anterior =
+          getStoredBlockFeedbacks().find((item) => item?.blocoId === blocoId) || {};
+
+        existentes.push({
+          blocoId,
+          blocoTitulo: bloco?.title || bloco?.id || 'Bloco',
+          respostas: [val],
+          devolutiva: anterior?.devolutiva || '',
+          perguntas: [
+            {
+              pergunta: getQuestionText(bloco, 0),
+              resposta: val,
+              devolutiva: texto
+            }
+          ],
+          guiaUsado: result?.guiaUsado || normalizeGuide(guia),
+          source: result?.source || 'desconhecida'
+        });
+
+        setStoredBlockFeedbacks(existentes);
+        setContinueState(section, 'ready');
+
+      } catch (err) {
+        console.error('[PERGUNTAS_BLOCO] erro no confirmar:', err);
+
         await setGuideResponse(
           uiText(
             'connection_oscillated',
@@ -1442,60 +1455,14 @@ if (btnApagar) {
           ),
           'warn'
         );
+
         setContinueState(section, 'error');
-        return;
+      } finally {
+        btnConfirm.dataset.busy = '0';
+        btnConfirm.disabled = false;
       }
-
-      await setGuideResponse(
-        texto,
-        result?.fallbackUsed ? 'warning' : 'success'
-      );
-
-      const blocoId = bloco?.id || '';
-      const existentes = getStoredBlockFeedbacks().filter(
-        (item) => item?.blocoId !== blocoId
-      );
-
-      const anterior =
-        getStoredBlockFeedbacks().find((item) => item?.blocoId === blocoId) || {};
-
-      existentes.push({
-        blocoId,
-        blocoTitulo: bloco?.title || bloco?.id || 'Bloco',
-        respostas: [val],
-        devolutiva: anterior?.devolutiva || '',
-        perguntas: [
-          {
-            pergunta: getQuestionText(bloco, 0),
-            resposta: val,
-            devolutiva: texto
-          }
-        ],
-        guiaUsado: result?.guiaUsado || normalizeGuide(guia),
-        source: result?.source || 'desconhecida'
-      });
-
-      setStoredBlockFeedbacks(existentes);      
-
-      setContinueState(section, 'ready');
-    } catch (err) {
-      console.error('[PERGUNTAS_BLOCO] erro no confirmar:', err);
-
-      await setGuideResponse(
-        uiText(
-          'connection_oscillated',
-          'A conexão com o guia oscilou neste momento. Toque em "Tentar novamente" para buscar a devolutiva.'
-        ),
-        'warn'
-      ); 
-
-      setContinueState(section, 'error');
-    } finally {
-      btnConfirm.dataset.busy = '0';
-      btnConfirm.disabled = false;
-    }
-  };
-}
+    };
+  }
 }
 async function renderBloco(section) {
   const sectionId = getSectionId(section);
