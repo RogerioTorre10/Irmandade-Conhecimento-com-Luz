@@ -789,7 +789,7 @@ function bindPressFx(btn) {
   window.__MIC_ACTIVE__ = true;
   updateMicButtonState(true);
   createAndStart();
-}
+
   
 function showMissingAnswerFeedback() {
   const msg = uiText('write_answer_first', 'Escreva sua resposta antes de continuar.');
