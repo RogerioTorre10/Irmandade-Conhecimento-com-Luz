@@ -296,10 +296,11 @@
       u.onerror = resolve;
 
       if (window.EffectCoordinator?.speak) {
-        window.EffectCoordinator.speak(texto);
-        resolve();
-        return;
-      }
+       Promise.resolve(window.EffectCoordinator.speak(texto))
+         .then(resolve)
+         .catch(resolve);
+       return;
+     }
 
       window.speechSynthesis.cancel();
       window.speechSynthesis.speak(u);
