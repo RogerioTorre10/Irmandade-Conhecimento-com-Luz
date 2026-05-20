@@ -779,18 +779,7 @@ function bindPressFx(btn) {
       }
     }
   }
-
-  if (window.__MIC_WANT__ === true) {
-    stopMicByUser();
-    return;
-  }
-
-  window.__MIC_WANT__ = true;
-  window.__MIC_ACTIVE__ = true;
-  updateMicButtonState(true);
-  createAndStart();
-
-  
+    
 function showMissingAnswerFeedback() {
   const msg = uiText('write_answer_first', 'Escreva sua resposta antes de continuar.');
   if (typeof window.toast === 'function') {
