@@ -328,7 +328,7 @@
 
     await runType(title, txt, Number(title.dataset.speed || 38));
     await iniciarLeituraDadosPessoais(root, txt);
-
+    
     title.classList.add('typed');
   }
 
@@ -342,7 +342,7 @@
     subtitle.style.width = '100%';
     subtitle.style.minHeight = '44px';
 
-    await runType(subtitle, txt, Number(subtitle.dataset.speed || 30));
+    await runType(subtitle, txt, Number(subtitle.dataset.speed || 40));
     await iniciarLeituraDadosPessoais(root, txt);
 
     subtitle.classList.add('typed');
