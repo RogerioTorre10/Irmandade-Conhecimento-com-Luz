@@ -1539,8 +1539,7 @@ async function renderBloco(section) {
 
   if (textarea) {
     textarea.value = getAnswer(bloco, 0);
-    textarea.focus();
-    ensureMicAttached(textarea);
+    textarea.focus();    
   }
 
   setGuideResponse('');
