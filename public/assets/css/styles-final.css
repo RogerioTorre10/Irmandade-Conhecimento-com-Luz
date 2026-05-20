@@ -1,27 +1,57 @@
 /* =========================================
-   SECTION FINAL — VERSÃO BLINDADA
+   SECTION FINAL — VERSÃO BLINDADA v2
    ========================================= */
+
+/* RESET GLOBAL DO CONTEXTO */
+html, body {
+  overflow-x: hidden !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+}
 
 /* BASE */
 #section-final {
   position: relative;
   min-height: 100vh;
   display: flex;
-  justify-content: center;
-  padding: 16px 0 32px;
-  overflow-x: hidden;
   flex-direction: column;
+  justify-content: flex-start;
   align-items: center;
-  width: 100%;
-  max-width: 100vw;
-  box-sizing: border-box;
+  padding: 16px 0 32px;
+  overflow-x: hidden !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  left: 0 !important;
+  right: 0 !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
 }
 
-/* CONTAINER */
-#section-final .j-panel-glow {
-  width: min(88vw, 500px);
-  max-width: 500px;
-  margin: 0 auto;
+/* TODOS OS WRAPPERS INTERNOS — CENTRALIZAÇÃO FORÇADA */
+#section-final .final-pergaminho-wrapper,
+#section-final .final-panel,
+#section-final .j-panel-glow,
+#section-final .j-perg-v-inner,
+#section-final .final-wrap,
+#section-final .j-arcane-card,
+#section-final .pergaminho-content {
+  margin-left: auto !important;
+  margin-right: auto !important;
+  box-sizing: border-box !important;
+  transform: none !important;
+  left: auto !important;
+  right: auto !important;
+  position: relative !important;
+}
+
+/* CONTAINER PRINCIPAL (ARO) */
+#section-final .j-panel-glow,
+#section-final .final-panel {
+  width: min(88vw, 500px) !important;
+  max-width: 500px !important;
   border-radius: 24px;
   overflow: hidden;
 }
@@ -74,22 +104,7 @@
   font-size: 14px;
 }
 
-/* MOBILE */
-@media (max-width: 600px) {
-  #section-final .final-acoes {
-    grid-template-columns: 1fr 1.2fr 1fr;
-  }
-
-  #section-final .final-title {
-    font-size: 18px;
-  }
-
-  #section-final .final-message p {
-    font-size: 13px;
-  }
-}
-
-/* ===== FINAL — BOTÕES COM AURA DO GUIA ===== */
+/* ===== BOTÕES COM AURA DO GUIA ===== */
 #section-final .final-acoes .btn,
 #section-final .final-acoes button,
 #section-final .final-acoes a,
@@ -125,27 +140,7 @@
   filter: grayscale(.08) !important;
 }
 
-/* CENTRALIZAÇÃO FORÇADA DE TODOS OS WRAPPERS */
-#section-final .final-pergaminho-wrapper,
-#section-final .final-panel,
-#section-final .j-panel-glow,
-#section-final .j-perg-v-inner,
-#section-final .final-wrap,
-#section-final .j-arcane-card,
-#section-final .pergaminho-content {
-  margin-left: auto !important;
-  margin-right: auto !important;
-  box-sizing: border-box !important;
-  /* remove qualquer transform residual que desloque o container */
-  transform: none !important;
-}
-
-#section-final .j-panel-glow,
-#section-final .final-panel {
-  width: min(88vw, 500px) !important;
-  max-width: 500px !important;
-}
-
+/* DESKTOP */
 @media (min-width: 901px) {
   #section-final {
     padding-top: 18px !important;
@@ -161,46 +156,55 @@
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 80, 230, 0.45) rgba(0, 0, 0, 0.18) !important;
 }
-
-#section-final .final-guide-feedback::-webkit-scrollbar {
-  width: 6px !important;
-}
-
+#section-final .final-guide-feedback::-webkit-scrollbar { width: 6px !important; }
 #section-final .final-guide-feedback::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.18);
+  background: rgba(0,0,0,.18);
   border-radius: 999px !important;
 }
-
 #section-final .final-guide-feedback::-webkit-scrollbar-thumb {
-  background: rgba(255, 80, 230, 0.45) !important;
+  background: rgba(255,80,230,.45) !important;
   border-radius: 999px !important;
-  box-shadow: 0 0 6px rgba(255, 80, 230, 0.35) !important;
+  box-shadow: 0 0 6px rgba(255,80,230,.35) !important;
 }
-
 #section-final .final-guide-feedback::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 80, 230, 0.7) !important;
+  background: rgba(255,80,230,.7) !important;
 }
 
-/* MOBILE — centralização sem transform */
+/* MOBILE */
 @media (max-width: 600px) {
   #section-final {
-    padding-left: 12px !important;
-    padding-right: 12px !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
     align-items: center !important;
-    justify-content: center !important;
+    justify-content: flex-start !important;
+    width: 100vw !important;
+    left: 0 !important;
   }
 
-  #section-final .j-panel-glow {
+  #section-final .j-panel-glow,
+  #section-final .final-panel {
     width: min(92vw, 500px) !important;
-    max-width: 500px !important;
+    max-width: 92vw !important;
     margin-left: auto !important;
     margin-right: auto !important;
-    /* REMOVIDO: transform: translateX(-6px) — era o causador do corte à direita */
+    transform: none !important;
+  }
+
+  #section-final .final-acoes {
+    grid-template-columns: 1fr 1.2fr 1fr;
+  }
+
+  #section-final .final-title {
+    font-size: 18px;
+  }
+
+  #section-final .final-message p {
+    font-size: 13px;
   }
 }
 
 /* ================================
-   FINAL → DATILOGRAFIA ESQUERDA → DIREITA
+   DATILOGRAFIA ESQUERDA → DIREITA
    ================================ */
 #section-final .final-message,
 #section-final .final-message p,
