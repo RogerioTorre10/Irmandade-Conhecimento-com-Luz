@@ -363,21 +363,23 @@
   if (speak && text && !el.dataset.spoken && runToken === window.JCSenha.state.activeRunToken) {
     try {
       if (window.EffectCoordinator?.speak) {
-        cancelAllSpeech();
+        if (!el.dataset.spoken) {
+          cancelAllSpeech();
+        }
 
-        const speakOptions = {
-          rate: voiceCtx?.rate ?? 1.0,
-          pitch: voiceCtx?.pitch ?? 1.0,
-          lang: voiceCtx?.lang ?? document.documentElement.lang ?? 'pt-BR',
-          gender: voiceCtx?.voiceGender ?? 'female',
-          guide: voiceCtx?.guide ?? 'lumen',
-          style: voiceCtx?.style ?? 'acolhedora'
-        };
+      const speakOptions = {
+        rate: voiceCtx?.rate ?? 1.0,
+        pitch: voiceCtx?.pitch ?? 1.0,
+        lang: voiceCtx?.lang ?? document.documentElement.lang ?? 'pt-BR',
+        gender: voiceCtx?.voiceGender ?? 'female',
+        guide: voiceCtx?.guide ?? 'lumen',
+        style: voiceCtx?.style ?? 'acolhedora'
+      };
 
-        await window.EffectCoordinator.speak(text, speakOptions);
-        await sleep(TTS_LATCH_MS);
-        el.dataset.spoken = 'true';
-      }
+      await window.EffectCoordinator.speak(text, speakOptions);
+      await sleep(TTS_LOCK_MS);
+      el.dataset.spoken = 'true';
+    
     } catch (err) {
       console.error('[JCSenha] erro no TTS:', err);
     }
