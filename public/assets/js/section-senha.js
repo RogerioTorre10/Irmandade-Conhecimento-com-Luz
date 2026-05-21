@@ -377,7 +377,6 @@
       };
 
       await window.EffectCoordinator.speak(text, speakOptions);
-      await sleep(TTS_LOCK_MS);
       el.dataset.spoken = 'true';        
       }
       
