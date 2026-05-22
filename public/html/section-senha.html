@@ -34,15 +34,17 @@
              data-text="Pronto? Digite agora e avance."></p>
 
           <!-- SENHA + OLHO -->
-          <div class="senha-input-wrap on-pergaminho">
-            <input id="senha-input"
-                   class="input-espinhos input-senha"
-                   type="password"
-                   placeholder="Digite a Palavra-Chave..."
-                   data-i18n-placeholder="senha.placeholder"
-                   aria-label="Digite a Palavra-Chave para a jornada"
-                   disabled />
-
+         <div id="senha-2fa-wrap"
+               class="senha-input-wrap on-pergaminho"
+               style="display:none; margin-top:14px;">
+            <input id="senha-2fa-code"
+                   class="input-espinhos input-2fa"
+                   type="text"
+                   maxlength="6"
+                   inputmode="numeric"
+                   placeholder="Digite o código enviado ao e-mail"
+                   aria-label="Digite o código de confirmação" />
+           
             <button class="btn btn-toggle-senha"
                     data-action="toggle-password"
                     aria-label="Alternar visibilidade da Palavra-Chave"
@@ -60,20 +62,7 @@
                    autocomplete="email"
                    aria-label="Digite seu e-mail" />
           </div>
-
-          <!-- CÓDIGO 2FA -->
-          <div id="senha-2fa-wrap"
-               class="senha-input-wrap on-pergaminho"
-               style="display:none; margin-top:14px;">
-            <input id="senha-2fa-code"
-                   class="input-espinhos input-2fa"
-                   type="text"
-                   maxlength="6"
-                   inputmode="numeric"
-                   placeholder="Digite o código enviado ao e-mail"
-                   aria-label="Digite o código de confirmação" />
-          </div>
-
+       
           <!-- CONFIRMAR CÓDIGO -->
           <div id="senha-confirmar-wrap"
                class="senha-confirmar-wrap"
