@@ -574,13 +574,16 @@
     err.message || 'Erro ao validar senha.',
     'error'
   );
-});     
+});
+});
+} 
+    
+root.dataset.transitionReady = 'true';
+root.dataset.senhaInitialized = 'true';
+window.JCSenha.state.ready = true;
+console.log('[JCSenha] pronto');
 
-    root.dataset.transitionReady = 'true';
-    root.dataset.senhaInitialized = 'true';
-    window.JCSenha.state.ready = true;
-    console.log('[JCSenha] pronto');
-  }
+}
                                
   function onSectionShown(evt) {
     const { sectionId, node } = evt?.detail || {};
@@ -594,15 +597,7 @@
     const myToken = window.JCSenha.state.initToken;
 
     initOnce(root, myToken);
-  }
-      
- if (typeof window.playTransitionVideo === 'function') {
-          window.playTransitionVideo(src, NEXT_SECTION_ID);
-        } else {
-          window.JC?.show?.(NEXT_SECTION_ID) ?? (location.hash = `#${NEXT_SECTION_ID}`);
-        }
-      });
-    }      
+  }      
 
   function bind() {
     if (!window.JCSenha.state.listenerOn) {
