@@ -3,30 +3,32 @@
 <link rel="stylesheet" href="/assets/css/j-panel-glow.css">
 <link rel="stylesheet" href="/assets/css/styles-senha.css">
 
-<section id="section-senha" class="section j-screen-vert" data-section="senha">
+<section id="section-senha"
+         class="section j-screen-vert"
+         data-section="senha">
+
   <div class="j-panel-glow senha-panel">
     <div class="j-perg-v-inner">
+
       <div class="j-arcane-card senha-wrap">
         <div class="conteudo-pergaminho senha-panel-inner">
 
+          <!-- TÍTULO -->
           <h2 class="titulo-pergaminho senha-title"
               id="senha-instr1"
               data-typing="true"
               data-cursor="true"
               data-speed="50"
-              data-i18n="senha.title"
-              data-i18n-text="senha.title"
-              data-text="Digite a Palavra-Chave">
+              data-text="Digite o Código">
           </h2>
 
+          <!-- TEXOS -->
           <p id="senha-instr2"
              class="senha-copy parchment-text-rough"
              data-typing="true"
              data-cursor="true"
              data-speed="50"
-             data-i18n="senha.p1"
-             data-i18n-text="senha.p1"
-             data-text="A Palavra-Chave é o segredo que abrirá as portas da sua jornada.">
+             data-text="O código foi enviado para o seu e-mail.">
           </p>
 
           <p id="senha-instr3"
@@ -34,9 +36,7 @@
              data-typing="true"
              data-cursor="true"
              data-speed="50"
-             data-i18n="senha.p2"
-             data-i18n-text="senha.p2"
-             data-text="Escolha com cuidado, pois ela reflete sua intenção.">
+             data-text="Verifique sua caixa de entrada e também o spam.">
           </p>
 
           <p id="senha-instr4"
@@ -44,91 +44,110 @@
              data-typing="true"
              data-cursor="true"
              data-speed="50"
-             data-i18n="senha.p3"
-             data-i18n-text="senha.p3"
-             data-text="Pronto? Digite agora e avance.">
+             data-text="Digite o código para confirmar sua jornada.">
           </p>
 
+          <!-- INPUT CÓDIGO -->
           <div class="senha-input-wrap on-pergaminho">
-            <input id="senha-input"
+
+            <input id="senha-2fa-code"
                    class="input-espinhos input-senha"
                    type="password"
-                   placeholder="Digite a Palavra-Chave..."
-                   data-i18n-placeholder="senha.placeholder"
-                   aria-label="Digite a Palavra-Chave para a jornada"
-                   disabled />
+                   maxlength="6"
+                   placeholder="Digite o código enviado..."
+                   aria-label="Digite o código de confirmação" />
 
             <button class="btn btn-toggle-senha"
-                    data-action="toggle-password"
-                    aria-label="Alternar visibilidade da Palavra-Chave"
-                    disabled>
+                    data-action="toggle-2fa"
+                    aria-label="Alternar visibilidade do código">
+
               👁️
+
             </button>
+
           </div>
 
-           <!-- EMAIL -->
-             <div class="senha-input-wrap on-pergaminho">
-               <input id="senha-email"
-                class="input-espinhos input-email"
-                type="email"
-               placeholder="Digite seu e-mail..."
-             autocomplete="email"
-         aria-label="Digite seu e-mail" />
-     </div>
+          <!-- EMAIL -->
+          <div class="senha-input-wrap on-pergaminho">
 
-    <div id="senha-2fa-wrap"
-     class="senha-input-wrap on-pergaminho"
-     style="display:none; margin-top:14px;">
+            <input id="senha-email"
+                   class="input-espinhos input-email"
+                   type="email"
+                   placeholder="Digite seu e-mail..."
+                   autocomplete="email"
+                   aria-label="Digite seu e-mail" />
 
-  <input id="senha-2fa-code"
-         class="input-espinhos input-2fa"
-         type="text"
-         maxlength="6"
-         placeholder="Digite o código enviado ao e-mail"
-         aria-label="Digite o código de confirmação" />
-</div>
+          </div>
 
-<div class="senha-confirmar-wrap"
-     style="display:none;"
-     id="senha-confirmar-wrap">
+          <!-- BOTÃO ENVIAR -->
+          <div class="senha-confirmar-wrap">
 
-  <button id="btn-confirmar-2fa"
-          class="btn btn-stone"
-          type="button">
-    🔐 Confirmar Código
-  </button>
-
-</div> 
-
-          <div class="senha-actions">
-           <button id="btn-senha-prev"
-                   class="btn btn-stone"
-                   data-i18n="common.back"
-                   data-text="Voltar"
-                   aria-label="Voltar para a home"
-                  disabled>
-              😢Voltar
-            </button>
-
-            <button id="btn-senha-avancar"
+            <button id="btn-enviar-2fa"
                     class="btn btn-stone"
-                    data-i18n="common.next"
-                    data-text="Avançar"
-                    data-next-section="section-guia"
-                    aria-label="Avançar para a seção guia"
-                    disabled>
-              💪Avançar
+                    type="button">
+
+              ✉️ Enviar Código por E-mail
+
             </button>
+
           </div>
 
+          <!-- SEPARADOR -->
+          <div class="senha-divider">
+            <span>◈</span>
+          </div>
+
+          <!-- REENVIO -->
+          <div class="senha-reenvio-wrap">
+
+            <div class="senha-copy-mini">
+              Ainda não recebeu o código?
+            </div>
+
+            <button id="btn-reenviar-2fa"
+                    class="btn btn-stone"
+                    type="button">
+
+              🔁 Reenviar Código
+
+            </button>
+
+          </div>
+
+          <!-- AÇÕES -->
+          <div class="senha-actions">
+
+            <button id="btn-senha-prev"
+                    class="btn btn-stone"
+                    data-text="Voltar"
+                    aria-label="Voltar">
+
+              😢 Voltar
+
+            </button>
+
+            <button id="btn-confirmar-2fa"
+                    class="btn btn-stone"
+                    type="button">
+
+              🔐 Confirmar Código
+
+            </button>
+
+          </div>
+
+          <!-- ERRO -->
           <div id="guia-error"
                class="guia-error"
                style="display:none;">
-            Não foi possível carregar os guias. Escolha um guia padrão abaixo.
+
+            Não foi possível validar o código.
+
           </div>
 
         </div>
       </div>
+
     </div>
   </div>
 </section>
