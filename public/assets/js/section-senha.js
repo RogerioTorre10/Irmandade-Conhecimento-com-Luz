@@ -524,27 +524,64 @@
           return;
         }
 
-        saveSenha(value);
-        input.type = 'password';
-        cancelAllSpeech();
+    const emailInput = root.querySelector('#senha-email');
+    const email = (emailInput?.value || '').trim();
 
-        [btnNext, input, toggle].forEach((el) => el?.setAttribute('disabled', 'true'));
+    if (!email) {
+     window.toast?.('Digite seu e-mail.', 'warning');
+    emailInput?.focus();
+    return;
+   }
 
-        const src = getTransitionSrc(root, btnNext);
-        if (typeof window.playTransitionVideo === 'function') {
-          window.playTransitionVideo(src, NEXT_SECTION_ID);
-        } else {
-          window.JC?.show?.(NEXT_SECTION_ID) ?? (location.hash = `#${NEXT_SECTION_ID}`);
-        }
-      });
-    }
+   saveSenha(value);
+
+   btnNext.setAttribute('disabled', 'true');
+
+   fetch('https://lumen-backend-api.onrender.com/api/auth/start', {
+    method: 'POST',
+    headers: {
+     'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      email,
+      senha: value,
+      device_hash: navigator.userAgent
+    })
+  })
+  .then(async (r) => {
+    const data = await r.json();
+
+    if (!r.ok || !data.ok) {
+      throw new Error(data?.detail || data?.message || 'Falha ao iniciar autenticação.');
+   }
+
+   window.toast?.('Código enviado ao e-mail.', 'success');
+
+  const wrap2fa = root.querySelector('#senha-2fa-wrap');
+  wrap2fa.style.display = 'flex';
+
+  sessionStorage.setItem('jornada.email', email);
+  sessionStorage.setItem('jornada.senha', value);
+
+  btnNext.style.display = 'none';
+ })
+.catch((err) => {
+  console.error(err);
+
+  btnNext.removeAttribute('disabled');
+
+  window.toast?.(
+    err.message || 'Erro ao validar senha.',
+    'error'
+  );
+});     
 
     root.dataset.transitionReady = 'true';
     root.dataset.senhaInitialized = 'true';
     window.JCSenha.state.ready = true;
     console.log('[JCSenha] pronto');
   }
-
+                               
   function onSectionShown(evt) {
     const { sectionId, node } = evt?.detail || {};
     if (sectionId !== SECTION_ID) return;
@@ -558,6 +595,14 @@
 
     initOnce(root, myToken);
   }
+      
+ if (typeof window.playTransitionVideo === 'function') {
+          window.playTransitionVideo(src, NEXT_SECTION_ID);
+        } else {
+          window.JC?.show?.(NEXT_SECTION_ID) ?? (location.hash = `#${NEXT_SECTION_ID}`);
+        }
+      });
+    }      
 
   function bind() {
     if (!window.JCSenha.state.listenerOn) {
