@@ -559,6 +559,12 @@
 
   const wrap2fa = root.querySelector('#senha-2fa-wrap');
   wrap2fa.style.display = 'flex';
+    
+  const confirmWrap = root.querySelector('#senha-confirmar-wrap');
+
+  if (confirmWrap) {
+    confirmWrap.style.display = 'flex';
+  }  
 
   sessionStorage.setItem('jornada.email', email);
   sessionStorage.setItem('jornada.senha', value);
