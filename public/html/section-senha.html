@@ -3,31 +3,29 @@
 <link rel="stylesheet" href="/assets/css/j-panel-glow.css">
 <link rel="stylesheet" href="/assets/css/styles-senha.css">
 
-<section id="section-senha"
-         class="section j-screen-vert"
-         data-section="senha">
-
+<section id="section-senha" class="section j-screen-vert" data-section="senha">
   <div class="j-panel-glow senha-panel">
     <div class="j-perg-v-inner">
-
       <div class="j-arcane-card senha-wrap">
-        <div class="conteudo-pergaminho senha-panel-inner">
+        <div class="conteudo-pergaminho senha-panel-inner senha-2fa-mode">
 
-          <!-- TÍTULO -->
           <h2 class="titulo-pergaminho senha-title"
               id="senha-instr1"
               data-typing="true"
               data-cursor="true"
               data-speed="50"
+              data-i18n="senha.title"
+              data-i18n-text="senha.title"
               data-text="Digite o Código">
           </h2>
 
-          <!-- TEXOS -->
           <p id="senha-instr2"
              class="senha-copy parchment-text-rough"
              data-typing="true"
              data-cursor="true"
              data-speed="50"
+             data-i18n="senha.p1"
+             data-i18n-text="senha.p1"
              data-text="O código foi enviado para o seu e-mail.">
           </p>
 
@@ -36,6 +34,8 @@
              data-typing="true"
              data-cursor="true"
              data-speed="50"
+             data-i18n="senha.p2"
+             data-i18n-text="senha.p2"
              data-text="Verifique sua caixa de entrada e também o spam.">
           </p>
 
@@ -44,110 +44,96 @@
              data-typing="true"
              data-cursor="true"
              data-speed="50"
+             data-i18n="senha.p3"
+             data-i18n-text="senha.p3"
              data-text="Digite o código para confirmar sua jornada.">
           </p>
 
-          <!-- INPUT CÓDIGO -->
-          <div class="senha-input-wrap on-pergaminho">
+          <!-- Mantido invisível para não quebrar o section-senha.js antigo -->
+          <input id="senha-input" type="hidden" value="2FA" />
 
+          <div class="senha-input-wrap senha-code-row on-pergaminho">
             <input id="senha-2fa-code"
                    class="input-espinhos input-senha"
                    type="password"
                    maxlength="6"
+                   inputmode="numeric"
                    placeholder="Digite o código enviado..."
+                   data-i18n-placeholder="senha.codePlaceholder"
                    aria-label="Digite o código de confirmação" />
 
             <button class="btn btn-toggle-senha"
-                    data-action="toggle-2fa"
+                    data-action="toggle-password"
                     aria-label="Alternar visibilidade do código">
-
               👁️
-
             </button>
-
           </div>
 
-          <!-- EMAIL -->
-          <div class="senha-input-wrap on-pergaminho">
-
+          <div class="senha-input-wrap senha-email-row on-pergaminho">
             <input id="senha-email"
                    class="input-espinhos input-email"
                    type="email"
                    placeholder="Digite seu e-mail..."
                    autocomplete="email"
+                   data-i18n-placeholder="senha.emailPlaceholder"
                    aria-label="Digite seu e-mail" />
-
           </div>
 
-          <!-- BOTÃO ENVIAR -->
-          <div class="senha-confirmar-wrap">
-
+          <div class="senha-send-wrap">
             <button id="btn-enviar-2fa"
-                    class="btn btn-stone"
-                    type="button">
-
-              ✉️ Enviar Código por E-mail
-
+                    class="btn btn-stone senha-btn-wide"
+                    type="button"
+                    data-i18n="senha.sendCode"
+                    data-text="Enviar código por e-mail">
+              ✉️ Enviar código por e-mail
             </button>
-
           </div>
 
-          <!-- SEPARADOR -->
           <div class="senha-divider">
             <span>◈</span>
           </div>
 
-          <!-- REENVIO -->
           <div class="senha-reenvio-wrap">
-
-            <div class="senha-copy-mini">
+            <div class="senha-copy-mini"
+                 data-i18n="senha.resendInfo"
+                 data-i18n-text="senha.resendInfo"
+                 data-text="Ainda não recebeu o código?">
               Ainda não recebeu o código?
             </div>
 
             <button id="btn-reenviar-2fa"
-                    class="btn btn-stone"
-                    type="button">
-
-              🔁 Reenviar Código
-
+                    class="btn btn-stone senha-btn-wide"
+                    type="button"
+                    data-i18n="senha.resendCode"
+                    data-text="Reenviar código">
+              🔁 Reenviar código
             </button>
-
           </div>
 
-          <!-- AÇÕES -->
           <div class="senha-actions">
-
             <button id="btn-senha-prev"
                     class="btn btn-stone"
+                    data-i18n="common.back"
                     data-text="Voltar"
                     aria-label="Voltar">
-
               😢 Voltar
-
             </button>
 
             <button id="btn-confirmar-2fa"
                     class="btn btn-stone"
-                    type="button">
-
+                    type="button"
+                    data-i18n="senha.confirmCode"
+                    data-text="Confirmar Código">
               🔐 Confirmar Código
-
             </button>
-
           </div>
 
-          <!-- ERRO -->
-          <div id="guia-error"
-               class="guia-error"
-               style="display:none;">
-
+          <div id="guia-error" class="guia-error" style="display:none;">
             Não foi possível validar o código.
-
           </div>
 
         </div>
       </div>
-
     </div>
   </div>
 </section>
