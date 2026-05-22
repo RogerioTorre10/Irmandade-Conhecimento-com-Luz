@@ -16,35 +16,48 @@
               data-speed="50"
               data-i18n="senha.title"
               data-i18n-text="senha.title"
-              data-text="Digite a Palavra-Chave"></h2>
+              data-text="Digite a Palavra-Chave">
+          </h2>
 
-          <p id="senha-instr2" class="senha-copy parchment-text-rough"
-             data-typing="true" data-cursor="true" data-speed="50"
-             data-i18n="senha.p1" data-i18n-text="senha.p1"
-             data-text="A Palavra-Chave é o segredo que abrirá as portas da sua jornada."></p>
+          <p id="senha-instr2"
+             class="senha-copy parchment-text-rough"
+             data-typing="true"
+             data-cursor="true"
+             data-speed="50"
+             data-i18n="senha.p1"
+             data-i18n-text="senha.p1"
+             data-text="A Palavra-Chave é o segredo que abrirá as portas da sua jornada.">
+          </p>
 
-          <p id="senha-instr3" class="senha-copy parchment-text-rough"
-             data-typing="true" data-cursor="true" data-speed="50"
-             data-i18n="senha.p2" data-i18n-text="senha.p2"
-             data-text="Escolha com cuidado, pois ela reflete sua intenção."></p>
+          <p id="senha-instr3"
+             class="senha-copy parchment-text-rough"
+             data-typing="true"
+             data-cursor="true"
+             data-speed="50"
+             data-i18n="senha.p2"
+             data-i18n-text="senha.p2"
+             data-text="Escolha com cuidado, pois ela reflete sua intenção.">
+          </p>
 
-          <p id="senha-instr4" class="senha-copy parchment-text-rough"
-             data-typing="true" data-cursor="true" data-speed="50"
-             data-i18n="senha.p3" data-i18n-text="senha.p3"
-             data-text="Pronto? Digite agora e avance."></p>
+          <p id="senha-instr4"
+             class="senha-copy parchment-text-rough"
+             data-typing="true"
+             data-cursor="true"
+             data-speed="50"
+             data-i18n="senha.p3"
+             data-i18n-text="senha.p3"
+             data-text="Pronto? Digite agora e avance.">
+          </p>
 
-          <!-- SENHA + OLHO -->
-         <div id="senha-2fa-wrap"
-               class="senha-input-wrap on-pergaminho"
-               style="display:none; margin-top:14px;">
-            <input id="senha-2fa-code"
-                   class="input-espinhos input-2fa"
-                   type="text"
-                   maxlength="6"
-                   inputmode="numeric"
-                   placeholder="Digite o código enviado ao e-mail"
-                   aria-label="Digite o código de confirmação" />
-           
+          <div class="senha-input-wrap on-pergaminho">
+            <input id="senha-input"
+                   class="input-espinhos input-senha"
+                   type="password"
+                   placeholder="Digite a Palavra-Chave..."
+                   data-i18n-placeholder="senha.placeholder"
+                   aria-label="Digite a Palavra-Chave para a jornada"
+                   disabled />
+
             <button class="btn btn-toggle-senha"
                     data-action="toggle-password"
                     aria-label="Alternar visibilidade da Palavra-Chave"
@@ -53,45 +66,58 @@
             </button>
           </div>
 
-          <!-- E-MAIL -->
-          <div class="senha-input-wrap on-pergaminho">
-            <input id="senha-email"
-                   class="input-espinhos input-email"
-                   type="email"
-                   placeholder="Digite seu e-mail..."
-                   autocomplete="email"
-                   aria-label="Digite seu e-mail" />
-          </div>
-       
-          <!-- CONFIRMAR CÓDIGO -->
-          <div id="senha-confirmar-wrap"
-               class="senha-confirmar-wrap"
-               style="display:none;">
-            <button id="btn-confirmar-2fa"
-                    class="btn btn-stone"
-                    type="button">
-              🔐 Confirmar Código
-            </button>
-          </div>
+           <!-- EMAIL -->
+             <div class="senha-input-wrap on-pergaminho">
+               <input id="senha-email"
+                class="input-espinhos input-email"
+                type="email"
+               placeholder="Digite seu e-mail..."
+             autocomplete="email"
+         aria-label="Digite seu e-mail" />
+     </div>
 
-          <!-- BOTÕES -->
+    <div id="senha-2fa-wrap"
+     class="senha-input-wrap on-pergaminho"
+     style="display:none; margin-top:14px;">
+
+  <input id="senha-2fa-code"
+         class="input-espinhos input-2fa"
+         type="text"
+         maxlength="6"
+         placeholder="Digite o código enviado ao e-mail"
+         aria-label="Digite o código de confirmação" />
+</div>
+
+<div class="senha-confirmar-wrap"
+     style="display:none;"
+     id="senha-confirmar-wrap">
+
+  <button id="btn-confirmar-2fa"
+          class="btn btn-stone"
+          type="button">
+    🔐 Confirmar Código
+  </button>
+
+</div> 
+
           <div class="senha-actions">
-            <button id="btn-senha-prev"
-                    class="btn btn-stone"
-                    data-i18n="common.back"
-                    data-text="Voltar"
-                    aria-label="Voltar para a home"
-                    disabled>
-              😢 Voltar
+           <button id="btn-senha-prev"
+                   class="btn btn-stone"
+                   data-i18n="common.back"
+                   data-text="Voltar"
+                   aria-label="Voltar para a home"
+                  disabled>
+              😢Voltar
             </button>
 
             <button id="btn-senha-avancar"
                     class="btn btn-stone"
-                    data-i18n="senha.sendCode"
-                    data-text="Enviar código"
-                    aria-label="Enviar código de confirmação"
+                    data-i18n="common.next"
+                    data-text="Avançar"
+                    data-next-section="section-guia"
+                    aria-label="Avançar para a seção guia"
                     disabled>
-              📩 Enviar código
+              💪Avançar
             </button>
           </div>
 
