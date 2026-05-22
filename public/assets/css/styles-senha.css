@@ -550,3 +550,57 @@
     max-width: min(calc(100vw - 12px), 430px) !important;
   }
 }
+#section-senha .senha-2fa-mode {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+#section-senha .senha-title,
+#section-senha .senha-copy {
+  width: 100%;
+  text-align: center;
+}
+
+#section-senha .senha-code-row {
+  display: grid !important;
+  grid-template-columns: 1fr 76px;
+  gap: 10px;
+  width: min(100%, 680px);
+}
+
+#section-senha .senha-email-row,
+#section-senha .senha-send-wrap,
+#section-senha .senha-reenvio-wrap {
+  width: min(100%, 680px);
+}
+
+#section-senha .senha-btn-wide {
+  width: 100%;
+  min-height: 56px;
+}
+
+#section-senha .senha-divider {
+  width: min(100%, 680px);
+  text-align: center;
+  color: #f6d65b;
+  margin: 6px 0;
+}
+
+#section-senha .senha-copy-mini {
+  width: 100%;
+  text-align: center;
+  padding: 14px 18px;
+  border-radius: 16px;
+  color: #ddd;
+  background: rgba(10, 10, 18, .72);
+  border: 1px solid rgba(255,255,255,.28);
+  margin-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+  #section-senha .senha-code-row {
+    grid-template-columns: 1fr 62px;
+  }
+}
