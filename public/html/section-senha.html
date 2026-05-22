@@ -112,27 +112,28 @@
 
           <div class="senha-actions">
             <button id="btn-senha-prev"
-                    class="btn btn-stone"
-                    data-i18n="common.back"
-                    data-text="Voltar"
-                    aria-label="Voltar">
-              😢 Voltar
-            </button>
+               class="btn btn-stone"
+               data-i18n="common.back"
+               data-text="Voltar"
+               aria-label="Voltar">
+            😢 Voltar
+          </button>
 
-            <button id="btn-confirmar-2fa"
-                    class="btn btn-stone"
-                    type="button"
-                    data-i18n="senha.confirmCode"
-                    data-text="Confirmar Código">
-              🔐 Confirmar Código
-            </button>
-          </div>
-
-          <div id="guia-error" class="guia-error" style="display:none;">
-            Não foi possível validar o código.
-          </div>
-
+          <button id="btn-senha-avancar"
+            class="btn btn-stone"
+               type="button"
+               data-i18n="senha.confirmCode"
+               data-text="Confirmar Código"
+               data-next-section="section-guia"
+               aria-label="Confirmar código e avançar">
+            🔐 Confirmar Código
+          </button>
         </div>
+        </div>
+
+         <div id="guia-error" class="guia-error" style="display:none;">
+            Não foi possível validar o código.
+          </div>        
       </div>
     </div>
   </div>
