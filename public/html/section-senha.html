@@ -66,6 +66,35 @@
             </button>
           </div>
 
+           <!-- EMAIL -->
+             <div class="senha-input-wrap on-pergaminho">
+               <input id="senha-email"
+                class="input-espinhos input-email"
+                type="email"
+               placeholder="Digite seu e-mail..."
+             autocomplete="email"
+         aria-label="Digite seu e-mail" />
+     </div>
+
+    <!-- CÓDIGO 2FA -->
+      <div id="senha-2fa-wrap"
+         class="senha-input-wrap on-pergaminho"
+          style="display:none; margin-top:14px;">
+
+           <input id="senha-2fa-code"
+             class="input-espinhos input-2fa"
+               type="text"
+              maxlength="6"
+            placeholder="Digite o código enviado ao e-mail"
+         aria-label="Digite o código de confirmação" />
+
+      <button id="btn-confirmar-2fa"
+    class="btn btn-stone"
+   type="button">
+    🔐Confirmar Código
+      </button>
+        </div>        
+
           <div class="senha-actions">
            <button id="btn-senha-prev"
                    class="btn btn-stone"
