@@ -52,22 +52,23 @@
           <!-- Mantido invisível para não quebrar o section-senha.js antigo -->
           <input id="senha-input" type="hidden" value="2FA" />
 
-          <div class="senha-input-wrap senha-code-row on-pergaminho">
-            <input id="senha-2fa-code"
-                   class="input-espinhos input-senha"
-                   type="password"
-                   maxlength="6"
-                   inputmode="numeric"
-                   placeholder="Digite o código enviado..."
-                   data-i18n-placeholder="senha.codePlaceholder"
-                   aria-label="Digite o código de confirmação" />
+         <div class="senha-input-wrap senha-code-row on-pergaminho">
+         <input id="senha-input"
+           class="input-espinhos input-senha"
+           type="password"
+           maxlength="6"
+           inputmode="numeric"
+           placeholder="Digite o código enviado..."
+           data-i18n-placeholder="senha.codePlaceholder"
+           aria-label="Digite o código de confirmação" />
 
-            <button class="btn btn-toggle-senha"
-                    data-action="toggle-password"
-                    aria-label="Alternar visibilidade do código">
-              👁️
-            </button>
-          </div>
+         <button class="btn btn-toggle-senha"
+           data-action="toggle-password"
+           type="button"
+           aria-label="Alternar visibilidade do código">
+          👁️
+        </button>
+       </div>
 
           <div class="senha-input-wrap senha-email-row on-pergaminho">
             <input id="senha-email"
