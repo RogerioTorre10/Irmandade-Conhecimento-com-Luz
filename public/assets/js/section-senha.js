@@ -669,6 +669,138 @@ const btnEnviar2FA = root.querySelector('#btn-enviar-2fa');
 const btnReenviar2FA = root.querySelector('#btn-reenviar-2fa');
 const emailInput = root.querySelector('#senha-email');
 
+ // =====================================================
+// ENVIAR CÓDIGO 2FA
+// =====================================================
+
+async function enviarCodigo2FA() {
+
+  const email = (emailInput?.value || '').trim();
+  const senhaDigitada = (input.value || '').trim();
+
+  if (!email) {
+    window.toast?.('Digite seu e-mail.', 'warning');
+    return;
+  }
+
+  if (!senhaDigitada) {
+    window.toast?.('Digite sua palavra-chave.', 'warning');
+    return;
+  }
+
+  try {
+
+    btnEnviar2FA?.setAttribute('disabled', 'true');
+
+    const resp = await fetch(
+      'https://lumen-backend-api.onrender.com/api/auth/start',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email,
+          senha: senhaDigitada,
+          device_hash:
+            localStorage.getItem('jornada_device_hash') ||
+            navigator.userAgent
+        })
+      }
+    );
+
+    const data = await resp.json();
+
+    if (!resp.ok || !data.ok) {
+      throw new Error(
+        data?.detail ||
+        data?.message ||
+        'Senha inválida.'
+      );
+    }
+
+    sessionStorage.setItem('jornada.email', email);
+    sessionStorage.setItem('jornada.senha', senhaDigitada);
+
+    window.toast?.(
+      'Código enviado ao e-mail.',
+      'success'
+    );
+
+    // MOSTRA ÁREA 2FA
+    const wrap2fa =
+      root.querySelector('#senha-2fa-wrap');
+
+    if (wrap2fa) {
+      wrap2fa.style.display = 'flex';
+    }
+
+    const confirmWrap =
+      root.querySelector('#senha-confirmar-wrap');
+
+    if (confirmWrap) {
+      confirmWrap.style.display = 'flex';
+    }
+
+    // ALTERA INPUT PARA CÓDIGO
+    input.value = '';
+
+    input.placeholder =
+      'Digite o código enviado...';
+
+    input.setAttribute('inputmode', 'numeric');
+
+    // MUDA ETAPA
+    btnNext.dataset.authStage = 'verify';
+
+  } catch (err) {
+
+    console.error(
+      '[JCSenha] erro ao enviar código:',
+      err
+    );
+
+    window.toast?.(
+      err.message || 'Erro ao enviar código.',
+      'error'
+    );
+
+  } finally {
+
+    btnEnviar2FA?.removeAttribute('disabled');
+  }
+}
+
+// =====================================================
+// LISTENERS
+// =====================================================
+
+if (
+  btnEnviar2FA &&
+  btnEnviar2FA.dataset.bound !== '1'
+) {
+
+  btnEnviar2FA.dataset.bound = '1';
+
+  btnEnviar2FA.addEventListener(
+    'click',
+    enviarCodigo2FA
+  );
+}
+
+if (
+  btnReenviar2FA &&
+  btnReenviar2FA.dataset.bound !== '1'
+) {
+
+  btnReenviar2FA.dataset.bound = '1';
+
+  btnReenviar2FA.addEventListener(
+    'click',
+    enviarCodigo2FA
+  );
+}   
+
 async function enviarCodigo2FA() {
   const email = (emailInput?.value || '').trim();
   const senha = 'TESTE123';
