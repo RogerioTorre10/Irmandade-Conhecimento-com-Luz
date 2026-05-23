@@ -774,3 +774,28 @@
   justify-content: center !important;
   transform: none !important;
 }
+
+#section-senha .senha-code-row {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 58px !important;
+  align-items: stretch !important;
+  gap: 8px !important;
+}
+
+#section-senha .senha-code-row #senha-input,
+#section-senha .senha-code-row .btn-toggle-senha {
+  height: 62px !important;
+  min-height: 62px !important;
+  margin: 0 !important;
+}
+
+#section-senha .senha-code-row .btn-toggle-senha {
+  width: 58px !important;
+  min-width: 58px !important;
+  max-width: 58px !important;
+  padding: 0 !important;
+  align-self: stretch !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
