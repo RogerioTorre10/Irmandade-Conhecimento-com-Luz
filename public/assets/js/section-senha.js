@@ -527,22 +527,10 @@
       });
     }
 
-    if (btnNext.dataset.boundNext !== '1') {
+ if (btnNext.dataset.boundNext !== '1') {
   btnNext.dataset.boundNext = '1';
 
   btnNext.addEventListener('click', async () => {
-
-    const value = (input.value || '').trim();
-
-    if (!value) {
-      window.toast?.(
-        'Por favor, digite sua senha para continuar.',
-        'warning'
-      );
-      input.focus();
-      return;
-    }
-
     const emailInput = root.querySelector('#senha-email');
     const email = (emailInput?.value || '').trim();
 
@@ -552,204 +540,122 @@
       return;
     }
 
-    saveSenha(value);
+    const etapa = btnNext.dataset.authStage || 'start';
 
-    btnNext.setAttribute('disabled', 'true');
+    // =====================================================
+    // ETAPA 1 — ENVIAR CÓDIGO
+    // =====================================================
+    if (etapa === 'start') {
+      const senhaDigitada = (input.value || '').trim();
 
-    try {
+      if (!senhaDigitada) {
+        window.toast?.('Por favor, digite sua senha para continuar.', 'warning');
+        input.focus();
+        return;
+      }
 
-      // =====================================================
-      // 1º PASSO → ENVIAR CÓDIGO 2FA
-      // =====================================================
+      saveSenha(senhaDigitada);
+      sessionStorage.setItem('jornada.email', email);
+      sessionStorage.setItem('jornada.senha', senhaDigitada);
 
-      const resp = await fetch(
-        'https://lumen-backend-api.onrender.com/api/auth/start',
-        {
+      btnNext.setAttribute('disabled', 'true');
+
+      try {
+        const resp = await fetch('https://lumen-backend-api.onrender.com/api/auth/start', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
             email,
-            senha: value,
-            device_hash:
-              localStorage.getItem('jornada_device_hash') ||
-              navigator.userAgent
+            senha: senhaDigitada,
+            device_hash: localStorage.getItem('jornada_device_hash') || 'browser'
           })
+        });
+
+        const data = await resp.json();
+
+        if (!resp.ok || !data.ok) {
+          throw new Error(data?.detail || data?.message || 'Senha inválida.');
         }
-      );
 
-      const data = await resp.json();
+        window.toast?.('Código enviado ao e-mail.', 'success');
 
-      if (!resp.ok || !data.ok) {
-        throw new Error(
-          data?.detail ||
-          data?.message ||
-          'Falha ao iniciar autenticação.'
-        );
+        const wrap2fa = root.querySelector('#senha-2fa-wrap');
+        if (wrap2fa) wrap2fa.style.display = 'flex';
+
+        const confirmWrap = root.querySelector('#senha-confirmar-wrap');
+        if (confirmWrap) confirmWrap.style.display = 'flex';
+
+        input.value = '';
+        input.placeholder = 'Digite o código recebido por e-mail';
+        input.setAttribute('inputmode', 'numeric');
+
+        btnNext.dataset.authStage = 'verify';
+        btnNext.removeAttribute('disabled');
+
+        return;
+
+      } catch (err) {
+        console.error('[JCSenha] erro ao iniciar 2FA:', err);
+        btnNext.removeAttribute('disabled');
+        window.toast?.(err.message || 'Erro ao validar senha.', 'error');
+        return;
+      }
+    }
+
+    // =====================================================
+    // ETAPA 2 — VALIDAR CÓDIGO
+    // =====================================================
+    if (etapa === 'verify') {
+      const code = (input.value || '').trim();
+      const senhaSalva = sessionStorage.getItem('jornada.senha') || '';
+
+      if (!code) {
+        window.toast?.('Digite o código recebido.', 'warning');
+        input.focus();
+        return;
       }
 
-      console.log('[JCSenha] código enviado:', data);
+      btnNext.setAttribute('disabled', 'true');
 
-      window.toast?.(
-        'Código enviado ao e-mail.',
-        'success'
-      );
+      try {
+        const resp = await fetch('https://lumen-backend-api.onrender.com/api/auth/verify', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email,
+            senha: senhaSalva,
+            code,
+            device_hash: localStorage.getItem('jornada_device_hash') || 'browser'
+          })
+        });
 
-      // =====================================================
-      // MOSTRA CAMPOS 2FA
-      // =====================================================
+        const data = await resp.json();
 
-      const wrap2fa =
-        root.querySelector('#senha-2fa-wrap');
+        if (!resp.ok || !data.ok) {
+          throw new Error(data?.detail || data?.message || 'Código inválido.');
+        }
 
-      if (wrap2fa) {
-        wrap2fa.style.display = 'flex';
+        console.log('[JCSenha] 2FA confirmado:', data);
+
+        if (window.JORNADA_SESSION?.iniciarSessao) {
+          await window.JORNADA_SESSION.iniciarSessao({ email });
+        }
+
+        window.toast?.('Acesso confirmado.', 'success');
+
+        if (window.JC?.show) {
+          window.JC.show('section-guia');
+        }
+
+      } catch (err) {
+        console.error('[JCSenha] erro ao confirmar 2FA:', err);
+        btnNext.removeAttribute('disabled');
+        window.toast?.(err.message || 'Erro ao confirmar código.', 'error');
       }
-
-      const confirmWrap =
-        root.querySelector('#senha-confirmar-wrap');
-
-      if (confirmWrap) {
-        confirmWrap.style.display = 'flex';
-      }
-
-      sessionStorage.setItem('jornada.email', email);
-      sessionStorage.setItem('jornada.senha', value);
-
-      btnNext.style.display = 'none';
-
-      // =====================================================
-      // BOTÃO CONFIRMAR 2FA
-      // =====================================================
-
-      const btnConfirmar =
-        root.querySelector('#btn-confirmar-2fa');
-
-      if (
-        btnConfirmar &&
-        btnConfirmar.dataset.boundConfirm !== '1'
-      ) {
-
-        btnConfirmar.dataset.boundConfirm = '1';
-
-        btnConfirmar.addEventListener(
-          'click',
-          async () => {
-
-            const code =
-              (
-                root.querySelector('#senha-input')
-                  ?.value || ''
-              ).trim();
-
-            if (!code) {
-              alert('Digite o código recebido.');
-              return;
-            }
-
-            try {
-
-              // =====================================================
-              // 2º PASSO → VERIFY 2FA
-              // =====================================================
-
-              const verifyResp = await fetch(
-                'https://lumen-backend-api.onrender.com/api/auth/verify',
-                {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify({
-                    email,
-                    senha: value,
-                    code,
-                    device_hash:
-                      localStorage.getItem(
-                        'jornada_device_hash'
-                      ) || 'browser'
-                  })
-                }
-              );
-
-              const verifyData =
-                await verifyResp.json();
-
-              if (!verifyResp.ok) {
-
-                alert(
-                  verifyData.detail ||
-                  'Código inválido.'
-                );
-
-                return;
-              }
-
-              console.log(
-                '[JCSenha] 2FA confirmado:',
-                verifyData
-              );
-
-              // =====================================================
-              // INICIA SESSÃO
-              // =====================================================
-
-              if (
-                window.JORNADA_SESSION?.iniciarSessao
-              ) {
-
-                await window.JORNADA_SESSION
-                  .iniciarSessao({
-                    email
-                  });
-              }
-
-              window.toast?.(
-                'Autenticação concluída.',
-                'success'
-              );
-
-              // =====================================================
-              // AVANÇA PARA GUIA
-              // =====================================================
-
-              await sleep(300);
-
-              if (window.JC?.show) {
-
-                window.JC.show('section-guia');
-
-              } else {
-
-                location.hash = '#section-guia';
-              }
-
-            } catch (err) {
-
-              console.error(
-                '[JCSenha] erro ao confirmar 2FA:',
-                err
-              );
-
-              alert(
-                'Erro ao confirmar código.'
-              );
-            }
-          }
-        );
-      }
-
-    } catch (err) {
-
-      console.error(err);
-
-      btnNext.removeAttribute('disabled');
-
-      window.toast?.(
-        err.message || 'Erro ao validar senha.',
-        'error'
-      );
     }
   });
 }
@@ -795,11 +701,7 @@ async function enviarCodigo2FA() {
     console.error('[JCSenha] erro ao enviar código:', err);
     alert('Erro ao enviar código. Tente novamente.');
   }
-}
-
-btnEnviar2FA?.addEventListener('click', enviarCodigo2FA);
-btnReenviar2FA?.addEventListener('click', enviarCodigo2FA);    
-
+ }
 }
                                
   function onSectionShown(evt) {
