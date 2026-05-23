@@ -99,7 +99,6 @@
 
   function isElementActuallyVisible(el) {
     if (!el) return false;
-
     const style = window.getComputedStyle(el);
     if (
       style.display === 'none' ||
@@ -110,19 +109,16 @@
     ) {
       return false;
     }
-
     const rect = el.getBoundingClientRect();
     return rect.width > 0 && rect.height > 0;
   }
 
   async function waitForSectionVisible(root, timeoutMs = 8000) {
     const start = Date.now();
-
     while (Date.now() - start < timeoutMs) {
       if (isElementActuallyVisible(root)) return true;
       await sleep(120);
     }
-
     return isElementActuallyVisible(root);
   }
 
@@ -151,27 +147,19 @@
   function buildGuideVoiceContext() {
     const guide = getActiveGuide();
     const lang = getActiveLang();
-
     const presetByGuide = {
       lumen: { voiceGender: 'female', pitch: 1.08, rate: 1.00, style: 'acolhedora' },
       zion:  { voiceGender: 'male',   pitch: 0.92, rate: 0.96, style: 'firme' },
       arian: { voiceGender: 'female', pitch: 1.16, rate: 0.94, style: 'inspiradora' }
     };
-
-    return {
-      lang,
-      guide,
-      ...(presetByGuide[guide] || presetByGuide.lumen)
-    };
+    return { lang, guide, ...(presetByGuide[guide] || presetByGuide.lumen) };
   }
 
   function syncGuideVoiceContext(root) {
     const ctx = buildGuideVoiceContext();
-
     window.__JC_VOICE_CONTEXT = ctx;
     window.__GUIDE_VOICE_CONTEXT = ctx;
     window.__SENHA_VOICE_CONTEXT = ctx;
-
     if (root) {
       root.dataset.lang = ctx.lang;
       root.dataset.guide = ctx.guide;
@@ -180,20 +168,17 @@
       root.dataset.voiceRate = String(ctx.rate);
       root.dataset.voiceStyle = ctx.style;
     }
-
     if (window.EffectCoordinator) {
       window.EffectCoordinator.voiceContext = {
         ...(window.EffectCoordinator.voiceContext || {}),
         ...ctx
       };
     }
-
     return ctx;
   }
 
   async function applySectionI18n(root) {
     if (!root) return;
-
     try {
       if (window.i18n?.apply) {
         await window.i18n.apply(root);
@@ -207,14 +192,8 @@
     root.querySelectorAll('[data-i18n-text]').forEach((el) => {
       const key = el.dataset.i18nText;
       if (!key || !window.i18n?.t) return;
-
       const translated = window.i18n.t(key);
-      if (
-        translated &&
-        typeof translated === 'string' &&
-        translated.trim() &&
-        translated !== key
-      ) {
+      if (translated && typeof translated === 'string' && translated.trim() && translated !== key) {
         const clean = translated.trim();
         el.dataset.text = clean;
         el.setAttribute('data-text', clean);
@@ -224,52 +203,38 @@
     root.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
       const key = el.dataset.i18nPlaceholder;
       if (!key || !window.i18n?.t) return;
-
       const translated = window.i18n.t(key);
-      if (
-        translated &&
-        typeof translated === 'string' &&
-        translated.trim() &&
-        translated !== key
-      ) {
+      if (translated && typeof translated === 'string' && translated.trim() && translated !== key) {
         el.placeholder = translated.trim();
       }
     });
   }
 
   function normalizeParagraph(el, { clear = false } = {}) {
-  if (!el) return false;
-
-  const key = el.dataset?.i18nText;
-  const translated =
-    (key && window.i18n?.t ? window.i18n.t(key) : null);
-
-  const source = (
-    (translated && translated !== key ? translated : null) ||
-    el.getAttribute('data-text') ||
-    el.dataset?.text ||
-    el.textContent ||
-    ''
-  ).trim();
-
-  if (!source) return false;
-
-  el.dataset.text = source;
-  el.setAttribute('data-text', source);
-
-  el.classList.remove('typing-active', 'typing-done', 'type-done');
-  el.removeAttribute('data-spoken');
-  el.removeAttribute('data-typed');
-  el.removeAttribute('aria-busy');
-
-  if (clear) {
-    el.textContent = '';
-  } else if (!el.textContent.trim()) {
-    el.textContent = source;
+    if (!el) return false;
+    const key = el.dataset?.i18nText;
+    const translated = (key && window.i18n?.t ? window.i18n.t(key) : null);
+    const source = (
+      (translated && translated !== key ? translated : null) ||
+      el.getAttribute('data-text') ||
+      el.dataset?.text ||
+      el.textContent ||
+      ''
+    ).trim();
+    if (!source) return false;
+    el.dataset.text = source;
+    el.setAttribute('data-text', source);
+    el.classList.remove('typing-active', 'typing-done', 'type-done');
+    el.removeAttribute('data-spoken');
+    el.removeAttribute('data-typed');
+    el.removeAttribute('aria-busy');
+    if (clear) {
+      el.textContent = '';
+    } else if (!el.textContent.trim()) {
+      el.textContent = source;
+    }
+    return true;
   }
-
-  return true;
-}
 
   function prepareTypingNodes(root, { clear = false } = {}) {
     if (!root) return;
@@ -297,101 +262,90 @@
     }
   }
 
- async function typeOnce(el, { speed = TYPING_SPEED, speak = true, voiceCtx = null, runToken = 0 } = {}) {
-  if (!el) return;
-  if (runToken !== window.JCSenha.state.activeRunToken) return;
+  async function typeOnce(el, { speed = TYPING_SPEED, speak = true, voiceCtx = null, runToken = 0 } = {}) {
+    if (!el) return;
+    if (runToken !== window.JCSenha.state.activeRunToken) return;
 
-  const key = el.dataset?.i18nText;
-  const translated =
-    (key && window.i18n?.t ? window.i18n.t(key) : null);
+    const key = el.dataset?.i18nText;
+    const translated = (key && window.i18n?.t ? window.i18n.t(key) : null);
+    const rawText =
+      (translated && translated !== key ? translated : null) ||
+      el.dataset?.text ||
+      el.getAttribute('data-text') ||
+      el.textContent ||
+      '';
+    const text = String(rawText).trim();
+    if (!text) return;
 
-  const rawText =
-    (translated && translated !== key ? translated : null) ||
-    el.dataset?.text ||
-    el.getAttribute('data-text') ||
-    el.textContent ||
-    '';
+    el.dataset.text = text;
+    el.setAttribute('data-text', text);
 
-  const text = String(rawText).trim();
-  if (!text) return;
+    window.G = window.G || {};
+    const prevLock = !!window.G.__typingLock;
+    window.G.__typingLock = true;
 
-  el.dataset.text = text;
-  el.setAttribute('data-text', text);
+    el.textContent = '';
+    el.classList.add('typing-active');
+    el.classList.remove('typing-done', 'type-done');
+    el.removeAttribute('data-spoken');
+    el.setAttribute('aria-busy', 'true');
 
-  window.G = window.G || {};
-  const prevLock = !!window.G.__typingLock;
-  window.G.__typingLock = true;
+    let usedFallback = false;
 
-  el.textContent = '';
-  el.classList.add('typing-active');
-  el.classList.remove('typing-done', 'type-done');
-  el.removeAttribute('data-spoken');
-  el.setAttribute('aria-busy', 'true');
-
-  let usedFallback = false;
-
-  if (typeof window.runTyping === 'function') {
-    await new Promise((resolve) => {
-      try {
-        window.runTyping(el, text, () => resolve(), {
-          speed,
-          cursor: true
-        });
-      } catch (err) {
-        console.warn('[JCSenha] runTyping falhou, fallback local', err);
-        usedFallback = true;
-        resolve();
-      }
-    });
-  } else {
-    usedFallback = true;
-  }
-
-  if (runToken !== window.JCSenha.state.activeRunToken) return;
-
-  if (usedFallback) {
-    await localType(el, text, speed);
-  }
-
-  el.classList.remove('typing-active');
-  el.classList.add('typing-done');
-  el.removeAttribute('aria-busy');
-  el.setAttribute('data-typed', 'true');
-
-  window.G.__typingLock = prevLock;
-
-  if (speak && text && !el.dataset.spoken && runToken === window.JCSenha.state.activeRunToken) {
-    try {
-      if (window.EffectCoordinator?.speak) {
-        if (!el.dataset.spoken) {
-          cancelAllSpeech();
+    if (typeof window.runTyping === 'function') {
+      await new Promise((resolve) => {
+        try {
+          window.runTyping(el, text, () => resolve(), { speed, cursor: true });
+        } catch (err) {
+          console.warn('[JCSenha] runTyping falhou, fallback local', err);
+          usedFallback = true;
+          resolve();
         }
-
-      const speakOptions = {
-        rate: voiceCtx?.rate ?? 1.0,
-        pitch: voiceCtx?.pitch ?? 1.0,
-        lang: voiceCtx?.lang ?? document.documentElement.lang ?? 'pt-BR',
-        gender: voiceCtx?.voiceGender ?? 'female',
-        guide: voiceCtx?.guide ?? 'lumen',
-        style: voiceCtx?.style ?? 'acolhedora'
-      };
-
-      await window.EffectCoordinator.speak(text, speakOptions);
-      el.dataset.spoken = 'true';        
-      }
-      
-    } catch (err) {
-      console.error('[JCSenha] erro no TTS:', err);
+      });
+    } else {
+      usedFallback = true;
     }
+
+    if (runToken !== window.JCSenha.state.activeRunToken) return;
+
+    if (usedFallback) {
+      await localType(el, text, speed);
+    }
+
+    el.classList.remove('typing-active');
+    el.classList.add('typing-done');
+    el.removeAttribute('aria-busy');
+    el.setAttribute('data-typed', 'true');
+
+    window.G.__typingLock = prevLock;
+
+    if (speak && text && !el.dataset.spoken && runToken === window.JCSenha.state.activeRunToken) {
+      try {
+        if (window.EffectCoordinator?.speak && !el.dataset.spoken) {
+          cancelAllSpeech();
+          const speakOptions = {
+            rate:   voiceCtx?.rate   ?? 1.0,
+            pitch:  voiceCtx?.pitch  ?? 1.0,
+            lang:   voiceCtx?.lang   ?? document.documentElement.lang ?? 'pt-BR',
+            gender: voiceCtx?.voiceGender ?? 'female',
+            guide:  voiceCtx?.guide  ?? 'lumen',
+            style:  voiceCtx?.style  ?? 'acolhedora'
+          };
+          await window.EffectCoordinator.speak(text, speakOptions);
+          el.dataset.spoken = 'true';
+        }
+      } catch (err) {
+        console.error('[JCSenha] erro no TTS:', err);
+      }
+    }
+
+    await sleep(80);
   }
 
-  await sleep(80);
-}
-  
   function getTransitionSrc(root, btn) {
-    return (btn?.dataset?.transitionSrc)
-      || (root?.dataset?.transitionSrc)
-      || '/assets/videos/filme-senha-confirmada.mp4';
+    return (btn?.dataset?.transitionSrc) ||
+      (root?.dataset?.transitionSrc) ||
+      '/assets/videos/filme-senha-confirmada.mp4';
   }
 
   function saveSenha(value) {
@@ -413,8 +367,6 @@
     root.dataset.transitionReady = 'false';
 
     cancelAllSpeech();
-
-    // Mantém fallback visível até a hora real de começar
     prepareTypingNodes(root, { clear: false });
 
     await waitForTransitionUnlock();
@@ -433,14 +385,14 @@
 
     let instr1, instr2, instr3, instr4, input, toggle, btnNext, btnPrev;
     try {
-      instr1 = await waitForElement('#senha-instr1', { within: root });
-      instr2 = await waitForElement('#senha-instr2', { within: root });
-      instr3 = await waitForElement('#senha-instr3', { within: root });
-      instr4 = await waitForElement('#senha-instr4', { within: root });
-      input  = await waitForElement('#senha-input', { within: root });
-      toggle = await waitForElement('.btn-toggle-senha', { within: root });
-      btnNext = await waitForElement('#btn-senha-avancar', { within: root });
-      btnPrev = await waitForElement('#btn-senha-prev', { within: root });
+      instr1   = await waitForElement('#senha-instr1',       { within: root });
+      instr2   = await waitForElement('#senha-instr2',       { within: root });
+      instr3   = await waitForElement('#senha-instr3',       { within: root });
+      instr4   = await waitForElement('#senha-instr4',       { within: root });
+      input    = await waitForElement('#senha-input',        { within: root });
+      toggle   = await waitForElement('.btn-toggle-senha',   { within: root });
+      btnNext  = await waitForElement('#btn-senha-avancar',  { within: root });
+      btnPrev  = await waitForElement('#btn-senha-prev',     { within: root });
     } catch (e) {
       console.error('[JCSenha] elementos não encontrados:', e);
       window.toast?.('Erro: elementos da seção Senha não carregados.', 'error');
@@ -463,19 +415,11 @@
 
     window.JCSenha.state.activeRunToken = triggerToken;
 
-    // Só agora limpa para digitar
     seq.forEach((el) => normalizeParagraph(el, { clear: true }));
 
     for (const el of seq) {
       if (triggerToken !== window.JCSenha.state.activeRunToken) return;
-
-      await typeOnce(el, {
-        speed: TYPING_SPEED,
-        speak: true,
-        voiceCtx,
-        runToken: triggerToken
-      });
-
+      await typeOnce(el, { speed: TYPING_SPEED, speak: true, voiceCtx, runToken: triggerToken });
       await sleep(BETWEEN_BLOCKS_MS);
     }
 
@@ -484,28 +428,19 @@
     [btnPrev, btnNext, input, toggle].forEach((el) => el?.removeAttribute('disabled'));
     input.focus();
 
+    // --- Botão olho ---
     if (toggle.dataset.boundToggle !== '1') {
-  toggle.dataset.boundToggle = '1';
+      toggle.dataset.boundToggle = '1';
+      toggle.addEventListener('click', () => {
+        const inputSenha = root.querySelector('#senha-input');
+        if (!inputSenha) return;
+        const atual = inputSenha.getAttribute('type');
+        inputSenha.setAttribute('type', atual === 'password' ? 'text' : 'password');
+        console.log('[JCSenha] olho mágico:', atual, '->', inputSenha.getAttribute('type'));
+      });
+    }
 
-  toggle.addEventListener('click', () => {
-    const inputSenha = root.querySelector('#senha-input');
-    if (!inputSenha) return;
-
-    const atual = inputSenha.getAttribute('type');
-    inputSenha.setAttribute(
-      'type',
-      atual === 'password' ? 'text' : 'password'
-    );
-
-    console.log(
-      '[JCSenha] olho mágico:',
-      atual,
-      '->',
-      inputSenha.getAttribute('type')
-    );
-  });
-}
-
+    // --- Botão Voltar ---
     if (btnPrev.dataset.boundPrev !== '1') {
       btnPrev.dataset.boundPrev = '1';
       btnPrev.addEventListener('click', () => {
@@ -513,12 +448,10 @@
         window.JCSenha.state.initToken++;
         window.JCSenha.state.activeRunToken = 0;
         root.dataset.senhaInitialized = 'false';
-
         if (HOME_URL && /^https?:\/\//.test(HOME_URL)) {
           window.location.href = HOME_URL;
           return;
         }
-
         if (window.JC?.show) {
           window.JC.show(HOME_URL);
         } else {
@@ -527,52 +460,175 @@
       });
     }
 
- if (btnNext.dataset.boundNext !== '1') {
-  btnNext.dataset.boundNext = '1';
+    // --- Botão Avançar ---
+    if (btnNext.dataset.boundNext !== '1') {
+      btnNext.dataset.boundNext = '1';
 
-  btnNext.addEventListener('click', async () => {
-    const emailInput = root.querySelector('#senha-email');
-    const email = (emailInput?.value || '').trim();
+      btnNext.addEventListener('click', async () => {
+        const emailInput = root.querySelector('#senha-email');
+        const email = (emailInput?.value || '').trim();
 
-    if (!email) {
-      window.toast?.('Digite seu e-mail.', 'warning');
-      emailInput?.focus();
-      return;
+        if (!email) {
+          window.toast?.('Digite seu e-mail.', 'warning');
+          emailInput?.focus();
+          return;
+        }
+
+        const etapa = btnNext.dataset.authStage || 'start';
+
+        // ETAPA 1 — ENVIAR CÓDIGO
+        if (etapa === 'start') {
+          const senhaDigitada =
+            sessionStorage.getItem('jornada.senha_original') ||
+            sessionStorage.getItem('jornada.senha') ||
+            (input.value || '').trim();
+
+          if (!senhaDigitada) {
+            window.toast?.('Por favor, digite sua senha para continuar.', 'warning');
+            input.focus();
+            return;
+          }
+
+          saveSenha(senhaDigitada);
+          sessionStorage.setItem('jornada.email', email);
+          sessionStorage.setItem('jornada.senha', senhaDigitada);
+
+          btnNext.setAttribute('disabled', 'true');
+
+          try {
+            const resp = await fetch('https://lumen-backend-api.onrender.com/api/auth/start', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                email,
+                senha: senhaDigitada,
+                device_hash: localStorage.getItem('jornada_device_hash') || 'browser'
+              })
+            });
+
+            const data = await resp.json();
+
+            if (!resp.ok || !data.ok) {
+              throw new Error(data?.detail || data?.message || 'Senha inválida.');
+            }
+
+            window.toast?.('Código enviado ao e-mail.', 'success');
+
+            const wrap2fa = root.querySelector('#senha-2fa-wrap');
+            if (wrap2fa) wrap2fa.style.display = 'flex';
+
+            const confirmWrap = root.querySelector('#senha-confirmar-wrap');
+            if (confirmWrap) confirmWrap.style.display = 'flex';
+
+            input.value = '';
+            input.placeholder = 'Digite o código recebido por e-mail';
+            input.setAttribute('inputmode', 'numeric');
+
+            btnNext.dataset.authStage = 'verify';
+            btnNext.removeAttribute('disabled');
+
+          } catch (err) {
+            console.error('[JCSenha] erro ao iniciar 2FA:', err);
+            btnNext.removeAttribute('disabled');
+            window.toast?.(err.message || 'Erro ao validar senha.', 'error');
+          }
+
+          return;
+        }
+
+        // ETAPA 2 — VALIDAR CÓDIGO
+        if (etapa === 'verify') {
+          const code = (input.value || '').trim();
+          const senhaSalva =
+            sessionStorage.getItem('jornada.senha_original') ||
+            sessionStorage.getItem('jornada.senha') ||
+            '';
+
+          if (!code) {
+            window.toast?.('Digite o código recebido.', 'warning');
+            input.focus();
+            return;
+          }
+
+          btnNext.setAttribute('disabled', 'true');
+
+          try {
+            const resp = await fetch('https://lumen-backend-api.onrender.com/api/auth/verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                email,
+                senha: senhaSalva,
+                code,
+                device_hash: localStorage.getItem('jornada_device_hash') || 'browser'
+              })
+            });
+
+            const data = await resp.json();
+
+            if (!resp.ok || !data.ok) {
+              throw new Error(data?.detail || data?.message || 'Código inválido.');
+            }
+
+            console.log('[JCSenha] 2FA confirmado:', data);
+
+            if (window.JORNADA_SESSION?.iniciarSessao) {
+              await window.JORNADA_SESSION.iniciarSessao({ email });
+            }
+
+            sessionStorage.setItem('jornada.senha_original', senhaSalva);
+            sessionStorage.setItem('jornada.senha', senhaSalva);
+
+            window.toast?.('Acesso confirmado.', 'success');
+
+            if (window.JC?.show) {
+              window.JC.show('section-guia');
+            }
+
+          } catch (err) {
+            console.error('[JCSenha] erro ao confirmar 2FA:', err);
+            btnNext.removeAttribute('disabled');
+            window.toast?.(err.message || 'Erro ao confirmar código.', 'error');
+          }
+
+          return;
+        }
+      });
     }
 
-    const etapa = btnNext.dataset.authStage || 'start';
+    root.dataset.transitionReady = 'true';
+    root.dataset.senhaInitialized = 'true';
+    window.JCSenha.state.ready = true;
+    console.log('[JCSenha] pronto');
 
-    // =====================================================
-    // ETAPA 1 — ENVIAR CÓDIGO
-    // =====================================================
-    if (etapa === 'start') {
-      const senhaDigitada =
-        sessionStorage.getItem('jornada.senha_original') ||
-        sessionStorage.getItem('jornada.senha') ||
-       (input.value || '').trim();
+    // --- Botões 2FA dedicados ---
+    const btnEnviar2FA   = root.querySelector('#btn-enviar-2fa');
+    const btnReenviar2FA = root.querySelector('#btn-reenviar-2fa');
+    const emailInput2FA  = root.querySelector('#senha-email');
 
+    async function enviarCodigo2FA() {
+      const email         = (emailInput2FA?.value || '').trim();
+      const senhaDigitada = (input.value || '').trim();
+
+      if (!email) {
+        window.toast?.('Digite seu e-mail.', 'warning');
+        return;
+      }
       if (!senhaDigitada) {
-        window.toast?.('Por favor, digite sua senha para continuar.', 'warning');
-        input.focus();
+        window.toast?.('Digite sua palavra-chave.', 'warning');
         return;
       }
 
-      saveSenha(senhaDigitada);
-      sessionStorage.setItem('jornada.email', email);
-      sessionStorage.setItem('jornada.senha', senhaDigitada);
-
-      btnNext.setAttribute('disabled', 'true');
-
       try {
+        btnEnviar2FA?.setAttribute('disabled', 'true');
+
         const resp = await fetch('https://lumen-backend-api.onrender.com/api/auth/start', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             email,
             senha: senhaDigitada,
-            device_hash: localStorage.getItem('jornada_device_hash') || 'browser'
+            device_hash: localStorage.getItem('jornada_device_hash') || navigator.userAgent
           })
         });
 
@@ -581,6 +637,9 @@
         if (!resp.ok || !data.ok) {
           throw new Error(data?.detail || data?.message || 'Senha inválida.');
         }
+
+        sessionStorage.setItem('jornada.email', email);
+        sessionStorage.setItem('jornada.senha', senhaDigitada);
 
         window.toast?.('Código enviado ao e-mail.', 'success');
 
@@ -591,232 +650,30 @@
         if (confirmWrap) confirmWrap.style.display = 'flex';
 
         input.value = '';
-        input.placeholder = 'Digite o código recebido por e-mail';
+        input.placeholder = 'Digite o código enviado...';
         input.setAttribute('inputmode', 'numeric');
 
         btnNext.dataset.authStage = 'verify';
-        btnNext.removeAttribute('disabled');
-
-        return;
 
       } catch (err) {
-        console.error('[JCSenha] erro ao iniciar 2FA:', err);
-        btnNext.removeAttribute('disabled');
-        window.toast?.(err.message || 'Erro ao validar senha.', 'error');
-        return;
+        console.error('[JCSenha] erro ao enviar código:', err);
+        window.toast?.(err.message || 'Erro ao enviar código.', 'error');
+      } finally {
+        btnEnviar2FA?.removeAttribute('disabled');
       }
     }
 
-    // =====================================================
-    // ETAPA 2 — VALIDAR CÓDIGO
-    // =====================================================
-    if (etapa === 'verify') {
-      const code = (input.value || '').trim();
-      const senhaSalva =
-      sessionStorage.getItem('jornada.senha_original') ||
-      sessionStorage.getItem('jornada.senha') ||
-      '';
-
-      if (!code) {
-        window.toast?.('Digite o código recebido.', 'warning');
-        input.focus();
-        return;
-      }
-
-      btnNext.setAttribute('disabled', 'true');
-
-      try {
-        const resp = await fetch('https://lumen-backend-api.onrender.com/api/auth/verify', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            email,
-            senha: senhaSalva,
-            code,
-            device_hash: localStorage.getItem('jornada_device_hash') || 'browser'
-          })
-        });
-
-        const data = await resp.json();
-
-        if (!resp.ok || !data.ok) {
-          throw new Error(data?.detail || data?.message || 'Código inválido.');
-        }
-
-        console.log('[JCSenha] 2FA confirmado:', data);
-
-        if (window.JORNADA_SESSION?.iniciarSessao) {
-          await window.JORNADA_SESSION.iniciarSessao({ email });
-        }
-
-        sessionStorage.setItem(
-         'jornada.senha_original',
-         senhaDigitada
-       );
-
-       sessionStorage.setItem(
-        'jornada.senha',
-        senhaDigitada
-      );
-
-        window.toast?.('Acesso confirmado.', 'success');
-
-        if (window.JC?.show) {
-          window.JC.show('section-guia');
-        }
-
-      } catch (err) {
-        console.error('[JCSenha] erro ao confirmar 2FA:', err);
-        btnNext.removeAttribute('disabled');
-        window.toast?.(err.message || 'Erro ao confirmar código.', 'error');
-      }
+    if (btnEnviar2FA && btnEnviar2FA.dataset.bound !== '1') {
+      btnEnviar2FA.dataset.bound = '1';
+      btnEnviar2FA.addEventListener('click', enviarCodigo2FA);
     }
-  });
-}
-    
-root.dataset.transitionReady = 'true';
-root.dataset.senhaInitialized = 'true';
-window.JCSenha.state.ready = true;
-console.log('[JCSenha] pronto');
 
-const btnEnviar2FA = root.querySelector('#btn-enviar-2fa');
-const btnReenviar2FA = root.querySelector('#btn-reenviar-2fa');
-const emailInput = root.querySelector('#senha-email');
-
- // =====================================================
-// ENVIAR CÓDIGO 2FA
-// =====================================================
-
-async function enviarCodigo2FA() {
-
-  const email = (emailInput?.value || '').trim();
-  const senhaDigitada = (input.value || '').trim();
-
-  if (!email) {
-    window.toast?.('Digite seu e-mail.', 'warning');
-    return;
+    if (btnReenviar2FA && btnReenviar2FA.dataset.bound !== '1') {
+      btnReenviar2FA.dataset.bound = '1';
+      btnReenviar2FA.addEventListener('click', enviarCodigo2FA);
+    }
   }
 
-  if (!senhaDigitada) {
-    window.toast?.('Digite sua palavra-chave.', 'warning');
-    return;
-  }
-
-  try {
-
-    btnEnviar2FA?.setAttribute('disabled', 'true');
-
-    const resp = await fetch(
-      'https://lumen-backend-api.onrender.com/api/auth/start',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          email,
-          senha: senhaDigitada,
-          device_hash:
-            localStorage.getItem('jornada_device_hash') ||
-            navigator.userAgent
-        })
-      }
-    );
-
-    const data = await resp.json();
-
-    if (!resp.ok || !data.ok) {
-      throw new Error(
-        data?.detail ||
-        data?.message ||
-        'Senha inválida.'
-      );
-    }
-
-    sessionStorage.setItem('jornada.email', email);
-    sessionStorage.setItem('jornada.senha', senhaDigitada);
-
-    window.toast?.(
-      'Código enviado ao e-mail.',
-      'success'
-    );
-
-    // MOSTRA ÁREA 2FA
-    const wrap2fa =
-      root.querySelector('#senha-2fa-wrap');
-
-    if (wrap2fa) {
-      wrap2fa.style.display = 'flex';
-    }
-
-    const confirmWrap =
-      root.querySelector('#senha-confirmar-wrap');
-
-    if (confirmWrap) {
-      confirmWrap.style.display = 'flex';
-    }
-
-    // ALTERA INPUT PARA CÓDIGO
-    input.value = '';
-
-    input.placeholder =
-      'Digite o código enviado...';
-
-    input.setAttribute('inputmode', 'numeric');
-
-    // MUDA ETAPA
-    btnNext.dataset.authStage = 'verify';
-
-  } catch (err) {
-
-    console.error(
-      '[JCSenha] erro ao enviar código:',
-      err
-    );
-
-    window.toast?.(
-      err.message || 'Erro ao enviar código.',
-      'error'
-    );
-
-  } finally {
-
-    btnEnviar2FA?.removeAttribute('disabled');
-  }
-}
-
-// =====================================================
-// LISTENERS
-// =====================================================
-
-if (
-  btnEnviar2FA &&
-  btnEnviar2FA.dataset.bound !== '1'
-) {
-
-  btnEnviar2FA.dataset.bound = '1';
-
-  btnEnviar2FA.addEventListener(
-    'click',
-    enviarCodigo2FA
-  );
-}
-
-if (
-  btnReenviar2FA &&
-  btnReenviar2FA.dataset.bound !== '1'
-) {
-
-  btnReenviar2FA.dataset.bound = '1';
-
-  btnReenviar2FA.addEventListener(
-    'click',
-    enviarCodigo2FA
-  );
-}   
-                               
   function onSectionShown(evt) {
     const { sectionId, node } = evt?.detail || {};
     if (sectionId !== SECTION_ID) return;
@@ -829,7 +686,7 @@ if (
     const myToken = window.JCSenha.state.initToken;
 
     initOnce(root, myToken);
-  }      
+  }
 
   function bind() {
     if (!window.JCSenha.state.listenerOn) {
