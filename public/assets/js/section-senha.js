@@ -528,74 +528,231 @@
     }
 
     if (btnNext.dataset.boundNext !== '1') {
-      btnNext.dataset.boundNext = '1';
-      btnNext.addEventListener('click', () => {
-        const value = (input.value || '').trim();
-        if (!value) {
-          window.toast?.('Por favor, digite sua senha para continuar.', 'warning');
-          input.focus();
-          return;
-        }
+  btnNext.dataset.boundNext = '1';
+
+  btnNext.addEventListener('click', async () => {
+
+    const value = (input.value || '').trim();
+
+    if (!value) {
+      window.toast?.(
+        'Por favor, digite sua senha para continuar.',
+        'warning'
+      );
+      input.focus();
+      return;
+    }
 
     const emailInput = root.querySelector('#senha-email');
     const email = (emailInput?.value || '').trim();
 
     if (!email) {
-     window.toast?.('Digite seu e-mail.', 'warning');
-    emailInput?.focus();
-    return;
-   }
+      window.toast?.('Digite seu e-mail.', 'warning');
+      emailInput?.focus();
+      return;
+    }
 
-   saveSenha(value);
+    saveSenha(value);
 
-   btnNext.setAttribute('disabled', 'true');
+    btnNext.setAttribute('disabled', 'true');
 
-   fetch('https://lumen-backend-api.onrender.com/api/auth/start', {
-    method: 'POST',
-    headers: {
-     'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      email,
-      senha: value,
-      device_hash: navigator.userAgent
-    })
-  })
-  .then(async (r) => {
-    const data = await r.json();
+    try {
 
-    if (!r.ok || !data.ok) {
-      throw new Error(data?.detail || data?.message || 'Falha ao iniciar autenticação.');
-   }
+      // =====================================================
+      // 1º PASSO → ENVIAR CÓDIGO 2FA
+      // =====================================================
 
-   window.toast?.('Código enviado ao e-mail.', 'success');
+      const resp = await fetch(
+        'https://lumen-backend-api.onrender.com/api/auth/start',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email,
+            senha: value,
+            device_hash:
+              localStorage.getItem('jornada_device_hash') ||
+              navigator.userAgent
+          })
+        }
+      );
 
-  const wrap2fa = root.querySelector('#senha-2fa-wrap');
-  wrap2fa.style.display = 'flex';
-    
-  const confirmWrap = root.querySelector('#senha-confirmar-wrap');
+      const data = await resp.json();
 
-  if (confirmWrap) {
-    confirmWrap.style.display = 'flex';
-  }  
+      if (!resp.ok || !data.ok) {
+        throw new Error(
+          data?.detail ||
+          data?.message ||
+          'Falha ao iniciar autenticação.'
+        );
+      }
 
-  sessionStorage.setItem('jornada.email', email);
-  sessionStorage.setItem('jornada.senha', value);
+      console.log('[JCSenha] código enviado:', data);
 
-  btnNext.style.display = 'none';
- })
-.catch((err) => {
-  console.error(err);
+      window.toast?.(
+        'Código enviado ao e-mail.',
+        'success'
+      );
 
-  btnNext.removeAttribute('disabled');
+      // =====================================================
+      // MOSTRA CAMPOS 2FA
+      // =====================================================
 
-  window.toast?.(
-    err.message || 'Erro ao validar senha.',
-    'error'
-  );
-});
-});
-} 
+      const wrap2fa =
+        root.querySelector('#senha-2fa-wrap');
+
+      if (wrap2fa) {
+        wrap2fa.style.display = 'flex';
+      }
+
+      const confirmWrap =
+        root.querySelector('#senha-confirmar-wrap');
+
+      if (confirmWrap) {
+        confirmWrap.style.display = 'flex';
+      }
+
+      sessionStorage.setItem('jornada.email', email);
+      sessionStorage.setItem('jornada.senha', value);
+
+      btnNext.style.display = 'none';
+
+      // =====================================================
+      // BOTÃO CONFIRMAR 2FA
+      // =====================================================
+
+      const btnConfirmar =
+        root.querySelector('#btn-confirmar-2fa');
+
+      if (
+        btnConfirmar &&
+        btnConfirmar.dataset.boundConfirm !== '1'
+      ) {
+
+        btnConfirmar.dataset.boundConfirm = '1';
+
+        btnConfirmar.addEventListener(
+          'click',
+          async () => {
+
+            const code =
+              (
+                root.querySelector('#senha-input')
+                  ?.value || ''
+              ).trim();
+
+            if (!code) {
+              alert('Digite o código recebido.');
+              return;
+            }
+
+            try {
+
+              // =====================================================
+              // 2º PASSO → VERIFY 2FA
+              // =====================================================
+
+              const verifyResp = await fetch(
+                'https://lumen-backend-api.onrender.com/api/auth/verify',
+                {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                    email,
+                    senha: value,
+                    code,
+                    device_hash:
+                      localStorage.getItem(
+                        'jornada_device_hash'
+                      ) || 'browser'
+                  })
+                }
+              );
+
+              const verifyData =
+                await verifyResp.json();
+
+              if (!verifyResp.ok) {
+
+                alert(
+                  verifyData.detail ||
+                  'Código inválido.'
+                );
+
+                return;
+              }
+
+              console.log(
+                '[JCSenha] 2FA confirmado:',
+                verifyData
+              );
+
+              // =====================================================
+              // INICIA SESSÃO
+              // =====================================================
+
+              if (
+                window.JORNADA_SESSION?.iniciarSessao
+              ) {
+
+                await window.JORNADA_SESSION
+                  .iniciarSessao({
+                    email
+                  });
+              }
+
+              window.toast?.(
+                'Autenticação concluída.',
+                'success'
+              );
+
+              // =====================================================
+              // AVANÇA PARA GUIA
+              // =====================================================
+
+              await sleep(300);
+
+              if (window.JC?.show) {
+
+                window.JC.show('section-guia');
+
+              } else {
+
+                location.hash = '#section-guia';
+              }
+
+            } catch (err) {
+
+              console.error(
+                '[JCSenha] erro ao confirmar 2FA:',
+                err
+              );
+
+              alert(
+                'Erro ao confirmar código.'
+              );
+            }
+          }
+        );
+      }
+
+    } catch (err) {
+
+      console.error(err);
+
+      btnNext.removeAttribute('disabled');
+
+      window.toast?.(
+        err.message || 'Erro ao validar senha.',
+        'error'
+      );
+    }
+  });
+}
     
 root.dataset.transitionReady = 'true';
 root.dataset.senhaInitialized = 'true';
