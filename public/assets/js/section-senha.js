@@ -589,6 +589,47 @@ root.dataset.senhaInitialized = 'true';
 window.JCSenha.state.ready = true;
 console.log('[JCSenha] pronto');
 
+const btnEnviar2FA = root.querySelector('#btn-enviar-2fa');
+const btnReenviar2FA = root.querySelector('#btn-reenviar-2fa');
+const emailInput = root.querySelector('#senha-email');
+
+async function enviarCodigo2FA() {
+  const email = (emailInput?.value || '').trim();
+  const senha = 'TESTE123';
+
+  if (!email) {
+    alert('Digite seu e-mail para receber o código.');
+    return;
+  }
+
+  try {
+    const resp = await fetch('https://lumen-backend-api.onrender.com/api/auth/start', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email,
+        senha,
+        device_hash: localStorage.getItem('jornada_device_hash') || 'browser'
+      })
+    });
+
+    const data = await resp.json();
+
+    if (!resp.ok) {
+      alert(data.detail || 'Não foi possível enviar o código.');
+      return;
+    }
+
+    alert('Código enviado ao e-mail informado.');
+  } catch (err) {
+    console.error('[JCSenha] erro ao enviar código:', err);
+    alert('Erro ao enviar código. Tente novamente.');
+  }
+}
+
+btnEnviar2FA?.addEventListener('click', enviarCodigo2FA);
+btnReenviar2FA?.addEventListener('click', enviarCodigo2FA);    
+
 }
                                
   function onSectionShown(evt) {
