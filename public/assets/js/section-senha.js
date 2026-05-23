@@ -612,7 +612,10 @@
     // =====================================================
     if (etapa === 'verify') {
       const code = (input.value || '').trim();
-      const senhaSalva = sessionStorage.getItem('jornada.senha') || '';
+      const senhaSalva =
+      sessionStorage.getItem('jornada.senha_original') ||
+      sessionStorage.getItem('jornada.senha') ||
+      '';
 
       if (!code) {
         window.toast?.('Digite o código recebido.', 'warning');
