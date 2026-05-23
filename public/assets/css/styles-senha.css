@@ -604,3 +604,145 @@
     grid-template-columns: 1fr 62px;
   }
 }
+/* ======================================================
+   PATCH DIAMANTE 2FA — ALINHAR COMO PRINT 2
+   ====================================================== */
+
+#section-senha .senha-2fa-mode {
+  gap: 18px !important;
+}
+
+#section-senha .senha-code-row {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 72px !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: min(100%, 640px) !important;
+  margin: 16px auto 0 !important;
+}
+
+#section-senha .senha-code-row #senha-2fa-code {
+  width: 100% !important;
+  min-height: 64px !important;
+  border-radius: 16px !important;
+  margin: 0 !important;
+}
+
+#section-senha .senha-code-row .btn-toggle-senha {
+  width: 72px !important;
+  max-width: 72px !important;
+  min-width: 72px !important;
+  height: 64px !important;
+  min-height: 64px !important;
+  margin: 0 !important;
+  border-radius: 14px !important;
+  font-size: 26px !important;
+}
+
+#section-senha .senha-email-row {
+  width: min(100%, 640px) !important;
+  margin: 14px auto 0 !important;
+}
+
+#section-senha #senha-email {
+  width: 100% !important;
+  min-height: 68px !important;
+  text-align: center !important;
+  font-size: 18px !important;
+}
+
+#section-senha .senha-send-wrap,
+#section-senha .senha-reenvio-wrap {
+  width: min(100%, 640px) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+#section-senha .senha-btn-wide {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 58px !important;
+}
+
+#section-senha .senha-divider {
+  width: min(100%, 640px) !important;
+  height: 28px !important;
+  margin: 12px auto 4px !important;
+  position: relative !important;
+  text-align: center !important;
+}
+
+#section-senha .senha-divider::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 215, 0, .75),
+    transparent
+  );
+}
+
+#section-senha .senha-divider span {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+  height: 28px;
+  color: #ffd700;
+  background: #080a12;
+  text-shadow: 0 0 8px rgba(255, 215, 0, .85);
+}
+
+#section-senha .senha-copy-mini {
+  width: 100% !important;
+  min-height: 58px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-bottom: 12px !important;
+  font-size: 18px !important;
+}
+
+#section-senha .senha-actions {
+  width: min(100%, 640px) !important;
+  max-width: 640px !important;
+  gap: 26px !important;
+  margin-top: 22px !important;
+}
+
+#section-senha .senha-actions button {
+  max-width: 260px !important;
+  min-height: 58px !important;
+}
+
+@media (max-width: 768px) {
+  #section-senha .senha-code-row,
+  #section-senha .senha-email-row,
+  #section-senha .senha-send-wrap,
+  #section-senha .senha-reenvio-wrap,
+  #section-senha .senha-divider,
+  #section-senha .senha-actions {
+    width: 100% !important;
+  }
+
+  #section-senha .senha-code-row {
+    grid-template-columns: minmax(0, 1fr) 58px !important;
+  }
+
+  #section-senha .senha-code-row .btn-toggle-senha {
+    width: 58px !important;
+    max-width: 58px !important;
+    min-width: 58px !important;
+  }
+
+  #section-senha .senha-actions {
+    gap: 12px !important;
+  }
+}
