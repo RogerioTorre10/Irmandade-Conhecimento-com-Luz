@@ -546,7 +546,10 @@
     // ETAPA 1 — ENVIAR CÓDIGO
     // =====================================================
     if (etapa === 'start') {
-      const senhaDigitada = (input.value || '').trim();
+      const senhaDigitada =
+        sessionStorage.getItem('jornada.senha_original') ||
+        sessionStorage.getItem('jornada.senha') ||
+       (input.value || '').trim();
 
       if (!senhaDigitada) {
         window.toast?.('Por favor, digite sua senha para continuar.', 'warning');
@@ -644,6 +647,16 @@
         if (window.JORNADA_SESSION?.iniciarSessao) {
           await window.JORNADA_SESSION.iniciarSessao({ email });
         }
+
+        sessionStorage.setItem(
+         'jornada.senha_original',
+         senhaDigitada
+       );
+
+       sessionStorage.setItem(
+        'jornada.senha',
+        senhaDigitada
+      );
 
         window.toast?.('Acesso confirmado.', 'success');
 
