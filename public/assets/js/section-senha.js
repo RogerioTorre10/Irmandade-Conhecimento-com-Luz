@@ -485,13 +485,26 @@
     input.focus();
 
     if (toggle.dataset.boundToggle !== '1') {
-      toggle.dataset.boundToggle = '1';
-      toggle.addEventListener('click', () => {
-        const was = input.type;
-        input.type = input.type === 'password' ? 'text' : 'password';
-        console.log('[JCSenha] olho mágico:', was, '→', input.type);
-      });
-    }
+  toggle.dataset.boundToggle = '1';
+
+  toggle.addEventListener('click', () => {
+    const inputSenha = root.querySelector('#senha-input');
+    if (!inputSenha) return;
+
+    const atual = inputSenha.getAttribute('type');
+    inputSenha.setAttribute(
+      'type',
+      atual === 'password' ? 'text' : 'password'
+    );
+
+    console.log(
+      '[JCSenha] olho mágico:',
+      atual,
+      '->',
+      inputSenha.getAttribute('type')
+    );
+  });
+}
 
     if (btnPrev.dataset.boundPrev !== '1') {
       btnPrev.dataset.boundPrev = '1';
