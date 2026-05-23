@@ -746,3 +746,31 @@
     gap: 12px !important;
   }
 }
+
+#section-senha .senha-code-row {
+  display: grid !important;
+  grid-template-columns: 1fr 58px !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+#section-senha .senha-code-row #senha-input {
+  width: 100% !important;
+  height: 62px !important;
+  min-height: 62px !important;
+  margin: 0 !important;
+}
+
+#section-senha .senha-code-row .btn-toggle-senha {
+  width: 58px !important;
+  min-width: 58px !important;
+  max-width: 58px !important;
+  height: 62px !important;
+  min-height: 62px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transform: none !important;
+}
