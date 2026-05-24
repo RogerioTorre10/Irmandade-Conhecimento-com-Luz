@@ -648,6 +648,7 @@
         }
 
         sessionStorage.setItem('jornada.email', email);
+        sessionStorage.setItem('jornada.senha_original', senhaDigitada);
         sessionStorage.setItem('jornada.senha', senhaDigitada);
 
         window.toast?.('Código enviado ao e-mail.', 'success');
