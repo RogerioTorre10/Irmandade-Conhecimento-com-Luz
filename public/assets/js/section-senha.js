@@ -717,9 +717,9 @@ async function enviarCodigo2FA() {
     const confirmWrap = root.querySelector('#senha-confirmar-wrap');
     if (confirmWrap) confirmWrap.style.display = 'flex';
 
-    input.value = '';
-    input.placeholder = 'Digite o código enviado...';
-    input.setAttribute('inputmode', 'numeric');
+    inputSenha.value = '';
+    inputSenha.placeholder = 'Digite o código enviado...';
+    inputSenha.setAttribute('inputmode', 'numeric');
 
     btnNext.dataset.authStage = 'verify';
 
