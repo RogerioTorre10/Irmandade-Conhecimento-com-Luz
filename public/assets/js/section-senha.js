@@ -514,31 +514,138 @@
       });
     }
 
-    if (btnNext.dataset.boundNext !== '1') {
-      btnNext.dataset.boundNext = '1';
-      btnNext.addEventListener('click', () => {
-        const value = (input.value || '').trim();
-        if (!value) {
-          window.toast?.('Por favor, digite sua senha para continuar.', 'warning');
-          input.focus();
-          return;
-        }
+   if (btnNext.dataset.boundNext !== '1') {
+  btnNext.dataset.boundNext = '1';
 
-        saveSenha(value);
-        input.type = 'password';
-        cancelAllSpeech();
+  btnNext.addEventListener('click', async () => {
+    const emailInput = root.querySelector('#senha-email');
+    const email = (emailInput?.value || '').trim();
 
-        [btnNext, input, toggle].forEach((el) => el?.setAttribute('disabled', 'true'));
-
-        const src = getTransitionSrc(root, btnNext);
-        if (typeof window.playTransitionVideo === 'function') {
-          window.playTransitionVideo(src, NEXT_SECTION_ID);
-        } else {
-          window.JC?.show?.(NEXT_SECTION_ID) ?? (location.hash = `#${NEXT_SECTION_ID}`);
-        }
-      });
+    if (!email) {
+      window.toast?.('Digite seu e-mail.', 'warning');
+      emailInput?.focus();
+      return;
     }
 
+    const etapa = btnNext.dataset.authStage || 'start';
+
+    // =====================================================
+    // ETAPA 1 — ENVIAR CÓDIGO
+    // =====================================================
+    if (etapa === 'start') {
+      const senhaDigitada = (input.value || '').trim();
+
+      if (!senhaDigitada) {
+        window.toast?.('Por favor, digite sua senha para continuar.', 'warning');
+        input.focus();
+        return;
+      }
+
+      saveSenha(senhaDigitada);
+      sessionStorage.setItem('jornada.email', email);
+      sessionStorage.setItem('jornada.senha', senhaDigitada);
+
+      btnNext.setAttribute('disabled', 'true');
+
+      try {
+        const resp = await fetch('https://lumen-backend-api.onrender.com/api/auth/start', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email,
+            senha: senhaDigitada,
+            device_hash: localStorage.getItem('jornada_device_hash') || 'browser'
+          })
+        });
+
+        const data = await resp.json();
+
+        if (!resp.ok || !data.ok) {
+          throw new Error(data?.detail || data?.message || 'Senha inválida.');
+        }
+
+        window.toast?.('Código enviado ao e-mail.', 'success');
+
+        const wrap2fa = root.querySelector('#senha-2fa-wrap');
+        if (wrap2fa) wrap2fa.style.display = 'flex';
+
+        const confirmWrap = root.querySelector('#senha-confirmar-wrap');
+        if (confirmWrap) confirmWrap.style.display = 'flex';
+
+        input.value = '';
+        input.placeholder = 'Digite o código recebido por e-mail';
+        input.setAttribute('inputmode', 'numeric');
+
+        btnNext.dataset.authStage = 'verify';
+        btnNext.removeAttribute('disabled');
+
+        return;
+
+      } catch (err) {
+        console.error('[JCSenha] erro ao iniciar 2FA:', err);
+        btnNext.removeAttribute('disabled');
+        window.toast?.(err.message || 'Erro ao validar senha.', 'error');
+        return;
+      }
+    }
+
+    // =====================================================
+    // ETAPA 2 — VALIDAR CÓDIGO
+    // =====================================================
+    if (etapa === 'verify') {
+      const code = (input.value || '').trim();
+      const senhaSalva = sessionStorage.getItem('jornada.senha') || '';
+
+      if (!code) {
+        window.toast?.('Digite o código recebido.', 'warning');
+        input.focus();
+        return;
+      }
+
+      btnNext.setAttribute('disabled', 'true');
+
+      try {
+        const resp = await fetch('https://lumen-backend-api.onrender.com/api/auth/verify', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email,
+            senha: senhaSalva,
+            code,
+            device_hash: localStorage.getItem('jornada_device_hash') || 'browser'
+          })
+        });
+
+        const data = await resp.json();
+
+        if (!resp.ok || !data.ok) {
+          throw new Error(data?.detail || data?.message || 'Código inválido.');
+        }
+
+        console.log('[JCSenha] 2FA confirmado:', data);
+
+        if (window.JORNADA_SESSION?.iniciarSessao) {
+          await window.JORNADA_SESSION.iniciarSessao({ email });
+        }
+
+        window.toast?.('Acesso confirmado.', 'success');
+
+        if (window.JC?.show) {
+          window.JC.show('section-guia');
+        }
+
+      } catch (err) {
+        console.error('[JCSenha] erro ao confirmar 2FA:', err);
+        btnNext.removeAttribute('disabled');
+        window.toast?.(err.message || 'Erro ao confirmar código.', 'error');
+      }
+    }
+  });
+}
     root.dataset.transitionReady = 'true';
     root.dataset.senhaInitialized = 'true';
     window.JCSenha.state.ready = true;
