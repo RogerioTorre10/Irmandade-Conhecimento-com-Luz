@@ -670,16 +670,9 @@ async function enviarCodigo2FA() {
   const email =
     (emailInput2FA?.value || '').trim();
 
-  const senhaDigitada =
-    sessionStorage.getItem(
-      'jornada.senha_original'
-    ) ||
-
-    sessionStorage.getItem(
-      'jornada.senha'
-    ) ||
-
-    (inputSenha?.value || '').trim();
+ const senhaDigitada =
+  (input.value || '').trim() ||
+  'TESTE123';
 
   if (!email) {
 
