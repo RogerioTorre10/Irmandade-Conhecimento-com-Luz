@@ -242,6 +242,7 @@
 #section-senha .password-wrap,
 #section-senha .password-field {
   display: flex !important;
+  position: relative !important;
   flex-direction: column !important;
   align-items: center !important;
   width: 100% !important;
