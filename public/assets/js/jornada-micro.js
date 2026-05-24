@@ -297,6 +297,12 @@
     window.__MIC_ACTIVE__ = true;
     state.starting = true;
     setButton(true);
+    if (window.__MIC_STARTING__ === true) {
+       warn('start bloqueado — já iniciando');
+      return;
+    }
+
+    window.__MIC_STARTING__ = true;
 
     clearRestart();
 
