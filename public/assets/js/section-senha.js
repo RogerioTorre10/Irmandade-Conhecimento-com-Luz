@@ -608,20 +608,25 @@
     const emailInput2FA  = root.querySelector('#senha-email');
 
     async function enviarCodigo2FA() {
-      const email         = (emailInput2FA?.value || '').trim();
-      const senhaDigitada =
-      sessionStorage.getItem('jornada.senha_original') ||
-      sessionStorage.getItem('jornada.senha') ||
-      (input.value || '').trim();
+     const email = (emailInput2FA?.value || '').trim();
 
-      if (!email) {
-        window.toast?.('Digite seu e-mail.', 'warning');
-        return;
-      }
-      if (!senhaDigitada) {
-        window.toast?.('Digite sua palavra-chave.', 'warning');
-        return;
-      }
+     const etapaAtual = btnNext.dataset.authStage || 'start';
+
+     const senhaDigitada =
+       sessionStorage.getItem('jornada.senha_original') ||
+       sessionStorage.getItem('jornada.senha') ||
+       (etapaAtual === 'start' ? (input.value || '').trim() : '');
+
+     if (!email) {
+       window.toast?.('Digite seu e-mail.', 'warning');
+      return;
+    }
+
+    if (!senhaDigitada) {
+      window.toast?.('Digite sua palavra-chave antes de solicitar o código.', 'warning');
+      input.focus();
+      return;
+     }
 
       try {
         btnEnviar2FA?.setAttribute('disabled', 'true');
