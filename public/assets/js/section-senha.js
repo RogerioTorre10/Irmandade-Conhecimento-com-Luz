@@ -408,6 +408,16 @@
     const voiceCtx = syncGuideVoiceContext(root);
 
     [btnPrev, btnNext, input, toggle].forEach((el) => el?.setAttribute('disabled', 'true'));
+   
+    btnNext.dataset.authStage = 'start';
+
+    input.value = '';
+    input.setAttribute('type', 'password');
+    input.removeAttribute('inputmode');
+    input.placeholder = 'Digite sua palavra-chave';
+
+    sessionStorage.removeItem('jornada.senha_original');
+    sessionStorage.removeItem('jornada.senha');
 
     await sleep(INITIAL_DELAY_MS);
 
