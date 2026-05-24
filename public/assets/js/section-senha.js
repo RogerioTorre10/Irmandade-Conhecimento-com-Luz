@@ -609,7 +609,10 @@
 
     async function enviarCodigo2FA() {
       const email         = (emailInput2FA?.value || '').trim();
-      const senhaDigitada = (input.value || '').trim();
+      const senhaDigitada =
+      sessionStorage.getItem('jornada.senha_original') ||
+      sessionStorage.getItem('jornada.senha') ||
+      (input.value || '').trim();
 
       if (!email) {
         window.toast?.('Digite seu e-mail.', 'warning');
