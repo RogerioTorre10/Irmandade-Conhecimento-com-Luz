@@ -173,6 +173,55 @@ textarea{
   color: var(--fg);
 }
 
+/* ======================================================
+   PATCH FINAL — OLHO MÁGICO ALINHADO AO INPUT 2FA
+   vence styles-base.css
+   ====================================================== */
+
+#section-senha .senha-code-row {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 62px !important;
+  align-items: stretch !important;
+  gap: 10px !important;
+  width: 100% !important;
+  max-width: 640px !important;
+  margin: 16px auto 0 !important;
+}
+
+#section-senha .senha-code-row #senha-input {
+  width: 100% !important;
+  height: 64px !important;
+  min-height: 64px !important;
+  margin: 0 !important;
+  padding: 14px 18px !important;
+  position: relative !important;
+}
+
+#section-senha .senha-code-row .btn-toggle-senha {
+  position: static !important;
+  top: auto !important;
+  right: auto !important;
+  transform: none !important;
+
+  width: 62px !important;
+  min-width: 62px !important;
+  max-width: 62px !important;
+
+  height: 64px !important;
+  min-height: 64px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  align-self: stretch !important;
+  border-radius: 14px !important;
+  z-index: 10 !important;
+}
+
 /* botões compartilhados */
 .btn{
   display: block;
