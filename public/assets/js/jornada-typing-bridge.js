@@ -56,23 +56,29 @@
     return __normalizeLang(raw);
   }
 
-  function getGuideNow() {
+ function getGuideNow() {
   const raw = String(
-    sessionStorage.getItem('jornada.guide') ||
-    sessionStorage.getItem('guiaEscolhido') ||
-    sessionStorage.getItem('jornada.guia') ||
-    localStorage.getItem('jornada.guide') ||
-    localStorage.getItem('guiaEscolhido') ||
-    localStorage.getItem('jornada.guia') ||
+    window.__GUIA_ATIVO ||
+    window.guiaAtual ||
+    window.JORNADA_GUIA_ATIVO ||
     window.currentGuide ||
+    sessionStorage.getItem('jornada.guide') ||
+    sessionStorage.getItem('jornada.guia') ||
+    sessionStorage.getItem('guiaEscolhido') ||
+    sessionStorage.getItem('guiaSelecionado') ||
+    localStorage.getItem('jornada.guide') ||
+    localStorage.getItem('jornada.guia') ||
+    localStorage.getItem('guiaEscolhido') ||
+    localStorage.getItem('guiaSelecionado') ||
+    document.body?.dataset?.guia ||
     'lumen'
   ).trim().toLowerCase();
 
-  if (raw.includes('arian')) return 'arian';
   if (raw.includes('zion')) return 'zion';
+  if (raw.includes('arian') || raw.includes('arion')) return 'arian';
   if (raw.includes('lumen')) return 'lumen';
 
-  return raw || 'lumen';
+  return 'lumen';
 }
 
   let __voices = [];
@@ -565,39 +571,40 @@ if (showCursor) element.appendChild(caret);
   window.EffectCoordinator = window.EffectCoordinator || {};
 
   function getGuideSpeechTuning(guide, lang) {
-    const g = String(guide || 'lumen').toLowerCase();
-    const L = String(lang || 'pt-BR');
+  const g = String(guide || getGuideNow() || 'lumen').toLowerCase();
+  const L = String(lang || 'pt-BR');
 
-    let baseRate = 1.0;
-    let basePitch = 1.0;
+  let baseRate = 1.0;
 
-    if (L.startsWith('zh')) {
-      baseRate = 0.92;
-      basePitch = 1.0;
-    } else if (L.startsWith('ja')) {
-      baseRate = 0.94;
-      basePitch = 1.0;
-    } else if (L.startsWith('fr')) {
-      baseRate = 0.98;
-      basePitch = 1.0;
-    } else if (L.startsWith('es')) {
-      baseRate = 0.99;
-      basePitch = 1.0;
-    } else if (L.startsWith('en')) {
-      baseRate = 1.0;
-      basePitch = 1.0;
-    }
+  if (L.startsWith('zh')) baseRate = 0.92;
+  else if (L.startsWith('ja')) baseRate = 0.94;
+  else if (L.startsWith('fr')) baseRate = 0.98;
+  else if (L.startsWith('es')) baseRate = 0.99;
+  else if (L.startsWith('en')) baseRate = 1.0;
+  else if (L.startsWith('de')) baseRate = 0.96;
 
-    if (g === 'zion') {
-      return { rate: Math.max(0.88, baseRate - 0.06), pitch: 0.82, volume: 1.0 };
-    }
-
-    if (g === 'lumen') {
-      return { rate: Math.min(1.08, baseRate + 0.03), pitch: 1.14, volume: 1.0 };
-    }
-
-    return { rate: Math.max(0.90, baseRate - 0.02), pitch: 0.96, volume: 1.0 };
+  if (g === 'zion') {
+    return {
+      rate: Math.max(0.86, baseRate - 0.07),
+      pitch: 0.78,
+      volume: 1.0
+    };
   }
+
+  if (g === 'arian') {
+    return {
+      rate: Math.max(0.90, baseRate - 0.02),
+      pitch: 1.18,
+      volume: 1.0
+    };
+  }
+
+  return {
+    rate: Math.min(1.08, baseRate + 0.03),
+    pitch: 1.14,
+    volume: 1.0
+  };
+}
 
   let __lastSpeakSig = '';
   let __lastSpeakAt = 0;
@@ -606,7 +613,7 @@ if (showCursor) element.appendChild(caret);
     if (!text || !('speechSynthesis' in window)) return;
 
     const lang = getLangNow();
-    const guide = getGuideNow();
+    const guide = String(options.guide || getGuideNow() || 'lumen').toLowerCase();
     const tuning = getGuideSpeechTuning(guide, lang);
 
     const clean = String(text).replace(/\s+/g, ' ').trim();
@@ -691,7 +698,7 @@ if (showCursor) element.appendChild(caret);
     } catch {}
 
     const lang = getLangNow();
-    const guide = getGuideNow();
+    const guide = String(options.guide || getGuideNow() || 'lumen').toLowerCase();
     const tuning = getGuideSpeechTuning(guide, lang);
 
     let speechDone = !('speechSynthesis' in window);
