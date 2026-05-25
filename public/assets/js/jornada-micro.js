@@ -343,6 +343,7 @@
   }
 
   function stop() {
+    window.__MIC_STARTING__ = false;
     window.__MIC_WANT__ = false;
     window.__MIC_ACTIVE__ = false;
     state.starting = false;
