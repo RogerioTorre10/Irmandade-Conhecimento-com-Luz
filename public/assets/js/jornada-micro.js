@@ -256,9 +256,13 @@
 
         try {
           setButton(true);
+          if (window.__MIC_STARTING__ === true) {
+           return;
+          }
+          window.__MIC_STARTING__ = true;
           state.starting = true;
           rec.start();
-        } catch (e) {
+          } catch (e) {
           warn('reinício falhou, recriando:', e);
 
           if (window.__MIC_WANT__ === true) {
