@@ -183,6 +183,7 @@
     rec.maxAlternatives = 1;
 
     rec.onstart = () => {
+      window.__MIC_STARTING__ = false;
       state.starting = false;
       window.__MIC_WANT__ = true;
       window.__MIC_ACTIVE__ = true;
