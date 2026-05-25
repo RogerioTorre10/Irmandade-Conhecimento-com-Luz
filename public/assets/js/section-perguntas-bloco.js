@@ -1379,6 +1379,13 @@ async function renderBloco(section) {
   State.questionIndex = 0;
   State.mounted = true;
 
+  // Garante que o microfone não fique preso no textarea da pergunta anterior
+  try {
+     window.JORNADA_MICRO?.stop?.();
+  } catch (e) {
+    console.warn('[PERGUNTAS_BLOCO][MIC] falha ao parar microfone:', e);
+  }
+
   applyGuiaTheme(section);
 
   const titleEl =
