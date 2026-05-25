@@ -1180,17 +1180,46 @@ function bindButtons(section, bloco, perguntaText) {
   }
 
   if (btnMic) {
-    btnMic.onclick = (ev) => {
-      ev.preventDefault();
-      ev.stopPropagation();
+  btnMic.onclick = (ev) => {
+    ev.preventDefault();
+    ev.stopPropagation();
 
-      window.JORNADA_MICRO?.toggle?.(textarea, {
-        mode: 'append',
-        lang: getLang(),
-        button: btnMic
-      });
-    };
-  }
+    const textareaAtual =
+      $('#jp-answer-input', section) ||
+      $('#answer-input', section) ||
+      $('textarea', section);
+
+    if (!textareaAtual) {
+      console.warn('[PERGUNTAS_BLOCO][MIC] textarea atual não encontrado.');
+      return;
+    }
+
+    const micState = window.JORNADA_MICRO?._state;
+    const micAtivo = window.JORNADA_MICRO?.isActive?.() === true;
+    const textareaAnterior = micState?.textarea || null;
+
+    // Se o microfone ficou preso em outra pergunta, reinicia no textarea atual
+    if (micAtivo && textareaAnterior && textareaAnterior !== textareaAtual) {
+      window.JORNADA_MICRO?.stop?.();
+
+      setTimeout(() => {
+        window.JORNADA_MICRO?.start?.(textareaAtual, {
+          mode: 'append',
+          lang: getLang(),
+          button: btnMic
+        });
+      }, 180);
+
+      return;
+    }
+
+    window.JORNADA_MICRO?.toggle?.(textareaAtual, {
+      mode: 'append',
+      lang: getLang(),
+      button: btnMic
+    });
+  };
+}
 
   if (btnApagar) {
     btnApagar.onclick = (ev) => {
