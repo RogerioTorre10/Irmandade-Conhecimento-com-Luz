@@ -537,16 +537,25 @@
 
        }
 
-      } catch (e) {
+          } catch (e) {
 
-        console.warn(
-         '[JC][AUTO_RESTORE][ERRO]',
-          e
+      console.warn(
+        '[JC][AUTO_RESTORE][ERRO]',
+        e
       );
 
-     }
+    }
 
-   }
+  }
+
+} catch (e) {
+
+  console.warn(
+    '[JC][AUTO_RESTORE][FATAL]',
+    e
+  );
+
+}
 
     const authScreen = document.getElementById('auth-screen');
     if (authScreen) {
