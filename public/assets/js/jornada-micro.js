@@ -209,9 +209,23 @@
           }
         }
 
-        finalText = normalizeText(finalText);
-        if (finalText) appendFinalText(finalText);
-      } catch (e) {
+  finalText = normalizeText(finalText);
+
+  if (finalText) {
+
+    const textareaAtual =
+      state.textarea ||
+      document.querySelector('#jp-answer-input') ||
+      document.querySelector('.jp-answer-input') ||
+      document.querySelector('textarea');
+
+  if (textareaAtual) {
+     state.textarea = textareaAtual;
+     window.__MIC_TARGET_TEXTAREA__ = textareaAtual;
+  }
+
+  appendFinalText(finalText);
+  } catch (e) {
         warn('falha no onresult:', e);
       }
     };
