@@ -473,6 +473,21 @@
       handleSectionLogic
     };
 
+    try {
+      const authOk = localStorage.getItem('jornada_auth_ok') === '1';
+      const startedAt = Number( localStorage.getItem('jornada_started_at') || 0 );
+      const dentro24h = startedAt && Date.now() - startedAt < 24 * 60 * 60 * 1000;
+      const lastSection = localStorage.getItem('jornada_last_section');
+
+    if ( authOk && dentro24h && lastSection && window.JC?.show ) { console.log('[JC] retomando jornada automaticamente:', lastSection );
+    await show(lastSection);
+    isInitializing = false;
+    return;
+   }
+  } catch (e) {
+    console.warn('[JC] falha ao restaurar jornada:', e);
+  }  
+
     const authScreen = document.getElementById('auth-screen');
     if (authScreen) {
       localStorage.setItem('token', 'dummy-token');
