@@ -387,6 +387,15 @@
       window.JC.currentSection = sectionId;
       lastShownSection = sectionId;
 
+      try {
+        const authOk = localStorage.getItem('jornada_auth_ok') === '1';
+
+      if (authOk && sectionId !== 'section-senha') {
+        localStorage.setItem('jornada_last_section', sectionId);
+        localStorage.setItem('jornada_last_at', String(Date.now()));
+      }
+    } catch {}
+
       await handleSectionLogic(sectionId, section);
       attachButtonEvents(sectionId, section);
 
