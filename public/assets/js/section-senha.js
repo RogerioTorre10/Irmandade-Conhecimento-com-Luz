@@ -629,79 +629,101 @@
           throw new Error(data?.detail || data?.message || 'Código inválido.');
         }
 
-        console.log('[JCSenha] 2FA confirmado:', data);
+        console.log('[CSenha] 2FA confirmado:', data);
 
-        if (window.JORNADA_SESSION?.iniciarSessao) {
-          await window.JORNADA_SESSION.iniciarSessao({ email });
-        }
+if (window.JORNADA_SESSION?.iniciarSessao) {
+  await window.JORNADA_SESSION.iniciarSessao({ email });
+}
 
-          try {
-            const retomada =
-              await window.JORNADA_SESSION.retomar();
+// =====================================================
+// SALVA AUTENTICAÇÃO
+// =====================================================
 
-            console.log('[SESSION][RETOMADA]', retomada);
+localStorage.setItem('jornada_auth_ok', '1');
+localStorage.setItem('jornada_email', email);
+localStorage.setItem(
+  'jornada_started_at',
+  String(Date.now())
+);
 
-            if (
-              retomada?.retomar &&
-              retomada?.last_section &&
-              window.JC?.show
-          ) {
+// =====================================================
+// TENTA RETOMAR
+// =====================================================
 
-          localStorage.setItem(
-           'jornada_last_section',
-            retomada.last_section
-         );
+try {
 
-          if (retomada.last_block) {
-           localStorage.setItem(
-           'jornada_last_block',
-           retomada.last_block
-          );
-         }
+  const retomada =
+    await window.JORNADA_SESSION?.retomar?.();
 
-         if (retomada.last_question != null) {
-           localStorage.setItem(
-           'jornada_last_question',
-           String(retomada.last_question)
-          );
-         }
+  console.log(
+    '[SESSION][RETOMADA]',
+    retomada
+  );
 
-        window.toast?.(
-          'Sua jornada foi restaurada.',
-          'success'
-        );
+  if (
+    retomada?.retomar &&
+    retomada?.last_section &&
+    window.JC?.show
+  ) {
 
-        await window.JC.show(
+    if (retomada.last_section) {
+      localStorage.setItem(
+        'jornada_last_section',
         retomada.last_section
-        );
-
-       return;
-      }
-
-    } catch (e) {
-      console.warn(
-       '[SESSION][RETOMADA][ERRO]',
-       e
-     );
+      );
     }
-        window.toast?.('Acesso confirmado.', 'success');
-        
-        localStorage.setItem('jornada_auth_ok', '1');
-        localStorage.setItem('jornada_email', email);
-        localStorage.setItem('jornada_started_at', String(Date.now()));
-        localStorage.setItem('jornada_last_section', 'section-guia');  
-        
-        if (window.JC?.show) {
-          window.JC.show('section-guia');
-        }
 
-      } catch (err) {
-        console.error('[JCSenha] erro ao confirmar 2FA:', err);
-        btnNext.removeAttribute('disabled');
-        window.toast?.(err.message || 'Erro ao confirmar código.', 'error');
-      }
+    if (retomada.last_block) {
+      localStorage.setItem(
+        'jornada_last_block',
+        retomada.last_block
+      );
     }
-  });
+
+    if (retomada.last_question != null) {
+      localStorage.setItem(
+        'jornada_last_question',
+        String(retomada.last_question)
+      );
+    }
+
+    window.toast?.(
+      'Sua jornada foi restaurada.',
+      'success'
+    );
+
+    await window.JC.show(
+      retomada.last_section
+    );
+
+    return;
+  }
+
+} catch (e) {
+
+  console.warn(
+    '[SESSION][RETOMADA][ERRO]',
+    e
+  );
+
+}
+
+// =====================================================
+// FLUXO NORMAL
+// =====================================================
+
+window.toast?.(
+  'Acesso confirmado.',
+  'success'
+);
+
+localStorage.setItem(
+  'jornada_last_section',
+  'section-guia'
+);
+
+if (window.JC?.show) {
+  window.JC.show('section-guia');
 }
 
    // =====================================================
