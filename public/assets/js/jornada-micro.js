@@ -350,6 +350,7 @@
       state.rec.start();
     } catch (e) {
       warn('falha ao iniciar:', e);
+      window.__MIC_STARTING__ = false;
 
       const delay = (isIOS() || isSafari()) ? 700 : 350;
 
