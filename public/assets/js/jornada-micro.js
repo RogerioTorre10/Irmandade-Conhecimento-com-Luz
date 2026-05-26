@@ -230,10 +230,14 @@
   }
 
   appendFinalText(finalText);
+
+  }
+
   } catch (e) {
-        warn('falha no onresult:', e);
-      }
-    };
+    warn('falha no onresult:', e);
+  }
+
+ };
 
     rec.onerror = (ev) => {
       const code = ev?.error || '';
