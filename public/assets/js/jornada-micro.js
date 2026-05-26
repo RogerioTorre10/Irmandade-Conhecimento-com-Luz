@@ -306,6 +306,7 @@
     }
 
     state.textarea = ta;
+    window.__MIC_TARGET_TEXTAREA__ = ta;
     state.opts = opts || {};
     state.button =
       opts.button ||
