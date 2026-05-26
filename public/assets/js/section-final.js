@@ -1491,6 +1491,17 @@ function removerFinalDuplicado(texto) {
 
         setPdfStatus(root, t('final.pdfSuccess', '✅ Pergaminho gerado e baixado com sucesso!'), 'ok');
 
+        try {
+          await window.JORNADA_SESSION?.finalizar?.({
+          pdf_enviado: true,
+          email_enviado: true
+        });
+
+        console.log('[FINAL][SESSION_FINALIZADA]');
+      } catch (e) {
+        console.warn('[FINAL][FINALIZAR][ERRO]', e);
+      }
+      
         const btnRetry = root.querySelector('#btn-pdf-retry');
         if (btnRetry) {
           btnRetry.disabled = true;
