@@ -318,16 +318,17 @@
       document.getElementById('jp-btn-mic') ||
       document.querySelector('[data-action="mic"], .jp-mic-btn, .mic-btn');
 
-    window.__MIC_WANT__ = true;
-    window.__MIC_ACTIVE__ = true;
-    state.starting = true;
-    setButton(true);
     if (window.__MIC_STARTING__ === true) {
-       warn('start bloqueado — já iniciando');
+      warn('start bloqueado — já iniciando');
       return;
     }
 
     window.__MIC_STARTING__ = true;
+
+    window.__MIC_WANT__ = true;
+    window.__MIC_ACTIVE__ = false;
+    state.starting = true;
+    setButton(true);
 
     clearRestart();
 
