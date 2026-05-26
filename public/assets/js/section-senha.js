@@ -636,7 +636,12 @@
         }
 
         window.toast?.('Acesso confirmado.', 'success');
-
+        
+        localStorage.setItem('jornada_auth_ok', '1');
+        localStorage.setItem('jornada_email', email);
+        localStorage.setItem('jornada_started_at', String(Date.now()));
+        localStorage.setItem('jornada_last_section', 'section-guia');  
+        
         if (window.JC?.show) {
           window.JC.show('section-guia');
         }
