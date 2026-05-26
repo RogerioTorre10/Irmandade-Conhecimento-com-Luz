@@ -635,6 +635,55 @@
           await window.JORNADA_SESSION.iniciarSessao({ email });
         }
 
+          try {
+            const retomada =
+              await window.JORNADA_SESSION.retomar();
+
+            console.log('[SESSION][RETOMADA]', retomada);
+
+            if (
+              retomada?.retomar &&
+              retomada?.last_section &&
+              window.JC?.show
+          ) {
+
+          localStorage.setItem(
+           'jornada_last_section',
+            retomada.last_section
+         );
+
+          if (retomada.last_block) {
+           localStorage.setItem(
+           'jornada_last_block',
+           retomada.last_block
+          );
+         }
+
+         if (retomada.last_question != null) {
+           localStorage.setItem(
+           'jornada_last_question',
+           String(retomada.last_question)
+          );
+         }
+
+        window.toast?.(
+          'Sua jornada foi restaurada.',
+          'success'
+        );
+
+        await window.JC.show(
+        retomada.last_section
+        );
+
+       return;
+      }
+
+    } catch (e) {
+      console.warn(
+       '[SESSION][RETOMADA][ERRO]',
+       e
+     );
+    }
         window.toast?.('Acesso confirmado.', 'success');
         
         localStorage.setItem('jornada_auth_ok', '1');
