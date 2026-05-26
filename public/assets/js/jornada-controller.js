@@ -390,12 +390,16 @@
       try {
         const authOk = localStorage.getItem('jornada_auth_ok') === '1';
 
-      if (authOk && sectionId !== 'section-senha') {
+        if (authOk && sectionId !== 'section-senha') {
         localStorage.setItem('jornada_last_section', sectionId);
         localStorage.setItem('jornada_last_at', String(Date.now()));
-      }
-    } catch {}
 
+        window.JORNADA_SESSION?.autoSave?.();
+       }
+     } catch (e) {
+       console.warn('[JC][SESSION_SAVE][ERRO]', e);
+     }
+     
       await handleSectionLogic(sectionId, section);
       attachButtonEvents(sectionId, section);
 
