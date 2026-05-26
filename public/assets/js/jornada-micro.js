@@ -237,6 +237,7 @@
 
     rec.onerror = (ev) => {
       const code = ev?.error || '';
+      window.__MIC_STARTING__ = false;
       warn('erro:', code);
 
       if (code === 'not-allowed' || code === 'service-not-allowed') {
