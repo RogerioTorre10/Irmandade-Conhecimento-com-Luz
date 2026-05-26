@@ -112,7 +112,12 @@
   }
 
   function appendFinalText(text) {
-    const ta = state.textarea;
+    const ta =
+    state.textarea ||
+    window.__MIC_TARGET_TEXTAREA__ ||
+    document.querySelector('#jp-answer-input') ||
+    document.querySelector('.jp-answer-input') ||
+    document.querySelector('textarea');
     if (!ta) return;
 
     const finalText = normalizeText(text);
