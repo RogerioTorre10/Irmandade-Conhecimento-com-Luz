@@ -345,9 +345,27 @@ function answerKey(bloco, qIndex = 0) {
   return `jornada_resp_${bloco.id}_${getQuestionId(bloco, qIndex)}`;
 }
 
-function saveAnswer(bloco, qIndex, value) {
-  if (!bloco) return;
-  localStorage.setItem(answerKey(bloco, qIndex), String(value || ''));
+try {
+
+  const savedQuestion =
+    Number(
+      localStorage.getItem(
+        'jornada_last_question'
+      ) || 0
+    );
+
+  if (
+    Number.isFinite(savedQuestion) &&
+    savedQuestion >= 0
+  ) {
+    currentQuestion = savedQuestion;
+  }
+
+} catch (e) {
+  console.warn(
+    '[PERGUNTAS][RESTORE_QUESTION][ERRO]',
+    e
+  );
 }
 
 function getAnswer(bloco, qIndex) {
