@@ -613,28 +613,36 @@
         const resp = await fetch('https://lumen-backend-api.onrender.com/api/auth/verify', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            email,
-            senha: senhaSalva,
-            code,
-            device_hash: localStorage.getItem('jornada_device_hash') || 'browser'
-          })
-        });
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email,
+          senha: senhaSalva,
+          code,
+          device_hash: localStorage.getItem('jornada_device_hash') || 'browser'
+        })
+      });
 
-        const data = await resp.json();
+      const data = await resp.json();
 
-        if (!resp.ok || !data.ok) {
-          throw new Error(data?.detail || data?.message || 'Código inválido.');
-        }
+      if (!resp.ok || !data.ok) {
+        throw new Error(data?.detail || data?.message || 'Código inválido.');
+     }
 
-        console.log('[CSenha] 2FA confirmado:', data);
+  // aqui fica o bloco de sucesso do 2FA   
+     console.log('[CSenha] 2FA confirmado:', data);
 
-if (window.JORNADA_SESSION?.iniciarSessao) {
-  await window.JORNADA_SESSION.iniciarSessao({ email });
-}
-
+     if (window.JORNADA_SESSION?.iniciarSessao) {
+     await window.JORNADA_SESSION.iniciarSessao({ email });
+     }
+    } catch (err) {
+       console.error('[JCSenha] erro ao confirmar 2FA:', err);
+       btnNext.removeAttribute('disabled');
+       window.toast?.(err.message || 'Erro ao confirmar código.', 'error');
+       return;
+     }
+        
+      
 // =====================================================
 // SALVA AUTENTICAÇÃO
 // =====================================================
@@ -707,7 +715,7 @@ try {
   );
 
 }
-
+      
 // =====================================================
 // FLUXO NORMAL
 // =====================================================
@@ -725,7 +733,7 @@ localStorage.setItem(
 if (window.JC?.show) {
   window.JC.show('section-guia');
 }
-
+}
    // =====================================================
 // BOTÕES DEDICADOS — ENVIAR / REENVIAR CÓDIGO 2FA
 // =====================================================
