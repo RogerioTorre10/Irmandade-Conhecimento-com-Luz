@@ -628,22 +628,14 @@
 
       if (!resp.ok || !data.ok) {
         throw new Error(data?.detail || data?.message || 'Código inválido.');
-     }
-
-  // aqui fica o bloco de sucesso do 2FA   
+     }  
+            // aqui fica o bloco de sucesso do 2FA   
      console.log('[CSenha] 2FA confirmado:', data);
 
      if (window.JORNADA_SESSION?.iniciarSessao) {
      await window.JORNADA_SESSION.iniciarSessao({ email });
-     }
-    } catch (err) {
-       console.error('[JCSenha] erro ao confirmar 2FA:', err);
-       btnNext.removeAttribute('disabled');
-       window.toast?.(err.message || 'Erro ao confirmar código.', 'error');
-       return;
-     }
-        
-      
+   }
+   
 // =====================================================
 // SALVA AUTENTICAÇÃO
 // =====================================================
@@ -734,8 +726,14 @@ localStorage.setItem(
 if (window.JC?.show) {
   window.JC.show('section-guia');
 }
-}
-   // =====================================================
+ } catch (err) {
+       console.error('[JCSenha] erro ao confirmar 2FA:', err);
+       btnNext.removeAttribute('disabled');
+       window.toast?.(err.message || 'Erro ao confirmar código.', 'error');
+       return;
+    }
+ }
+ // =====================================================
 // BOTÕES DEDICADOS — ENVIAR / REENVIAR CÓDIGO 2FA
 // =====================================================
 
