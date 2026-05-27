@@ -526,8 +526,8 @@
       emailInput?.focus();
       return;
     }
+  })
   }
-  });
     const etapa = btnNext.dataset.authStage || 'start';
 
     // =====================================================
