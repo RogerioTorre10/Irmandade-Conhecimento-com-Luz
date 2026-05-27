@@ -202,43 +202,41 @@
       try {
         let finalText = '';
 
-        for (let i = ev.resultIndex; i < ev.results.length; i++) {
-          const result = ev.results[i];
-          if (!result || !result[0]) continue;
+      for (let i = ev.resultIndex; i < ev.results.length; i++) {
+        const result = ev.results[i];
+        if (!result || !result[0]) continue;
 
-          const transcript = normalizeText(result[0].transcript);
-          if (!transcript) continue;
+      const transcript = normalizeText(result[0].transcript);
+      if (!transcript) continue;
 
-          if (result.isFinal) {
-            finalText += ' ' + transcript;
-          }
-        }
+      if (result.isFinal) {
+        finalText += ' ' + transcript;
+      }
+     } 
 
-  finalText = normalizeText(finalText);
+    finalText = normalizeText(finalText);
 
-  if (finalText) {
+      if (finalText) {
+        const textareaAtual =
+          state.textarea ||
+          window.__MIC_TARGET_TEXTAREA__ ||
+          document.querySelector('#jp-answer-input') ||
+          document.querySelector('.jp-answer-input') ||
+          document.querySelector('textarea');
 
-    const textareaAtual =
-      state.textarea ||
-      document.querySelector('#jp-answer-input') ||
-      document.querySelector('.jp-answer-input') ||
-      document.querySelector('textarea');
+      if (textareaAtual) {
+        state.textarea = textareaAtual;
+        window.__MIC_TARGET_TEXTAREA__ = textareaAtual;
+      }
 
-  if (textareaAtual) {
-     state.textarea = textareaAtual;
-     window.__MIC_TARGET_TEXTAREA__ = textareaAtual;
-  }
+      appendFinalText(finalText);
+     }
 
-  appendFinalText(finalText);
-
-  }
-
-  } catch (e) {
-    warn('falha no onresult:', e);
-  }
-
- };
-
+    } catch (e) {
+      warn('falha no onresult:', e);
+    }
+   };
+    
     rec.onerror = (ev) => {
       const code = ev?.error || '';
       window.__MIC_STARTING__ = false;
