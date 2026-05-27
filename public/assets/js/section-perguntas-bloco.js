@@ -1394,7 +1394,23 @@ async function renderBloco(section) {
 
   State.sectionId = sectionId;
   State.bloco = bloco;
+try {
+  const savedQuestion = Number(
+    localStorage.getItem('jornada_last_question') || 0
+  );
+
+  if (
+    Number.isFinite(savedQuestion) &&
+    savedQuestion >= 0
+  ) {
+    State.questionIndex = savedQuestion;
+  } else {
+    State.questionIndex = 0;
+  }
+} catch (e) {
+  console.warn('[PERGUNTAS][RESTORE_QUESTION][ERRO]', e);
   State.questionIndex = 0;
+}
   State.mounted = true;
 
   // Garante que o microfone não fique preso no textarea da pergunta anterior
