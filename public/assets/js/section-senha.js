@@ -643,19 +643,24 @@
        return;
      }
 
-  const resp = await fetch(
-    'https://lumen-backend-api.onrender.com/api/auth/verify',
-          method: 'POST',
-          headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          email,
-          senha: senhaSalva,
-          code,
-          device_hash: localStorage.getItem('jornada_device_hash') || 'browser'
+      const resp = await fetch(
+        'https://lumen-backend-api.onrender.com/api/auth/verify',
+       {
+        method: 'POST',
+        headers: {
+         'Content-Type': 'application/json'
+       },
+
+      body: JSON.stringify({
+        email,
+        senha: senhaSalva,
+        code,
+        device_hash:
+          localStorage.getItem('jornada_device_hash') ||
+          'browser'
         })
-      });
+       }
+      );
 
       const data = await resp.json();
 
