@@ -358,7 +358,7 @@ try {
     Number.isFinite(savedQuestion) &&
     savedQuestion >= 0
   ) {
-    currentQuestion = savedQuestion;
+    State.questionIndex = savedQuestion;
   }
 
 } catch (e) {
@@ -752,13 +752,33 @@ function getBlockQuestionsCount(bloco) {
 
 function getCurrentQuestionIndex(bloco) {
   if (!bloco) return 0;
-  if (typeof bloco.currentIndex === 'number') return bloco.currentIndex;
-  if (typeof bloco.questionIndex === 'number') return bloco.questionIndex;
-  if (typeof bloco.idx === 'number') return bloco.idx;
+
+  if (
+    typeof State !== 'undefined' &&
+    State &&
+    typeof State.questionIndex === 'number'
+  ) {
+    return State.questionIndex;
+  }
+
+  if (typeof bloco.currentIndex === 'number') {
+    return bloco.currentIndex;
+  }
+
+  if (typeof bloco.questionIndex === 'number') {
+    return bloco.questionIndex;
+  }
+
+  if (typeof bloco.idx === 'number') {
+    return bloco.idx;
+  }
+
   const raw =
+    localStorage.getItem('jornada_last_question') ||
     sessionStorage.getItem(`jp:${bloco.id}:idx`) ||
     sessionStorage.getItem(`bloco:${bloco.id}:idx`) ||
     '0';
+
   return Number(raw || 0);
 }
 
