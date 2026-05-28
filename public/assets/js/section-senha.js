@@ -533,7 +533,7 @@
     const emailInput2FA = root.querySelector('#senha-email');
     const btnEnviar2FA = root.querySelector('#btn-enviar-2fa');
     const btnReenviar2FA = root.querySelector('#btn-reenviar-2fa');
-    btnNext =
+    const btnNext =
       root.querySelector('#btn-senha-avancar') ||
       root.querySelector('[data-next]');
     
