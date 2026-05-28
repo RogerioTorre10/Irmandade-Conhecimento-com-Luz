@@ -539,11 +539,11 @@
     // ETAPA 1 — ENVIAR CÓDIGO
     // =====================================================
     if (etapa === 'start') {
-      const senhaDigitada = (input?.value || '').trim() || 'TESTE123';
+      const senhaDigitada = (senhaInput2FA?.value || '').trim() || 'TESTE123';
 
       if (!senhaDigitada) {
         window.toast?.('Por favor, digite sua senha para continuar.', 'warning');
-        input.focus();
+        senhaInput2FA?.focus();
         return;
       }
       
