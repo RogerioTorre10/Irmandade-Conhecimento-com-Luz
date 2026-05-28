@@ -533,8 +533,10 @@
     const emailInput2FA = root.querySelector('#senha-email');
     const btnEnviar2FA = root.querySelector('#btn-enviar-2fa');
     const btnReenviar2FA = root.querySelector('#btn-reenviar-2fa');
-    const btnNext = root.querySelector('#btn-senha-avancar');
-
+    const btnNext =
+      root.querySelector('#btn-senha-avancar') ||
+      root.querySelector('[data-next]');
+    
     // =====================================================
     // ETAPA 1 — ENVIAR CÓDIGO
     // =====================================================
