@@ -541,6 +541,15 @@
         input.focus();
         return;
       }
+      
+      const email =
+        (emailInput2FA?.value || '').trim();
+
+      if (!email) {
+        window.toast?.('Digite seu e-mail.', 'warning');
+        emailInput2FA?.focus();
+        return;
+      }      
 
       saveSenha(senhaDigitada);
       sessionStorage.setItem('jornada.email', email);
