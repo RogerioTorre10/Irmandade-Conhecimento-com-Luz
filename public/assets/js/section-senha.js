@@ -610,7 +610,7 @@
     // ETAPA 2 — VALIDAR CÓDIGO
     // =====================================================
     if (etapa === 'verify') {
-      const code = (input.value || '').trim();
+      const code = (senhaInput2FA?.value || '').trim();
       const senhaSalva =
       sessionStorage.getItem('jornada.senha_original') ||
       sessionStorage.getItem('jornada.senha') ||
@@ -618,14 +618,33 @@
 
       if (!code) {
         window.toast?.('Digite o código recebido.', 'warning');
-        input.focus();
+        senhaInput2FA?.focus();
         return;
       }
 
       btnNext.setAttribute('disabled', 'true');
 
       try {
-        const resp = await fetch('https://lumen-backend-api.onrender.com/api/auth/verify', {
+
+      const email =
+         sessionStorage.getItem('jornada.email') ||
+         (emailInput2FA?.value || '').trim();
+
+      if (!email) {
+
+      window.toast?.(
+        'E-mail não encontrado. Reenvie o código.',
+        'warning'
+     );
+
+       emailInput2FA?.focus();
+
+       btnNext.removeAttribute('disabled');
+       return;
+     }
+
+  const resp = await fetch(
+    'https://lumen-backend-api.onrender.com/api/auth/verify',
           method: 'POST',
           headers: {
           'Content-Type': 'application/json'
