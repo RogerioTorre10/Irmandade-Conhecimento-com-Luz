@@ -742,12 +742,13 @@ if (window.JC?.show) {
        return;
     }
  }
- // =====================================================
+// =====================================================
 // BOTÕES DEDICADOS — ENVIAR / REENVIAR CÓDIGO 2FA
 // =====================================================
 
-const senhaInput2FA = root.querySelector('#senha-input');
-    
+const senhaInput2FA =
+  root.querySelector('#senha-input');
+
 const btnEnviar2FA =
   root.querySelector('#btn-enviar-2fa');
 
@@ -762,9 +763,9 @@ async function enviarCodigo2FA() {
   const email =
     (emailInput2FA?.value || '').trim();
 
- const senhaDigitada =
-  (senhaInput2FA?.value || '').trim()
-  'TESTE123';
+  const senhaDigitada =
+    (senhaInput2FA?.value || '').trim() ||
+    'TESTE123';
 
   if (!email) {
 
@@ -784,7 +785,7 @@ async function enviarCodigo2FA() {
       'warning'
     );
 
-    input?.focus();
+    senhaInput2FA?.focus();
     return;
   }
 
@@ -804,44 +805,34 @@ async function enviarCodigo2FA() {
       'https://lumen-backend-api.onrender.com/api/auth/start',
       {
         method: 'POST',
-
         headers: {
-          'Content-Type':
-            'application/json'
+          'Content-Type': 'application/json'
         },
 
         body: JSON.stringify({
           email,
-
           senha: senhaDigitada,
-
           device_hash:
-            localStorage.getItem(
-              'jornada_device_hash'
-            ) || 'browser'
+            localStorage.getItem('jornada_device_hash') ||
+            'browser'
         })
       }
     );
 
     const data = await resp.json();
 
-    if (!resp.ok || !data.ok) {
+    if (!resp.ok || !data?.ok) {
 
       throw new Error(
         data?.detail ||
         data?.message ||
-        'Senha inválida.'
+        'Erro ao enviar código.'
       );
     }
 
     sessionStorage.setItem(
       'jornada.email',
       email
-    );
-
-    sessionStorage.setItem(
-      'jornada.senha_original',
-      senhaDigitada
     );
 
     sessionStorage.setItem(
@@ -854,87 +845,39 @@ async function enviarCodigo2FA() {
       'success'
     );
 
-    const wrap2fa =
-      root.querySelector(
-        '#senha-2fa-wrap'
-      );
-
-    if (wrap2fa) {
-      wrap2fa.style.display = 'flex';
-    }
-
-    const confirmWrap =
-      root.querySelector(
-        '#senha-confirmar-wrap'
-      );
-
-    if (confirmWrap) {
-      confirmWrap.style.display = 'flex';
-    }
-
-    input.value = '';
-
-    input.placeholder =
-      'Digite o código enviado...';
-
-    input.setAttribute(
-      'inputmode',
-      'numeric'
-    );
-
-    btnNext.dataset.authStage =
-      'verify';
-
   } catch (err) {
 
     console.error(
-      '[JCSenha] erro ao enviar código:',
+      '[2FA] erro ao enviar código:',
       err
     );
 
     window.toast?.(
-      err.message ||
-      'Erro ao enviar código.',
+      err?.message || 'Erro ao enviar código.',
       'error'
     );
 
   } finally {
 
-    btnEnviar2FA?.removeAttribute(
-      'disabled'
-    );
+    btnEnviar2FA?.removeAttribute('disabled');
 
-    btnReenviar2FA?.removeAttribute(
-      'disabled'
-    );
+    btnReenviar2FA?.removeAttribute('disabled');
   }
 }
 
-if (
-  btnEnviar2FA &&
-  btnEnviar2FA.dataset.bound !== '1'
-) {
+// =====================================================
+// EVENTOS DOS BOTÕES
+// =====================================================
 
-  btnEnviar2FA.dataset.bound = '1';
+btnEnviar2FA?.addEventListener(
+  'click',
+  enviarCodigo2FA
+);
 
-  btnEnviar2FA.addEventListener(
-    'click',
-    enviarCodigo2FA
-  );
-}
-
-if (
-  btnReenviar2FA &&
-  btnReenviar2FA.dataset.bound !== '1'
-) {
-
-  btnReenviar2FA.dataset.bound = '1';
-
-  btnReenviar2FA.addEventListener(
-    'click',
-    enviarCodigo2FA
-  );
-} 
+btnReenviar2FA?.addEventListener(
+  'click',
+  enviarCodigo2FA
+);
     
     root.dataset.transitionReady = 'true';
     root.dataset.senhaInitialized = 'true';
