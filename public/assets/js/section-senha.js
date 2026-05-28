@@ -534,7 +534,7 @@
     // ETAPA 1 — ENVIAR CÓDIGO
     // =====================================================
     if (etapa === 'start') {
-      const senhaDigitada = (inputSenha?.value || '').trim() || 'TESTE123';
+      const senhaDigitada = (input?.value || '').trim() || 'TESTE123';
 
       if (!senhaDigitada) {
         window.toast?.('Por favor, digite sua senha para continuar.', 'warning');
@@ -737,7 +737,7 @@ if (window.JC?.show) {
 // BOTÕES DEDICADOS — ENVIAR / REENVIAR CÓDIGO 2FA
 // =====================================================
 
-const inputSenha = root.querySelector('#senha-input');
+const input = root.querySelector('#senha-input');
 
 const btnEnviar2FA =
   root.querySelector('#btn-enviar-2fa');
@@ -775,7 +775,7 @@ async function enviarCodigo2FA() {
       'warning'
     );
 
-    inputSenha?.focus();
+    input?.focus();
     return;
   }
 
@@ -863,12 +863,12 @@ async function enviarCodigo2FA() {
       confirmWrap.style.display = 'flex';
     }
 
-    inputSenha.value = '';
+    input.value = '';
 
-    inputSenha.placeholder =
+    input.placeholder =
       'Digite o código enviado...';
 
-    inputSenha.setAttribute(
+    input.setAttribute(
       'inputmode',
       'numeric'
     );
