@@ -737,8 +737,8 @@ if (window.JC?.show) {
 // BOTÕES DEDICADOS — ENVIAR / REENVIAR CÓDIGO 2FA
 // =====================================================
 
-const input = root.querySelector('#senha-input');
-
+const senhaInput2FA = root.querySelector('#senha-input');
+    
 const btnEnviar2FA =
   root.querySelector('#btn-enviar-2fa');
 
@@ -754,7 +754,7 @@ async function enviarCodigo2FA() {
     (emailInput2FA?.value || '').trim();
 
  const senhaDigitada =
-  (input.value || '').trim() ||
+  (senhaInput2FA?.value || '').trim()
   'TESTE123';
 
   if (!email) {
