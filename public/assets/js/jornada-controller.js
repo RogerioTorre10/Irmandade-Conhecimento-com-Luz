@@ -575,35 +575,40 @@
     // Resets de sessão
     (function resetJornadaIfNewRun() {
       const runId = String(Date.now());
-      const lastRun = sessionStorage.getItem('JORNADA_RUN_ID');
+const lastRun = sessionStorage.getItem('JORNADA_RUN_ID');
 
-    const hasSavedJourney =
-      localStorage.getItem('jornada_codigo') ||
-      localStorage.getItem('jornada_last_section') ||
-      localStorage.getItem('jornada_auth_ok');
+const savedSection =
+  localStorage.getItem('jornada_last_section');
 
-    if (!lastRun && !hasSavedJourney) {
-      sessionStorage.setItem('JORNADA_RUN_ID', runId);
+const hasSavedJourney =
+  localStorage.getItem('jornada_codigo') ||
+  savedSection ||
+  localStorage.getItem('jornada_auth_ok');
 
-    const keys = [
-      'JORNADA_GUIA',
-      'JORNADA_SELFIECARD',
-      'SELFIE_CARD',
-      '__SELFIECARD_DONE__',
-      'JORNADA_PROGRESS',
-      'JORNADA_RESPOSTAS',
-      'JORNADA_STATE_CACHE'
-    ];
+if (!lastRun) {
+  sessionStorage.setItem('JORNADA_RUN_ID', runId);
+}
 
-    keys.forEach(k => {
-      sessionStorage.removeItem(k);
-      localStorage.removeItem(k);
-    });
+if (!lastRun && !hasSavedJourney) {
+  const keys = [
+    'JORNADA_GUIA',
+    'JORNADA_SELFIECARD',
+    'SELFIE_CARD',
+    '__SELFIECARD_DONE__',
+    'JORNADA_PROGRESS',
+    'JORNADA_RESPOSTAS',
+    'JORNADA_STATE_CACHE'
+  ];
 
-    console.log('[RESET] Jornada resetada para novo run:', runId);
-    }
-   })();
-  }
+  keys.forEach(k => {
+    sessionStorage.removeItem(k);
+    localStorage.removeItem(k);
+  });
+
+  console.log('[RESET] Jornada resetada para novo run:', runId);
+} else {
+  console.log('[RESET] preservado por retomada:', savedSection);
+}
 
     document.addEventListener('section:shown', async (e) => {
     const { sectionId, node } = e.detail || {};
