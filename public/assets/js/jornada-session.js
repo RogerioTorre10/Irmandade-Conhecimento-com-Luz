@@ -96,10 +96,18 @@
             sessionStorage.getItem('JORNADA_RESPOSTAS') || '{}'
           ),
 
-        progresso:
+        const progressObj =
           JSON.parse(
-            sessionStorage.getItem('JORNADA_PROGRESS') || '{}'
-          ),
+             sessionStorage.getItem('JORNADA_PROGRESS') || '{}'
+        );
+
+        if (progressObj.total) {
+          progressObj.total = toIntSafe(progressObj.total);
+        }
+
+        if (progressObj.pergunta) {
+          progressObj.pergunta = toIntSafe(progressObj.pergunta);
+        }
 
         dados:
           JSON.parse(
