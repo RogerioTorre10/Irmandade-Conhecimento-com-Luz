@@ -1313,7 +1313,7 @@ function bindButtons(section, bloco, perguntaText) {
           return;
         }
 
-        saveAnswer(bloco, 0, val);
+        saveAnswerSafe(bloco, 0, val);
         setContinueState(section, 'loading');
 
         await setGuideResponse(
