@@ -564,11 +564,25 @@
     }
 
     try {
-      await show('section-intro');
-    } catch (err) {
-      console.warn('[JC.init] Falha na intro, tentando termos1');
-      await show('section-termos1');
-    }
+  const savedSection =
+    localStorage.getItem('jornada_last_section');
+
+  const authOk =
+    localStorage.getItem('jornada_auth_ok') === '1';
+
+  const startSection =
+    authOk && savedSection
+      ? savedSection
+      : 'section-intro';
+
+  console.log('[JC.init] Iniciando em:', startSection);
+
+  await show(startSection);
+
+} catch (err) {
+  console.warn('[JC.init] Falha ao iniciar seção salva, voltando para intro:', err);
+  await show('section-intro');
+}
 
     isInitializing = false;
 
