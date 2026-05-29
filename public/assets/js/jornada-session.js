@@ -143,9 +143,14 @@
         return;
       }
 
+      console.log(
+       '[SESSION][PAYLOAD]',
+       JSON.stringify(payload, null, 2)
+      );
+
       const res = await fetch(
-        `${API}/jornada/progresso/salvar`,
-        {
+       `${API_BASE}/jornada/progresso/salvar`,
+       {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
