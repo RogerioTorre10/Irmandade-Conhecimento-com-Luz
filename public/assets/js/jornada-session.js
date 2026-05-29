@@ -149,7 +149,7 @@
       );
 
       const res = await fetch(
-       `${API_BASE}/jornada/progresso/salvar`,
+       `${API}/jornada/progresso/salvar`,
        {
           method: 'POST',
           headers: {
