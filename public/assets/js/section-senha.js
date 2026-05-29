@@ -543,7 +543,7 @@
       btnNext.setAttribute('disabled', 'true');
 
       try {
-        const resp = await fetch('https://lumen-backend-api.onrender.com/api/auth/start', {
+        const resp = await fetch(`${API_BASE}/auth/start`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -605,7 +605,7 @@
       btnNext.setAttribute('disabled', 'true');
 
       try {
-        const resp = await fetch('https://lumen-backend-api.onrender.com/api/auth/verify', {
+        const resp = await fetch(`${API_BASE}/auth/verify`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
