@@ -643,11 +643,13 @@ if (!lastRun && !hasSavedJourney) {
       await prepareTyping(node);
       await applyTypingAndTTS(sectionId, node, { forceReplay: true });
     }
+    }  
   });
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init, { once: true });
   } else {
     init();
+  }
   }
 })();
