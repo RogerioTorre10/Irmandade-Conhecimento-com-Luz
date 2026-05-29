@@ -576,15 +576,33 @@
     (function resetJornadaIfNewRun() {
       const runId = String(Date.now());
       const lastRun = sessionStorage.getItem('JORNADA_RUN_ID');
-      if (!lastRun) {
-        sessionStorage.setItem('JORNADA_RUN_ID', runId);
-        const keys = ['JORNADA_GUIA', 'JORNADA_SELFIECARD', 'SELFIE_CARD', '__SELFIECARD_DONE__', 'JORNADA_PROGRESS', 'JORNADA_RESPOSTAS', 'JORNADA_STATE_CACHE'];
-        keys.forEach(k => {
-          try { sessionStorage.removeItem(k); localStorage.removeItem(k); } catch {}
-        });
-        console.log('[RESET] Jornada resetada para novo run:', runId);
-      }
-    })();
+
+    const hasSavedJourney =
+      localStorage.getItem('jornada_codigo') ||
+      localStorage.getItem('jornada_last_section') ||
+      localStorage.getItem('jornada_auth_ok');
+
+    if (!lastRun && !hasSavedJourney) {
+      sessionStorage.setItem('JORNADA_RUN_ID', runId);
+
+    const keys = [
+      'JORNADA_GUIA',
+      'JORNADA_SELFIECARD',
+      'SELFIE_CARD',
+      '__SELFIECARD_DONE__',
+      'JORNADA_PROGRESS',
+      'JORNADA_RESPOSTAS',
+      'JORNADA_STATE_CACHE'
+    ];
+
+    keys.forEach(k => {
+      sessionStorage.removeItem(k);
+      localStorage.removeItem(k);
+    });
+
+    console.log('[RESET] Jornada resetada para novo run:', runId);
+    }
+   })();
   }
 
     document.addEventListener('section:shown', async (e) => {
