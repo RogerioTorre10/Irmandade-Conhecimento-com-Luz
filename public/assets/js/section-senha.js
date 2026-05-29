@@ -406,8 +406,12 @@
   }
 
   async function initOnce(root, triggerToken) {
-    if (!root) return;
-    if (triggerToken !== window.JCSenha.state.initToken) return;
+  const API_BASE =
+    window.APP_CONFIG?.API_BASE ||
+    'https://lumen-backend-api.onrender.com/api';
+
+  if (!root) return;
+  if (triggerToken !== window.JCSenha.state.initToken) return;
 
     root.dataset.senhaInitialized = 'false';
     root.dataset.transitionReady = 'false';
