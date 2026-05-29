@@ -65,60 +65,65 @@
   // =====================================================
 
   function buildPayload(extra = {}) {
-    return {
-      email:
-        localStorage.getItem(STORAGE.EMAIL) ||
-        localStorage.getItem('jornada_email') ||
-        '',
+  const progressObj =
+    JSON.parse(
+      sessionStorage.getItem('JORNADA_PROGRESS') || '{}'
+    );
 
-      codigo_jornada:
-        localStorage.getItem(STORAGE.CODIGO) || '',
-
-      last_section:
-        localStorage.getItem('jornada_last_section') ||
-        'section-intro',
-
-      last_block:
-        localStorage.getItem('jornada_last_block') || '',
-
-      last_question:
-        toIntSafe(localStorage.getItem('jornada_last_question')),
-
-      progresso_json_temp: {
-        guia: sessionStorage.getItem('jornada.guia'),
-        idioma:
-          localStorage.getItem('i18n_lang') ||
-          window.i18n?.lang ||
-          'pt-BR',
-
-        respostas:
-          JSON.parse(
-            sessionStorage.getItem('JORNADA_RESPOSTAS') || '{}'
-          ),
-
-        const progressObj =
-          JSON.parse(
-             sessionStorage.getItem('JORNADA_PROGRESS') || '{}'
-        );
-
-        if (progressObj.total) {
-          progressObj.total = toIntSafe(progressObj.total);
-        }
-
-        if (progressObj.pergunta) {
-          progressObj.pergunta = toIntSafe(progressObj.pergunta);
-        }
-
-        dados:
-          JSON.parse(
-            sessionStorage.getItem('JORNADA_DADOS') || '{}'
-          )
-      },
-
-      ...extra,
-      last_question: toIntSafe(extra.last_question || localStorage.getItem('jornada_last_question'))
-    };
+  if (progressObj.total) {
+    progressObj.total = toIntSafe(progressObj.total);
   }
+
+  if (progressObj.pergunta) {
+    progressObj.pergunta = toIntSafe(progressObj.pergunta);
+  }
+
+  return {
+    email:
+      localStorage.getItem(STORAGE.EMAIL) ||
+      localStorage.getItem('jornada_email') ||
+      '',
+
+    codigo_jornada:
+      localStorage.getItem(STORAGE.CODIGO) || '',
+
+    last_section:
+      localStorage.getItem('jornada_last_section') ||
+      'section-intro',
+
+    last_block:
+      localStorage.getItem('jornada_last_block') || '',
+
+    last_question:
+      toIntSafe(
+        extra.last_question ||
+        localStorage.getItem('jornada_last_question')
+      ),
+
+    progresso_json_temp: {
+      guia: sessionStorage.getItem('jornada.guia'),
+
+      idioma:
+        localStorage.getItem('i18n_lang') ||
+        window.i18n?.lang ||
+        'pt-BR',
+
+      respostas:
+        JSON.parse(
+          sessionStorage.getItem('JORNADA_RESPOSTAS') || '{}'
+        ),
+
+      progresso: progressObj,
+
+      dados:
+        JSON.parse(
+          sessionStorage.getItem('JORNADA_DADOS') || '{}'
+        )
+    },
+
+    ...extra
+  };
+}
 
   // =====================================================
   // SAVE
