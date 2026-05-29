@@ -49,6 +49,17 @@
     return hash;
   }
 
+  function toIntSafe(value) {
+  if (value == null) return 0;
+
+  const first =
+    String(value)
+      .split('/')[0]
+      .replace(/[^\d]/g, '');
+
+  return Number(first) || 0;
+}
+
   // =====================================================
   // PAYLOAD
   // =====================================================
@@ -71,7 +82,7 @@
         localStorage.getItem('jornada_last_block') || '',
 
       last_question:
-        Number(localStorage.getItem('jornada_last_question') || 0),
+        toIntSafe(localStorage.getItem('jornada_last_question')),
 
       progresso_json_temp: {
         guia: sessionStorage.getItem('jornada.guia'),
@@ -96,7 +107,8 @@
           )
       },
 
-      ...extra
+      ...extra,
+      last_question: toIntSafe(extra.last_question || localStorage.getItem('jornada_last_question'))
     };
   }
 
