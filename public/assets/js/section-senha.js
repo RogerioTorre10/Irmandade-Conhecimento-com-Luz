@@ -641,6 +641,27 @@
     }
   });
 }
+
+ const enviarCodigoManual = async () => {
+  btnNext.dataset.authStage = 'start';
+  btnNext.click();
+};
+
+const btnEnviar2FA =
+  root.querySelector('#btn-enviar-2fa');
+
+const btnReenviar2FA =
+  root.querySelector('#btn-reenviar-2fa');
+
+if (btnEnviar2FA && btnEnviar2FA.dataset.boundSend !== '1') {
+  btnEnviar2FA.dataset.boundSend = '1';
+  btnEnviar2FA.addEventListener('click', enviarCodigoManual);
+}
+
+if (btnReenviar2FA && btnReenviar2FA.dataset.boundResend !== '1') {
+  btnReenviar2FA.dataset.boundResend = '1';
+  btnReenviar2FA.addEventListener('click', enviarCodigoManual);
+}   
     
     root.dataset.transitionReady = 'true';
     root.dataset.senhaInitialized = 'true';
