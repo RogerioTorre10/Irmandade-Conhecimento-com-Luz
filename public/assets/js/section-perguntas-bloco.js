@@ -1270,6 +1270,17 @@ function bindButtons(section, bloco, perguntaText) {
     };
   }
 
+  function saveAnswerSafe(payload = {}) {
+  window.JORNADA_RESPOSTAS = window.JORNADA_RESPOSTAS || [];
+
+  window.JORNADA_RESPOSTAS.push(payload);
+
+  sessionStorage.setItem(
+    'JORNADA_RESPOSTAS',
+    JSON.stringify(window.JORNADA_RESPOSTAS)
+  );
+}
+
   if (btnConfirm) {
     btnConfirm.onclick = async (ev) => {
       ev.preventDefault();
