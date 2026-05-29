@@ -644,7 +644,7 @@ if (
   await applyTypingAndTTS(sectionId, node, { forceReplay: true });
 }
     }  
-  });
+  })
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init, { once: true });
