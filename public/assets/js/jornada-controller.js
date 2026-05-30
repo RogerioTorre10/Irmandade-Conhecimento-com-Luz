@@ -556,7 +556,7 @@
   );
 
 }
-
+  }
     const authScreen = document.getElementById('auth-screen');
     if (authScreen) {
       localStorage.setItem('token', 'dummy-token');
@@ -587,69 +587,83 @@
     isInitializing = false;
 
     // Resets de sessão
-    (function resetJornadaIfNewRun() {
-      const runId = String(Date.now());
-const lastRun = sessionStorage.getItem('JORNADA_RUN_ID');
+(function resetJornadaIfNewRun() {
+  const runId = String(Date.now());
+  const lastRun = sessionStorage.getItem('JORNADA_RUN_ID');
 
-const savedSection =
-  localStorage.getItem('jornada_last_section');
+  const savedSection =
+    localStorage.getItem('jornada_last_section');
 
-const hasSavedJourney =
-  localStorage.getItem('jornada_codigo') ||
-  savedSection ||
-  localStorage.getItem('jornada_auth_ok');
+  const hasSavedJourney =
+    localStorage.getItem('jornada_codigo') ||
+    savedSection ||
+    localStorage.getItem('jornada_auth_ok');
 
-if (!lastRun) {
-  sessionStorage.setItem('JORNADA_RUN_ID', runId);
-}
+  if (!lastRun) {
+    sessionStorage.setItem('JORNADA_RUN_ID', runId);
+  }
 
-if (!lastRun && !hasSavedJourney) {
-  const keys = [
-    'JORNADA_GUIA',
-    'JORNADA_SELFIECARD',
-    'SELFIE_CARD',
-    '__SELFIECARD_DONE__',
-    'JORNADA_PROGRESS',
-    'JORNADA_RESPOSTAS',
-    'JORNADA_STATE_CACHE'
-  ];
+  if (!lastRun && !hasSavedJourney) {
+    const keys = [
+      'JORNADA_GUIA',
+      'JORNADA_SELFIECARD',
+      'SELFIE_CARD',
+      '__SELFIECARD_DONE__',
+      'JORNADA_PROGRESS',
+      'JORNADA_RESPOSTAS',
+      'JORNADA_STATE_CACHE'
+    ];
 
-  keys.forEach(k => {
-    sessionStorage.removeItem(k);
-    localStorage.removeItem(k);
-  });
+    keys.forEach(k => {
+      sessionStorage.removeItem(k);
+      localStorage.removeItem(k);
+    });
 
-  console.log('[RESET] Jornada resetada para novo run:', runId);
-} else {
-  console.log('[RESET] preservado por retomada:', savedSection);
-}
+    console.log('[RESET] Jornada resetada para novo run:', runId);
 
-    document.addEventListener('section:shown', async (e) => {
-    const { sectionId, node } = e.detail || {};
-    if (!node) return;
-
-    window.JC.currentSection = sectionId;
-    attachButtonEvents(sectionId, node);
-
-if (
-  (
-    isIntroLike(sectionId) ||
-    sectionId === 'section-dados-pessoais' ||
-    sectionId === 'section-final'
-  ) &&
-  sectionId !== lastShownSection
-) {
-  await applyI18nToSection(sectionId, node);
-  await prepareTyping(node);
-  await applyTypingAndTTS(sectionId, node, { forceReplay: true });
-}
-    }) 
-  });
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init, { once: true });
   } else {
-    init();
+
+    console.log(
+      '[RESET] preservado por retomada:',
+      savedSection
+    );
   }
+
+})(); // FECHA A IIFE AQUI
+
+document.addEventListener('section:shown', async (e) => {
+  const { sectionId, node } = e.detail || {};
+  if (!node) return;
+
+  window.JC.currentSection = sectionId;
+  attachButtonEvents(sectionId, node);
+
+  if (
+    (
+      isIntroLike(sectionId) ||
+      sectionId === 'section-dados-pessoais' ||
+      sectionId === 'section-final'
+    ) &&
+    sectionId !== lastShownSection
+  ) {
+    await applyI18nToSection(sectionId, node);
+    await prepareTyping(node);
+    await applyTypingAndTTS(
+      sectionId,
+      node,
+      { forceReplay: true }
+    );
   }
+});
+
+if (document.readyState === 'loading') {
+  document.addEventListener(
+    'DOMContentLoaded',
+    init,
+    { once: true }
+  );
+} else {
+  init();
+}
+
 })();
