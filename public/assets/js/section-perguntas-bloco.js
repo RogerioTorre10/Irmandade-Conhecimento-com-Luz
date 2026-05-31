@@ -1119,7 +1119,20 @@ async function maybeHandleBlockClosure(section, bloco) {
     }
 
     const result = await gerarDevolutivaDoBloco(bloco);
-    const textoFinal = String(result?.texto || '').trim();
+
+    console.log('[BLOCO][RESULT]', result);
+
+    const textoFinal = String(
+      result?.texto ||
+      result?.devolutiva ||
+      result?.resposta ||
+      result?.message ||
+      result?.content ||
+      result?.data?.texto ||
+      result?.data?.devolutiva ||
+      result?.data?.resposta ||
+      ''
+    ).trim();
 
     if (!textoFinal) {
       console.warn('[BLOCO] devolutiva do bloco vazia');
