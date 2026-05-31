@@ -1331,9 +1331,9 @@ function bindButtons(section, bloco, perguntaText) {
         const respostas =
           JSON.parse(
             sessionStorage.getItem('JORNADA_RESPOSTAS') || '{}'
-          );
+         );
 
-        const blocoId =
+        const blocoKey =
           bloco?.id || 'raizes';
 
         const perguntaTexto =
@@ -1341,15 +1341,15 @@ function bindButtons(section, bloco, perguntaText) {
           bloco?.perguntas?.[0]?.pergunta ||
           '';
 
-        respostas[blocoId] =
-        respostas[blocoId] || [];
+        respostas[blocoKey] =
+          respostas[blocoKey] || [];
 
-        respostas[blocoId][0] = {
+        respostas[blocoKey][0] = {
           pergunta: perguntaTexto,
           resposta: val,
-          blocoId,
+          blocoId: blocoKey,
           index: 0
-         };
+        };
 
         sessionStorage.setItem(
           'JORNADA_RESPOSTAS',
