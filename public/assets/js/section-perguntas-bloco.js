@@ -1327,6 +1327,34 @@ function bindButtons(section, bloco, perguntaText) {
         }
 
         saveAnswerSafe(bloco, 0, val);
+
+        const respostas =
+          JSON.parse(
+            sessionStorage.getItem('JORNADA_RESPOSTAS') || '{}'
+          );
+
+        const blocoId =
+          bloco?.id || 'raizes';
+
+        const perguntaTexto =
+          bloco?.perguntas?.[0]?.texto ||
+          bloco?.perguntas?.[0]?.pergunta ||
+          '';
+
+        respostas[blocoId] =
+        respostas[blocoId] || [];
+
+        respostas[blocoId][0] = {
+          pergunta: perguntaTexto,
+          resposta: val,
+          blocoId,
+          index: 0
+         };
+
+        sessionStorage.setItem(
+          'JORNADA_RESPOSTAS',
+          JSON.stringify(respostas)
+        );
         setContinueState(section, 'loading');
 
         await setGuideResponse(
