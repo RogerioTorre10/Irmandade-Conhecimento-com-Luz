@@ -465,7 +465,7 @@
           } else {
             Promise.resolve().then(run).then(done).catch(done);
           }
-        }, 60);
+        }, 0);
       });
     } catch {
       window.__SELFIECARD_PROMISE__ = Promise.resolve(true);
@@ -569,11 +569,20 @@
     const section = findSection(root || null);
     if (!section) return;
 
+    section.style.visibility = 'hidden';
+
     buildMarkup(section);
     renderCard(section);
     bind(section);
+
+    Promise.resolve(
+      window.__SELFIECARD_PROMISE__ || Promise.resolve()
+    ).finally(() => {
+
+    section.style.visibility = 'visible';
+
     runTypingInSection(section).catch(() => {});
-  }
+  });
 
   document.addEventListener('DOMContentLoaded', () => {
     applyThemeFromStorage();
