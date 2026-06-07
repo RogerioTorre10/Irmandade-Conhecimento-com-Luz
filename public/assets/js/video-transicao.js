@@ -311,7 +311,7 @@ Object.assign(frame.style, {
         });
       });
     }, 80);
-   }
+   })
       
     skip.addEventListener('click', finishAndGo);
 
