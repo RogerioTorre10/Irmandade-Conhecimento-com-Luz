@@ -459,7 +459,7 @@
           const done = () => resolve(true);
 
           if ('requestIdleCallback' in window) {
-            requestIdleCallback(() => {
+            requestAnimationFrame(() => {
               Promise.resolve().then(run).then(done).catch(done);
             }, { timeout: 1200 });
           } else {
