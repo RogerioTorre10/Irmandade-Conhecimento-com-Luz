@@ -578,15 +578,10 @@
     Promise.resolve(
       window.__SELFIECARD_PROMISE__ || Promise.resolve()
     ).finally(() => {
-
-    section.style.visibility = 'visible';
-
-    runTypingInSection(section).catch(() => {});
-  });
-
-  document.addEventListener('DOMContentLoaded', () => {
-    applyThemeFromStorage();
-  });
+      section.style.visibility = 'visible';
+      runTypingInSection(section).catch(() => {});
+    });
+  }
 
   document.addEventListener('section:shown', (e) => {
     const id = e.detail && e.detail.sectionId;
