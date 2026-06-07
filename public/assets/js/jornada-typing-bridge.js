@@ -92,13 +92,22 @@
  };
 
   function __loadVoicesNow() {
-    try {
-      __voices = speechSynthesis.getVoices?.() || [];
-    } catch {
-      __voices = [];
+  try {
+    const next = speechSynthesis.getVoices?.() || [];
+    const oldSig = (__voices || []).map(v => `${v.name}|${v.lang}`).join('||');
+    const newSig = next.map(v => `${v.name}|${v.lang}`).join('||');
+
+    __voices = next;
+
+    if (oldSig !== newSig) {
+      __voiceCache.clear();
     }
-    return __voices;
+  } catch {
+    __voices = [];
   }
+
+  return __voices;
+}
 
   function __ensureVoicesReady(timeoutMs = 1600) {
     if (!('speechSynthesis' in window)) return Promise.resolve();
