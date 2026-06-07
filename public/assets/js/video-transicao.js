@@ -292,21 +292,17 @@ Object.assign(frame.style, {
 
       try { ambient.pause(); } catch (_) {}
 
-      overlay.classList.remove('show');
-      overlay.classList.add('hide');
-      overlay.style.opacity = '0';
-
       setTimeout(() => {
         navigateTo(nextSectionId);
 
         requestAnimationFrame(() => {
-          cleanup();
-          document.body.classList.remove('vt-fade-out');
-          document.body.classList.add('vt-fade-in');
-          setTimeout(() => document.body.classList.remove('vt-fade-in'), 650);
+          requestAnimationFrame(() => {
+            overlay.classList.remove('show');
+            overlay.classList.add('hide');
+            overlay.style.opacity = '0';
+          });
         });
-      }, 620);
-    });
+     }, 80);
 
     skip.addEventListener('click', finishAndGo);
 
