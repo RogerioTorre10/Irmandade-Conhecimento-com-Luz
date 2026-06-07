@@ -312,27 +312,69 @@ Object.assign(frame.style, {
 
     document.addEventListener('keydown', onKeydown, true);
 
+    const waitMediaReady = (media, timeout = 1800) => {
+      return new Promise((resolve) => {
+       if (!media) return resolve();
+
+       if (media.readyState >= 2) return resolve();
+
+       let done = false;
+
+       const finish = () => {
+         if (done) return;
+         done = true;
+         media.removeEventListener('loadedmetadata', finish);
+         media.removeEventListener('canplay', finish);
+         resolve();
+       };
+
+       media.addEventListener('loadedmetadata', finish, { once: true });
+       media.addEventListener('canplay', finish, { once: true });
+
+       try { media.load(); } catch (_) {}
+
+       setTimeout(finish, timeout);
+     });
+    };
+
+    const resetMedia = async (media) => {
+       if (!media) return;
+
+       try { media.pause(); } catch (_) {}
+
+       try {
+         media.currentTime = 0;
+       } catch (_) {}
+
+       await waitMediaReady(media);
+
+       try {
+         media.currentTime = 0;
+       } catch (_) {}
+    };
+
     const tryPlayBoth = async () => {
-      try { ambient.currentTime = 0; } catch (_) {}
-      try { video.currentTime = 0; } catch (_) {}
+       await resetMedia(ambient);
+       await resetMedia(video);
 
-      try {
-        await ambient.play();
-        log('Ambient tocando.');
-      } catch (err) {
-        warn('Falha ao tocar ambient:', err?.message || err);
-      }
+       try {
+         await ambient.play();
+         log('Ambient tocando.');
+       } catch (err) {
+         warn('Falha ao tocar ambient:', err?.message || err);
+       }
 
-      try {
-        await video.play();
-        log('Vídeo principal tocando.');
-      } catch (err) {
-        warn('Falha ao tocar vídeo principal:', err?.message || err);
-        video.muted = true;
-        ambient.muted = true;
+       try {
+         await video.play();
+         log('Vídeo principal tocando.');
+       } catch (err) {
+         warn('Falha ao tocar vídeo principal:', err?.message || err);
 
-        try { await ambient.play(); } catch (_) {}
-        try { await video.play(); } catch (_) {}
+         video.muted = true;
+         ambient.muted = true;
+
+       try { await ambient.play(); } catch (_) {}
+       try { await video.play(); } catch (_) {}
       }
     };
 
