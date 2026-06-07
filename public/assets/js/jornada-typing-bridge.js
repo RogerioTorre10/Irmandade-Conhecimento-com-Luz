@@ -271,6 +271,20 @@
 
     let candidates = exact.length ? exact : family;
 
+    if (guide === 'zion' && candidates.length) {
+      const maleHints = /male|man|homem|masculin|masculine|daniel|david|alex|jorge|paul|carlos|felipe|ricardo|antonio|bruno|thomas/i;
+      const femaleHints = /female|woman|mulher|feminin|feminine|zira|samantha|helena|luciana|maria|sofia|victoria|ana|paulina|monica|marie|amelie|celine|audrey|denise/i;
+
+    const maleCandidates = candidates.filter(v =>
+      maleHints.test(String(v.name || '')) &&
+      !femaleHints.test(String(v.name || ''))
+    );
+
+    if (maleCandidates.length) {
+      candidates = maleCandidates;
+      }
+    }
+
     if (!candidates.length) {
       typingLog('Nenhuma voz compatível com o idioma. Usando fallback global.', {
         requestedLang: lang,
