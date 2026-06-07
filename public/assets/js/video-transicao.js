@@ -296,17 +296,21 @@ Object.assign(frame.style, {
 
       try { ambient.pause(); } catch (_) {}
 
+      window.__TRANSITION_LOCK = false;
+      window.JORNADA_TRANSICAO_ATIVA = false;
+      isPlaying = false;
+
       setTimeout(() => {
         navigateTo(nextSectionId);
 
+      requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           overlay.classList.remove('show');
           overlay.classList.add('hide');
           overlay.style.opacity = '0';
         });
       });
-     }, 80);
-
+    }, 80);
     skip.addEventListener('click', finishAndGo);
 
     overlay.addEventListener('click', (e) => {
