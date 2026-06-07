@@ -300,12 +300,11 @@ Object.assign(frame.style, {
         navigateTo(nextSectionId);
 
         requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            overlay.classList.remove('show');
-            overlay.classList.add('hide');
-            overlay.style.opacity = '0';
-          });
+          overlay.classList.remove('show');
+          overlay.classList.add('hide');
+          overlay.style.opacity = '0';
         });
+      });
      }, 80);
 
     skip.addEventListener('click', finishAndGo);
