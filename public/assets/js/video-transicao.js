@@ -161,6 +161,8 @@
   ambient.muted = true;
   ambient.loop = true;
   ambient.preload = 'auto';
+  ambient.setAttribute('playsinline', '');
+  ambient.setAttribute('webkit-playsinline', '');    
 
   Object.assign(ambient.style, {
     position: 'fixed',
@@ -211,6 +213,8 @@ Object.assign(frame.style, {
   video.controls = false;
   video.muted = true;
   video.preload = 'auto';
+  video.setAttribute('playsinline', '');
+  video.setAttribute('webkit-playsinline', '');    
 
   Object.assign(video.style, {
     position: 'absolute',
