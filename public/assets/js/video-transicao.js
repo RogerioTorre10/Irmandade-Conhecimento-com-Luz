@@ -161,8 +161,6 @@
   ambient.muted = true;
   ambient.loop = true;
   ambient.preload = 'auto';
-  ambient.setAttribute('playsinline', '');
-  ambient.setAttribute('webkit-playsinline', '');    
 
   Object.assign(ambient.style, {
     position: 'fixed',
@@ -177,33 +175,24 @@
     pointerEvents: 'none'
   });
 
-  // primeiro cria o frame
-const frame = document.createElement('div');
-frame.id = 'vt-frame';
-frame.className = 'vt-video-frame';
+  const frame = document.createElement('div');
+  frame.id = 'vt-frame';
+  frame.className = 'vt-video-frame';
 
-// AGORA sim calcula as dimensões (depois do frame existir)
-const _isMobile = window.innerWidth < 768;
-const _vw = window.innerWidth * (_isMobile ? 0.96 : 0.94);
-const _maxH = window.innerHeight * (_isMobile ? 0.70 : 0.72);
-const _ar = 16 / 9;
-let _fw = _vw;
-let _fh = _fw / _ar;
-if (_fh > _maxH) { _fh = _maxH; _fw = _fh * _ar; }
-
-Object.assign(frame.style, {
-  position: 'relative',
-  display: 'block',
-  width: `${Math.round(_fw)}px`,
-  height: `${Math.round(_fh)}px`,
-  maxWidth: _isMobile ? '96vw' : '94vw',
-  maxHeight: _isMobile ? '70vh' : '72vh',
-  borderRadius: '18px',
-  overflow: 'hidden',
-  background: 'rgba(0,0,0,0.45)',
-  boxShadow: '0 0 0 2px rgba(212,175,55,.82), 0 0 42px rgba(212,175,55,.45)',
-  zIndex: '5'
-});
+  Object.assign(frame.style, {
+    position: 'relative',
+    display: 'block',
+    width: 'min(96vw, 1280px)',
+    height: 'min(82vh, 720px)',
+    maxWidth: '96vw',
+    maxHeight: '82vh',
+    borderRadius: '18px',
+    overflow: 'hidden',
+    background: 'rgba(0,0,0,0.45)',
+    boxShadow:
+      '0 0 0 2px rgba(212,175,55,.82), 0 0 42px rgba(212,175,55,.45)',
+    zIndex: '5'
+  });
 
   const video = document.createElement('video');
   video.id = 'vt-video';
@@ -213,8 +202,6 @@ Object.assign(frame.style, {
   video.controls = false;
   video.muted = true;
   video.preload = 'auto';
-  video.setAttribute('playsinline', '');
-  video.setAttribute('webkit-playsinline', '');    
 
   Object.assign(video.style, {
     position: 'absolute',
@@ -274,8 +261,7 @@ Object.assign(frame.style, {
     }
 
     isPlaying = true;
-    window.JORNADA_TRANSICAO_ATIVA = true;  
-    
+
     document.body.classList.remove('vt-fade-in');
     document.body.classList.add('vt-fade-out');
 
@@ -291,34 +277,27 @@ Object.assign(frame.style, {
     const onResize = () => fitFrameToVideo(frame, video);
     window.addEventListener('resize', onResize);
 
-    const finishAndGo = () => {
-      if (finishAndGo.__done) return;
-      finishAndGo.__done = true;
-
+    const finishAndGo = safeOnce(() => {
       window.removeEventListener('resize', onResize);
 
-      try { clearTimeout(safetyTimer); } catch (_) {}
       try { ambient.pause(); } catch (_) {}
-      try { video.pause(); } catch (_) {}
 
-      window.__TRANSITION_LOCK = false;
-      window.JORNADA_TRANSICAO_ATIVA = false;
-      isPlaying = false;
+      overlay.classList.remove('show');
+      overlay.classList.add('hide');
+      overlay.style.opacity = '0';
 
-      document.dispatchEvent(new CustomEvent('transition:ended'));
-      window.dispatchEvent(new CustomEvent('jornada:transicao:end'));
+      setTimeout(() => {
+        navigateTo(nextSectionId);
 
-      if (nextSectionId) navigateTo(nextSectionId);
-
-      requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          overlay.classList.remove('show');
-          overlay.classList.add('hide');
-          overlay.style.opacity = '0';
+          cleanup();
+          document.body.classList.remove('vt-fade-out');
+          document.body.classList.add('vt-fade-in');
+          setTimeout(() => document.body.classList.remove('vt-fade-in'), 650);
         });
-      });
-    };
-      
+      }, 620);
+    });
+
     skip.addEventListener('click', finishAndGo);
 
     overlay.addEventListener('click', (e) => {
@@ -327,69 +306,27 @@ Object.assign(frame.style, {
 
     document.addEventListener('keydown', onKeydown, true);
 
-    const waitMediaReady = (media, timeout = 1800) => {
-      return new Promise((resolve) => {
-       if (!media) return resolve();
-
-       if (media.readyState >= 2) return resolve();
-
-       let done = false;
-
-       const finish = () => {
-         if (done) return;
-         done = true;
-         media.removeEventListener('loadedmetadata', finish);
-         media.removeEventListener('canplay', finish);
-         resolve();
-       };
-
-       media.addEventListener('loadedmetadata', finish, { once: true });
-       media.addEventListener('canplay', finish, { once: true });
-
-       try { media.load(); } catch (_) {}
-
-       setTimeout(finish, timeout);
-     });
-    };
-
-    const resetMedia = async (media) => {
-       if (!media) return;
-
-       try { media.pause(); } catch (_) {}
-
-       try {
-         media.currentTime = 0;
-       } catch (_) {}
-
-       await waitMediaReady(media);
-
-       try {
-         media.currentTime = 0;
-       } catch (_) {}
-    };
-
     const tryPlayBoth = async () => {
-       await resetMedia(ambient);
-       await resetMedia(video);
+      try { ambient.currentTime = 0; } catch (_) {}
+      try { video.currentTime = 0; } catch (_) {}
 
-       try {
-         await ambient.play();
-         log('Ambient tocando.');
-       } catch (err) {
-         warn('Falha ao tocar ambient:', err?.message || err);
-       }
+      try {
+        await ambient.play();
+        log('Ambient tocando.');
+      } catch (err) {
+        warn('Falha ao tocar ambient:', err?.message || err);
+      }
 
-       try {
-         await video.play();
-         log('Vídeo principal tocando.');
-       } catch (err) {
-         warn('Falha ao tocar vídeo principal:', err?.message || err);
+      try {
+        await video.play();
+        log('Vídeo principal tocando.');
+      } catch (err) {
+        warn('Falha ao tocar vídeo principal:', err?.message || err);
+        video.muted = true;
+        ambient.muted = true;
 
-         video.muted = true;
-         ambient.muted = true;
-
-       try { await ambient.play(); } catch (_) {}
-       try { await video.play(); } catch (_) {}
+        try { await ambient.play(); } catch (_) {}
+        try { await video.play(); } catch (_) {}
       }
     };
 
