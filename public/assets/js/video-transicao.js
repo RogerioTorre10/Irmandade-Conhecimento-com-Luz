@@ -299,8 +299,9 @@
         setTimeout(() => {
           document.body.classList.remove('vt-fade-in');
         }, 650);
-       }, 900);
-      
+      }, 900);
+    });
+                                 
     skip.addEventListener('click', finishAndGo);
 
     overlay.addEventListener('click', (e) => {
