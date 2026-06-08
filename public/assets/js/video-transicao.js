@@ -291,17 +291,24 @@ Object.assign(frame.style, {
     const onResize = () => fitFrameToVideo(frame, video);
     window.addEventListener('resize', onResize);
 
-    const finishAndGo = safeOnce(() => {
+    const finishAndGo = () => {
+      if (finishAndGo.__done) return;
+      finishAndGo.__done = true;
+
       window.removeEventListener('resize', onResize);
 
+      try { clearTimeout(safetyTimer); } catch (_) {}
       try { ambient.pause(); } catch (_) {}
+      try { video.pause(); } catch (_) {}
 
       window.__TRANSITION_LOCK = false;
       window.JORNADA_TRANSICAO_ATIVA = false;
       isPlaying = false;
 
-      setTimeout(() => {
-        navigateTo(nextSectionId);
+      document.dispatchEvent(new CustomEvent('transition:ended'));
+      window.dispatchEvent(new CustomEvent('jornada:transicao:end'));
+
+      if (nextSectionId) navigateTo(nextSectionId);
 
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
@@ -310,8 +317,7 @@ Object.assign(frame.style, {
           overlay.style.opacity = '0';
         });
       });
-    }, 80);
-   });
+    };
       
     skip.addEventListener('click', finishAndGo);
 
