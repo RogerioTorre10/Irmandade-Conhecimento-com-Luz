@@ -426,28 +426,6 @@
     await sleep(80);
   }
 
-  function waitForTransitionUnlock(timeout = 12000) {
-    return new Promise((resolve) => {
-      const started = Date.now();
-
-      const check = () => {
-        const videoAtivo =
-          document.body.classList.contains('transition-playing') ||
-          document.body.classList.contains('is-transitioning') ||
-          document.querySelector('.video-transition.show, .video-transition.active, .transition-video.show, .transition-video.active');
-
-        if (!videoAtivo || Date.now() - started > timeout) {
-          resolve();
-          return;
-        }
-
-        requestAnimationFrame(check);
-       };
-
-       check();
-     });
-  } 
-
   async function initOnce(root, triggerToken) {
     if (!root) return;
     if (triggerToken !== window.JCTermos1.state.initToken) return;
