@@ -287,17 +287,20 @@
       overlay.style.opacity = '0';
 
       setTimeout(() => {
-        navigateTo(nextSectionId);
+        cleanup();
 
-        requestAnimationFrame(() => {
-          cleanup();
-          document.body.classList.remove('vt-fade-out');
-          document.body.classList.add('vt-fade-in');
-          setTimeout(() => document.body.classList.remove('vt-fade-in'), 650);
-        });
-      }, 620);
-    });
+        document.body.classList.remove('vt-fade-out');
+        document.body.classList.add('vt-fade-in');
 
+        setTimeout(() => {
+          navigateTo(nextSectionId);
+        }, 180);
+
+        setTimeout(() => {
+          document.body.classList.remove('vt-fade-in');
+        }, 650);
+       }, 900);
+      
     skip.addEventListener('click', finishAndGo);
 
     overlay.addEventListener('click', (e) => {
