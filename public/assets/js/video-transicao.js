@@ -262,6 +262,11 @@
 
     isPlaying = true;
 
+    window.__TRANSITION_LOCK = true;
+    window.JORNADA_TRANSICAO_ATIVA = true;
+
+    document.body.classList.add('is-transitioning');
+    document.body.classList.add('transition-playing');
     document.body.classList.remove('vt-fade-in');
     document.body.classList.add('vt-fade-out');
 
