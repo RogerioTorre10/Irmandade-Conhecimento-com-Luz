@@ -861,7 +861,6 @@ if (showCursor) element.appendChild(caret);
   };
 
   typingLog('TransitionGuard instalado — typing aguarda fim do vídeo.');
-})();
 
   typingLog('TypingBridge pronto');
 })(window);
