@@ -116,6 +116,9 @@
 
       window.__TRANSITION_LOCK = false;
       window.JORNADA_TRANSICAO_ATIVA = false;
+      document.body.classList.remove('is-transitioning');
+      document.body.classList.remove('transition-playing');
+      
       isPlaying = false;
 
       document.dispatchEvent(new CustomEvent('transition:ended'));
