@@ -817,7 +817,7 @@ if (showCursor) element.appendChild(caret);
   const _origTypeAndSpeak = window.typeAndSpeak;
   const _origRunTyping    = window.runTyping;
 
-  // Aguarda fim da transição se estiver ativa, senão executa direto
+function waitTransitionThen(fn) {
   const transicaoAtiva =
     window.JORNADA_TRANSICAO_ATIVA === true ||
     window.__TRANSITION_LOCK === true ||
@@ -862,5 +862,9 @@ if (showCursor) element.appendChild(caret);
 
   typingLog('TransitionGuard instalado — typing aguarda fim do vídeo.');
 
-  typingLog('TypingBridge pronto');
+})();  
+
+typingLog('TypingBridge pronto');
+
+  
 })(window);
