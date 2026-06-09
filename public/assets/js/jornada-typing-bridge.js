@@ -818,10 +818,17 @@ if (showCursor) element.appendChild(caret);
   const _origRunTyping    = window.runTyping;
 
   // Aguarda fim da transição se estiver ativa, senão executa direto
-  function waitTransitionThen(fn) {
-    if (!window.JORNADA_TRANSICAO_ATIVA) {
-      return fn();
-    }
+  const transicaoAtiva =
+    window.JORNADA_TRANSICAO_ATIVA === true ||
+    window.__TRANSITION_LOCK === true ||
+    document.body.classList.contains('is-transitioning') ||
+    document.body.classList.contains('transition-playing') ||
+    document.getElementById('vt-overlay') ||
+    document.getElementById('transition-overlay');
+
+  if (!transicaoAtiva) {
+    return fn();
+  }
 
     typingLog('Transição ativa — typing em espera…');
 
