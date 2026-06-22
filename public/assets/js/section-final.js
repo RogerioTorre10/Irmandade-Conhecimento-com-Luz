@@ -229,14 +229,10 @@ function buildBlockSynthesisText(blocos = []) {
   return blocos
     .map((bloco, index) => {
       const titulo = String(bloco?.titulo || `Bloco ${index + 1}`).trim();
-      const respostas = Array.isArray(bloco?.respostas)
-        ? bloco.respostas.map((r) => String(r || '').trim()).filter(Boolean)
-        : [];
       const devolutiva = String(bloco?.devolutiva || '').trim();
 
       return [
         `${index + 1}. ${titulo}`,
-        respostas.length ? `Respostas: ${respostas.join(' | ')}` : '',
         devolutiva ? `Síntese do bloco: ${devolutiva}` : ''
       ].filter(Boolean).join('\n');
     })
@@ -1027,16 +1023,16 @@ function buildFinalSynthesisPayload() {
       const body = {
         nome,
         guia: guiaId,
-        respostas,
+        respostas: [],
         devolutivas,
         blocos,
         sinteseBlocos,
         dadosPessoais,
-        idioma: getActiveLang(),
-        retry: isRetry,
-        forceComplete: true,
-        minSentences: guiaId === 'lumen' ? 8 : 7,
-        minChars: guiaId === 'lumen' ? 1000 : 850
+       idioma: getActiveLang(),
+       retry: isRetry,
+       forceComplete: true,
+       minSentences: guiaId === 'lumen' ? 8 : 7,
+       minChars: guiaId === 'lumen' ? 1000 : 850
       };
 
       console.log('[FINAL][DEVOLUTIVA] tentando com guia:', guiaId, body);
