@@ -645,45 +645,40 @@ function buildFinalSynthesisPayload() {
   // PAYLOAD FINAL
   // ================================
   function buildFinalPayloadDiamante() {
-    const s = getJornadaState();
+  const s = getJornadaState();
+  const nome = String(
+    s.nome ?? s.name ?? s.participantName ?? s.participante ?? localStorage.getItem('JORNADANOME') ?? sessionStorage.getItem('JORNADANOME') ?? 'Caminhante'
+  ).trim();
 
-    const nome = String(
-      s.nome ?? s.name ?? s.participantName ?? s.participante ??
-      localStorage.getItem('JORNADA_NOME') ?? sessionStorage.getItem('JORNADA_NOME') ?? ''
-    ).trim();
+  const guiaNorm = readGuideFromEverywhere(s);
+  const guia = String(guiaNorm.id || 'lumen').trim().toLowerCase();
 
-    const guiaNorm = readGuideFromEverywhere(s);
-    const guia = String(guiaNorm.id || '').trim().toLowerCase();
+  const respostasEstruturadas = collectPerguntasPayload();
+  const respostas = respostasEstruturadas
+    .map(item => String(item.resposta || '').trim())
+    .filter(Boolean);
 
-    const respostasEstruturadas = collectPerguntasPayload();
-    const respostas = respostasEstruturadas
-      .map((item) => String(item.resposta || '').trim())
-      .filter(Boolean);
+  const blocosData = buildFinalSynthesisPayload();
+  const dadosPessoaisRaw = getDadosPessoaisPayload();
+  const dadosPessoais = buildDadosPessoaisFinalSilencioso(dadosPessoaisRaw);
+  const selfieCard = readSelfieCardFromEverywhere(s);
+  const devolutivaFinal = getStoredFinalFeedback();
 
-    const selfieCard = readSelfieCardFromEverywhere(s);
-    const devolutivaFinal = getStoredFinalFeedback();
-    const dadosPessoaisRaw = getDadosPessoaisPayload();
-    const dadosPessoais = buildDadosPessoaisFinalSilencioso(dadosPessoaisRaw);
-    const blocosData = buildFinalSynthesisPayload();
+  const payload = {
+    nome,
+    guia,
+    idioma: getActiveLang(),
+    respostas,
+    blocos: Array.isArray(blocosData?.blocos) ? blocosData.blocos : [],
+    sinteseBlocos: String(blocosData?.sinteseBlocos || '').trim(),
+    dadosPessoais,
+    selfieCard,
+    devolutivaFinal
+  };
 
-    const payload = {
-     nome,
-     guia,
-     respostas,
-     blocos: blocosData.blocos,
-     sinteseBlocos: blocosData.sinteseBlocos,
-     selfieCard,
-     devolutivaFinal,
-     dadosPessoais,
-     idioma: getActiveLang()
-   };
-
-    console.log('[FINAL][PAYLOAD NORMALIZED]', payload, '[GUIA]', guiaNorm);
-    return payload;
-  }
-
-  window.buildFinalPayloadDiamante = buildFinalPayloadDiamante;
-
+  window.LASTFINALPAYLOAD = payload;
+  return payload;
+}
   // ================================
   // TTS
   // ================================
@@ -870,22 +865,19 @@ function buildFinalSynthesisPayload() {
   }
 
   function isWeakFeedback(text, opts = {}) {
-    const minChars = Number(opts.minChars ?? 180);
-    const minSentences = Number(opts.minSentences ?? 3);
-    const txt = String(text || '').replace(/\s+/g, ' ').trim();
+  const minChars = Number(opts.minChars ?? 520);
+  const minSentences = Number(opts.minSentences ?? 5);
+  const txt = String(text || '').replace(/\s+/g, ' ').trim();
+  if (!txt) return true;
+  if (txt.length < minChars) return true;
+  const sentences = txt.split(/[.!?]+/).map(s => s.trim()).filter(Boolean);
+  if (sentences.length < minSentences) return true;
+  return false;
+}
 
-    if (!txt) return true;
-    if (txt.length < minChars) return true;
-    if (countSentences(txt) < minSentences) return true;
-    if (!/[.!?…]$/.test(txt)) return true;
-    return false;
-  }
-
-  function buildGuideFallbackText(guiaRaw, nomeRaw) {
-    const guia = normalizeGuide(guiaRaw).id || 'lumen';
-    const nome = String(nomeRaw || 'Caminhante').trim() || 'Caminhante';
-    const lang = getActiveLang();
-
+function buildGuideFallbackText(guiaRaw, nomeRaw) {
+  const guia = normalizeGuide(guiaRaw?.id || guiaRaw || 'lumen').id || 'lumen';
+  const nome = String(nomeRaw || 'Caminhante').trim();
     const fallbackI18n = {
       'pt-BR': {
         lumen: `${nome}, sua jornada revelou sinais de sensibilidade, coragem e abertura interior. Cada resposta sua deixou marcas de verdade no pergaminho da alma. Continue avançando com fé, porque a luz que você procura também cresce dentro de você.`,
@@ -978,98 +970,63 @@ function buildFinalSynthesisPayload() {
 
   async function fetchFinalGuideFeedback() {
   const payload = buildFinalPayloadDiamante();
-
-  const respostas = Array.isArray(payload?.respostas)
-    ? payload.respostas.filter(Boolean)
-    : [];
-
-  const devolutivas = Array.isArray(payload?.blocos)
-    ? payload.blocos
-        .map((b) => String(b?.devolutiva || '').trim())
-        .filter(Boolean)
-    : collectIntermediateFeedbacks();
-
-  const guiaOriginal = normalizeGuide(payload?.guia || 'lumen').id || 'lumen';
-  const nome = String(payload?.nome || 'Caminhante').trim() || 'Caminhante';
-  const fallbackText = buildGuideFallbackText(guiaOriginal, nome);
-
+  const respostas = Array.isArray(payload?.respostas) ? payload.respostas.filter(Boolean) : [];
   const blocos = Array.isArray(payload?.blocos) ? payload.blocos : [];
   const sinteseBlocos = String(payload?.sinteseBlocos || '').trim();
-  const dadosPessoais = buildDadosPessoaisFinalSilencioso(payload?.dadosPessoais || {});
-    
-  if (!respostas.length && !devolutivas.length && !blocos.length) {
-    return {
-      ok: true,
-      text: fallbackText,
-      guiaUsado: 'lumen',
-      guiaOriginal,
-      fallbackUsed: true
-    };
+  const guiaOriginal = normalizeGuide(payload?.guia || 'lumen').id || 'lumen';
+  const nome = String(payload?.nome || 'Caminhante').trim();
+  const dadosPessoais = buildDadosPessoaisFinalSilencioso(payload?.dadosPessoais);
+
+  if (!respostas.length && !blocos.length && !sinteseBlocos) {
+    return { ok: true, text: buildGuideFallbackText({ id: guiaOriginal }, nome), guiaUsado: guiaOriginal, fallbackUsed: true };
   }
 
-  const guiasParaTentar = [guiaOriginal, guiaOriginal];
-
-  if (guiaOriginal !== 'lumen') {
-    guiasParaTentar.push('lumen');
-  }
+  const guiasParaTentar = [guiaOriginal];
+  if (guiaOriginal !== 'lumen') guiasParaTentar.push('lumen');
 
   let ultimoErro = null;
 
-  for (let idx = 0; idx < guiasParaTentar.length; idx++) {
-    const guiaId = guiasParaTentar[idx];
-    const isRetry = idx === 1 && guiaId === guiaOriginal;
-
+  for (let i = 0; i < guiasParaTentar.length; i++) {
+    const guiaId = guiasParaTentar[i];
     try {
       const body = {
         nome,
         guia: guiaId,
-        respostas: [],
-        devolutivas,
+        idioma: getActiveLang(),
+        respostas,
         blocos,
         sinteseBlocos,
         dadosPessoais,
-       idioma: getActiveLang(),
-       retry: isRetry,
-       forceComplete: true,
-       minSentences: guiaId === 'lumen' ? 8 : 7,
-       minChars: guiaId === 'lumen' ? 1000 : 850
+        retry: i > 0,
+        forceComplete: true
       };
-
-      console.log('[FINAL][DEVOLUTIVA] tentando com guia:', guiaId, body);
 
       const result = await postFinalFeedback(body);
       const texto = String(result?.texto || '').trim();
 
-      if (isWeakFeedback(texto, {
-        minChars: guiaId === 'lumen' ? 900 : 780,
-        minSentences: guiaId === 'lumen' ? 8 : 6
-      })) {
-        ultimoErro = new Error(`Devolutiva curta ou incompleta para ${guiaId}`);
-        console.warn('[FINAL][DEVOLUTIVA] resposta fraca, tentando próxima camada:', guiaId, texto);
+      if (isWeakFeedback(texto, { minChars: 520, minSentences: 5 })) {
+        ultimoErro = new Error('Devolutiva final fraca');
         continue;
       }
 
       return {
         ok: true,
         text: texto,
-        guiaUsado: result?.guia || result?.provider || guiaId,
-        guiaOriginal,
-        fallbackUsed: Boolean(result?.fallbackUsed || guiaId !== guiaOriginal)
+        guiaUsado: result?.guia || guiaId,
+        fallbackUsed: Boolean(result?.fallbackUsed),
+        raw: result
       };
     } catch (err) {
       ultimoErro = err;
-      console.error('[FINAL] Sequência final falhou:', err);
     }
   }
 
-  console.warn('[FINAL] usando fallback local após falhas:', ultimoErro);
-
   return {
     ok: true,
-    text: fallbackText,
-    guiaUsado: 'lumen',
-    guiaOriginal,
-    fallbackUsed: true
+    text: buildGuideFallbackText({ id: guiaOriginal }, nome),
+    guiaUsado: guiaOriginal,
+    fallbackUsed: true,
+    error: ultimoErro ? String(ultimoErro.message || ultimoErro) : 'fallback'
   };
 }
 
