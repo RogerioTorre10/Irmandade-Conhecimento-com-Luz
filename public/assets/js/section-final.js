@@ -662,25 +662,26 @@ function buildFinalSynthesisPayload() {
   const selfieCard = readSelfieCardFromEverywhere(s);
 
   const payload = {
-    nome,
-    guia,
-    idioma: getActiveLang(),
+  nome,
+  guia,
+  idioma: getActiveLang(),
 
-    // REGRA NOVA: final NÃO recebe respostas soltas
-    respostas: [],
+  respostas: [],
 
-    // FINAL nasce das devolutivas dos blocos
-    blocos: Array.isArray(blocosData?.blocos) ? blocosData.blocos : [],
-    sinteseBlocos: String(blocosData?.sinteseBlocos || '').trim(),
+  devolutivas: blocosData?.blocos || [],
 
-    // Apenas personalidade + vazio/pleno como base silenciosa
-    dadosPessoais,
+  blocos: Array.isArray(blocosData?.blocos)
+    ? blocosData.blocos.map((b) => ({
+        bloco: b.bloco,
+        bloco_nome: b.bloco_nome,
+        texto: String(b.texto || "").trim()
+      }))
+    : [],
 
-    selfieCard,
+  dados: dadosPessoais,
 
-    // Nunca mandar devolutiva final antiga para o backend
-    devolutivaFinal: ''
-  };
+  sintese: []
+};
 
   window.LASTFINALPAYLOAD = payload;
   window.__LAST_FINAL_PAYLOAD__ = payload;
