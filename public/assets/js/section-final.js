@@ -887,8 +887,11 @@ function buildFinalSynthesisPayload() {
 }
 
 function buildGuideFallbackText(guiaRaw, nomeRaw) {
-  const guia = normalizeGuide(guiaRaw?.id || guiaRaw || 'lumen').id || 'lumen';
-  const nome = String(nomeRaw || 'Caminhante').trim();
+  const guia = normalizeGuide(guiaRaw?.id || guiaRaw || "lumen").id || "lumen";
+  const nome = String(nomeRaw || "caminhante").trim();
+
+  const lang = getActiveLang ? getActiveLang() : "pt-BR";
+
     const fallbackI18n = {
       'pt-BR': {
         lumen: `${nome}, sua jornada revelou sinais de sensibilidade, coragem e abertura interior. Cada resposta sua deixou marcas de verdade no pergaminho da alma. Continue avançando com fé, porque a luz que você procura também cresce dentro de você.`,
@@ -927,8 +930,8 @@ function buildGuideFallbackText(guiaRaw, nomeRaw) {
       }
     };
 
-    const bag = fallbackI18n[lang] || fallbackI18n['pt-BR'];
-    return bag[guia] || bag.lumen;
+    const bg = fallbackI18n[lang] || fallbackI18n["pt-BR"];
+    return bg[guia] || bg.lumen;
   }
 
   // ================================
