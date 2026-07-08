@@ -646,39 +646,49 @@ function buildFinalSynthesisPayload() {
   // ================================
   function buildFinalPayloadDiamante() {
   const s = getJornadaState();
+
   const nome = String(
-    s.nome ?? s.name ?? s.participantName ?? s.participante ?? localStorage.getItem('JORNADANOME') ?? sessionStorage.getItem('JORNADANOME') ?? 'Caminhante'
+    sessionStorage.getItem('jornada.nome') ||
+    s.nome ||
+    'Caminhante'
   ).trim();
 
   const guiaNorm = readGuideFromEverywhere(s);
   const guia = String(guiaNorm.id || 'lumen').trim().toLowerCase();
 
-  const respostasEstruturadas = collectPerguntasPayload();
-  const respostas = respostasEstruturadas
-    .map(item => String(item.resposta || '').trim())
-    .filter(Boolean);
-
   const blocosData = buildFinalSynthesisPayload();
   const dadosPessoaisRaw = getDadosPessoaisPayload();
   const dadosPessoais = buildDadosPessoaisFinalSilencioso(dadosPessoaisRaw);
   const selfieCard = readSelfieCardFromEverywhere(s);
-  const devolutivaFinal = getStoredFinalFeedback();
 
   const payload = {
     nome,
     guia,
     idioma: getActiveLang(),
-    respostas,
+
+    // REGRA NOVA: final NÃO recebe respostas soltas
+    respostas: [],
+
+    // FINAL nasce das devolutivas dos blocos
     blocos: Array.isArray(blocosData?.blocos) ? blocosData.blocos : [],
     sinteseBlocos: String(blocosData?.sinteseBlocos || '').trim(),
+
+    // Apenas personalidade + vazio/pleno como base silenciosa
     dadosPessoais,
+
     selfieCard,
-    devolutivaFinal
+
+    // Nunca mandar devolutiva final antiga para o backend
+    devolutivaFinal: ''
   };
 
   window.LASTFINALPAYLOAD = payload;
+  window.__LAST_FINAL_PAYLOAD__ = payload;
+
+  console.log('[FINAL][PAYLOAD LIMPO]', payload);
   return payload;
 }
+  
   // ================================
   // TTS
   // ================================
