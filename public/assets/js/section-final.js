@@ -980,16 +980,16 @@ function buildGuideFallbackText(guiaRaw, nomeRaw) {
 
   async function fetchFinalGuideFeedback() {
   const payload = buildFinalPayloadDiamante();
-  const respostas = Array.isArray(payload?.respostas) ? payload.respostas.filter(Boolean) : [];
+  const respostas = [];
   const blocos = Array.isArray(payload?.blocos) ? payload.blocos : [];
   const sinteseBlocos = String(payload?.sinteseBlocos || '').trim();
   const guiaOriginal = normalizeGuide(payload?.guia || 'lumen').id || 'lumen';
   const nome = String(payload?.nome || 'Caminhante').trim();
   const dadosPessoais = buildDadosPessoaisFinalSilencioso(payload?.dadosPessoais);
 
-  if (!respostas.length && !blocos.length && !sinteseBlocos) {
-    return { ok: true, text: buildGuideFallbackText({ id: guiaOriginal }, nome), guiaUsado: guiaOriginal, fallbackUsed: true };
-  }
+  if (!blocos.length && !sinteseBlocos) {
+  throw new Error('Final bloqueada: sem devolutivas de bloco da jornada atual.');
+}
 
   const guiasParaTentar = [guiaOriginal];
   if (guiaOriginal !== 'lumen') guiasParaTentar.push('lumen');
@@ -1108,8 +1108,7 @@ function removerFinalDuplicado(texto) {
 
       window.__JORNADA_DEVOLUTIVA_FINAL__ = texto;
       sessionStorage.setItem('JORNADA_DEVOLUTIVA_FINAL', texto);
-      localStorage.setItem('JORNADA_DEVOLUTIVA_FINAL', texto);
-
+      
       box.textContent = '';
 
       /* texto visual permanece original */
