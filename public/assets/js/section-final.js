@@ -1369,11 +1369,10 @@ function removerFinalDuplicado(texto) {
           return;
         }
 
-        if (!hasAnyRespostaValida(collectPerguntasPayload())) {
-          setPdfStatus(root, t('final.noAnswers', '⚠ Sem respostas. Finalize as perguntas antes de gerar o PDF.'), 'err');
-          return;
+        if (!Array.isArray(payload.blocos) || !payload.blocos.length) {
+           setPdfStatus(root, '⚠ Sem devolutivas de bloco. Conclua a jornada antes de gerar o PDF.', 'err');
+           return;
         }
-
         const selfiecard =
           sessionStorage.getItem('JORNADA_SELFIECARD') ||
           localStorage.getItem('JORNADA_SELFIECARD') ||
