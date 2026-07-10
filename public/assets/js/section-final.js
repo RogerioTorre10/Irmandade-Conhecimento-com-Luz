@@ -1348,8 +1348,8 @@ function removerFinalDuplicado(texto) {
         } catch {}
 
         const payload =
-          (typeof buildFinalPayloadDiamante === 'function' && buildFinalPayloadDiamante()) ||
           (typeof buildFinalPayload === 'function' && buildFinalPayload()) ||
+          (typeof buildFinalPayloadDiamante === 'function' && buildFinalPayloadDiamante()) ||      
           window.__LAST_FINAL_PAYLOAD__ ||
           null;
 
