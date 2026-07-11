@@ -28,12 +28,76 @@
         nextSection: 'section-perguntas-reflexoes',
         transitionVideo: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
         questions: [
-          {
-            id: 'sonho_espiritual',
-            label: 'Qual é o seu maior sonho espiritual?',
-            data_i18n: 'pergunta_sonho_espiritual'
-          }
-        ]
+  {
+    number: 1,
+    block: 1,
+    id: 'q01_criacao',
+    label: 'Por quem você foi criado? Pais biológicos, apenas um deles, familiares, pais adotivos ou outra pessoa?',
+    data_i18n: 'q01_criacao'
+  },
+  {
+    number: 2,
+    block: 2,
+    id: 'q02_filho_unico',
+    label: 'Você é filho único? Como isso marcou seu senso de individualidade?',
+    data_i18n: 'q02_filho_unico'
+  },
+  {
+    number: 3,
+    block: 3,
+    id: 'q03_irmaos',
+    label: 'Quantos irmãos você tem? Qual era seu lugar entre eles: primogênito, do meio ou caçula?',
+    data_i18n: 'q03_irmaos'
+  },
+  {
+    number: 4,
+    block: 4,
+    id: 'q04_privacoes',
+    label: 'Você já passou fome ou viveu privações severas na infância? Como isso influenciou sua forma de enxergar a vida?',
+    data_i18n: 'q04_privacoes'
+  },
+  {
+    number: 5,
+    block: 5,
+    id: 'q05_deficiencia',
+    label: 'Você possui alguma deficiência física? Já sofreu preconceito por causa dela?',
+    data_i18n: 'q05_deficiencia'
+  },
+  {
+    number: 6,
+    block: 6,
+    id: 'q06_escolaridade',
+    label: 'Qual é o seu nível de escolaridade? Como você avalia o investimento que fez em sua formação?',
+    data_i18n: 'q06_escolaridade'
+  },
+  {
+    number: 7,
+    block: 7,
+    id: 'q07_estado_civil',
+    label: 'Qual é o seu estado civil hoje? O que isso revela sobre o momento que você está vivendo?',
+    data_i18n: 'q07_estado_civil'
+  },
+  {
+    number: 8,
+    block: 8,
+    id: 'q08_identidade',
+    label: 'Você se lembra da primeira vez em que percebeu que era alguém único no mundo? Quantos anos tinha?',
+    data_i18n: 'q08_identidade'
+  },
+  {
+    number: 9,
+    block: 9,
+    id: 'q09_silencio',
+    label: 'Como é sua relação com o silêncio? Ele o incomoda ou o acalma?',
+    data_i18n: 'q09_silencio'
+  },
+  {
+    number: 10,
+    block: 10,
+    id: 'q10_crianca',
+    label: 'Se você pudesse conversar com a criança que um dia foi, o que diria a ela?',
+    data_i18n: 'q10_crianca'
+  }
       },
       {
         sectionId: 'section-perguntas-reflexoes',
