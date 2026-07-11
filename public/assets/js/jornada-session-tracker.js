@@ -109,11 +109,22 @@
     if (
       existente.jornadaId &&
       existente.deadline_at &&
-      existente.deadline_at > now()
+      Number(existente.deadline_at) > now() &&
+      !existente.concluido
     ) {
+      existente.ultimo_acesso = now();
+
+      save(existente);
+
+      iniciarContador();
+
+      console.log(
+        '[JORNADA_SESSION][72H] Sessão existente preservada e contador ativado:',
+        existente
+      );
+
       return existente;
     }
-
     const device_hash = await gerarDeviceHash();
 
     const sessao = {
@@ -267,23 +278,11 @@
     Number(st.deadline_at) - now()
   );
 
-  const horas = Math.floor(
-    totalMs / 3600000
-  );
-
-  const minutos = Math.floor(
-    (totalMs % 3600000) / 60000
-  );
-
-  const segundos = Math.floor(
-    (totalMs % 60000) / 1000
-  );
-
   return {
     totalMs,
-    horas,
-    minutos,
-    segundos
+    horas: Math.floor(totalMs / 3600000),
+    minutos: Math.floor((totalMs % 3600000) / 60000),
+    segundos: Math.floor((totalMs % 60000) / 1000)
   };
 }
 
@@ -321,28 +320,34 @@ function horasRestantes() {
     '#jornada-countdown, .jornada-countdown'
   );
 
-  if (el) {
-    if (tempo.totalMs <= 0) {
-      el.textContent = 'Prazo encerrado';
+  if (!el) {
+    console.warn(
+      '[JORNADA_SESSION][72H] Elemento do contador não encontrado.'
+    );
+    return;
+  }
 
-      const st = load();
+  if (tempo.totalMs <= 0) {
+    el.textContent = 'Prazo encerrado';
 
-      if (st.status !== 'expirado') {
-        st.status = 'expirado';
-        st.expirado_em = now();
-        save(st);
-        sincronizar(st);
-      }
+    const st = load();
 
-      pararContador();
-      return;
+    if (st.status !== 'expirado') {
+      st.status = 'expirado';
+      st.expirado_em = now();
+
+      save(st);
+      sincronizar(st);
     }
 
-    const hh = String(tempo.horas).padStart(2, '0');
-    const mm = String(tempo.minutos).padStart(2, '0');
-
-    el.textContent = `${hh}h ${mm}min`;
+    pararContador();
+    return;
   }
+
+  const hh = String(tempo.horas).padStart(2, '0');
+  const mm = String(tempo.minutos).padStart(2, '0');
+
+  el.textContent = `${hh}h ${mm}min`;
 
   emitirAviso(tempo.horas);
 }
@@ -491,24 +496,38 @@ function horasRestantes() {
   // AUTO RETOMADA
   // ============================================
 
-  document.addEventListener('DOMContentLoaded', async () => {
+  async function iniciarTrackerAutomaticamente() {
+  const st = load();
 
-    const st = load();
+  if (
+    st.jornadaId &&
+    st.deadline_at &&
+    Number(st.deadline_at) > now() &&
+    !st.concluido
+  ) {
+    await retomarSessao();
 
-    if (
-      st.jornadaId &&
-      st.deadline_at &&
-      st.deadline_at > now() &&
-      !st.concluido
-    ) {
+    toast(
+      `Você possui ${horasRestantes()}h restantes para concluir a jornada.`,
+      'normal'
+    );
 
-      await retomarSessao();
+    return;
+  }
 
-      toast(
-        `Você possui ${horasRestantes()}h restantes para concluir a jornada.`,
-        'normal'
-      );
-    }
-  });
+  console.log(
+    '[JORNADA_SESSION][72H] Nenhuma sessão ativa encontrada para retomada.'
+  );
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener(
+    'DOMContentLoaded',
+    iniciarTrackerAutomaticamente,
+    { once: true }
+  );
+} else {
+  iniciarTrackerAutomaticamente();
+}
 
 })();
