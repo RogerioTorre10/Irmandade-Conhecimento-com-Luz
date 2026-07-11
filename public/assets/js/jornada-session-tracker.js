@@ -295,10 +295,31 @@
     if (el) {
 
       if (horas <= 0) {
-        el.textContent = 'Prazo encerrado';
-      } else {
-        el.textContent = `${horas}h restantes`;
-      }
+  el.textContent = 'Prazo encerrado';
+
+  const st = load();
+
+  if (st.status !== 'expirado') {
+    st.status = 'expirado';
+    st.concluido = false;
+    st.expirado_em = now();
+
+    save(st);
+    sincronizar(st);
+  }
+
+  pararContador();
+
+  window.dispatchEvent(
+    new CustomEvent('jornada:expirada', {
+      detail: { sessao: st }
+    })
+  );
+
+  return;
+}
+
+el.textContent = `${horas}h restantes`;
     }
 
     emitirAviso(horas);
@@ -311,6 +332,10 @@
   function emitirAviso(horas) {
 
     const st = load();
+     
+    if (!Array.isArray(st.warned_hours)) {
+       st.warned_hours = [];
+    }
 
     const marcos = [48, 24, 12, 6, 2, 1];
 
