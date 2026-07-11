@@ -19,34 +19,82 @@
   visibility: visible;
 }
 
-.jornada-timer{
+/* =====================================================
+   CABEÇALHO E CONTADOR REGRESSIVO DA JORNADA
+   ===================================================== */
 
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-
-    margin-top:6px;
-    margin-bottom:18px;
-
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  width: 100%;
+  text-align: center;
 }
-.timer-label{
-    font-family:'BerkshireSwash', cursive;
-    font-size:15px;
-    color:#d8c7a0;
-    letter-spacing:1px;
-    text-shadow:
-        0 0 6px rgba(255,210,120,.35);
-    margin-bottom:2px;
+
+.header-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
 }
-.jornada-countdown{
-    font-family:'BerkshireSwash', cursive;
-    font-size:28px;
-    color:#ffd979;
-    font-weight:700;
-    letter-spacing:2px;
-    text-shadow:
-        0 0 10px rgba(255,190,60,.75),
-        0 0 18px rgba(255,120,0,.45);
+
+.header-title h1 {
+  margin: 0;
+  text-align: center;
+}
+
+.jornada-timer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: min(320px, 90vw);
+
+  margin: 7px auto 0;
+  padding-top: 7px;
+
+  border-top: 1px solid rgba(255, 215, 120, 0.25);
+
+  text-align: center;
+}
+
+.timer-label {
+  display: block;
+
+  margin: 0 0 2px;
+
+  font-family: 'BerkshireSwash', cursive;
+  font-size: 15px;
+  line-height: 1.2;
+  letter-spacing: 1px;
+
+  color: #d8c7a0;
+  text-align: center;
+
+  text-shadow:
+    0 0 6px rgba(255, 210, 120, 0.35);
+}
+
+.jornada-countdown {
+  display: block;
+
+  margin: 0;
+
+  font-family: 'BerkshireSwash', cursive;
+  font-size: 28px;
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: 2px;
+
+  color: #ffd979;
+  text-align: center;
+
+  text-shadow:
+    0 0 10px rgba(255, 190, 60, 0.75),
+    0 0 18px rgba(255, 120, 0, 0.45);
 }
 
 /* sections antigas — sem invadir a intro */
@@ -388,4 +436,32 @@ footer,
     aspect-ratio: 16 / 9 !important;
     border-radius: 16px !important;
   }
+
+  .site-header {
+    gap: 10px;
+  }
+
+  .header-title {
+    flex: 1;
+  }
+
+  .header-title h1 {
+    font-size: clamp(25px, 8vw, 36px);
+  }
+
+  .jornada-timer {
+    width: min(280px, 88vw);
+    margin-top: 5px;
+    padding-top: 5px;
+  }
+
+  .timer-label {
+    font-size: 13px;
+    letter-spacing: 0.5px;
+  }
+
+  .jornada-countdown {
+    font-size: 24px;
+  }
+}
 }
