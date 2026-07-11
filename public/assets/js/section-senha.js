@@ -635,49 +635,45 @@
         * Se já existir uma sessão válida, o tracker preserva o deadline original.
         */
         if (
-          window.JORNADA_SESSION &&
-          typeof window.JORNADA_SESSION.iniciarSessao === 'function'
+          window.JORNADA_TIMER &&
+          typeof window.JORNADA_TIMER.iniciarSessao === 'function'
         ) {
           try {
             const sessao72h =
-              await window.JORNADA_SESSION.iniciarSessao({
+              await window.JORNADA_TIMER.iniciarSessao({
                 email
               });
 
-          if (sessao72h?.criado_em) {
-            localStorage.setItem(
-              'jornada_started_at',
-              String(sessao72h.criado_em)
-            );
-          }
+            if (sessao72h?.criado_em) {
+              localStorage.setItem(
+                'jornada_started_at',
+                String(sessao72h.criado_em)
+              );
+            }
 
-          if (sessao72h?.deadline_at) {
-            localStorage.setItem(
-              'jornada_deadline_at',
-              String(sessao72h.deadline_at)
-            );
-          }
+            if (sessao72h?.deadline_at) {
+              localStorage.setItem(
+                'jornada_deadline_at',
+                String(sessao72h.deadline_at)
+              );
+            }
 
-          console.log(
-            '[JCSenha][72H] Sessão iniciada ou preservada:',
-            sessao72h
-          );
+            console.log(
+              '[JCSenha][72H] Sessão iniciada ou preservada:',
+              sessao72h
+             );
 
-        } catch (sessionErr) {
-          /*
-          * Não interrompe a entrada na jornada.
-          * O progresso principal continua sendo salvo pelo sistema de backup.
-          */
-          console.error(
-            '[JCSenha][72H] Falha ao iniciar contador:',
-            sessionErr
-          );
-        }
-      } else {
-        console.warn(
-          '[JCSenha][72H] JORNADA_SESSION não está disponível.'
-        );
-      }
+            } catch (sessionErr) {
+              console.error(
+                '[JCSenha][72H] Falha ao iniciar contador:',
+                sessionErr
+              );
+            }
+           } else {
+             console.warn(
+               '[JCSenha][72H] JORNADA_TIMER não está disponível.'
+             );
+           }
  
       window.toast?.('Acesso confirmado.', 'success');
 
