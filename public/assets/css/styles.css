@@ -19,6 +19,36 @@
   visibility: visible;
 }
 
+.jornada-timer{
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+
+    margin-top:6px;
+    margin-bottom:18px;
+
+}
+.timer-label{
+    font-family:'BerkshireSwash', cursive;
+    font-size:15px;
+    color:#d8c7a0;
+    letter-spacing:1px;
+    text-shadow:
+        0 0 6px rgba(255,210,120,.35);
+    margin-bottom:2px;
+}
+.jornada-countdown{
+    font-family:'BerkshireSwash', cursive;
+    font-size:28px;
+    color:#ffd979;
+    font-weight:700;
+    letter-spacing:2px;
+    text-shadow:
+        0 0 10px rgba(255,190,60,.75),
+        0 0 18px rgba(255,120,0,.45);
+}
+
 /* sections antigas — sem invadir a intro */
 #section{
   max-width: 600px;
