@@ -28,76 +28,87 @@
         nextSection: 'section-perguntas-reflexoes',
         transitionVideo: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
         questions: [
-  {
-    number: 1,
-    block: 1,
-    id: 'q01_criacao',
-    label: 'Por quem você foi criado? Pais biológicos, apenas um deles, familiares, pais adotivos ou outra pessoa?',
-    data_i18n: 'q01_criacao'
-  },
-  {
-    number: 2,
-    block: 2,
-    id: 'q02_filho_unico',
-    label: 'Você é filho único? Como isso marcou seu senso de individualidade?',
-    data_i18n: 'q02_filho_unico'
-  },
-  {
-    number: 3,
-    block: 3,
-    id: 'q03_irmaos',
-    label: 'Quantos irmãos você tem? Qual era seu lugar entre eles: primogênito, do meio ou caçula?',
-    data_i18n: 'q03_irmaos'
-  },
-  {
-    number: 4,
-    block: 4,
-    id: 'q04_privacoes',
-    label: 'Você já passou fome ou viveu privações severas na infância? Como isso influenciou sua forma de enxergar a vida?',
-    data_i18n: 'q04_privacoes'
-  },
-  {
-    number: 5,
-    block: 5,
-    id: 'q05_deficiencia',
-    label: 'Você possui alguma deficiência física? Já sofreu preconceito por causa dela?',
-    data_i18n: 'q05_deficiencia'
-  },
-  {
-    number: 6,
-    block: 6,
-    id: 'q06_escolaridade',
-    label: 'Qual é o seu nível de escolaridade? Como você avalia o investimento que fez em sua formação?',
-    data_i18n: 'q06_escolaridade'
-  },
-  {
-    number: 7,
-    block: 7,
-    id: 'q07_estado_civil',
-    label: 'Qual é o seu estado civil hoje? O que isso revela sobre o momento que você está vivendo?',
-    data_i18n: 'q07_estado_civil'
-  },
-  {
-    number: 8,
-    block: 8,
-    id: 'q08_identidade',
-    label: 'Você se lembra da primeira vez em que percebeu que era alguém único no mundo? Quantos anos tinha?',
-    data_i18n: 'q08_identidade'
-  },
-  {
-    number: 9,
-    block: 9,
-    id: 'q09_silencio',
-    label: 'Como é sua relação com o silêncio? Ele o incomoda ou o acalma?',
-    data_i18n: 'q09_silencio'
-  },
-  {
-    number: 10,
-    block: 10,
-    id: 'q10_crianca',
-    label: 'Se você pudesse conversar com a criança que um dia foi, o que diria a ela?',
-    data_i18n: 'q10_crianca'
-  }
+      {
+        number: 1,
+        block: 1,
+        id: 'q01_criacao',
+        theme: 'criacao_familiar',
+        label: 'Por quem você foi criado? Pais biológicos, apenas um deles, familiares, pais adotivos ou outra pessoa?',
+        data_i18n: 'q01_criacao'
+      },
+      {
+        number: 2,
+        block: 1,
+        id: 'q02_filho_unico',
+        theme: 'individualidade',
+        label: 'Você é filho único? Como isso marcou seu senso de individualidade?',
+        data_i18n: 'q02_filho_unico'
+      },
+      {
+        number: 3,
+        block: 1,
+        id: 'q03_irmaos',
+        theme: 'irmaos',
+        label: 'Quantos irmãos você tem? Qual era seu lugar entre eles: primogênito, do meio ou caçula?',
+        data_i18n: 'q03_irmaos'
+      },
+      {
+        number: 4,
+        block: 1,
+        id: 'q04_privacoes',
+        theme: 'privacoes',
+        label: 'Você já passou fome ou viveu privações severas na infância? Como isso influenciou sua forma de enxergar a vida?',
+        data_i18n: 'q04_privacoes'
+      },
+      {
+        number: 5,
+        block: 1,
+        id: 'q05_deficiencia',
+        theme: 'deficiencia',
+        label: 'Você possui alguma deficiência física? Já sofreu preconceito por causa dela?',
+        data_i18n: 'q05_deficiencia'
+      },
+      {
+        number: 6,
+        block: 1,
+        id: 'q06_escolaridade',
+        theme: 'escolaridade',
+        label: 'Qual é o seu nível de escolaridade? Como você avalia o investimento que fez em sua formação?',
+        data_i18n: 'q06_escolaridade'
+      },
+      {
+        number: 7,
+        block: 1,
+        id: 'q07_estado_civil',
+        theme: 'estado_civil',
+        label: 'Qual é o seu estado civil hoje? O que isso revela sobre o momento que você está vivendo?',
+        data_i18n: 'q07_estado_civil'
+      },
+      {
+        number: 8,
+        block: 1,
+        id: 'q08_identidade',
+        theme: 'identidade',
+        label: 'Você se lembra da primeira vez em que percebeu que era alguém único no mundo? Quantos anos tinha?',
+        data_i18n: 'q08_identidade'
+      },
+      {
+        number: 9,
+        block: 1,
+        id: 'q09_silencio',
+        theme: 'silencio',
+        label: 'Como é sua relação com o silêncio? Ele o incomoda ou o acalma?',
+        data_i18n: 'q09_silencio'
+      },
+      {
+        number: 10,
+        block: 1,
+        id: 'q10_crianca',
+        theme: 'crianca_interior',
+        label: 'Se você pudesse conversar com a criança que um dia foi, o que diria a ela?',
+        data_i18n: 'q10_crianca'
+      }
+      ]   
       },
       {
         sectionId: 'section-perguntas-reflexoes',
@@ -108,12 +119,98 @@
         nextSection: 'section-perguntas-crescimento',
         transitionVideo: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4',
         questions: [
-          {
-            id: 'significado_luz',
-            label: 'O que "luz" significa para você?',
-            data_i18n: 'pergunta_significado_luz'
-          }
-        ]
+
+{
+    number: 11,
+    block: 2,
+    id: 'q11_percepcao_vida',
+    theme: 'vida',
+    label: 'Como você tem percebido a sua própria vida até aqui?',
+    data_i18n: 'q11_percepcao_vida'
+},
+
+{
+    number: 12,
+    block: 2,
+    id: 'q12_percepcao_outros',
+    theme: 'empatia',
+    label: 'Como você enxerga a vida das pessoas ao seu redor?',
+    data_i18n: 'q12_percepcao_outros'
+},
+
+{
+    number: 13,
+    block: 2,
+    id: 'q13_traumas',
+    theme: 'traumas',
+    label: 'Como você lida com os seus traumas? Consegue falar sobre eles?',
+    data_i18n: 'q13_traumas'
+},
+
+{
+    number: 14,
+    block: 2,
+    id: 'q14_verdade',
+    theme: 'verdade',
+    label: 'Você acredita que existe uma verdade maior ou que tudo depende do olhar de cada pessoa?',
+    data_i18n: 'q14_verdade'
+},
+
+{
+    number: 15,
+    block: 2,
+    id: 'q15_vicios',
+    theme: 'vicios',
+    label: 'Qual é o seu maior vício? Por que acredita que ele surgiu? Já tentou vencê-lo? Percebe também outros vícios mais sutis ou emocionais em você?',
+    data_i18n: 'q15_vicios'
+},
+
+{
+    number: 16,
+    block: 2,
+    id: 'q16_doenca',
+    theme: 'doenca',
+    label: 'O que a doença representa para você? Está enfrentando alguma condição neste momento?',
+    data_i18n: 'q16_doenca'
+},
+
+{
+    number: 17,
+    block: 2,
+    id: 'q17_presenca',
+    theme: 'solidao',
+    label: 'Existe alguém que você gostaria de ter ao seu lado neste momento? Por que essa pessoa não está presente?',
+    data_i18n: 'q17_presenca'
+},
+
+{
+    number: 18,
+    block: 2,
+    id: 'q18_morte',
+    theme: 'morte',
+    label: 'Como você percebe a morte? Ela desperta medo, conforto ou curiosidade?',
+    data_i18n: 'q18_morte'
+},
+
+{
+    number: 19,
+    block: 2,
+    id: 'q19_doenca_espiritual',
+    theme: 'espiritualidade',
+    label: 'Você acredita que algumas doenças podem refletir sombras internas ou fazer parte de um processo de crescimento espiritual?',
+    data_i18n: 'q19_doenca_espiritual'
+},
+
+{
+    number: 20,
+    block: 2,
+    id: 'q20_sentido_doenca',
+    theme: 'sentido_doenca',
+    label: 'Como você compreende a doença? Ela pode ter algum significado ou propósito em determinados momentos da vida?',
+    data_i18n: 'q20_sentido_doenca'
+}
+
+]
       },
       {
         sectionId: 'section-perguntas-crescimento',
@@ -124,12 +221,98 @@
         nextSection: 'section-perguntas-integracao',
         transitionVideo: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4',
         questions: [
-          {
-            id: 'pratica_gratidao',
-            label: 'Como você pratica gratidão diariamente?',
-            data_i18n: 'pergunta_pratica_gratidao'
-          }
-        ]
+
+{
+    number: 21,
+    block: 3,
+    theme: 'sentido_da_vida',
+    id: 'q21_sentido_vida',
+    label: 'Como você percebe o sentido da vida? Existe um propósito maior ou tudo acontece por acaso?',
+    data_i18n: 'q21_sentido_vida'
+},
+
+{
+    number: 22,
+    block: 3,
+    theme: 'espiritualidade',
+    id: 'q22_espiritualidade',
+    label: 'Você acredita em Deus, na espiritualidade ou em algo além do que podemos ver?',
+    data_i18n: 'q22_espiritualidade'
+},
+
+{
+    number: 23,
+    block: 3,
+    theme: 'experiencia_espiritual',
+    id: 'q23_guia_invisivel',
+    label: 'Você já se sentiu guiado por algo invisível? Pode contar uma experiência marcante?',
+    data_i18n: 'q23_guia_invisivel'
+},
+
+{
+    number: 24,
+    block: 3,
+    theme: 'dor_emocional',
+    id: 'q24_dor_emocional',
+    label: 'Qual foi a maior dor emocional que você já enfrentou? Como conseguiu lidar com ela?',
+    data_i18n: 'q24_dor_emocional'
+},
+
+{
+    number: 25,
+    block: 3,
+    theme: 'superacao',
+    id: 'q25_superacao',
+    label: 'Qual foi a maior superação da sua vida? Que força você descobriu naquele momento?',
+    data_i18n: 'q25_superacao'
+},
+
+{
+    number: 26,
+    block: 3,
+    theme: 'medos',
+    id: 'q26_medos',
+    label: 'Do que você mais tem medo hoje? O que esse medo pode estar tentando lhe mostrar?',
+    data_i18n: 'q26_medos'
+},
+
+{
+    number: 27,
+    block: 3,
+    theme: 'autocuidado',
+    id: 'q27_esquecimento_de_si',
+    label: 'Por que você acredita que acabou se esquecendo de si mesmo? Quando foi a última vez que recebeu um elogio que realmente o marcou?',
+    data_i18n: 'q27_esquecimento_de_si'
+},
+
+{
+    number: 28,
+    block: 3,
+    theme: 'prioridade_pessoal',
+    id: 'q28_prioridade',
+    label: 'Por que você acredita que, muitas vezes, não consegue colocar a si mesmo como prioridade?',
+    data_i18n: 'q28_prioridade'
+},
+
+{
+    number: 29,
+    block: 3,
+    theme: 'autoestima',
+    id: 'q29_autoestima',
+    label: 'Você costuma reconhecer e elogiar a si mesmo? Em quais momentos isso acontece?',
+    data_i18n: 'q29_autoestima'
+},
+
+{
+    number: 30,
+    block: 3,
+    theme: 'sonhos',
+    id: 'q30_sonhos',
+    label: 'Você se vê como alguém que ajuda sonhos a nascerem ou como alguém que, sem perceber, acaba enterrando os próprios sonhos?',
+    data_i18n: 'q30_sonhos'
+}
+
+]
       },
       {
         sectionId: 'section-perguntas-integracao',
@@ -140,12 +323,98 @@
         nextSection: 'section-perguntas-sintese',
         transitionVideo: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4',
         questions: [
-          {
-            id: 'mensagem_futuro',
-            label: 'Uma mensagem para o seu eu futuro.',
-            data_i18n: 'pergunta_mensagem_futuro'
-          }
-        ]
+
+{
+    number: 31,
+    block: 4,
+    theme: 'maior_sonho',
+    id: 'q31_maior_sonho',
+    label: 'Qual é o seu maior sonho hoje? Algo que faz você sorrir só de imaginar.',
+    data_i18n: 'q31_maior_sonho'
+},
+
+{
+    number: 32,
+    block: 4,
+    theme: 'barreiras',
+    id: 'q32_barreiras',
+    label: 'O que você acredita que o impede de realizá-lo? Essas barreiras são internas, externas ou ambas?',
+    data_i18n: 'q32_barreiras'
+},
+
+{
+    number: 33,
+    block: 4,
+    theme: 'proposito',
+    id: 'q33_proposito',
+    label: 'Você sente que está vivendo o seu propósito ou ainda está em busca dele?',
+    data_i18n: 'q33_proposito'
+},
+
+{
+    number: 34,
+    block: 4,
+    theme: 'chamado_interior',
+    id: 'q34_chamado_interior',
+    label: 'Existe um chamado interior, uma voz silenciosa, que você tem ignorado?',
+    data_i18n: 'q34_chamado_interior'
+},
+
+{
+    number: 35,
+    block: 4,
+    theme: 'origem_dos_medos',
+    id: 'q35_origem_medos',
+    label: 'Os seus medos estão ligados a qual situação ou sentimento específico?',
+    data_i18n: 'q35_origem_medos'
+},
+
+{
+    number: 36,
+    block: 4,
+    theme: 'decisoes_e_limites',
+    id: 'q36_decisoes_limites',
+    label: 'Você sente que deixa de tomar certas decisões por medo ou acaba aceitando situações que o humilham?',
+    data_i18n: 'q36_decisoes_limites'
+},
+
+{
+    number: 37,
+    block: 4,
+    theme: 'acolhimento_do_sofrimento',
+    id: 'q37_acolhimento_sofrimento',
+    label: 'O que você diria para alguém que está sofrendo profundamente neste momento?',
+    data_i18n: 'q37_acolhimento_sofrimento'
+},
+
+{
+    number: 38,
+    block: 4,
+    theme: 'vida_alem_da_terra',
+    id: 'q38_vida_alem_terra',
+    label: 'Você acredita que existe vida além da Terra ou acredita que toda a existência acontece apenas aqui?',
+    data_i18n: 'q38_vida_alem_terra'
+},
+
+{
+    number: 39,
+    block: 4,
+    theme: 'legado',
+    id: 'q39_legado',
+    label: 'Como você gostaria de ser lembrado quando não estiver mais aqui? Que legado deseja deixar?',
+    data_i18n: 'q39_legado'
+},
+
+{
+    number: 40,
+    block: 4,
+    theme: 'destino_dos_sonhos',
+    id: 'q40_destino_sonhos',
+    label: 'O que aconteceu com os sonhos que você teve — ou com aqueles que nunca chegou a realizar?',
+    data_i18n: 'q40_destino_sonhos'
+}
+
+]
       },
       {
         sectionId: 'section-perguntas-sintese',
@@ -156,12 +425,98 @@
         nextSection: 'section-final',
         transitionVideo: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4',
         questions: [
-          {
-            id: 'passo_fe',
-            label: 'Qual será seu próximo passo de fé e coragem?',
-            data_i18n: 'pergunta_passo_fe'
-          }
-        ]
+
+{
+    number: 41,
+    block: 5,
+    theme: 'choro',
+    id: 'q41_choro',
+    label: 'Você tem chorado com frequência? Consegue identificar o que costuma provocar esse choro?',
+    data_i18n: 'q41_choro'
+},
+
+{
+    number: 42,
+    block: 5,
+    theme: 'origem_do_choro',
+    id: 'q42_origem_choro',
+    label: 'Esse choro nasce de um vazio interior, de uma perda ou de um arrependimento?',
+    data_i18n: 'q42_origem_choro'
+},
+
+{
+    number: 43,
+    block: 5,
+    theme: 'expressao_da_dor',
+    id: 'q43_expressao_dor',
+    label: 'Quando o choro chega, o que predomina: o silêncio, a busca por algo que intensifique esse sentimento ou a raiva querendo se manifestar?',
+    data_i18n: 'q43_expressao_dor'
+},
+
+{
+    number: 44,
+    block: 5,
+    theme: 'tristeza_depressao',
+    id: 'q44_tristeza_depressao',
+    label: 'Você se sente triste ou acredita estar vivendo um estado depressivo? Consegue perceber a diferença entre essas duas experiências?',
+    data_i18n: 'q44_tristeza_depressao'
+},
+
+{
+    number: 45,
+    block: 5,
+    theme: 'ajuda_profissional',
+    id: 'q45_ajuda_profissional',
+    label: 'Se você acredita estar vivendo um estado depressivo, já pensou em procurar ajuda profissional para compreender melhor o que está sentindo?',
+    data_i18n: 'q45_ajuda_profissional'
+},
+
+{
+    number: 46,
+    block: 5,
+    theme: 'comportamento_relacional',
+    id: 'q46_comportamento_relacional',
+    label: 'Nas suas relações, você se considera uma pessoa mais agressiva ou mais submissa?',
+    data_i18n: 'q46_comportamento_relacional'
+},
+
+{
+    number: 47,
+    block: 5,
+    theme: 'autopercepcao',
+    id: 'q47_autopercepcao',
+    label: 'Você sente que, às vezes, é difícil conviver consigo mesmo ou costuma carregar raiva por decisões que considera equivocadas?',
+    data_i18n: 'q47_autopercepcao'
+},
+
+{
+    number: 48,
+    block: 5,
+    theme: 'autoimagem',
+    id: 'q48_autoimagem',
+    label: 'Você se considera uma pessoa interessante ou acredita ser alguém sem muito interesse para os outros?',
+    data_i18n: 'q48_autoimagem'
+},
+
+{
+    number: 49,
+    block: 5,
+    theme: 'limites',
+    id: 'q49_limites',
+    label: 'Você tem dificuldade em dizer "não" para as pessoas?',
+    data_i18n: 'q49_limites'
+},
+
+{
+    number: 50,
+    block: 5,
+    theme: 'morte',
+    id: 'q50_morte',
+    label: 'Você tem medo de morrer? Muitas vezes, o medo está menos na morte em si e mais na forma como ela pode acontecer. Como você percebe isso em você?',
+    data_i18n: 'q50_morte'
+}
+
+]
       }
     ],
 
