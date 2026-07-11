@@ -96,17 +96,26 @@
     };
     tick();
 
-    form.addEventListener("submit", (e) => {
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
       const ok = validate(input.value);
       if (!ok) {
         form.classList.add("shake");
         setTimeout(() => form.classList.remove("shake"), 500);
         return;
-      }
-      grant();
-      onGranted();
-    });
+    }
+
+    grant();
+
+    const emailInput = document.querySelector("#email") || document.querySelector("[name=email]");
+    const emailDoParticipante = emailInput ? emailInput.value.trim() : (window.JORNADA_EMAIL || "");
+
+    if (window.JORNADA_SESSION && typeof window.JORNADA_SESSION.iniciarSessao === "function") {
+      await window.JORNADA_SESSION.iniciarSessao({ email: emailDoParticipante });
+    }
+
+    onGranted();
+   });
   }
 
   window.JORNADA_AUTH = {
