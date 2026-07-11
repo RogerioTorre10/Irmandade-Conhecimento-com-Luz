@@ -31,81 +31,81 @@
       {
         number: 1,
         block: 1,
-        id: 'q01_criacao',
         theme: 'criacao_familiar',
+        id: 'q01_criacao',
         label: 'Por quem você foi criado? Pais biológicos, apenas um deles, familiares, pais adotivos ou outra pessoa?',
         data_i18n: 'q01_criacao'
       },
       {
         number: 2,
         block: 1,
-        id: 'q02_filho_unico',
         theme: 'individualidade',
-        label: 'Você é filho único? Como isso marcou seu senso de individualidade?',
+        id: 'q02_filho_unico',        
+        label: 'Você é filho único ou tem irmãos? Como essa realidade marcou seu senso de individualidade?',
         data_i18n: 'q02_filho_unico'
       },
       {
         number: 3,
         block: 1,
-        id: 'q03_irmaos',
         theme: 'irmaos',
-        label: 'Quantos irmãos você tem? Qual era seu lugar entre eles: primogênito, do meio ou caçula?',
+        id: 'q03_irmaos',        
+        label: 'Se tem ou tivesse irmãos? Quantos? Qual é ou seria seu lugar entre eles: primogênito, do meio ou caçula?',
         data_i18n: 'q03_irmaos'
       },
       {
         number: 4,
         block: 1,
-        id: 'q04_privacoes',
         theme: 'privacoes',
+        id: 'q04_privacoes',        
         label: 'Você já passou fome ou viveu privações severas na infância? Como isso influenciou sua forma de enxergar a vida?',
         data_i18n: 'q04_privacoes'
       },
       {
         number: 5,
         block: 1,
-        id: 'q05_deficiencia',
         theme: 'deficiencia',
-        label: 'Você possui alguma deficiência física? Já sofreu preconceito por causa dela?',
+        id: 'q05_deficiencia',        
+        label: 'Você possui alguma deficiência, social, física, cognitiva? Já sofreu preconceito por causa dela?',
         data_i18n: 'q05_deficiencia'
       },
       {
         number: 6,
         block: 1,
-        id: 'q06_escolaridade',
         theme: 'escolaridade',
+        id: 'q06_escolaridade',        
         label: 'Qual é o seu nível de escolaridade? Como você avalia o investimento que fez em sua formação?',
         data_i18n: 'q06_escolaridade'
       },
       {
         number: 7,
         block: 1,
-        id: 'q07_estado_civil',
         theme: 'estado_civil',
-        label: 'Qual é o seu estado civil hoje? O que isso revela sobre o momento que você está vivendo?',
+        id: 'q07_estado_civil',        
+        label: 'Como o seu estado civil hoje influência o momento que você está vivendo?',
         data_i18n: 'q07_estado_civil'
       },
       {
         number: 8,
         block: 1,
-        id: 'q08_identidade',
         theme: 'identidade',
+        id: 'q08_identidade',        
         label: 'Você se lembra da primeira vez em que percebeu que era alguém único no mundo? Quantos anos tinha?',
         data_i18n: 'q08_identidade'
       },
       {
         number: 9,
         block: 1,
-        id: 'q09_silencio',
         theme: 'silencio',
+        id: 'q09_silencio',        
         label: 'Como é sua relação com o silêncio? Ele o incomoda ou o acalma?',
         data_i18n: 'q09_silencio'
       },
       {
         number: 10,
         block: 1,
-        id: 'q10_crianca',
         theme: 'crianca_interior',
-        label: 'Se você pudesse conversar com a criança que um dia foi, o que diria a ela?',
+        id: 'q10_crianca',        
+        label: 'Se você pudesse conversar com a criança que ainda habita em você, o que diria a ela?',
         data_i18n: 'q10_crianca'
       }
       ]   
@@ -123,8 +123,8 @@
 {
     number: 11,
     block: 2,
-    id: 'q11_percepcao_vida',
     theme: 'vida',
+    id: 'q11_percepcao_vida',
     label: 'Como você tem percebido a sua própria vida até aqui?',
     data_i18n: 'q11_percepcao_vida'
 },
@@ -132,8 +132,8 @@
 {
     number: 12,
     block: 2,
-    id: 'q12_percepcao_outros',
     theme: 'empatia',
+    id: 'q12_percepcao_outros',    
     label: 'Como você enxerga a vida das pessoas ao seu redor?',
     data_i18n: 'q12_percepcao_outros'
 },
@@ -141,8 +141,8 @@
 {
     number: 13,
     block: 2,
-    id: 'q13_traumas',
     theme: 'traumas',
+    id: 'q13_traumas',    
     label: 'Como você lida com os seus traumas? Consegue falar sobre eles?',
     data_i18n: 'q13_traumas'
 },
@@ -150,8 +150,8 @@
 {
     number: 14,
     block: 2,
-    id: 'q14_verdade',
     theme: 'verdade',
+    id: 'q14_verdade',    
     label: 'Você acredita que existe uma verdade maior ou que tudo depende do olhar de cada pessoa?',
     data_i18n: 'q14_verdade'
 },
@@ -159,8 +159,8 @@
 {
     number: 15,
     block: 2,
-    id: 'q15_vicios',
     theme: 'vicios',
+    id: 'q15_vicios',    
     label: 'Qual é o seu maior vício? Por que acredita que ele surgiu? Já tentou vencê-lo? Percebe também outros vícios mais sutis ou emocionais em você?',
     data_i18n: 'q15_vicios'
 },
@@ -168,8 +168,8 @@
 {
     number: 16,
     block: 2,
-    id: 'q16_doenca',
     theme: 'doenca',
+    id: 'q16_doenca',    
     label: 'O que a doença representa para você? Está enfrentando alguma condição neste momento?',
     data_i18n: 'q16_doenca'
 },
@@ -177,8 +177,8 @@
 {
     number: 17,
     block: 2,
-    id: 'q17_presenca',
     theme: 'solidao',
+    id: 'q17_presenca',    
     label: 'Existe alguém que você gostaria de ter ao seu lado neste momento? Por que essa pessoa não está presente?',
     data_i18n: 'q17_presenca'
 },
@@ -186,8 +186,8 @@
 {
     number: 18,
     block: 2,
-    id: 'q18_morte',
     theme: 'morte',
+    id: 'q18_morte',    
     label: 'Como você percebe a morte? Ela desperta medo, conforto ou curiosidade?',
     data_i18n: 'q18_morte'
 },
@@ -195,18 +195,18 @@
 {
     number: 19,
     block: 2,
-    id: 'q19_doenca_espiritual',
     theme: 'espiritualidade',
-    label: 'Você acredita que algumas doenças podem refletir sombras internas ou fazer parte de um processo de crescimento espiritual?',
+    id: 'q19_doenca_espiritual',
+    label: 'Como você compreende a doença? Ela pode ter algum significado ou propósito em determinados momentos da vida?',
     data_i18n: 'q19_doenca_espiritual'
 },
 
 {
     number: 20,
     block: 2,
-    id: 'q20_sentido_doenca',
     theme: 'sentido_doenca',
-    label: 'Como você compreende a doença? Ela pode ter algum significado ou propósito em determinados momentos da vida?',
+    id: 'q20_sentido_doenca',
+    label: 'Você acredita que algumas doenças podem refletir sombras internas ou fazer parte de um processo de crescimento espiritual?',    
     data_i18n: 'q20_sentido_doenca'
 }
 
@@ -236,7 +236,7 @@
     block: 3,
     theme: 'espiritualidade',
     id: 'q22_espiritualidade',
-    label: 'Você acredita em Deus, na espiritualidade ou em algo além do que podemos ver?',
+    label: 'Você acredita em Deus, em um ser supremo, na espiritualidade ou em algo além do que podemos ver?',
     data_i18n: 'q22_espiritualidade'
 },
 
@@ -308,7 +308,7 @@
     block: 3,
     theme: 'sonhos',
     id: 'q30_sonhos',
-    label: 'Você se vê como alguém que ajuda sonhos a nascerem ou como alguém que, sem perceber, acaba enterrando os próprios sonhos?',
+    label: 'Você se vê como alguém que ajuda sonhos a nascerem ou como alguém que, sem perceber, acaba enterrando os próprios sonhos e dos outros?',
     data_i18n: 'q30_sonhos'
 }
 
@@ -356,7 +356,7 @@
     block: 4,
     theme: 'chamado_interior',
     id: 'q34_chamado_interior',
-    label: 'Existe um chamado interior, uma voz silenciosa, que você tem ignorado?',
+    label: 'Existe um chamado interior, uma vontade silenciosa, que você tem ignorado?',
     data_i18n: 'q34_chamado_interior'
 },
 
@@ -392,7 +392,7 @@
     block: 4,
     theme: 'vida_alem_da_terra',
     id: 'q38_vida_alem_terra',
-    label: 'Você acredita que existe vida além da Terra ou acredita que toda a existência acontece apenas aqui?',
+    label: 'Você acredita que existe vida além do nosso planeta Terra ou acredita que toda a existência acontece apenas aqui?',
     data_i18n: 'q38_vida_alem_terra'
 },
 
@@ -410,7 +410,7 @@
     block: 4,
     theme: 'destino_dos_sonhos',
     id: 'q40_destino_sonhos',
-    label: 'O que aconteceu com os sonhos que você teve — ou com aqueles que nunca chegou a realizar?',
+    label: 'O que aconteceu com os sonhos que você teve — e os quais nunca chegou a realizar?',
     data_i18n: 'q40_destino_sonhos'
 }
 
