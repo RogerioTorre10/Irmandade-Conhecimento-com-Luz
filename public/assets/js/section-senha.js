@@ -630,25 +630,60 @@
         localStorage.setItem('jornada_email', email);
         localStorage.setItem('jornada_last_section', 'section-guia');
 
-        // 🔽 INICIA A SESSÃO OFICIAL (grava started_at + deadline_et de 72h)
-        try {
-          if (window.JORNADA_SESSION?.iniciarSessao) {
-            await window.JORNADA_SESSION.iniciarSessao({ email });
-          } else {
-            // fallback caso o módulo de sessão ainda não tenha carregado
-            localStorage.setItem('jornada_started_at', String(Date.now()));
+        /*
+        * Inicia o prazo fixo de 72 horas apenas após a confirmação do 2FA.
+        * Se já existir uma sessão válida, o tracker preserva o deadline original.
+        */
+        if (
+          window.JORNADA_SESSION &&
+          typeof window.JORNADA_SESSION.iniciarSessao === 'function'
+        ) {
+          try {
+            const sessao72h =
+              await window.JORNADA_SESSION.iniciarSessao({
+                email
+              });
+
+          if (sessao72h?.criado_em) {
+            localStorage.setItem(
+              'jornada_started_at',
+              String(sessao72h.criado_em)
+            );
           }
-        } catch (e) {
-          console.warn('[JCSenha] iniciarSessao falhou, usando fallback:', e);
-          localStorage.setItem('jornada_started_at', String(Date.now()));
+
+          if (sessao72h?.deadline_at) {
+            localStorage.setItem(
+              'jornada_deadline_at',
+              String(sessao72h.deadline_at)
+            );
+          }
+
+          console.log(
+            '[JCSenha][72H] Sessão iniciada ou preservada:',
+            sessao72h
+          );
+
+        } catch (sessionErr) {
+          /*
+          * Não interrompe a entrada na jornada.
+          * O progresso principal continua sendo salvo pelo sistema de backup.
+          */
+          console.error(
+            '[JCSenha][72H] Falha ao iniciar contador:',
+            sessionErr
+          );
         }
+      } else {
+        console.warn(
+          '[JCSenha][72H] JORNADA_SESSION não está disponível.'
+        );
+      }
+ 
+      window.toast?.('Acesso confirmado.', 'success');
 
-        window.toast?.('Acesso confirmado.', 'success');
-
-        if (window.JC?.show) {
-          window.JC.show('section-guia');
-        }
-
+      if (window.JC?.show) {
+        window.JC.show('section-guia');
+      }
 
       } catch (err) {
         console.error('[JCSenha] erro ao confirmar 2FA:', err);
