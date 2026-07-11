@@ -481,7 +481,7 @@ function horasRestantes() {
   // API GLOBAL
   // ============================================
 
-  window.JORNADA_SESSION = {
+  window.JORNADA_TIMER = {
     iniciarSessao,
     retomarSessao,
     salvarBloco,
@@ -491,6 +491,11 @@ function horasRestantes() {
     tempoRestante,
     iniciarContador
   };
+
+  console.log(
+    '[JORNADA_TIMER] API 72h carregada:',
+    Object.keys(window.JORNADA_TIMER || {})
+  );
 
   // ============================================
   // AUTO RETOMADA
