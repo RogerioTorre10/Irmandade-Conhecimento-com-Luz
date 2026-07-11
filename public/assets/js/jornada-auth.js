@@ -1,13 +1,14 @@
 /* ============================================
    jornada-auth.js — Gate de Senha + Olho
    Expondo: window.JORNADA_AUTH
-   ============================================ */
+   v1.1 — countdown de 24h removido, sessão de 72h
+   delegada ao jornada-session-tracker.js
+============================================ */
 ;(function () {
   const CFG = Object.assign(
     {
       ACCESS_CODE: (window.JORNADA_CFG && window.JORNADA_CFG.PASS) || "IRMANDADE",
       STORAGE_KEY: "jornada_auth",
-      FINISH_HOURS: 24,
       START_DAYS: null,
       ISSUED_AT: null,
     },
@@ -21,8 +22,7 @@
   };
 
   const now = () => Date.now();
-  const ms  = (h) => h*3600*1000;
-  const msd = (d) => d*24*3600*1000;
+  const msd = (d) => d * 24 * 3600 * 1000;
 
   function validate(code) {
     return String(code || "").trim() === String(CFG.ACCESS_CODE).trim();
@@ -31,28 +31,6 @@
   function isStartWindowOpen() {
     if (!CFG.START_DAYS || !CFG.ISSUED_AT) return true;
     return now() <= (Number(CFG.ISSUED_AT) + msd(CFG.START_DAYS));
-  }
-
-  function grant() {
-    const st = S.load();
-    st.granted_at  = now();
-    st.deadline_at = st.granted_at + ms(CFG.FINISH_HOURS);
-    S.save(st);
-  }
-
-  function timeLeftMs() {
-    const st = S.load();
-    if (!st.deadline_at) return null;
-    return Math.max(0, st.deadline_at - now());
-  }
-
-  function formatCountdown(msLeft) {
-    if (msLeft == null) return "";
-    const s = Math.floor(msLeft / 1000);
-    const h = Math.floor(s / 3600);
-    const m = Math.floor((s % 3600) / 60);
-    const ss = s % 60;
-    return `${h}h ${m}m ${ss}s`;
   }
 
   function bindEyeToggle(inputEl, eyeEl) {
@@ -70,14 +48,13 @@
       formSelector = "#form-senha",
       inputSelector = "#senha",
       eyeSelector = ".password-toggle",
-      countdownSelector = "#senha-countdown",
+      emailSelector = "#email",
       onGranted = () => {}
     } = opts;
 
     const form = document.querySelector(formSelector);
     const input = document.querySelector(inputSelector);
     const eye = document.querySelector(eyeSelector);
-    const countdown = document.querySelector(countdownSelector);
 
     if (!form || !input) return;
 
@@ -85,16 +62,8 @@
 
     if (!isStartWindowOpen()) {
       form.querySelector("button[type=submit]")?.setAttribute("disabled", "disabled");
-      if (countdown) countdown.textContent = "Janela de início expirada.";
       return;
     }
-
-    const tick = () => {
-      const msLeft = timeLeftMs();
-      if (countdown) countdown.textContent = msLeft ? `Tempo restante: ${formatCountdown(msLeft)}` : "";
-      if (msLeft && msLeft > 0) requestAnimationFrame(tick);
-    };
-    tick();
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -103,26 +72,23 @@
         form.classList.add("shake");
         setTimeout(() => form.classList.remove("shake"), 500);
         return;
-    }
+      }
 
-    grant();
+      const emailInput = document.querySelector(emailSelector) || document.querySelector("[name=email]");
+      const emailDoParticipante = emailInput ? emailInput.value.trim() : (window.JORNADA_EMAIL || "");
 
-    const emailInput = document.querySelector("#email") || document.querySelector("[name=email]");
-    const emailDoParticipante = emailInput ? emailInput.value.trim() : (window.JORNADA_EMAIL || "");
+      if (window.JORNADA_SESSION && typeof window.JORNADA_SESSION.iniciarSessao === "function") {
+        await window.JORNADA_SESSION.iniciarSessao({ email: emailDoParticipante });
+      } else {
+        console.warn("[JORNADA_AUTH] JORNADA_SESSION não encontrado — contador de 72h não foi iniciado.");
+      }
 
-    if (window.JORNADA_SESSION && typeof window.JORNADA_SESSION.iniciarSessao === "function") {
-      await window.JORNADA_SESSION.iniciarSessao({ email: emailDoParticipante });
-    }
-
-    onGranted();
-   });
+      onGranted();
+    });
   }
 
   window.JORNADA_AUTH = {
     init,
     clear: S.clear,
-    timeLeftMs,
-    formatCountdown,
   };
 })();
-
