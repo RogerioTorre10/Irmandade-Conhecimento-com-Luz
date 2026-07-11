@@ -628,14 +628,27 @@
 
         localStorage.setItem('jornada_auth_ok', '1');
         localStorage.setItem('jornada_email', email);
-        localStorage.setItem('jornada_started_at', String(Date.now()));
         localStorage.setItem('jornada_last_section', 'section-guia');
+
+        // 🔽 INICIA A SESSÃO OFICIAL (grava started_at + deadline_et de 72h)
+        try {
+          if (window.JORNADA_SESSION?.iniciarSessao) {
+            await window.JORNADA_SESSION.iniciarSessao({ email });
+          } else {
+            // fallback caso o módulo de sessão ainda não tenha carregado
+            localStorage.setItem('jornada_started_at', String(Date.now()));
+          }
+        } catch (e) {
+          console.warn('[JCSenha] iniciarSessao falhou, usando fallback:', e);
+          localStorage.setItem('jornada_started_at', String(Date.now()));
+        }
 
         window.toast?.('Acesso confirmado.', 'success');
 
         if (window.JC?.show) {
           window.JC.show('section-guia');
         }
+
 
       } catch (err) {
         console.error('[JCSenha] erro ao confirmar 2FA:', err);
