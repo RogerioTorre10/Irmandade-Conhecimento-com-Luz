@@ -477,18 +477,14 @@ function horasRestantes() {
   // ============================================
 
   window.JORNADA_SESSION = {
-
     iniciarSessao,
-
     retomarSessao,
-
     salvarBloco,
-
     salvarSnapshot,
-
     concluirJornada,
-
-    horasRestantes
+    horasRestantes,
+    tempoRestante,
+    iniciarContador
   };
 
   // ============================================
