@@ -312,6 +312,10 @@
 
     const st = load();
 
+    if (!Array.isArray(st.warned_hours)) {
+      st.warned_hours = [];
+    }
+
     const marcos = [48, 24, 12, 6, 2, 1];
 
     for (const marco of marcos) {
