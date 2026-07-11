@@ -19,7 +19,7 @@
   const AUTH_KEY      = 'jornada_auth';
 
   const TOTAL_HOURS   = 72;
-  const TICK_INTERVAL = 60 * 1000;
+  const TICK_INTERVAL = 1000;
 
   // ============================================
   // UTILITÁRIOS
@@ -250,16 +250,46 @@
   // HORAS RESTANTES
   // ============================================
 
-  function horasRestantes() {
+  function tempoRestante() {
+  const st = load();
 
-    const st = load();
-
-    if (!st.deadline_at) return TOTAL_HOURS;
-
-    const left = Math.max(0, st.deadline_at - now());
-
-    return Math.floor(msToH(left));
+  if (!st.deadline_at) {
+    return {
+      totalMs: hToMs(TOTAL_HOURS),
+      horas: TOTAL_HOURS,
+      minutos: 0,
+      segundos: 0
+    };
   }
+
+  const totalMs = Math.max(
+    0,
+    Number(st.deadline_at) - now()
+  );
+
+  const horas = Math.floor(
+    totalMs / 3600000
+  );
+
+  const minutos = Math.floor(
+    (totalMs % 3600000) / 60000
+  );
+
+  const segundos = Math.floor(
+    (totalMs % 60000) / 1000
+  );
+
+  return {
+    totalMs,
+    horas,
+    minutos,
+    segundos
+  };
+}
+
+function horasRestantes() {
+  return tempoRestante().horas;
+}
 
   // ============================================
   // CONTADOR
@@ -285,24 +315,37 @@
   }
 
   function tick() {
+  const tempo = tempoRestante();
 
-    const horas = horasRestantes();
+  const el = document.querySelector(
+    '#jornada-countdown, .jornada-countdown'
+  );
 
-    const el = document.querySelector(
-      '#jornada-countdown, .jornada-countdown'
-    );
+  if (el) {
+    if (tempo.totalMs <= 0) {
+      el.textContent = 'Prazo encerrado';
 
-    if (el) {
+      const st = load();
 
-      if (horas <= 0) {
-        el.textContent = 'Prazo encerrado';
-      } else {
-        el.textContent = `${horas}h restantes`;
+      if (st.status !== 'expirado') {
+        st.status = 'expirado';
+        st.expirado_em = now();
+        save(st);
+        sincronizar(st);
       }
+
+      pararContador();
+      return;
     }
 
-    emitirAviso(horas);
+    const hh = String(tempo.horas).padStart(2, '0');
+    const mm = String(tempo.minutos).padStart(2, '0');
+
+    el.textContent = `${hh}h ${mm}min`;
   }
+
+  emitirAviso(tempo.horas);
+}
 
   // ============================================
   // AVISOS
