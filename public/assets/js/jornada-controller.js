@@ -295,6 +295,24 @@ async function show(sectionId) {
 if (isTransitioning) { console.log('[JC.show] Transição em andamento, ignorando:', sectionId); return; }
 if (sectionId === window.JC.currentSection) { console.log('[JC.show] Já é a seção atual:', sectionId); return; }
 isTransitioning = true;
+const previousSectionId =
+  window.JC.currentSection;
+
+const previousSection =
+  previousSectionId
+    ? document.getElementById(previousSectionId)
+    : null;
+
+/*
+ * Esconde imediatamente a seção anterior antes de
+ * carregar a próxima. Evita flash visual entre telas.
+ */
+if ( previousSection && previousSectionId !== sectionId) {
+  previousSection.classList.add('section-leaving');
+  previousSection.setAttribute('aria-hidden','true');
+  previousSection.style.pointerEvents ='none';
+  previousSection.style.visibility ='hidden';
+  previousSection.style.opacity ='0';}  
 console.log('[JC.show] Iniciando:', sectionId);
 try {
 const cleanId = sectionId.replace(/^section-/, '');
