@@ -28,48 +28,51 @@
 },
   "site": { "title": "Viaje • Hermandad Conocimiento con Luz" },
   "intro": {
-    "title": "Viaje del Conocimiento",
-    "start": "Iniciar",
-    "p1": "Buenos días.",
-    "p2": "Respeto y amor.",
-    "p3": "Vamos en paz.",
-    "p4": "El amor es vida.",
-    "p5": "Dios sea alabado."
-  },
-  "termos1": {
-    "title": "Viaje",
-    "subtitle": "AVISO",
-    "description": "Este viaje tiene reglas importantes.",
-    "li1": "Tus respuestas son confidenciales.",
-    "li2": "Al iniciar, aceptas los términos.",
-    "li3": "El PDF se generará al final.",
-    "li4": "No hay reembolso después de iniciar.",
-    "li5": "El acceso está limitado al período definido.",
-    "li6": "15 días para comenzar.",
-    "li7": "24 horas para completar después de iniciar.",
-    "li8": "Recomendamos un ambiente tranquilo.",
-    "li9": "Prepara tu mente con intención positiva."
-  },
-  "termos2": {
-    "title": "Término de Responsabilidad",
-    "li1": "No hay garantía de resultados.",
-    "li2": "El autoconocimiento es un proceso personal.",
-    "li3": "Tú eres responsable de tus elecciones.",
-    "li4": "El apoyo emocional puede ser necesario.",
-    "li5": "La Guía IA actúa como orientadora simbólica.",
-    "li6": "La guía no sustituye a profesionales.",
-    "li7": "Mantén responsabilidad sobre tus acciones.",
-    "li8": "El viaje es una experiencia interpretativa.",
-    "li9": "Tu privacidad es respetada.",
-    "li10": "El consentimiento consciente es obligatorio."
-  },
-  "senha": {
-    "title": "Ingresa la Palabra Clave",
-    "p1": "La Palabra Clave es el secreto que abrirá tu viaje.",
-    "p2": "Elige con cuidado, pues refleja tu intención.",
-    "p3": "¿Listo? Escribe ahora y avanza.",
-    "placeholder": "Escribe la Palabra Clave..."
-  },
+  "title": "Viaje Esencial",
+  "start": "Comenzar",
+  "p1": "Bienvenido(a) al VIAJE ESENCIAL – Conocimiento con Luz.",
+  "p2": "Una experiencia simbólica de autoconocimiento.",
+  "p3": "Responderás preguntas significativas acompañado por un Guía de IA.",
+  "p4": "Elige tu Guía: Lumen, Zion o Arian.",
+  "p5": "Al finalizar podrás generar tu PDF y tu SelfieCard."
+},
+
+"termos1": {
+  "title": "Viaje Esencial",
+  "subtitle": "AVISO. Lee atentamente estas condiciones importantes.",
+  "description": "Al comenzar, aceptas estos términos.",
+  "li1": "Tu consentimiento informado es necesario para participar.",
+  "li2": "Tus respuestas son confidenciales y deben ser sinceras.",
+  "li3": "El acceso es personal, protegido mediante verificación en dos pasos y válido durante 72 horas.",
+  "li4": "Si la experiencia se interrumpe, podrás continuar desde el último punto guardado dentro del plazo establecido.",
+  "li5": "Tras la activación, dispondrás de hasta 72 horas para completar el Viaje.",
+  "li6": "Al finalizar, genera y descarga tu PDF y tu SelfieCard.",
+  "li7": "Descarga tus archivos inmediatamente después de su generación.",
+  "li8": "Una vez entregados, tus datos serán eliminados automáticamente.",
+  "li9": "Busca un lugar tranquilo y dedica este tiempo a ti mismo."
+},
+
+"termos2": {
+  "title": "Términos de Responsabilidad",
+  "li1": "Tu Guía es una IA diseñada para acompañar la reflexión mediante un lenguaje cercano y humano.",
+  "li2": "Este Viaje no ofrece diagnósticos, tratamientos ni orientación clínica.",
+  "li3": "No sustituye la atención psicológica, médica o terapéutica.",
+  "li4": "Cuando sea necesario, podrá recomendarse buscar apoyo profesional.",
+  "li5": "Tus decisiones y acciones siguen siendo tu responsabilidad.",
+  "li6": "Este Viaje ofrece una experiencia simbólica y de reflexión personal.",
+  "li7": "Comunícate con respeto, empatía y cordialidad.",
+  "li8": "Evita expresiones ofensivas, discriminatorias o de odio.",
+  "li9": "La forma en que hablas con tu Guía también refleja cómo dialogas contigo mismo.",
+  "li10": "Al continuar, confirmas que has leído, comprendido y aceptado estos términos."
+},
+
+"senha": {
+  "title": "Confirma tu Acceso",
+  "p1": "El código enviado a tu correo electrónico desbloqueará tu Viaje.",
+  "p2": "Esta es una experiencia personal, educativa y simbólica.",
+  "p3": "Al continuar, confirmas que has leído y aceptado estos términos.",
+  "placeholder": "Introduce el código de verificación..."
+},
   "guia": {
   "title": "Elige tu Guía",
   "subtitle": "{{nome}}! Selecciona quién te acompañará en esta jornada.",
