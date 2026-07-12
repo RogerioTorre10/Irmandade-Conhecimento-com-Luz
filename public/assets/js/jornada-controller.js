@@ -319,6 +319,10 @@ const cleanId = sectionId.replace(/^section-/, '');
 let section = await window.carregarEtapa(cleanId);
 if (section && section.id !== sectionId) { section.id = sectionId; }
 section = await waitForNode('#' + sectionId, 12000);
+section.style.visibility = 'hidden';
+section.style.opacity = '0';
+section.style.pointerEvents = 'none';
+section.setAttribute('aria-hidden','true');  
 if (!section) { throw new Error(`Seção ${sectionId} não encontrada`); }
 await applyI18nToSection(sectionId, section);
 await prepareTyping(section);
