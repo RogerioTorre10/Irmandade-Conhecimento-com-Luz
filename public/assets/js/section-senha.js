@@ -297,13 +297,24 @@
     }
   }
 
- async function typeOnce(el, { speed = TYPING_SPEED, speak = true, voiceCtx = null, runToken = 0 } = {}) {
+ async function typeOnce(
+  el,
+  {
+    speed = TYPING_SPEED,
+    speak = true,
+    voiceCtx = null,
+    runToken = 0
+  } = {}
+) {
   if (!el) return;
   if (runToken !== window.JCSenha.state.activeRunToken) return;
 
   const key = el.dataset?.i18nText;
+
   const translated =
-    (key && window.i18n?.t ? window.i18n.t(key) : null);
+    key && window.i18n?.t
+      ? window.i18n.t(key)
+      : null;
 
   const rawText =
     (translated && translated !== key ? translated : null) ||
@@ -313,13 +324,15 @@
     '';
 
   const text = String(rawText).trim();
+
   if (!text) return;
 
   el.dataset.text = text;
   el.setAttribute('data-text', text);
 
   window.G = window.G || {};
-  const prevLock = !!window.G.__typingLock;
+
+  const previousTypingLock = !!window.G.__typingLock;
   window.G.__typingLock = true;
 
   el.textContent = '';
@@ -328,29 +341,109 @@
   el.removeAttribute('data-spoken');
   el.setAttribute('aria-busy', 'true');
 
-  let usedFallback = false;
+  const speakOptions = {
+    rate: voiceCtx?.rate ?? 1,
+    pitch: voiceCtx?.pitch ?? 1,
+    lang:
+      voiceCtx?.lang ??
+      document.documentElement.lang ??
+      'pt-BR',
+    gender:
+      voiceCtx?.voiceGender ??
+      'female',
+    guide:
+      voiceCtx?.guide ??
+      'lumen',
+    style:
+      voiceCtx?.style ??
+      'acolhedora'
+  };
+
+  let typingPromise;
 
   if (typeof window.runTyping === 'function') {
-    await new Promise((resolve) => {
+    typingPromise = new Promise((resolve) => {
       try {
-        window.runTyping(el, text, () => resolve(), {
-          speed,
-          cursor: true
-        });
+        window.runTyping(
+          el,
+          text,
+          resolve,
+          {
+            speed,
+            cursor: true
+          }
+        );
       } catch (err) {
-        console.warn('[JCSenha] runTyping falhou, fallback local', err);
-        usedFallback = true;
-        resolve();
+        console.warn(
+          '[JCSenha] runTyping falhou; usando fallback local.',
+          err
+        );
+
+        localType(el, text, speed)
+          .then(resolve);
       }
     });
   } else {
-    usedFallback = true;
+    typingPromise = localType(
+      el,
+      text,
+      speed
+    );
   }
 
-  if (runToken !== window.JCSenha.state.activeRunToken) return;
+  let speechPromise = Promise.resolve();
 
-  if (usedFallback) {
-    await localType(el, text, speed);
+  if (
+    speak &&
+    runToken === window.JCSenha.state.activeRunToken &&
+    window.EffectCoordinator?.speak
+  ) {
+    try {
+      cancelAllSpeech();
+
+      /*
+       * Pequeno atraso permite que os primeiros caracteres
+       * apareçam antes da voz iniciar.
+       */
+      speechPromise = sleep(TTS_LATCH_MS)
+        .then(() => {
+          if (
+            runToken !==
+            window.JCSenha.state.activeRunToken
+          ) {
+            return;
+          }
+
+          return window.EffectCoordinator.speak(
+            text,
+            speakOptions
+          );
+        });
+    } catch (err) {
+      console.error(
+        '[JCSenha] erro ao iniciar TTS:',
+        err
+      );
+    }
+  }
+
+  /*
+   * Datilografia e leitura executam ao mesmo tempo.
+   * A próxima frase só começa quando ambas terminarem.
+   */
+  await Promise.allSettled([
+    typingPromise,
+    speechPromise
+  ]);
+
+  if (
+    runToken !==
+    window.JCSenha.state.activeRunToken
+  ) {
+    window.G.__typingLock =
+      previousTypingLock;
+
+    return;
   }
 
   el.classList.remove('typing-active');
@@ -358,34 +451,14 @@
   el.removeAttribute('aria-busy');
   el.setAttribute('data-typed', 'true');
 
-  window.G.__typingLock = prevLock;
-
-  if (speak && text && !el.dataset.spoken && runToken === window.JCSenha.state.activeRunToken) {
-    try {
-      if (window.EffectCoordinator?.speak) {
-        if (!el.dataset.spoken) {
-          cancelAllSpeech();
-        }
-
-      const speakOptions = {
-        rate: voiceCtx?.rate ?? 1.0,
-        pitch: voiceCtx?.pitch ?? 1.0,
-        lang: voiceCtx?.lang ?? document.documentElement.lang ?? 'pt-BR',
-        gender: voiceCtx?.voiceGender ?? 'female',
-        guide: voiceCtx?.guide ?? 'lumen',
-        style: voiceCtx?.style ?? 'acolhedora'
-      };
-
-      await window.EffectCoordinator.speak(text, speakOptions);
-      el.dataset.spoken = 'true';        
-      }
-      
-    } catch (err) {
-      console.error('[JCSenha] erro no TTS:', err);
-    }
+  if (speak) {
+    el.dataset.spoken = 'true';
   }
 
-  await sleep(80);
+  window.G.__typingLock =
+    previousTypingLock;
+
+  await sleep(120);
 }
   
   function getTransitionSrc(root, btn) {
