@@ -338,6 +338,17 @@ window.JORNADA_SESSION?.autoSave?.();
 } catch (e) { console.warn('[JC][SESSION_SAVE][ERRO]', e); }
 await handleSectionLogic(sectionId, section);
 attachButtonEvents(sectionId, section);
+await new Promise((resolve) =>
+  requestAnimationFrame(() =>
+    requestAnimationFrame(resolve)
+  )
+);
+
+section.style.visibility = 'visible';
+section.style.opacity = '1';
+section.style.pointerEvents = 'auto';
+section.setAttribute('aria-hidden','false');
+section.classList.add('section-entered');  
 document.dispatchEvent(new CustomEvent('section:shown', { detail: { sectionId, node: section } }));
 console.log('[JC.show] Exibida com sucesso:', sectionId);
 } catch (err) {
