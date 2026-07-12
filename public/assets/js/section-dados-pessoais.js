@@ -6,7 +6,7 @@
   const SECTION_ID = 'section-dados-pessoais';
   const STORAGE_KEY = 'JORNADA_DADOS_PESSOAIS';
 
-  const VIDEO_NEXT = '/assets/videos/filme-0-ao-encontro-da-jornada.mp4';
+  const VIDEO_NEXT = '/assets/videos/conhecimento-com-luz-jardim.mp4';
   const NEXT_SECTION_ID = 'section-perguntas-raizes';
 
   if (window.__DADOS_PESSOAIS_BOUND__) {
