@@ -307,12 +307,15 @@ const previousSection =
  * Esconde imediatamente a seção anterior antes de
  * carregar a próxima. Evita flash visual entre telas.
  */
-if ( previousSection && previousSectionId !== sectionId) {
+if (  previousSection && previousSectionId !== sectionId) {
+  const activeEl = document.activeElement;
+  if (activeEl && previousSection.contains(activeEl)
+  ) {try {activeEl.blur();} catch (_) {}}
   previousSection.classList.add('section-leaving');
-  previousSection.setAttribute('aria-hidden','true');
-  previousSection.style.pointerEvents ='none';
-  previousSection.style.visibility ='hidden';
-  previousSection.style.opacity ='0';}  
+  previousSection.style.pointerEvents = 'none';
+  previousSection.style.visibility = 'hidden';
+  previousSection.style.opacity = '0';
+  previousSection.setAttribute('aria-hidden','true');}
 console.log('[JC.show] Iniciando:', sectionId);
 try {
 const cleanId = sectionId.replace(/^section-/, '');
