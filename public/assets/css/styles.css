@@ -464,27 +464,3 @@ footer,
     font-size: 24px;
   }
 }
-
-/* =====================================================
-   BLINDAGEM CONTRA FLASH ENTRE SEÇÕES
-   ===================================================== */
-
-.section-leaving {
-  opacity: 0 !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
-}
-
-.section-entered {
-  opacity: 1 !important;
-  visibility: visible !important;
-  pointer-events: auto !important;
-}
-
-#section-conteudo > section,
-#jornada-content-wrapper > section {
-  transition:
-    opacity 90ms linear,
-    visibility 90ms linear;
-}
-
