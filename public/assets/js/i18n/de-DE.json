@@ -28,48 +28,51 @@
 },
   "site": { "title": "Reise • Bruderschaft des Wissens mit Licht" },
   "intro": {
-    "title": "Reise des Wissens",
-    "start": "Starten",
-    "p1": "Guten Morgen.",
-    "p2": "Respekt und Liebe.",
-    "p3": "Lassen Sie uns in Frieden gehen.",
-    "p4": "Liebe ist Leben.",
-    "p5": "Gott sei gepriesen."
-  },
-  "termos1": {
-    "title": "Reise",
-    "subtitle": "HINWEIS",
-    "description": "Diese Reise hat wichtige Regeln.",
-    "li1": "Ihre Antworten sind vertraulich.",
-    "li2": "Mit dem Start akzeptieren Sie die Bedingungen.",
-    "li3": "Das PDF wird am Ende erstellt.",
-    "li4": "Nach dem Start keine Rückerstattung.",
-    "li5": "Der Zugriff ist auf den definierten Zeitraum beschränkt.",
-    "li6": "15 Tage zum Start.",
-    "li7": "24 Stunden zum Abschluss nach dem Start.",
-    "li8": "Wir empfehlen eine ruhige Umgebung.",
-    "li9": "Bereiten Sie Ihren Geist mit positiver Absicht vor."
-  },
-  "termos2": {
-    "title": "Haftungserklärung",
-    "li1": "Es gibt keine Ergebnisgarantie.",
-    "li2": "Selbsterkenntnis ist ein persönlicher Prozess.",
-    "li3": "Sie sind für Ihre Entscheidungen verantwortlich.",
-    "li4": "Emotionale Unterstützung kann notwendig sein.",
-    "li5": "Der KI-Guide wirkt als symbolischer Begleiter.",
-    "li6": "Der Guide ersetzt keine Fachkräfte.",
-    "li7": "Übernehmen Sie Verantwortung für Ihre Handlungen.",
-    "li8": "Die Reise ist eine interpretative Erfahrung.",
-    "li9": "Ihre Privatsphäre wird respektiert.",
-    "li10": "Bewusste Zustimmung ist verpflichtend."
-  },
-  "senha": {
-    "title": "Geben Sie das Schlüsselwort ein",
-    "p1": "Das Schlüsselwort ist das Geheimnis, das Ihre Reise öffnet.",
-    "p2": "Wählen Sie es sorgfältig, denn es spiegelt Ihre Absicht wider.",
-    "p3": "Bereit? Geben Sie es jetzt ein und fahren Sie fort.",
-    "placeholder": "Schlüsselwort eingeben..."
-  },
+  "title": "Essenzielle Reise",
+  "start": "Starten",
+  "p1": "Willkommen zur ESSENZIELLEN REISE – Wissen mit Licht.",
+  "p2": "Eine symbolische Reise der Selbsterkenntnis.",
+  "p3": "Sie beantworten bedeutungsvolle Fragen und werden von einem KI-Guide begleitet.",
+  "p4": "Wählen Sie Ihren Guide: Lumen, Zion oder Arian.",
+  "p5": "Am Ende können Sie Ihr PDF und Ihre SelfieCard erstellen."
+},
+
+"termos1": {
+  "title": "Essenzielle Reise",
+  "subtitle": "HINWEIS. Bitte lesen Sie diese wichtigen Bedingungen.",
+  "description": "Mit dem Start stimmen Sie diesen Bedingungen zu.",
+  "li1": "Ihre bewusste Zustimmung ist erforderlich.",
+  "li2": "Ihre Antworten sind vertraulich und sollten ehrlich sein.",
+  "li3": "Der Zugang ist persönlich, durch eine Zwei-Faktor-Bestätigung geschützt und 72 Stunden gültig.",
+  "li4": "Bei einer Unterbrechung können Sie Ihre Reise innerhalb der Frist am zuletzt gespeicherten Punkt fortsetzen.",
+  "li5": "Nach der Aktivierung haben Sie bis zu 72 Stunden Zeit, die Reise abzuschließen.",
+  "li6": "Erstellen und laden Sie am Ende Ihr PDF und Ihre SelfieCard herunter.",
+  "li7": "Laden Sie Ihre Dateien direkt nach der Erstellung herunter.",
+  "li8": "Nach der Bereitstellung werden Ihre Daten automatisch gelöscht.",
+  "li9": "Wählen Sie einen ruhigen Ort und nehmen Sie sich ausreichend Zeit."
+},
+
+"termos2": {
+  "title": "Nutzungsbedingungen",
+  "li1": "Ihr Guide ist eine KI mit menschlich wirkender Sprache, die zur Selbstreflexion anregt.",
+  "li2": "Diese Reise bietet keine Diagnose, Behandlung oder medizinische Beratung.",
+  "li3": "Sie ersetzt keine psychologische, medizinische oder therapeutische Betreuung.",
+  "li4": "Falls erforderlich, kann professionelle Unterstützung empfohlen werden.",
+  "li5": "Ihre Entscheidungen und Handlungen bleiben Ihre eigene Verantwortung.",
+  "li6": "Diese Reise bietet eine symbolische und reflektierende Erfahrung.",
+  "li7": "Bitte begegnen Sie Ihrem Guide mit Respekt, Empathie und Höflichkeit.",
+  "li8": "Vermeiden Sie beleidigende, diskriminierende oder hasserfüllte Sprache.",
+  "li9": "Die Art, wie Sie mit Ihrem Guide sprechen, spiegelt auch den Dialog mit sich selbst wider.",
+  "li10": "Mit dem Fortfahren bestätigen Sie, dass Sie diese Bedingungen gelesen und akzeptiert haben."
+},
+
+"senha": {
+  "title": "Zugang bestätigen",
+  "p1": "Der per E-Mail gesendete Bestätigungscode aktiviert Ihre Reise.",
+  "p2": "Dies ist eine persönliche, symbolische und bildungsorientierte Erfahrung.",
+  "p3": "Mit dem Fortfahren bestätigen Sie, dass Sie die Bedingungen gelesen und akzeptiert haben.",
+  "placeholder": "Bestätigungscode eingeben..."
+},
   "guia": {
   "title": "Wähle deinen Guide",
   "subtitle": "Hallo, {{nome}}! Wähle deinen Guide für die Reise.",
