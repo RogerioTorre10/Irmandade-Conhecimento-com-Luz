@@ -36,40 +36,51 @@
     "p4": "Love is life.",
     "p5": "Praise be to God."
   },
-  "termos1": {
-    "title": "Journey",
-    "subtitle": "NOTICE",
-    "description": "This journey has important rules.",
-    "li1": "Your answers are confidential.",
-    "li2": "By starting, you accept the terms.",
-    "li3": "The PDF will be generated at the end.",
-    "li4": "No refund after starting.",
-    "li5": "Access is limited to the defined period.",
-    "li6": "15 days to start.",
-    "li7": "24 hours to complete after starting.",
-    "li8": "We recommend a quiet environment.",
-    "li9": "Prepare your mind with positive intention."
-  },
-  "termos2": {
-    "title": "Liability Term",
-    "li1": "There is no guarantee of results.",
-    "li2": "Self-knowledge is a personal process.",
-    "li3": "You are responsible for your choices.",
-    "li4": "Emotional support may be necessary.",
-    "li5": "The AI Guide acts as a symbolic mentor.",
-    "li6": "The guide does not replace professionals.",
-    "li7": "Maintain responsibility for your actions.",
-    "li8": "The journey is an interpretive experience.",
-    "li9": "Your privacy is respected.",
-    "li10": "Conscious consent is mandatory."
-  },
-  "senha": {
-    "title": "Enter the Keyword",
-    "p1": "The Keyword is the secret that will open your journey.",
-    "p2": "Choose carefully, as it reflects your intention.",
-    "p3": "Ready? Type now and proceed.",
-    "placeholder": "Type the Keyword..."
-  },
+  "intro": {
+  "title": "Essential Journey",
+  "start": "Start",
+  "p1": "Welcome to the ESSENTIAL JOURNEY – Knowledge with Light.",
+  "p2": "A symbolic journey of self-discovery.",
+  "p3": "You will answer meaningful questions guided by an AI Guide.",
+  "p4": "Choose your Guide: Lumen, Zion or Arian.",
+  "p5": "At the end, you can generate your PDF and SelfieCard."
+},
+
+"terms1": {
+  "title": "Essential Journey",
+  "subtitle": "NOTICE. Please read these important terms.",
+  "description": "By starting, you agree to these terms.",
+  "li1": "Your informed consent is required.",
+  "li2": "Your answers are confidential and should be honest.",
+  "li3": "Access is personal, protected by two-step verification and valid for 72 hours.",
+  "li4": "If interrupted, you may continue from your last saved point within the time limit.",
+  "li5": "After activation, you have up to 72 hours to complete the Journey.",
+  "li6": "When finished, generate and download your PDF and SelfieCard.",
+  "li7": "Download your files immediately after they are generated.",
+  "li8": "After delivery, your data will be automatically removed.",
+  "li9": "Choose a quiet place and take your time."
+},
+
+"terms2": {
+  "title": "Terms of Responsibility",
+  "li1": "Your Guide is an AI designed to support reflection through human-centered language.",
+  "li2": "This Journey does not provide diagnosis, treatment or clinical advice.",
+  "li3": "It does not replace psychological, medical or therapeutic care.",
+  "li4": "Professional support may be recommended whenever appropriate.",
+  "li5": "Your choices and actions remain your responsibility.",
+  "li6": "This Journey offers a symbolic and reflective experience.",
+  "li7": "Please communicate with respect, empathy and courtesy.",
+  "li8": "Avoid offensive, discriminatory or hateful language.",
+  "li9": "The way you speak to your Guide also reflects the way you speak to yourself.",
+  "li10": "By continuing, you confirm that you understand and accept these terms."
+},
+"senha": {
+  "title": "Confirm Your Access",
+  "p1": "The verification code sent to your email unlocks your Journey.",
+  "p2": "This is a personal, educational and symbolic experience.",
+  "p3": "By continuing, you confirm that you have read and accepted the terms.",
+  "placeholder": "Enter your verification code..."
+}
   "guia": {
   "title": "Choose Your Guide",
   "subtitle": "Hello, {{nome}}! Choose your guide for the Journey.",
