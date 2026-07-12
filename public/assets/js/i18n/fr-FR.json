@@ -28,41 +28,51 @@
 },
   "site": { "title": "Voyage • Fraternité Connaissance avec Lumière" },
   "intro": {
-    "title": "Voyage de la Connaissance",
-    "start": "Commencer",
-    "p1": "Bonjour.",
-    "p2": "Respect et amour.",
-    "p3": "Allons en paix.",
-    "p4": "L'amour est vie.",
-    "p5": "Que Dieu soit loué."
-  },
-  "termos1": {
-    "title": "Voyage",
-    "subtitle": "AVIS",
-    "description": "Ce voyage a des règles importantes.",
-    "li1": "Vos réponses sont confidentielles.",
-    "li2": "En commençant, vous acceptez les conditions.",
-    "li3": "Le PDF sera généré à la fin.",
-    "li4": "Aucun remboursement après le début.",
-    "li5": "L'accès est limité à la période définie.",
-    "li6": "15 jours pour commencer.",
-    "li7": "24 heures pour terminer après le début.",
-    "li8": "Nous recommandons un environnement calme.",
-    "li9": "Préparez votre esprit avec une intention positive."
-  },
-  "termos2": {
-    "title": "Terme de Responsabilité",
-    "li1": "Il n'y a aucune garantie de résultats.",
-    "li2": "La connaissance de soi est un processus personnel.",
-    "li3": "Vous êtes responsable de vos choix.",
-    "li4": "Un soutien émotionnel peut être nécessaire.",
-    "li5": "Le Guide IA agit comme un guide symbolique.",
-    "li6": "Le guide ne remplace pas les professionnels.",
-    "li7": "Maintenez la responsabilité de vos actions.",
-    "li8": "Le voyage est une expérience interprétative.",
-    "li9": "Votre vie privée est respectée.",
-    "li10": "Le consentement conscient est obligatoire."
-  },
+  "title": "Voyage Essentiel",
+  "start": "Commencer",
+  "p1": "Bienvenue dans le VOYAGE ESSENTIEL – Connaissance avec Lumière.",
+  "p2": "Une expérience symbolique de connaissance de soi.",
+  "p3": "Vous répondrez à des questions profondes accompagné par un Guide IA.",
+  "p4": "Choisissez votre Guide : Lumen, Zion ou Arian.",
+  "p5": "À la fin, vous pourrez générer votre PDF et votre SelfieCard."
+},
+
+"termos1": {
+  "title": "Voyage Essentiel",
+  "subtitle": "AVIS. Veuillez lire attentivement ces conditions importantes.",
+  "description": "En commençant, vous acceptez les présentes conditions.",
+  "li1": "Votre consentement éclairé est indispensable.",
+  "li2": "Vos réponses sont confidentielles et doivent être sincères.",
+  "li3": "L'accès est personnel, protégé par une vérification en deux étapes et valable pendant 72 heures.",
+  "li4": "En cas d'interruption, vous pourrez reprendre votre parcours au dernier point enregistré, dans le délai prévu.",
+  "li5": "Après l'activation, vous disposez de 72 heures pour terminer le Voyage.",
+  "li6": "À la fin, générez et téléchargez votre PDF ainsi que votre SelfieCard.",
+  "li7": "Téléchargez vos fichiers dès leur génération.",
+  "li8": "Une fois les documents remis, vos données seront automatiquement supprimées.",
+  "li9": "Choisissez un endroit calme et accordez-vous ce moment."
+},
+
+"termos2": {
+  "title": "Conditions de Responsabilité",
+  "li1": "Votre Guide est une intelligence artificielle conçue pour accompagner votre réflexion avec un langage chaleureux et humain.",
+  "li2": "Ce Voyage ne fournit ni diagnostic, ni traitement, ni conseil médical ou clinique.",
+  "li3": "Il ne remplace en aucun cas un accompagnement psychologique, médical ou thérapeutique.",
+  "li4": "Lorsque cela est nécessaire, il pourra être recommandé de consulter un professionnel qualifié.",
+  "li5": "Vos choix et vos décisions demeurent sous votre entière responsabilité.",
+  "li6": "Ce Voyage propose une expérience symbolique de réflexion et de connaissance de soi.",
+  "li7": "Veuillez communiquer avec respect, empathie et bienveillance.",
+  "li8": "Évitez tout langage offensant, discriminatoire ou haineux.",
+  "li9": "La manière dont vous vous adressez à votre Guide reflète aussi la manière dont vous dialoguez avec vous-même.",
+  "li10": "En poursuivant, vous confirmez avoir lu, compris et accepté ces conditions."
+},
+
+"senha": {
+  "title": "Confirmez votre accès",
+  "p1": "Le code de vérification envoyé par e-mail activera votre Voyage.",
+  "p2": "Il s'agit d'une expérience personnelle, éducative et symbolique.",
+  "p3": "En poursuivant, vous confirmez avoir lu et accepté ces conditions.",
+  "placeholder": "Saisissez le code de vérification..."
+}
   "senha": {
     "title": "Entrez le Mot-Clé",
     "p1": "Le Mot-Clé est le secret qui ouvrira votre voyage.",
