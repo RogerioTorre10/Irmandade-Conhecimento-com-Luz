@@ -295,37 +295,12 @@ async function show(sectionId) {
 if (isTransitioning) { console.log('[JC.show] Transição em andamento, ignorando:', sectionId); return; }
 if (sectionId === window.JC.currentSection) { console.log('[JC.show] Já é a seção atual:', sectionId); return; }
 isTransitioning = true;
-const previousSectionId =
-  window.JC.currentSection;
-
-const previousSection =
-  previousSectionId
-    ? document.getElementById(previousSectionId)
-    : null;
-
-/*
- * Esconde imediatamente a seção anterior antes de
- * carregar a próxima. Evita flash visual entre telas.
- */
-if (  previousSection && previousSectionId !== sectionId) {
-  const activeEl = document.activeElement;
-  if (activeEl && previousSection.contains(activeEl)
-  ) {try {activeEl.blur();} catch (_) {}}
-  previousSection.classList.add('section-leaving');
-  previousSection.style.pointerEvents = 'none';
-  previousSection.style.visibility = 'hidden';
-  previousSection.style.opacity = '0';
-  previousSection.setAttribute('aria-hidden','true');}
 console.log('[JC.show] Iniciando:', sectionId);
 try {
 const cleanId = sectionId.replace(/^section-/, '');
 let section = await window.carregarEtapa(cleanId);
 if (section && section.id !== sectionId) { section.id = sectionId; }
 section = await waitForNode('#' + sectionId, 12000);
-section.style.visibility = 'hidden';
-section.style.opacity = '0';
-section.style.pointerEvents = 'none';
-section.setAttribute('aria-hidden','true');  
 if (!section) { throw new Error(`Seção ${sectionId} não encontrada`); }
 await applyI18nToSection(sectionId, section);
 await prepareTyping(section);
@@ -341,17 +316,6 @@ window.JORNADA_SESSION?.autoSave?.();
 } catch (e) { console.warn('[JC][SESSION_SAVE][ERRO]', e); }
 await handleSectionLogic(sectionId, section);
 attachButtonEvents(sectionId, section);
-await new Promise((resolve) =>
-  requestAnimationFrame(() =>
-    requestAnimationFrame(resolve)
-  )
-);
-
-section.style.visibility = 'visible';
-section.style.opacity = '1';
-section.style.pointerEvents = 'auto';
-section.setAttribute('aria-hidden','false');
-section.classList.add('section-entered');  
 document.dispatchEvent(new CustomEvent('section:shown', { detail: { sectionId, node: section } }));
 console.log('[JC.show] Exibida com sucesso:', sectionId);
 } catch (err) {
