@@ -643,3 +643,30 @@
     border-radius: 12px;
   }
 }
+/* === FIX MOBILE: teclado virtual cortava botões === */
+#section-senha {
+  min-height: 100dvh !important;   /* dvh respeita barra do Safari + teclado */
+  overflow-y: auto !important;      /* section rola */
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: max(28px, env(safe-area-inset-bottom)) !important;
+}
+
+#section-senha .j-arcane-card,
+#section-senha .senha-wrap {
+  min-height: 0 !important;         /* deixa o card crescer conforme conteúdo */
+  overflow: visible !important;     /* não corta os botões */
+  padding-bottom: 28px !important;
+}
+
+@media (max-width: 899px) {
+  #section-senha .j-arcane-card,
+  #section-senha .senha-wrap {
+    min-height: 0 !important;
+    padding: 20px 18px 32px !important;
+  }
+  /* espaço extra pra rolar acima do teclado */
+  #section-senha .senha-2fa-mode,
+  #section-senha .senha-panel-inner {
+    padding-bottom: 30vh !important;
+  }
+}
