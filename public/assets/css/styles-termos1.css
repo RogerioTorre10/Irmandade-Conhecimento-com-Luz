@@ -17,7 +17,8 @@
   justify-content: center !important;
   align-items: center !important;
   margin: 0 auto !important;
-  padding: 18px 12px 110px !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
