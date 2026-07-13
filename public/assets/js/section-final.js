@@ -204,6 +204,46 @@
     );
   }
 
+  function getFinalReplayButton(section) {
+  return (
+    section?.querySelector('#btnOuvirFinal') ||
+    document.getElementById('btnOuvirFinal')
+  );
+}
+
+function setFinalReplayState(section, state = 'ready') {
+
+  const btn = getFinalReplayButton(section);
+
+  if (!btn) return;
+
+  if (state === 'hidden') {
+
+    btn.hidden = true;
+    btn.disabled = true;
+    btn.textContent = "🔊 Ouvir novamente";
+    return;
+
+  }
+
+  btn.hidden = false;
+
+  if (state === 'reading') {
+
+    btn.disabled = true;
+    btn.dataset.busy = "1";
+    btn.textContent = "🔊 Lendo...";
+
+    return;
+
+  }
+
+  btn.dataset.busy = "0";
+  btn.disabled = false;
+  btn.textContent = "🔊 Ouvir novamente";
+
+}
+
   function getStoredBlockFeedbacks() {
     try {
       return JSON.parse(sessionStorage.getItem('JORNADA_DEVOLUTIVAS_BLOCO') || '[]');
