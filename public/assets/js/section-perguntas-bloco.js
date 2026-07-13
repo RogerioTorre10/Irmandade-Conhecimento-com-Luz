@@ -236,6 +236,88 @@
     return String(l || 'pt-BR').trim();
   }
 
+  function isIOSDevice() {
+  return /iPhone|iPad|iPod/i.test(
+    navigator.userAgent || ''
+  );
+}
+
+function isIOSInAppBrowser() {
+  const ua = navigator.userAgent || '';
+
+  if (!isIOSDevice()) {
+    return false;
+  }
+
+  /*
+   * Detecta navegadores internos comuns.
+   * No iOS, Chrome e Firefox também usam WebKit,
+   * mas continuam identificáveis por CriOS e FxiOS.
+   */
+  const inAppMarkers = [
+    /WhatsApp/i,
+    /Instagram/i,
+    /FBAN|FBAV/i,
+    /Messenger/i,
+    /Line\//i
+  ];
+
+  const knownBrowser =
+    /Version\/[\d.]+.*Safari/i.test(ua) ||
+    /CriOS/i.test(ua) ||
+    /FxiOS/i.test(ua) ||
+    /EdgiOS/i.test(ua);
+
+  return (
+    inAppMarkers.some((pattern) => pattern.test(ua)) ||
+    !knownBrowser
+  );
+}
+
+function showMicrophoneMessage(message) {
+  if (typeof window.toast === 'function') {
+    window.toast(message, 'warning');
+    return;
+  }
+
+  alert(message);
+}
+
+function describeMicrophoneError(error) {
+  const name = String(error?.name || '');
+  const message = String(error?.message || '');
+
+  if (name === 'NotAllowedError') {
+    return (
+      'O acesso ao microfone foi bloqueado. ' +
+      'Abra a Jornada diretamente no Safari e permita o microfone nos ajustes do site.'
+    );
+  }
+
+  if (name === 'NotFoundError') {
+    return 'Nenhum microfone foi encontrado neste aparelho.';
+  }
+
+  if (name === 'NotReadableError') {
+    return (
+      'O microfone está ocupado ou indisponível. ' +
+      'Feche outros aplicativos que possam estar usando o áudio e tente novamente.'
+    );
+  }
+
+  if (name === 'SecurityError') {
+    return (
+      'O navegador bloqueou o microfone por segurança. ' +
+      'Confirme que a Jornada está aberta em HTTPS e diretamente no Safari.'
+    );
+  }
+
+  return (
+    message ||
+    'Não foi possível iniciar o microfone. Abra a Jornada no Safari e tente novamente.'
+  );
+}
+
   function getBlocoAtual(sectionId) {
     if (!sectionId) return null;
     if (!window.JORNADA_PAPER_QA || typeof window.JORNADA_PAPER_QA.getBlockBySection !== 'function') {
