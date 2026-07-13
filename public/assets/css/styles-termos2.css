@@ -1,5 +1,8 @@
 /* =========================================================
-   SECTION-TERMOS2 — LAPIDADO, ESTÁVEL E SEGURO PARA IPHONE
+   SECTION-TERMOS1 — CORRIGIDO PARA MOBILE (ANDROID + iOS)
+   - Card mais largo e legível
+   - Sem clipping vertical (parchment cresce com o conteúdo)
+   - Botões sempre visíveis
    ========================================================= */
 
 :root {
@@ -11,19 +14,20 @@
 #section-termos2 {
   width: 100% !important;
   min-height: 100vh !important;
+  min-height: 100svh !important;
   min-height: 100dvh !important;
   box-sizing: border-box !important;
   display: flex !important;
   justify-content: center !important;
-  align-items: center !important;
+  align-items: flex-start !important;
   margin: 0 auto !important;
-  padding: 18px 12px 110px !important;
+  padding: 16px 10px calc(28px + env(safe-area-inset-bottom)) !important;
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
   text-align: left !important;
   overflow-x: hidden !important;
-  overflow-y: auto !important;
+  overflow-y: visible !important;
   overscroll-behavior-x: none;
   -webkit-overflow-scrolling: touch;
 }
@@ -32,12 +36,12 @@
   position: relative !important;
   z-index: 3 !important;
   width: min(520px, calc(100vw - 24px)) !important;
-  max-width: 470px !important;
+  max-width: 520px !important;
   box-sizing: border-box !important;
   margin: 0 auto !important;
   padding: 12px !important;
   border-radius: 24px !important;
-  overflow: hidden !important;
+  overflow: visible !important;
 }
 
 #section-termos2 .j-panel-glow::before {
@@ -50,24 +54,27 @@
   box-shadow: 0 0 24px rgba(212,175,55,.36), inset 0 0 18px rgba(255,230,150,.12);
 }
 
-#section-termos2 .j-perg-v-inner {
+#section-termos1 .j-perg-v-inner {
   position: relative !important;
   z-index: 4 !important;
+  margin: 0 auto !important;
   width: 100% !important;
   min-width: 0 !important;
   box-sizing: border-box !important;
-  overflow: hidden !important;
+  overflow: visible !important;
 }
 
 #section-termos2 .j-arcane-card {
   position: relative !important;
   width: 100% !important;
   min-width: 0 !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: none !important;
   box-sizing: border-box !important;
   margin: 0 auto !important;
   border-radius: 24px !important;
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
+  overflow: visible !important;
   -webkit-overflow-scrolling: touch !important;
 }
 
@@ -90,8 +97,8 @@
   gap: 10px;
 }
 
-#section-termos2 .termos2-title,
-#section-termos2 h3[data-typing="true"] {
+#section-termos2 .termos1-title,
+#section-termos2 .section-title {
   position: relative !important;
   display: block !important;
   width: 100% !important;
@@ -214,7 +221,7 @@
 }
 
 #section-termos2 .btn-stone,
-#section-termos2 .avancarBtn {
+#section-termos2 .nextBtn {
   position: relative !important;
   display: inline-block !important;
   min-width: 140px !important;
@@ -233,13 +240,13 @@
 }
 
 #section-termos2 .btn-stone:hover:not(:disabled),
-#section-termos2 .avancarBtn:hover:not(:disabled) {
+#section-termos2 .nextBtn:hover:not(:disabled) {
   transform: translateY(-1px);
   box-shadow: inset 0 3px 6px rgba(0,0,0,.4), 0 0 10px rgba(255,215,0,.22), 0 6px 12px rgba(0,0,0,.45) !important;
 }
 
 #section-termos2 .btn-stone:disabled,
-#section-termos2 .avancarBtn:disabled { opacity: .6 !important; pointer-events: none !important; }
+#section-termos2 .nextBtn:disabled { opacity: .6 !important; pointer-events: none !important; }
 #section-termos2 .is-hidden { opacity: 0 !important; pointer-events: none !important; transition: opacity .25s ease; }
 #section-termos2 .btn-ready-pulse { animation: btnReady .6s ease-out 1; }
 
@@ -250,63 +257,88 @@
 }
 @keyframes btnReady { 0%{transform:scale(.98);filter:brightness(.95)} 60%{transform:scale(1.02);filter:brightness(1.08)} 100%{transform:scale(1);filter:none} }
 
+/* ============ MOBILE (Android + iOS) ============ */
 @media (max-width: 768px) {
   #section-termos2 {
     display: block !important;
     width: 100% !important;
+    min-height: 100svh !important;
     min-height: 100dvh !important;
     height: auto !important;
-    padding: 12px 10px calc(120px + env(safe-area-inset-bottom)) !important;
-    overflow-x: clip !important;
-    overflow-y: auto !important;
+    padding: 14px 10px calc(32px + env(safe-area-inset-bottom)) !important;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
   }
 
   #section-termos2 .j-panel-glow {
-    width: 100% !important;
-    max-width: 430px !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    padding: 14px 12px 22px !important;
+    width: calc(100vw - 20px) !important;
+    max-width: 460px !important;
+    margin: 0 auto !important;
+    padding: 10px 10px 18px !important;
     border-radius: 20px !important;
-    overflow: hidden !important;
+    overflow: visible !important;
   }
 
+  /* pergaminho cresce com o conteúdo — sem clipping */
   #section-termos2 .j-perg-v-inner {
     width: 100% !important;
     min-height: 0 !important;
     height: auto !important;
-    padding: 54px 0 78px !important;
+    padding: 40px 6px 44px !important;
     background-size: 100% 100% !important;
     background-position: center top !important;
-    overflow: hidden !important;
+    overflow: visible !important;
   }
 
+  /* card ocupa a largura útil do pergaminho */
   #section-termos2 .j-arcane-card {
-    width: min(86%,340px) !important;
-    max-width: 340px !important;
+    width: 100% !important;
+    max-width: 100% !important;
     min-height: 0 !important;
     height: auto !important;
     max-height: none !important;
     margin: 0 auto !important;
-    padding: 24px 16px 20px !important;
+    padding: 20px 14px 18px !important;
     overflow: visible !important;
   }
 
-  #section-termos2 .termos2-title,
-#section-termos2 h3[data-typing="true"] { font-size: clamp(1.15rem,5vw,1.55rem) !important; margin-bottom: 14px !important; }
+  #section-termos2 .termos1-title,
+  #section-termos2 .section-title {
+    font-size: clamp(1.15rem,5vw,1.55rem) !important;
+    margin-bottom: 14px !important;
+  }
 
   #section-termos2 .parchment-text-rough,
   #section-termos2 .termos-lista-rough > li,
-  #section-termos2 ul > li { font-size: clamp(.75rem,3vw,.92rem) !important; line-height: 1.52 !important; padding: 4px 6px !important; }
+  #section-termos2 ul > li {
+    font-size: clamp(.9rem,3.6vw,1rem) !important;
+    line-height: 1.55 !important;
+    padding: 4px 6px !important;
+  }
 
   #section-termos2 .footer-actions,
-  #section-termos2 .parchment-actions-rough { position: relative !important; bottom: auto !important; margin-top: 18px !important; padding-top: 10px !important; background: transparent !important; }
+  #section-termos2 .parchment-actions-rough {
+    position: relative !important;
+    bottom: auto !important;
+    margin-top: 18px !important;
+    padding-top: 10px !important;
+    background: transparent !important;
+  }
   #section-termos2 button { min-height: 44px !important; }
+}
+
+/* Telas bem estreitas (iPhone SE etc.) */
+@media (max-width: 380px) {
+  #section-termos2 .j-perg-v-inner { padding: 32px 4px 38px !important; }
+  #section-termos2 .j-arcane-card { padding: 16px 10px 14px !important; }
+  #section-termos2 .parchment-text-rough,
+  #section-termos2 .termos-lista-rough > li,
+  #section-termos2 ul > li { font-size: .88rem !important; }
 }
 
 @media (max-width: 926px) and (orientation: landscape) {
   #section-termos2 { padding-top: 8px !important; padding-bottom: calc(72px + env(safe-area-inset-bottom)) !important; }
   #section-termos2 .j-panel-glow { width: min(92vw,620px) !important; max-width: 620px !important; }
   #section-termos2 .j-perg-v-inner { padding-top: 34px !important; padding-bottom: 48px !important; }
-  #section-termos2 .j-arcane-card { width: min(88%,520px) !important; max-width: 520px !important; }
+  #section-termos2 .j-arcane-card { width: 100% !important; max-width: 100% !important; padding: 18px 16px !important; }
 }
