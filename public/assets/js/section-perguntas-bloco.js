@@ -1376,46 +1376,136 @@ function describeMicrophoneError(error) {
     }
 
     if (btnMic) {
-      btnMic.onclick = (ev) => {
-        ev.preventDefault();
-        ev.stopPropagation();
+  btnMic.onclick = async (ev) => {
+    ev.preventDefault();
+    ev.stopPropagation();
 
-        const textareaAtual =
-          $('#jp-answer-input', section) ||
-          $('#answer-input', section) ||
-          $('textarea', section);
+    const textareaAtual =
+      $('#jp-answer-input', section) ||
+      $('#answer-input', section) ||
+      $('textarea', section);
 
-        if (!textareaAtual) {
-          console.warn('[PERGUNTAS_BLOCO][MIC] textarea atual não encontrado.');
-          return;
-        }
+    if (!textareaAtual) {
+      console.warn(
+        '[PERGUNTAS_BLOCO][MIC] textarea atual não encontrado.'
+      );
+      return;
+    }
 
-        const micState = window.JORNADA_MICRO?._state;
-        const micAtivo = window.JORNADA_MICRO?.isActive?.() === true;
-        const textareaAnterior = micState?.textarea || null;
+    /*
+     * O navegador interno do WhatsApp no iPhone pode negar
+     * o microfone mesmo com a permissão geral ativada.
+     */
+    if (isIOSInAppBrowser()) {
+      showMicrophoneMessage(
+        'Para usar o microfone no iPhone, abra esta Jornada diretamente no Safari.'
+      );
+      return;
+    }
 
-        // Se o microfone ficou preso em outra pergunta, reinicia no textarea atual
-        if (micAtivo && textareaAnterior && textareaAnterior !== textareaAtual) {
-          window.JORNADA_MICRO?.stop?.();
+    if (!window.isSecureContext) {
+      showMicrophoneMessage(
+        'O microfone exige uma conexão segura HTTPS.'
+      );
+      return;
+    }
 
-          setTimeout(() => {
-            window.JORNADA_MICRO?.start?.(textareaAtual, {
-              mode: 'append',
-              lang: getLang(),
-              button: btnMic
-            });
-          }, 180);
+    if (
+      !navigator.mediaDevices ||
+      typeof navigator.mediaDevices.getUserMedia !== 'function'
+    ) {
+      showMicrophoneMessage(
+        'Este navegador não disponibilizou o acesso ao microfone. Abra a Jornada no Safari.'
+      );
+      return;
+    }
 
-          return;
-        }
+    if (
+      !window.JORNADA_MICRO ||
+      typeof window.JORNADA_MICRO.toggle !== 'function'
+    ) {
+      console.error(
+        '[PERGUNTAS_BLOCO][MIC] JORNADA_MICRO não está disponível.'
+      );
 
-        window.JORNADA_MICRO?.toggle?.(textareaAtual, {
+      showMicrophoneMessage(
+        'O recurso de voz ainda não foi carregado. Atualize a página e tente novamente.'
+      );
+      return;
+    }
+
+    try {
+      const micState =
+        window.JORNADA_MICRO?._state;
+
+      const micAtivo =
+        window.JORNADA_MICRO?.isActive?.() === true;
+
+      const textareaAnterior =
+        micState?.textarea || null;
+
+      /*
+       * Se o microfone ficou vinculado à pergunta anterior,
+       * encerra aquela instância e inicia no textarea atual.
+       */
+      if (
+        micAtivo &&
+        textareaAnterior &&
+        textareaAnterior !== textareaAtual
+      ) {
+        window.JORNADA_MICRO.stop?.();
+
+        await new Promise((resolve) =>
+          setTimeout(resolve, 180)
+        );
+
+        await window.JORNADA_MICRO.start?.(
+          textareaAtual,
+          {
+            mode: 'append',
+            lang: getLang(),
+            button: btnMic
+          }
+        );
+
+        return;
+      }
+
+      /*
+       * O toggle é chamado diretamente dentro do clique.
+       * Isso preserva o gesto exigido pelo Safari no iPhone.
+       */
+      await window.JORNADA_MICRO.toggle(
+        textareaAtual,
+        {
           mode: 'append',
           lang: getLang(),
           button: btnMic
-        });
-      };
+        }
+      );
+
+    } catch (error) {
+      console.error(
+        '[PERGUNTAS_BLOCO][MIC][IPHONE]',
+        {
+          name: error?.name,
+          message: error?.message,
+          secureContext: window.isSecureContext,
+          mediaDevices:
+            Boolean(navigator.mediaDevices),
+          getUserMedia:
+            typeof navigator.mediaDevices?.getUserMedia,
+          userAgent:
+            navigator.userAgent
+        }
+      );
+
+      showMicrophoneMessage(
+        describeMicrophoneError(error)
+      );
     }
+  };
+}
 
     if (btnApagar) {
       btnApagar.onclick = (ev) => {
