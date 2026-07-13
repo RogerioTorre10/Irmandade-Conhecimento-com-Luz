@@ -1,5 +1,5 @@
 /* =========================================================
-   SECTION-TERMOS1 — LAPIDADO, ESTÁVEL E SEGURO PARA IPHONE
+   SECTION-TERMOS2 — LAPIDADO, ESTÁVEL E SEGURO PARA IPHONE
    ========================================================= */
 
 :root {
@@ -8,7 +8,7 @@
   --stone-img: url('/assets/img/textura-de-pedra.jpg');
 }
 
-#section-termos1 {
+#section-termos2 {
   width: 100% !important;
   min-height: 100vh !important;
   min-height: 100dvh !important;
@@ -28,7 +28,7 @@
   -webkit-overflow-scrolling: touch;
 }
 
-#section-termos1 .j-panel-glow {
+#section-termos2 .j-panel-glow {
   position: relative !important;
   z-index: 3 !important;
   width: min(520px, calc(100vw - 24px)) !important;
@@ -40,7 +40,7 @@
   overflow: hidden !important;
 }
 
-#section-termos1 .j-panel-glow::before {
+#section-termos2 .j-panel-glow::before {
   content: "";
   position: absolute !important;
   inset: 0;
@@ -50,7 +50,7 @@
   box-shadow: 0 0 24px rgba(212,175,55,.36), inset 0 0 18px rgba(255,230,150,.12);
 }
 
-#section-termos1 .j-perg-v-inner {
+#section-termos2 .j-perg-v-inner {
   position: relative !important;
   z-index: 4 !important;
   width: 100% !important;
@@ -59,7 +59,7 @@
   overflow: hidden !important;
 }
 
-#section-termos1 .j-arcane-card {
+#section-termos2 .j-arcane-card {
   position: relative !important;
   width: 100% !important;
   min-width: 0 !important;
@@ -71,10 +71,10 @@
   -webkit-overflow-scrolling: touch !important;
 }
 
-#section-termos1 .parchment-inner-rough,
-#section-termos1 .termos-wrap,
-#section-termos1 #termos1,
-#section-termos1 .pergaminho-content {
+#section-termos2 .parchment-inner-rough,
+#section-termos2 .termos-wrap,
+#section-termos2 #termos2,
+#section-termos2 .pergaminho-content {
   position: relative !important;
   width: 100% !important;
   min-width: 0 !important;
@@ -83,15 +83,15 @@
   overflow: visible !important;
 }
 
-#section-termos1 #termos1 {
+#section-termos2 #termos2 {
   display: flex;
   flex-direction: column;
   align-items: stretch;
   gap: 10px;
 }
 
-#section-termos1 .termos1-title,
-#section-termos1 .section-title {
+#section-termos2 .termos2-title,
+#section-termos2 h3[data-typing="true"] {
   position: relative !important;
   display: block !important;
   width: 100% !important;
@@ -108,9 +108,9 @@
   overflow-wrap: anywhere !important;
 }
 
-#section-termos1 .parchment-text-rough,
-#section-termos1 .termos-lista-rough > li,
-#section-termos1 ul > li {
+#section-termos2 .parchment-text-rough,
+#section-termos2 .termos-lista-rough > li,
+#section-termos2 ul > li {
   position: relative !important;
   display: block !important;
   width: 100% !important;
@@ -134,8 +134,8 @@
   z-index: 2 !important;
 }
 
-#section-termos1 .termos-lista-rough,
-#section-termos1 ul {
+#section-termos2 .termos-lista-rough,
+#section-termos2 ul {
   display: flex !important;
   flex-direction: column !important;
   align-items: stretch !important;
@@ -146,19 +146,19 @@
   padding: 0 !important;
 }
 
-#section-termos1 .termos-lista-rough > li + li { margin-top: 2px !important; }
-#section-termos1 .termos-lista-rough > li::marker,
-#section-termos1 ul > li::marker,
-#section-termos1 .termos-lista-rough > li::before,
-#section-termos1 ul > li::before { content: none !important; display: none !important; }
+#section-termos2 .termos-lista-rough > li + li { margin-top: 2px !important; }
+#section-termos2 .termos-lista-rough > li::marker,
+#section-termos2 ul > li::marker,
+#section-termos2 .termos-lista-rough > li::before,
+#section-termos2 ul > li::before { content: none !important; display: none !important; }
 
-#section-termos1 [data-typing="true"] {
+#section-termos2 [data-typing="true"] {
   position: relative !important;
   isolation: isolate !important;
   text-shadow: 0 0 6px rgba(255,230,120,.72), 0 0 14px rgba(255,210,90,.38), 0 0 22px rgba(255,170,40,.22) !important;
 }
 
-#section-termos1 [data-typing="true"]::before {
+#section-termos2 [data-typing="true"]::before {
   content: "" !important;
   position: absolute !important;
   inset: -4px -6px !important;
@@ -169,8 +169,8 @@
   box-shadow: 0 0 8px rgba(255,220,120,.14), 0 0 18px rgba(255,180,60,.10) !important;
 }
 
-#section-termos1 [data-typing="true"][data-cursor="true"] { padding-right: .35em !important; }
-#section-termos1 [data-typing="true"][data-cursor="true"].typing-active::after {
+#section-termos2 [data-typing="true"][data-cursor="true"] { padding-right: .35em !important; }
+#section-termos2 [data-typing="true"][data-cursor="true"].typing-active::after {
   content: "";
   position: absolute;
   right: .05em;
@@ -183,26 +183,26 @@
   animation: termosCaretBlink 1s steps(1,end) infinite;
 }
 
-#section-termos1 [data-typing="true"].typing-done::after,
-#section-termos1 [data-typing="true"].type-done::after { content: none !important; }
+#section-termos2 [data-typing="true"].typing-done::after,
+#section-termos2 [data-typing="true"].type-done::after { content: none !important; }
 
-#section-termos1 [data-typing="true"].typing-active,
-#section-termos1 [data-typing="true"].speaking-active {
+#section-termos2 [data-typing="true"].typing-active,
+#section-termos2 [data-typing="true"].speaking-active {
   background: radial-gradient(ellipse at center, rgba(255,220,120,.16) 0%, rgba(255,190,70,.08) 45%, transparent 100%) !important;
   box-shadow: 0 0 0 1px rgba(255,220,120,.18), 0 0 10px rgba(255,220,120,.18), 0 0 22px rgba(255,180,60,.14), inset 0 0 10px rgba(255,240,180,.04) !important;
   text-shadow: 0 0 7px rgba(255,235,150,.95), 0 0 16px rgba(255,215,90,.75), 0 0 26px rgba(255,170,40,.48) !important;
   animation: termosAuraPulse 1.6s ease-in-out infinite;
 }
 
-#section-termos1 [data-typing="true"].typing-done,
-#section-termos1 [data-typing="true"].type-done {
+#section-termos2 [data-typing="true"].typing-done,
+#section-termos2 [data-typing="true"].type-done {
   background: radial-gradient(ellipse at center, rgba(255,220,120,.09) 0%, rgba(255,190,70,.04) 46%, transparent 100%) !important;
   box-shadow: 0 0 0 1px rgba(255,220,120,.10), 0 0 8px rgba(255,220,120,.10), 0 0 16px rgba(255,180,60,.08) !important;
   text-shadow: 0 0 4px rgba(255,225,120,.62), 0 0 10px rgba(255,185,70,.22) !important;
 }
 
-#section-termos1 .footer-actions,
-#section-termos1 .parchment-actions-rough {
+#section-termos2 .footer-actions,
+#section-termos2 .parchment-actions-rough {
   position: relative !important;
   z-index: 5 !important;
   display: flex !important;
@@ -213,8 +213,8 @@
   padding-top: 10px !important;
 }
 
-#section-termos1 .btn-stone,
-#section-termos1 .nextBtn {
+#section-termos2 .btn-stone,
+#section-termos2 .avancarBtn {
   position: relative !important;
   display: inline-block !important;
   min-width: 140px !important;
@@ -232,16 +232,16 @@
   transition: transform .2s ease, filter .2s ease, box-shadow .2s ease !important;
 }
 
-#section-termos1 .btn-stone:hover:not(:disabled),
-#section-termos1 .nextBtn:hover:not(:disabled) {
+#section-termos2 .btn-stone:hover:not(:disabled),
+#section-termos2 .avancarBtn:hover:not(:disabled) {
   transform: translateY(-1px);
   box-shadow: inset 0 3px 6px rgba(0,0,0,.4), 0 0 10px rgba(255,215,0,.22), 0 6px 12px rgba(0,0,0,.45) !important;
 }
 
-#section-termos1 .btn-stone:disabled,
-#section-termos1 .nextBtn:disabled { opacity: .6 !important; pointer-events: none !important; }
-#section-termos1 .is-hidden { opacity: 0 !important; pointer-events: none !important; transition: opacity .25s ease; }
-#section-termos1 .btn-ready-pulse { animation: btnReady .6s ease-out 1; }
+#section-termos2 .btn-stone:disabled,
+#section-termos2 .avancarBtn:disabled { opacity: .6 !important; pointer-events: none !important; }
+#section-termos2 .is-hidden { opacity: 0 !important; pointer-events: none !important; transition: opacity .25s ease; }
+#section-termos2 .btn-ready-pulse { animation: btnReady .6s ease-out 1; }
 
 @keyframes termosCaretBlink { 0%,45%{opacity:.95} 50%,100%{opacity:0} }
 @keyframes termosAuraPulse {
@@ -251,7 +251,7 @@
 @keyframes btnReady { 0%{transform:scale(.98);filter:brightness(.95)} 60%{transform:scale(1.02);filter:brightness(1.08)} 100%{transform:scale(1);filter:none} }
 
 @media (max-width: 768px) {
-  #section-termos1 {
+  #section-termos2 {
     display: block !important;
     width: 100% !important;
     min-height: 100dvh !important;
@@ -261,7 +261,7 @@
     overflow-y: auto !important;
   }
 
-  #section-termos1 .j-panel-glow {
+  #section-termos2 .j-panel-glow {
     width: min(94vw,430px) !important;
     max-width: calc(100vw - 20px) !important;
     margin: 0 auto 24px !important;
@@ -270,7 +270,7 @@
     overflow: hidden !important;
   }
 
-  #section-termos1 .j-perg-v-inner {
+  #section-termos2 .j-perg-v-inner {
     width: 100% !important;
     min-height: 0 !important;
     height: auto !important;
@@ -280,7 +280,7 @@
     overflow: hidden !important;
   }
 
-  #section-termos1 .j-arcane-card {
+  #section-termos2 .j-arcane-card {
     width: min(86%,340px) !important;
     max-width: 340px !important;
     min-height: 0 !important;
@@ -291,21 +291,21 @@
     overflow: visible !important;
   }
 
-  #section-termos1 .termos1-title,
-#section-termos1 .section-title { font-size: clamp(1.15rem,5vw,1.55rem) !important; margin-bottom: 14px !important; }
+  #section-termos2 .termos2-title,
+#section-termos2 h3[data-typing="true"] { font-size: clamp(1.15rem,5vw,1.55rem) !important; margin-bottom: 14px !important; }
 
-  #section-termos1 .parchment-text-rough,
-  #section-termos1 .termos-lista-rough > li,
-  #section-termos1 ul > li { font-size: clamp(.75rem,3vw,.92rem) !important; line-height: 1.52 !important; padding: 4px 6px !important; }
+  #section-termos2 .parchment-text-rough,
+  #section-termos2 .termos-lista-rough > li,
+  #section-termos2 ul > li { font-size: clamp(.75rem,3vw,.92rem) !important; line-height: 1.52 !important; padding: 4px 6px !important; }
 
-  #section-termos1 .footer-actions,
-  #section-termos1 .parchment-actions-rough { position: relative !important; bottom: auto !important; margin-top: 18px !important; padding-top: 10px !important; background: transparent !important; }
-  #section-termos1 button { min-height: 44px !important; }
+  #section-termos2 .footer-actions,
+  #section-termos2 .parchment-actions-rough { position: relative !important; bottom: auto !important; margin-top: 18px !important; padding-top: 10px !important; background: transparent !important; }
+  #section-termos2 button { min-height: 44px !important; }
 }
 
 @media (max-width: 926px) and (orientation: landscape) {
-  #section-termos1 { padding-top: 8px !important; padding-bottom: calc(72px + env(safe-area-inset-bottom)) !important; }
-  #section-termos1 .j-panel-glow { width: min(92vw,620px) !important; max-width: 620px !important; }
-  #section-termos1 .j-perg-v-inner { padding-top: 34px !important; padding-bottom: 48px !important; }
-  #section-termos1 .j-arcane-card { width: min(88%,520px) !important; max-width: 520px !important; }
+  #section-termos2 { padding-top: 8px !important; padding-bottom: calc(72px + env(safe-area-inset-bottom)) !important; }
+  #section-termos2 .j-panel-glow { width: min(92vw,620px) !important; max-width: 620px !important; }
+  #section-termos2 .j-perg-v-inner { padding-top: 34px !important; padding-bottom: 48px !important; }
+  #section-termos2 .j-arcane-card { width: min(88%,520px) !important; max-width: 520px !important; }
 }
