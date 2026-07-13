@@ -13,6 +13,15 @@
 
 /* ======================================================
    BASE / PALCO
+   ------------------------------------------------------
+   IMPORTANTE (iOS Safari):
+   - NÃO usar overflow-y:auto aqui. Fazer a section rolar
+     internamente + flexbox + align-items:flex-start dispara
+     um bug do WebKit que corta o TOPO do conteúdo e impede
+     rolar até ele. Deixamos a página (body) rolar normalmente.
+   - Usamos min-height com fallback: 100vh -> 100svh -> 100dvh.
+     O dvh acompanha barra do Safari e teclado virtual.
+   - safe-area-inset-bottom protege o rodapé no notch/home bar.
    ====================================================== */
 
 #section-senha {
@@ -23,9 +32,11 @@
   width: 100%;
   max-width: 100%;
   min-height: 100vh;
-  padding: 18px 0 42px !important;
+  min-height: 100svh;
+  min-height: 100dvh;
+  padding: 18px 0 max(42px, env(safe-area-inset-bottom)) !important;
   overflow-x: hidden !important;
-  overflow-y: visible !important;
+  overflow-y: visible !important;   /* NÃO trocar por auto no iOS */
   background: transparent !important;
   box-sizing: border-box;
 }
@@ -92,6 +103,8 @@
   transform: none !important;
 }
 
+/* Card: deixamos crescer conforme conteúdo. min-height é PISO,
+   não teto. overflow visible para não cortar botões. */
 #section-senha .j-arcane-card,
 #section-senha .senha-wrap {
   position: relative !important;
@@ -102,7 +115,7 @@
   padding: 28px 26px 34px !important;
   border-radius: 24px !important;
   box-sizing: border-box !important;
-  overflow: hidden !important;
+  overflow: visible !important;
   left: auto !important;
   right: auto !important;
   transform: none !important;
@@ -255,8 +268,7 @@
   box-sizing: border-box !important;
 }
 
-/* Linha principal do código/senha + olho mágico.
-   Esta é a regra definitiva: não duplique abaixo. */
+/* Linha principal do código/senha + olho mágico. */
 #section-senha .senha-code-row {
   display: grid !important;
   grid-template-columns: minmax(0, 1fr) 62px !important;
@@ -283,6 +295,8 @@
   border-radius: 16px !important;
   position: relative !important;
   z-index: 2 !important;
+  /* iOS: evita zoom automático em input com font-size < 16px */
+  font-size: 16px !important;
 }
 
 /* Olho mágico: alinhado pelo grid, mesma altura do input. */
@@ -309,8 +323,6 @@
   line-height: 1 !important;
 }
 
-/* Segurança: se o botão estiver fora da linha por algum motivo,
-   ele não vira botão largo de 320px; mantém formato quadrado. */
 #section-senha .btn-toggle-senha,
 #section-senha [data-action="toggle-password"] {
   display: flex !important;
@@ -532,7 +544,7 @@
 
 @media (max-width: 899px) {
   #section-senha {
-    padding: 8px 0 36px !important;
+    padding: 8px 0 max(36px, env(safe-area-inset-bottom)) !important;
   }
 
   #section-senha .j-panel-glow,
@@ -542,9 +554,11 @@
     padding: 10px !important;
   }
 
+  /* Mobile: min-height 0 para o card acompanhar o conteúdo
+     e nunca gerar recorte no iOS quando o teclado abre. */
   #section-senha .j-arcane-card,
   #section-senha .senha-wrap {
-    min-height: 540px !important;
+    min-height: 0 !important;
     margin-top: 12px !important;
     margin-bottom: 20px !important;
     padding: 22px 18px 28px !important;
@@ -563,6 +577,14 @@
   #section-senha .senha-actions .btn-stone,
   #section-senha .senha-actions button {
     min-height: 48px !important;
+  }
+
+  /* Espaço extra abaixo dos botões para o teclado do iOS
+     não sobrepor a última linha. Aplicado no wrapper interno,
+     não na section (não transformar em scroll container). */
+  #section-senha .senha-2fa-mode,
+  #section-senha .senha-panel-inner {
+    padding-bottom: 24vh !important;
   }
 }
 
@@ -596,10 +618,12 @@
 @media (max-width: 480px) {
   html, body {
     overflow-x: hidden !important;
+    /* NÃO usar overflow-y:auto/hidden aqui — deixa a rolagem
+       natural da página funcionar no iOS Safari. */
   }
 
   #section-senha {
-    padding: 8px 0 28px !important;
+    padding: 8px 0 max(28px, env(safe-area-inset-bottom)) !important;
   }
 
   #section-senha .j-panel-glow,
@@ -610,7 +634,7 @@
 
   #section-senha .j-arcane-card,
   #section-senha .senha-wrap {
-    min-height: 500px !important;
+    min-height: 0 !important;
     padding: 18px 14px 24px !important;
   }
 
@@ -622,6 +646,7 @@
     height: 58px !important;
     min-height: 58px !important;
     padding: 12px 14px !important;
+    font-size: 16px !important; /* iOS: não dar zoom no focus */
   }
 
   #section-senha .senha-code-row .btn-toggle-senha,
@@ -641,32 +666,5 @@
   #section-senha [data-typing="true"].type-done::before {
     inset: -3px -5px;
     border-radius: 12px;
-  }
-}
-/* === FIX MOBILE: teclado virtual cortava botões === */
-#section-senha {
-  min-height: 100dvh !important;   /* dvh respeita barra do Safari + teclado */
-  overflow-y: auto !important;      /* section rola */
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: max(28px, env(safe-area-inset-bottom)) !important;
-}
-
-#section-senha .j-arcane-card,
-#section-senha .senha-wrap {
-  min-height: 0 !important;         /* deixa o card crescer conforme conteúdo */
-  overflow: visible !important;     /* não corta os botões */
-  padding-bottom: 28px !important;
-}
-
-@media (max-width: 899px) {
-  #section-senha .j-arcane-card,
-  #section-senha .senha-wrap {
-    min-height: 0 !important;
-    padding: 20px 18px 32px !important;
-  }
-  /* espaço extra pra rolar acima do teclado */
-  #section-senha .senha-2fa-mode,
-  #section-senha .senha-panel-inner {
-    padding-bottom: 30vh !important;
   }
 }
