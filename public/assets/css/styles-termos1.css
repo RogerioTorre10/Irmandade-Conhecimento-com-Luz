@@ -54,6 +54,11 @@
 #section-termos1 .j-perg-v-inner {
   position: relative !important;
   z-index: 4 !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  left: auto !important;
+  right: auto !important;
+  transform: none !important;   
   width: 100% !important;
   min-width: 0 !important;
   box-sizing: border-box !important;
@@ -65,7 +70,11 @@
   width: 100% !important;
   min-width: 0 !important;
   box-sizing: border-box !important;
-  margin: 0 auto !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  left: auto !important;
+  right: auto !important;
+  transform: none !important;
   border-radius: 24px !important;
   overflow-x: hidden !important;
   overflow-y: auto !important;
