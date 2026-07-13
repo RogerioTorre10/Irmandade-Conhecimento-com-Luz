@@ -1,5 +1,5 @@
 /* =========================================================
-   SECTION-TERMOS1 — CORRIGIDO PARA MOBILE (ANDROID + iOS)
+   SECTION-TERMOS2 — CORRIGIDO PARA MOBILE (ANDROID + iOS)
    - Card mais largo e legível
    - Sem clipping vertical (parchment cresce com o conteúdo)
    - Botões sempre visíveis
@@ -54,7 +54,7 @@
   box-shadow: 0 0 24px rgba(212,175,55,.36), inset 0 0 18px rgba(255,230,150,.12);
 }
 
-#section-termos1 .j-perg-v-inner {
+#section-termos2 .j-perg-v-inner {
   position: relative !important;
   z-index: 4 !important;
   margin: 0 auto !important;
@@ -97,7 +97,7 @@
   gap: 10px;
 }
 
-#section-termos2 .termos1-title,
+#section-termos2 .termos2-title,
 #section-termos2 .section-title {
   position: relative !important;
   display: block !important;
@@ -302,7 +302,7 @@
     overflow: visible !important;
   }
 
-  #section-termos2 .termos1-title,
+  #section-termos2 .termos2-title,
   #section-termos2 .section-title {
     font-size: clamp(1.15rem,5vw,1.55rem) !important;
     margin-bottom: 14px !important;
