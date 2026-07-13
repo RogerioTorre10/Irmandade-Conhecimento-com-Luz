@@ -442,6 +442,7 @@
       instr3 = await waitForElement('#senha-instr3', { within: root });
       instr4 = await waitForElement('#senha-instr4', { within: root });
       input  = await waitForElement('#senha-input', { within: root });
+      input.addEventListener('focus', () => { setTimeout(() => {(btnNext || input).scrollIntoView({ block: 'center', behavior: 'smooth' });}, 300);});
       toggle = await waitForElement('.btn-toggle-senha', { within: root });
       btnNext = await waitForElement('#btn-senha-avancar', { within: root });
       btnPrev = await waitForElement('#btn-senha-prev', { within: root });
