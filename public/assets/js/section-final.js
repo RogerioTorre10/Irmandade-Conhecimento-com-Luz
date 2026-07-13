@@ -1685,6 +1685,56 @@ titleEl.removeAttribute('data-i18n');
     unlockPortalButton(section);
     lockFinalButtons(section);
 
+    function mountFinalReplayButton(section) {
+
+  const btn = getFinalReplayButton(section);
+
+  if (!btn) return;
+
+  setFinalReplayState(section,"hidden");
+
+  if (btn.dataset.boundReplay === "1")
+      return;
+
+  btn.dataset.boundReplay = "1";
+
+  btn.onclick = async () => {
+
+      if (btn.dataset.busy === "1")
+          return;
+
+      const texto =
+            window.__JORNADA_DEVOLUTIVA_FINAL__
+         || sessionStorage.getItem("JORNADA_DEVOLUTIVA_FINAL")
+         || localStorage.getItem("JORNADA_DEVOLUTIVA_FINAL")
+         || "";
+
+      if (!texto.trim())
+          return;
+
+      setFinalReplayState(section,"reading");
+
+      try{
+
+          speechSynthesis.cancel();
+
+          speechChain = Promise.resolve();
+
+          await queueSpeak(
+              normalizarReferenciasBiblicasParaVoz(texto)
+          );
+
+      }
+      finally{
+
+          setFinalReplayState(section,"ready");
+
+      }
+
+  };
+
+}
+
     try {
       setPdfStatus(section, t('final.gathering', 'O Guia está reunindo as chamas da sua jornada...'), null);
       const textoFinal = await renderFinalGuideFeedback(section);
