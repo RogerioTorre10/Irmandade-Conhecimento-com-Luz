@@ -30,7 +30,7 @@
         questions: [
           {
             id: 'sonho_espiritual',
-            label: 'Qual é o seu maior sonho espiritual?',
+            label: 'Você acredita na força espiritual? Teme o fracasso?',
             data_i18n: 'pergunta_sonho_espiritual'
           }
         ]
@@ -46,7 +46,7 @@
         questions: [
           {
             id: 'significado_luz',
-            label: 'O que "luz" significa para você?',
+            label: 'Como está sua energia vital, sente revigorada ou enfraquecida? Qual o motivo?',
             data_i18n: 'pergunta_significado_luz'
           }
         ]
@@ -78,7 +78,7 @@
         questions: [
           {
             id: 'mensagem_futuro',
-            label: 'Uma mensagem para o seu eu futuro.',
+            label: 'Você se preparou para o seu futuro ou isso nunca foi prioridade?',
             data_i18n: 'pergunta_mensagem_futuro'
           }
         ]
@@ -94,7 +94,7 @@
         questions: [
           {
             id: 'passo_fe',
-            label: 'Qual será seu próximo passo de fé e coragem?',
+            label: 'Qual é o seu maior medo? Ele é o mesmo de antes ou se tornou a soma de todos?',
             data_i18n: 'pergunta_passo_fe'
           }
         ]
