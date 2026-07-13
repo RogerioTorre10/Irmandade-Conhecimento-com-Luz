@@ -1150,6 +1150,8 @@ function removerFinalDuplicado(texto) {
 
       await queueSpeak(textoParaVoz);
 
+      setFinalReplayState(section, "ready");
+
       window.__GUIA_FINAL_EFETIVO__ =
       result.guiaUsado ||
       result.provider ||
