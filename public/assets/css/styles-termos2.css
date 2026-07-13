@@ -261,70 +261,144 @@
 @media (max-width: 768px) {
   #section-termos2 {
     display: block !important;
+
     width: 100% !important;
-    min-height: 100svh !important;
+    min-width: 0 !important;
     min-height: 100dvh !important;
     height: auto !important;
-    padding: 14px 10px calc(32px + env(safe-area-inset-bottom)) !important;
+
+    margin: 0 auto !important;
+
+    padding:
+      12px
+      8px
+      calc(120px + env(safe-area-inset-bottom))
+      !important;
+
+    box-sizing: border-box !important;
+
     overflow-x: hidden !important;
-    overflow-y: visible !important;
+    overflow-y: auto !important;
+
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  #section-termos2,
+  #section-termos2 * {
+    box-sizing: border-box !important;
   }
 
   #section-termos2 .j-panel-glow {
-    width: calc(100vw - 20px) !important;
-    max-width: 460px !important;
-    margin: 0 auto !important;
-    padding: 10px 10px 18px !important;
+    position: relative !important;
+
+    width: calc(100% - 8px) !important;
+    max-width: 430px !important;
+    min-width: 0 !important;
+
+    margin: 0 auto 24px !important;
+    padding: 12px 10px 20px !important;
+
+    left: auto !important;
+    right: auto !important;
+    transform: none !important;
+
     border-radius: 20px !important;
-    overflow: visible !important;
+    overflow: hidden !important;
   }
 
-  /* pergaminho cresce com o conteúdo — sem clipping */
   #section-termos2 .j-perg-v-inner {
     width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+
     min-height: 0 !important;
     height: auto !important;
-    padding: 40px 6px 44px !important;
+
+    margin: 0 auto !important;
+    padding: 52px 0 76px !important;
+
+    left: auto !important;
+    right: auto !important;
+    transform: none !important;
+
     background-size: 100% 100% !important;
     background-position: center top !important;
-    overflow: visible !important;
+
+    overflow: hidden !important;
   }
 
-  /* card ocupa a largura útil do pergaminho */
   #section-termos2 .j-arcane-card {
-    width: 100% !important;
-    max-width: 100% !important;
+    width: calc(100% - 32px) !important;
+    max-width: 340px !important;
+    min-width: 0 !important;
+
     min-height: 0 !important;
     height: auto !important;
-    max-height: none !important;
+    max-height: 58dvh !important;
+
     margin: 0 auto !important;
-    padding: 20px 14px 18px !important;
-    overflow: visible !important;
+    padding: 22px 14px 18px !important;
+
+    left: auto !important;
+    right: auto !important;
+    transform: none !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    overscroll-behavior: contain !important;
+    -webkit-overflow-scrolling: touch !important;
   }
 
-  #section-termos2 .termos2-title,
-  #section-termos2 .section-title {
-    font-size: clamp(1.15rem,5vw,1.55rem) !important;
-    margin-bottom: 14px !important;
+  #section-termos2 .parchment-inner-rough,
+  #section-termos2 .termos-wrap,
+  #section-termos2 #termos2,
+  #section-termos2 .pergaminho-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+
+    overflow-x: hidden !important;
   }
 
   #section-termos2 .parchment-text-rough,
+  #section-termos2 .termos-lista-rough,
   #section-termos2 .termos-lista-rough > li,
+  #section-termos2 ul,
   #section-termos2 ul > li {
-    font-size: clamp(.9rem,3.6vw,1rem) !important;
-    line-height: 1.55 !important;
-    padding: 4px 6px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+
+    white-space: normal !important;
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
   }
 
   #section-termos2 .footer-actions,
   #section-termos2 .parchment-actions-rough {
     position: relative !important;
     bottom: auto !important;
-    margin-top: 18px !important;
-    padding-top: 10px !important;
+
+    width: 100% !important;
+
+    margin: 16px auto 0 !important;
+    padding: 8px 0 0 !important;
+
     background: transparent !important;
   }
-  #section-termos2 button { min-height: 44px !important; }
+
+  #section-termos2 .j-arcane-card::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  #section-termos2 .j-arcane-card::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background: rgba(255, 215, 120, 0.58);
+  }
 }
 
 /* Telas bem estreitas (iPhone SE etc.) */
