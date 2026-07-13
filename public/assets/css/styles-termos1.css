@@ -262,9 +262,10 @@
   }
 
   #section-termos1 .j-panel-glow {
-    width: min(94vw,430px) !important;
-    max-width: calc(100vw - 20px) !important;
-    margin: 0 auto 24px !important;
+    width: 100% !important;
+    max-width: 430px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
     padding: 14px 12px 22px !important;
     border-radius: 20px !important;
     overflow: hidden !important;
@@ -292,7 +293,7 @@
   }
 
   #section-termos1 .termos1-title,
-#section-termos1 .section-title { font-size: clamp(1.15rem,5vw,1.55rem) !important; margin-bottom: 14px !important; }
+  #section-termos1 .section-title { font-size: clamp(1.15rem,5vw,1.55rem) !important; margin-bottom: 14px !important; }
 
   #section-termos1 .parchment-text-rough,
   #section-termos1 .termos-lista-rough > li,
