@@ -1681,6 +1681,7 @@ titleEl.removeAttribute('data-i18n');
     }
 
     mountFinalPdfUI(section);
+    mountFinalReplayButton(section);
     unlockPortalButton(section);
     lockFinalButtons(section);
 
