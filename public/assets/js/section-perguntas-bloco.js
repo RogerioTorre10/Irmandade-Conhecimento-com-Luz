@@ -250,9 +250,14 @@ function isIOSInAppBrowser() {
   }
 
   /*
-   * Detecta navegadores internos comuns.
-   * No iOS, Chrome e Firefox também usam WebKit,
-   * mas continuam identificáveis por CriOS e FxiOS.
+   * Só bloqueamos quando há marcador EXPLÍCITO de webview
+   * interna (WhatsApp/Instagram/Facebook/Messenger/Line).
+   *
+   * Não confiamos em "ausência de Safari na UA" para detectar
+   * in-app: o Safari em modo PWA (adicionado à tela de início)
+   * e algumas WebViews perdem o token "Version/... Safari",
+   * o que fazia o botão de microfone ficar inoperante mesmo
+   * com a permissão liberada.
    */
   const inAppMarkers = [
     /WhatsApp/i,
@@ -262,16 +267,7 @@ function isIOSInAppBrowser() {
     /Line\//i
   ];
 
-  const knownBrowser =
-    /Version\/[\d.]+.*Safari/i.test(ua) ||
-    /CriOS/i.test(ua) ||
-    /FxiOS/i.test(ua) ||
-    /EdgiOS/i.test(ua);
-
-  return (
-    inAppMarkers.some((pattern) => pattern.test(ua)) ||
-    !knownBrowser
-  );
+  return inAppMarkers.some((pattern) => pattern.test(ua));
 }
 
 function showMicrophoneMessage(message) {
@@ -576,124 +572,38 @@ function describeMicrophoneError(error) {
   }
 
   function pickVoiceForGuide() {
-  const guide = getGuideAtivo();
-  const lang = getActiveLang();
-  const langPrefix = String(lang || 'pt-BR')
-    .slice(0, 2)
-    .toLowerCase();
+    const guideRaw =
+      sessionStorage.getItem('jornada.guia') ||
+      localStorage.getItem('JORNADA_GUIA') ||
+      document.body.dataset.guia ||
+      'lumen';
 
-  const voices =
-    window.speechSynthesis?.getVoices?.() || [];
+    const guide = normalizeGuide(guideRaw);
+    const voices = window.speechSynthesis?.getVoices?.() || [];
+    if (!voices.length) return null;
 
-  if (!voices.length) {
-    return null;
-  }
+    const lang = document.documentElement.lang || getLang() || 'pt-BR';
+    const langShort = String(lang).slice(0, 2).toLowerCase();
 
-  const langVoices = voices.filter((voice) =>
-    String(voice.lang || '')
-      .toLowerCase()
-      .startsWith(langPrefix)
-  );
-
-  const list =
-    langVoices.length
-      ? langVoices
-      : voices;
-
-  const femaleHints = [
-    'female',
-    'woman',
-    'mulher',
-    'feminina',
-    'feminine',
-    'maria',
-    'luciana',
-    'helena',
-    'samantha',
-    'victoria',
-    'zira',
-    'monica',
-    'siri female'
-  ];
-
-  const maleHints = [
-    'male',
-    'man',
-    'homem',
-    'masculina',
-    'masculine',
-    'paulo',
-    'daniel',
-    'ricardo',
-    'jorge',
-    'felipe',
-    'bruno',
-    'thiago',
-    'diego',
-    'fernando',
-    'antonio',
-    'carlos',
-    'david',
-    'alex',
-    'thomas',
-    'google uk english male'
-  ];
-
-  const hasHint = (voice, hints) => {
-    const name =
-      String(voice?.name || '')
-        .toLowerCase();
-
-    return hints.some((hint) =>
-      name.includes(hint)
-    );
-  };
-
-  if (
-    guide === 'lumen' ||
-    guide === 'arian'
-  ) {
-    return (
-      list.find((voice) =>
-        hasHint(voice, femaleHints)
-      ) ||
-      list[0] ||
-      null
-    );
-  }
-
-  if (guide === 'zion') {
-    const maleInLanguage = list.find((voice) =>
-      hasHint(voice, maleHints) &&
-      !hasHint(voice, femaleHints)
+    const filtered = voices.filter((v) =>
+      String(v.lang || '').toLowerCase().startsWith(langShort)
     );
 
-    if (maleInLanguage) {
-      return maleInLanguage;
+    const list = filtered.length ? filtered : voices;
+
+    const femaleHints = ['female', 'woman', 'maria', 'luciana', 'helena', 'samantha', 'victoria', 'google português do brasil'];
+    const maleHints = ['male', 'man', 'paulo', 'daniel', 'ricardo', 'jorge', 'google português'];
+
+    if (guide === 'lumen' || guide === 'arian') {
+      return list.find((v) => femaleHints.some((h) => String(v.name || '').toLowerCase().includes(h))) || list[0] || null;
     }
 
-    const nonFemaleInLanguage = list.find((voice) =>
-      !hasHint(voice, femaleHints)
-    );
-
-    if (nonFemaleInLanguage) {
-      return nonFemaleInLanguage;
+    if (guide === 'zion') {
+      return list.find((v) => maleHints.some((h) => String(v.name || '').toLowerCase().includes(h))) || list[0] || null;
     }
 
-    const maleAnyLanguage = voices.find((voice) =>
-      hasHint(voice, maleHints) &&
-      !hasHint(voice, femaleHints)
-    );
-
-    if (maleAnyLanguage) {
-      return maleAnyLanguage;
-    }
-
-    return null;
+    return list[0] || null;
   }
-
-  return list[0] || null;
-}
 
   function speakText(text) {
     const clean = String(text || '').replace(/\s+/g, ' ').trim();
@@ -717,8 +627,8 @@ function describeMicrophoneError(error) {
 
       const utt = new SpeechSynthesisUtterance(clean);
       utt.lang = lang;
-      utt.rate = guide === 'zion' ? 0.90 : 0.98;
-      utt.pitch = guide === 'zion' ? 0.76 : 1.12;
+      utt.rate = guide === 'zion' ? 0.92 : 0.98;
+      utt.pitch = guide === 'zion' ? 0.82 : 1.12;
       utt.volume = 1;
 
       const voice = pickVoiceForGuide();
@@ -1521,6 +1431,23 @@ function describeMicrophoneError(error) {
     }
 
     try {
+      /*
+       * iOS Safari exige que getUserMedia seja chamado SÍNCRONO
+       * dentro do gesto do usuário. Fazemos um "priming" aqui,
+       * antes de qualquer await, para desbloquear o microfone.
+       * O stream é encerrado logo em seguida — o JORNADA_MICRO
+       * abrirá o seu próprio stream em sequência, já autorizado.
+       */
+      if (isIOSDevice()) {
+        try {
+          const primerStream =
+            await navigator.mediaDevices.getUserMedia({ audio: true });
+          primerStream.getTracks().forEach((t) => t.stop());
+        } catch (primerErr) {
+          throw primerErr;
+        }
+      }
+
       const micState =
         window.JORNADA_MICRO?._state;
 
