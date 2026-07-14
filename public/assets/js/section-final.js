@@ -211,37 +211,48 @@
   );
 }
 
-function setFinalReplayState(section, state = 'ready') {
-
+function setFinalReplayState(
+  section,
+  state = 'ready'
+) {
   const btn = getFinalReplayButton(section);
 
   if (!btn) return;
 
-  if (state === 'hidden') {
+  const textoNormal = t(
+    'final.replay',
+    '🔊 Ler novamente'
+  );
 
+  const textoLendo = t(
+    'final.reading',
+    '🔊 Lendo...'
+  );
+
+  if (!btn.dataset.originalText) {
+    btn.dataset.originalText = textoNormal;
+  }
+
+  if (state === 'hidden') {
     btn.hidden = true;
     btn.disabled = true;
-    btn.textContent = "🔊 Ouvir novamente";
+    btn.dataset.busy = '0';
+    btn.textContent = textoNormal;
     return;
-
   }
 
   btn.hidden = false;
 
   if (state === 'reading') {
-
     btn.disabled = true;
-    btn.dataset.busy = "1";
-    btn.textContent = "🔊 Lendo...";
-
+    btn.dataset.busy = '1';
+    btn.textContent = textoLendo;
     return;
-
   }
 
-  btn.dataset.busy = "0";
   btn.disabled = false;
-  btn.textContent = "🔊 Ouvir novamente";
-
+  btn.dataset.busy = '0';
+  btn.textContent = textoNormal;
 }
 
   function getStoredBlockFeedbacks() {
