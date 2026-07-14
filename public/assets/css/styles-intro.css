@@ -214,19 +214,19 @@
   }
    
 }
-#section-termos1 [data-typing="true"].typing-done::after,
-#section-termos1 [data-typing="true"].type-done::after { content: none !important; }
+#section-intro [data-typing="true"].typing-done::after,
+#section-intro [data-typing="true"].type-done::after { content: none !important; }
 
-#section-termos1 [data-typing="true"].typing-active,
-#section-termos1 [data-typing="true"].speaking-active {
+#section-intro [data-typing="true"].typing-active,
+#section-intro [data-typing="true"].speaking-active {
   background: radial-gradient(ellipse at center, rgba(255,220,120,.16) 0%, rgba(255,190,70,.08) 45%, transparent 100%) !important;
   box-shadow: 0 0 0 1px rgba(255,220,120,.18), 0 0 10px rgba(255,220,120,.18), 0 0 22px rgba(255,180,60,.14), inset 0 0 10px rgba(255,240,180,.04) !important;
   text-shadow: 0 0 7px rgba(255,235,150,.95), 0 0 16px rgba(255,215,90,.75), 0 0 26px rgba(255,170,40,.48) !important;
   animation: termosAuraPulse 1.6s ease-in-out infinite;
 }
 
-#section-termos1 [data-typing="true"].typing-done,
-#section-termos1 [data-typing="true"].type-done {
+#section-intro [data-typing="true"].typing-done,
+#section-intro [data-typing="true"].type-done {
   background: radial-gradient(ellipse at center, rgba(255,220,120,.09) 0%, rgba(255,190,70,.04) 46%, transparent 100%) !important;
   box-shadow: 0 0 0 1px rgba(255,220,120,.10), 0 0 8px rgba(255,220,120,.10), 0 0 16px rgba(255,180,60,.08) !important;
   text-shadow: 0 0 4px rgba(255,225,120,.62), 0 0 10px rgba(255,185,70,.22) !important;
