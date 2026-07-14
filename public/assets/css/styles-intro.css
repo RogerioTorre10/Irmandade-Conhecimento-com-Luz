@@ -1,732 +1,132 @@
 /* =========================================================
-   STYLES-intro — LIMPO E ESTÁVEL
+   STYLES-INTRO — PATCH DE UNIFICAÇÃO (section-intro)
+   ---------------------------------------------------------
+   Cole/adicione ESTE bloco no FINAL do seu styles-intro.css
+   (ou importe depois). Mantém todos os "mimos" originais
+   da intro (textura de pergaminho, selos, título, botão
+   dourado, animação de digitação) e apenas padroniza:
+     - palco preto
+     - painel de vidro dourado
+     - card que CRESCE com o texto
+     - SCROLL interno (texto não vaza)
+     - AÇÕES presas ao rodapé do card
+     - ÁUREA DOURADA PERMANENTE no texto
    ========================================================= */
 
-:root {
-  --intro-gold: #ffd700;
-  --intro-gold-soft: rgba(255, 215, 0, 0.32);
-  --intro-gold-mid: rgba(255, 215, 0, 0.18);
-  --intro-glow: rgba(255, 220, 120, 0.26);
-  --intro-text: #f8f1dc;
-  --intro-img: url('/assets/img/textura-de-pedra.jpg');
-}
-
-/* =========================================================
-   SECTION BASE
-   ========================================================= */
-
+/* 1) PALCO */
 #section-intro {
-  background: transparent !important;
+  position: relative !important;
+  background: #000 !important;
   display: flex !important;
   justify-content: center !important;
-  align-items: center !important;
+  align-items: flex-start !important;
   width: 100% !important;
-  min-height: 100vh !important;
-  text-align: left !important;
-  overflow: hidden !important;
+  max-width: 100% !important;
+  min-height: 100vh;
+  min-height: 100svh;
+  min-height: 100dvh;
+  padding: 18px 0 max(42px, env(safe-area-inset-bottom)) !important;
+  overflow-x: hidden !important;
+  overflow-y: visible !important; /* NÃO trocar por auto (bug iOS Safari) */
+  box-sizing: border-box !important;
   box-shadow: none !important;
   border: none !important;
 }
 
+/* 2) PAINEL DE VIDRO DOURADO */
 #section-intro .j-panel-glow {
   position: relative !important;
-  width: min(520px, 92vw) !important;
-  max-width: 470px !important;
+  width: min(92vw, 520px) !important;
+  max-width: 520px !important;
   margin: 0 auto !important;
   padding: 12px !important;
   border-radius: 24px !important;
   overflow: hidden !important;
+  isolation: isolate !important;
+  box-sizing: border-box !important;
   z-index: 3 !important;
+  left: auto !important;
+  right: auto !important;
+  transform: none !important;
 }
-
 #section-intro .j-panel-glow::before {
   content: "";
   position: absolute !important;
   inset: 0;
   border-radius: inherit;
   pointer-events: none;
-  border: 1px solid rgba(212, 175, 55, 0.48);
+  z-index: 1;
+  border: 1px solid rgba(212, 175, 55, 0.48) !important;
   box-shadow:
     0 0 24px rgba(212, 175, 55, 0.36),
-    inset 0 0 18px rgba(255, 230, 150, 0.12);
+    inset 0 0 18px rgba(255, 230, 150, 0.12) !important;
+  background:
+    linear-gradient(to bottom, rgba(255,255,255,0.08), transparent 45%, transparent),
+    radial-gradient(circle at 50% 50%, rgba(255,215,90,0.12) 0%, rgba(255,215,90,0.06) 42%, transparent 78%) !important;
 }
 
-#section-intro .j-perg-v-inner {
-  position: relative !important;
-  overflow: visible !important;
-  z-index: 4 !important;
-}
-
+/* 3) CARD INTERNO — cresce com o texto */
 #section-intro .j-arcane-card {
   position: relative !important;
   overflow: hidden !important;
   border-radius: 24px !important;
   margin: 0 auto !important;
-  min-height: 470px !important;
-  height: 470px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: min(70vh, 470px) !important;
   max-height: none !important;
-  width: 84% !important;
-  max-width: 390px !important;
   display: flex !important;
   flex-direction: column !important;
   justify-content: flex-start !important;
+  padding: 42px 28px 30px !important;
+  box-sizing: border-box !important;
+}
 
-  padding: 42px 28px 30px !important; 
- }
-
-#section-intro .parchment-actions-rough {
-    margin-top: auto !important;
-    padding-bottom: 8px !important;
-  }
-
-/* =========================================================
-   MIOLO
-   ========================================================= */
-
+/* 4) MIOLO — scroll interno dourado */
 #section-intro .parchment-inner-rough,
 #section-intro .intro-wrap,
 #section-intro #intro {
-  position: relative !important;;
+  position: relative !important;
   text-align: left !important;
-  overflow: hidden !important;
-  flex: 1 !important; 
-}
-
-#section-intro #intro {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
-}
-
-/* =========================================================
-   TÍTULO
-   ========================================================= */
-
-#section-intro .intro-title,
-#section-intro .section-title {
-  position: relative !important;
-  display: block;
-  width: 100%;
-  margin: 8px 0 12px;
-  padding: 0 8px;
-  text-align: center !important;
-  font-family: 'ManufacturingConsent', sans-serif;
-  font-size: clamp(26px, 4vw, 34px);
-  line-height: 1.15;
-  color: var(--intro-gold);
-  text-shadow:
-    0 0 6px rgba(255, 215, 0, 0.45),
-    0 0 14px rgba(255, 180, 60, 0.22);
-  word-break: normal;
-  overflow-wrap: break-word;
-}
-
-/* =========================================================
-   TEXTOS DIGITÁVEIS
-   ========================================================= */
-
-#section-intro .parchment-text-rough,
-#section-intro .intro-lista-rough > li {
-  position: relative !important;
-  display: block !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  margin: 0 !important;
-  padding: 3px 8px !important;
-  border-radius: 12px !important;
-  text-align: left !important;
-  direction: ltr !important;
-  white-space: normal !important;
-  line-height: 1.55 !important;
-  font-family: 'BerkshireSwash', cursive !important;
-  font-size: 13px !important;
-  color: var(--intro-gold) !important;
-  background: transparent !important;
-  isolation: isolate !important;
-  z-index: 2 !important;
-}
-
-/* cursor */
-#section-intro [data-typing="true"][data-cursor="true"] {
-  padding-right: 0.35em !important;
-}
-
-#section-intro [data-typing="true"][data-cursor="true"].typing-active::after {
-  content: "";
-  position: absolute;
-  right: 0.05em;
-  bottom: 0.18em;
-  width: 2px;
-  height: 1em;
-  border-radius: 2px;
-  background: linear-gradient(180deg, #ffe08a 0%, #ffbf3b 100%);
-  box-shadow: 0 0 6px rgba(255, 210, 100, 0.9);
-  animation: introCaretBlink 1s steps(1, end) infinite;
-}
-
-#section-intro [data-typing="true"].typing-done::after,
-#section-intro [data-typing="true"].type-done::after {
-  content: none;
-}
-
-/* aura viva */
-#section-intro [data-typing="true"].typing-active {
-  background: radial-gradient(
-    ellipse at center,
-    rgba(255, 220, 120, 0.16) 0%,
-    rgba(255, 190, 70, 0.08) 45%,
-    transparent 100%
-  ) !important;
-  box-shadow:
-    0 0 0 1px rgba(255, 220, 120, 0.18),
-    0 0 10px rgba(255, 220, 120, 0.18),
-    0 0 22px rgba(255, 180, 60, 0.14),
-    inset 0 0 10px rgba(255, 240, 180, 0.04) !important;
-  text-shadow:
-    0 0 6px rgba(255, 230, 120, 0.95),
-    0 0 12px rgba(255, 210, 90, 0.72),
-    0 0 20px rgba(255, 170, 40, 0.36) !important;
-  animation: introAuraPulse 1.6s ease-in-out infinite;
-}
-
-#section-intro [data-typing="true"].typing-active::before,
-#section-intro [data-typing="true"].typing-done::before,
-#section-intro [data-typing="true"].type-done::before {
-  content: "";
-  position: absolute !important;
-  inset: -4px -6px;
-  border-radius: 14px;
-  pointer-events: none;
-  z-index: -1;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(255, 220, 120, 0.10) 0%,
-    rgba(255, 180, 60, 0.05) 55%,
-    transparent 100%
-  );
-}
-
-#section-intro [data-typing="true"].typing-done,
-#section-intro [data-typing="true"].type-done {
-  background: radial-gradient(
-    ellipse at center,
-    rgba(255, 220, 120, 0.09) 0%,
-    rgba(255, 190, 70, 0.04) 46%,
-    transparent 100%
-  ) !important;
-  box-shadow:
-    0 0 0 1px rgba(255, 220, 120, 0.10),
-    0 0 8px rgba(255, 220, 120, 0.10),
-    0 0 16px rgba(255, 180, 60, 0.08) !important;
-  text-shadow:
-    0 0 4px rgba(255, 225, 120, 0.62),
-    0 0 10px rgba(255, 185, 70, 0.22) !important;
-}
-
-/* =========================================================
-   LISTA SEM BULLET
-   ========================================================= */
-
-#section-intro .intro-lista-rough,
-#section-intro ul {
-  list-style: none !important;
-  margin: 2px 0 0 !important;
-  padding: 0 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: flex-start !important;
-  width: 100% !important;  
-}
-
-#section-intro .intro-lista-rough > li,
-#section-intro ul > li {
-  list-style: none !important;
-  margin: 0 !important;
-  padding-left: 8px !important;
-}
-
-#section-intro .intro-lista-rough > li::marker,
-#section-intro ul > li::marker,
-#section-intro .intro-lista-rough > li::before,
-#section-intro ul > li::before {
-  content: none !important;
-  display: none !important;
-}
-
-/* =========================================================
-   AÇÕES
-   ========================================================= */
-
-#section-intro .footer-actions,
-#section-intro .parchment-actions-rough {
-  margin-top: auto !important;
-  padding-top: 16px !important;
-  padding-bottom: 12px !important;
-  display: flex !important;
-  justify-content: center !important;  
-}
-
-#section-intro .btn-stone,
-#section-intro .nextBtn {
-  position: relative !important;
-  display: inline-block;
-  min-width: 140px;
-  padding: 10px 18px;
-  border-radius: 8px;
-  border: 2px solid #4a4a4a;
-  color: #ffd700;
-  cursor: pointer;
-  text-shadow: 1px 1px 3px rgba(0,0,0,.7);
-  background:
-    linear-gradient(to bottom, #a0a0a0, #808080),
-    var(--stone-img) center/cover;
-  background-blend-mode: overlay;
-  box-shadow:
-    inset 0 3px 6px rgba(0,0,0,.4),
-    0 6px 12px rgba(0,0,0,.45);
-  transition: transform .2s ease, filter .2s ease, box-shadow .2s ease;
-}
-
-#section-intro .btn-stone:hover:not(:disabled),
-#section-intro .nextBtn:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow:
-    inset 0 3px 6px rgba(0,0,0,.4),
-    0 0 10px rgba(255, 215, 0, 0.22),
-    0 6px 12px rgba(0,0,0,.45);
-}
-
-#section-intro .btn-stone:disabled,
-#section-intro .nextBtn:disabled {
-  opacity: .6;
-  pointer-events: none;
-}
-
-/* =========================================================
-   UTILITÁRIOS
-   ========================================================= */
-
-#section-intro .is-hidden {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity .25s ease;
-}
-
-#section-intro .btn-ready-pulse {
-  animation: btnReady .6s ease-out 1;
-}
-
-/* =========================================================
-   ANIMAÇÕES
-   ========================================================= */
-
-@keyframes introCaretBlink {
-  0%, 45% { opacity: 0.95; }
-  50%, 100% { opacity: 0; }
-}
-
-@keyframes introAuraPulse {
-  0% {
-    box-shadow:
-      0 0 0 1px rgba(255, 220, 120, 0.16),
-      0 0 8px rgba(255, 220, 120, 0.14),
-      0 0 16px rgba(255, 180, 60, 0.10),
-      inset 0 0 8px rgba(255, 240, 180, 0.03);
-  }
-  50% {
-    box-shadow:
-      0 0 0 1px rgba(255, 220, 120, 0.24),
-      0 0 14px rgba(255, 220, 120, 0.24),
-      0 0 26px rgba(255, 180, 60, 0.18),
-      inset 0 0 12px rgba(255, 240, 180, 0.06);
-  }
-  100% {
-    box-shadow:
-      0 0 0 1px rgba(255, 220, 120, 0.16),
-      0 0 8px rgba(255, 220, 120, 0.14),
-      0 0 16px rgba(255, 180, 60, 0.10),
-      inset 0 0 8px rgba(255, 240, 180, 0.03);
-  }
-}
-
-@keyframes btnReady {
-  0%   { transform: scale(0.98); filter: brightness(0.95); }
-  60%  { transform: scale(1.02); filter: brightness(1.08); }
-  100% { transform: scale(1); filter: none; }
-}
-
-/* =========================================================
-   RESPONSIVO
-   ========================================================= */
-
-@media (max-width: 600px) {
-  #section-intro {
-    padding: 8px 0 120px !important;
-  }
-
-  #section-intro .j-panel-glow {
-    width: calc(100vw - 32px) !important;
-    max-width: 440px !important;
-    padding: 18px 14px 28px !important;
-    border-radius: 20px !important;
-  }
-
-  #section-intro .intro-title,
-  #section-intro .section-title {
-    font-size: 26px !important;
-    margin-bottom: 14px !important;
-  }
-
-  #section-intro .parchment-text-rough,
-  #section-intro .intro-lista-rough > li {
-    font-size: 13px !important;
-    line-height: 1.6 !important;
-    padding: 3px 6px !important;
-  }
-
-  #section-intro [data-typing="true"].typing-active::before,
-  #section-intro [data-typing="true"].typing-done::before,
-  #section-intro [data-typing="true"].type-done::before {
-    inset: -3px -5px;
-    border-radius: 12px;
-  }
-}
-/* =========================================
-   FORÇA QUEBRA DE LINHA NOS ITENS LONGOS
-   ========================================= */
-
-/* garante que cada item comece em nova linha */
-#section-intro .intro-lista-rough > li {
-  display: block !important;
-  width: 100% !important;
-  clear: both !important;
-}
-
-/* força quebra de linha no conteúdo interno */
-#section-intro .intro-lista-rough > li[data-typing="true"] {
-  white-space: normal !important;
-  word-break: break-word !important;
-  overflow-wrap: break-word !important;
-}
-
-/* 👇 evita que o typing tente encaixar na linha anterior */
-#section-intro .intro-lista-rough {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: flex-start !important;
-}
-
-/* opcional: pequeno espaçamento entre linhas */
-#section-intro .intro-lista-rough > li + li {
-  margin-top: 2px !important;
-}
-/* =========================================
-   SENHA — AURA TAMBÉM DURANTE A FALA
-   ========================================= */
-#section-intro .intro-lista-rough li[data-typing="true"] {
-  display: inline-block !important;
-  width: fit-content !important;
-  max-width: 100% !important;
-  clear: none !important;
-  padding: 4px 10px !important;
-  border-radius: 14px !important;
-}
-
-#section-intro [data-typing="true"].speaking-active {
-  background: radial-gradient(
-    ellipse at center,
-    rgba(255, 220, 120, 0.16) 0%,
-    rgba(255, 190, 70, 0.08) 45%,
-    transparent 100%
-  ) !important;
-  box-shadow:
-    0 0 0 1px rgba(255, 220, 120, 0.18),
-    0 0 10px rgba(255, 220, 120, 0.18),
-    0 0 22px rgba(255, 180, 60, 0.14),
-    inset 0 0 10px rgba(255, 240, 180, 0.04) !important;
-  text-shadow:
-    0 0 6px rgba(255, 230, 120, 0.95),
-    0 0 12px rgba(255, 210, 90, 0.72),
-    0 0 20px rgba(255, 170, 40, 0.36) !important;
-  animation: senhaAuraPulse 1.6s ease-in-out infinite;
-}
-
-#section-intro [data-typing="true"].speaking-active::before {
-  content: "";
-  position: absolute !important;
-  inset: -4px -6px;
-  border-radius: 14px;
-  pointer-events: none;
-  z-index: -1;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(255, 220, 120, 0.10) 0%,
-    rgba(255, 180, 60, 0.05) 55%,
-    transparent 100%
-  );
-}
-/* =========================================
-   SCROLL MOBILE intro— SOLUÇÃO OFICIAL
-   ========================================= */
-
-@media (max-width: 768px) {
-
-  /* container principal continua fixo */
- #section-intro {
-    overflow: hidden !important;
-  }
-
-  /* libera espaço do painel */
-  #section-intro .j-panel-glow {
-    max-height: 88vh !important;
-    overflow: hidden !important;
-    display: flex !important;
-    flex-direction: column !important;
-  }
-
-  /* 👇 AQUI ACONTECE O SCROLL */
-  #section-intro .j-arcane-card {
-    flex: 1;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    -webkit-overflow-scrolling: touch !important;
-    padding-right: 8px !important;
-    margin: 0 auto !important;
-  }
-
-  /* garante espaço pro botão */
-  #section-intro .footer-actions {
-    position: sticky;
-    bottom: 0;
-    background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
-    padding-top: 12px;
-    z-index: 5;
-  }
- 
-  #section-intro .j-arcane-card::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  #section-intro .j-arcane-card::-webkit-scrollbar-thumb {
-    background: rgba(255, 215, 120, 0.6);
-    border-radius: 10px;
-  }
-}
-
-/* =========================================
-   intro — AURA FIXA BLINDADA
-   Não depende só de typing-done
-   ========================================= */
-
-#section-intro [data-typing="true"] {
-  position: relative !important;
-  isolation: isolate !important;
-  text-shadow:
-    0 0 6px rgba(255, 230, 120, 0.72),
-    0 0 14px rgba(255, 210, 90, 0.38),
-    0 0 22px rgba(255, 170, 40, 0.22) !important;
-}
-
-#section-intro [data-typing="true"]::before {
-  content: "" !important;
-  position: absolute !important;
-  inset: -4px -6px !important;
-  border-radius: 14px !important;
-  pointer-events: none !important;
-  z-index: -1 !important;
-
-  background: radial-gradient(
-    ellipse at center,
-    rgba(255, 220, 120, 0.075) 0%,
-    rgba(255, 180, 60, 0.035) 55%,
-    transparent 100%
-  ) !important;
-
-  box-shadow:
-    0 0 8px rgba(255, 220, 120, 0.14),
-    0 0 18px rgba(255, 180, 60, 0.10) !important;
-}
-
-#section-intro [data-typing="true"].typing-active {
-  text-shadow:
-    0 0 7px rgba(255, 235, 150, 0.95),
-    0 0 16px rgba(255, 215, 90, 0.75),
-    0 0 26px rgba(255, 170, 40, 0.48) !important;
-}
-
-#section-intro [data-typing="true"].typing-active::before {
-  background: radial-gradient(
-    ellipse at center,
-    rgba(255, 220, 120, 0.14) 0%,
-    rgba(255, 180, 60, 0.07) 55%,
-    transparent 100%
-  ) !important;
-
-  box-shadow:
-    0 0 12px rgba(255, 220, 120, 0.26),
-    0 0 26px rgba(255, 180, 60, 0.18) !important;
-}
-/* =====================================================
-   intro — PADRÃO VISUAL IGUAL À SECTION SENHA
-===================================================== */
-
-@media (max-width: 768px) {
-  #section-intro,
-  #section-intro {
-    min-height: 100dvh !important;
-    height: auto !important;
-    padding: 0 10px 24px !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    align-items: flex-start !important;
-    justify-content: center !important;
-  }
-
-  #section-intro .j-panel-glow,
-  #section-intro .j-panel-glow {
-    width: min(94vw, 430px) !important;
-    max-width: 430px !important;
-    min-height: 92dvh !important;
-    height: auto !important;
-    margin: 72px auto 24px !important;
-    overflow: visible !important;
-  }
-
-  #section-intro .j-perg-v-inner,
-  #section-intro .j-perg-v-inner {
-    width: 100% !important;
-    min-height: 92dvh !important;
-    height: auto !important;
-    background-size: 100% 100% !important;
-    background-position: center top !important;
-    overflow: visible !important;
-    padding: 72px 0 110px !important;
-  }
-
-  #section-intro .j-arcane-card,
-  #section-intro .j-arcane-card {
-    width: 84% !important;
-    max-width: 330px !important;
-    min-height: 52dvh !important;
-    height: auto !important;
-    max-height: none !important;
-    margin: 0 auto !important;
-    padding: 26px 18px 22px !important;
-    overflow: visible !important;
-  }
-
-  #section-intro .pergaminho-content,
-  #section-intro .pergaminho-content {
-    min-height: auto !important;
-    padding-bottom: 14px !important;
-    overflow: visible !important;
-  }
-
-  #section-intro h1,
-  #section-intro h1 {
-    font-size: clamp(1.15rem, 5vw, 1.55rem) !important;
-    margin-bottom: 18px !important;
-    text-align: center !important;
-  }
-
-  #section-intro,
-  #section-intro,
-  #section-intro li {
-    font-size: clamp(0.75rem, 3vw, 0.92rem) !important;
-    line-height: 1.52 !important;
-  }
-
-  #section-intro button,
-  #section-intro button {
-    min-height: 44px !important;
-    margin-top: 14px !important;
-  }
-}
-
-/* ======================================================
-   INTRO — MOBILE (MESMO PADRÃO DA SECTION TERMOS)
-   ====================================================== */
-
-@media (max-width:768px){
-  #section-intro{
-    display:flex !important;
-    justify-content:center !important;
-    align-items:flex-start !important;
-    width:100% !important;
-    max-width:100% !important;
-    padding: 8px 6px calc(120px + env(safe-area-inset-bottom)) !important;
-    overflow-x:hidden !important;
-    overflow-y:auto !important;
-    -webkit-overflow-scrolling:touch !important;
-  }
-
-  #section-intro .j-panel-glow{
-    width:calc(100% - 8px) !important;
-    max-width:430px !important;
-    margin:0 auto 20px !important;
-    padding:10px 8px 18px !important;
-    left:auto !important;
-    right:auto !important;
-    transform:none !important;
-  }
-
-  #section-intro .j-perg-v-inner{
-    width:100% !important;
-    padding: 46px 0 70px !important;
-    background-size:100% 100% !important;
-  }
-
-  #section-intro .j-arcane-card{
-    width:calc(100% - 24px) !important;
-    max-width:340px !important;
-    margin:0 auto !important;
-    padding:20px 14px 24px !important;
-    overflow-y:auto !important;
-    overflow-x:hidden !important;
-    -webkit-overflow-scrolling:touch !important;
-  }
-
-}
-/* =========================================================
-   FIX DEFINITIVO — botão na base inferior do card
-   ========================================================= */
-
-/* O card DEVE ser flex-column com altura fixa para o margin-top:auto funcionar */
-#section-intro .j-arcane-card {
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: flex-start !important;
-  height: 470px !important;
-  min-height: 470px !important;
-  overflow: hidden !important;
-}
-
-/* O miolo ocupa todo o espaço disponível */
-#section-intro .parchment-inner-rough,
-#section-intro .intro-wrap,
-#section-intro #intro {
   flex: 1 1 auto !important;
-  min-height: 0 !important;        /* ← essencial para flex funcionar */
-  overflow: hidden !important;
+  min-height: 0 !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+  -webkit-overflow-scrolling: touch !important;
+  max-height: calc(100dvh - 180px) !important;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(212, 175, 55, 0.55) transparent;
 }
+#section-intro .parchment-inner-rough::-webkit-scrollbar,
+#section-intro .intro-wrap::-webkit-scrollbar,
+#section-intro #intro::-webkit-scrollbar { width: 6px; height: 6px; }
+#section-intro .parchment-inner-rough::-webkit-scrollbar-thumb,
+#section-intro .intro-wrap::-webkit-scrollbar-thumb,
+#section-intro #intro::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.55);
+  border-radius: 8px;
+  box-shadow: 0 0 6px rgba(255, 215, 0, 0.35);
+}
+#section-intro .parchment-inner-rough::-webkit-scrollbar-track { background: transparent; }
 
-/* Botão empurrado para o fundo */
+/* 5) AÇÕES / SINALIZADOR presos ao rodapé do card */
 #section-intro .parchment-actions-rough,
-#section-intro .footer-actions {
-  flex-shrink: 0 !important;       /* ← não encolhe */
+#section-intro .card-actions {
   margin-top: auto !important;
   padding-top: 12px !important;
-  padding-bottom: 10px !important;
-  display: flex !important;
-  justify-content: center !important;
+  padding-bottom: 8px !important;
+  flex-shrink: 0 !important;
 }
 
-/* Mobile: card com altura mínima também definida */
-@media (max-width: 768px) {
-  #section-intro .j-arcane-card {
-    height: auto !important;
-    min-height: 380px !important;
-    flex: 0 0 auto !important;     /* ← sai do flex:1 que quebrava o layout */
-  }
+/* 6) ÁUREA DOURADA PERMANENTE NO TEXTO */
+#section-intro :where(
+  p, li, span,
+  .typed-text, [data-typing], [data-typing="true"],
+  .parchment-inner-rough, .intro-wrap, #intro
+) {
+  text-shadow:
+    0 0 6px rgba(255, 215, 0, 0.55),
+    0 0 14px rgba(255, 220, 120, 0.28) !important;
 }
