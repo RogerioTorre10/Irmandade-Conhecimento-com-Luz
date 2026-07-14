@@ -269,18 +269,48 @@
     let candidates = exact.length ? exact : family;
 
     if (guide === 'zion' && candidates.length) {
-      const maleHints = /male|man|homem|masculin|masculine|daniel|david|alex|jorge|paul|carlos|felipe|ricardo|antonio|bruno|thomas/i;
-      const femaleHints = /female|woman|mulher|feminin|feminine|zira|samantha|helena|luciana|maria|sofia|victoria|ana|paulina|monica|marie|amelie|celine|audrey|denise/i;
+  // Nomes explicitamente masculinos conhecidos em desktop e mobile.
+  const maleHints =
+    /\b(male|man|homem|masculin[oa]?|masculine|daniel|david|alex|jorge|paul|paulo|carlos|felipe|ricardo|antonio|antônio|bruno|thomas|thiago|diego|fernando|eddy|enrique|luca|marco|mateo|matheus|junior|joão|joao|guilherme|rafael|roberto|samuel|xander|hattori|otoya|ichiro|kenji|hiro)\b/i;
 
-    const maleCandidates = candidates.filter(v =>
-      maleHints.test(String(v.name || '')) &&
-      !femaleHints.test(String(v.name || ''))
-    );
+  const femaleHints =
+    /\b(female|woman|mulher|feminin[oa]?|feminine|zira|samantha|helena|luciana|maria|sofia|victoria|ana|paulina|monica|marie|amelie|amélie|celine|céline|audrey|denise|karen|tessa|fiona|moira|serena|allison|susan|joana|catarina|vitoria|vitória|isabela|clara|beatriz)\b/i;
 
-    if (maleCandidates.length) {
-      candidates = maleCandidates;
+  const isMale = (voice) => {
+    const name = String(voice?.name || '');
+    return maleHints.test(name) && !femaleHints.test(name);
+  };
+
+  const isFemale = (voice) => {
+    return femaleHints.test(String(voice?.name || ''));
+  };
+
+  // 1) Prioridade absoluta: voz masculina no idioma da Jornada.
+  const maleInLang = candidates.filter(isMale);
+
+  if (maleInLang.length) {
+    candidates = maleInLang;
+  } else {
+    // 2) Preserva a pronúncia correta e elimina vozes femininas conhecidas.
+    const nonFemaleInLang = candidates.filter((voice) => !isFemale(voice));
+
+    if (nonFemaleInLang.length) {
+      candidates = nonFemaleInLang;
+    } else {
+      // 3) Último recurso: voz masculina de outro idioma.
+      // Pode apresentar sotaque ou pronúncia inadequada, mas evita uma
+      // voz explicitamente feminina quando o aparelho oferece alternativa.
+      const maleAnyLang = __voices.filter(isMale);
+
+      if (maleAnyLang.length) {
+        candidates = maleAnyLang;
       }
+
+      // Se nenhuma alternativa existir, mantém o ranking normal.
+      // O perfil de pitch do Zion continuará sendo aplicado depois.
     }
+  }
+}
 
     if (!candidates.length) {
       typingLog('Nenhuma voz compatível com o idioma. Usando fallback global.', {
