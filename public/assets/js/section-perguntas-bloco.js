@@ -572,38 +572,209 @@ function describeMicrophoneError(error) {
   }
 
   function pickVoiceForGuide() {
-    const guideRaw =
-      sessionStorage.getItem('jornada.guia') ||
-      localStorage.getItem('JORNADA_GUIA') ||
-      document.body.dataset.guia ||
-      'lumen';
+  const guideRaw =
+    sessionStorage.getItem('jornada.guia') ||
+    localStorage.getItem('JORNADA_GUIA') ||
+    localStorage.getItem('jornada.guia') ||
+    document.body?.dataset?.guia ||
+    window.currentGuide ||
+    'lumen';
 
-    const guide = normalizeGuide(guideRaw);
-    const voices = window.speechSynthesis?.getVoices?.() || [];
-    if (!voices.length) return null;
+  const guide = normalizeGuide(guideRaw);
 
-    const lang = document.documentElement.lang || getLang() || 'pt-BR';
-    const langShort = String(lang).slice(0, 2).toLowerCase();
+  const voices =
+    window.speechSynthesis?.getVoices?.() || [];
 
-    const filtered = voices.filter((v) =>
-      String(v.lang || '').toLowerCase().startsWith(langShort)
+  if (!voices.length) {
+    console.warn(
+      '[TTS] Nenhuma voz disponível neste momento.'
     );
 
-    const list = filtered.length ? filtered : voices;
-
-    const femaleHints = ['female', 'woman', 'maria', 'luciana', 'helena', 'samantha', 'victoria', 'google português do brasil'];
-    const maleHints = ['male', 'man', 'paulo', 'daniel', 'ricardo', 'jorge', 'google português'];
-
-    if (guide === 'lumen' || guide === 'arian') {
-      return list.find((v) => femaleHints.some((h) => String(v.name || '').toLowerCase().includes(h))) || list[0] || null;
-    }
-
-    if (guide === 'zion') {
-      return list.find((v) => maleHints.some((h) => String(v.name || '').toLowerCase().includes(h))) || list[0] || null;
-    }
-
-    return list[0] || null;
+    return null;
   }
+
+  const lang =
+    document.documentElement.lang ||
+    getLang() ||
+    'pt-BR';
+
+  const langShort =
+    String(lang)
+      .slice(0, 2)
+      .toLowerCase();
+
+  const langVoices = voices.filter((voice) =>
+    String(voice.lang || '')
+      .toLowerCase()
+      .startsWith(langShort)
+  );
+
+  const preferredVoices =
+    langVoices.length
+      ? langVoices
+      : voices;
+
+  const femaleHints = [
+    'female',
+    'woman',
+    'mulher',
+    'feminina',
+    'feminine',
+
+    'maria',
+    'luciana',
+    'helena',
+    'samantha',
+    'victoria',
+    'sofia',
+    'ana',
+    'monica',
+    'zira',
+
+    'siri female',
+    'google uk english female'
+  ];
+
+  const maleHints = [
+    'male',
+    'man',
+    'homem',
+    'masculina',
+    'masculine',
+
+    'daniel',
+    'alex',
+    'fred',
+    'ralph',
+    'albert',
+    'arthur',
+    'reed',
+    'eddy',
+    'rocko',
+
+    'paulo',
+    'felipe',
+    'antonio',
+    'carlos',
+    'ricardo',
+    'jorge',
+    'david',
+    'bruno',
+    'thiago',
+    'diego',
+    'fernando',
+    'roberto',
+    'joão',
+    'guilherme',
+
+    'google uk english male'
+  ];
+
+  function hasHint(voice, hints) {
+    const name =
+      String(voice?.name || '')
+        .toLowerCase();
+
+    return hints.some((hint) =>
+      name.includes(hint)
+    );
+  }
+
+  /*
+   * Lumen e Arian:
+   * priorizam voz feminina no idioma atual.
+   */
+  if (
+    guide === 'lumen' ||
+    guide === 'arian'
+  ) {
+    return (
+      preferredVoices.find((voice) =>
+        hasHint(voice, femaleHints)
+      ) ||
+      voices.find((voice) =>
+        hasHint(voice, femaleHints)
+      ) ||
+      preferredVoices[0] ||
+      voices[0] ||
+      null
+    );
+  }
+
+  /*
+   * Zion:
+   * nunca utiliza automaticamente a primeira voz,
+   * porque no iPhone ela frequentemente é feminina.
+   */
+  if (guide === 'zion') {
+    // 1. Masculina no idioma atual
+    const maleInCurrentLanguage =
+      preferredVoices.find((voice) =>
+        hasHint(voice, maleHints) &&
+        !hasHint(voice, femaleHints)
+      );
+
+    if (maleInCurrentLanguage) {
+      console.log(
+        '[TTS][ZION] Voz masculina no idioma:',
+        maleInCurrentLanguage.name,
+        maleInCurrentLanguage.lang
+      );
+
+      return maleInCurrentLanguage;
+    }
+
+    // 2. Voz do idioma atual não identificada como feminina
+    const nonFemaleInCurrentLanguage =
+      preferredVoices.find((voice) =>
+        !hasHint(voice, femaleHints)
+      );
+
+    if (nonFemaleInCurrentLanguage) {
+      console.log(
+        '[TTS][ZION] Voz não feminina no idioma:',
+        nonFemaleInCurrentLanguage.name,
+        nonFemaleInCurrentLanguage.lang
+      );
+
+      return nonFemaleInCurrentLanguage;
+    }
+
+    // 3. Masculina em qualquer idioma
+    const maleAnyLanguage =
+      voices.find((voice) =>
+        hasHint(voice, maleHints) &&
+        !hasHint(voice, femaleHints)
+      );
+
+    if (maleAnyLanguage) {
+      console.log(
+        '[TTS][ZION] Voz masculina alternativa:',
+        maleAnyLanguage.name,
+        maleAnyLanguage.lang
+      );
+
+      return maleAnyLanguage;
+    }
+
+    /*
+     * Não usar preferredVoices[0] nem voices[0].
+     * O pitch masculino de Zion continuará aplicado,
+     * mas não forçaremos uma voz explicitamente feminina.
+     */
+    console.warn(
+      '[TTS][ZION] Nenhuma voz masculina identificada.',
+      voices.map((voice) => ({
+        name: voice.name,
+        lang: voice.lang
+      }))
+    );
+
+    return null;
+  }
+
+  return preferredVoices[0] || voices[0] || null;
+}
 
   function speakText(text) {
     const clean = String(text || '').replace(/\s+/g, ' ').trim();
@@ -627,8 +798,8 @@ function describeMicrophoneError(error) {
 
       const utt = new SpeechSynthesisUtterance(clean);
       utt.lang = lang;
-      utt.rate = guide === 'zion' ? 0.92 : 0.98;
-      utt.pitch = guide === 'zion' ? 0.82 : 1.12;
+      utt.rate = guide === 'zion' ? 0.90 : 0.98;
+      utt.pitch = guide === 'zion' ? 0.76 : 1.12;
       utt.volume = 1;
 
       const voice = pickVoiceForGuide();
