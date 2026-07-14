@@ -1,5 +1,5 @@
 /* =========================================================
-   SECTION-TERMOS2 — CORRIGIDO PARA MOBILE (ANDROID + iOS)
+   SECTION-TERMOS1 — CORRIGIDO PARA MOBILE (ANDROID + iOS)
    - Card mais largo e legível
    - Sem clipping vertical (parchment cresce com o conteúdo)
    - Botões sempre visíveis
@@ -80,7 +80,7 @@
 
 #section-termos1 .parchment-inner-rough,
 #section-termos1 .termos-wrap,
-#section-termos1 #termos2,
+#section-termos1 #termos1,
 #section-termos1 .pergaminho-content {
   position: relative !important;
   width: 100% !important;
