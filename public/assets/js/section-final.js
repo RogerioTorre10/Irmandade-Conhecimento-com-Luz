@@ -762,11 +762,9 @@ function buildFinalSynthesisPayload() {
       ];
 
       const maleHints = [
-        'male', 'man', 'homem', 'masculina', 'masculine', 'masculino',
-        'paulo', 'daniel', 'ricardo', 'jorge', 'felipe', 'bruno', 'thiago',
-        'diego', 'fernando', 'antonio', 'antônio', 'rafael', 'roberto',
-        'joão', 'joao', 'guilherme', 'carlos', 'david', 'alex', 'thomas',
-        'google uk english male'
+        'male', 'man', 'homem', 'masculina', 'masculino', 'masculine', 'paulo', 'daniel', 'ricardo', 'jorge',
+        'felipe', 'bruno', 'thiago', 'diego', 'fernando', 'antonio', 'antônio', 'rafael', 'roberto',  'joão',
+        'joao', 'guilherme', 'carlos', 'david', 'alex', 'thomas', 'google uk english male'
       ];
 
       const langVoices = voices.filter((v) => String(v.lang || '').toLowerCase().startsWith(langPrefix));
@@ -785,16 +783,62 @@ function buildFinalSynthesisPayload() {
       }
 
       if (guide === 'zion') {
-        return (
-          findByHints(preferredLangVoices, maleHints) ||
-          findByHints(langVoices, maleHints) ||
-          findByHints(voices, maleHints) ||
-          preferredLangVoices[0] ||
-          langVoices[0] ||
-          voices[0] ||
-          null
-        );
-      }
+  // 1) Voz masculina no idioma preferencial.
+  const zionPreferred = findByHints(
+    preferredLangVoices,
+    maleHints
+  );
+
+  if (
+    zionPreferred &&
+    !femaleHints.some((hint) =>
+      String(zionPreferred.name || '').toLowerCase().includes(hint)
+    )
+  ) {
+    return zionPreferred;
+  }
+
+  // 2) Voz masculina entre as vozes do idioma ativo.
+  const zionInLang = findByHints(langVoices, maleHints);
+
+  if (
+    zionInLang &&
+    !femaleHints.some((hint) =>
+      String(zionInLang.name || '').toLowerCase().includes(hint)
+    )
+  ) {
+    return zionInLang;
+  }
+
+  // 3) Voz do idioma correto não identificada como feminina.
+  const sameLanguagePool = preferredLangVoices.length
+    ? preferredLangVoices
+    : langVoices;
+
+  const nonFemaleLang = sameLanguagePool.find((voice) =>
+    !femaleHints.some((hint) =>
+      String(voice.name || '').toLowerCase().includes(hint)
+    )
+  );
+
+  if (nonFemaleLang) return nonFemaleLang;
+
+  // 4) Voz masculina de qualquer idioma como último recurso.
+  const zionAny = findByHints(voices, maleHints);
+
+  if (
+    zionAny &&
+    !femaleHints.some((hint) =>
+      String(zionAny.name || '').toLowerCase().includes(hint)
+    )
+  ) {
+    return zionAny;
+  }
+
+  // Não escolhe voices[0], pois ela costuma ser feminina no mobile.
+  // O pitch grave configurado abaixo permanece como proteção final.
+  return null;
+}
 
       if (guide === 'arian') {
         return (
