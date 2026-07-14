@@ -1,171 +1,408 @@
 /* =========================================================
-   STYLES-TERMOS1 — PATCH DE UNIFICAÇÃO (section-termos1)
-   ---------------------------------------------------------
-   Cole/adicione ESTE bloco no FINAL do seu styles-termos1.css
-   (ou importe depois). Mantém todos os "mimos" originais
-   da termos1 (textura de pergaminho, selos, título, botão
-   dourado, animação de digitação) e apenas padroniza:
-     - palco preto
-     - painel de vidro dourado
-     - card que CRESCE com o texto
-     - SCROLL interno (texto não vaza)
-     - AÇÕES presas ao rodapé do card
-     - ÁUREA DOURADA PERMANENTE no texto
+   SECTION-TERMOS2 — CORRIGIDO PARA MOBILE (ANDROID + iOS)
+   - Card mais largo e legível
+   - Sem clipping vertical (parchment cresce com o conteúdo)
+   - Botões sempre visíveis
    ========================================================= */
 
-/* 1) PALCO */
+:root {
+  --termos-gold: #ffd700;
+  --termos-text: #f8f1dc;
+  --stone-img: url('/assets/img/textura-de-pedra.jpg');
+}
+
 #section-termos1 {
-  position: relative !important;
-  background: #000 !important;
+  width: 100% !important;
+  min-height: 100vh !important;
+  min-height: 100svh !important;
+  min-height: 100dvh !important;
+  box-sizing: border-box !important;
   display: flex !important;
   justify-content: center !important;
   align-items: flex-start !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  min-height: 100vh;
-  min-height: 100svh;
-  min-height: 100dvh;
-  padding: 18px 0 max(42px, env(safe-area-inset-bottom)) !important;
-  overflow-x: hidden !important;
-  overflow-y: visible !important; /* NÃO trocar por auto (bug iOS Safari) */
-  box-sizing: border-box !important;
-  box-shadow: none !important;
+  margin: 0 auto !important;
+  padding: 16px 10px calc(28px + env(safe-area-inset-bottom)) !important;
+  background: transparent !important;
   border: none !important;
+  box-shadow: none !important;
+  text-align: left !important;
+  overflow-x: hidden !important;
+  overflow-y: visible !important;
+  overscroll-behavior-x: none;
+  -webkit-overflow-scrolling: touch;
 }
 
-/* 2) PAINEL DE VIDRO DOURADO */
 #section-termos1 .j-panel-glow {
   position: relative !important;
-  width: min(92vw, 520px) !important;
+  z-index: 3 !important;
+  width: min(520px, calc(100vw - 24px)) !important;
   max-width: 520px !important;
+  box-sizing: border-box !important;
   margin: 0 auto !important;
   padding: 12px !important;
   border-radius: 24px !important;
-  overflow: hidden !important;
-  isolation: isolate !important;
-  box-sizing: border-box !important;
-  z-index: 3 !important;
-  left: auto !important;
-  right: auto !important;
-  transform: none !important;
+  overflow: visible !important;
 }
+
 #section-termos1 .j-panel-glow::before {
   content: "";
   position: absolute !important;
   inset: 0;
   border-radius: inherit;
   pointer-events: none;
-  z-index: 1;
-  border: 1px solid rgba(212, 175, 55, 0.48) !important;
-  box-shadow:
-    0 0 24px rgba(212, 175, 55, 0.36),
-    inset 0 0 18px rgba(255, 230, 150, 0.12) !important;
-  background:
-    linear-gradient(to bottom, rgba(255,255,255,0.08), transparent 45%, transparent),
-    radial-gradient(circle at 50% 50%, rgba(255,215,90,0.12) 0%, rgba(255,215,90,0.06) 42%, transparent 78%) !important;
+  border: 1px solid rgba(212,175,55,.48);
+  box-shadow: 0 0 24px rgba(212,175,55,.36), inset 0 0 18px rgba(255,230,150,.12);
 }
 
-/* 3) CARD INTERNO — cresce com o texto */
-#section-termos1 .j-arcane-card {
+#section-termos1 .j-perg-v-inner {
   position: relative !important;
-  overflow: hidden !important;
-  border-radius: 24px !important;
+  z-index: 4 !important;
   margin: 0 auto !important;
   width: 100% !important;
-  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+}
+
+#section-termos1 .j-arcane-card {
+  position: relative !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
   height: auto !important;
-  min-height: min(70vh, 470px) !important;
   max-height: none !important;
+  box-sizing: border-box !important;
+  margin: 0 auto !important;
+  border-radius: 24px !important;
+  overflow: visible !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+#section-termos1 .parchment-inner-rough,
+#section-termos1 .termos-wrap,
+#section-termos1 #termos2,
+#section-termos1 .pergaminho-content {
+  position: relative !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  text-align: left !important;
+  overflow: visible !important;
+}
+
+#section-termos1 #termos1 {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+
+#section-termos1 .termos1-title,
+#section-termos1 .section-title {
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  margin: 8px 0 12px !important;
+  padding: 0 8px !important;
+  text-align: center !important;
+  font-family: 'ManufacturingConsent', sans-serif !important;
+  font-size: clamp(24px, 4vw, 34px) !important;
+  line-height: 1.15 !important;
+  color: var(--termos-gold) !important;
+  text-shadow: 0 0 6px rgba(255,215,0,.45), 0 0 14px rgba(255,180,60,.22) !important;
+  word-break: normal !important;
+  overflow-wrap: anywhere !important;
+}
+
+#section-termos1 .parchment-text-rough,
+#section-termos1 .termos-lista-rough > li,
+#section-termos1 ul > li {
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  padding: 4px 8px !important;
+  border-radius: 12px !important;
+  text-align: left !important;
+  direction: ltr !important;
+  white-space: normal !important;
+  word-break: break-word !important;
+  overflow-wrap: anywhere !important;
+  font-family: 'BerkshireSwash', cursive !important;
+  font-size: 13px !important;
+  line-height: 1.55 !important;
+  color: var(--termos-gold) !important;
+  background: transparent !important;
+  isolation: isolate !important;
+  z-index: 2 !important;
+}
+
+#section-termos1 .termos-lista-rough,
+#section-termos1 ul {
   display: flex !important;
   flex-direction: column !important;
-  justify-content: flex-start !important;
-  padding: 42px 28px 30px !important;
-  box-sizing: border-box !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  list-style: none !important;
+  margin: 2px 0 0 !important;
+  padding: 0 !important;
 }
 
-/* 4) MIOLO — scroll interno dourado */
-#section-termos1 .parchment-inner-rough,
-#section-termos1 .termos1-wrap,
-#section-termos1 #termos1 {
+#section-termos1 .termos-lista-rough > li + li { margin-top: 2px !important; }
+#section-termos1 .termos-lista-rough > li::marker,
+#section-termos1 ul > li::marker,
+#section-termos1 .termos-lista-rough > li::before,
+#section-termos1 ul > li::before { content: none !important; display: none !important; }
+
+#section-termos1 [data-typing="true"] {
   position: relative !important;
-  text-align: left !important;
-  flex: 1 1 auto !important;
-  min-height: 0 !important;
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
-  overscroll-behavior: contain !important;
-  -webkit-overflow-scrolling: touch !important;
-  max-height: calc(100dvh - 180px) !important;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(212, 175, 55, 0.55) transparent;
-}
-#section-termos1 .parchment-inner-rough::-webkit-scrollbar,
-#section-termos1 .termos1-wrap::-webkit-scrollbar,
-#section-termos1 #termos1::-webkit-scrollbar { width: 6px; height: 6px; }
-#section-termos1 .parchment-inner-rough::-webkit-scrollbar-thumb,
-#section-termos1 .termos1-wrap::-webkit-scrollbar-thumb,
-#section-termos1 #termos1::-webkit-scrollbar-thumb {
-  background: rgba(212, 175, 55, 0.55);
-  border-radius: 8px;
-  box-shadow: 0 0 6px rgba(255, 215, 0, 0.35);
-}
-#section-termos1 .parchment-inner-rough::-webkit-scrollbar-track { background: transparent; }
-
-/* 5) AÇÕES / SINALIZADOR presos ao rodapé do card */
-#section-termos1 .parchment-actions-rough,
-#section-termos1 .card-actions {
-  margin-top: auto !important;
-  padding-top: 12px !important;
-  padding-bottom: 8px !important;
-  flex-shrink: 0 !important;
+  isolation: isolate !important;
+  text-shadow: 0 0 6px rgba(255,230,120,.72), 0 0 14px rgba(255,210,90,.38), 0 0 22px rgba(255,170,40,.22) !important;
 }
 
-/* 6) ÁUREA DOURADA PERMANENTE NO TEXTO */
-#section-termos1 :where(
-  p, li, span,
-  .typed-text, [data-typing], [data-typing="true"],
-  .parchment-inner-rough, .termos1-wrap, #termos1
-) {
-  text-shadow:
-    0 0 6px rgba(255, 215, 0, 0.55),
-    0 0 14px rgba(255, 220, 120, 0.28) !important;
+#section-termos1 [data-typing="true"]::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: -4px -6px !important;
+  z-index: -1 !important;
+  border-radius: 14px !important;
+  pointer-events: none !important;
+  background: radial-gradient(ellipse at center, rgba(255,220,120,.075) 0%, rgba(255,180,60,.035) 55%, transparent 100%) !important;
+  box-shadow: 0 0 8px rgba(255,220,120,.14), 0 0 18px rgba(255,180,60,.10) !important;
 }
 
-
-/* =========================================================
-   PATCH ÁUREA + COR DOURADA PERMANENTE — #section-termos1
-   Cole no FINAL do styles-termos1.css
-   ========================================================= */
-
-/* 1) Garante COR dourada em todo texto do miolo */
-#section-termos1 .parchment-text-rough,
-#section-termos1 .parchment-inner-rough p,
-#section-termos1 .parchment-inner-rough li,
-#section-termos1 .parchment-inner-rough span,
-#section-termos1 .intro-wrap p, #section-termos1 .intro-wrap li, #section-termos1 .intro-wrap span,
-#section-termos1 .termos-wrap p, #section-termos1 .termos-wrap li, #section-termos1 .termos-wrap span,
-#section-termos1 .intro-lista-rough > li,
-#section-termos1 [data-typing="true"] {
-  color: #ffd700 !important;
+#section-termos1 [data-typing="true"][data-cursor="true"] { padding-right: .35em !important; }
+#section-termos1 [data-typing="true"][data-cursor="true"].typing-active::after {
+  content: "";
+  position: absolute;
+  right: .05em;
+  bottom: .18em;
+  width: 2px;
+  height: 1em;
+  border-radius: 2px;
+  background: linear-gradient(180deg,#ffe08a 0%,#ffbf3b 100%);
+  box-shadow: 0 0 6px rgba(255,210,100,.9);
+  animation: termosCaretBlink 1s steps(1,end) infinite;
 }
 
-/* 2) ÁUREA base — sempre presente (mesmo antes de digitar) */
-#section-termos1 .parchment-text-rough,
-#section-termos1 .intro-lista-rough > li,
-#section-termos1 [data-typing="true"] {
-  text-shadow:
-    0 0 6px rgba(255, 215, 0, 0.75),
-    0 0 14px rgba(255, 200, 90, 0.45),
-    0 0 22px rgba(255, 170, 40, 0.25) !important;
+#section-termos1 [data-typing="true"].typing-done::after,
+#section-termos1 [data-typing="true"].type-done::after { content: none !important; }
+
+#section-termos1 [data-typing="true"].typing-active,
+#section-termos1 [data-typing="true"].speaking-active {
+  background: radial-gradient(ellipse at center, rgba(255,220,120,.16) 0%, rgba(255,190,70,.08) 45%, transparent 100%) !important;
+  box-shadow: 0 0 0 1px rgba(255,220,120,.18), 0 0 10px rgba(255,220,120,.18), 0 0 22px rgba(255,180,60,.14), inset 0 0 10px rgba(255,240,180,.04) !important;
+  text-shadow: 0 0 7px rgba(255,235,150,.95), 0 0 16px rgba(255,215,90,.75), 0 0 26px rgba(255,170,40,.48) !important;
+  animation: termosAuraPulse 1.6s ease-in-out infinite;
 }
 
-/* 3) ÁUREA PERMANECE após a digitação (vence .typing-done/.type-done) */
 #section-termos1 [data-typing="true"].typing-done,
-#section-termos1 [data-typing="true"].type-done,
-#section-termos1 .parchment-text-rough.typing-done,
-#section-termos1 .parchment-text-rough.type-done {
-  text-shadow:
-    0 0 6px rgba(255, 215, 0, 0.75),
-    0 0 14px rgba(255, 200, 90, 0.45),
-    0 0 22px rgba(255, 170, 40, 0.25) !important;
+#section-termos1 [data-typing="true"].type-done {
+  background: radial-gradient(ellipse at center, rgba(255,220,120,.09) 0%, rgba(255,190,70,.04) 46%, transparent 100%) !important;
+  box-shadow: 0 0 0 1px rgba(255,220,120,.10), 0 0 8px rgba(255,220,120,.10), 0 0 16px rgba(255,180,60,.08) !important;
+  text-shadow: 0 0 4px rgba(255,225,120,.62), 0 0 10px rgba(255,185,70,.22) !important;
+}
+
+#section-termos1 .footer-actions,
+#section-termos1 .parchment-actions-rough {
+  position: relative !important;
+  z-index: 5 !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
+  margin-top: 22px !important;
+  padding-top: 10px !important;
+}
+
+#section-termos1.btn-stone,
+#section-termos1 .nextBtn {
+  position: relative !important;
+  display: inline-block !important;
+  min-width: 140px !important;
+  min-height: 44px !important;
+  box-sizing: border-box !important;
+  padding: 10px 18px !important;
+  border: 2px solid #4a4a4a !important;
+  border-radius: 8px !important;
+  color: #ffd700 !important;
+  cursor: pointer !important;
+  text-shadow: 1px 1px 3px rgba(0,0,0,.7) !important;
+  background: linear-gradient(to bottom,#a0a0a0,#808080), var(--stone-img) center/cover !important;
+  background-blend-mode: overlay !important;
+  box-shadow: inset 0 3px 6px rgba(0,0,0,.4), 0 6px 12px rgba(0,0,0,.45) !important;
+  transition: transform .2s ease, filter .2s ease, box-shadow .2s ease !important;
+}
+
+#section-termos1 .btn-stone:hover:not(:disabled),
+#section-termos1 .nextBtn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: inset 0 3px 6px rgba(0,0,0,.4), 0 0 10px rgba(255,215,0,.22), 0 6px 12px rgba(0,0,0,.45) !important;
+}
+
+#section-termos1 .btn-stone:disabled,
+#section-termos1 .nextBtn:disabled { opacity: .6 !important; pointer-events: none !important; }
+#section-termos1 .is-hidden { opacity: 0 !important; pointer-events: none !important; transition: opacity .25s ease; }
+#section-termos1 .btn-ready-pulse { animation: btnReady .6s ease-out 1; }
+
+@keyframes termosCaretBlink { 0%,45%{opacity:.95} 50%,100%{opacity:0} }
+@keyframes termosAuraPulse {
+  0%,100% { box-shadow: 0 0 0 1px rgba(255,220,120,.16),0 0 8px rgba(255,220,120,.14),0 0 16px rgba(255,180,60,.10),inset 0 0 8px rgba(255,240,180,.03); }
+  50% { box-shadow: 0 0 0 1px rgba(255,220,120,.24),0 0 14px rgba(255,220,120,.24),0 0 26px rgba(255,180,60,.18),inset 0 0 12px rgba(255,240,180,.06); }
+}
+@keyframes btnReady { 0%{transform:scale(.98);filter:brightness(.95)} 60%{transform:scale(1.02);filter:brightness(1.08)} 100%{transform:scale(1);filter:none} }
+
+/* ============ MOBILE (Android + iOS) ============ */
+@media (max-width: 768px) {
+  #section-termos1 {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 100dvh !important;
+    height: auto !important;
+    margin: 0 auto !important;
+    padding: 12px  8px calc(120px + env(safe-area-inset-bottom))  !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  #section-termos1,
+  #section-termos1 * {
+    box-sizing: border-box !important;
+  }
+
+  #section-termos1 .j-panel-glow {
+    position: relative !important;
+
+    width: calc(100% - 8px) !important;
+    max-width: 430px !important;
+    min-width: 0 !important;
+
+    margin: 0 auto 24px !important;
+    padding: 12px 10px 20px !important;
+
+    left: auto !important;
+    right: auto !important;
+    transform: none !important;
+
+    border-radius: 20px !important;
+    overflow: hidden !important;
+  }
+
+  #section-termos1 .j-perg-v-inner {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+
+    min-height: 0 !important;
+    height: auto !important;
+
+    margin: 0 auto !important;
+    padding: 52px 0 76px !important;
+
+    left: auto !important;
+    right: auto !important;
+    transform: none !important;
+
+    background-size: 100% 100% !important;
+    background-position: center top !important;
+
+    overflow: hidden !important;
+  }
+
+  #section-termos1 .j-arcane-card {
+    width: calc(100% - 32px) !important;
+    max-width: 340px !important;
+    min-width: 0 !important;
+
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: 58dvh !important;
+
+    margin: 0 auto !important;
+    padding: 22px 14px 18px !important;
+
+    left: auto !important;
+    right: auto !important;
+    transform: none !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    overscroll-behavior: contain !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  #section-termos1 .parchment-inner-rough,
+  #section-termos1 .termos-wrap,
+  #section-termos1 #termos1,
+  #section-termos1 .pergaminho-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+
+    overflow-x: hidden !important;
+  }
+
+  #section-termos1 .parchment-text-rough,
+  #section-termos1 .termos-lista-rough,
+  #section-termos1 .termos-lista-rough > li,
+  #section-termos1 ul,
+  #section-termos1 ul > li {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+
+    white-space: normal !important;
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  #section-termos1 .footer-actions,
+  #section-termos1 .parchment-actions-rough {
+    position: relative !important;
+    bottom: auto !important;
+
+    width: 100% !important;
+
+    margin: 16px auto 0 !important;
+    padding: 8px 0 0 !important;
+
+    background: transparent !important;
+  }
+
+  #section-termos1 .j-arcane-card::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  #section-termos1 .j-arcane-card::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background: rgba(255, 215, 120, 0.58);
+  }
+}
+
+/* Telas bem estreitas (iPhone SE etc.) */
+@media (max-width: 380px) {
+  #section-termos1 .j-perg-v-inner { padding: 32px 4px 38px !important; }
+  #section-termos1 .j-arcane-card { padding: 16px 10px 14px !important; }
+  #section-termos1 .parchment-text-rough,
+  #section-termos1 .termos-lista-rough > li,
+  #section-termos1 ul > li { font-size: .88rem !important; }
+}
+
+@media (max-width: 926px) and (orientation: landscape) {
+  #section-termos1 { padding-top: 8px !important; padding-bottom: calc(72px + env(safe-area-inset-bottom)) !important; }
+  #section-termos1 .j-panel-glow { width: min(92vw,620px) !important; max-width: 620px !important; }
+  #section-termos1 .j-perg-v-inner { padding-top: 34px !important; padding-bottom: 48px !important; }
+  #section-termos1 .j-arcane-card { width: 100% !important; max-width: 100% !important; padding: 18px 16px !important; }
 }
