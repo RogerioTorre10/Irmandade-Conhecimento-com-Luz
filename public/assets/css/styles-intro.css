@@ -109,7 +109,7 @@
   font-family: 'ManufacturingConsent', sans-serif !important;
   font-size: clamp(24px, 4vw, 34px) !important;
   line-height: 1.15 !important;
-  color: var(--termos-gold) !important;
+  color: var(--intro-gold) !important;
   text-shadow: 0 0 6px rgba(255,215,0,.45), 0 0 14px rgba(255,180,60,.22) !important;
   word-break: normal !important;
   overflow-wrap: anywhere !important;
@@ -135,7 +135,7 @@
   font-family: 'BerkshireSwash', cursive !important;
   font-size: 13px !important;
   line-height: 1.55 !important;
-  color: var(--termos-gold) !important;
+  color: var(--intro-gold) !important;
   background: transparent !important;
   isolation: isolate !important;
   z-index: 2 !important;
@@ -365,8 +365,8 @@
   }
 
   #section-intro .parchment-text-rough,
-  #section-intro .termos-lista-rough,
-  #section-intro .termos-lista-rough > li,
+  #section-intro .intro-lista-rough,
+  #section-intro .intro-lista-rough > li,
   #section-intro ul,
   #section-intro ul > li {
     width: 100% !important;
@@ -406,7 +406,7 @@
   #section-intro .j-perg-v-inner { padding: 32px 4px 38px !important; }
   #section-intro .j-arcane-card { padding: 16px 10px 14px !important; }
   #section-intro .parchment-text-rough,
-  #section-intro .termos-lista-rough > li,
+  #section-intro .intro-lista-rough > li,
   #section-intro ul > li { font-size: .88rem !important; }
 }
 
