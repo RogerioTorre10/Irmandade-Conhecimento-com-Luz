@@ -740,22 +740,15 @@ function describeMicrophoneError(error) {
       return nonFemaleInCurrentLanguage;
     }
 
-    // 3. Masculina em qualquer idioma
-    const maleAnyLanguage =
-      voices.find((voice) =>
-        hasHint(voice, maleHints) &&
-        !hasHint(voice, femaleHints)
-      );
+    /*
+     * IMPORTANTE: não usar "masculina em qualquer idioma".
+     * Isso causaria Zion falar português com sotaque
+     * americano (ex.: Daniel, Alex, David em en-US/en-GB).
+     * Preferimos cair no default do sistema no idioma
+     * correto (com o pitch reduzido abaixo) do que trocar
+     * de idioma só para conseguir uma voz masculina.
+     */
 
-    if (maleAnyLanguage) {
-      console.log(
-        '[TTS][ZION] Voz masculina alternativa:',
-        maleAnyLanguage.name,
-        maleAnyLanguage.lang
-      );
-
-      return maleAnyLanguage;
-    }
 
     /*
      * Não usar preferredVoices[0] nem voices[0].
