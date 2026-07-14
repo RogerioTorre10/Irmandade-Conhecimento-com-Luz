@@ -257,35 +257,39 @@
 }
 @keyframes btnReady { 0%{transform:scale(.98);filter:brightness(.95)} 60%{transform:scale(1.02);filter:brightness(1.08)} 100%{transform:scale(1);filter:none} }
 
-/* ============ MOBILE (Android + iOS) ============ */
+/* ======================================================
+   TERMOS 1 — MOBILE COM CRESCIMENTO PROGRESSIVO
+   Mesmo comportamento visual da Intro
+   ====================================================== */
+
 @media (max-width: 768px) {
+  #section-termos1,
+  #section-termos1 * {
+    box-sizing: border-box !important;
+  }
+
   #section-termos1 {
-    display: block !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
 
     width: 100% !important;
+    max-width: 100% !important;
     min-width: 0 !important;
+
+    min-height: 100vh !important;
     min-height: 100dvh !important;
     height: auto !important;
 
     margin: 0 auto !important;
-
     padding:
       12px
       8px
       calc(120px + env(safe-area-inset-bottom))
       !important;
 
-    box-sizing: border-box !important;
-
     overflow-x: hidden !important;
-    overflow-y: auto !important;
-
-    -webkit-overflow-scrolling: touch !important;
-  }
-
-  #section-termos1,
-  #section-termos1 * {
-    box-sizing: border-box !important;
+    overflow-y: visible !important;
   }
 
   #section-termos1 .j-panel-glow {
@@ -294,6 +298,10 @@
     width: calc(100% - 8px) !important;
     max-width: 430px !important;
     min-width: 0 !important;
+
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
 
     margin: 0 auto 24px !important;
     padding: 12px 10px 20px !important;
@@ -313,6 +321,7 @@
 
     min-height: 0 !important;
     height: auto !important;
+    max-height: none !important;
 
     margin: 0 auto !important;
     padding: 52px 0 76px !important;
@@ -334,20 +343,16 @@
 
     min-height: 0 !important;
     height: auto !important;
-    max-height: 58dvh !important;
+    max-height: none !important;
 
     margin: 0 auto !important;
-    padding: 22px 14px 18px !important;
+    padding: 22px 14px 24px !important;
 
     left: auto !important;
     right: auto !important;
     transform: none !important;
 
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-
-    overscroll-behavior: contain !important;
-    -webkit-overflow-scrolling: touch !important;
+    overflow: visible !important;
   }
 
   #section-termos1 .parchment-inner-rough,
@@ -358,24 +363,10 @@
     max-width: 100% !important;
     min-width: 0 !important;
 
-    padding-left: 0 !important;
-    padding-right: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
 
-    overflow-x: hidden !important;
-  }
-
-  #section-termos1 .parchment-text-rough,
-  #section-termos1 .termos-lista-rough,
-  #section-termos1 .termos-lista-rough > li,
-  #section-termos1 ul,
-  #section-termos1 ul > li {
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-
-    white-space: normal !important;
-    word-break: break-word !important;
-    overflow-wrap: anywhere !important;
+    overflow: visible !important;
   }
 
   #section-termos1 .footer-actions,
@@ -384,20 +375,28 @@
     bottom: auto !important;
 
     width: 100% !important;
-
-    margin: 16px auto 0 !important;
-    padding: 8px 0 0 !important;
+    margin: 18px auto 0 !important;
+    padding: 10px 0 0 !important;
 
     background: transparent !important;
   }
+}
 
-  #section-termos1 .j-arcane-card::-webkit-scrollbar {
-    width: 5px;
+@media (max-width: 926px) and (orientation: landscape) {
+  #section-termos1 {
+    padding-bottom:
+      calc(80px + env(safe-area-inset-bottom))
+      !important;
   }
 
-  #section-termos1 .j-arcane-card::-webkit-scrollbar-thumb {
-    border-radius: 10px;
-    background: rgba(255, 215, 120, 0.58);
+  #section-termos1 .j-panel-glow {
+    width: min(92vw, 620px) !important;
+    max-width: 620px !important;
+  }
+
+  #section-termos1 .j-arcane-card {
+    width: min(88%, 520px) !important;
+    max-width: 520px !important;
   }
 }
 
