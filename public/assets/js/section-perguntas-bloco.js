@@ -576,69 +576,119 @@ function describeMicrophoneError(error) {
   }
 
   function pickVoiceForGuide() {
-  const guide = getGuiaAtivo();
+  const guide = getGuideAtivo();
   const lang = getActiveLang();
-  const langPrefix = String(lang || 'pt-BR').slice(0, 2).toLowerCase();
+  const langPrefix = String(lang || 'pt-BR')
+    .slice(0, 2)
+    .toLowerCase();
 
-  const voices = window.speechSynthesis?.getVoices?.() || [];
-  if (!voices.length) return null;
+  const voices =
+    window.speechSynthesis?.getVoices?.() || [];
+
+  if (!voices.length) {
+    return null;
+  }
 
   const langVoices = voices.filter((voice) =>
-    String(voice.lang || '').toLowerCase().startsWith(langPrefix)
+    String(voice.lang || '')
+      .toLowerCase()
+      .startsWith(langPrefix)
   );
 
-  const list = langVoices.length ? langVoices : voices;
-  
+  const list =
+    langVoices.length
+      ? langVoices
+      : voices;
+
   const femaleHints = [
-    'female', 'woman', 'mulher', 'feminina', 'feminine', 'maria', 'luciana', 'helena', 'samantha', 'victoria',
-    'zira', 'joana', 'catarina', 'vitoria', 'vitória', 'isabela', 'clara', 'karen'
+    'female',
+    'woman',
+    'mulher',
+    'feminina',
+    'feminine',
+    'maria',
+    'luciana',
+    'helena',
+    'samantha',
+    'victoria',
+    'zira',
+    'monica',
+    'siri female'
   ];
 
   const maleHints = [
-    'male', 'man', 'homem', 'masculina', 'masculino', 'masculine', 'paulo', 'daniel', 'ricardo', 'jorge', 'felipe',
-    'bruno', 'thiago', 'diego', 'fernando', 'antonio', 'antônio', 'rafael', 'roberto', 'joão', 'joao', 'guilherme',
-    'carlos', 'david', 'alex', 'thomas', 'google uk english male'
+    'male',
+    'man',
+    'homem',
+    'masculina',
+    'masculine',
+    'paulo',
+    'daniel',
+    'ricardo',
+    'jorge',
+    'felipe',
+    'bruno',
+    'thiago',
+    'diego',
+    'fernando',
+    'antonio',
+    'carlos',
+    'david',
+    'alex',
+    'thomas',
+    'google uk english male'
   ];
 
   const hasHint = (voice, hints) => {
-    const name = String(voice?.name || '').toLowerCase();
-    return hints.some((hint) => name.includes(hint));
+    const name =
+      String(voice?.name || '')
+        .toLowerCase();
+
+    return hints.some((hint) =>
+      name.includes(hint)
+    );
   };
 
-  if (guide === 'lumen' || guide === 'arian' || guide === 'arion') {
+  if (
+    guide === 'lumen' ||
+    guide === 'arian'
+  ) {
     return (
-      list.find((voice) => hasHint(voice, femaleHints)) ||
+      list.find((voice) =>
+        hasHint(voice, femaleHints)
+      ) ||
       list[0] ||
       null
     );
   }
 
   if (guide === 'zion') {
-    // 1) Masculina no idioma da Jornada.
-    const maleInLang = list.find((voice) =>
+    const maleInLanguage = list.find((voice) =>
       hasHint(voice, maleHints) &&
       !hasHint(voice, femaleHints)
     );
 
-    if (maleInLang) return maleInLang;
+    if (maleInLanguage) {
+      return maleInLanguage;
+    }
 
-    // 2) Voz não identificada como feminina no idioma correto.
-    const nonFemaleInLang = list.find(
-      (voice) => !hasHint(voice, femaleHints)
+    const nonFemaleInLanguage = list.find((voice) =>
+      !hasHint(voice, femaleHints)
     );
 
-    if (nonFemaleInLang) return nonFemaleInLang;
+    if (nonFemaleInLanguage) {
+      return nonFemaleInLanguage;
+    }
 
-    // 3) Masculina em qualquer idioma como último recurso.
-    const maleAnyLang = voices.find((voice) =>
+    const maleAnyLanguage = voices.find((voice) =>
       hasHint(voice, maleHints) &&
       !hasHint(voice, femaleHints)
     );
 
-    if (maleAnyLang) return maleAnyLang;
+    if (maleAnyLanguage) {
+      return maleAnyLanguage;
+    }
 
-    // Sem voz adequada: o navegador usará sua voz padrão e o pitch
-    // grave configurado para Zion continuará sendo aplicado.
     return null;
   }
 
