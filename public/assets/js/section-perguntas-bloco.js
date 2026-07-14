@@ -717,8 +717,8 @@ function describeMicrophoneError(error) {
 
       const utt = new SpeechSynthesisUtterance(clean);
       utt.lang = lang;
-      utt.rate = guide === 'zion' ? 0.92 : 0.98;
-      utt.pitch = guide === 'zion' ? 0.82 : 1.12;
+      utt.rate = guide === 'zion' ? 0.90 : 0.98;
+      utt.pitch = guide === 'zion' ? 0.76 : 1.12;
       utt.volume = 1;
 
       const voice = pickVoiceForGuide();
