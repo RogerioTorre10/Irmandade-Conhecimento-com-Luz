@@ -133,6 +133,284 @@
 
 
 /* =========================================================
+   STYLES-SHARED — PATCH DE UNIFICAÇÃO
+   ---------------------------------------------------------
+   Cole este arquivo DEPOIS de:
+     styles-intro.css
+     styles-termos1.css
+     styles-termos2.css
+     styles-senha.css
+   (ou importe-o por último no seu HTML/entry).
+
+   Objetivo:
+   1) Padronizar #section-intro / #section-termos1 /
+      #section-termos2 / #section-senha no mesmo padrão
+      visual da INTRO (vidro dourado, container que cresce
+      com o texto, fundo preto, scroll INTERNO do miolo,
+      sinalizador/actions preso ao rodapé do card).
+   2) Deixar a áurea dourada do texto PERMANENTE em todas
+      as 4 sections (hoje só a senha mantém).
+
+   NÃO altera texturas, selos, títulos, botões, animações
+   de digitação, olho mágico da senha, etc.
+   ========================================================= */
+
+
+/* =========================================================
+   1) PALCO — fundo preto uniforme + alturas seguras iOS
+   ========================================================= */
+
+#section-intro,
+#section-termos1,
+#section-termos2,
+#section-senha {
+  position: relative !important;
+  background: #000 !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: flex-start !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 100vh;
+  min-height: 100svh;
+  min-height: 100dvh;
+  padding: 18px 0 max(42px, env(safe-area-inset-bottom)) !important;
+  overflow-x: hidden !important;
+  overflow-y: visible !important; /* NÃO trocar por auto (bug iOS Safari) */
+  box-sizing: border-box !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+
+/* =========================================================
+   2) PAINEL DE VIDRO — .j-panel-glow idêntico nas 4
+   ========================================================= */
+
+#section-intro   .j-panel-glow,
+#section-termos1 .j-panel-glow,
+#section-termos2 .j-panel-glow,
+#section-senha   .j-panel-glow,
+#section-senha   .senha-panel {
+  position: relative !important;
+  width: min(92vw, 520px) !important;
+  max-width: 520px !important;
+  margin: 0 auto !important;
+  padding: 12px !important;
+  border-radius: 24px !important;
+  overflow: hidden !important;
+  isolation: isolate !important;
+  box-sizing: border-box !important;
+  z-index: 3 !important;
+  left: auto !important;
+  right: auto !important;
+  transform: none !important;
+}
+
+#section-intro   .j-panel-glow::before,
+#section-termos1 .j-panel-glow::before,
+#section-termos2 .j-panel-glow::before,
+#section-senha   .j-panel-glow::before {
+  content: "";
+  position: absolute !important;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+  border: 1px solid rgba(212, 175, 55, 0.48) !important;
+  box-shadow:
+    0 0 24px rgba(212, 175, 55, 0.36),
+    inset 0 0 18px rgba(255, 230, 150, 0.12) !important;
+  background:
+    linear-gradient(to bottom, rgba(255,255,255,0.08), transparent 45%, transparent),
+    radial-gradient(circle at 50% 50%, rgba(255,215,90,0.12) 0%, rgba(255,215,90,0.06) 42%, transparent 78%) !important;
+}
+
+
+/* =========================================================
+   3) CARD INTERNO — cresce com o conteúdo, sem altura fixa
+   ========================================================= */
+
+#section-intro   .j-arcane-card,
+#section-termos1 .j-arcane-card,
+#section-termos2 .j-arcane-card,
+#section-senha   .j-arcane-card {
+  position: relative !important;
+  overflow: hidden !important;
+  border-radius: 24px !important;
+  margin: 0 auto !important;
+  width: 100% !important;
+  max-width: 100% !important;
+
+  /* Cresce com o texto até o limite da viewport */
+  height: auto !important;
+  min-height: min(70vh, 470px) !important;
+  max-height: none !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+
+  padding: 42px 28px 30px !important;
+  box-sizing: border-box !important;
+}
+
+
+/* =========================================================
+   4) MIOLO — scroll INTERNO para o texto não vazar
+   ---------------------------------------------------------
+   O card cresce até min(70vh, 470px). A partir daí, o
+   miolo passa a rolar internamente. Scrollbar dourada.
+   ========================================================= */
+
+/* =========================================================
+   4) MIOLO — UM ÚNICO scroll interno
+   ---------------------------------------------------------
+   Regra: apenas o wrapper MAIS EXTERNO do miolo rola.
+   Wrappers internos (aninhados) ficam com overflow:visible
+   e height:auto para não criarem uma segunda barra.
+   O scroll da PÁGINA continua livre (section = overflow-y:visible).
+   ========================================================= */
+
+/* 4.a — wrapper externo do miolo: ÚNICO scroll interno */
+#section-intro   .j-arcane-card > .parchment-inner-rough,
+#section-intro   .j-arcane-card > .intro-wrap,
+#section-intro   .j-arcane-card > #intro,
+#section-termos1 .j-arcane-card > .parchment-inner-rough,
+#section-termos1 .j-arcane-card > .termos-wrap,
+#section-termos1 .j-arcane-card > #termos1,
+#section-termos2 .j-arcane-card > .parchment-inner-rough,
+#section-termos2 .j-arcane-card > .termos-wrap,
+#section-termos2 .j-arcane-card > #termos2,
+#section-senha   .j-arcane-card > .parchment-inner-rough,
+#section-senha   .j-arcane-card > .senha-wrap,
+#section-senha   .j-arcane-card > #senha {
+  position: relative !important;
+  text-align: left !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+  -webkit-overflow-scrolling: touch !important;
+  max-height: calc(100dvh - 200px) !important;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(212, 175, 55, 0.55) transparent;
+}
+
+/* 4.b — wrappers ANINHADOS: NUNCA criam scroll próprio */
+#section-intro   .parchment-inner-rough .intro-wrap,
+#section-intro   .parchment-inner-rough #intro,
+#section-intro   .intro-wrap .parchment-inner-rough,
+#section-termos1 .parchment-inner-rough .termos-wrap,
+#section-termos1 .parchment-inner-rough #termos1,
+#section-termos1 .termos-wrap .parchment-inner-rough,
+#section-termos2 .parchment-inner-rough .termos-wrap,
+#section-termos2 .parchment-inner-rough #termos2,
+#section-termos2 .termos-wrap .parchment-inner-rough,
+#section-senha   .parchment-inner-rough .senha-wrap,
+#section-senha   .parchment-inner-rough #senha,
+#section-senha   .senha-wrap .parchment-inner-rough {
+  overflow: visible !important;
+  max-height: none !important;
+  height: auto !important;
+  min-height: 0 !important;
+}
+
+/* Scrollbar dourada fina — só no wrapper externo */
+#section-intro   .j-arcane-card > *::-webkit-scrollbar,
+#section-termos1 .j-arcane-card > *::-webkit-scrollbar,
+#section-termos2 .j-arcane-card > *::-webkit-scrollbar,
+#section-senha   .j-arcane-card > *::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+#section-intro   .j-arcane-card > *::-webkit-scrollbar-thumb,
+#section-termos1 .j-arcane-card > *::-webkit-scrollbar-thumb,
+#section-termos2 .j-arcane-card > *::-webkit-scrollbar-thumb,
+#section-senha   .j-arcane-card > *::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.55);
+  border-radius: 8px;
+  box-shadow: 0 0 6px rgba(255, 215, 0, 0.35);
+}
+#section-intro   .j-arcane-card > *::-webkit-scrollbar-track,
+#section-termos1 .j-arcane-card > *::-webkit-scrollbar-track,
+#section-termos2 .j-arcane-card > *::-webkit-scrollbar-track,
+#section-senha   .j-arcane-card > *::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+
+/* =========================================================
+   5) AÇÕES / SINALIZADOR — sempre presos ao rodapé do card
+   ========================================================= */
+
+#section-intro   .parchment-actions-rough,
+#section-termos1 .parchment-actions-rough,
+#section-termos2 .parchment-actions-rough,
+#section-senha   .parchment-actions-rough,
+#section-intro   .card-actions,
+#section-termos1 .card-actions,
+#section-termos2 .card-actions,
+#section-senha   .card-actions {
+  margin-top: auto !important;
+  padding-top: 12px !important;
+  padding-bottom: 8px !important;
+  flex-shrink: 0 !important;
+}
+
+
+/* =========================================================
+   6) ÁUREA DOURADA PERMANENTE NO TEXTO
+   ---------------------------------------------------------
+   Vence qualquer regra que zere o text-shadow ao final da
+   digitação nas sections intro / termos1 / termos2.
+   A senha já tem áurea permanente — aqui só reforçamos.
+   ========================================================= */
+
+/* 6.a — TEXT-SHADOW dourado forte em cada parágrafo/item.
+   Usa ID (alta especificidade) + !important para vencer
+   qualquer regra que zere o shadow ao final da digitação. */
+#section-intro   p, #section-intro   li, #section-intro   span,
+#section-intro   .typed-text, #section-intro   [data-typing],
+#section-termos1 p, #section-termos1 li, #section-termos1 span,
+#section-termos1 .typed-text, #section-termos1 [data-typing],
+#section-termos2 p, #section-termos2 li, #section-termos2 span,
+#section-termos2 .typed-text, #section-termos2 [data-typing],
+#section-senha   p, #section-senha   li, #section-senha   span,
+#section-senha   .typed-text, #section-senha   [data-typing] {
+  text-shadow:
+    0 0 4px  rgba(255, 215,  0, 0.90),
+    0 0 10px rgba(255, 200, 60, 0.65),
+    0 0 20px rgba(255, 170, 30, 0.40) !important;
+}
+
+/* 6.b — ÁUREA que ENVOLVE cada parágrafo/item (drop-shadow
+   segue o contorno do texto, criando o halo dourado
+   visível ao redor do bloco, não só nas letras).       */
+#section-intro   .parchment-inner-rough > p,
+#section-intro   .parchment-inner-rough > ul > li,
+#section-intro   .intro-wrap > p,
+#section-intro   .intro-wrap > ul > li,
+#section-termos1 .parchment-inner-rough > p,
+#section-termos1 .parchment-inner-rough > ul > li,
+#section-termos1 .termos-wrap > p,
+#section-termos1 .termos-wrap > ul > li,
+#section-termos2 .parchment-inner-rough > p,
+#section-termos2 .parchment-inner-rough > ul > li,
+#section-termos2 .termos-wrap > p,
+#section-termos2 .termos-wrap > ul > li,
+#section-senha   .parchment-inner-rough > p,
+#section-senha   .parchment-inner-rough > ul > li,
+#section-senha   .senha-wrap > p,
+#section-senha   .senha-wrap > ul > li {
+  filter:
+    drop-shadow(0 0 6px  rgba(255, 215,  0, 0.55))
+    drop-shadow(0 0 14px rgba(255, 190, 60, 0.35)) !important;
+}
+
+
+/* =========================================================
    PATCH ÁUREA + COR DOURADA PERMANENTE — #section-intro
    Cole no FINAL do styles-intro.css
    ========================================================= */
