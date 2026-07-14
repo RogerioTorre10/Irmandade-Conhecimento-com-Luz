@@ -576,38 +576,76 @@ function describeMicrophoneError(error) {
   }
 
   function pickVoiceForGuide() {
-    const guideRaw =
-      sessionStorage.getItem('jornada.guia') ||
-      localStorage.getItem('JORNADA_GUIA') ||
-      document.body.dataset.guia ||
-      'lumen';
+  const guide = getGuiaAtivo();
+  const lang = getActiveLang();
+  const langPrefix = String(lang || 'pt-BR').slice(0, 2).toLowerCase();
 
-    const guide = normalizeGuide(guideRaw);
-    const voices = window.speechSynthesis?.getVoices?.() || [];
-    if (!voices.length) return null;
+  const voices = window.speechSynthesis?.getVoices?.() || [];
+  if (!voices.length) return null;
 
-    const lang = document.documentElement.lang || getLang() || 'pt-BR';
-    const langShort = String(lang).slice(0, 2).toLowerCase();
+  const langVoices = voices.filter((voice) =>
+    String(voice.lang || '').toLowerCase().startsWith(langPrefix)
+  );
 
-    const filtered = voices.filter((v) =>
-      String(v.lang || '').toLowerCase().startsWith(langShort)
+  const list = langVoices.length ? langVoices : voices;
+
+  // "Google português do Brasil" é uma identificação genérica do Android.
+  // Não deve ser classificada automaticamente como feminina.
+  const femaleHints = [
+    'female', 'woman', 'mulher', 'feminina', 'feminine', 'maria', 'luciana', 'helena', 'samantha', 'victoria',
+    'zira', 'joana', 'catarina', 'vitoria', 'vitória', 'isabela', 'clara', 'karen'
+  ];
+
+  const maleHints = [
+    'male', 'man', 'homem', 'masculina', 'masculino', 'masculine', 'paulo', 'daniel', 'ricardo', 'jorge', 'felipe',
+    'bruno', 'thiago', 'diego', 'fernando', 'antonio', 'antônio', 'rafael', 'roberto', 'joão', 'joao', 'guilherme',
+    'carlos', 'david', 'alex', 'thomas', 'google uk english male'
+  ];
+
+  const hasHint = (voice, hints) => {
+    const name = String(voice?.name || '').toLowerCase();
+    return hints.some((hint) => name.includes(hint));
+  };
+
+  if (guide === 'lumen' || guide === 'arian' || guide === 'arion') {
+    return (
+      list.find((voice) => hasHint(voice, femaleHints)) ||
+      list[0] ||
+      null
+    );
+  }
+
+  if (guide === 'zion') {
+    // 1) Masculina no idioma da Jornada.
+    const maleInLang = list.find((voice) =>
+      hasHint(voice, maleHints) &&
+      !hasHint(voice, femaleHints)
     );
 
-    const list = filtered.length ? filtered : voices;
+    if (maleInLang) return maleInLang;
 
-    const femaleHints = ['female', 'woman', 'maria', 'luciana', 'helena', 'samantha', 'victoria', 'google português do brasil'];
-    const maleHints = ['male', 'man', 'paulo', 'daniel', 'ricardo', 'jorge', 'google português'];
+    // 2) Voz não identificada como feminina no idioma correto.
+    const nonFemaleInLang = list.find(
+      (voice) => !hasHint(voice, femaleHints)
+    );
 
-    if (guide === 'lumen' || guide === 'arian') {
-      return list.find((v) => femaleHints.some((h) => String(v.name || '').toLowerCase().includes(h))) || list[0] || null;
-    }
+    if (nonFemaleInLang) return nonFemaleInLang;
 
-    if (guide === 'zion') {
-      return list.find((v) => maleHints.some((h) => String(v.name || '').toLowerCase().includes(h))) || list[0] || null;
-    }
+    // 3) Masculina em qualquer idioma como último recurso.
+    const maleAnyLang = voices.find((voice) =>
+      hasHint(voice, maleHints) &&
+      !hasHint(voice, femaleHints)
+    );
 
-    return list[0] || null;
+    if (maleAnyLang) return maleAnyLang;
+
+    // Sem voz adequada: o navegador usará sua voz padrão e o pitch
+    // grave configurado para Zion continuará sendo aplicado.
+    return null;
   }
+
+  return list[0] || null;
+}
 
   function speakText(text) {
     const clean = String(text || '').replace(/\s+/g, ' ').trim();
