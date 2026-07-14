@@ -588,9 +588,7 @@ function describeMicrophoneError(error) {
   );
 
   const list = langVoices.length ? langVoices : voices;
-
-  // "Google português do Brasil" é uma identificação genérica do Android.
-  // Não deve ser classificada automaticamente como feminina.
+  
   const femaleHints = [
     'female', 'woman', 'mulher', 'feminina', 'feminine', 'maria', 'luciana', 'helena', 'samantha', 'victoria',
     'zira', 'joana', 'catarina', 'vitoria', 'vitória', 'isabela', 'clara', 'karen'
