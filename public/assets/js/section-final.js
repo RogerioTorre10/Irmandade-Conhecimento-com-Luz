@@ -762,8 +762,10 @@ function buildFinalSynthesisPayload() {
       ];
 
       const maleHints = [
-        'male', 'man', 'homem', 'masculina', 'masculine',
-        'paulo', 'daniel', 'ricardo', 'jorge', 'felipe', 'antonio', 'carlos', 'alex', 'david',
+        'male', 'man', 'homem', 'masculina', 'masculine', 'masculino',
+        'paulo', 'daniel', 'ricardo', 'jorge', 'felipe', 'bruno', 'thiago',
+        'diego', 'fernando', 'antonio', 'antônio', 'rafael', 'roberto',
+        'joão', 'joao', 'guilherme', 'carlos', 'david', 'alex', 'thomas',
         'google uk english male'
       ];
 
