@@ -58,19 +58,16 @@
 
  function getGuideNow() {
   const raw = String(
-    window.__GUIA_ATIVO ||
-    window.guiaAtual ||
-    window.JORNADA_GUIA_ATIVO ||
-    window.currentGuide ||
-    sessionStorage.getItem('jornada.guide') ||
     sessionStorage.getItem('jornada.guia') ||
+    sessionStorage.getItem('jornada.guide') ||
     sessionStorage.getItem('guiaEscolhido') ||
-    sessionStorage.getItem('guiaSelecionado') ||
-    localStorage.getItem('jornada.guide') ||
+    localStorage.getItem('JORNADA_GUIA') ||
     localStorage.getItem('jornada.guia') ||
+    localStorage.getItem('jornada.guide') ||
     localStorage.getItem('guiaEscolhido') ||
-    localStorage.getItem('guiaSelecionado') ||
     document.body?.dataset?.guia ||
+    document.documentElement?.dataset?.guia ||
+    window.currentGuide ||
     'lumen'
   ).trim().toLowerCase();
 
@@ -78,7 +75,7 @@
   if (raw.includes('arian') || raw.includes('arion')) return 'arian';
   if (raw.includes('lumen')) return 'lumen';
 
-  return 'lumen';
+  return raw || 'lumen';
 }
 
   let __voices = [];
