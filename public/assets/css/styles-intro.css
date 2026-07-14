@@ -6,8 +6,8 @@
    ========================================================= */
 
 :root {
-  --termos-gold: #ffd700;
-  --termos-text: #f8f1dc;
+  --intro-gold: #ffd700;
+  --intro-text: #f8f1dc;
   --stone-img: url('/assets/img/textura-de-pedra.jpg');
 }
 
@@ -44,7 +44,7 @@
   overflow: visible !important;
 }
 
-#section-termos2 .j-panel-glow::before {
+#section-intro .j-panel-glow::before {
   content: "";
   position: absolute !important;
   inset: 0;
@@ -79,7 +79,7 @@
 }
 
 #section-intro .parchment-inner-rough,
-#section-intro .termos-wrap,
+#section-intro .intro-wrap,
 #section-intro #intro,
 #section-intro .pergaminho-content {
   position: relative !important;
@@ -90,7 +90,7 @@
   overflow: visible !important;
 }
 
-#section-intro #termos2 {
+#section-intro #intro {
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -116,7 +116,7 @@
 }
 
 #section-intro .parchment-text-rough,
-#section-intro .termos-lista-rough > li,
+#section-intro .intro-lista-rough > li,
 #section-intro ul > li {
   position: relative !important;
   display: block !important;
@@ -141,7 +141,7 @@
   z-index: 2 !important;
 }
 
-#section-intro .termos-lista-rough,
+#section-intro .intro-lista-rough,
 #section-intro ul {
   display: flex !important;
   flex-direction: column !important;
@@ -156,7 +156,7 @@
 #section-intro .intro-lista-rough > li + li { margin-top: 2px !important; }
 #section-intro .intro-lista-rough > li::marker,
 #section-intro ul > li::marker,
-#section-intro .termos-lista-rough > li::before,
+#section-intro .intro-lista-rough > li::before,
 #section-intro ul > li::before { content: none !important; display: none !important; }
 
 #section-intro [data-typing="true"] {
@@ -187,7 +187,7 @@
   border-radius: 2px;
   background: linear-gradient(180deg,#ffe08a 0%,#ffbf3b 100%);
   box-shadow: 0 0 6px rgba(255,210,100,.9);
-  animation: termosCaretBlink 1s steps(1,end) infinite;
+  animation: introCaretBlink 1s steps(1,end) infinite;
 }
 
 #section-intro [data-typing="true"].typing-done::after,
@@ -198,7 +198,7 @@
   background: radial-gradient(ellipse at center, rgba(255,220,120,.16) 0%, rgba(255,190,70,.08) 45%, transparent 100%) !important;
   box-shadow: 0 0 0 1px rgba(255,220,120,.18), 0 0 10px rgba(255,220,120,.18), 0 0 22px rgba(255,180,60,.14), inset 0 0 10px rgba(255,240,180,.04) !important;
   text-shadow: 0 0 7px rgba(255,235,150,.95), 0 0 16px rgba(255,215,90,.75), 0 0 26px rgba(255,170,40,.48) !important;
-  animation: termosAuraPulse 1.6s ease-in-out infinite;
+  animation: introAuraPulse 1.6s ease-in-out infinite;
 }
 
 #section-intro [data-typing="true"].typing-done,
@@ -250,8 +250,8 @@
 #section-intro .is-hidden { opacity: 0 !important; pointer-events: none !important; transition: opacity .25s ease; }
 #section-intro .btn-ready-pulse { animation: btnReady .6s ease-out 1; }
 
-@keyframes termosCaretBlink { 0%,45%{opacity:.95} 50%,100%{opacity:0} }
-@keyframes termosAuraPulse {
+@keyframes introCaretBlink { 0%,45%{opacity:.95} 50%,100%{opacity:0} }
+@keyframes introAuraPulse {
   0%,100% { box-shadow: 0 0 0 1px rgba(255,220,120,.16),0 0 8px rgba(255,220,120,.14),0 0 16px rgba(255,180,60,.10),inset 0 0 8px rgba(255,240,180,.03); }
   50% { box-shadow: 0 0 0 1px rgba(255,220,120,.24),0 0 14px rgba(255,220,120,.24),0 0 26px rgba(255,180,60,.18),inset 0 0 12px rgba(255,240,180,.06); }
 }
@@ -351,8 +351,8 @@
   }
 
   #section-intro .parchment-inner-rough,
-  #section-intro .termos-wrap,
-  #section-intro #termos2,
+  #section-intro .intro-wrap,
+  #section-intro #intro,
   #section-intro .pergaminho-content {
     width: 100% !important;
     max-width: 100% !important;
