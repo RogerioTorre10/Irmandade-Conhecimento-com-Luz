@@ -268,37 +268,39 @@
 
     let candidates = exact.length ? exact : family;
 
-        if (guide === 'zion' && candidates.length) {
-      // Nomes explicitamente masculinos conhecidos em desktop e mobile.
-      const maleHints =
-        /\b(male|man|homem|masculin[oa]?|masculine|daniel|david|alex|jorge|paul|paulo|carlos|felipe|ricardo|antonio|antônio|bruno|thomas|thiago|diego|fernando|eddy|enrique|luca|marco|mateo|matheus|junior|joão|joao|guilherme|rafael|roberto|samuel|xander|hattori|otoya|ichiro|kenji|hiro|onyx|reed|ash)\b/i;
+    if (guide === 'zion' && candidates.length) {
+  // Nomes explicitamente masculinos conhecidos em desktop e mobile.
+  const maleHints =
+    /\b(male|man|homem|masculin[oa]?|masculine|daniel|david|alex|jorge|paul|paulo|carlos|felipe|ricardo|antonio|antônio|bruno|thomas|thiago|diego|fernando|eddy|enrique|luca|marco|mateo|matheus|junior|joão|joao|guilherme|rafael|roberto|samuel|xander|hattori|otoya|ichiro|kenji|hiro)\b/i;
 
-      const femaleHints =
-        /\b(female|woman|mulher|feminin[oa]?|feminine|zira|samantha|helena|luciana|maria|sofia|victoria|ana|paulina|monica|marie|amelie|amélie|celine|céline|audrey|denise|karen|tessa|fiona|moira|serena|allison|susan|joana|catarina|vitoria|vitória|isabela|clara|beatriz|nova|shimmer)\b/i;
+  const femaleHints =
+    /\b(female|woman|mulher|feminin[oa]?|feminine|zira|samantha|helena|luciana|maria|sofia|victoria|ana|paulina|monica|marie|amelie|amélie|celine|céline|audrey|denise|karen|tessa|fiona|moira|serena|allison|susan|joana|catarina|vitoria|vitória|isabela|clara|beatriz)\b/i;
 
-      const isMale   = v => maleHints.test(String(v?.name||'')) && !femaleHints.test(String(v?.name||''));
-      const isFemale = v => femaleHints.test(String(v?.name||''));
+  const isMale = (voice) => {
+    const name = String(voice?.name || '');
+    return maleHints.test(name) && !femaleHints.test(name);
+  };
 
-      // 1) Voz masculina NO idioma correto → escolha ideal.
-      const maleInLang = candidates.filter(isMale);
-      if (maleInLang.length) {
-        candidates = maleInLang;
-        window.__ZION_VOICE_IS_FEMALE__ = false;
-      } else {
-        // 2) Sem masculina: remove femininas conhecidas e mantém o idioma.
-        //    NUNCA trocamos de idioma (evita sotaque inglês/estrangeiro).
-        const nonFemaleInLang = candidates.filter(v => !isFemale(v));
-        if (nonFemaleInLang.length) {
-          candidates = nonFemaleInLang;
-          window.__ZION_VOICE_IS_FEMALE__ = false;
-        } else {
-          // 3) Só sobrou voz feminina no idioma → mantemos assim mesmo,
-          //    mas marcamos para o tuning aplicar pitch grave forçado.
-          window.__ZION_VOICE_IS_FEMALE__ = true;
-        }
-      }
+  const isFemale = (voice) => {
+    return femaleHints.test(String(voice?.name || ''));
+  };
+
+  // 1) Prioridade absoluta: voz masculina no idioma da Jornada.
+  const maleInLang = candidates.filter(isMale);
+
+  if (maleInLang.length) {
+    candidates = maleInLang;
+  } else {
+    // 2) Preserva a pronúncia correta e elimina vozes femininas conhecidas.
+    const nonFemaleInLang = candidates.filter((voice) => !isFemale(voice));
+
+    if (nonFemaleInLang.length) {
+      candidates = nonFemaleInLang;
+      // Sem voz masculina no idioma: mantém o ranking normal no idioma correto.
+      // Nunca troca de idioma para o Zion — o pitch reduzido garante o timbre masculino.
     }
-
+  }
+}
 
     if (!candidates.length) {
       typingLog('Nenhuma voz compatível com o idioma. Usando fallback global.', {
@@ -621,17 +623,13 @@ if (showCursor) element.appendChild(caret);
   else if (L.startsWith('en')) baseRate = 1.0;
   else if (L.startsWith('de')) baseRate = 0.96;
 
-    if (g === 'zion') {
-    // Se o aparelho só ofereceu voz feminina no idioma, derrubamos o pitch
-    // bem mais forte para simular timbre masculino SEM trocar o idioma.
-    const femaleFallback = window.__ZION_VOICE_IS_FEMALE__ === true;
+  if (g === 'zion') {
     return {
-      rate:   Math.max(0.82, baseRate - (femaleFallback ? 0.12 : 0.07)),
-      pitch:  femaleFallback ? 0.35 : 0.72,
+      rate: Math.max(0.86, baseRate - 0.07),
+      pitch: 0.78,
       volume: 1.0
     };
   }
-
 
   if (g === 'arian') {
     return {
