@@ -296,18 +296,8 @@
 
     if (nonFemaleInLang.length) {
       candidates = nonFemaleInLang;
-    } else {
-      // 3) Último recurso: voz masculina de outro idioma.
-      // Pode apresentar sotaque ou pronúncia inadequada, mas evita uma
-      // voz explicitamente feminina quando o aparelho oferece alternativa.
-      const maleAnyLang = __voices.filter(isMale);
-
-      if (maleAnyLang.length) {
-        candidates = maleAnyLang;
-      }
-
-      // Se nenhuma alternativa existir, mantém o ranking normal.
-      // O perfil de pitch do Zion continuará sendo aplicado depois.
+      // Sem voz masculina no idioma: mantém o ranking normal no idioma correto.
+      // Nunca troca de idioma para o Zion — o pitch reduzido garante o timbre masculino.
     }
   }
 }
