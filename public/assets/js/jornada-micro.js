@@ -341,6 +341,18 @@
       }
     } catch (_) {}
 
+    if (isIOS() || isSafari()) {
+    try {
+        await navigator.mediaDevices.getUserMedia({
+            audio: true
+        });
+    } catch (e) {
+        warn("getUserMedia recusado:", e);
+        setButton(false);
+        return;
+    }
+  }
+
     state.rec = buildRecognizer();
     window.__REC__ = state.rec;
     window.__MIC_INSTANCE__ = state.rec;
