@@ -464,3 +464,39 @@ footer,
     font-size: 24px;
   }
 }
+
+@media (min-width: 769px) {
+  #section-intro   .j-panel-glow,
+  #section-intro   .j-perg-v-inner,
+  #section-intro   .j-arcane-card,
+  #section-intro   .j-arcane-card > *,
+  #section-intro   .parchment-inner-rough,
+  #section-intro   .intro-wrap,
+  #section-intro   #intro,
+  #section-termos1 .j-panel-glow,
+  #section-termos1 .j-perg-v-inner,
+  #section-termos1 .j-arcane-card,
+  #section-termos1 .j-arcane-card > *,
+  #section-termos1 .parchment-inner-rough,
+  #section-termos1 .termos-wrap,
+  #section-termos1 #termos1,
+  #section-termos2 .j-panel-glow,
+  #section-termos2 .j-perg-v-inner,
+  #section-termos2 .j-arcane-card,
+  #section-termos2 .j-arcane-card > *,
+  #section-termos2 .parchment-inner-rough,
+  #section-termos2 .termos-wrap,
+  #section-termos2 #termos2,
+  #section-senha   .j-panel-glow,
+  #section-senha   .j-perg-v-inner,
+  #section-senha   .j-arcane-card,
+  #section-senha   .j-arcane-card > *,
+  #section-senha   .parchment-inner-rough,
+  #section-senha   .senha-wrap,
+  #section-senha   #senha {
+    overflow: visible !important;
+    max-height: none !important;
+    height: auto !important;
+  }
+}
+
