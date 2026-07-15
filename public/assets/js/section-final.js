@@ -204,6 +204,57 @@
     );
   }
 
+  function getFinalReplayButton(section) {
+  return (
+    section?.querySelector('#btnOuvirFinal') ||
+    document.getElementById('btnOuvirFinal')
+  );
+}
+
+function setFinalReplayState(
+  section,
+  state = 'ready'
+) {
+  const btn = getFinalReplayButton(section);
+
+  if (!btn) return;
+
+  const textoNormal = t(
+    'final.replay',
+    '🔊 Ler novamente'
+  );
+
+  const textoLendo = t(
+    'final.reading',
+    '🔊 Lendo...'
+  );
+
+  if (!btn.dataset.originalText) {
+    btn.dataset.originalText = textoNormal;
+  }
+
+  if (state === 'hidden') {
+    btn.hidden = true;
+    btn.disabled = true;
+    btn.dataset.busy = '0';
+    btn.textContent = textoNormal;
+    return;
+  }
+
+  btn.hidden = false;
+
+  if (state === 'reading') {
+    btn.disabled = true;
+    btn.dataset.busy = '1';
+    btn.textContent = textoLendo;
+    return;
+  }
+
+  btn.disabled = false;
+  btn.dataset.busy = '0';
+  btn.textContent = textoNormal;
+}
+
   function getStoredBlockFeedbacks() {
     try {
       return JSON.parse(sessionStorage.getItem('JORNADA_DEVOLUTIVAS_BLOCO') || '[]');
@@ -646,50 +697,39 @@ function buildFinalSynthesisPayload() {
   // ================================
   function buildFinalPayloadDiamante() {
   const s = getJornadaState();
-
   const nome = String(
-    sessionStorage.getItem('jornada.nome') ||
-    s.nome ||
-    'Caminhante'
+    s.nome ?? s.name ?? s.participantName ?? s.participante ?? localStorage.getItem('JORNADANOME') ?? sessionStorage.getItem('JORNADANOME') ?? 'Caminhante'
   ).trim();
 
   const guiaNorm = readGuideFromEverywhere(s);
   const guia = String(guiaNorm.id || 'lumen').trim().toLowerCase();
 
+  const respostasEstruturadas = collectPerguntasPayload();
+  const respostas = respostasEstruturadas
+    .map(item => String(item.resposta || '').trim())
+    .filter(Boolean);
+
   const blocosData = buildFinalSynthesisPayload();
   const dadosPessoaisRaw = getDadosPessoaisPayload();
   const dadosPessoais = buildDadosPessoaisFinalSilencioso(dadosPessoaisRaw);
   const selfieCard = readSelfieCardFromEverywhere(s);
+  const devolutivaFinal = getStoredFinalFeedback();
 
   const payload = {
-  nome,
-  guia,
-  idioma: getActiveLang(),
-
-  respostas: [],
-
-  devolutivas: blocosData?.blocos || [],
-
-  blocos: Array.isArray(blocosData?.blocos)
-    ? blocosData.blocos.map((b) => ({
-        bloco: b.bloco,
-        bloco_nome: b.bloco_nome,
-        texto: String(b.texto || "").trim()
-      }))
-    : [],
-
-  dados: dadosPessoais,
-
-  sintese: []
-};
+    nome,
+    guia,
+    idioma: getActiveLang(),
+    respostas,
+    blocos: Array.isArray(blocosData?.blocos) ? blocosData.blocos : [],
+    sinteseBlocos: String(blocosData?.sinteseBlocos || '').trim(),
+    dadosPessoais,
+    selfieCard,
+    devolutivaFinal
+  };
 
   window.LASTFINALPAYLOAD = payload;
-  window.__LAST_FINAL_PAYLOAD__ = payload;
-
-  console.log('[FINAL][PAYLOAD LIMPO]', payload);
   return payload;
 }
-  
   // ================================
   // TTS
   // ================================
@@ -722,9 +762,9 @@ function buildFinalSynthesisPayload() {
       ];
 
       const maleHints = [
-        'male', 'man', 'homem', 'masculina', 'masculine',
-        'paulo', 'daniel', 'ricardo', 'jorge', 'felipe', 'antonio', 'carlos', 'alex', 'david',
-        'google uk english male'
+        'male', 'man', 'homem', 'masculina', 'masculino', 'masculine', 'paulo', 'daniel', 'ricardo', 'jorge',
+        'felipe', 'bruno', 'thiago', 'diego', 'fernando', 'antonio', 'antônio', 'rafael', 'roberto',  'joão',
+        'joao', 'guilherme', 'carlos', 'david', 'alex', 'thomas', 'google uk english male'
       ];
 
       const langVoices = voices.filter((v) => String(v.lang || '').toLowerCase().startsWith(langPrefix));
@@ -743,16 +783,50 @@ function buildFinalSynthesisPayload() {
       }
 
       if (guide === 'zion') {
-        return (
-          findByHints(preferredLangVoices, maleHints) ||
-          findByHints(langVoices, maleHints) ||
-          findByHints(voices, maleHints) ||
-          preferredLangVoices[0] ||
-          langVoices[0] ||
-          voices[0] ||
-          null
-        );
-      }
+  // 1) Voz masculina no idioma preferencial.
+  const zionPreferred = findByHints(
+    preferredLangVoices,
+    maleHints
+  );
+
+  if (
+    zionPreferred &&
+    !femaleHints.some((hint) =>
+      String(zionPreferred.name || '').toLowerCase().includes(hint)
+    )
+  ) {
+    return zionPreferred;
+  }
+
+  // 2) Voz masculina entre as vozes do idioma ativo.
+  const zionInLang = findByHints(langVoices, maleHints);
+
+  if (
+    zionInLang &&
+    !femaleHints.some((hint) =>
+      String(zionInLang.name || '').toLowerCase().includes(hint)
+    )
+  ) {
+    return zionInLang;
+  }
+
+  // 3) Voz do idioma correto não identificada como feminina.
+  const sameLanguagePool = preferredLangVoices.length
+    ? preferredLangVoices
+    : langVoices;
+
+  const nonFemaleLang = sameLanguagePool.find((voice) =>
+    !femaleHints.some((hint) =>
+      String(voice.name || '').toLowerCase().includes(hint)
+    )
+  );
+
+  if (nonFemaleLang) return nonFemaleLang;
+
+  // Não escolhe voices[0], pois ela costuma ser feminina no mobile.
+  // O pitch grave configurado abaixo permanece como proteção final.
+  return null;
+}
 
       if (guide === 'arian') {
         return (
@@ -887,11 +961,8 @@ function buildFinalSynthesisPayload() {
 }
 
 function buildGuideFallbackText(guiaRaw, nomeRaw) {
-  const guia = normalizeGuide(guiaRaw?.id || guiaRaw || "lumen").id || "lumen";
-  const nome = String(nomeRaw || "caminhante").trim();
-
-  const lang = getActiveLang ? getActiveLang() : "pt-BR";
-
+  const guia = normalizeGuide(guiaRaw?.id || guiaRaw || 'lumen').id || 'lumen';
+  const nome = String(nomeRaw || 'Caminhante').trim();
     const fallbackI18n = {
       'pt-BR': {
         lumen: `${nome}, sua jornada revelou sinais de sensibilidade, coragem e abertura interior. Cada resposta sua deixou marcas de verdade no pergaminho da alma. Continue avançando com fé, porque a luz que você procura também cresce dentro de você.`,
@@ -930,8 +1001,8 @@ function buildGuideFallbackText(guiaRaw, nomeRaw) {
       }
     };
 
-    const bg = fallbackI18n[lang] || fallbackI18n["pt-BR"];
-    return bg[guia] || bg.lumen;
+    const bag = fallbackI18n[lang] || fallbackI18n['pt-BR'];
+    return bag[guia] || bag.lumen;
   }
 
   // ================================
@@ -984,16 +1055,16 @@ function buildGuideFallbackText(guiaRaw, nomeRaw) {
 
   async function fetchFinalGuideFeedback() {
   const payload = buildFinalPayloadDiamante();
-  const respostas = [];
+  const respostas = Array.isArray(payload?.respostas) ? payload.respostas.filter(Boolean) : [];
   const blocos = Array.isArray(payload?.blocos) ? payload.blocos : [];
   const sinteseBlocos = String(payload?.sinteseBlocos || '').trim();
   const guiaOriginal = normalizeGuide(payload?.guia || 'lumen').id || 'lumen';
   const nome = String(payload?.nome || 'Caminhante').trim();
   const dadosPessoais = buildDadosPessoaisFinalSilencioso(payload?.dadosPessoais);
 
-  if (!blocos.length && !sinteseBlocos) {
-  throw new Error('Final bloqueada: sem devolutivas de bloco da jornada atual.');
-}
+  if (!respostas.length && !blocos.length && !sinteseBlocos) {
+    return { ok: true, text: buildGuideFallbackText({ id: guiaOriginal }, nome), guiaUsado: guiaOriginal, fallbackUsed: true };
+  }
 
   const guiasParaTentar = [guiaOriginal];
   if (guiaOriginal !== 'lumen') guiasParaTentar.push('lumen');
@@ -1112,7 +1183,8 @@ function removerFinalDuplicado(texto) {
 
       window.__JORNADA_DEVOLUTIVA_FINAL__ = texto;
       sessionStorage.setItem('JORNADA_DEVOLUTIVA_FINAL', texto);
-      
+      localStorage.setItem('JORNADA_DEVOLUTIVA_FINAL', texto);
+
       box.textContent = '';
 
       /* texto visual permanece original */
@@ -1122,6 +1194,8 @@ function removerFinalDuplicado(texto) {
       const textoParaVoz = normalizarReferenciasBiblicasParaVoz(texto);
 
       await queueSpeak(textoParaVoz);
+
+      setFinalReplayState(section, "ready");
 
       window.__GUIA_FINAL_EFETIVO__ =
       result.guiaUsado ||
@@ -1348,8 +1422,8 @@ function removerFinalDuplicado(texto) {
         } catch {}
 
         const payload =
+          (typeof buildFinalPayloadDiamante === 'function' && buildFinalPayloadDiamante()) ||
           (typeof buildFinalPayload === 'function' && buildFinalPayload()) ||
-          (typeof buildFinalPayloadDiamante === 'function' && buildFinalPayloadDiamante()) ||      
           window.__LAST_FINAL_PAYLOAD__ ||
           null;
 
@@ -1373,10 +1447,11 @@ function removerFinalDuplicado(texto) {
           return;
         }
 
-        if (!Array.isArray(payload.blocos) || !payload.blocos.length) {
-           setPdfStatus(root, '⚠ Sem devolutivas de bloco. Conclua a jornada antes de gerar o PDF.', 'err');
-           return;
+        if (!hasAnyRespostaValida(collectPerguntasPayload())) {
+          setPdfStatus(root, t('final.noAnswers', '⚠ Sem respostas. Finalize as perguntas antes de gerar o PDF.'), 'err');
+          return;
         }
+
         const selfiecard =
           sessionStorage.getItem('JORNADA_SELFIECARD') ||
           localStorage.getItem('JORNADA_SELFIECARD') ||
@@ -1651,8 +1726,59 @@ titleEl.removeAttribute('data-i18n');
     }
 
     mountFinalPdfUI(section);
+    mountFinalReplayButton(section);
     unlockPortalButton(section);
     lockFinalButtons(section);
+
+    function mountFinalReplayButton(section) {
+
+  const btn = getFinalReplayButton(section);
+
+  if (!btn) return;
+
+  setFinalReplayState(section,"hidden");
+
+  if (btn.dataset.boundReplay === "1")
+      return;
+
+  btn.dataset.boundReplay = "1";
+
+  btn.onclick = async () => {
+
+      if (btn.dataset.busy === "1")
+          return;
+
+      const texto =
+            window.__JORNADA_DEVOLUTIVA_FINAL__
+         || sessionStorage.getItem("JORNADA_DEVOLUTIVA_FINAL")
+         || localStorage.getItem("JORNADA_DEVOLUTIVA_FINAL")
+         || "";
+
+      if (!texto.trim())
+          return;
+
+      setFinalReplayState(section,"reading");
+
+      try{
+
+          speechSynthesis.cancel();
+
+          speechChain = Promise.resolve();
+
+          await queueSpeak(
+              normalizarReferenciasBiblicasParaVoz(texto)
+          );
+
+      }
+      finally{
+
+          setFinalReplayState(section,"ready");
+
+      }
+
+  };
+
+}
 
     try {
       setPdfStatus(section, t('final.gathering', 'O Guia está reunindo as chamas da sua jornada...'), null);
