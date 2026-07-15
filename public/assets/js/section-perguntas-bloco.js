@@ -714,7 +714,20 @@
       textarea.dispatchEvent(new Event('input', { bubbles: true }));
     }
 
-    function createAndStart() {
+    async function createAndStart() {
+      if (hasMediaDevices && (isIOS || isSafari)) {
+         try {
+            await navigator.mediaDevices.getUserMedia({
+                audio: true
+            });
+         } catch (err) {
+            console.warn("[MIC] getUserMedia recusado:", err);
+
+            updateMicButtonState(false);
+            stopMicByUser();
+            return;
+         }
+      }
       if (window.__MIC_WANT__ !== true) return;
       resetRefs();
 
