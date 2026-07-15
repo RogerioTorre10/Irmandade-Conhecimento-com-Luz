@@ -11,134 +11,397 @@
   --stone-img: url('/assets/img/textura-de-pedra.jpg');
 }
 
+/* =========================================================
+   STYLES-TERMOS1 v2.0 — AUREA + LTR + TRANSICAO BLINDADA
+   ========================================================= */
+
 #section-termos1 {
-  width: 100% !important;
-  min-height: 100vh !important;
-  min-height: 100svh !important;
-  min-height: 100dvh !important;
-  box-sizing: border-box !important;
+  background: transparent !important;
   display: flex !important;
   justify-content: center !important;
-  align-items: flex-start !important;
-  margin: 0 auto !important;
-  padding: 16px 10px calc(28px + env(safe-area-inset-bottom)) !important;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
+  align-items: center !important;
+  width: 100% !important;
+  min-height: 100vh !important;
   text-align: left !important;
-  overflow-x: hidden !important;
-  overflow-y: visible !important;
-  /*overscroll-behavior-x: none;*/
-  /*-webkit-overflow-scrolling: touch;*/
-}
-
-#section-termos1 .j-panel-glow {
-  position: relative !important;
-  z-index: 3 !important;
-  width: min(520px, calc(100vw - 24px)) !important;
-  max-width: 520px !important;
-  box-sizing: border-box !important;
-  margin: 0 auto !important;
-  padding: 12px !important;
-  border-radius: 24px !important;
   overflow: visible !important;
 }
 
-#section-termos1 .j-panel-glow::before {
-  content: "";
-  position: absolute !important;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  border: 1px solid rgba(212,175,55,.48);
-  box-shadow: 0 0 24px rgba(212,175,55,.36), inset 0 0 18px rgba(255,230,150,.12);
+/* ============================
+   ESTRUTURA BASE
+   ============================ */
+
+#section-termos1 .termos-panel {
+  position: relative !important;
+  width: min(520px, 92vw) !important;
+  max-width: 470px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding: 10px !important;
 }
 
 #section-termos1 .j-perg-v-inner {
-  position: relative !important;
-  z-index: 4 !important;
-  margin: 0 auto !important;
-  width: 100% !important;
-  min-width: 0 !important;
-  box-sizing: border-box !important;
+  position: relative;
   overflow: visible !important;
 }
 
 #section-termos1 .j-arcane-card {
   position: relative !important;
-  width: 100% !important;
-  min-width: 0 !important;
-  min-height: 0 !important;
-  height: auto !important;
-  max-height: none !important;
-  box-sizing: border-box !important;
-  margin: 0 auto !important;
-  border-radius: 24px !important;
-  overflow: visible !important;
-  /*-webkit-overflow-scrolling: touch !important;*/
+  overflow: hidden !important;
+  margin-top: -18px !important;
+  margin-bottom: 24px !important;
 }
 
+#section-termos1 .parchment-rough,
 #section-termos1 .parchment-inner-rough,
-#section-termos1 .termos-wrap,
-#section-termos1 #termos1,
-#section-termos1 .pergaminho-content {
-  position: relative !important;
-  width: 100% !important;
-  min-width: 0 !important;
-  box-sizing: border-box !important;
-  text-align: left !important;
+#section-termos1 .termos-wrap {
+  position: relative;
   overflow: visible !important;
 }
 
 #section-termos1 #termos1 {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 10px;
+  position: relative;
+  z-index: 2;
 }
 
-#section-termos1 .termos1-title,
-#section-termos1 .section-title {
-  position: relative !important;
-  display: block !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-  margin: 8px 0 12px !important;
-  padding: 0 8px !important;
+/* ============================
+   BORDA / GLOW DO CARD
+   ============================ */
+
+#section-termos1 .j-panel-glow::before {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid rgba(212, 175, 55, 0.55);
+  box-shadow:
+    0 0 28px rgba(212, 175, 55, 0.55),
+    inset 0 0 18px rgba(255, 230, 150, 0.25);
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.16),
+    transparent 45%,
+    transparent 100%
+  ) !important;
+}
+
+/* ============================
+   TITULO
+   ============================ */
+
+#section-termos1 #termos1 .section-title {
+  position: relative;
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-height: 2.2em;
+  box-sizing: border-box;
   text-align: center !important;
-  font-family: 'ManufacturingConsent', sans-serif !important;
-  font-size: clamp(24px, 4vw, 34px) !important;
-  line-height: 1.15 !important;
-  color: var(--termos-gold) !important;
-  text-shadow: 0 0 6px rgba(255,215,0,.45), 0 0 14px rgba(255,180,60,.22) !important;
-  word-break: normal !important;
-  overflow-wrap: anywhere !important;
+  direction: ltr !important;
+  unicode-bidi: plaintext !important;
+  white-space: normal;
+  overflow: visible;
+  word-break: normal;
+  overflow-wrap: break-word;
+  transform-origin: center center;
+  z-index: 1;
 }
 
-#section-termos1 .parchment-text-rough,
-#section-termos1 .termos-lista-rough > li,
-#section-termos1 ul > li {
-  position: relative !important;
-  display: block !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  min-width: 0 !important;
-  box-sizing: border-box !important;
-  margin: 0 !important;
-  padding: 4px 8px !important;
-  border-radius: 12px !important;
-  text-align: left !important;
+/* ============================
+   SUBTITULO / TEXTO / LISTA
+   ============================ */
+
+#section-termos1 #termos1 p,
+#section-termos1 #termos1 li {
+  position: relative;
+  display: block;
+  width: 100%;
+  text-align: center !important;
   direction: ltr !important;
-  white-space: normal !important;
-  word-break: break-word !important;
-  overflow-wrap: anywhere !important;
-  font-family: 'BerkshireSwash', cursive !important;
-  font-size: 13px !important;
-  line-height: 1.55 !important;
-  color: var(--termos-gold) !important;
-  background: transparent !important;
-  isolation: isolate !important;
-  z-index: 2 !important;
+  unicode-bidi: plaintext !important;
+  white-space: normal;
+  overflow: visible;
+  word-break: normal;
+  overflow-wrap: break-word;
+  transform-origin: left center;
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+  z-index: 1;
+}
+
+/* lista sem bolinhas */
+#section-termos1 #termos1 ul {
+  list-style: none !important;
+  margin: 0;
+  padding: 0;
+}
+
+#section-termos1 #termos1 li,
+#section-termos1 #termos1 li::marker,
+#section-termos1 #termos1 li::before,
+#section-termos1 #termos1 li::after {
+  list-style: none !important;
+  content: none !important;
+}
+
+#section-termos1 #termos1 li + li {
+  margin-top: 8px;
+}
+
+/* ============================
+   CURSOR DE DATILOGRAFIA
+   ============================ */
+
+#section-termos1 [data-typing="true"][data-cursor="true"] {
+  position: relative;
+}
+
+#section-termos1 [data-typing="true"][data-cursor="true"].typing-active::after {
+  content: '';
+  position: absolute;
+  right: 0.05em;
+  bottom: 0.10em;
+  width: 0.5ch;
+  height: 1.05em;
+  background: linear-gradient(180deg, #ffd36b 0%, #ffbf3b 80%, #b27a1a 100%);
+  border-radius: 2px;
+  opacity: 0.95;
+  animation: termosCaretBlink 1s steps(1, end) infinite;
+  box-shadow: 0 0 6px rgba(255, 200, 80, 0.9);
+}
+
+#section-termos1 [data-typing="true"][data-cursor="true"].typing-done::after,
+#section-termos1 [data-typing="true"][data-cursor="true"].type-done::after {
+  content: none;
+}
+
+/* ============================
+   AUREA NO TEXTO
+   ============================ */
+
+#section-termos1 #termos1 .typing-active {
+  text-shadow:
+    0 0 6px rgba(255, 230, 120, 0.95),
+    0 0 12px rgba(255, 210, 90, 0.80),
+    0 0 20px rgba(255, 170, 40, 0.55),
+    0 0 30px rgba(255, 140, 0, 0.24);
+  animation: termosTextAuraPulse 1.45s ease-in-out infinite;
+}
+
+#section-termos1 #termos1 .section-title.typing-active::before,
+#section-termos1 #termos1 p.typing-active::before,
+#section-termos1 #termos1 li.typing-active::before {
+  content: '';
+  position: absolute;
+  inset: -6px -10px;
+  border-radius: 14px;
+  pointer-events: none;
+  z-index: -1;
+  border: 1px solid rgba(255, 220, 120, 0.32);
+  background:
+    radial-gradient(circle at center,
+      rgba(255, 220, 120, 0.16) 0%,
+      rgba(255, 190, 70, 0.10) 38%,
+      rgba(255, 150, 40, 0.04) 65%,
+      transparent 100%);
+  box-shadow:
+    0 0 10px rgba(255, 220, 120, 0.28),
+    0 0 22px rgba(255, 180, 60, 0.24),
+    inset 0 0 10px rgba(255, 240, 180, 0.08);
+  animation: termosTextFramePulse 1.45s ease-in-out infinite;
+}
+
+#section-termos1 #termos1 .typing-done,
+#section-termos1 #termos1 .type-done {
+  text-shadow:
+    0 0 4px rgba(255, 225, 120, 0.65),
+    0 0 10px rgba(255, 185, 70, 0.30);
+}
+
+/* glow suave do container enquanto digita */
+#section-termos1:has(.typing-active) .j-panel-glow {
+  outline: 2px solid rgba(255, 204, 102, 0.14);
+  outline-offset: 6px;
+  box-shadow:
+    0 0 0 1px rgba(255, 204, 102, 0.10) inset,
+    0 0 16px rgba(255, 204, 102, 0.22),
+    0 0 34px rgba(255, 153, 0, 0.16);
+  animation: termosPanelGlow 1.8s ease-in-out infinite;
+}
+
+/* ============================
+   TRANSICAO BLINDADA
+   ============================ */
+
+html.is-transitioning #section-termos1 [data-typing="true"],
+body.is-transitioning #section-termos1 [data-typing="true"],
+html.vt-force-fixed #section-termos1 [data-typing="true"],
+body.vt-force-fixed #section-termos1 [data-typing="true"],
+#section-termos1[data-transition-ready="false"] [data-typing="true"] {
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+#section-termos1[data-transition-ready="true"] [data-typing="true"] {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* ============================
+   ACOES
+   ============================ */
+
+#section-termos1 .footer-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+/* ============================
+   DESKTOP
+   ============================ */
+
+@media (min-width: 900px) {
+  #section-termos1 .j-perg-v-inner {
+    position: relative !important;
+    transform: translateY(40px) !important;
+    top: 40px !important;
+    overflow: visible !important;
+    z-index: 5 !important;
+  }
+
+  #section-termos1 .j-panel-glow {
+    position: relative !important;
+    transform: translate(-16px, -70px) !important;
+    top: 10px !important;
+    width: min(520px, 92vw) !important;
+    max-width: 470px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    z-index: 6 !important;
+  }
+}
+
+/* ============================
+   MOBILE
+   ============================ */
+
+@media (max-width: 600px) {
+  #section-termos1 {
+    padding: 8px 0 140px !important;
+    overflow: hidden !important;
+    min-height: 100vh !important;
+  }
+
+  #section-termos1 .j-panel-glow {
+    width: calc(100vw - 32px) !important;
+    max-width: 440px !important;
+    margin: 0 auto !important;
+    padding: 24px 18px 44px !important;
+    border-radius: 20px !important;
+    box-sizing: border-box !important;
+    transform: translateY(-80px) translateZ(0) !important;
+    -webkit-transform: translateY(-80px) translateZ(0) !important;
+    overflow: hidden !important;
+  }
+
+  #section-termos1 .j-perg-v-inner {
+    padding: 0 10px !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+  }
+
+  #section-termos1 #termos1 .section-title.typing-active::before,
+  #section-termos1 #termos1 p.typing-active::before,
+  #section-termos1 #termos1 li.typing-active::before {
+    inset: -5px -7px;
+    border-radius: 12px;
+  }
+
+  #section-termos1 .footer-actions {
+    margin-top: 24px !important;
+  }
+}
+
+/* ============================
+   ANIMACOES
+   ============================ */
+
+@keyframes termosCaretBlink {
+  0%, 45%   { opacity: 0.95; }
+  50%, 100% { opacity: 0; }
+}
+
+@keyframes termosPanelGlow {
+  0% {
+    box-shadow:
+      0 0 0 1px rgba(255, 204, 102, 0.10) inset,
+      0 0 16px rgba(255, 204, 102, 0.22),
+      0 0 28px rgba(255, 153, 0, 0.14);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(255, 204, 102, 0.14) inset,
+      0 0 20px rgba(255, 204, 102, 0.30),
+      0 0 38px rgba(255, 153, 0, 0.20);
+  }
+  100% {
+    box-shadow:
+      0 0 0 1px rgba(255, 204, 102, 0.10) inset,
+      0 0 16px rgba(255, 204, 102, 0.22),
+      0 0 28px rgba(255, 153, 0, 0.14);
+  }
+}
+
+@keyframes termosTextAuraPulse {
+  0% {
+    text-shadow:
+      0 0 5px rgba(255, 230, 120, 0.82),
+      0 0 10px rgba(255, 210, 90, 0.62),
+      0 0 16px rgba(255, 165, 40, 0.35);
+  }
+  50% {
+    text-shadow:
+      0 0 8px rgba(255, 235, 140, 1),
+      0 0 16px rgba(255, 215, 110, 0.90),
+      0 0 24px rgba(255, 170, 50, 0.55),
+      0 0 36px rgba(255, 145, 30, 0.24);
+  }
+  100% {
+    text-shadow:
+      0 0 5px rgba(255, 230, 120, 0.82),
+      0 0 10px rgba(255, 210, 90, 0.62),
+      0 0 16px rgba(255, 165, 40, 0.35);
+  }
+}
+
+@keyframes termosTextFramePulse {
+  0% {
+    opacity: 0.78;
+    transform: scale(0.995);
+    box-shadow:
+      0 0 8px rgba(255, 220, 120, 0.20),
+      0 0 18px rgba(255, 180, 60, 0.16),
+      inset 0 0 8px rgba(255, 240, 180, 0.06);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.01);
+    box-shadow:
+      0 0 12px rgba(255, 225, 130, 0.34),
+      0 0 26px rgba(255, 185, 70, 0.28),
+      inset 0 0 12px rgba(255, 240, 180, 0.10);
+  }
+  100% {
+    opacity: 0.78;
+    transform: scale(0.995);
+    box-shadow:
+      0 0 8px rgba(255, 220, 120, 0.20),
+      0 0 18px rgba(255, 180, 60, 0.16),
+      inset 0 0 8px rgba(255, 240, 180, 0.06);
+  }
 }
 
 #section-termos1 .termos-lista-rough,
