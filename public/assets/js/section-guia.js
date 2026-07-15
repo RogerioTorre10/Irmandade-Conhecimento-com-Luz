@@ -13,7 +13,7 @@
   const DATA_URL = '/assets/data/guias.json';
 
   // UX: confirmação em 2 passos
-  const ARM_TIMEOUT_MS = 10000;
+  const ARM_TIMEOUT_MS = 35000;
   const HOVER_DELAY_MS = 150;
 
   // Preview
@@ -147,7 +147,20 @@
 
     previewVideo.playsInline = true;
     previewVideo.preload = 'auto';
+    previewVideo.addEventListener('click', async (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
 
+      if (!armedId) return;
+
+      const guiaParaConfirmar = armedId;
+      const root = document.getElementById(SECTION_ID);
+
+      if (cancelArm) cancelArm(root);
+
+      await confirmGuide(guiaParaConfirmar);
+    });
+    
     previewVideo.addEventListener('error', () => {
       stopPreview();
     });
