@@ -236,84 +236,6 @@
     return String(l || 'pt-BR').trim();
   }
 
-  function isIOSDevice() {
-  return /iPhone|iPad|iPod/i.test(
-    navigator.userAgent || ''
-  );
-}
-
-function isIOSInAppBrowser() {
-  const ua = navigator.userAgent || '';
-
-  if (!isIOSDevice()) {
-    return false;
-  }
-
-  /*
-   * Só bloqueamos quando há marcador EXPLÍCITO de webview
-   * interna (WhatsApp/Instagram/Facebook/Messenger/Line).
-   *
-   * Não confiamos em "ausência de Safari na UA" para detectar
-   * in-app: o Safari em modo PWA (adicionado à tela de início)
-   * e algumas WebViews perdem o token "Version/... Safari",
-   * o que fazia o botão de microfone ficar inoperante mesmo
-   * com a permissão liberada.
-   */
-  const inAppMarkers = [
-    /WhatsApp/i,
-    /Instagram/i,
-    /FBAN|FBAV/i,
-    /Messenger/i,
-    /Line\//i
-  ];
-
-  return inAppMarkers.some((pattern) => pattern.test(ua));
-}
-
-function showMicrophoneMessage(message) {
-  if (typeof window.toast === 'function') {
-    window.toast(message, 'warning');
-    return;
-  }
-
-  alert(message);
-}
-
-function describeMicrophoneError(error) {
-  const name = String(error?.name || '');
-  const message = String(error?.message || '');
-
-  if (name === 'NotAllowedError') {
-    return (
-      'O acesso ao microfone foi bloqueado. ' +
-      'Abra a Jornada diretamente no Safari e permita o microfone nos ajustes do site.'
-    );
-  }
-
-  if (name === 'NotFoundError') {
-    return 'Nenhum microfone foi encontrado neste aparelho.';
-  }
-
-  if (name === 'NotReadableError') {
-    return (
-      'O microfone está ocupado ou indisponível. ' +
-      'Feche outros aplicativos que possam estar usando o áudio e tente novamente.'
-    );
-  }
-
-  if (name === 'SecurityError') {
-    return (
-      'O navegador bloqueou o microfone por segurança. ' +
-      'Confirme que a Jornada está aberta em HTTPS e diretamente no Safari.'
-    );
-  }
-
-  return (
-    message ||
-    'Não foi possível iniciar o microfone. Abra a Jornada no Safari e tente novamente.'
-  );
-}
-
   function getBlocoAtual(sectionId) {
     if (!sectionId) return null;
     if (!window.JORNADA_PAPER_QA || typeof window.JORNADA_PAPER_QA.getBlockBySection !== 'function') {
@@ -572,202 +494,38 @@ function describeMicrophoneError(error) {
   }
 
   function pickVoiceForGuide() {
-  const guideRaw =
-    sessionStorage.getItem('jornada.guia') ||
-    localStorage.getItem('JORNADA_GUIA') ||
-    localStorage.getItem('jornada.guia') ||
-    document.body?.dataset?.guia ||
-    window.currentGuide ||
-    'lumen';
+    const guideRaw =
+      sessionStorage.getItem('jornada.guia') ||
+      localStorage.getItem('JORNADA_GUIA') ||
+      document.body.dataset.guia ||
+      'lumen';
 
-  const guide = normalizeGuide(guideRaw);
+    const guide = normalizeGuide(guideRaw);
+    const voices = window.speechSynthesis?.getVoices?.() || [];
+    if (!voices.length) return null;
 
-  const voices =
-    window.speechSynthesis?.getVoices?.() || [];
+    const lang = document.documentElement.lang || getLang() || 'pt-BR';
+    const langShort = String(lang).slice(0, 2).toLowerCase();
 
-  if (!voices.length) {
-    console.warn(
-      '[TTS] Nenhuma voz disponível neste momento.'
+    const filtered = voices.filter((v) =>
+      String(v.lang || '').toLowerCase().startsWith(langShort)
     );
 
-    return null;
-  }
+    const list = filtered.length ? filtered : voices;
 
-  const lang =
-    document.documentElement.lang ||
-    getLang() ||
-    'pt-BR';
+    const femaleHints = ['female', 'woman', 'maria', 'luciana', 'helena', 'samantha', 'victoria', 'google português do brasil'];
+    const maleHints = ['male', 'man', 'paulo', 'daniel', 'ricardo', 'jorge', 'google português'];
 
-  const langShort =
-    String(lang)
-      .slice(0, 2)
-      .toLowerCase();
-
-  const langVoices = voices.filter((voice) =>
-    String(voice.lang || '')
-      .toLowerCase()
-      .startsWith(langShort)
-  );
-
-  const preferredVoices =
-    langVoices.length
-      ? langVoices
-      : voices;
-
-  const femaleHints = [
-    'female',
-    'woman',
-    'mulher',
-    'feminina',
-    'feminine',
-
-    'maria',
-    'luciana',
-    'helena',
-    'samantha',
-    'victoria',
-    'sofia',
-    'ana',
-    'monica',
-    'zira',
-
-    'siri female',
-    'google uk english female'
-  ];
-
-  const maleHints = [
-    'male',
-    'man',
-    'homem',
-    'masculina',
-    'masculine',
-
-    'daniel',
-    'alex',
-    'fred',
-    'ralph',
-    'albert',
-    'arthur',
-    'reed',
-    'eddy',
-    'rocko',
-
-    'paulo',
-    'felipe',
-    'antonio',
-    'carlos',
-    'ricardo',
-    'jorge',
-    'david',
-    'bruno',
-    'thiago',
-    'diego',
-    'fernando',
-    'roberto',
-    'joão',
-    'guilherme',
-
-    'google uk english male'
-  ];
-
-  function hasHint(voice, hints) {
-    const name =
-      String(voice?.name || '')
-        .toLowerCase();
-
-    return hints.some((hint) =>
-      name.includes(hint)
-    );
-  }
-
-  /*
-   * Lumen e Arian:
-   * priorizam voz feminina no idioma atual.
-   */
-  if (
-    guide === 'lumen' ||
-    guide === 'arian'
-  ) {
-    return (
-      preferredVoices.find((voice) =>
-        hasHint(voice, femaleHints)
-      ) ||
-      voices.find((voice) =>
-        hasHint(voice, femaleHints)
-      ) ||
-      preferredVoices[0] ||
-      voices[0] ||
-      null
-    );
-  }
-
-  /*
-   * Zion:
-   * nunca utiliza automaticamente a primeira voz,
-   * porque no iPhone ela frequentemente é feminina.
-   */
-  if (guide === 'zion') {
-    // 1. Masculina no idioma atual
-    const maleInCurrentLanguage =
-      preferredVoices.find((voice) =>
-        hasHint(voice, maleHints) &&
-        !hasHint(voice, femaleHints)
-      );
-
-    if (maleInCurrentLanguage) {
-      console.log(
-        '[TTS][ZION] Voz masculina no idioma:',
-        maleInCurrentLanguage.name,
-        maleInCurrentLanguage.lang
-      );
-
-      return maleInCurrentLanguage;
+    if (guide === 'lumen' || guide === 'arian') {
+      return list.find((v) => femaleHints.some((h) => String(v.name || '').toLowerCase().includes(h))) || list[0] || null;
     }
 
-    // 2. Voz do idioma atual não identificada como feminina
-    const nonFemaleInCurrentLanguage =
-      preferredVoices.find((voice) =>
-        !hasHint(voice, femaleHints)
-      );
-
-    if (nonFemaleInCurrentLanguage) {
-      console.log(
-        '[TTS][ZION] Voz não feminina no idioma:',
-        nonFemaleInCurrentLanguage.name,
-        nonFemaleInCurrentLanguage.lang
-      );
-
-      return nonFemaleInCurrentLanguage;
+    if (guide === 'zion') {
+      return list.find((v) => maleHints.some((h) => String(v.name || '').toLowerCase().includes(h))) || list[0] || null;
     }
 
-    /*
-     * IMPORTANTE: não usar "masculina em qualquer idioma".
-     * Isso causaria Zion falar português com sotaque
-     * americano (ex.: Daniel, Alex, David em en-US/en-GB).
-     * Preferimos cair no default do sistema no idioma
-     * correto (com o pitch reduzido abaixo) do que trocar
-     * de idioma só para conseguir uma voz masculina.
-     */
-
-
-    /*
-     * Não usar preferredVoices[0] nem voices[0].
-     * O pitch masculino de Zion continuará aplicado,
-     * mas não forçaremos uma voz explicitamente feminina.
-     */
-    console.warn(
-      '[TTS][ZION] Nenhuma voz masculina identificada.',
-      voices.map((voice) => ({
-        name: voice.name,
-        lang: voice.lang
-      }))
-    );
-
-    return null;
+    return list[0] || null;
   }
-
-  return preferredVoices[0] || voices[0] || null;
-}
 
   function speakText(text) {
     const clean = String(text || '').replace(/\s+/g, ' ').trim();
@@ -791,8 +549,8 @@ function describeMicrophoneError(error) {
 
       const utt = new SpeechSynthesisUtterance(clean);
       utt.lang = lang;
-      utt.rate = guide === 'zion' ? 0.90 : 0.98;
-      utt.pitch = guide === 'zion' ? 0.76 : 1.12;
+      utt.rate = guide === 'zion' ? 0.92 : 0.98;
+      utt.pitch = guide === 'zion' ? 0.82 : 1.12;
       utt.volume = 1;
 
       const voice = pickVoiceForGuide();
@@ -1536,153 +1294,46 @@ function describeMicrophoneError(error) {
     }
 
     if (btnMic) {
-  btnMic.onclick = async (ev) => {
-    ev.preventDefault();
-    ev.stopPropagation();
+      btnMic.onclick = (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
 
-    const textareaAtual =
-      $('#jp-answer-input', section) ||
-      $('#answer-input', section) ||
-      $('textarea', section);
+        const textareaAtual =
+          $('#jp-answer-input', section) ||
+          $('#answer-input', section) ||
+          $('textarea', section);
 
-    if (!textareaAtual) {
-      console.warn(
-        '[PERGUNTAS_BLOCO][MIC] textarea atual não encontrado.'
-      );
-      return;
-    }
-
-    /*
-     * O navegador interno do WhatsApp no iPhone pode negar
-     * o microfone mesmo com a permissão geral ativada.
-     */
-    if (isIOSInAppBrowser()) {
-      showMicrophoneMessage(
-        'Para usar o microfone no iPhone, abra esta Jornada diretamente no Safari.'
-      );
-      return;
-    }
-
-    if (!window.isSecureContext) {
-      showMicrophoneMessage(
-        'O microfone exige uma conexão segura HTTPS.'
-      );
-      return;
-    }
-
-    if (
-      !navigator.mediaDevices ||
-      typeof navigator.mediaDevices.getUserMedia !== 'function'
-    ) {
-      showMicrophoneMessage(
-        'Este navegador não disponibilizou o acesso ao microfone. Abra a Jornada no Safari.'
-      );
-      return;
-    }
-
-    if (
-      !window.JORNADA_MICRO ||
-      typeof window.JORNADA_MICRO.toggle !== 'function'
-    ) {
-      console.error(
-        '[PERGUNTAS_BLOCO][MIC] JORNADA_MICRO não está disponível.'
-      );
-
-      showMicrophoneMessage(
-        'O recurso de voz ainda não foi carregado. Atualize a página e tente novamente.'
-      );
-      return;
-    }
-
-    try {
-      /*
-       * iOS Safari exige que getUserMedia seja chamado SÍNCRONO
-       * dentro do gesto do usuário. Fazemos um "priming" aqui,
-       * antes de qualquer await, para desbloquear o microfone.
-       * O stream é encerrado logo em seguida — o JORNADA_MICRO
-       * abrirá o seu próprio stream em sequência, já autorizado.
-       */
-      if (isIOSDevice()) {
-        try {
-          const primerStream =
-            await navigator.mediaDevices.getUserMedia({ audio: true });
-          primerStream.getTracks().forEach((t) => t.stop());
-        } catch (primerErr) {
-          throw primerErr;
+        if (!textareaAtual) {
+          console.warn('[PERGUNTAS_BLOCO][MIC] textarea atual não encontrado.');
+          return;
         }
-      }
 
-      const micState =
-        window.JORNADA_MICRO?._state;
+        const micState = window.JORNADA_MICRO?._state;
+        const micAtivo = window.JORNADA_MICRO?.isActive?.() === true;
+        const textareaAnterior = micState?.textarea || null;
 
-      const micAtivo =
-        window.JORNADA_MICRO?.isActive?.() === true;
+        // Se o microfone ficou preso em outra pergunta, reinicia no textarea atual
+        if (micAtivo && textareaAnterior && textareaAnterior !== textareaAtual) {
+          window.JORNADA_MICRO?.stop?.();
 
-      const textareaAnterior =
-        micState?.textarea || null;
+          setTimeout(() => {
+            window.JORNADA_MICRO?.start?.(textareaAtual, {
+              mode: 'append',
+              lang: getLang(),
+              button: btnMic
+            });
+          }, 180);
 
-      /*
-       * Se o microfone ficou vinculado à pergunta anterior,
-       * encerra aquela instância e inicia no textarea atual.
-       */
-      if (
-        micAtivo &&
-        textareaAnterior &&
-        textareaAnterior !== textareaAtual
-      ) {
-        window.JORNADA_MICRO.stop?.();
+          return;
+        }
 
-        await new Promise((resolve) =>
-          setTimeout(resolve, 180)
-        );
-
-        await window.JORNADA_MICRO.start?.(
-          textareaAtual,
-          {
-            mode: 'append',
-            lang: getLang(),
-            button: btnMic
-          }
-        );
-
-        return;
-      }
-
-      /*
-       * O toggle é chamado diretamente dentro do clique.
-       * Isso preserva o gesto exigido pelo Safari no iPhone.
-       */
-      await window.JORNADA_MICRO.toggle(
-        textareaAtual,
-        {
+        window.JORNADA_MICRO?.toggle?.(textareaAtual, {
           mode: 'append',
           lang: getLang(),
           button: btnMic
-        }
-      );
-
-    } catch (error) {
-      console.error(
-        '[PERGUNTAS_BLOCO][MIC][IPHONE]',
-        {
-          name: error?.name,
-          message: error?.message,
-          secureContext: window.isSecureContext,
-          mediaDevices:
-            Boolean(navigator.mediaDevices),
-          getUserMedia:
-            typeof navigator.mediaDevices?.getUserMedia,
-          userAgent:
-            navigator.userAgent
-        }
-      );
-
-      showMicrophoneMessage(
-        describeMicrophoneError(error)
-      );
+        });
+      };
     }
-  };
-}
 
     if (btnApagar) {
       btnApagar.onclick = (ev) => {
