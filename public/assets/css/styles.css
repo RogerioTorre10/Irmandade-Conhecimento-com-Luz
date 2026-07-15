@@ -499,4 +499,16 @@ footer,
     height: auto !important;
   }
 }
-
+@media (min-width: 769px) {
+  html {
+    overflow-y: scroll !important;      /* barra sempre presente = sem oscilar */
+    scrollbar-gutter: stable;           /* reserva espaço mesmo quando não precisa */
+  }
+  #section-intro,
+  #section-termos1,
+  #section-termos2,
+  #section-senha {
+    /* vh é estável no desktop; dvh muda com chrome do browser e causa reflow */
+    min-height: 100vh !important;
+  }
+}
