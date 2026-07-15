@@ -665,6 +665,7 @@
     const isIOS = /iphone|ipad|ipod/i.test(ua);
     const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
     const isMobile = /iphone|ipad|ipod|android/i.test(ua);
+    const hasMediaDevices = !!navigator.mediaDevices && !!navigator.mediaDevices.getUserMedia;
 
     // ── helpers internos ──
     function resetRefs() {
