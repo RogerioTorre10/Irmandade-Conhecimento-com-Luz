@@ -823,18 +823,6 @@ function buildFinalSynthesisPayload() {
 
   if (nonFemaleLang) return nonFemaleLang;
 
-  // 4) Voz masculina de qualquer idioma como último recurso.
-  const zionAny = findByHints(voices, maleHints);
-
-  if (
-    zionAny &&
-    !femaleHints.some((hint) =>
-      String(zionAny.name || '').toLowerCase().includes(hint)
-    )
-  ) {
-    return zionAny;
-  }
-
   // Não escolhe voices[0], pois ela costuma ser feminina no mobile.
   // O pitch grave configurado abaixo permanece como proteção final.
   return null;
