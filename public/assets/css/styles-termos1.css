@@ -28,7 +28,7 @@
   text-align: left !important;
   overflow-x: hidden !important;
   overflow-y: visible !important;
-  overscroll-behavior-x: none;
+  /*overscroll-behavior-x: none;*/
   /*-webkit-overflow-scrolling: touch;*/
 }
 
@@ -277,21 +277,16 @@
   #section-termos1 * {
     box-sizing: border-box !important;
   }
-
   #section-termos1 .j-panel-glow {
     position: relative !important;
-
     width: calc(100% - 8px) !important;
     max-width: 430px !important;
     min-width: 0 !important;
-
     margin: 0 auto 24px !important;
     padding: 12px 10px 20px !important;
-
     left: auto !important;
     right: auto !important;
     transform: none !important;
-
     border-radius: 20px !important;
     overflow: hidden !important;
   }
@@ -300,20 +295,15 @@
     width: 100% !important;
     max-width: 100% !important;
     min-width: 0 !important;
-
     min-height: 0 !important;
     height: auto !important;
-
     margin: 0 auto !important;
     padding: 52px 0 76px !important;
-
     left: auto !important;
     right: auto !important;
     transform: none !important;
-
     background-size: 100% 100% !important;
     background-position: center top !important;
-
     overflow: hidden !important;
   }
 
@@ -321,21 +311,16 @@
     width: calc(100% - 32px) !important;
     max-width: 340px !important;
     min-width: 0 !important;
-
     min-height: 0 !important;
     height: auto !important;
     max-height: 58dvh !important;
-
     margin: 0 auto !important;
     padding: 22px 14px 18px !important;
-
     left: auto !important;
     right: auto !important;
     transform: none !important;
-
     overflow-x: hidden !important;
     overflow-y: auto !important;
-
     overscroll-behavior: contain !important;
     -webkit-overflow-scrolling: touch !important;
   }
@@ -347,10 +332,8 @@
     width: 100% !important;
     max-width: 100% !important;
     min-width: 0 !important;
-
     padding-left: 0 !important;
     padding-right: 0 !important;
-
     overflow-x: hidden !important;
   }
 
@@ -362,7 +345,6 @@
     width: 100% !important;
     max-width: 100% !important;
     min-width: 0 !important;
-
     white-space: normal !important;
     word-break: break-word !important;
     overflow-wrap: anywhere !important;
@@ -372,12 +354,9 @@
   #section-termos1 .parchment-actions-rough {
     position: relative !important;
     bottom: auto !important;
-
     width: 100% !important;
-
     margin: 16px auto 0 !important;
     padding: 8px 0 0 !important;
-
     background: transparent !important;
   }
 
