@@ -391,28 +391,10 @@
         return;
       }
 
-      // Desperta a permissão de áudio no Safari/iPhone
-      if (
-        /iphone|ipad|ipod/i.test(navigator.userAgent) &&
-        navigator.mediaDevices?.getUserMedia
-      ) {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({
-            audio: true
-          });
-
-          stream.getTracks().forEach(track => track.stop());
-
-          console.log('[MIC] Sessão de áudio inicializada para iPhone.');
-        } catch (e) {
-          console.warn('[MIC] Não foi possível inicializar áudio:', e);
-        }
-      }
-
       try { window.speechSynthesis?.cancel?.(); } catch {}
-
       playIntroTransitionToTermos1();
     });
+  }
  
 
   async function init(root) {
