@@ -11,10 +11,6 @@
   --stone-img: url('/assets/img/textura-de-pedra.jpg');
 }
 
-/* =========================================================
-   STYLES-TERMOS1 v2.0 — AUREA + LTR + TRANSICAO BLINDADA
-   ========================================================= */
-
 #section-termos1 {
   background: transparent !important;
   display: flex !important;
