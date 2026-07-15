@@ -28,8 +28,8 @@
   text-align: left !important;
   overflow-x: hidden !important;
   overflow-y: visible !important;
-  overscroll-behavior-x: none;
-  -webkit-overflow-scrolling: touch;
+  /*overscroll-behavior-x: none;
+  -webkit-overflow-scrolling: touch;*/
 }
 
 #section-termos2 .j-panel-glow {
@@ -75,7 +75,7 @@
   margin: 0 auto !important;
   border-radius: 24px !important;
   overflow: visible !important;
-  -webkit-overflow-scrolling: touch !important;
+  /*-webkit-overflow-scrolling: touch !important;*/
 }
 
 #section-termos2 .parchment-inner-rough,
