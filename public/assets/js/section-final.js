@@ -1187,14 +1187,23 @@ function removerFinalDuplicado(texto) {
 
       box.textContent = '';
 
-      /* texto visual permanece original */
-      await typeText(box, texto, 22, false);
-
-      /* voz recebe texto tratado */
       const textoParaVoz = normalizarReferenciasBiblicasParaVoz(texto);
 
-      await queueSpeak(textoParaVoz);
+      // inicia a datilografia
+      const typingPromise = typeText(box, texto, 22, false);
 
+      // pequena vantagem visual para a aura aparecer
+      await sleep(350);
+ 
+      // inicia a leitura enquanto digita
+      const speechPromise = queueSpeak(textoParaVoz);
+
+      // espera ambos terminarem
+      await Promise.all([
+      typingPromise,
+      speechPromise
+      ]);
+      
       setFinalReplayState(section, "ready");
 
       window.__GUIA_FINAL_EFETIVO__ =
