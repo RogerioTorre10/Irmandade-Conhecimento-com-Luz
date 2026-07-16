@@ -59,6 +59,63 @@
     return /^((?!chrome|android).)*safari/i.test(ua);
   }
 
+  async function ensureMicPermissionIOS() {
+  if (!isIOS()) return true;
+  if (!navigator.mediaDevices?.getUserMedia) return true;
+
+  if (state.micPermissionIOSReady) {
+    return true;
+  }
+
+  if (state.micPermissionIOSPending) {
+    return state.micPermissionIOSPending;
+  }
+
+  state.micPermissionIOSPending = (async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true
+      });
+
+      stream.getTracks().forEach((track) => track.stop());
+
+      state.micPermissionIOSReady = true;
+
+      log('permissão inicial do microfone confirmada no iOS');
+      return true;
+    } catch (e) {
+      state.micPermissionIOSReady = false;
+
+      warn(
+        'permissão de microfone negada no iOS:',
+        e?.name || e
+      );
+
+      if (typeof window.toast === 'function') {
+        if (e?.name === 'NotAllowedError') {
+          window.toast(
+            '🎤 Permissão negada. Ative o microfone para este site nos ajustes do Safari e tente novamente.'
+          );
+        } else if (e?.name === 'NotFoundError') {
+          window.toast('🎤 Nenhum microfone encontrado.');
+        } else {
+          window.toast(
+            '🎤 Não foi possível acessar o microfone: ' +
+            (e?.message || e?.name || 'erro desconhecido')
+          );
+        }
+      }
+
+      markStopped();
+      return false;
+    } finally {
+      state.micPermissionIOSPending = null;
+    }
+  })();
+
+  return state.micPermissionIOSPending;
+}
+  
   function setButton(active) {
     const btn =
       state.button ||
