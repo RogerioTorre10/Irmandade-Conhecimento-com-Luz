@@ -360,83 +360,139 @@
   }
 
   function start(textarea, opts = {}) {
-    if (!SR) {
-      warn('SpeechRecognition não suportado neste navegador.');
-      setButton(false);
-      return;
-    }
 
-    const ta = typeof textarea === 'string' ? document.querySelector(textarea) : textarea;
-    if (!ta) {
-      warn('textarea não encontrado.');
-      return;
-    }
-
-    state.textarea = ta;
-    window.__MIC_TARGET_TEXTAREA__ = ta;
-    state.opts = opts || {};
-    state.button =
-      opts.button ||
-      document.getElementById('jp-btn-mic') ||
-      document.querySelector('[data-action="mic"], .jp-mic-btn, .mic-btn');
-
-    if (window.__MIC_STARTING__ === true) {
-      warn('start bloqueado — já iniciando');
-      return;
-    }
-
-    window.__MIC_STARTING__ = true;
-
-    window.__MIC_WANT__ = true;
-    window.__MIC_ACTIVE__ = false;
-    state.starting = true;
-    setButton(true);
-
-    clearRestart();
-
-    try {
-      if (state.rec) {
-        try { state.rec.stop(); } catch (_) {}
-      }
-    } catch (_) {}
-
-    if (isIOS() || isSafari()) {
-    try {
-        await navigator.mediaDevices.getUserMedia({
-            audio: true
-        });
-    } catch (e) {
-        warn("getUserMedia recusado:", e);
-        setButton(false);
-        return;
-    }
+  if (!SR) {
+    warn('SpeechRecognition não suportado neste navegador.');
+    setButton(false);
+    return;
   }
 
+  const ta =
+    typeof textarea === 'string'
+      ? document.querySelector(textarea)
+      : textarea;
+
+  if (!ta) {
+    warn('textarea não encontrado.');
+    return;
+  }
+
+  state.textarea = ta;
+  window.__MIC_TARGET_TEXTAREA__ = ta;
+
+  state.opts = opts || {};
+
+  state.button =
+    opts.button ||
+    document.getElementById('jp-btn-mic') ||
+    document.querySelector('[data-action="mic"], .jp-mic-btn, .mic-btn');
+
+  if (window.__MIC_STARTING__ === true) {
+    warn('start bloqueado — já iniciando');
+    return;
+  }
+
+  window.__MIC_STARTING__ = true;
+  window.__MIC_WANT__ = true;
+  window.__MIC_ACTIVE__ = false;
+
+  state.starting = true;
+
+  setButton(true);
+
+  clearRestart();
+
+  try {
+    if (state.rec) {
+      try {
+        state.rec.stop();
+      } catch (_) {}
+    }
+  } catch (_) {}
+
+  const launch = () => {
+
     state.rec = buildRecognizer();
+
     window.__REC__ = state.rec;
     window.__MIC_INSTANCE__ = state.rec;
 
     try {
+
       if (!isMobile()) {
         ta.focus();
       }
 
       state.rec.start();
-    } catch (e) {
-      warn('falha ao iniciar:', e);
-      window.__MIC_STARTING__ = false;
 
-      const delay = (isIOS() || isSafari()) ? 700 : 350;
+    } catch (e) {
+
+      warn('falha ao iniciar:', e);
+
+      window.__MIC_STARTING__ = false;
+      state.starting = false;
+
+      const delay =
+        isIOS()
+          ? 700
+          : 350;
 
       state.restartTimer = setTimeout(() => {
+
         if (window.__MIC_WANT__ === true) {
           start(state.textarea, state.opts);
         }
+
       }, delay);
 
-      window.__MIC_RESTART_TIMER__ = state.restartTimer;
+      window.__MIC_RESTART_TIMER__ =
+        state.restartTimer;
     }
+  };
+
+  // =====================================================
+  // iPhone / iPad
+  // =====================================================
+
+  if (isIOS()) {
+
+    ensureMicPermissionIOS()
+      .then((ok) => {
+
+        if (!ok) {
+          window.__MIC_STARTING__ = false;
+          state.starting = false;
+          return;
+        }
+
+        if (window.__MIC_WANT__ !== true) {
+          markStopped();
+          return;
+        }
+
+        launch();
+
+      })
+      .catch((err) => {
+
+        warn('erro ao verificar permissão:', err);
+
+        window.__MIC_STARTING__ = false;
+        state.starting = false;
+
+        markStopped();
+
+      });
+
+    return;
   }
+
+  // =====================================================
+  // Android / Desktop
+  // =====================================================
+
+  launch();
+}
 
   function stop() {
     window.__MIC_STARTING__ = false;
