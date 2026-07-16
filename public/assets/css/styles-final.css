@@ -361,3 +361,54 @@ min-width:220px;
   padding-left: 18px !important;
   padding-right: 18px !important;
 }
+
+/* =========================================================
+   SECTION FINAL — scroll seguro no iPhone/iPad
+   Não altera desktop nem Android
+   ========================================================= */
+@supports (-webkit-touch-callout: none) {
+  #section-final {
+    display: block !important;
+
+    width: 100% !important;
+    height: auto !important;
+    min-height: 100vh !important;
+    min-height: 100svh !important;
+    min-height: 100dvh !important;
+    max-height: none !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: auto !important;
+
+    padding-bottom: calc(
+      120px + env(safe-area-inset-bottom)
+    ) !important;
+  }
+
+  #section-final .j-panel-glow,
+  #section-final .j-perg-v-inner,
+  #section-final .j-arcane-card,
+  #section-final .final-container,
+  #section-final .final-content,
+  #section-final .final-guide-feedback {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    overflow: visible !important;
+  }
+
+  html,
+  body {
+    min-height: 100% !important;
+    height: auto !important;
+  }
+
+  body:not(.vt-playing) {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+}
