@@ -1183,18 +1183,29 @@
           hoverTimers.set(guiaId, timer);
         });
 
-        btn.addEventListener('mouseleave', () => {
-          if (!guiaId) return;
+       btn.addEventListener('mouseleave', () => {
+        if (!guiaId) return;
 
-          if (hoverTimers.has(guiaId)) {
-            clearTimeout(hoverTimers.get(guiaId));
-            hoverTimers.delete(guiaId);
-          }
+        if (hoverTimers.has(guiaId)) {
+         clearTimeout(hoverTimers.get(guiaId));
+         hoverTimers.delete(guiaId);
+       }
 
-          const saved = readSavedGuide();
-          applyGuiaTheme(saved || null);
-        });
+      /*
+       * Se o guia ainda não foi selecionado,
+       * o preview pode fechar normalmente.
+       *
+       * Se já existe um guia armado,
+       * mantém o preview aberto para permitir
+       * o clique sobre a imagem/vídeo.
+       */
+      if (!armedId) {
+       stopPreview();
 
+       const saved = readSavedGuide();
+       applyGuiaTheme(saved || null);
+      }
+     });
         btn.addEventListener('focus', () => {
           const g = findGuia(guias, guiaId);
           if (g && els.guiaTexto) {
