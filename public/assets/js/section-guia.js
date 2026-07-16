@@ -1239,8 +1239,16 @@
 
         document.addEventListener('click', (e) => {
           const inside = e.target.closest(
-            '.guia-option, .guia-options, #btn-confirmar-nome, #guiaNameInput, #guiaPreviewOverlay, #guiaPreviewVideo'
-          );
+            [
+              '.guia-option',
+              '.guia-options',
+              '#btn-confirmar-nome',
+              '#guiaNameInput',
+              '#guiaPreviewOverlay',
+              '#guiaPreviewVideo'
+             ].join(', ')
+            );
+          
           if (!inside && armedId && cancelArm) {
             const r = document.getElementById(SECTION_ID);
             if (r) cancelArm(r);
