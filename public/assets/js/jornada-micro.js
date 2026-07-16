@@ -22,7 +22,9 @@
     restartTimer: null,
     lastText: '',
     lastAt: 0,
-    starting: false
+    starting: false,
+    micPermissionIOSReady: false,
+    micPermissionIOSPending: null
   };
 
   function log(...args) {
