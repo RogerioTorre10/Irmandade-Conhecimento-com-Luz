@@ -287,7 +287,6 @@
   }
 
   function stopPreview() {
-
   if (previewOverlay) {
     previewOverlay.dataset.confirmando = '0';
   }
@@ -304,7 +303,7 @@
 
   previewPlaying = false;
   previewCurrentSrc = null;
-  previewGuidId = null;
+  previewGuiaId = null;
 
   unmarkPreviewConfirmable();
 
