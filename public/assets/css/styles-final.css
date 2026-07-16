@@ -363,29 +363,35 @@ min-width:220px;
 }
 
 /* =========================================================
-   SECTION FINAL — scroll seguro no iPhone/iPad
-   Não altera desktop nem Android
+   SECTION FINAL — scroll seguro no iPhone/iPad (FIX)
+   Só o BODY rola. html sem overflow-x:hidden (bug iOS).
    ========================================================= */
 @supports (-webkit-touch-callout: none) {
+  html {
+    overflow-x: visible !important;   /* desfaz o hidden global no iOS */
+    height: auto !important;
+    overflow-y: visible !important;
+  }
+
+  body:not(.vt-playing) {
+    overflow-x: hidden !important;    /* clip horizontal fica só no body */
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    height: auto !important;
+    min-height: 100% !important;
+  }
+
   #section-final {
     display: block !important;
-
     width: 100% !important;
     height: auto !important;
-    min-height: 100vh !important;
     min-height: 100svh !important;
-    min-height: 100dvh !important;
     max-height: none !important;
 
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
+    /* NÃO virar scroller — deixa o body rolar */
+    overflow: visible !important;
 
-    -webkit-overflow-scrolling: touch !important;
-    overscroll-behavior-y: auto !important;
-
-    padding-bottom: calc(
-      120px + env(safe-area-inset-bottom)
-    ) !important;
+    padding-bottom: calc(120px + env(safe-area-inset-bottom)) !important;
   }
 
   #section-final .j-panel-glow,
@@ -397,18 +403,6 @@ min-width:220px;
     height: auto !important;
     min-height: 0 !important;
     max-height: none !important;
-
     overflow: visible !important;
-  }
-
-  html,
-  body {
-    min-height: 100% !important;
-    height: auto !important;
-  }
-
-  body:not(.vt-playing) {
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch !important;
   }
 }
