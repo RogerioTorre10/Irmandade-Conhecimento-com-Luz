@@ -1209,9 +1209,29 @@
         btn.addEventListener('click', (ev) => {
           ev.preventDefault();
           ev.stopPropagation();
+
           if (btn.dataset.locked === '1') return;
-          armGuide(root, btn, label);
-        });
+
+       const jaEstavaArmado = armedId === guiaId;
+
+       /*
+       * Primeiro registra a escolha.
+       * No segundo clique, armGuide confirma pelo próprio botão.
+       */
+       armGuide(root, btn, label);
+
+       /*
+       * Abre o vídeo somente no primeiro clique,
+       * depois que armedId já recebeu o guia.
+       */
+       if (!jaEstavaArmado) {
+         const src = String(btn.dataset.previewSrc || '').trim();
+
+       if (src) {
+         playPreviewSrc(src, !nomeConfirmado);
+       }
+      }
+     });
 
         btn.addEventListener('dblclick', (ev) => {
           ev.preventDefault();
