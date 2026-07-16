@@ -386,9 +386,7 @@
       btn.addEventListener('mouseleave', smartLeave);
 
       btn.addEventListener('focusin', triggerPreview);
-      btn.addEventListener('focusout', smartLeave);
-
-      btn.addEventListener('touchstart', triggerPreview, { passive: true });
+      btn.addEventListener('focusout', smartLeave);      
     });
 
     window.addEventListener('jc:section:leave', stopPreview, { passive: true });
