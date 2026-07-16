@@ -287,28 +287,38 @@
   }
 
   function stopPreview() {
-    if (previewStopTimer) {
-      clearTimeout(previewStopTimer);
-      previewStopTimer = null;
-    }
-    if (previewLeaveTimer) {
-      clearTimeout(previewLeaveTimer);
-      previewLeaveTimer = null;
-    }
 
-    previewPlaying = false;
-    previewCurrentSrc = null;
-    previewGuiaId = null;
-    unmarkPreviewConfirmable();
-
-    if (previewVideo) {
-      try { previewVideo.pause(); } catch {}
-      try { previewVideo.currentTime = 0; } catch {}
-      try { previewVideo.removeAttribute('src'); previewVideo.load(); } catch {}
-    }
-
-    hidePreview();
+  if (previewOverlay) {
+    previewOverlay.dataset.confirmando = '0';
   }
+
+  if (previewStopTimer) {
+    clearTimeout(previewStopTimer);
+    previewStopTimer = null;
+  }
+
+  if (previewLeaveTimer) {
+    clearTimeout(previewLeaveTimer);
+    previewLeaveTimer = null;
+  }
+
+  previewPlaying = false;
+  previewCurrentSrc = null;
+  previewGuidId = null;
+
+  unmarkPreviewConfirmable();
+
+  if (previewVideo) {
+    try { previewVideo.pause(); } catch {}
+    try { previewVideo.currentTime = 0; } catch {}
+    try {
+      previewVideo.removeAttribute('src');
+      previewVideo.load();
+    } catch {}
+  }
+
+  hidePreview();
+}
 
   async function playPreviewSrc(src, withAudio = false) {
     if (!src) return false;
