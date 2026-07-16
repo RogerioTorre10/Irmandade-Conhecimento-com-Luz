@@ -1380,41 +1380,41 @@
 
     // ── Botão MIC ── CORREÇÃO CENTRAL
     if (btnMic) {
-      // Remove listeners antigos clonando o nó (evita duplicação entre rerenders)
-      const newBtn = btnMic.cloneNode(true);
-      btnMic.parentNode?.replaceChild(newBtn, btnMic);
+  // Remove listeners antigos clonando o nó
+     const newBtn = btnMic.cloneNode(true);
+     btnMic.parentNode?.replaceChild(newBtn, btnMic);
 
-      // Garante estado visual limpo ao montar
+     updateMicButtonState(false);
+
+  newBtn.onclick = (ev) => {
+    ev.preventDefault();
+    ev.stopPropagation();
+
+    if (
+      !window.JORNADA_MICRO ||
+      typeof window.JORNADA_MICRO.toggle !== 'function'
+    ) {
+      console.error(
+        '[MIC] Motor JORNADA_MICRO não está disponível.'
+      );
+
       updateMicButtonState(false);
 
-      newBtn.onclick = (ev) => {
-        ev.preventDefault();
-        ev.stopPropagation();
+      if (typeof window.toast === 'function') {
+        window.toast(
+          '🎤 O microfone ainda não está disponível. Recarregue a página.'
+        );
+      }
 
-        if (
-          !window.JORNADA_MICRO ||
-          typeof window.JORNADA_MICRO.toggle !== 'function'
-        ) {
-          console.error(
-            '[MIC] Motor JORNADA_MICRO não está disponível.'
-          );
+      return;
+    }
 
-          updateMicButtonState(false);
-
-          if (typeof window.toast === 'function') {
-            window.toast(
-              '🎤 O microfone ainda não está disponível. Recarregue a página.'
-            );
-          }
-
-          return;
-        }
-
-        window.JORNADA_MICRO.toggle(textarea, {
-          button: newBtn,
-          lang: getLang()
-        });
-      };
+    window.JORNADA_MICRO.toggle(textarea, {
+      button: newBtn,
+      lang: getLang()
+    });
+  };
+}
 
     // ── Botão Apagar ──
     if (btnApagar) {
