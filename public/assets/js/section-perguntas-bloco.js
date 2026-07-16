@@ -1390,9 +1390,31 @@
       newBtn.onclick = (ev) => {
         ev.preventDefault();
         ev.stopPropagation();
-        triggerMic(textarea);
+
+        if (
+          !window.JORNADA_MICRO ||
+          typeof window.JORNADA_MICRO.toggle !== 'function'
+        ) {
+          console.error(
+            '[MIC] Motor JORNADA_MICRO não está disponível.'
+          );
+
+          updateMicButtonState(false);
+
+          if (typeof window.toast === 'function') {
+            window.toast(
+              '🎤 O microfone ainda não está disponível. Recarregue a página.'
+            );
+          }
+
+          return;
+        }
+
+        window.JORNADA_MICRO.toggle(textarea, {
+          button: newBtn,
+          lang: getLang()
+        });
       };
-    }
 
     // ── Botão Apagar ──
     if (btnApagar) {
