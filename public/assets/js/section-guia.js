@@ -141,78 +141,97 @@
   // PREVIEW
   // =====================================================
   function ensurePreviewRefs() {
-    if (previewOverlay && previewVideo) return true;
+  if (previewOverlay && previewVideo) return true;
 
-    previewOverlay = document.getElementById('guiaPreviewOverlay');
-    previewVideo = document.getElementById('guiaPreviewVideo');
+  previewOverlay = document.getElementById('guiaPreviewOverlay');
+  previewVideo = document.getElementById('guiaPreviewVideo');
 
-    if (!previewOverlay || !previewVideo) return false;
+  if (!previewOverlay || !previewVideo) return false;
 
-    previewVideo.playsInline = true;
-    previewVideo.preload = 'auto';
-    previewVideo.addEventListener('click', async (ev) => {
-      ev.preventDefault();
-      ev.stopPropagation();
+  previewVideo.playsInline = true;
+  previewVideo.preload = 'auto';
 
-      const root = document.getElementById(SECTION_ID);
+  previewOverlay.style.pointerEvents = 'auto';
+  previewOverlay.style.cursor = 'pointer';
 
-      // Antes do nome confirmado, apenas foca o input.
-      if (!nomeConfirmado) {
-        const input = root?.querySelector('#guiaNameInput');
-        input?.focus();
-        return;
-      }
+  previewVideo.style.pointerEvents = 'auto';
+  previewVideo.style.cursor = 'pointer';
 
-      // Já armado: confirma.
-      if (armedId) {
-        const guiaParaConfirmar = armedId;
-        try {
-          await confirmGuide(guiaParaConfirmar);
-        } finally {
-          if (cancelArm) cancelArm(root);
-        }
-        return;
-      }
+  const confirmarPeloPreview = async (ev) => {
+    ev?.preventDefault?.();
+    ev?.stopPropagation?.();
+    ev?.stopImmediatePropagation?.();
 
-      // Não armado ainda: usa o guia atualmente em preview para armar.
-      const gid = previewGuiaId;
-      if (!gid || !root) return;
-
-      const btnAlvo = root.querySelector(
-        '.guia-option[data-guia="' + gid + '"]'
+    if (!armedId) {
+      console.warn(
+        '[GUIA][PREVIEW] Clique primeiro no botão do guia para selecioná-lo.'
       );
-      if (!btnAlvo) return;
+      return;
+    }
 
-      const label = (btnAlvo.dataset.nome || btnAlvo.textContent || 'guia')
-        .trim()
-        .toUpperCase();
+    if (previewOverlay.dataset.confirmando === '1') {
+      return;
+    }
 
-      armGuide(root, btnAlvo, label);
+    const guiaParaConfirmar = armedId;
+    const root = document.getElementById(SECTION_ID);
+
+    if (!root) return;
+
+    previewOverlay.dataset.confirmando = '1';
+
+    if (armTimer) {
+      clearTimeout(armTimer);
+      armTimer = null;
+    }
+
+    root.querySelectorAll('.guia-option').forEach((el) => {
+      el.classList.remove('armed');
+      el.setAttribute('aria-pressed', 'false');
     });
 
-    // Manter preview vivo enquanto o mouse estiver sobre o overlay.
-    previewOverlay.addEventListener('mouseenter', () => {
-      if (previewLeaveTimer) {
-        clearTimeout(previewLeaveTimer);
-        previewLeaveTimer = null;
-      }
-    });
+    try {
+      await confirmGuide(guiaParaConfirmar);
+    } catch (erro) {
+      console.error(
+        '[GUIA][PREVIEW] Falha ao confirmar o guia:',
+        erro
+      );
 
-    previewOverlay.addEventListener('mouseleave', (ev) => {
-      // Se estiver armado, não para — segue até timeout/confirm/cancel.
-      if (armedId) return;
-      // Se estiver voltando para um botão de guia, também não para.
-      const to = ev.relatedTarget;
-      if (to && to.closest && to.closest('.guia-option')) return;
-      scheduleStopPreview();
-    });
-    
-    previewVideo.addEventListener('error', () => {
-      stopPreview();
-    });
+      previewOverlay.dataset.confirmando = '0';
+    }
+  };
 
-    return true;
+  if (previewOverlay.dataset.confirmGuideBound !== '1') {
+    previewOverlay.dataset.confirmGuideBound = '1';
+
+    previewOverlay.addEventListener(
+      'click',
+      confirmarPeloPreview,
+      true
+    );
   }
+
+  /*
+   * O vídeo também recebe o listener por segurança.
+   * O controle interno impede confirmação duplicada.
+   */
+  if (previewVideo.dataset.confirmGuideBound !== '1') {
+    previewVideo.dataset.confirmGuideBound = '1';
+
+    previewVideo.addEventListener(
+      'click',
+      confirmarPeloPreview,
+      true
+    );
+  }
+
+  previewVideo.addEventListener('error', () => {
+    stopPreview();
+  });
+
+  return true;
+}
 
   function scheduleStopPreview() {
     if (previewLeaveTimer) clearTimeout(previewLeaveTimer);
