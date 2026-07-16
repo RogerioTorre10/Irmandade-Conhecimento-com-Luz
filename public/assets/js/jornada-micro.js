@@ -1,11 +1,11 @@
 /* /assets/js/jornada-micro.js
  * Motor único de microfone da Jornada Conhecimento com Luz
  * API pública:
- * - JORNADA_MICRO.attach(textarea, opts)
- * - JORNADA_MICRO.toggle(textarea, opts)
- * - JORNADA_MICRO.start(textarea, opts)
- * - JORNADA_MICRO.stop()
- * - JORNADA_MICRO.isActive()
+ *  - JORNADA_MICRO.attach(textarea, opts)
+ *  - JORNADA_MICRO.toggle(textarea, opts)
+ *  - JORNADA_MICRO.start(textarea, opts)
+ *  - JORNADA_MICRO.stop()
+ *  - JORNADA_MICRO.isActive()
  */
 (function (window, document) {
   'use strict';
@@ -24,16 +24,12 @@
     lastAt: 0,
     starting: false,
     micPermissionIOSReady: false,
-    micPermissionIOSPending: null
+    micPermissionIOSPending: null,
+    micStream: null
   };
 
-  function log(...args) {
-    console.log(MOD, ...args);
-  }
-
-  function warn(...args) {
-    console.warn(MOD, ...args);
-  }
+  function log(...args)  { console.log(MOD, ...args); }
+  function warn(...args) { console.warn(MOD, ...args); }
 
   function getLang() {
     return (
@@ -46,76 +42,80 @@
     );
   }
 
-  function isMobile() {
-    return /iphone|ipad|ipod|android/i.test(navigator.userAgent || '');
-  }
-
-  function isIOS() {
-    return /iphone|ipad|ipod/i.test(navigator.userAgent || '');
-  }
-
+  function isMobile() { return /iphone|ipad|ipod|android/i.test(navigator.userAgent || ''); }
+  function isIOS()    { return /iphone|ipad|ipod/i.test(navigator.userAgent || ''); }
   function isSafari() {
     const ua = navigator.userAgent || '';
     return /^((?!chrome|android).)*safari/i.test(ua);
   }
 
+  // -----------------------------------------------------------------
+  // Permissão de microfone no iOS Safari
+  //  - Exige contexto seguro (HTTPS ou localhost). Sem isso, o Safari
+  //    rejeita getUserMedia silenciosamente com NotAllowedError.
+  //  - Mantém o MediaStream vivo durante toda a sessão para que o
+  //    SpeechRecognition possa usar o mesmo grant sem pedir de novo.
+  // -----------------------------------------------------------------
   async function ensureMicPermissionIOS() {
-  if (!isIOS()) return true;
-  if (!navigator.mediaDevices?.getUserMedia) return true;
+    if (!isIOS()) return true;
+    if (!navigator.mediaDevices?.getUserMedia) return true;
 
-  if (state.micPermissionIOSReady) {
-    return true;
-  }
+    if (!window.isSecureContext) {
+      warn('contexto não seguro — iOS bloqueia microfone fora de HTTPS/localhost');
+      if (typeof window.toast === 'function') {
+        window.toast('🎤 Acesse este site em HTTPS para liberar o microfone no iPhone.');
+      }
+      markStopped();
+      return false;
+    }
 
-  if (state.micPermissionIOSPending) {
+    if (state.micPermissionIOSReady && state.micStream) return true;
+
+    if (state.micPermissionIOSPending) return state.micPermissionIOSPending;
+
+    state.micPermissionIOSPending = (async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        // NÃO paramos as tracks — manter o stream vivo evita que o Safari
+        // peça permissão novamente ao iniciar o SpeechRecognition.
+        state.micStream = stream;
+        state.micPermissionIOSReady = true;
+        log('permissão inicial do microfone confirmada no iOS');
+        return true;
+      } catch (e) {
+        state.micPermissionIOSReady = false;
+        state.micStream = null;
+
+        warn('permissão de microfone negada no iOS:', e?.name || e);
+
+        if (typeof window.toast === 'function') {
+          if (e?.name === 'NotAllowedError') {
+            window.toast('🎤 Permissão negada. Ative o microfone para este site em Ajustes › Safari › Microfone.');
+          } else if (e?.name === 'NotFoundError') {
+            window.toast('🎤 Nenhum microfone encontrado.');
+          } else {
+            window.toast('🎤 Não foi possível acessar o microfone: ' + (e?.message || e?.name || 'erro desconhecido'));
+          }
+        }
+
+        markStopped();
+        return false;
+      } finally {
+        state.micPermissionIOSPending = null;
+      }
+    })();
+
     return state.micPermissionIOSPending;
   }
 
-  state.micPermissionIOSPending = (async () => {
+  function releaseMicStream() {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: true
-      });
+      state.micStream?.getTracks?.().forEach((t) => t.stop());
+    } catch (_) {}
+    state.micStream = null;
+    state.micPermissionIOSReady = false;
+  }
 
-      stream.getTracks().forEach((track) => track.stop());
-
-      state.micPermissionIOSReady = true;
-
-      log('permissão inicial do microfone confirmada no iOS');
-      return true;
-    } catch (e) {
-      state.micPermissionIOSReady = false;
-
-      warn(
-        'permissão de microfone negada no iOS:',
-        e?.name || e
-      );
-
-      if (typeof window.toast === 'function') {
-        if (e?.name === 'NotAllowedError') {
-          window.toast(
-            '🎤 Permissão negada. Ative o microfone para este site nos ajustes do Safari e tente novamente.'
-          );
-        } else if (e?.name === 'NotFoundError') {
-          window.toast('🎤 Nenhum microfone encontrado.');
-        } else {
-          window.toast(
-            '🎤 Não foi possível acessar o microfone: ' +
-            (e?.message || e?.name || 'erro desconhecido')
-          );
-        }
-      }
-
-      markStopped();
-      return false;
-    } finally {
-      state.micPermissionIOSPending = null;
-    }
-  })();
-
-  return state.micPermissionIOSPending;
-}
-  
   function setButton(active) {
     const btn =
       state.button ||
@@ -131,11 +131,7 @@
 
     if (active) {
       btn.style.setProperty('background', '#b30000', 'important');
-      btn.style.setProperty(
-        'box-shadow',
-        '0 0 2px rgba(255,255,255,0.10), 0 0 14px rgba(255,0,0,0.45)',
-        'important'
-      );
+      btn.style.setProperty('box-shadow', '0 0 2px rgba(255,255,255,0.10), 0 0 14px rgba(255,0,0,0.45)', 'important');
       btn.style.setProperty('color', '#fff', 'important');
     } else {
       btn.style.removeProperty('background');
@@ -160,6 +156,7 @@
   function markStopped() {
     window.__MIC_WANT__ = false;
     window.__MIC_ACTIVE__ = false;
+    window.__MIC_STARTING__ = false;
     state.starting = false;
     clearRestart();
     resetRefs();
@@ -172,11 +169,11 @@
 
   function appendFinalText(text) {
     const ta =
-    state.textarea ||
-    window.__MIC_TARGET_TEXTAREA__ ||
-    document.querySelector('#jp-answer-input') ||
-    document.querySelector('.jp-answer-input') ||
-    document.querySelector('textarea');
+      state.textarea ||
+      window.__MIC_TARGET_TEXTAREA__ ||
+      document.querySelector('#jp-answer-input') ||
+      document.querySelector('.jp-answer-input') ||
+      document.querySelector('textarea');
     if (!ta) return;
 
     const finalText = normalizeText(text);
@@ -211,11 +208,7 @@
       for (let size = Math.min(prevWords.length, newWords.length); size >= 1; size--) {
         const tail = prevWords.slice(-size).join(' ').toLowerCase();
         const head = newWords.slice(0, size).join(' ').toLowerCase();
-
-        if (tail === head) {
-          overlap = size;
-          break;
-        }
+        if (tail === head) { overlap = size; break; }
       }
 
       if (overlap > 0) {
@@ -261,47 +254,45 @@
       try {
         let finalText = '';
 
-      for (let i = ev.resultIndex; i < ev.results.length; i++) {
-        const result = ev.results[i];
-        if (!result || !result[0]) continue;
+        for (let i = ev.resultIndex; i < ev.results.length; i++) {
+          const result = ev.results[i];
+          if (!result || !result[0]) continue;
 
-      const transcript = normalizeText(result[0].transcript);
-      if (!transcript) continue;
+          const transcript = normalizeText(result[0].transcript);
+          if (!transcript) continue;
 
-      if (result.isFinal) {
-        finalText += ' ' + transcript;
+          if (result.isFinal) finalText += ' ' + transcript;
+        }
+
+        finalText = normalizeText(finalText);
+
+        if (finalText) {
+          const textareaAtual =
+            state.textarea ||
+            window.__MIC_TARGET_TEXTAREA__ ||
+            document.querySelector('#jp-answer-input') ||
+            document.querySelector('.jp-answer-input') ||
+            document.querySelector('textarea');
+
+          if (textareaAtual) {
+            state.textarea = textareaAtual;
+            window.__MIC_TARGET_TEXTAREA__ = textareaAtual;
+          }
+
+          appendFinalText(finalText);
+        }
+      } catch (e) {
+        warn('falha no onresult:', e);
       }
-     } 
+    };
 
-    finalText = normalizeText(finalText);
-
-      if (finalText) {
-        const textareaAtual =
-          state.textarea ||
-          window.__MIC_TARGET_TEXTAREA__ ||
-          document.querySelector('#jp-answer-input') ||
-          document.querySelector('.jp-answer-input') ||
-          document.querySelector('textarea');
-
-      if (textareaAtual) {
-        state.textarea = textareaAtual;
-        window.__MIC_TARGET_TEXTAREA__ = textareaAtual;
-      }
-
-      appendFinalText(finalText);
-     }
-
-    } catch (e) {
-      warn('falha no onresult:', e);
-    }
-   };
-    
     rec.onerror = (ev) => {
       const code = ev?.error || '';
       window.__MIC_STARTING__ = false;
       warn('erro:', code);
 
       if (code === 'not-allowed' || code === 'service-not-allowed') {
+        releaseMicStream();
         markStopped();
         if (typeof window.toast === 'function') {
           window.toast('🎤 Permissão do microfone negada. Ative o microfone no navegador.');
@@ -311,9 +302,7 @@
 
       if (code === 'aborted') return;
 
-      if (window.__MIC_WANT__ === true) {
-        setButton(true);
-      }
+      if (window.__MIC_WANT__ === true) setButton(true);
     };
 
     rec.onend = () => {
@@ -330,22 +319,16 @@
 
       clearRestart();
       state.restartTimer = setTimeout(() => {
-        if (window.__MIC_WANT__ !== true) {
-          markStopped();
-          return;
-        }
+        if (window.__MIC_WANT__ !== true) { markStopped(); return; }
 
         try {
           setButton(true);
-          if (window.__MIC_STARTING__ === true) {
-           return;
-          }
+          if (window.__MIC_STARTING__ === true) return;
           window.__MIC_STARTING__ = true;
           state.starting = true;
           rec.start();
-          } catch (e) {
+        } catch (e) {
           warn('reinício falhou, recriando:', e);
-
           if (window.__MIC_WANT__ === true) {
             state.rec = null;
             start(state.textarea, state.opts);
@@ -360,139 +343,102 @@
   }
 
   function start(textarea, opts = {}) {
-
-  if (!SR) {
-    warn('SpeechRecognition não suportado neste navegador.');
-    setButton(false);
-    return;
-  }
-
-  const ta =
-    typeof textarea === 'string'
-      ? document.querySelector(textarea)
-      : textarea;
-
-  if (!ta) {
-    warn('textarea não encontrado.');
-    return;
-  }
-
-  state.textarea = ta;
-  window.__MIC_TARGET_TEXTAREA__ = ta;
-
-  state.opts = opts || {};
-
-  state.button =
-    opts.button ||
-    document.getElementById('jp-btn-mic') ||
-    document.querySelector('[data-action="mic"], .jp-mic-btn, .mic-btn');
-
-  if (window.__MIC_STARTING__ === true) {
-    warn('start bloqueado — já iniciando');
-    return;
-  }
-
-  window.__MIC_STARTING__ = true;
-  window.__MIC_WANT__ = true;
-  window.__MIC_ACTIVE__ = false;
-
-  state.starting = true;
-
-  setButton(true);
-
-  clearRestart();
-
-  try {
-    if (state.rec) {
-      try {
-        state.rec.stop();
-      } catch (_) {}
+    if (!SR) {
+      warn('SpeechRecognition não suportado neste navegador.');
+      setButton(false);
+      return;
     }
-  } catch (_) {}
 
-  const launch = () => {
+    const ta = typeof textarea === 'string' ? document.querySelector(textarea) : textarea;
+    if (!ta) { warn('textarea não encontrado.'); return; }
 
-    state.rec = buildRecognizer();
+    state.textarea = ta;
+    window.__MIC_TARGET_TEXTAREA__ = ta;
 
-    window.__REC__ = state.rec;
-    window.__MIC_INSTANCE__ = state.rec;
+    state.opts = opts || {};
+
+    state.button =
+      opts.button ||
+      document.getElementById('jp-btn-mic') ||
+      document.querySelector('[data-action="mic"], .jp-mic-btn, .mic-btn');
+
+    if (window.__MIC_STARTING__ === true) {
+      warn('start bloqueado — já iniciando');
+      return;
+    }
+
+    window.__MIC_STARTING__ = true;
+    window.__MIC_WANT__ = true;
+    window.__MIC_ACTIVE__ = false;
+    state.starting = true;
+
+    setButton(true);
+    clearRestart();
 
     try {
+      if (state.rec) { try { state.rec.stop(); } catch (_) {} }
+    } catch (_) {}
 
-      if (!isMobile()) {
-        ta.focus();
-      }
+    const launch = () => {
+      state.rec = buildRecognizer();
+      window.__REC__ = state.rec;
+      window.__MIC_INSTANCE__ = state.rec;
 
-      state.rec.start();
-
-    } catch (e) {
-
-      warn('falha ao iniciar:', e);
-
-      window.__MIC_STARTING__ = false;
-      state.starting = false;
-
-      const delay =
-        isIOS()
-          ? 700
-          : 350;
-
-      state.restartTimer = setTimeout(() => {
-
-        if (window.__MIC_WANT__ === true) {
-          start(state.textarea, state.opts);
-        }
-
-      }, delay);
-
-      window.__MIC_RESTART_TIMER__ =
-        state.restartTimer;
-    }
-  };
-
-  // =====================================================
-  // iPhone / iPad
-  // =====================================================
-
-  if (isIOS()) {
-
-    ensureMicPermissionIOS()
-      .then((ok) => {
-
-        if (!ok) {
-          window.__MIC_STARTING__ = false;
-          state.starting = false;
-          return;
-        }
-
-        if (window.__MIC_WANT__ !== true) {
-          markStopped();
-          return;
-        }
-
-        launch();
-
-      })
-      .catch((err) => {
-
-        warn('erro ao verificar permissão:', err);
-
+      try {
+        if (!isMobile()) ta.focus();
+        state.rec.start();
+      } catch (e) {
+        warn('falha ao iniciar:', e);
         window.__MIC_STARTING__ = false;
         state.starting = false;
 
-        markStopped();
+        const delay = isIOS() ? 700 : 350;
+        state.restartTimer = setTimeout(() => {
+          if (window.__MIC_WANT__ === true) start(state.textarea, state.opts);
+        }, delay);
+        window.__MIC_RESTART_TIMER__ = state.restartTimer;
+      }
+    };
 
-      });
+    // ================================================================
+    // iPhone / iPad — preserva o gesto do usuário
+    //  - Se a permissão já foi concedida nesta sessão, chamamos launch()
+    //    SÍNCRONO dentro do próprio clique (o gesto ainda está válido).
+    //  - Se ainda não, disparamos getUserMedia dentro do gesto. O toque
+    //    seguinte terá micPermissionIOSReady=true e cairá no caminho
+    //    síncrono acima.
+    // ================================================================
+    if (isIOS()) {
+      if (state.micPermissionIOSReady && state.micStream) {
+        launch();
+        return;
+      }
 
-    return;
+      ensureMicPermissionIOS()
+        .then((ok) => {
+          if (!ok) {
+            window.__MIC_STARTING__ = false;
+            state.starting = false;
+            return;
+          }
+          if (window.__MIC_WANT__ !== true) { markStopped(); return; }
+          launch();
+        })
+        .catch((err) => {
+          warn('erro ao verificar permissão:', err);
+          window.__MIC_STARTING__ = false;
+          state.starting = false;
+          markStopped();
+        });
+
+      return;
+    }
+
+    // ================================================================
+    // Android / Desktop
+    // ================================================================
+    launch();
   }
-
-  // =====================================================
-  // Android / Desktop
-  // =====================================================
-
-  launch();
-}
 
   function stop() {
     window.__MIC_STARTING__ = false;
@@ -505,6 +451,7 @@
     try { window.__REC__?.stop?.(); } catch (_) {}
     try { window.__MIC_INSTANCE__?.stop?.(); } catch (_) {}
 
+    releaseMicStream();
     resetRefs();
     setButton(false);
     log('parado');
@@ -515,7 +462,6 @@
       stop();
       return;
     }
-
     start(textarea, opts);
   }
 
