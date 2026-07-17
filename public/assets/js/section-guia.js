@@ -55,9 +55,6 @@
   let previewStopTimer = null;
   let previewPlaying = false;
   let previewCurrentSrc = null;
-  let previewGuiaId = null;
-  let previewLeaveTimer = null;
-  const PREVIEW_LEAVE_DELAY_MS = 180;
 
   // =====================================================
   // HELPERS
@@ -141,137 +138,34 @@
   // PREVIEW
   // =====================================================
   function ensurePreviewRefs() {
-  if (previewOverlay && previewVideo) return true;
+    if (previewOverlay && previewVideo) return true;
 
-  previewOverlay = document.getElementById('guiaPreviewOverlay');
-  previewVideo = document.getElementById('guiaPreviewVideo');
+    previewOverlay = document.getElementById('guiaPreviewOverlay');
+    previewVideo = document.getElementById('guiaPreviewVideo');
 
-  if (!previewOverlay || !previewVideo) return false;
+    if (!previewOverlay || !previewVideo) return false;
 
-  previewVideo.playsInline = true;
-  previewVideo.preload = 'auto';
+    previewVideo.playsInline = true;
+    previewVideo.preload = 'auto';
+    previewVideo.addEventListener('click', async (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
 
-  previewOverlay.style.pointerEvents = 'auto';
-  previewOverlay.style.cursor = 'pointer';
+      if (!armedId) return;
 
-  previewVideo.style.pointerEvents = 'auto';
-  previewVideo.style.cursor = 'pointer';
+      const guiaParaConfirmar = armedId;
+      const root = document.getElementById(SECTION_ID);
 
-  const confirmarPeloPreview = async (ev) => {
-    ev?.preventDefault?.();
-    ev?.stopPropagation?.();
-    ev?.stopImmediatePropagation?.();
+      if (cancelArm) cancelArm(root);
 
-    if (!armedId) {
-      console.warn(
-        '[GUIA][PREVIEW] Clique primeiro no botão do guia para selecioná-lo.'
-      );
-      return;
-    }
-
-    if (previewOverlay.dataset.confirmando === '1') {
-      return;
-    }
-
-    const guiaParaConfirmar = armedId;
-    const root = document.getElementById(SECTION_ID);
-
-    if (!root) return;
-
-    previewOverlay.dataset.confirmando = '1';
-
-    if (armTimer) {
-      clearTimeout(armTimer);
-      armTimer = null;
-    }
-
-    root.querySelectorAll('.guia-option').forEach((el) => {
-      el.classList.remove('armed');
-      el.setAttribute('aria-pressed', 'false');
+      await confirmGuide(guiaParaConfirmar);
+    });
+    
+    previewVideo.addEventListener('error', () => {
+      stopPreview();
     });
 
-    try {
-      await confirmGuide(guiaParaConfirmar);
-    } catch (erro) {
-      console.error(
-        '[GUIA][PREVIEW] Falha ao confirmar o guia:',
-        erro
-      );
-
-      previewOverlay.dataset.confirmando = '0';
-    }
-  };
-
-  if (previewOverlay.dataset.confirmGuideBound !== '1') {
-    previewOverlay.dataset.confirmGuideBound = '1';
-
-    previewOverlay.addEventListener(
-      'click',
-      confirmarPeloPreview,
-      true
-    );
-  }
-
-  /*
-   * O vídeo também recebe o listener por segurança.
-   * O controle interno impede confirmação duplicada.
-   */
-  if (previewVideo.dataset.confirmGuideBound !== '1') {
-    previewVideo.dataset.confirmGuideBound = '1';
-
-    previewVideo.addEventListener(
-      'click',
-      confirmarPeloPreview,
-      true
-    );
-  }
-
-  previewVideo.addEventListener('error', () => {
-    stopPreview();
-  });
-
-  return true;
-}
-
-  function scheduleStopPreview() {
-    if (previewLeaveTimer) clearTimeout(previewLeaveTimer);
-    previewLeaveTimer = setTimeout(() => {
-      previewLeaveTimer = null;
-      if (armedId) return; // não interromper se já armado
-      stopPreview();
-    }, PREVIEW_LEAVE_DELAY_MS);
-  }
-
-  function cancelScheduledStopPreview() {
-    if (previewLeaveTimer) {
-      clearTimeout(previewLeaveTimer);
-      previewLeaveTimer = null;
-    }
-  }
-
-  function markPreviewConfirmable() {
-    if (!previewOverlay || !previewVideo) return;
-    if (!nomeConfirmado) return;
-    previewOverlay.classList.add('is-confirmable');
-    try {
-      previewVideo.style.cursor = 'pointer';
-      previewVideo.setAttribute('role', 'button');
-      previewVideo.setAttribute('tabindex', '0');
-      const label = tGuide(
-        'guia.preview.confirm.aria',
-        'Toque na imagem para confirmar sua escolha'
-      );
-      previewVideo.setAttribute('aria-label', label);
-    } catch {}
-  }
-
-  function unmarkPreviewConfirmable() {
-    if (!previewOverlay || !previewVideo) return;
-    previewOverlay.classList.remove('is-confirmable');
-    try {
-      previewVideo.style.removeProperty('cursor');
-      previewVideo.removeAttribute('aria-label');
-    } catch {}
+    return true;
   }
 
   function showPreview() {
@@ -287,37 +181,22 @@
   }
 
   function stopPreview() {
-  if (previewOverlay) {
-    previewOverlay.dataset.confirmando = '0';
+    if (previewStopTimer) {
+      clearTimeout(previewStopTimer);
+      previewStopTimer = null;
+    }
+
+    previewPlaying = false;
+    previewCurrentSrc = null;
+
+    if (previewVideo) {
+      try { previewVideo.pause(); } catch {}
+      try { previewVideo.currentTime = 0; } catch {}
+      try { previewVideo.removeAttribute('src'); previewVideo.load(); } catch {}
+    }
+
+    hidePreview();
   }
-
-  if (previewStopTimer) {
-    clearTimeout(previewStopTimer);
-    previewStopTimer = null;
-  }
-
-  if (previewLeaveTimer) {
-    clearTimeout(previewLeaveTimer);
-    previewLeaveTimer = null;
-  }
-
-  previewPlaying = false;
-  previewCurrentSrc = null;
-  previewGuiaId = null;
-
-  unmarkPreviewConfirmable();
-
-  if (previewVideo) {
-    try { previewVideo.pause(); } catch {}
-    try { previewVideo.currentTime = 0; } catch {}
-    try {
-      previewVideo.removeAttribute('src');
-      previewVideo.load();
-    } catch {}
-  }
-
-  hidePreview();
-}
 
   async function playPreviewSrc(src, withAudio = false) {
     if (!src) return false;
@@ -340,7 +219,6 @@
     try { previewVideo.load(); } catch {}
 
     showPreview();
-    markPreviewConfirmable();
     previewStopTimer = setTimeout(stopPreview, PREVIEW_TIMEOUT_MS);
 
     try {
@@ -353,61 +231,37 @@
   }
 
   function bindPreviewToButtons(root, buttons) {
-  if (!root || !buttons?.length) return;
-  if (root.dataset.previewBound === '1') return;
-
-  root.dataset.previewBound = '1';
-
-  /*
-   * O preview não será mais iniciado por:
-   * - mouseenter
-   * - focusin
-   * - touchstart
-   *
-   * Ele será aberto somente pelo clique oficial no botão,
-   * depois que o guia já tiver sido registrado em armedId.
-   */
-
-  buttons.forEach((btn) => {
-    btn.dataset.previewBtnBound = '1';
-  });
-
-  window.addEventListener(
-    'jc:section:leave',
-    stopPreview,
-    { passive: true }
-  );
-}
+    if (!root || !buttons?.length) return;
+    if (root.dataset.previewBound === '1') return;
+    root.dataset.previewBound = '1';
 
     buttons.forEach((btn) => {
       if (btn.dataset.previewBtnBound === '1') return;
       btn.dataset.previewBtnBound = '1';
 
       const getSrc = () => (btn.dataset.previewSrc || '').trim();
-      const btnGuiaId = canonGuia(btn.dataset.guia || '');
 
-      const triggerPreview = () => {
+      btn.addEventListener('mouseenter', () => {
         const src = getSrc();
         if (!src) return;
-        cancelScheduledStopPreview();
-        previewGuiaId = btnGuiaId;
         playPreviewSrc(src, !nomeConfirmado);
-      };
+      });
 
-      const smartLeave = (ev) => {
-        // Não parar se já armado — usuário está indo para a imagem/confirmando.
-        if (armedId) return;
-        // Se está indo em direção ao overlay do preview, manter.
-        const to = ev && ev.relatedTarget;
-        if (to && to.closest && to.closest('#guiaPreviewOverlay')) return;
-        scheduleStopPreview();
-      };
+      btn.addEventListener('mouseleave', stopPreview);
 
-      btn.addEventListener('mouseenter', triggerPreview);
-      btn.addEventListener('mouseleave', smartLeave);
+      btn.addEventListener('focusin', () => {
+        const src = getSrc();
+        if (!src) return;
+        playPreviewSrc(src, !nomeConfirmado);
+      });
 
-      btn.addEventListener('focusin', triggerPreview);
-      btn.addEventListener('focusout', smartLeave);      
+      btn.addEventListener('focusout', stopPreview);
+
+      btn.addEventListener('touchstart', () => {
+        const src = getSrc();
+        if (!src) return;
+        playPreviewSrc(src, !nomeConfirmado);
+      }, { passive: true });
     });
 
     window.addEventListener('jc:section:leave', stopPreview, { passive: true });
@@ -878,13 +732,12 @@
     btn.setAttribute('aria-pressed', 'true');
 
     armedId = guiaId;
-    markPreviewConfirmable();
 
     showNotice(
       root,
       tGuide(
-        'guia.armed.withImage',
-        'Você escolheu {{guia}}. Clique novamente no botão — ou toque na imagem — para confirmar.',
+        'guia.armed',
+        'Você escolheu {{guia}}. Clique novamente para confirmar.',
         { guia: label }
       ),
       { speak: true }
@@ -1131,10 +984,8 @@
         }
 
         nomeConfirmado = true;
-        // Não paramos o preview aqui — se estiver tocando, o usuário deve poder ir direto na imagem.
-        // stopPreview foi removido para permitir confirmação via imagem sem re-hover.
+        stopPreview();
         safeSpeechCancel();
-        markPreviewConfirmable();
 
         const upperName = name.toUpperCase();
         els.nameInput.value = upperName;
@@ -1202,29 +1053,18 @@
           hoverTimers.set(guiaId, timer);
         });
 
-       btn.addEventListener('mouseleave', () => {
-        if (!guiaId) return;
+        btn.addEventListener('mouseleave', () => {
+          if (!guiaId) return;
 
-        if (hoverTimers.has(guiaId)) {
-         clearTimeout(hoverTimers.get(guiaId));
-         hoverTimers.delete(guiaId);
-       }
+          if (hoverTimers.has(guiaId)) {
+            clearTimeout(hoverTimers.get(guiaId));
+            hoverTimers.delete(guiaId);
+          }
 
-      /*
-       * Se o guia ainda não foi selecionado,
-       * o preview pode fechar normalmente.
-       *
-       * Se já existe um guia armado,
-       * mantém o preview aberto para permitir
-       * o clique sobre a imagem/vídeo.
-       */
-      if (!armedId) {
-       stopPreview();
+          const saved = readSavedGuide();
+          applyGuiaTheme(saved || null);
+        });
 
-       const saved = readSavedGuide();
-       applyGuiaTheme(saved || null);
-      }
-     });
         btn.addEventListener('focus', () => {
           const g = findGuia(guias, guiaId);
           if (g && els.guiaTexto) {
@@ -1239,29 +1079,9 @@
         btn.addEventListener('click', (ev) => {
           ev.preventDefault();
           ev.stopPropagation();
-
           if (btn.dataset.locked === '1') return;
-
-       const jaEstavaArmado = armedId === guiaId;
-
-       /*
-       * Primeiro registra a escolha.
-       * No segundo clique, armGuide confirma pelo próprio botão.
-       */
-       armGuide(root, btn, label);
-
-       /*
-       * Abre o vídeo somente no primeiro clique,
-       * depois que armedId já recebeu o guia.
-       */
-       if (!jaEstavaArmado) {
-         const src = String(btn.dataset.previewSrc || '').trim();
-
-       if (src) {
-         playPreviewSrc(src, !nomeConfirmado);
-       }
-      }
-     });
+          armGuide(root, btn, label);
+        });
 
         btn.addEventListener('dblclick', (ev) => {
           ev.preventDefault();
@@ -1289,16 +1109,8 @@
 
         document.addEventListener('click', (e) => {
           const inside = e.target.closest(
-            [
-              '.guia-option',
-              '.guia-options',
-              '#btn-confirmar-nome',
-              '#guiaNameInput',
-              '#guiaPreviewOverlay',
-              '#guiaPreviewVideo'
-             ].join(', ')
-            );
-          
+            '.guia-option, .guia-options, #btn-confirmar-nome, #guiaNameInput'
+          );
           if (!inside && armedId && cancelArm) {
             const r = document.getElementById(SECTION_ID);
             if (r) cancelArm(r);
