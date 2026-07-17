@@ -163,31 +163,13 @@
         return;
       }
 
-      // Já armado: confirma.
-      if (armedId) {
-        const guiaParaConfirmar = armedId;
-        try {
-          await confirmGuide(guiaParaConfirmar);
-        } finally {
-          if (cancelArm) cancelArm(root);
-        }
-        return;
-      }
-
-      // Não armado ainda: usa o guia atualmente em preview para armar.
-      const gid = previewGuiaId;
+      // Depois do nome confirmado, tocar no vídeo tem o mesmo valor do toque no botão:
+      // confirma diretamente o guia em preview, sem exigir segundo clique/toque.
+      const gid = armedId || previewGuiaId;
       if (!gid || !root) return;
 
-      const btnAlvo = root.querySelector(
-        '.guia-option[data-guia="' + gid + '"]'
-      );
-      if (!btnAlvo) return;
-
-      const label = (btnAlvo.dataset.nome || btnAlvo.textContent || 'guia')
-        .trim()
-        .toUpperCase();
-
-      armGuide(root, btnAlvo, label);
+      await confirmGuide(gid);
+      if (cancelArm) cancelArm(root);
     });
 
     // Manter preview vivo enquanto o mouse estiver sobre o overlay.
@@ -810,7 +792,7 @@
     const guiaId = canonGuia(btn?.dataset?.guia || '');
     if (!guiaId) return;
 
-    if (armedId === guiaId) {
+    if (nomeConfirmado || armedId === guiaId) {
       confirmGuide(guiaId);
       if (cancelArm) cancelArm(root);
       return;
