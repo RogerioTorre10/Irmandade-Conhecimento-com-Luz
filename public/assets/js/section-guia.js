@@ -353,9 +353,31 @@
   }
 
   function bindPreviewToButtons(root, buttons) {
-    if (!root || !buttons?.length) return;
-    if (root.dataset.previewBound === '1') return;
-    root.dataset.previewBound = '1';
+  if (!root || !buttons?.length) return;
+  if (root.dataset.previewBound === '1') return;
+
+  root.dataset.previewBound = '1';
+
+  /*
+   * O preview não será mais iniciado por:
+   * - mouseenter
+   * - focusin
+   * - touchstart
+   *
+   * Ele será aberto somente pelo clique oficial no botão,
+   * depois que o guia já tiver sido registrado em armedId.
+   */
+
+  buttons.forEach((btn) => {
+    btn.dataset.previewBtnBound = '1';
+  });
+
+  window.addEventListener(
+    'jc:section:leave',
+    stopPreview,
+    { passive: true }
+  );
+}
 
     buttons.forEach((btn) => {
       if (btn.dataset.previewBtnBound === '1') return;
