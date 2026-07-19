@@ -47,13 +47,20 @@ html, body {
   position: relative !important;
 }
 
-/* CONTAINER PRINCIPAL (ARO) */
+/* CONTAINER PRINCIPAL — mantém a áurea visível */
 #section-final .j-panel-glow,
 #section-final .final-panel {
   width: min(88vw, 500px) !important;
   max-width: 500px !important;
   border-radius: 24px;
-  overflow: hidden;
+  overflow: visible !important;
+  isolation: isolate;
+}
+
+/* O recorte arredondado fica somente na parte interna */
+#section-final .j-perg-v-inner,
+#section-final .j-arcane-card {
+  border-radius: 20px;
 }
 
 .final-replay-wrap{
@@ -92,13 +99,25 @@ min-width:220px;
   margin-bottom: 12px;
 }
 
-/* DEVOLUTIVA */
-.final-guide-feedback {
+/* DEVOLUTIVA — áurea leve e estática, sem custo de animação */
+#section-final .final-guide-feedback {
+  position: relative;
   margin: 18px auto;
   padding: 16px;
   border-radius: 16px;
   max-height: 420px;
   overflow-y: auto;
+
+  border: 1px solid var(--guia-strong);
+
+  box-shadow:
+    0 0 12px var(--guia-soft),
+    0 0 28px color-mix(
+      in srgb,
+      var(--guia-main) 38%,
+      transparent
+    ),
+    inset 0 0 12px rgba(255, 255, 255, 0.035);
 }
 
 /* ACTIONS */
