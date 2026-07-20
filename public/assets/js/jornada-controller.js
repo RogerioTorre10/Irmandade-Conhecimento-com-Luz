@@ -419,8 +419,14 @@ if (retomada?.retomar && retomada?.last_section &&
 !SECOES_IGNORADAS_RESTORE.includes(retomada.last_section)) {
 secaoRemota = retomada.last_section;
 }
-} catch (e) {
-console.warn('[JC][AUTO_RESTORE][BACKEND_ERR]', e);
+catch (e) {
+console.warn('[JC][AUTO_RESTORE][BACKEND_ERR]',e);
+const fallback = window.JORNADA_SESSION?.getInitialSection?.();
+if ( fallback && fallback !== 'section-intro') {
+console.log('[JC] Usando snapshot local:', fallback );
+await show(fallback);isInitializing = false;
+return;
+}
 }
 
 const melhor = _melhorSecaoRetomada(secaoRemota, secaoLocal);
