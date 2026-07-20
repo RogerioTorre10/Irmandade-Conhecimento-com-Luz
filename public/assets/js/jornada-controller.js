@@ -292,6 +292,8 @@ else if (Date.now() - start > timeout) { clearInterval(interval); reject(new Err
 }
 
 async function show(sectionId) {
+if ( window.JORNADA_SESSION?.reauthRequired && sectionId !== 'section-senha') {
+console.warn('[JC] Redirecionando para reautenticação.');sectionId = 'section-senha';} 
 if (isTransitioning) { console.log('[JC.show] Transição em andamento, ignorando:', sectionId); return; }
 if (sectionId === window.JC.currentSection) { console.log('[JC.show] Já é a seção atual:', sectionId); return; }
 isTransitioning = true;
