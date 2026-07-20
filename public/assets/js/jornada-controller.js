@@ -310,13 +310,50 @@
       window.JC.currentSection = sectionId;
       lastShownSection = sectionId;
       try {
-        const authOk = localStorage.getItem('jornada_auth_ok') === '1';
-        if (authOk && sectionId !== 'section-senha') {
-          localStorage.setItem('jornada_last_section', sectionId);
-          localStorage.setItem('jornada_last_at', String(Date.now()));
-          window.JORNADA_SESSION?.atualizarEstado?.({ last_section: sectionId, estado_tela: 'section_loaded' });
-        }
-      } catch (e) { console.warn('[JC][SESSION_SAVE][ERRO]', e); }
+  const authOk =
+    localStorage.getItem('jornada_auth_ok') === '1';
+
+  const secaoPrivadaValida =
+    authOk &&
+    !SECOES_IGNORADAS_RESTORE.includes(sectionId);
+
+  /*
+   * Intro, Termos e Senha nunca podem substituir
+   * o último checkpoint privado já alcançado.
+   */
+  if (secaoPrivadaValida) {
+    localStorage.setItem(
+      'jornada_last_section',
+      sectionId
+    );
+
+    localStorage.setItem(
+      'jornada_last_at',
+      String(Date.now())
+    );
+
+    await window.JORNADA_SESSION?.atualizarEstado?.({
+      last_section: sectionId,
+      estado_tela: 'section_loaded'
+    });
+
+    console.log(
+      '[JC][CHECKPOINT] Seção privada salva:',
+      sectionId
+    );
+  } else {
+    console.log(
+      '[JC][CHECKPOINT] Seção pública ignorada:',
+      sectionId
+    );
+  }
+
+} catch (e) {
+  console.warn(
+    '[JC][SESSION_SAVE][ERRO]',
+    e
+  );
+}
       await handleSectionLogic(sectionId, section);
       attachButtonEvents(sectionId, section);
       document.dispatchEvent(new CustomEvent('section:shown', { detail: { sectionId, node: section } }));
