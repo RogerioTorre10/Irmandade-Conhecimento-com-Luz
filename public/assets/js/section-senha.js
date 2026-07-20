@@ -626,15 +626,11 @@
           throw new Error(data?.detail || data?.message || 'Código inválido.');
         }
 
-        localStorage.setItem('jornada_auth_ok', '1');
-        localStorage.setItem('jornada_email', email);
-        localStorage.setItem('jornada_last_section', 'section-guia');
-
-        /*
-        * Inicia o prazo fixo de 72 horas apenas após a confirmação do 2FA.
-        * Se já existir uma sessão válida, o tracker preserva o deadline original.
-        */
-        if (
+      await window.JORNADA_SESSION.registrarAtivacao({ email, codigo_jornada: data.codigo_jornada,
+        started_at: data.started_at, deadline_at: data.deadline_at, last_section:'section-guia'
+      });
+        
+       if (
           window.JORNADA_TIMER &&
           typeof window.JORNADA_TIMER.iniciarSessao === 'function'
         ) {
