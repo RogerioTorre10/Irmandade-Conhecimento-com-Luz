@@ -659,6 +659,11 @@
               sessao72h
              );
 
+            await window.JORNADA_SESSION.atualizarEstado({
+              last_section: 'section-guia',
+              estado_tela: '2fa_confirmado'
+           });
+
             } catch (sessionErr) {
               console.error(
                 '[JCSenha][72H] Falha ao iniciar contador:',
