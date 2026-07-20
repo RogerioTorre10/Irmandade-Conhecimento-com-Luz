@@ -414,7 +414,7 @@ if (retomada?.reason === 'reautenticacao_necessaria' ||  retomada?.reautenticaca
   isInitializing = false;
   return;
 }
-  
+}  
 if (retomada?.retomar && retomada?.last_section &&
 !SECOES_IGNORADAS_RESTORE.includes(retomada.last_section)) {
 secaoRemota = retomada.last_section;
