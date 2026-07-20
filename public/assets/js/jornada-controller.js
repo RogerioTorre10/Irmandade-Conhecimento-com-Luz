@@ -432,7 +432,19 @@
     try {
       const authOk = localStorage.getItem('jornada_auth_ok') === '1';
       const startedAt = Number(localStorage.getItem('jornada_started_at') || 0);
-      const dentro24h = startedAt && (Date.now() - startedAt < 24 * 60 * 60 * 1000);
+      const deadlineAt =
+  Number(
+    localStorage.getItem('jornada_deadline_at') || 0
+  );
+
+const dentro72h =
+  deadlineAt
+    ? Date.now() < deadlineAt
+    : (
+        startedAt &&
+        Date.now() - startedAt <
+          72 * 60 * 60 * 1000
+      );
       const secaoLocal = localStorage.getItem('jornada_last_section');
 
       // Tenta retomar mesmo sem authOk confirmado, desde que haja secaoLocal salva
