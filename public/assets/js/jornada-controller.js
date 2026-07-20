@@ -405,6 +405,13 @@ let secaoRemota = null;
 try {
 const retomada = await window.JORNADA_SESSION?.retomar?.();
 console.log('[JC][RETOMADA]', retomada);
+if (retomada?.reason === 'reautenticacao_necessaria' ||  retomada?.reautenticacao_necessaria){
+  console.log('[JC] Reautenticação necessária.');
+  await show('section-senha');
+  isInitializing = false;
+  return;
+}
+  
 if (retomada?.retomar && retomada?.last_section &&
 !SECOES_IGNORADAS_RESTORE.includes(retomada.last_section)) {
 secaoRemota = retomada.last_section;
