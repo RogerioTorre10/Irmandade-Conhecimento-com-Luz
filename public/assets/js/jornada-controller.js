@@ -450,7 +450,7 @@ const dentro72h =
       // Tenta retomar mesmo sem authOk confirmado, desde que haja secaoLocal salva
       const temDadosLocais = secaoLocal && !SECOES_IGNORADAS_RESTORE.includes(secaoLocal);
 
-      if ((authOk && dentro24h) || temDadosLocais) {
+      if ((authOk && dentro72h) || temDadosLocais) {
         console.log('[JC][AUTO_RESTORE] Tentando retomar. Local:', secaoLocal);
 
         let secaoRemota = null;
