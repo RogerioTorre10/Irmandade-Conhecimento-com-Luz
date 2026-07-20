@@ -559,6 +559,18 @@
 
         const data = await resp.json();
 
+        if (data?.reautenticacao_necessaria ||data?.reason ==='reautenticacao_necessaria') {
+        await window.JORNADA_SESSION.concluirReautenticacao({email,codigo_jornada:
+        data.codigo_jornada,started_at:
+        data.started_at,deadline_at:
+        data.deadline_at,last_section:'section-guia'
+      });
+
+        window.toast?.('Sessão restaurada com sucesso.','success');
+        window.JC?.show('section-guia');
+        return;
+        }
+
         if (!resp.ok || !data.ok) {
           throw new Error(data?.detail || data?.message || 'Senha inválida.');
         }
