@@ -433,17 +433,16 @@ authScreen.style.display = 'none';
 }
 
 try {
+// O Guardião decide de onde a Jornada deve começar.
+const guardianSection = window.JORNADA_SESSION?.getInitialSection?.();
 const savedSection = localStorage.getItem('jornada_last_section');
 const authOk = localStorage.getItem('jornada_auth_ok') === '1';
-const startSection = authOk && savedSection ? savedSection : 'section-intro';
+const startSection = guardianSection || (authOk && savedSection ? savedSection : 'section-intro');
 console.log('[JC.init] Iniciando em:', startSection);
 await show(startSection);
-} catch (err) {
-console.warn('[JC.init] Falha ao iniciar seção salva, voltando para intro:', err);
+} catch (err) {console.warn('[JC.init] Falha ao iniciar seção salva, voltando para intro:', err);
 await show('section-intro');
-} finally {
-isInitializing = false;
-}
+} finally {isInitializing = false;}
 }
 
 (function resetJornadaIfNewRun() {
