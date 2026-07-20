@@ -311,7 +311,8 @@ const authOk = localStorage.getItem('jornada_auth_ok') === '1';
 if (authOk && sectionId !== 'section-senha') {
 localStorage.setItem('jornada_last_section', sectionId);
 localStorage.setItem('jornada_last_at', String(Date.now()));
-window.JORNADA_SESSION?.autoSave?.();
+window.JORNADA_SESSION?.atualizarEstado?.({last_section: sectionId,estado_tela: 'section_loaded'
+});
 }
 } catch (e) { console.warn('[JC][SESSION_SAVE][ERRO]', e); }
 await handleSectionLogic(sectionId, section);
