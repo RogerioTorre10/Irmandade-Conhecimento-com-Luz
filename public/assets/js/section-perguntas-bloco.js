@@ -1340,9 +1340,19 @@
     const dadosPessoais = buildDadosPessoaisPayload();
     const blocoId = bloco?.id || '';
     const anterior = getStoredBlockFeedbacks().find((item) => item?.blocoId === blocoId) || {};
-    const parcial = String(
-      anterior?.devolutiva || anterior?.texto || anterior?.perguntas?.[0]?.devolutiva || ''
-    ).trim();
+    // RETOMADA CIRÚRGICA: se já existe devolutiva do bloco, usa-a.
+    // Caso contrário, concatena TODAS as devolutivas por pergunta já geradas
+    // (elas foram persistidas antes do datilografar), formando um parcial
+    // suficiente (>=900) para o backend curto-circuitar e não chamar a IA.
+    let parcial = String(anterior?.devolutiva || anterior?.texto || '').trim();
+    if (!parcial) {
+      const partes = Array.isArray(anterior?.perguntas) ? anterior.perguntas : [];
+      const concat = partes
+        .map((p) => String(p?.devolutiva || '').trim())
+        .filter(Boolean)
+        .join('\n\n');
+      if (concat) parcial = concat;
+    }
 
     if (!respostas.length) {
       return { ok: false, texto: '', source: 'empty_block_answers' };
