@@ -416,3 +416,103 @@
   #section-intro .j-perg-v-inner { padding-top: 34px !important; padding-bottom: 48px !important; }
   #section-intro .j-arcane-card { width: 100% !important; max-width: 100% !important; padding: 18px 16px !important; }
 }
+
+/* ======================================================
+   DATILOGRAFIA / AURA (portado da section-senha)
+   Aplica áurea dourada persistente e pulsante durante a datilografia
+   ====================================================== */
+
+#section-intro [data-typing="true"][data-cursor="true"] {
+  padding-right: 0.45em !important;
+}
+
+#section-intro [data-typing="true"][data-cursor="true"].typing-active::after {
+  content: "";
+  position: absolute;
+  right: 0.05em;
+  bottom: 0.18em;
+  width: 2px;
+  height: 1em;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #ffe08a 0%, #ffbf3b 100%);
+  box-shadow: 0 0 6px rgba(255, 210, 100, 0.9);
+  animation: intro1CaretBlink 1s steps(1, end) infinite;
+}
+
+#section-intro [data-typing="true"].typing-done::after,
+#section-intro [data-typing="true"].type-done::after {
+  content: none;
+}
+
+#section-intro [data-typing="true"].typing-active {
+  background: radial-gradient(ellipse at center, rgba(255, 220, 120, 0.16) 0%, rgba(255, 190, 70, 0.08) 45%, transparent 100%) !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 220, 120, 0.18),
+    0 0 10px rgba(255, 220, 120, 0.18),
+    0 0 22px rgba(255, 180, 60, 0.14),
+    inset 0 0 10px rgba(255, 240, 180, 0.04) !important;
+  text-shadow:
+    0 0 6px rgba(255, 230, 120, 0.95),
+    0 0 12px rgba(255, 210, 90, 0.72),
+    0 0 20px rgba(255, 170, 40, 0.36) !important;
+  animation: intro1AuraPulse 1.6s ease-in-out infinite;
+}
+
+#section-intro [data-typing="true"].typing-active::before,
+#section-intro [data-typing="true"].typing-done::before,
+#section-intro [data-typing="true"].type-done::before {
+  content: "";
+  position: absolute;
+  inset: -4px -6px;
+  border-radius: 14px;
+  pointer-events: none;
+  z-index: -1;
+  background: radial-gradient(ellipse at center, rgba(255, 220, 120, 0.10) 0%, rgba(255, 180, 60, 0.05) 55%, transparent 100%);
+}
+
+#section-intro [data-typing="true"].typing-done,
+#section-intro [data-typing="true"].type-done {
+  background: radial-gradient(ellipse at center, rgba(255, 220, 120, 0.08) 0%, rgba(255, 190, 70, 0.04) 46%, transparent 100%) !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 220, 120, 0.10),
+    0 0 8px rgba(255, 220, 120, 0.10),
+    0 0 16px rgba(255, 180, 60, 0.08) !important;
+}
+
+@keyframes intro1CaretBlink {
+  0%, 45% { opacity: 0.95; }
+  50%, 100% { opacity: 0; }
+}
+
+@keyframes intro1AuraPulse {
+  0% {
+    box-shadow:
+      0 0 0 1px rgba(255, 220, 120, 0.16),
+      0 0 8px rgba(255, 220, 120, 0.14),
+      0 0 16px rgba(255, 180, 60, 0.10),
+      inset 0 0 8px rgba(255, 240, 180, 0.03);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(255, 220, 120, 0.24),
+      0 0 14px rgba(255, 220, 120, 0.24),
+      0 0 26px rgba(255, 180, 60, 0.18),
+      inset 0 0 12px rgba(255, 240, 180, 0.06);
+  }
+  100% {
+    box-shadow:
+      0 0 0 1px rgba(255, 220, 120, 0.16),
+      0 0 8px rgba(255, 220, 120, 0.14),
+      0 0 16px rgba(255, 180, 60, 0.10),
+      inset 0 0 8px rgba(255, 240, 180, 0.03);
+  }
+}
+
+@media (max-width: 480px) {
+  #section-intro [data-typing="true"].typing-active::before,
+  #section-intro [data-typing="true"].typing-done::before,
+  #section-intro [data-typing="true"].type-done::before {
+    inset: -3px -5px !important;
+    border-radius: 12px !important;
+  }
+}
