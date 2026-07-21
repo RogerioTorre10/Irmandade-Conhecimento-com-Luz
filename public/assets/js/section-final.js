@@ -1162,18 +1162,10 @@ function buildGuideFallbackText(guiaRaw, nomeRaw) {
   }
 
   function buildParcialFinal() {
-    const cached = String(getStoredFinalFeedback() || '').trim();
-    if (cached) return cached;
-    try {
-      const blocos = getStoredBlockFeedbacks() || [];
-      const concat = blocos
-        .map((b) => String(b?.devolutiva || b?.texto || '').trim())
-        .filter(Boolean)
-        .join('\n\n');
-      return concat;
-    } catch (_) {
-      return '';
-    }
+    // IMPORTANTE: só reaproveita se existe DEVOLUTIVA FINAL de fato já salva.
+    // NÃO concatenar devolutivas de bloco aqui — isso faria o backend curto-circuitar
+    // (>=2000 chars) mesmo na primeira geração da final, entregando texto antigo.
+    return String(getStoredFinalFeedback() || '').trim();
   }
 
   async function fetchFinalGuideFeedback() {
