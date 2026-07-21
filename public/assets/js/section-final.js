@@ -1074,6 +1074,7 @@ function buildGuideFallbackText(guiaRaw, nomeRaw) {
   for (let i = 0; i < guiasParaTentar.length; i++) {
     const guiaId = guiasParaTentar[i];
     try {
+      // === RETOMADA CIRÚRGICA: envia devolutiva final já salva como parcial ===
       const body = {
         nome,
         guia: guiaId,
@@ -1083,7 +1084,8 @@ function buildGuideFallbackText(guiaRaw, nomeRaw) {
         sinteseBlocos,
         dadosPessoais,
         retry: i > 0,
-        forceComplete: true
+        forceComplete: true,
+        parcial: String(getStoredFinalFeedback() || '').trim()
       };
 
       const result = await postFinalFeedback(body);
