@@ -319,6 +319,20 @@
       {}
     );
 
+    const devolutivasBloco = safeJsonParse(
+      sessionStorage.getItem('JORNADA_DEVOLUTIVAS_BLOCO') ||
+      localStorage.getItem('JORNADA_DEVOLUTIVAS_BLOCO') ||
+      sessionStorage.getItem('jornada.blockFeedbacks') ||
+      localStorage.getItem('jornada.blockFeedbacks'),
+      []
+    );
+
+    const devolutivaFinal = String(
+      sessionStorage.getItem('JORNADA_DEVOLUTIVA_FINAL') ||
+      localStorage.getItem('JORNADA_DEVOLUTIVA_FINAL') ||
+      ''
+    ).trim();
+
     if (progressObj.total) {
       progressObj.total = toIntSafe(progressObj.total);
     }
@@ -345,6 +359,34 @@
 
       progresso:
         progressObj,
+
+      devolutivas_bloco:
+        Array.isArray(devolutivasBloco)
+          ? devolutivasBloco
+          : [],
+
+      devolutivasBloco:
+        Array.isArray(devolutivasBloco)
+          ? devolutivasBloco
+          : [],
+
+      devolutiva_final:
+        devolutivaFinal,
+
+      devolutivaFinal:
+        devolutivaFinal,
+
+      devolutivas: {
+        ...(progressObj.devolutivas || {}),
+        blocos:
+          Array.isArray(devolutivasBloco)
+            ? devolutivasBloco
+            : [],
+        final:
+          devolutivaFinal
+            ? { texto: devolutivaFinal }
+            : progressObj.devolutivas?.final
+      },
 
       dados:
         safeJsonParse(
@@ -727,6 +769,60 @@
         'JORNADA_PROGRESS',
         JSON.stringify(snapshot.progresso)
       );
+    }
+
+    const devolutivasBloco =
+      snapshot.devolutivas_bloco ||
+      snapshot.devolutivasBloco ||
+      snapshot.devolutivas?.blocos ||
+      [];
+
+    if (Array.isArray(devolutivasBloco) && devolutivasBloco.length) {
+      const rawDevolutivasBloco = JSON.stringify(devolutivasBloco);
+
+      sessionStorage.setItem(
+        'JORNADA_DEVOLUTIVAS_BLOCO',
+        rawDevolutivasBloco
+      );
+
+      localStorage.setItem(
+        'JORNADA_DEVOLUTIVAS_BLOCO',
+        rawDevolutivasBloco
+      );
+
+      sessionStorage.setItem(
+        'jornada.blockFeedbacks',
+        rawDevolutivasBloco
+      );
+
+      localStorage.setItem(
+        'jornada.blockFeedbacks',
+        rawDevolutivasBloco
+      );
+
+      window.__JORNADA_DEVOLUTIVAS__ = devolutivasBloco;
+    }
+
+    const devolutivaFinal = String(
+      snapshot.devolutiva_final ||
+      snapshot.devolutivaFinal ||
+      snapshot.devolutivas?.final?.texto ||
+      snapshot.devolutivas?.final ||
+      ''
+    ).trim();
+
+    if (devolutivaFinal) {
+      sessionStorage.setItem(
+        'JORNADA_DEVOLUTIVA_FINAL',
+        devolutivaFinal
+      );
+
+      localStorage.setItem(
+        'JORNADA_DEVOLUTIVA_FINAL',
+        devolutivaFinal
+      );
+
+      window.__JORNADA_DEVOLUTIVA_FINAL__ = devolutivaFinal;
     }
 
     if (snapshot.dados) {
