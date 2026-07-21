@@ -1151,6 +1151,31 @@ function buildGuideFallbackText(guiaRaw, nomeRaw) {
   };
 }
 
+  function getGuiaFinal() {
+    try {
+      const st = (typeof getState === 'function') ? getState() : (window.JORNADA_STATE || {});
+      const g = readGuideFromEverywhere(st || {});
+      return g?.id || g?.nome || '';
+    } catch (_) {
+      return '';
+    }
+  }
+
+  function buildParcialFinal() {
+    const cached = String(getStoredFinalFeedback() || '').trim();
+    if (cached) return cached;
+    try {
+      const blocos = getStoredBlockFeedbacks() || [];
+      const concat = blocos
+        .map((b) => String(b?.devolutiva || b?.texto || '').trim())
+        .filter(Boolean)
+        .join('\n\n');
+      return concat;
+    } catch (_) {
+      return '';
+    }
+  }
+
   async function fetchFinalGuideFeedback() {
   const cachedFinal = getStoredFinalFeedback();
   if (cachedFinal.length >= 2000) {
@@ -1194,7 +1219,7 @@ function buildGuideFallbackText(guiaRaw, nomeRaw) {
         dadosPessoais,
         retry: i > 0,
         forceComplete: true,
-        parcial: String(getStoredFinalFeedback() || '').trim()
+        parcial: buildParcialFinal()
       };
 
       const result = await postFinalFeedback(body);
