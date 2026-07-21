@@ -899,22 +899,106 @@
   }
 
   // ─── Armazenamento de devolutivas ────────────────────────────────────────────
-  function getStoredBlockFeedbacks() {
+  function safeJson(raw, fallback) {
     try {
-      return JSON.parse(
-        sessionStorage.getItem('JORNADA_DEVOLUTIVAS_BLOCO') || '[]'
-      );
+      const parsed = JSON.parse(raw || '');
+      return parsed == null ? fallback : parsed;
     } catch {
-      return [];
+      return fallback;
     }
   }
 
-  function setStoredBlockFeedbacks(items) {
+  function normalizeStoredFeedbacks(value) {
+    if (Array.isArray(value)) return value;
+    if (Array.isArray(value?.blocos)) return value.blocos;
+    return [];
+  }
+
+  function getRemoteSnapshotCache() {
+    const snap = safeJson(sessionStorage.getItem('JORNADA_PROGRESS'), {}) || {};
+    const devolutivas = snap.devolutivas || {};
+    return {
+      blocoItems: normalizeStoredFeedbacks(
+        snap.devolutivas_bloco || snap.devolutivasBloco || devolutivas.blocos || []
+      ),
+      finalText: String(
+        snap.devolutiva_final || snap.devolutivaFinal || devolutivas.final?.texto || devolutivas.final || ''
+      ).trim(),
+    };
+  }
+
+  function mergeFeedbackLists(...lists) {
+    const map = new Map();
+    lists.flat().forEach((item) => {
+      if (!item || typeof item !== 'object') return;
+      const blocoId = String(item.blocoId || item.id || item.bloco || '').trim();
+      const key = blocoId || String(item.blocoTitulo || item.titulo || map.size).trim();
+      if (!key) return;
+      const old = map.get(key) || {};
+      map.set(key, {
+        ...old,
+        ...item,
+        blocoId: blocoId || old.blocoId || key,
+        devolutiva: String(item.devolutiva || item.texto || old.devolutiva || '').trim(),
+        perguntas: Array.isArray(item.perguntas) ? item.perguntas : old.perguntas,
+      });
+    });
+    return Array.from(map.values());
+  }
+
+  function getStoredBlockFeedbacks() {
+    const local = normalizeStoredFeedbacks(safeJson(localStorage.getItem('JORNADA_DEVOLUTIVAS_BLOCO'), []));
+    const session = normalizeStoredFeedbacks(sessionStorage.getItem('JORNADA_DEVOLUTIVAS_BLOCO') ? safeJson(sessionStorage.getItem('JORNADA_DEVOLUTIVAS_BLOCO'), []) : []);
+    const legacy = normalizeStoredFeedbacks(safeJson(localStorage.getItem('jornada.blockFeedbacks') || sessionStorage.getItem('jornada.blockFeedbacks'), []));
+    const remote = getRemoteSnapshotCache().blocoItems;
+    const merged = mergeFeedbackLists(remote, local, session, legacy);
+    if (merged.length) setStoredBlockFeedbacks(merged, { silent: true });
+    return merged;
+  }
+
+  function updateProgressCache(partial = {}) {
     try {
-      sessionStorage.setItem(
-        'JORNADA_DEVOLUTIVAS_BLOCO',
-        JSON.stringify(items || [])
-      );
+      const progress = safeJson(sessionStorage.getItem('JORNADA_PROGRESS'), {}) || {};
+      const next = { ...progress, ...partial };
+      sessionStorage.setItem('JORNADA_PROGRESS', JSON.stringify(next));
+    } catch {}
+  }
+
+  function requestCriticalSave(extra = {}) {
+    try {
+      window.JORNADA_SESSION?.atualizarEstado?.({
+        last_section: State.sectionId || document.querySelector('section[id^="section-perguntas-"]')?.id || localStorage.getItem('jornada_last_section') || '',
+        last_block: State.bloco?.id || localStorage.getItem('jornada_last_block') || '',
+        last_question: State.questionIndex || 0,
+        devolutiva_concluida: true,
+        critical: true,
+        ...extra,
+      }, { immediate: true, reason: extra.reason || 'devolutiva_salva' });
+    } catch (err) {
+      console.warn('[DEVOLUTIVA][SAVE][WARN]', err);
+    }
+  }
+
+  function setStoredBlockFeedbacks(items, options = {}) {
+    const normalized = mergeFeedbackLists(normalizeStoredFeedbacks(items));
+    try {
+      const raw = JSON.stringify(normalized || []);
+      sessionStorage.setItem('JORNADA_DEVOLUTIVAS_BLOCO', raw);
+      localStorage.setItem('JORNADA_DEVOLUTIVAS_BLOCO', raw);
+      sessionStorage.setItem('jornada.blockFeedbacks', raw);
+      localStorage.setItem('jornada.blockFeedbacks', raw);
+      window.__JORNADA_DEVOLUTIVAS__ = normalized;
+      updateProgressCache({
+        devolutivas_bloco: normalized,
+        devolutivasBloco: normalized,
+        devolutivas: {
+          ...(safeJson(sessionStorage.getItem('JORNADA_PROGRESS'), {})?.devolutivas || {}),
+          blocos: normalized,
+        },
+      });
+      if (!options.silent) {
+        requestCriticalSave({ reason: 'devolutiva_bloco_salva' });
+      }
     } catch {}
   }
 
@@ -1105,6 +1189,19 @@
       parcial: String(parcial || '').trim(),
     };
 
+    if (body.parcial.length >= 900) {
+      return {
+        ok: true,
+        texto: body.parcial,
+        guiaUsado: guiaNorm,
+        guiaSolicitado: guiaNorm,
+        fallbackUsed: false,
+        provider: 'frontend_cache',
+        providerDivergente: false,
+        source: 'frontend_cache',
+      };
+    }
+
     console.log('[DEVOLUTIVA][API][REQUEST]', {
       guia: guiaNorm,
       idioma: lang,
@@ -1241,6 +1338,11 @@
     const respostas = getAllAnswersFromBlock(bloco);
     const blocoNome = bloco?.title || bloco?.id || 'Bloco';
     const dadosPessoais = buildDadosPessoaisPayload();
+    const blocoId = bloco?.id || '';
+    const anterior = getStoredBlockFeedbacks().find((item) => item?.blocoId === blocoId) || {};
+    const parcial = String(
+      anterior?.devolutiva || anterior?.texto || anterior?.perguntas?.[0]?.devolutiva || ''
+    ).trim();
 
     if (!respostas.length) {
       return { ok: false, texto: '', source: 'empty_block_answers' };
@@ -1255,6 +1357,7 @@
       pergunta: '',
       resposta: respostas[respostas.length - 1] || '',
       dadosPessoais,
+      parcial,
     });
   }
 
@@ -1516,11 +1619,6 @@
             return;
           }
 
-          await setGuideResponse(
-            texto,
-            result?.fallbackUsed ? 'warning' : 'success'
-          );
-
           const blocoId = bloco?.id || '';
           const existentes = getStoredBlockFeedbacks().filter(
             (item) => item?.blocoId !== blocoId
@@ -1534,7 +1632,8 @@
             blocoId,
             blocoTitulo: bloco?.title || bloco?.id || 'Bloco',
             respostas: [val],
-            devolutiva: anterior?.devolutiva || '',
+            devolutiva: texto,
+            texto,
             perguntas: [
               {
                 pergunta: getQuestionText(bloco, 0),
@@ -1547,6 +1646,12 @@
           });
 
           setStoredBlockFeedbacks(existentes);
+
+          await setGuideResponse(
+            texto,
+            result?.fallbackUsed ? 'warning' : 'success'
+          );
+
           setContinueState(section, 'ready');
         } catch (err) {
           console.error('[PERGUNTAS_BLOCO] erro no confirmar:', err);
