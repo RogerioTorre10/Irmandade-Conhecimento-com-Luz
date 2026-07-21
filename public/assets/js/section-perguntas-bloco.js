@@ -940,6 +940,12 @@
         ...item,
         blocoId: blocoId || old.blocoId || key,
         devolutiva: String(item.devolutiva || item.texto || old.devolutiva || '').trim(),
+        // Preserva devolutiva final do bloco separadamente — não pode ser
+        // sobrescrita pelo save por pergunta.
+        devolutivaFinal: String(
+          item.devolutivaFinal || old.devolutivaFinal || ''
+        ).trim(),
+        blockFinal: Boolean(item.blockFinal || old.blockFinal),
         perguntas: Array.isArray(item.perguntas) ? item.perguntas : old.perguntas,
       });
     });
@@ -1340,11 +1346,29 @@
     const dadosPessoais = buildDadosPessoaisPayload();
     const blocoId = bloco?.id || '';
     const anterior = getStoredBlockFeedbacks().find((item) => item?.blocoId === blocoId) || {};
-    // RETOMADA CIRÚRGICA: se já existe devolutiva do bloco, usa-a.
-    // Caso contrário, concatena TODAS as devolutivas por pergunta já geradas
-    // (elas foram persistidas antes do datilografar), formando um parcial
-    // suficiente (>=900) para o backend curto-circuitar e não chamar a IA.
-    let parcial = String(anterior?.devolutiva || anterior?.texto || '').trim();
+
+    // RETOMADA CIRÚRGICA (nível 1): se já foi entregue devolutiva final do
+    // bloco em execução anterior, reaproveita SEM chamar a IA — independente
+    // do tamanho do texto. Isso evita nova cobrança de tokens quando o
+    // participante retoma exatamente neste ponto.
+    const _blockFinalTxt = String(anterior?.devolutivaFinal || '').trim();
+    if (anterior?.blockFinal && _blockFinalTxt) {
+      return {
+        ok: true,
+        texto: _blockFinalTxt,
+        guiaUsado: normalizeGuide(document.body.dataset.guia || 'lumen'),
+        guiaSolicitado: normalizeGuide(document.body.dataset.guia || 'lumen'),
+        fallbackUsed: false,
+        provider: 'frontend_block_cache',
+        providerDivergente: false,
+        source: 'frontend_block_cache',
+      };
+    }
+
+    // RETOMADA CIRÚRGICA (nível 2): se não há bloco final salvo, tenta usar
+    // devolutivas por pergunta concatenadas como parcial para o backend
+    // curto-circuitar por tamanho (>=900).
+    let parcial = _blockFinalTxt || String(anterior?.devolutiva || anterior?.texto || '').trim();
     if (!parcial) {
       const partes = Array.isArray(anterior?.perguntas) ? anterior.perguntas : [];
       const concat = partes
@@ -1415,6 +1439,10 @@
         blocoTitulo: bloco?.title || bloco?.id || 'Bloco',
         respostas: getAllAnswersFromBlock(bloco),
         devolutiva: textoFinal,
+        // Campo dedicado à devolutiva final do bloco — NÃO é sobrescrito
+        // por saves posteriores por pergunta.
+        devolutivaFinal: textoFinal,
+        blockFinal: true,
         perguntas: Array.isArray(atual?.perguntas) ? atual.perguntas : [],
         guiaUsado:
           result?.guiaUsado ||
@@ -1644,6 +1672,10 @@
             respostas: [val],
             devolutiva: texto,
             texto,
+            // Preserva a devolutiva final do bloco (se já foi entregue antes)
+            // — não pode ser perdida por este save de pergunta.
+            devolutivaFinal: String(anterior?.devolutivaFinal || '').trim(),
+            blockFinal: Boolean(anterior?.blockFinal),
             perguntas: [
               {
                 pergunta: getQuestionText(bloco, 0),
@@ -1732,11 +1764,16 @@
 
     setGuideResponse('');
     // === RETOMADA CIRÚRGICA: restaura devolutiva já gerada para este bloco ===
+    // Prioridade: devolutiva final do bloco (se já foi entregue) > por pergunta.
     try {
       const _prev =
         getStoredBlockFeedbacks().find((it) => it?.blocoId === bloco?.id) || null;
       const _prevTxt = String(
-        _prev?.perguntas?.[0]?.devolutiva || _prev?.devolutiva || ''
+        (_prev?.blockFinal && _prev?.devolutivaFinal) ||
+          _prev?.devolutivaFinal ||
+          _prev?.perguntas?.[0]?.devolutiva ||
+          _prev?.devolutiva ||
+          ''
       ).trim();
       if (_prevTxt) {
         setGuideResponse(_prevTxt, 'success');
