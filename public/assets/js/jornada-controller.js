@@ -458,6 +458,18 @@ const dentro72h =
           const retomada = await window.JORNADA_SESSION?.retomar?.();
           console.log('[JC][RETOMADA]', retomada);
           if (retomada?.reason === 'reautenticacao_necessaria' || retomada?.reautenticacao_necessaria) {
+            // Jornada em andamento porém sem dados novos salvos (página vazia
+            // após a senha): NÃO devolver para a section-senha, pois ela recusa
+            // a mesma senha e não aceita nova para jornada já iniciada.
+            // Retomamos direto na última seção local válida.
+            const localOk = secaoLocal && !SECOES_IGNORADAS_RESTORE.includes(secaoLocal);
+            if (localOk) {
+              console.log('[JC] Reauth solicitado, mas retomando local (jornada ativa, página vazia):', secaoLocal);
+              window.toast?.('✅ Sua jornada foi restaurada. Bem-vindo(a) de volta! 🙏', 'success');
+              await show(secaoLocal);
+              isInitializing = false;
+              return;
+            }
             console.log('[JC] Reautenticação necessária.');
             await show('section-senha');
             isInitializing = false;
@@ -502,7 +514,13 @@ const dentro72h =
       const guardianSection = window.JORNADA_SESSION?.getInitialSection?.();
       const savedSection = localStorage.getItem('jornada_last_section');
       const authOk2 = localStorage.getItem('jornada_auth_ok') === '1';
-      const startSection = guardianSection || (authOk2 && savedSection ? savedSection : 'section-intro');
+      // Se há uma seção salva além de intro/termos/senha, retomar mesmo sem
+      // authOk2: a jornada já foi iniciada e voltar para intro faria a senha
+      // ser recusada (jornada já ativa) e o participante perderia o acesso.
+      const savedResumivel = savedSection && !SECOES_IGNORADAS_RESTORE.includes(savedSection);
+      const startSection =
+        guardianSection ||
+        (savedResumivel ? savedSection : (authOk2 && savedSection ? savedSection : 'section-intro'));
       console.log('[JC.init] Iniciando em:', startSection);
       await show(startSection);
     } catch (err) {
