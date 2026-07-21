@@ -520,38 +520,86 @@ min-width:220px;
 }
 
 /* =========================================================
-   RESTAURA COR DOURADA + ÁUREA DOURADA DO TEXTO (FIX)
-   Adicionado de forma cirúrgica, sem alterar o fluxo.
+   RESTAURA COR DOURADA + ÁUREA DOURADA DO TEXTO (FIX v3)
+   Replica a lógica da section-senha: áurea acompanha a
+   datilografia (typing-active) e permanece fixa ao término
+   (typing-done / type-done). Aplica também de forma
+   persistente aos elementos-chave, mesmo sem o data-typing.
    ========================================================= */
-#section-final .final-title {
-  color: #f2d17a !important;
-  text-shadow:
-    0 0 6px rgba(212, 175, 55, 0.55),
-    0 0 14px rgba(212, 175, 55, 0.35),
-    1px 1px 2px rgba(0, 0, 0, 0.85) !important;
-}
 
+/* Cor dourada base */
+#section-final .final-title,
 #section-final .final-message,
 #section-final .final-message p,
 #section-final .final-guide-feedback,
 #section-final .final-guide-feedback p {
   color: #f2d17a !important;
-  text-shadow:
-    0 0 4px rgba(212, 175, 55, 0.35),
-    1px 1px 2px rgba(0, 0, 0, 0.80) !important;
 }
 
-/* Áurea dourada envolvendo o bloco de devolutiva */
+#section-final .final-title {
+  text-shadow:
+    0 0 6px rgba(255, 230, 120, 0.85),
+    0 0 14px rgba(255, 180, 60, 0.45),
+    1px 1px 2px rgba(0, 0, 0, 0.85) !important;
+}
+
+/* Garantir que os elementos possam receber a áurea via ::before */
+#section-final .final-title,
+#section-final .final-message p,
+#section-final .final-guide-feedback {
+  position: relative;
+  isolation: isolate;
+}
+
+/* ÁUREA PERSISTENTE (equivalente ao .typing-done da senha) —
+   aplicada em todos os estados por padrão. Quando o efeito de
+   datilografia entrar em ação, as regras .typing-active acima
+   sobrescrevem naturalmente com a áurea pulsante. */
+#section-final .final-title,
+#section-final .final-message p,
+#section-final .final-guide-feedback {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 220, 120, 0.08) 0%,
+    rgba(255, 190, 70, 0.04) 46%,
+    transparent 100%
+  ) !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 220, 120, 0.14),
+    0 0 10px rgba(255, 220, 120, 0.16),
+    0 0 22px rgba(255, 180, 60, 0.12),
+    inset 0 0 10px rgba(255, 240, 180, 0.04) !important;
+  text-shadow:
+    0 0 6px rgba(255, 230, 120, 0.75),
+    0 0 12px rgba(255, 210, 90, 0.45),
+    1px 1px 2px rgba(0, 0, 0, 0.80) !important;
+  border-radius: 12px;
+}
+
+/* Halo externo suave (equivalente ao ::before da senha) */
+#section-final .final-title::before,
+#section-final .final-message p::before,
+#section-final .final-guide-feedback::before {
+  content: "";
+  position: absolute;
+  inset: -4px -6px;
+  border-radius: 14px;
+  pointer-events: none;
+  z-index: -1;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 220, 120, 0.10) 0%,
+    rgba(255, 180, 60, 0.05) 55%,
+    transparent 100%
+  );
+}
+
+/* Bloco de devolutiva: áurea dourada mais destacada */
 #section-final .final-guide-feedback {
   border: 1px solid rgba(212, 175, 55, 0.55) !important;
   box-shadow:
-    0 0 12px rgba(212, 175, 55, 0.35),
-    0 0 28px rgba(212, 175, 55, 0.22),
+    0 0 0 1px rgba(255, 220, 120, 0.18),
+    0 0 14px rgba(212, 175, 55, 0.40),
+    0 0 30px rgba(212, 175, 55, 0.24),
     inset 0 0 12px rgba(255, 220, 140, 0.06) !important;
-  background:
-    linear-gradient(
-      to bottom,
-      rgba(60, 40, 10, 0.18),
-      rgba(20, 12, 4, 0.28)
-    ) !important;
 }
