@@ -255,12 +255,73 @@ function setFinalReplayState(
   btn.textContent = textoNormal;
 }
 
-  function getStoredBlockFeedbacks() {
+  function readJsonStorage(key, fallback) {
     try {
-      return JSON.parse(sessionStorage.getItem('JORNADA_DEVOLUTIVAS_BLOCO') || '[]');
+      const raw = sessionStorage.getItem(key) || localStorage.getItem(key) || '';
+      if (!raw) return fallback;
+      const parsed = JSON.parse(raw);
+      return parsed == null ? fallback : parsed;
     } catch {
-      return [];
+      return fallback;
     }
+  }
+
+  function normalizeFeedbackArray(value) {
+    if (Array.isArray(value)) return value;
+    if (Array.isArray(value?.blocos)) return value.blocos;
+    return [];
+  }
+
+  function getProgressSnapshotFinal() {
+    return readJsonStorage('JORNADA_PROGRESS', {}) || {};
+  }
+
+  function mergeBlockFeedbacksFinal(...lists) {
+    const map = new Map();
+    lists.flat().forEach((item) => {
+      if (!item || typeof item !== 'object') return;
+      const blocoId = String(item.blocoId || item.id || item.bloco || '').trim();
+      const key = blocoId || String(item.blocoTitulo || item.titulo || map.size).trim();
+      if (!key) return;
+      const old = map.get(key) || {};
+      map.set(key, {
+        ...old,
+        ...item,
+        blocoId: blocoId || old.blocoId || key,
+        devolutiva: String(item.devolutiva || item.texto || old.devolutiva || '').trim(),
+        perguntas: Array.isArray(item.perguntas) ? item.perguntas : old.perguntas,
+      });
+    });
+    return Array.from(map.values());
+  }
+
+  function persistBlockFeedbacksFinal(items) {
+    try {
+      const merged = mergeBlockFeedbacksFinal(normalizeFeedbackArray(items));
+      const raw = JSON.stringify(merged);
+      sessionStorage.setItem('JORNADA_DEVOLUTIVAS_BLOCO', raw);
+      localStorage.setItem('JORNADA_DEVOLUTIVAS_BLOCO', raw);
+      sessionStorage.setItem('jornada.blockFeedbacks', raw);
+      localStorage.setItem('jornada.blockFeedbacks', raw);
+      window.__JORNADA_DEVOLUTIVAS__ = merged;
+      const snap = getProgressSnapshotFinal();
+      snap.devolutivas_bloco = merged;
+      snap.devolutivasBloco = merged;
+      snap.devolutivas = { ...(snap.devolutivas || {}), blocos: merged };
+      sessionStorage.setItem('JORNADA_PROGRESS', JSON.stringify(snap));
+    } catch {}
+  }
+
+  function getStoredBlockFeedbacks() {
+    const snap = getProgressSnapshotFinal();
+    const remote = normalizeFeedbackArray(
+      snap.devolutivas_bloco || snap.devolutivasBloco || snap.devolutivas?.blocos || []
+    );
+    const session = normalizeFeedbackArray(readJsonStorage('JORNADA_DEVOLUTIVAS_BLOCO', []));
+    const legacy = normalizeFeedbackArray(readJsonStorage('jornada.blockFeedbacks', []));
+    const merged = mergeBlockFeedbacksFinal(remote, session, legacy);
+    if (merged.length) persistBlockFeedbacksFinal(merged);
+    return merged;
   }
 
   function buildPdfBlocksFromSession() {
@@ -300,11 +361,48 @@ function buildFinalSynthesisPayload() {
   
 
   function getStoredFinalFeedback() {
+    const snap = getProgressSnapshotFinal();
+    const fromSnap = String(
+      snap.devolutiva_final ||
+      snap.devolutivaFinal ||
+      snap.devolutivas?.final?.texto ||
+      snap.devolutivas?.final ||
+      ''
+    ).trim();
+
     return String(
       window.__JORNADA_DEVOLUTIVA_FINAL__ ||
       sessionStorage.getItem('JORNADA_DEVOLUTIVA_FINAL') ||
+      localStorage.getItem('JORNADA_DEVOLUTIVA_FINAL') ||
+      fromSnap ||
       ''
     ).trim();
+  }
+
+  function persistFinalFeedback(texto, meta = {}) {
+    const clean = String(texto || '').trim();
+    if (!clean) return;
+    try {
+      window.__JORNADA_DEVOLUTIVA_FINAL__ = clean;
+      sessionStorage.setItem('JORNADA_DEVOLUTIVA_FINAL', clean);
+      localStorage.setItem('JORNADA_DEVOLUTIVA_FINAL', clean);
+      const snap = getProgressSnapshotFinal();
+      snap.devolutiva_final = clean;
+      snap.devolutivaFinal = clean;
+      snap.devolutivas = {
+        ...(snap.devolutivas || {}),
+        final: { texto: clean, ...meta },
+      };
+      sessionStorage.setItem('JORNADA_PROGRESS', JSON.stringify(snap));
+      window.JORNADA_SESSION?.atualizarEstado?.({
+        last_section: SECTION_ID,
+        devolutiva_concluida: true,
+        critical: true,
+        reason: 'devolutiva_final_salva',
+      }, { immediate: true, reason: 'devolutiva_final_salva' });
+    } catch (err) {
+      console.warn('[FINAL][SAVE][WARN]', err);
+    }
   }
 
   function getStoredAnswersFlat() {
@@ -1054,6 +1152,17 @@ function buildGuideFallbackText(guiaRaw, nomeRaw) {
 }
 
   async function fetchFinalGuideFeedback() {
+  const cachedFinal = getStoredFinalFeedback();
+  if (cachedFinal.length >= 2000) {
+    return {
+      ok: true,
+      text: cachedFinal,
+      guiaUsado: normalizeGuide(getGuiaFinal()).id || 'lumen',
+      fallbackUsed: false,
+      raw: { source: 'frontend_cache' }
+    };
+  }
+
   const payload = buildFinalPayloadDiamante();
   const respostas = Array.isArray(payload?.respostas) ? payload.respostas.filter(Boolean) : [];
   const blocos = Array.isArray(payload?.blocos) ? payload.blocos : [];
@@ -1183,9 +1292,10 @@ function removerFinalDuplicado(texto) {
 
       const texto = removerFinalDuplicado(result.text);      
 
-      window.__JORNADA_DEVOLUTIVA_FINAL__ = texto;
-      sessionStorage.setItem('JORNADA_DEVOLUTIVA_FINAL', texto);
-      localStorage.setItem('JORNADA_DEVOLUTIVA_FINAL', texto);
+      persistFinalFeedback(texto, {
+        guiaUsado: result?.guiaUsado || result?.provider || normalizeGuide(getGuiaFinal()).id || 'lumen',
+        source: result?.raw?.source || result?.provider || 'api'
+      });
 
       box.textContent = '';
 
