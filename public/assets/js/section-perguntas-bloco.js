@@ -1087,6 +1087,7 @@
       pergunta,
       resposta,
       dadosPessoais,
+      parcial,
     } = params;
 
     const guiaNorm = normalizeGuide(guia || 'lumen');
@@ -1101,6 +1102,7 @@
       pergunta: pergunta || '',
       resposta: resposta || '',
       dadosPessoais: dadosPessoais || {},
+      parcial: String(parcial || '').trim(),
     };
 
     console.log('[DEVOLUTIVA][API][REQUEST]', {
@@ -1478,6 +1480,16 @@
             localStorage.getItem('jc.nome') ||
             'Participante';
 
+          // === RETOMADA CIRÚRGICA: reaproveita devolutiva já salva no bloco/pergunta ===
+          const _blocoIdAtual = bloco?.id || '';
+          const _anteriorParcial =
+            getStoredBlockFeedbacks().find((it) => it?.blocoId === _blocoIdAtual) || {};
+          const _parcialTxt = String(
+            _anteriorParcial?.perguntas?.[0]?.devolutiva ||
+              _anteriorParcial?.devolutiva ||
+              ''
+          ).trim();
+
           const result = await requestGuideFeedbackWithFallback({
             nome,
             guia,
@@ -1487,6 +1499,7 @@
             pergunta: getQuestionText(bloco, 0),
             resposta: val,
             dadosPessoais,
+            parcial: _parcialTxt,
           });
 
           const texto = String(result?.texto || '').trim();
