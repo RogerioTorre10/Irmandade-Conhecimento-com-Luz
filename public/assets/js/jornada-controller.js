@@ -290,13 +290,14 @@
     });
   }
 
-  async function show(sectionId) {
-    if (window.JORNADA_SESSION?.reauthRequired && sectionId !== 'section-senha') {
+  async function show(sectionId, opts) {
+    const force = !!(opts && opts.force);
+    if (window.JORNADA_SESSION?.reauthRequired && sectionId !== 'section-senha' && !force) {
       console.warn('[JC] Redirecionando para reautenticação.');
       sectionId = 'section-senha';
     }
-    if (isTransitioning) { console.log('[JC.show] Transição em andamento, ignorando:', sectionId); return; }
-    if (sectionId === window.JC.currentSection) { console.log('[JC.show] Já é a seção atual:', sectionId); return; }
+    if (isTransitioning && !force) { console.log('[JC.show] Transição em andamento, ignorando:', sectionId); return; }
+    if (sectionId === window.JC.currentSection && !force) { console.log('[JC.show] Já é a seção atual:', sectionId); return; }
     isTransitioning = true;
     console.log('[JC.show] Iniciando:', sectionId);
     try {
@@ -466,7 +467,7 @@ const dentro72h =
             if (localOk) {
               console.log('[JC] Reauth solicitado, mas retomando local (jornada ativa, página vazia):', secaoLocal);
               window.toast?.('✅ Sua jornada foi restaurada. Bem-vindo(a) de volta! 🙏', 'success');
-              await show(secaoLocal);
+              await show(secaoLocal, { force: true });
               isInitializing = false;
               return;
             }
@@ -484,7 +485,7 @@ const dentro72h =
           const fallback = window.JORNADA_SESSION?.getInitialSection?.();
           if (fallback && fallback !== 'section-intro') {
             console.log('[JC] Usando snapshot local:', fallback);
-            await show(fallback);
+            await show(fallback, { force: true });
             isInitializing = false;
             return;
           }
@@ -494,7 +495,7 @@ const dentro72h =
         if (melhor) {
           console.log('[JC][AUTO_RESTORE] Retomando em:', melhor);
           window.toast?.('✅ Sua jornada foi restaurada. Bem-vindo(a) de volta! 🙏', 'success');
-          await show(melhor);
+          await show(melhor, { force: true });
           isInitializing = false;
           return;
         }
@@ -522,7 +523,7 @@ const dentro72h =
         guardianSection ||
         (savedResumivel ? savedSection : (authOk2 && savedSection ? savedSection : 'section-intro'));
       console.log('[JC.init] Iniciando em:', startSection);
-      await show(startSection);
+      await show(startSection, { force: startSection !== 'section-intro' });
     } catch (err) {
       console.warn('[JC.init] Falha ao iniciar seção salva, voltando para intro:', err);
       await show('section-intro');
