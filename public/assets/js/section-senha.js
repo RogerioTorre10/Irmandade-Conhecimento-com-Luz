@@ -703,10 +703,34 @@
   });
 }
 
+ // Whitelist de chaves técnicas que NÃO devem ser apagadas ao (re)enviar o código.
+ // Tudo que é de jornada antiga (respostas, devolutivas, guia, progresso) é limpo,
+ // para destravar o participante preso a uma sessão anterior. A senha real vive
+ // no backend/e-mail — o storage guarda só estado local.
+ const SENHA_PRESERVE_KEYS = ['jornada_device_hash', 'i18n_lang', 'lang'];
+
+ const limparEstadoJornadaAntiga = () => {
+   try {
+     const backupLocal = {};
+     SENHA_PRESERVE_KEYS.forEach((k) => {
+       const v = localStorage.getItem(k);
+       if (v !== null) backupLocal[k] = v;
+     });
+     localStorage.clear();
+     sessionStorage.clear();
+     Object.entries(backupLocal).forEach(([k, v]) => localStorage.setItem(k, v));
+   } catch (e) {
+     console.warn('[JCSenha] limpeza de storage falhou (ignorado):', e);
+   }
+ };
+
  const enviarCodigoManual = async () => {
-  btnNext.dataset.authStage = 'start';
-  btnNext.click();
-};
+   // Limpa ANTES de enviar: se o envio falhar, o participante tenta de novo
+   // já sem o lastro da jornada antiga. Se sucesso, começa limpo.
+   limparEstadoJornadaAntiga();
+   btnNext.dataset.authStage = 'start';
+   btnNext.click();
+ };
 
 const btnEnviar2FA =
   root.querySelector('#btn-enviar-2fa');
