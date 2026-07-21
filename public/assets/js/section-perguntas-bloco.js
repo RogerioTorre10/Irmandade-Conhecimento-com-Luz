@@ -1616,7 +1616,22 @@
     }
 
     setGuideResponse('');
-    setContinueState(section, 'idle');
+    // === RETOMADA CIRÚRGICA: restaura devolutiva já gerada para este bloco ===
+    try {
+      const _prev =
+        getStoredBlockFeedbacks().find((it) => it?.blocoId === bloco?.id) || null;
+      const _prevTxt = String(
+        _prev?.perguntas?.[0]?.devolutiva || _prev?.devolutiva || ''
+      ).trim();
+      if (_prevTxt) {
+        setGuideResponse(_prevTxt, 'success');
+        setContinueState(section, 'ready');
+      } else {
+        setContinueState(section, 'idle');
+      }
+    } catch {
+      setContinueState(section, 'idle');
+    }
     updateProgress(bloco);
     bindButtons(section, bloco, perguntaText);
 
