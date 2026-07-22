@@ -743,11 +743,38 @@ if (btnEnviar2FA && btnEnviar2FA.dataset.boundSend !== '1') {
   btnEnviar2FA.addEventListener('click', enviarCodigoManual);
 }
 
+// Handler reforçado do "Reenviar código": limpa storage do domínio (com confirmação)
+// e depois dispara o envio normal. Preserva apenas chaves técnicas essenciais.
+const reenviarComLimpeza = async () => {
+  const ok = confirm(
+    '🔁 Reenviar código?\n\n' +
+    'Isso vai limpar os dados desta jornada neste dispositivo ' +
+    '(sem afetar histórico, outras abas ou outros sites) e enviar um novo código.'
+  );
+  if (!ok) return;
+
+  try {
+    const PRESERVAR = ['jornada_device_hash', 'i18n_lang', 'lang'];
+    const backup = {};
+    PRESERVAR.forEach(k => {
+      const v = localStorage.getItem(k);
+      if (v !== null) backup[k] = v;
+    });
+    localStorage.clear();
+    sessionStorage.clear();
+    Object.entries(backup).forEach(([k, v]) => localStorage.setItem(k, v));
+  } catch (e) {
+    console.warn('[JCSenha] limpeza profunda falhou (ignorado):', e);
+  }
+
+  // Dispara o mesmo fluxo do "Enviar código"
+  enviarCodigoManual();
+};
+
 if (btnReenviar2FA && btnReenviar2FA.dataset.boundResend !== '1') {
   btnReenviar2FA.dataset.boundResend = '1';
-  btnReenviar2FA.addEventListener('click', enviarCodigoManual);
-}   
-    
+  btnReenviar2FA.addEventListener('click', reenviarComLimpeza);
+}
     root.dataset.transitionReady = 'true';
     root.dataset.senhaInitialized = 'true';
     window.JCSenha.state.ready = true;
