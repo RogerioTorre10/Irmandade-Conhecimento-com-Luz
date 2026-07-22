@@ -1061,7 +1061,8 @@ function buildFinalSynthesisPayload() {
 function buildGuideFallbackText(guiaRaw, nomeRaw) {
   const guia = normalizeGuide(guiaRaw?.id || guiaRaw || 'lumen').id || 'lumen';
   const nome = String(nomeRaw || 'Caminhante').trim();
-    const fallbackI18n = {
+  const lang = getActiveLang();   // <<< ADICIONE ESTA LINHA
+  const fallbackI18n = {
       'pt-BR': {
         lumen: `${nome}, sua jornada revelou sinais de sensibilidade, coragem e abertura interior. Cada resposta sua deixou marcas de verdade no pergaminho da alma. Continue avançando com fé, porque a luz que você procura também cresce dentro de você.`,
         zion: `${nome}, você atravessou esta jornada com honestidade e presença. O que foi despertado aqui não deve ficar parado. Transforme percepção em passo, passo em caminho, caminho em propósito.`,
