@@ -377,9 +377,9 @@
       };
 
       await window.EffectCoordinator.speak(text, speakOptions);
-      el.dataset.spoken = 'true';        
+      el.dataset.spoken = 'true';
       }
-      
+
     } catch (err) {
       console.error('[JCSenha] erro no TTS:', err);
     }
@@ -387,7 +387,7 @@
 
   await sleep(80);
 }
-  
+
   function getTransitionSrc(root, btn) {
     return (btn?.dataset?.transitionSrc)
       || (root?.dataset?.transitionSrc)
@@ -418,7 +418,6 @@
 
     cancelAllSpeech();
 
-    // Mantém fallback visível até a hora real de começar
     prepareTypingNodes(root, { clear: false });
 
     await waitForTransitionUnlock();
@@ -467,7 +466,6 @@
 
     window.JCSenha.state.activeRunToken = triggerToken;
 
-    // Só agora limpa para digitar
     seq.forEach((el) => normalizeParagraph(el, { clear: true }));
 
     for (const el of seq) {
@@ -641,7 +639,7 @@
       await window.JORNADA_SESSION.registrarAtivacao({ email, codigo_jornada: data.codigo_jornada,
         started_at: data.started_at, deadline_at: data.deadline_at, last_section:'section-guia'
       });
-        
+
        if (
           window.JORNADA_TIMER &&
           typeof window.JORNADA_TIMER.iniciarSessao === 'function'
@@ -687,7 +685,7 @@
                '[JCSenha][72H] JORNADA_TIMER não está disponível.'
              );
            }
- 
+
       window.toast?.('Acesso confirmado.', 'success');
 
       if (window.JC?.show) {
@@ -703,84 +701,130 @@
   });
 }
 
- // Whitelist de chaves técnicas que NÃO devem ser apagadas ao (re)enviar o código.
- // Tudo que é de jornada antiga (respostas, devolutivas, guia, progresso) é limpo,
- // para destravar o participante preso a uma sessão anterior. A senha real vive
- // no backend/e-mail — o storage guarda só estado local.
- const SENHA_PRESERVE_KEYS = ['jornada_device_hash', 'i18n_lang', 'lang'];
+  // ===== Limpeza de estado local =====
+  // A jornada real é validada no backend (auth/start + auth/verify + pagamento).
+  // O storage só guarda estado de UI e o device_hash. Apagar isso NUNCA concede
+  // acesso — apenas destrava o participante preso a uma sessão anterior.
 
- const limparEstadoJornadaAntiga = () => {
-   try {
-     const backupLocal = {};
-     SENHA_PRESERVE_KEYS.forEach((k) => {
-       const v = localStorage.getItem(k);
-       if (v !== null) backupLocal[k] = v;
-     });
-     localStorage.clear();
-     sessionStorage.clear();
-     Object.entries(backupLocal).forEach(([k, v]) => localStorage.setItem(k, v));
-   } catch (e) {
-     console.warn('[JCSenha] limpeza de storage falhou (ignorado):', e);
-   }
- };
+  // ENVIAR (primeiro envio): limpeza leve, preserva device_hash e idioma.
+  const SENHA_PRESERVE_KEYS_LIGHT = ['jornada_device_hash', 'i18n_lang', 'lang'];
 
- const enviarCodigoManual = async () => {
-   // Limpa ANTES de enviar: se o envio falhar, o participante tenta de novo
-   // já sem o lastro da jornada antiga. Se sucesso, começa limpo.
-   limparEstadoJornadaAntiga();
-   btnNext.dataset.authStage = 'start';
-   btnNext.click();
- };
+  // REENVIAR (com confirmação): limpeza profunda, device_hash é REGENERADO.
+  const SENHA_PRESERVE_KEYS_DEEP = ['i18n_lang', 'lang'];
 
-const btnEnviar2FA =
-  root.querySelector('#btn-enviar-2fa');
+  const limparStorageDominio = (preserveKeys) => {
+    try {
+      const backup = {};
+      preserveKeys.forEach((k) => {
+        const v = localStorage.getItem(k);
+        if (v !== null) backup[k] = v;
+      });
+      localStorage.clear();
+      sessionStorage.clear();
+      Object.entries(backup).forEach(([k, v]) => localStorage.setItem(k, v));
+    } catch (e) {
+      console.warn('[JCSenha] limpeza de storage falhou (ignorado):', e);
+    }
+  };
 
-const btnReenviar2FA =
-  root.querySelector('#btn-reenviar-2fa');
+  const limparCookiesDominio = () => {
+    try {
+      const cookies = document.cookie ? document.cookie.split(';') : [];
+      const paths = ['/', location.pathname];
+      const host = location.hostname;
+      const domains = ['', host, '.' + host];
+      cookies.forEach((c) => {
+        const name = c.split('=')[0].trim();
+        if (!name) return;
+        paths.forEach((p) => {
+          domains.forEach((d) => {
+            document.cookie =
+              name + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=' + p +
+              (d ? '; domain=' + d : '') + '; SameSite=Lax';
+          });
+        });
+      });
+    } catch (e) {
+      console.warn('[JCSenha] limpeza de cookies falhou (ignorado):', e);
+    }
+  };
 
-if (btnEnviar2FA && btnEnviar2FA.dataset.boundSend !== '1') {
-  btnEnviar2FA.dataset.boundSend = '1';
-  btnEnviar2FA.addEventListener('click', enviarCodigoManual);
-}
+  const limparCacheStorage = async () => {
+    if (!('caches' in window)) return;
+    try {
+      const keys = await caches.keys();
+      await Promise.all(keys.map((k) => caches.delete(k)));
+    } catch (e) {
+      console.warn('[JCSenha] limpeza de Cache Storage falhou (ignorado):', e);
+    }
+  };
 
-// Handler reforçado do "Reenviar código": limpa storage do domínio (com confirmação)
-// e depois dispara o envio normal. Preserva apenas chaves técnicas essenciais.
-const reenviarComLimpeza = async () => {
-  const ok = confirm(
-    '🔁 Reenviar código?\n\n' +
-    'Isso vai limpar os dados desta jornada neste dispositivo ' +
-    '(sem afetar histórico, outras abas ou outros sites) e enviar um novo código.'
-  );
-  if (!ok) return;
+  const limparIndexedDB = async () => {
+    try {
+      if (typeof indexedDB === 'undefined' || !indexedDB.databases) return;
+      const dbs = await indexedDB.databases();
+      await Promise.all(
+        (dbs || []).map((db) => {
+          if (!db?.name) return Promise.resolve();
+          return new Promise((res) => {
+            const req = indexedDB.deleteDatabase(db.name);
+            req.onsuccess = req.onerror = req.onblocked = () => res();
+          });
+        })
+      );
+    } catch (e) {
+      console.warn('[JCSenha] limpeza de IndexedDB falhou (ignorado):', e);
+    }
+  };
 
-  try {
-    const PRESERVAR = ['jornada_device_hash', 'i18n_lang', 'lang'];
-    const backup = {};
-    PRESERVAR.forEach(k => {
-      const v = localStorage.getItem(k);
-      if (v !== null) backup[k] = v;
-    });
-    localStorage.clear();
-    sessionStorage.clear();
-    Object.entries(backup).forEach(([k, v]) => localStorage.setItem(k, v));
-  } catch (e) {
-    console.warn('[JCSenha] limpeza profunda falhou (ignorado):', e);
+  const enviarCodigoManual = async () => {
+    // Envio normal: limpa estado antigo mas mantém device_hash.
+    limparStorageDominio(SENHA_PRESERVE_KEYS_LIGHT);
+    btnNext.dataset.authStage = 'start';
+    btnNext.click();
+  };
+
+  const reenviarComLimpeza = async () => {
+    const ok = confirm(
+      '🔄 Reenviar código\n\n' +
+      'Isso vai limpar os dados desta jornada neste dispositivo ' +
+      '(sem afetar seu histórico, outras abas ou outros sites) ' +
+      'e enviar um novo código.'
+    );
+    if (!ok) return;
+
+    // Limpeza profunda do DOMÍNIO ATUAL (não afeta histórico do navegador):
+    limparStorageDominio(SENHA_PRESERVE_KEYS_DEEP); // regenera device_hash
+    limparCookiesDominio();
+    await limparCacheStorage();
+    await limparIndexedDB();
+
+    // Dispara o mesmo fluxo do "Enviar código".
+    enviarCodigoManual();
+  };
+
+  const btnEnviar2FA =
+    root.querySelector('#btn-enviar-2fa');
+
+  const btnReenviar2FA =
+    root.querySelector('#btn-reenviar-2fa');
+
+  if (btnEnviar2FA && btnEnviar2FA.dataset.boundSend !== '1') {
+    btnEnviar2FA.dataset.boundSend = '1';
+    btnEnviar2FA.addEventListener('click', enviarCodigoManual);
   }
 
-  // Dispara o mesmo fluxo do "Enviar código"
-  enviarCodigoManual();
-};
+  if (btnReenviar2FA && btnReenviar2FA.dataset.boundResend !== '1') {
+    btnReenviar2FA.dataset.boundResend = '1';
+    btnReenviar2FA.addEventListener('click', reenviarComLimpeza);
+  }
 
-if (btnReenviar2FA && btnReenviar2FA.dataset.boundResend !== '1') {
-  btnReenviar2FA.dataset.boundResend = '1';
-  btnReenviar2FA.addEventListener('click', reenviarComLimpeza);
-}
     root.dataset.transitionReady = 'true';
     root.dataset.senhaInitialized = 'true';
     window.JCSenha.state.ready = true;
     console.log('[JCSenha] pronto');
   }
- 
+
   function onSectionShown(evt) {
     const { sectionId, node } = evt?.detail || {};
     if (sectionId !== SECTION_ID) return;
