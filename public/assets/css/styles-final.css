@@ -603,3 +603,20 @@ min-width:220px;
     0 0 30px rgba(212, 175, 55, 0.24),
     inset 0 0 12px rgba(255, 220, 140, 0.06) !important;
 }
+
+/* ============================================
+   DESKTOP — elimina scroll interno duplicado
+   ============================================ */
+@media (min-width: 769px) {
+  #section-final .final-guide-feedback,
+  #section-final .j-panel-glow,
+  #section-final .j-perg-v-inner,
+  #section-final .j-arcane-card,
+  #section-final .final-panel,
+  #section-final .pergaminho-content {
+    max-height: none !important;
+    height: auto !important;
+    overflow: visible !important;
+    overflow-y: visible !important;
+  }
+}
