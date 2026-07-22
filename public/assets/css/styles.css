@@ -517,7 +517,8 @@ footer,
   }
 
   #section-termos1,
-  #section-termos2 {
+  #section-termos2,
+  #section-final, {
     min-height: auto !important;
     height: auto !important;
     overflow: visible !important;
