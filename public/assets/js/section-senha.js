@@ -789,7 +789,7 @@
       '🔄 Reenviar código\n\n' +
       'Isso vai limpar os dados desta jornada neste dispositivo ' +
       '(sem afetar seu histórico, outras abas ou outros sites) ' +
-      'e enviar um novo código.'
+      'e CLICK NOVAMENTE NO BOTÃO EM ENVIAR CÓDIGO.'
     );
     if (!ok) return;
 
