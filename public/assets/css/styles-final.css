@@ -475,6 +475,51 @@ min-width:220px;
 }
 
 /* =========================================================
+   SECTION FINAL — scroll seguro no iPhone/iPad (FIX)
+   Só o BODY rola. html sem overflow-x:hidden (bug iOS).
+   ========================================================= */
+@supports (-webkit-touch-callout: none) {
+  html {
+    overflow-x: visible !important;   /* desfaz o hidden global no iOS */
+    height: auto !important;
+    overflow-y: visible !important;
+  }
+
+  body:not(.vt-playing) {
+    overflow-x: hidden !important;    /* clip horizontal fica só no body */
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    height: auto !important;
+    min-height: 100% !important;
+  }
+
+  #section-final {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 100svh !important;
+    max-height: none !important;
+
+    /* NÃO virar scroller — deixa o body rolar */
+    overflow: visible !important;
+
+    padding-bottom: calc(120px + env(safe-area-inset-bottom)) !important;
+  }
+
+  #section-final .j-panel-glow,
+  #section-final .j-perg-v-inner,
+  #section-final .j-arcane-card,
+  #section-final .final-container,
+  #section-final .final-content,
+  #section-final .final-guide-feedback {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+}
+
+/* =========================================================
    RESTAURA COR DOURADA + ÁUREA DOURADA DO TEXTO (FIX v3)
    Replica a lógica da section-senha: áurea acompanha a
    datilografia (typing-active) e permanece fixa ao término
@@ -560,14 +605,83 @@ min-width:220px;
 }
 
 /* =========================================================
-   FIX DEFINITIVO — SECTION FINAL / SCROLL DO PERGAMINHO
+   FIX v4 — SECTION FINAL / REMOVE BARRA EXTERNA
    Objetivo:
-   1) manter SOMENTE a barra sutil dentro da devolutiva;
-   2) manter a barra externa natural da página;
-   3) remover a barra do meio colada no container do pergaminho.
+   1) remover a rolagem mais externa da página quando a section-final estiver ativa;
+   2) manter a barra do meio no pergaminho (#jornada-canvas);
+   3) manter a devolutiva dentro do container, com scroll sutil próprio.
    ========================================================= */
 
-/* A seção final NÃO deve virar área de rolagem própria. */
+/* Quando a etapa final está renderizada, o navegador não deve criar
+   uma barra externa competindo com o pergaminho. */
+@supports selector(body:has(#section-final)) {
+  html:has(#section-final),
+  body:has(#section-final) {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    overflow-x: hidden !important;
+    overflow-y: hidden !important;
+    overscroll-behavior: none !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+
+  html:has(#section-final)::-webkit-scrollbar,
+  body:has(#section-final)::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+    display: none !important;
+  }
+
+  body:has(#section-final) .container {
+    height: calc(100dvh - 118px) !important;
+    max-height: calc(100dvh - 118px) !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* Esta é a barra do meio que deve permanecer: rolagem do pergaminho. */
+  body:has(#section-final) #jornada-canvas {
+    width: min(600px, calc(100vw - 24px)) !important;
+    max-width: min(600px, calc(100vw - 24px)) !important;
+    height: calc(100dvh - 132px) !important;
+    max-height: calc(100dvh - 132px) !important;
+    min-height: 0 !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: rgba(255, 80, 230, 0.55) rgba(0, 0, 0, 0.12) !important;
+  }
+
+  body:has(#section-final) #jornada-canvas::-webkit-scrollbar {
+    width: 7px !important;
+    height: 7px !important;
+    display: block !important;
+  }
+
+  body:has(#section-final) #jornada-canvas::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.12) !important;
+    border-radius: 999px !important;
+  }
+
+  body:has(#section-final) #jornada-canvas::-webkit-scrollbar-thumb {
+    background: rgba(255, 80, 230, 0.55) !important;
+    border-radius: 999px !important;
+    box-shadow: 0 0 7px rgba(255, 80, 230, 0.32) !important;
+  }
+
+  body:has(#section-final) #jornada-canvas::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 80, 230, 0.75) !important;
+  }
+}
+
+/* Os wrappers internos não podem criar uma terceira barra. */
 #section-final,
 #section-final .final-pergaminho-wrapper,
 #section-final .final-panel,
@@ -579,7 +693,9 @@ min-width:220px;
 #section-final .final-container,
 #section-final .final-content,
 #section-final .final-message,
-#section-final .final-message p {
+#section-final .final-message p,
+#section-conteudo:has(#section-final),
+#jornada-content-wrapper:has(#section-final) {
   height: auto !important;
   min-height: 0 !important;
   max-height: none !important;
@@ -589,7 +705,6 @@ min-width:220px;
   -ms-overflow-style: none !important;
 }
 
-/* Esconde qualquer scrollbar criada por wrapper/pai, sem afetar a devolutiva. */
 #section-final .final-pergaminho-wrapper::-webkit-scrollbar,
 #section-final .final-panel::-webkit-scrollbar,
 #section-final .j-panel-glow::-webkit-scrollbar,
@@ -600,22 +715,29 @@ min-width:220px;
 #section-final .final-container::-webkit-scrollbar,
 #section-final .final-content::-webkit-scrollbar,
 #section-final .final-message::-webkit-scrollbar,
-#section-final .final-message p::-webkit-scrollbar {
+#section-final .final-message p::-webkit-scrollbar,
+#section-conteudo:has(#section-final)::-webkit-scrollbar,
+#jornada-content-wrapper:has(#section-final)::-webkit-scrollbar {
   width: 0 !important;
   height: 0 !important;
   display: none !important;
 }
 
-/* Só a caixa de devolutiva final fica com scroll interno, igual à lógica da intro. */
+/* Mantém a caixa da devolutiva dentro do pergaminho e impede que ela
+   empurre o layout para fora do container. */
 #section-final .final-guide-feedback {
   display: block !important;
-  width: 100% !important;
-  max-width: 100% !important;
+  position: relative !important;
+  width: calc(100% - 16px) !important;
+  max-width: calc(100% - 16px) !important;
+  min-width: 0 !important;
   box-sizing: border-box !important;
+  margin: 16px auto 14px !important;
+  padding: 16px 18px !important;
 
   height: auto !important;
   min-height: 0 !important;
-  max-height: 420px !important;
+  max-height: 34dvh !important;
 
   overflow-x: hidden !important;
   overflow-y: auto !important;
@@ -626,7 +748,6 @@ min-width:220px;
   scrollbar-color: rgba(255, 80, 230, 0.58) rgba(0, 0, 0, 0.18) !important;
 }
 
-/* Scrollbar sutil somente dentro da devolutiva. */
 #section-final .final-guide-feedback::-webkit-scrollbar {
   width: 6px !important;
   height: 6px !important;
@@ -648,61 +769,55 @@ min-width:220px;
   background: rgba(255, 80, 230, 0.78) !important;
 }
 
-/* Mobile: reduz a altura da caixa e preserva o scroll só dentro dela. */
+/* Ajustes específicos de altura para telas menores. */
 @media (max-width: 768px) {
+  @supports selector(body:has(#section-final)) {
+    body:has(#section-final) .container {
+      height: calc(100dvh - 96px) !important;
+      max-height: calc(100dvh - 96px) !important;
+    }
+
+    body:has(#section-final) #jornada-canvas {
+      width: calc(100vw - 18px) !important;
+      max-width: calc(100vw - 18px) !important;
+      height: calc(100dvh - 108px) !important;
+      max-height: calc(100dvh - 108px) !important;
+      padding-left: 10px !important;
+      padding-right: 10px !important;
+    }
+  }
+
   #section-final {
-    overflow-x: hidden !important;
-    overflow-y: visible !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
 
   #section-final .final-guide-feedback {
-    max-height: 58dvh !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
+    width: calc(100% - 12px) !important;
+    max-width: calc(100% - 12px) !important;
+    max-height: 32dvh !important;
+    margin-top: 14px !important;
+    padding: 14px 16px !important;
   }
 }
 
-/* iPhone/iPad: não deixe o patch iOS transformar wrappers em scrollers. */
+/* iOS/Safari: mantém a página externa travada e a rolagem no pergaminho. */
 @supports (-webkit-touch-callout: none) {
-  html {
-    height: auto !important;
-    overflow-y: visible !important;
-  }
+  @supports selector(body:has(#section-final)) {
+    html:has(#section-final),
+    body:has(#section-final) {
+      height: 100dvh !important;
+      min-height: 100dvh !important;
+      overflow-x: hidden !important;
+      overflow-y: hidden !important;
+      -webkit-overflow-scrolling: auto !important;
+    }
 
-  body:not(.vt-playing) {
-    height: auto !important;
-    min-height: 100% !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-  }
-
-  #section-final,
-  #section-final .final-pergaminho-wrapper,
-  #section-final .final-panel,
-  #section-final .j-panel-glow,
-  #section-final .j-perg-v-inner,
-  #section-final .final-wrap,
-  #section-final .j-arcane-card,
-  #section-final .pergaminho-content,
-  #section-final .final-container,
-  #section-final .final-content,
-  #section-final .final-message,
-  #section-final .final-message p {
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    overflow-x: visible !important;
-    overflow-y: visible !important;
-    scrollbar-width: none !important;
-  }
-
-  #section-final .final-guide-feedback {
-    max-height: 58dvh !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-    overscroll-behavior: contain !important;
-    -webkit-overflow-scrolling: touch !important;
-    scrollbar-width: thin !important;
+    body:has(#section-final) #jornada-canvas,
+    #section-final .final-guide-feedback {
+      -webkit-overflow-scrolling: touch !important;
+      overscroll-behavior: contain !important;
+    }
   }
 }
+
