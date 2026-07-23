@@ -694,3 +694,86 @@ body:has(#section-final) .final-guide-feedback {
     padding: 14px 16px !important;
   }
 }
+
+/* =========================================================
+   FIX DE ENCAIXE — CONTENÇÃO TOTAL DO PERGAMINHO
+   ========================================================= */
+
+/* 1. PERMITIR QUE OS CONTAINERS PAI ACOMPANHEM O CONTEÚDO */
+#section-final .final-pergaminho-wrapper,
+#section-final .j-panel-glow,
+#section-final .j-perg-v-inner,
+#section-final .j-arcane-card,
+#section-final .parchment-rough,
+#section-final .parchment-inner-rough,
+#section-final .pergaminho-content {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+  box-sizing: border-box !important;
+}
+
+/* 2. CAIXA DA DEVOLUTIVA — FIXA E CONTIDA DENTRO DO PERGAMINHO */
+#section-final .final-guide-feedback {
+  display: block !important;
+  position: relative !important;
+  box-sizing: border-box !important;
+  
+  /* Largura interna para não encostar nas bordas do pergaminho */
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 16px auto 10px auto !important;
+  padding: 16px 18px !important;
+
+  /* ALTURA FIXA: O container não cresce, apenas o texto rola por dentro */
+  height: 280px !important;
+  min-height: 280px !important;
+  max-height: 280px !important;
+  flex: 0 0 280px !important;
+
+  /* ROLAGEM INTERNA */
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  overscroll-behavior: contain !important;
+  -webkit-overflow-scrolling: touch !important;
+
+  /* ESTILO VISUAL E BORDAS */
+  background: rgba(10, 5, 18, 0.6) !important; /* Fundo levemente escurecido para leitura */
+  border: 1px solid rgba(212, 175, 55, 0.5) !important;
+  border-radius: 12px !important;
+
+  /* AURA DOURADA */
+  box-shadow:
+    0 0 12px rgba(0, 0, 0, 0.6),
+    0 0 18px rgba(212, 175, 55, 0.25),
+    inset 0 0 10px rgba(255, 220, 140, 0.05) !important;
+
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(255, 80, 230, 0.55) rgba(0, 0, 0, 0.2) !important;
+}
+
+/* BARRA DE ROLAGEM INTERNA DA DEVOLUTIVA */
+#section-final .final-guide-feedback::-webkit-scrollbar {
+  width: 6px !important;
+  display: block !important;
+}
+
+#section-final .final-guide-feedback::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2) !important;
+  border-radius: 999px !important;
+}
+
+#section-final .final-guide-feedback::-webkit-scrollbar-thumb {
+  background: rgba(255, 80, 230, 0.55) !important;
+  border-radius: 999px !important;
+}
+
+/* AJUSTE PARA DESKTOP */
+@media (min-width: 769px) {
+  #section-final .final-guide-feedback {
+    height: 320px !important;
+    min-height: 320px !important;
+    max-height: 320px !important;
+  }
+}
