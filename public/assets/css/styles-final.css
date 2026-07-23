@@ -105,10 +105,8 @@ min-width:220px;
   margin: 18px auto;
   padding: 16px;
   border-radius: 16px;
-  max-height: 420px !important;
-  overflow-y: auto !important;
-  -webkit-overflow-scrolling: touch !important;
-  overscroll-behavior: contain !important;
+  max-height: 420px;
+  overflow-y: auto;
 
   border: 1px solid var(--guia-strong);
 
@@ -477,58 +475,6 @@ min-width:220px;
 }
 
 /* =========================================================
-   SECTION FINAL — scroll seguro no iPhone/iPad (FIX)
-   Só o BODY rola. html sem overflow-x:hidden (bug iOS).
-   ========================================================= */
-@supports (-webkit-touch-callout: none) {
-  html {
-    overflow-x: visible !important;   /* desfaz o hidden global no iOS */
-    height: auto !important;
-    overflow-y: visible !important;
-  }
-
-  body:not(.vt-playing) {
-    overflow-x: hidden !important;    /* clip horizontal fica só no body */
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-    height: auto !important;
-    min-height: 100% !important;
-  }
-
-  #section-final {
-    display: block !important;
-    width: 100% !important;
-    height: auto !important;
-    min-height: 100svh !important;
-    max-height: none !important;
-
-    /* NÃO virar scroller — deixa o body rolar */
-    overflow: visible !important;
-
-    padding-bottom: calc(120px + env(safe-area-inset-bottom)) !important;
-  }
-
-  #section-final .j-panel-glow,
-  #section-final .j-perg-v-inner,
-  #section-final .j-arcane-card,
-  #section-final .final-container,
-  #section-final .final-content {
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    overflow: visible !important;
-  }
-
-  /* iOS: devolutiva mantém scroll interno próprio (padrão do intro) */
-  #section-final .final-guide-feedback {
-    max-height: 58dvh !important;
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-    overscroll-behavior: contain !important;
-  }
-}
-
-/* =========================================================
    RESTAURA COR DOURADA + ÁUREA DOURADA DO TEXTO (FIX v3)
    Replica a lógica da section-senha: áurea acompanha a
    datilografia (typing-active) e permanece fixa ao término
@@ -613,22 +559,150 @@ min-width:220px;
     inset 0 0 12px rgba(255, 220, 140, 0.06) !important;
 }
 
-
 /* =========================================================
-   SCROLL INTERNO DA DEVOLUTIVA — padrão do styles-intro
-   Caixa com altura limitada e scroll próprio, sem competir
-   com o scroll externo da página.
+   FIX DEFINITIVO — SECTION FINAL / SCROLL DO PERGAMINHO
+   Objetivo:
+   1) manter SOMENTE a barra sutil dentro da devolutiva;
+   2) manter a barra externa natural da página;
+   3) remover a barra do meio colada no container do pergaminho.
    ========================================================= */
-#section-final .final-guide-feedback {
-  max-height: 420px !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-  -webkit-overflow-scrolling: touch !important;
-  overscroll-behavior: contain !important;
+
+/* A seção final NÃO deve virar área de rolagem própria. */
+#section-final,
+#section-final .final-pergaminho-wrapper,
+#section-final .final-panel,
+#section-final .j-panel-glow,
+#section-final .j-perg-v-inner,
+#section-final .final-wrap,
+#section-final .j-arcane-card,
+#section-final .pergaminho-content,
+#section-final .final-container,
+#section-final .final-content,
+#section-final .final-message,
+#section-final .final-message p {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow-x: visible !important;
+  overflow-y: visible !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
 }
 
+/* Esconde qualquer scrollbar criada por wrapper/pai, sem afetar a devolutiva. */
+#section-final .final-pergaminho-wrapper::-webkit-scrollbar,
+#section-final .final-panel::-webkit-scrollbar,
+#section-final .j-panel-glow::-webkit-scrollbar,
+#section-final .j-perg-v-inner::-webkit-scrollbar,
+#section-final .final-wrap::-webkit-scrollbar,
+#section-final .j-arcane-card::-webkit-scrollbar,
+#section-final .pergaminho-content::-webkit-scrollbar,
+#section-final .final-container::-webkit-scrollbar,
+#section-final .final-content::-webkit-scrollbar,
+#section-final .final-message::-webkit-scrollbar,
+#section-final .final-message p::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+}
+
+/* Só a caixa de devolutiva final fica com scroll interno, igual à lógica da intro. */
+#section-final .final-guide-feedback {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: 420px !important;
+
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+  -webkit-overflow-scrolling: touch !important;
+
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(255, 80, 230, 0.58) rgba(0, 0, 0, 0.18) !important;
+}
+
+/* Scrollbar sutil somente dentro da devolutiva. */
+#section-final .final-guide-feedback::-webkit-scrollbar {
+  width: 6px !important;
+  height: 6px !important;
+  display: block !important;
+}
+
+#section-final .final-guide-feedback::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.18) !important;
+  border-radius: 999px !important;
+}
+
+#section-final .final-guide-feedback::-webkit-scrollbar-thumb {
+  background: rgba(255, 80, 230, 0.58) !important;
+  border-radius: 999px !important;
+  box-shadow: 0 0 6px rgba(255, 80, 230, 0.35) !important;
+}
+
+#section-final .final-guide-feedback::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 80, 230, 0.78) !important;
+}
+
+/* Mobile: reduz a altura da caixa e preserva o scroll só dentro dela. */
 @media (max-width: 768px) {
+  #section-final {
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+  }
+
   #section-final .final-guide-feedback {
     max-height: 58dvh !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+}
+
+/* iPhone/iPad: não deixe o patch iOS transformar wrappers em scrollers. */
+@supports (-webkit-touch-callout: none) {
+  html {
+    height: auto !important;
+    overflow-y: visible !important;
+  }
+
+  body:not(.vt-playing) {
+    height: auto !important;
+    min-height: 100% !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  #section-final,
+  #section-final .final-pergaminho-wrapper,
+  #section-final .final-panel,
+  #section-final .j-panel-glow,
+  #section-final .j-perg-v-inner,
+  #section-final .final-wrap,
+  #section-final .j-arcane-card,
+  #section-final .pergaminho-content,
+  #section-final .final-container,
+  #section-final .final-content,
+  #section-final .final-message,
+  #section-final .final-message p {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow-x: visible !important;
+    overflow-y: visible !important;
+    scrollbar-width: none !important;
+  }
+
+  #section-final .final-guide-feedback {
+    max-height: 58dvh !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: thin !important;
   }
 }
