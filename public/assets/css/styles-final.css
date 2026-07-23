@@ -622,101 +622,91 @@ html, body {
 }
 
 /* =========================================================
-   CORREÇÃO DEFINITIVA — SECTION FINAL COM UM ÚNICO SCROLL
-   A página rola; nenhum box interno rola.
+   DEVOLUTIVA FINAL — SCROLL INTERNO DENTRO DO BOX
+   Mantém o card compacto e a barra encostada nele.
    ========================================================= */
 
-/* A devolutiva cresce por inteiro */
-#section-final .final-guide-feedback,
-#section-final .final-guide-feedback p {
+#section-final .final-guide-feedback {
+  display: block !important;
+
   width: 100% !important;
+  max-width: 100% !important;
+
   height: auto !important;
-  min-height: 0 !important;
-  max-height: none !important;
+  min-height: 260px !important;
+  max-height: 560px !important;
 
-  overflow: visible !important;
-  overflow-x: visible !important;
-  overflow-y: visible !important;
-
-  overscroll-behavior: auto !important;
-  touch-action: pan-y !important;
-}
-
-/* Neutraliza os wrappers internos da Final */
-#section-final,
-#section-final .final-pergaminho-wrapper,
-#section-final .final-panel,
-#section-final .j-panel-glow,
-#section-final .j-perg-v-inner,
-#section-final .j-arcane-card,
-#section-final .pergaminho-content,
-#section-final .final-container,
-#section-final .final-content,
-#section-final .final-wrap {
-  height: auto !important;
-  min-height: 0 !important;
-  max-height: none !important;
-
-  overflow: visible !important;
-  overflow-x: visible !important;
-  overflow-y: visible !important;
-}
-
-/*
- * Neutraliza os containers estruturais que normalmente
- * recebem height:100vh e overflow:auto na Jornada.
- */
-body:has(#section-final:not(.hidden))
-  :is(
-    main,
-    #app,
-    #root,
-    #jornada-app,
-    #jornada-root,
-    .app,
-    .app-container,
-    .journey-container,
-    .jornada-container,
-    .sections-container,
-    .section-container,
-    .page-container,
-    .main-container
-  ) {
-  height: auto !important;
-  min-height: 0 !important;
-  max-height: none !important;
-
-  overflow: visible !important;
-  overflow-x: visible !important;
-  overflow-y: visible !important;
-}
-
-/* Somente a página poderá rolar */
-html:has(#section-final:not(.hidden)) {
-  height: auto !important;
-  min-height: 100% !important;
   overflow-x: hidden !important;
   overflow-y: auto !important;
+
+  box-sizing: border-box !important;
+
+  padding: 18px 22px 18px 18px !important;
+
+  scrollbar-gutter: stable;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+
+  scrollbar-width: thin !important;
+  scrollbar-color:
+    var(--guia-strong)
+    rgba(0, 0, 0, 0.28) !important;
 }
 
-body:has(#section-final:not(.hidden)) {
+/* Barra interna encostada na lateral do box */
+#section-final .final-guide-feedback::-webkit-scrollbar {
+  display: block !important;
+  width: 8px !important;
   height: auto !important;
-  min-height: 100vh !important;
-  max-height: none !important;
-
-  overflow-x: hidden !important;
-  overflow-y: visible !important;
-
-  overscroll-behavior-y: auto !important;
 }
 
-/* Impede reaparecimento visual de scrollbar interna */
-#section-final * {
-  scrollbar-width: none;
+/* Fundo da barra */
+#section-final .final-guide-feedback::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.28) !important;
+  border-radius: 10px !important;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
-#section-final *::-webkit-scrollbar {
-  width: 0 !important;
-  height: 0 !important;
-  display: none !important;
+/* Parte móvel da barra */
+#section-final .final-guide-feedback::-webkit-scrollbar-thumb {
+  background:
+    linear-gradient(
+      to bottom,
+      var(--guia-strong),
+      var(--guia-main)
+    ) !important;
+
+  border-radius: 10px !important;
+  border: 2px solid rgba(0, 0, 0, 0.30) !important;
+
+  box-shadow:
+    0 0 8px var(--guia-soft) !important;
+}
+
+#section-final .final-guide-feedback::-webkit-scrollbar-thumb:hover {
+  filter: brightness(1.18);
+}
+
+/* O texto não deve criar largura além do box */
+#section-final .final-guide-feedback,
+#section-final .final-guide-feedback p {
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  word-break: normal !important;
+}
+
+/* MOBILE — card um pouco menor */
+@media (max-width: 768px) {
+  #section-final .final-guide-feedback {
+    min-height: 240px !important;
+    max-height: 480px !important;
+
+    padding-left: 16px !important;
+    padding-right: 20px !important;
+  }
+
+  #section-final .final-guide-feedback::-webkit-scrollbar {
+    width: 6px !important;
+  }
 }
