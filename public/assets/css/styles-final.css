@@ -105,8 +105,8 @@ min-width:220px;
   margin: 18px auto;
   padding: 16px;
   border-radius: 16px;
-  max-height: 420px;
-  overflow-y: auto;
+  max-height: none;
+  overflow-y: visible;
 
   border: 1px solid var(--guia-strong);
 
