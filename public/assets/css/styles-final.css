@@ -1,5 +1,6 @@
 /* =========================================
-   SECTION FINAL — VERSÃO BLINDADA v2
+   SECTION FINAL — VERSÃO BLINDADA v3
+   (sem scroll interno duplicado — desktop + mobile)
    ========================================= */
 
 /* RESET GLOBAL DO CONTEXTO */
@@ -64,13 +65,13 @@ html, body {
 }
 
 .final-replay-wrap{
-display:flex;
-justify-content:center;
-margin-top:18px;
-margin-bottom:18px;
+  display:flex;
+  justify-content:center;
+  margin-top:18px;
+  margin-bottom:18px;
 }
 #btnOuvirFinal{
-min-width:220px;
+  min-width:220px;
 }
 
 /* CARD */
@@ -99,14 +100,19 @@ min-width:220px;
   margin-bottom: 12px;
 }
 
-/* DEVOLUTIVA — áurea leve e estática, sem custo de animação */
+/* DEVOLUTIVA — áurea leve e estática, SEM scroll interno
+   (flui no scroll natural da página, desktop e mobile) */
 #section-final .final-guide-feedback {
   position: relative;
   margin: 18px auto;
   padding: 16px;
   border-radius: 16px;
-  max-height: none;
-  overflow-y: visible;
+
+  /* neutralizado — nada de max-height / overflow interno */
+  max-height: none !important;
+  height: auto !important;
+  overflow: visible !important;
+  overflow-y: visible !important;
 
   border: 1px solid var(--guia-strong);
 
@@ -336,25 +342,6 @@ min-width:220px;
   }
 }
 
-/* SCROLLBAR DEVOLUTIVA */
-#section-final .final-guide-feedback {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 80, 230, 0.45) rgba(0, 0, 0, 0.18) !important;
-}
-#section-final .final-guide-feedback::-webkit-scrollbar { width: 6px !important; }
-#section-final .final-guide-feedback::-webkit-scrollbar-track {
-  background: rgba(0,0,0,.18);
-  border-radius: 999px !important;
-}
-#section-final .final-guide-feedback::-webkit-scrollbar-thumb {
-  background: rgba(255,80,230,.45) !important;
-  border-radius: 999px !important;
-  box-shadow: 0 0 6px rgba(255,80,230,.35) !important;
-}
-#section-final .final-guide-feedback::-webkit-scrollbar-thumb:hover {
-  background: rgba(255,80,230,.7) !important;
-}
-
 /* MOBILE */
 @media (max-width: 600px) {
   #section-final {
@@ -369,7 +356,7 @@ min-width:220px;
     max-width: 500px !important;
     margin-left: auto !important;
     margin-right: auto !important;
-    transform: none !important;   /* ← centraliza de volta */
+    transform: none !important;
   }
 
   #section-final .final-acoes {
@@ -475,18 +462,18 @@ min-width:220px;
 }
 
 /* =========================================================
-   SECTION FINAL — scroll seguro no iPhone/iPad (FIX)
+   SECTION FINAL — scroll seguro no iPhone/iPad
    Só o BODY rola. html sem overflow-x:hidden (bug iOS).
    ========================================================= */
 @supports (-webkit-touch-callout: none) {
   html {
-    overflow-x: visible !important;   /* desfaz o hidden global no iOS */
+    overflow-x: visible !important;
     height: auto !important;
     overflow-y: visible !important;
   }
 
   body:not(.vt-playing) {
-    overflow-x: hidden !important;    /* clip horizontal fica só no body */
+    overflow-x: hidden !important;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch !important;
     height: auto !important;
@@ -499,10 +486,7 @@ min-width:220px;
     height: auto !important;
     min-height: 100svh !important;
     max-height: none !important;
-
-    /* NÃO virar scroller — deixa o body rolar */
     overflow: visible !important;
-
     padding-bottom: calc(120px + env(safe-area-inset-bottom)) !important;
   }
 
@@ -520,14 +504,9 @@ min-width:220px;
 }
 
 /* =========================================================
-   RESTAURA COR DOURADA + ÁUREA DOURADA DO TEXTO (FIX v3)
-   Replica a lógica da section-senha: áurea acompanha a
-   datilografia (typing-active) e permanece fixa ao término
-   (typing-done / type-done). Aplica também de forma
-   persistente aos elementos-chave, mesmo sem o data-typing.
+   COR DOURADA + ÁUREA DOURADA DO TEXTO
    ========================================================= */
 
-/* Cor dourada base */
 #section-final .final-title,
 #section-final .final-message,
 #section-final .final-message p,
@@ -543,7 +522,6 @@ min-width:220px;
     1px 1px 2px rgba(0, 0, 0, 0.85) !important;
 }
 
-/* Garantir que os elementos possam receber a áurea via ::before */
 #section-final .final-title,
 #section-final .final-message p,
 #section-final .final-guide-feedback {
@@ -551,10 +529,6 @@ min-width:220px;
   isolation: isolate;
 }
 
-/* ÁUREA PERSISTENTE (equivalente ao .typing-done da senha) —
-   aplicada em todos os estados por padrão. Quando o efeito de
-   datilografia entrar em ação, as regras .typing-active acima
-   sobrescrevem naturalmente com a áurea pulsante. */
 #section-final .final-title,
 #section-final .final-message p,
 #section-final .final-guide-feedback {
@@ -576,7 +550,6 @@ min-width:220px;
   border-radius: 12px;
 }
 
-/* Halo externo suave (equivalente ao ::before da senha) */
 #section-final .final-title::before,
 #section-final .final-message p::before,
 #section-final .final-guide-feedback::before {
@@ -594,7 +567,6 @@ min-width:220px;
   );
 }
 
-/* Bloco de devolutiva: áurea dourada mais destacada */
 #section-final .final-guide-feedback {
   border: 1px solid rgba(212, 175, 55, 0.55) !important;
   box-shadow:
@@ -604,19 +576,47 @@ min-width:220px;
     inset 0 0 12px rgba(255, 220, 140, 0.06) !important;
 }
 
-/* ============================================
-   DESKTOP — elimina scroll interno duplicado
-   ============================================ */
-@media (min-width: 769px) {
-  #section-final .final-guide-feedback,
-  #section-final .j-panel-glow,
-  #section-final .j-perg-v-inner,
-  #section-final .j-arcane-card,
-  #section-final .final-panel,
-  #section-final .pergaminho-content {
-    max-height: none !important;
-    height: auto !important;
-    overflow: visible !important;
-    overflow-y: visible !important;
-  }
+/* =========================================================
+   BLINDAGEM FINAL — SEM SCROLL INTERNO (desktop + mobile)
+   Neutraliza qualquer max-height/overflow interno que
+   possa ser reintroduzido por outros CSS ou por estilo
+   inline aplicado via JS.
+   ========================================================= */
+#section-final,
+#section-final .final-guide-feedback,
+#section-final .j-panel-glow,
+#section-final .j-perg-v-inner,
+#section-final .j-arcane-card,
+#section-final .final-panel,
+#section-final .final-container,
+#section-final .final-content,
+#section-final .pergaminho-content,
+#section-final [class*="panel"],
+#section-final [class*="card"],
+#section-final [class*="pergaminho"] {
+  max-height: none !important;
+  height: auto !important;
+  overflow: visible !important;
+  overflow-y: visible !important;
+}
+
+/* Esconde scrollbar interna caso algum estilo residual force overflow */
+#section-final .final-guide-feedback::-webkit-scrollbar,
+#section-final .j-panel-glow::-webkit-scrollbar,
+#section-final .j-perg-v-inner::-webkit-scrollbar,
+#section-final .j-arcane-card::-webkit-scrollbar,
+#section-final .final-panel::-webkit-scrollbar,
+#section-final .pergaminho-content::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+}
+#section-final .final-guide-feedback,
+#section-final .j-panel-glow,
+#section-final .j-perg-v-inner,
+#section-final .j-arcane-card,
+#section-final .final-panel,
+#section-final .pergaminho-content {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
 }
