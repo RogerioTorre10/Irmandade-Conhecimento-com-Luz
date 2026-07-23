@@ -1,6 +1,5 @@
 /* =========================================
-   SECTION FINAL — VERSÃO BLINDADA v3
-   (sem scroll interno duplicado — desktop + mobile)
+   SECTION FINAL — VERSÃO BLINDADA v2
    ========================================= */
 
 /* RESET GLOBAL DO CONTEXTO */
@@ -65,13 +64,13 @@ html, body {
 }
 
 .final-replay-wrap{
-  display:flex;
-  justify-content:center;
-  margin-top:18px;
-  margin-bottom:18px;
+display:flex;
+justify-content:center;
+margin-top:18px;
+margin-bottom:18px;
 }
 #btnOuvirFinal{
-  min-width:220px;
+min-width:220px;
 }
 
 /* CARD */
@@ -100,19 +99,14 @@ html, body {
   margin-bottom: 12px;
 }
 
-/* DEVOLUTIVA — áurea leve e estática, SEM scroll interno
-   (flui no scroll natural da página, desktop e mobile) */
+/* DEVOLUTIVA — áurea leve e estática, sem custo de animação */
 #section-final .final-guide-feedback {
   position: relative;
   margin: 18px auto;
   padding: 16px;
   border-radius: 16px;
-
-  /* neutralizado — nada de max-height / overflow interno */
-  max-height: none !important;
-  height: auto !important;
-  overflow: visible !important;
-  overflow-y: visible !important;
+  max-height: 420px;
+  overflow-y: auto;
 
   border: 1px solid var(--guia-strong);
 
@@ -237,99 +231,6 @@ html, body {
   pointer-events: none !important;
 }
 
-/* ======================================================
-   DATILOGRAFIA / AURA
-   ====================================================== */
-
-#section-final [data-typing="true"][data-cursor="true"] {
-  padding-right: 0.45em !important;
-}
-
-#section-final [data-typing="true"][data-cursor="true"].typing-active::after {
-  content: "";
-  position: absolute;
-  right: 0.05em;
-  bottom: 0.18em;
-  width: 2px;
-  height: 1em;
-  border-radius: 2px;
-  background: linear-gradient(180deg, #ffe08a 0%, #ffbf3b 100%);
-  box-shadow: 0 0 6px rgba(255, 210, 100, 0.9);
-  animation: senhaCaretBlink 1s steps(1, end) infinite;
-}
-
-#section-final [data-typing="true"].typing-done::after,
-#section-final [data-typing="true"].type-done::after {
-  content: none;
-}
-
-#section-final [data-typing="true"].typing-active {
-  background: radial-gradient(ellipse at center, rgba(255, 220, 120, 0.16) 0%, rgba(255, 190, 70, 0.08) 45%, transparent 100%) !important;
-  box-shadow:
-    0 0 0 1px rgba(255, 220, 120, 0.18),
-    0 0 10px rgba(255, 220, 120, 0.18),
-    0 0 22px rgba(255, 180, 60, 0.14),
-    inset 0 0 10px rgba(255, 240, 180, 0.04) !important;
-  text-shadow:
-    0 0 6px rgba(255, 230, 120, 0.95),
-    0 0 12px rgba(255, 210, 90, 0.72),
-    0 0 20px rgba(255, 170, 40, 0.36) !important;
-  animation: senhaAuraPulse 1.6s ease-in-out infinite;
-}
-
-#section-final [data-typing="true"].typing-active::before,
-#section-final [data-typing="true"].typing-done::before,
-#section-final [data-typing="true"].type-done::before {
-  content: "";
-  position: absolute;
-  inset: -4px -6px;
-  border-radius: 14px;
-  pointer-events: none;
-  z-index: -1;
-  background: radial-gradient(ellipse at center, rgba(255, 220, 120, 0.10) 0%, rgba(255, 180, 60, 0.05) 55%, transparent 100%);
-}
-
-#section-final [data-typing="true"].typing-done,
-#section-final [data-typing="true"].type-done {
-  background: radial-gradient(ellipse at center, rgba(255, 220, 120, 0.08) 0%, rgba(255, 190, 70, 0.04) 46%, transparent 100%) !important;
-  box-shadow:
-    0 0 0 1px rgba(255, 220, 120, 0.10),
-    0 0 8px rgba(255, 220, 120, 0.10),
-    0 0 16px rgba(255, 180, 60, 0.08) !important;
-}
-
-/* ======================================================
-   ANIMAÇÕES
-   ====================================================== */
-
-@keyframes finalCaretBlink {
-  0%, 45% { opacity: 0.95; }
-  50%, 100% { opacity: 0; }
-}
-
-@keyframes finalAuraPulse {
-  0% {
-    box-shadow:
-      0 0 0 1px rgba(255, 220, 120, 0.16),
-      0 0 8px rgba(255, 220, 120, 0.14),
-      0 0 16px rgba(255, 180, 60, 0.10),
-      inset 0 0 8px rgba(255, 240, 180, 0.03);
-  }
-  50% {
-    box-shadow:
-      0 0 0 1px rgba(255, 220, 120, 0.24),
-      0 0 14px rgba(255, 220, 120, 0.24),
-      0 0 26px rgba(255, 180, 60, 0.18),
-      inset 0 0 12px rgba(255, 240, 180, 0.06);
-  }
-  100% {
-    box-shadow:
-      0 0 0 1px rgba(255, 220, 120, 0.16),
-      0 0 8px rgba(255, 220, 120, 0.14),
-      0 0 16px rgba(255, 180, 60, 0.10),
-      inset 0 0 8px rgba(255, 240, 180, 0.03);
-  }
-}
 
 /* DESKTOP */
 @media (min-width: 901px) {
@@ -340,6 +241,25 @@ html, body {
   #section-final .pergaminho-content {
     padding: 18px 22px 14px !important;
   }
+}
+
+/* SCROLLBAR DEVOLUTIVA */
+#section-final .final-guide-feedback {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 80, 230, 0.45) rgba(0, 0, 0, 0.18) !important;
+}
+#section-final .final-guide-feedback::-webkit-scrollbar { width: 6px !important; }
+#section-final .final-guide-feedback::-webkit-scrollbar-track {
+  background: rgba(0,0,0,.18);
+  border-radius: 999px !important;
+}
+#section-final .final-guide-feedback::-webkit-scrollbar-thumb {
+  background: rgba(255,80,230,.45) !important;
+  border-radius: 999px !important;
+  box-shadow: 0 0 6px rgba(255,80,230,.35) !important;
+}
+#section-final .final-guide-feedback::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,80,230,.7) !important;
 }
 
 /* MOBILE */
@@ -356,7 +276,7 @@ html, body {
     max-width: 500px !important;
     margin-left: auto !important;
     margin-right: auto !important;
-    transform: none !important;
+    transform: none !important;   /* ← centraliza de volta */
   }
 
   #section-final .final-acoes {
@@ -462,18 +382,18 @@ html, body {
 }
 
 /* =========================================================
-   SECTION FINAL — scroll seguro no iPhone/iPad
+   SECTION FINAL — scroll seguro no iPhone/iPad (FIX)
    Só o BODY rola. html sem overflow-x:hidden (bug iOS).
    ========================================================= */
 @supports (-webkit-touch-callout: none) {
   html {
-    overflow-x: visible !important;
+    overflow-x: visible !important;   /* desfaz o hidden global no iOS */
     height: auto !important;
     overflow-y: visible !important;
   }
 
   body:not(.vt-playing) {
-    overflow-x: hidden !important;
+    overflow-x: hidden !important;    /* clip horizontal fica só no body */
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch !important;
     height: auto !important;
@@ -486,7 +406,10 @@ html, body {
     height: auto !important;
     min-height: 100svh !important;
     max-height: none !important;
+
+    /* NÃO virar scroller — deixa o body rolar */
     overflow: visible !important;
+
     padding-bottom: calc(120px + env(safe-area-inset-bottom)) !important;
   }
 
@@ -504,209 +427,38 @@ html, body {
 }
 
 /* =========================================================
-   COR DOURADA + ÁUREA DOURADA DO TEXTO
+   RESTAURA COR DOURADA + ÁUREA DOURADA DO TEXTO (FIX)
+   Adicionado de forma cirúrgica, sem alterar o fluxo.
    ========================================================= */
+#section-final .final-title {
+  color: #f2d17a !important;
+  text-shadow:
+    0 0 6px rgba(212, 175, 55, 0.55),
+    0 0 14px rgba(212, 175, 55, 0.35),
+    1px 1px 2px rgba(0, 0, 0, 0.85) !important;
+}
 
-#section-final .final-title,
 #section-final .final-message,
 #section-final .final-message p,
 #section-final .final-guide-feedback,
 #section-final .final-guide-feedback p {
   color: #f2d17a !important;
-}
-
-#section-final .final-title {
   text-shadow:
-    0 0 6px rgba(255, 230, 120, 0.85),
-    0 0 14px rgba(255, 180, 60, 0.45),
-    1px 1px 2px rgba(0, 0, 0, 0.85) !important;
-}
-
-#section-final .final-title,
-#section-final .final-message p,
-#section-final .final-guide-feedback {
-  position: relative;
-  isolation: isolate;
-}
-
-#section-final .final-title,
-#section-final .final-message p,
-#section-final .final-guide-feedback {
-  background: radial-gradient(
-    ellipse at center,
-    rgba(255, 220, 120, 0.08) 0%,
-    rgba(255, 190, 70, 0.04) 46%,
-    transparent 100%
-  ) !important;
-  box-shadow:
-    0 0 0 1px rgba(255, 220, 120, 0.14),
-    0 0 10px rgba(255, 220, 120, 0.16),
-    0 0 22px rgba(255, 180, 60, 0.12),
-    inset 0 0 10px rgba(255, 240, 180, 0.04) !important;
-  text-shadow:
-    0 0 6px rgba(255, 230, 120, 0.75),
-    0 0 12px rgba(255, 210, 90, 0.45),
+    0 0 4px rgba(212, 175, 55, 0.35),
     1px 1px 2px rgba(0, 0, 0, 0.80) !important;
-  border-radius: 12px;
 }
 
-#section-final .final-title::before,
-#section-final .final-message p::before,
-#section-final .final-guide-feedback::before {
-  content: "";
-  position: absolute;
-  inset: -4px -6px;
-  border-radius: 14px;
-  pointer-events: none;
-  z-index: -1;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(255, 220, 120, 0.10) 0%,
-    rgba(255, 180, 60, 0.05) 55%,
-    transparent 100%
-  );
-}
-
+/* Áurea dourada envolvendo o bloco de devolutiva */
 #section-final .final-guide-feedback {
   border: 1px solid rgba(212, 175, 55, 0.55) !important;
   box-shadow:
-    0 0 0 1px rgba(255, 220, 120, 0.18),
-    0 0 14px rgba(212, 175, 55, 0.40),
-    0 0 30px rgba(212, 175, 55, 0.24),
+    0 0 12px rgba(212, 175, 55, 0.35),
+    0 0 28px rgba(212, 175, 55, 0.22),
     inset 0 0 12px rgba(255, 220, 140, 0.06) !important;
-}
-
-/* =========================================================
-   BLINDAGEM FINAL — SEM SCROLL INTERNO (desktop + mobile)
-   Neutraliza qualquer max-height/overflow interno que
-   possa ser reintroduzido por outros CSS ou por estilo
-   inline aplicado via JS.
-   ========================================================= */
-#section-final,
-#section-final .final-guide-feedback,
-#section-final .j-panel-glow,
-#section-final .j-perg-v-inner,
-#section-final .j-arcane-card,
-#section-final .final-panel,
-#section-final .final-container,
-#section-final .final-content,
-#section-final .pergaminho-content,
-#section-final [class*="panel"],
-#section-final [class*="card"],
-#section-final [class*="pergaminho"] {
-  max-height: none !important;
-  height: auto !important;
-  overflow: visible !important;
-  overflow-y: visible !important;
-}
-
-/* Esconde scrollbar interna caso algum estilo residual force overflow */
-#section-final .final-guide-feedback::-webkit-scrollbar,
-#section-final .j-panel-glow::-webkit-scrollbar,
-#section-final .j-perg-v-inner::-webkit-scrollbar,
-#section-final .j-arcane-card::-webkit-scrollbar,
-#section-final .final-panel::-webkit-scrollbar,
-#section-final .pergaminho-content::-webkit-scrollbar {
-  width: 0 !important;
-  height: 0 !important;
-  display: none !important;
-}
-#section-final .final-guide-feedback,
-#section-final .j-panel-glow,
-#section-final .j-perg-v-inner,
-#section-final .j-arcane-card,
-#section-final .final-panel,
-#section-final .pergaminho-content {
-  scrollbar-width: none !important;
-  -ms-overflow-style: none !important;
-}
-
-/* =========================================================
-   DEVOLUTIVA FINAL — SCROLL INTERNO DENTRO DO BOX
-   Mantém o card compacto e a barra encostada nele.
-   ========================================================= */
-
-#section-final .final-guide-feedback {
-  display: block !important;
-
-  width: 100% !important;
-  max-width: 100% !important;
-
-  height: auto !important;
-  min-height: 260px !important;
-  max-height: 560px !important;
-
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
-
-  box-sizing: border-box !important;
-
-  padding: 18px 22px 18px 18px !important;
-
-  scrollbar-gutter: stable;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-
-  scrollbar-width: thin !important;
-  scrollbar-color:
-    var(--guia-strong)
-    rgba(0, 0, 0, 0.28) !important;
-}
-
-/* Barra interna encostada na lateral do box */
-#section-final .final-guide-feedback::-webkit-scrollbar {
-  display: block !important;
-  width: 8px !important;
-  height: auto !important;
-}
-
-/* Fundo da barra */
-#section-final .final-guide-feedback::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.28) !important;
-  border-radius: 10px !important;
-  margin-top: 10px;
-  margin-bottom: 10px;
-}
-
-/* Parte móvel da barra */
-#section-final .final-guide-feedback::-webkit-scrollbar-thumb {
   background:
     linear-gradient(
       to bottom,
-      var(--guia-strong),
-      var(--guia-main)
+      rgba(60, 40, 10, 0.18),
+      rgba(20, 12, 4, 0.28)
     ) !important;
-
-  border-radius: 10px !important;
-  border: 2px solid rgba(0, 0, 0, 0.30) !important;
-
-  box-shadow:
-    0 0 8px var(--guia-soft) !important;
-}
-
-#section-final .final-guide-feedback::-webkit-scrollbar-thumb:hover {
-  filter: brightness(1.18);
-}
-
-/* O texto não deve criar largura além do box */
-#section-final .final-guide-feedback,
-#section-final .final-guide-feedback p {
-  white-space: normal !important;
-  overflow-wrap: anywhere !important;
-  word-break: normal !important;
-}
-
-/* MOBILE — card um pouco menor */
-@media (max-width: 768px) {
-  #section-final .final-guide-feedback {
-    min-height: 240px !important;
-    max-height: 480px !important;
-
-    padding-left: 16px !important;
-    padding-right: 20px !important;
-  }
-
-  #section-final .final-guide-feedback::-webkit-scrollbar {
-    width: 6px !important;
-  }
 }
