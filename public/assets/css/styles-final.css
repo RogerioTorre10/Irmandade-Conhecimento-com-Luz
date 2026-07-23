@@ -1,464 +1,141 @@
-/* =========================================
-   SECTION FINAL — VERSÃO BLINDADA v2
-   ========================================= */
-
-/* RESET GLOBAL DO CONTEXTO */
-html, body {
-  overflow-x: hidden !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  box-sizing: border-box !important;
+/* styles-final.css */
+#section-final {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: radial-gradient(circle at center, #1a1a2e, #0a0a1a);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 1s ease;
 }
 
-/* BASE */
-#section-final {
+#section-final.show {
+  opacity: 1;
+}
+
+.final-pergaminho-wrapper {
+  width: 100%; height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.pergaminho-vertical {
+  background: center/contain no-repeat url('/assets/img/pergaminho-rasgado-vert.png');
+  width: 90vw;
+  max-width: 500px;
+  height: 90vh;
+  max-height: 800px;
+  padding: 60px 40px;
+  border-radius: 20px;
+  box-shadow: 0 0 60px rgba(212,175,55,0.8);
   position: relative;
-  min-height: 100vh;
+  background-color: rgba(245, 235, 200, 0.1);
+}
+
+.pergaminho-content {
+  text-align: center;
+  color: #ffd700;
+  font-family: 'BerkshireSwash', cursive;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  padding: 16px 0 32px;
-  overflow-x: hidden !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  left: 0 !important;
-  right: 0 !important;
-  margin: 0 !important;
-  box-sizing: border-box !important;
+  justify-content: center;
+  gap: 22px;
+  height: 100%;
+  overflow: hidden;
 }
 
-/* TODOS OS WRAPPERS INTERNOS — CENTRALIZAÇÃO FORÇADA */
-#section-final .final-pergaminho-wrapper,
-#section-final .final-panel,
-#section-final .j-panel-glow,
-#section-final .j-perg-v-inner,
-#section-final .final-wrap,
-#section-final .j-arcane-card,
-#section-final .pergaminho-content {
-  margin-left: auto !important;
-  margin-right: auto !important;
-  box-sizing: border-box !important;
-  transform: none !important;
-  left: auto !important;
-  right: auto !important;
-  position: relative !important;
+.final-title {
+  font-size: 2.4em;
+  text-shadow: 0 0 20px gold;
+  margin: 0;
+  min-height: 1.2em;
 }
 
-/* CONTAINER PRINCIPAL — mantém a áurea visível */
-#section-final .j-panel-glow,
-#section-final .final-panel {
-  width: min(88vw, 500px) !important;
-  max-width: 500px !important;
-  border-radius: 24px;
-  overflow: visible !important;
-  isolation: isolate;
+.final-message p {
+  font-size: 1.3em;
+  line-height: 1.6;
+  margin: 10px 0;
+  text-shadow: 0 0 10px rgba(255,215,0,0.5);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.6s ease;
 }
 
-/* O recorte arredondado fica somente na parte interna */
-#section-final .j-perg-v-inner,
-#section-final .j-arcane-card {
-  border-radius: 20px;
+.final-message p.revealed {
+  opacity: 1;
+  transform: translateY(0);
 }
 
-.final-replay-wrap{
-display:flex;
-justify-content:center;
-margin-top:18px;
-margin-bottom:18px;
-}
-#btnOuvirFinal{
-min-width:220px;
+.final-bold {
+  font-weight: bold;
+  font-size: 1.5em !important;
+  color: #ffeb3b;
 }
 
-/* CARD */
-#section-final .j-arcane-card {
-  padding: 22px 18px;
-  border-radius: 20px;
-  background: rgba(0,0,0,.18);
+/* BOTÕES */
+.final-acoes {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.8s ease;
 }
 
-/* CONTENT */
-#section-final .pergaminho-content {
-  padding: 12px;
-  text-align: left !important;
+.final-acoes.show {
+  opacity: 1;
+  transform: translateY(0);
 }
 
-/* TITLE */
-#section-final .final-title {
-  font-size: clamp(22px, 2vw, 30px);
-  margin-bottom: 12px;
+.btn-gold, .btn-light {
+  padding: 14px 24px;
+  border-radius: 12px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 1.1em;
 }
 
-/* MESSAGE */
-#section-final .final-message p {
-  font-size: 15px;
-  line-height: 1.45;
-  margin-bottom: 12px;
+.btn-gold {
+  background: linear-gradient(45deg, #d4af37, #f4e04d);
+  color: #000;
+  box-shadow: 0 0 20px gold;
 }
 
-/* DEVOLUTIVA — áurea leve e estática, sem custo de animação */
-#section-final .final-guide-feedback {
-  position: relative;
-  margin: 18px auto;
-  padding: 16px;
-  border-radius: 16px;
-  max-height: 420px;
-  overflow-y: auto;
-
-  border: 1px solid var(--guia-strong);
-
-  box-shadow:
-    0 0 12px var(--guia-soft),
-    0 0 28px color-mix(
-      in srgb,
-      var(--guia-main) 38%,
-      transparent
-    ),
-    inset 0 0 12px rgba(255, 255, 255, 0.035);
+.btn-gold:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 0 30px gold;
 }
 
-/* ACTIONS */
-#section-final .final-acoes {
-  display: grid;
-  grid-template-columns: 1fr 1.4fr 1fr;
-  gap: 10px;
-  margin-top: 18px;
+.btn-light {
+  background: rgba(255,255,255,0.1);
+  color: #ffd700;
+  border: 1px solid #d4af37;
+  backdrop-filter: blur(5px);
 }
 
-#section-final .final-acoes button {
-  min-height: 50px;
-  font-size: 14px;
+.btn-light:hover {
+  background: #d4af37;
+  color: #000;
 }
 
-/* ===== BOTÕES COM AURA DO GUIA ===== */
-#section-final .final-acoes .btn,
-#section-final .final-acoes button,
-#section-final .final-acoes a,
-#section-final #btnPdf,
-#section-final #btnBaixarSelfie,
-#section-final #btnVoltarPortal {
-  position: relative !important;
-  border: 1px solid var(--guia-strong) !important;
-  color: var(--guia-text) !important;
-  background:
-    linear-gradient(to bottom, rgba(255,255,255,0.08), rgba(0,0,0,0.24)) !important;
-  box-shadow:
-    0 0 10px var(--guia-soft),
-    0 0 24px color-mix(in srgb, var(--guia-main) 35%, transparent),
-    inset 0 0 10px rgba(255,255,255,0.04) !important;
-  text-shadow: 0 0 6px var(--guia-soft) !important;
-  transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease !important;
-}
-
-#section-final .final-acoes .btn:hover,
-#section-final .final-acoes button:hover,
-#section-final .final-acoes a:hover {
-  transform: translateY(-1px) scale(1.01) !important;
-  box-shadow:
-    0 0 14px var(--guia-soft),
-    0 0 30px color-mix(in srgb, var(--guia-main) 50%, transparent),
-    inset 0 0 12px rgba(255,255,255,0.06) !important;
-}
-
-#section-final .final-acoes .btn.is-busy,
-#section-final .final-acoes button.is-busy {
-  opacity: .62 !important;
-  filter: grayscale(.08) !important;
-}
-
-#section-final #btnOuvirFinal,
-#section-final .btn-replay-final {
-  position: relative !important;
-  display: inline-flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-
-  width: auto !important;
-  min-width: 210px !important;
-  min-height: 48px !important;
-
-  margin: 0 auto !important;
-  padding: 10px 18px !important;
-
-  border: 2px solid #4a4a4a !important;
-  border-radius: 8px !important;
-
-  color: #f9e7c2 !important;
-  font-family: inherit !important;
-  text-align: center !important;
-  cursor: pointer !important;
-
-  text-shadow:
-    1px 1px 3px rgba(0, 0, 0, 0.85) !important;
-
-  background:
-    linear-gradient(
-      to bottom,
-      rgba(180, 180, 180, 0.45),
-      rgba(70, 70, 70, 0.75)
-    ),
-    url('/assets/img/textura-de-pedra.jpg')
-    center / cover no-repeat !important;
-
-  background-blend-mode: overlay !important;
-
-  box-shadow:
-    inset 0 3px 6px rgba(0, 0, 0, 0.45),
-    0 6px 12px rgba(0, 0, 0, 0.55),
-    0 0 12px rgba(212, 175, 55, 0.28) !important;
-
-  transition:
-    transform 0.2s ease,
-    filter 0.2s ease,
-    box-shadow 0.2s ease !important;
-}
-
-#section-final #btnOuvirFinal:hover:not(:disabled) {
-  transform: scale(1.04) !important;
-  filter: brightness(1.15) !important;
-
-  box-shadow:
-    inset 0 3px 6px rgba(0, 0, 0, 0.45),
-    0 0 18px rgba(212, 175, 55, 0.58),
-    0 0 32px rgba(212, 175, 55, 0.32) !important;
-}
-
-#section-final #btnOuvirFinal:disabled {
-  opacity: 0.6 !important;
-  pointer-events: none !important;
-}
-
-
-/* DESKTOP */
-@media (min-width: 901px) {
-  #section-final {
-    padding-top: 18px !important;
+/* Responsivo */
+@media (max-width: 480px) {
+  .pergaminho-vertical {
+    padding: 40px 25px;
+    width: 95vw;
+    height: 95vh;
   }
-
-  #section-final .pergaminho-content {
-    padding: 18px 22px 14px !important;
-  }
-}
-
-/* SCROLLBAR DEVOLUTIVA */
-#section-final .final-guide-feedback {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 80, 230, 0.45) rgba(0, 0, 0, 0.18) !important;
-}
-#section-final .final-guide-feedback::-webkit-scrollbar { width: 6px !important; }
-#section-final .final-guide-feedback::-webkit-scrollbar-track {
-  background: rgba(0,0,0,.18);
-  border-radius: 999px !important;
-}
-#section-final .final-guide-feedback::-webkit-scrollbar-thumb {
-  background: rgba(255,80,230,.45) !important;
-  border-radius: 999px !important;
-  box-shadow: 0 0 6px rgba(255,80,230,.35) !important;
-}
-#section-final .final-guide-feedback::-webkit-scrollbar-thumb:hover {
-  background: rgba(255,80,230,.7) !important;
-}
-
-/* MOBILE */
-@media (max-width: 600px) {
-  #section-final {
-    padding-left: 12px !important;
-    padding-right: 12px !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-
-  #section-final .j-panel-glow {
-    width: min(92vw, 500px) !important;
-    max-width: 500px !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    transform: none !important;   /* ← centraliza de volta */
-  }
-
-  #section-final .final-acoes {
-    grid-template-columns: 1fr 1.2fr 1fr;
-  }
-
-  #section-final .final-title {
-    font-size: 18px;
-  }
-
-  #section-final .final-message p {
-    font-size: 13px;
-  }
-}
-
-/* =====================================================
-   FIX MOBILE — SECTION FINAL CENTRALIZADA / SEM DIREITA
-   ===================================================== */
-
-@media (max-width: 768px) {
-  html,
-  body {
-    width: 100%;
-    max-width: 100%;
-    overflow-x: hidden !important;
-  }
-
-  #section-final,
-  .section-final {
-    width: 100% !important;
-    max-width: 100vw !important;
-    min-height: 100svh;
-    margin: 0 auto !important;
-    padding-left: 10px !important;
-    padding-right: 10px !important;
-    overflow-x: hidden !important;
-    box-sizing: border-box !important;
-  }
-
-  #section-final .j-panel-glow,
-  #section-final .final-panel,
-  #section-final .final-card,
-  #section-final .j-pergaminho,
-  #section-final .pergaminho,
-  #section-final [class*="panel"],
-  #section-final [class*="card"] {
-    width: 100% !important;
-    max-width: calc(100vw - 20px) !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    left: auto !important;
-    right: auto !important;
-    transform: none !important;
-    box-sizing: border-box !important;
-  }
-
-  #section-final img,
-  #section-final canvas,
-  #section-final video {
-    max-width: 100% !important;
-    height: auto;
-  }
-
-  #section-final .final-actions,
-  #section-final .final-buttons,
-  #section-final .actions {
-    width: 100% !important;
-    max-width: 100% !important;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-    box-sizing: border-box;
-  }
-
-  #section-final button,
-  #section-final .btn,
-  #section-final a {
-    max-width: 100%;
-    box-sizing: border-box;
-  }
-}
-
-/* ================================
-   DATILOGRAFIA ESQUERDA → DIREITA
-   ================================ */
-#section-final .final-message,
-#section-final .final-message p,
-#section-final .final-guide-feedback {
-  text-align: left !important;
-  direction: ltr !important;
-  transform-origin: left center !important;
-}
-
-#section-final .final-message p {
-  width: 100%;
-  display: block;
-}
-
-#section-final .final-guide-feedback {
-  padding-left: 18px !important;
-  padding-right: 18px !important;
-}
-
-/* =========================================================
-   SECTION FINAL — scroll seguro no iPhone/iPad (FIX)
-   Só o BODY rola. html sem overflow-x:hidden (bug iOS).
-   ========================================================= */
-@supports (-webkit-touch-callout: none) {
-  html {
-    overflow-x: visible !important;   /* desfaz o hidden global no iOS */
-    height: auto !important;
-    overflow-y: visible !important;
-  }
-
-  body:not(.vt-playing) {
-    overflow-x: hidden !important;    /* clip horizontal fica só no body */
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-    height: auto !important;
-    min-height: 100% !important;
-  }
-
-  #section-final {
-    display: block !important;
-    width: 100% !important;
-    height: auto !important;
-    min-height: 100svh !important;
-    max-height: none !important;
-
-    /* NÃO virar scroller — deixa o body rolar */
-    overflow: visible !important;
-
-    padding-bottom: calc(120px + env(safe-area-inset-bottom)) !important;
-  }
-
-  #section-final .j-panel-glow,
-  #section-final .j-perg-v-inner,
-  #section-final .j-arcane-card,
-  #section-final .final-container,
-  #section-final .final-content,
-  #section-final .final-guide-feedback {
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    overflow: visible !important;
-  }
-}
-
-/* =========================================================
-   RESTAURA COR DOURADA + ÁUREA DOURADA DO TEXTO (FIX)
-   Adicionado de forma cirúrgica, sem alterar o fluxo.
-   ========================================================= */
-#section-final .final-title {
-  color: #f2d17a !important;
-  text-shadow:
-    0 0 6px rgba(212, 175, 55, 0.55),
-    0 0 14px rgba(212, 175, 55, 0.35),
-    1px 1px 2px rgba(0, 0, 0, 0.85) !important;
-}
-
-#section-final .final-message,
-#section-final .final-message p,
-#section-final .final-guide-feedback,
-#section-final .final-guide-feedback p {
-  color: #f2d17a !important;
-  text-shadow:
-    0 0 4px rgba(212, 175, 55, 0.35),
-    1px 1px 2px rgba(0, 0, 0, 0.80) !important;
-}
-
-/* Áurea dourada envolvendo o bloco de devolutiva */
-#section-final .final-guide-feedback {
-  border: 1px solid rgba(212, 175, 55, 0.55) !important;
-  box-shadow:
-    0 0 12px rgba(212, 175, 55, 0.35),
-    0 0 28px rgba(212, 175, 55, 0.22),
-    inset 0 0 12px rgba(255, 220, 140, 0.06) !important;
-  background:
-    linear-gradient(
-      to bottom,
-      rgba(60, 40, 10, 0.18),
-      rgba(20, 12, 4, 0.28)
-    ) !important;
+  .final-title { font-size: 2em; }
+  .final-message p { font-size: 1.1em; }
+  .final-bold { font-size: 1.3em !important; }
 }
