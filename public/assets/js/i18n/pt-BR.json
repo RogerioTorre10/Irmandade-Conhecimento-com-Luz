@@ -70,13 +70,18 @@
   },
   
   "senha": {
-   "title": "Confirme seu Acesso",
-   "p1": "O código enviado por e-mail libera sua Jornada.",
-   "p2": "Esta é uma experiência pessoal, educativa e simbólica.",
-   "p3": "Ao prosseguir, você declara estar ciente dos termos.",
-   "placeholder": "Digite o código recebido...",
-   "reenviar_limpeza": "🔄 Reenviar código\n\nIsso irá limpar os dados desta Jornada neste dispositivo.\n(Não afeta seu histórico, outras abas ou outros sites.)\n\nDepois clique novamente no botão ENVIAR CÓDIGO."
-  },
+  "title": "Confirme seu Acesso",
+  "p1": "O código enviado por e-mail libera sua Jornada.",
+  "p2": "Esta é uma experiência pessoal, educativa e simbólica.",
+  "p3": "Ao prosseguir, você declara estar ciente destes termos.",
+  "codePlaceholder": "Digite o código recebido...",
+  "emailPlaceholder": "Digite seu e-mail...",
+  "sendCode": "✉️ Enviar código por e-mail",
+  "resendInfo": "Dificuldade em solicitar o código? Clique no botão abaixo.",
+  "resendCode": "🔄 Limpar os dados desta Jornada neste dispositivo e tentar novamente.",
+  "confirmCode": "🔐 Confirmar",
+  "reenviar_limpeza": "🔄 Reenviar código\n\nSerá feita uma limpeza apenas dos dados desta Jornada neste dispositivo para resolver possíveis falhas de envio.\n\nSeu progresso e seu histórico permanecerão preservados.\n\nDepois, clique novamente no botão ENVIAR CÓDIGO."
+}
   
  "guia": {
   "title": "Escolha seu Guia",
