@@ -78,7 +78,7 @@
   "resendCode": "🔄 Borrar los datos locales de esta Jornada en este dispositivo e intentarlo de nuevo.",
   "confirmCode": "🔐 Confirmar",
   "reenviar_limpeza": "🔄 Reenviar código de verificación\n\nSolo se eliminarán los datos locales de esta Jornada en este dispositivo para resolver posibles problemas de envío.\n\nTu progreso y tu historial permanecerán intactos.\n\nDespués, vuelve a pulsar el botón ENVIAR CÓDIGO."
-}
+},
   
   "guia": {
   "title": "Elige tu Guía",
