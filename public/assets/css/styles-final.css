@@ -348,7 +348,8 @@ min-width:220px;
   }
 
   #section-final .pergaminho-content {
-    padding: 18px 22px 14px !important;
+     padding-bottom:24px !important;
+     padding: 18px 22px 14px !important;
   }
 }
 
