@@ -79,7 +79,7 @@
   "p1": "The verification code sent to your email unlocks your Journey.",
   "p2": "This is a personal, educational and symbolic experience.",
   "p3": "By continuing, you confirm that you have read and accepted the terms.",
-  "placeholder": "Enter your verification code..."
+  "placeholder": "Enter your verification code...",
   "reenviar_limpeza": "🔄 Resend code\n\nThis will clear this Journey's data on this device.\n(It does not affect your history, other tabs, or other websites.)\n\nAfter that, click the SEND CODE button again."
 },
   "guia": {
