@@ -75,6 +75,11 @@ min-width:220px;
 
 /* CARD */
 #section-final .j-arcane-card {
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+
+  overflow:hidden !important;
   padding: 22px 18px;
   border-radius: 20px;
   background: rgba(0,0,0,.18);
