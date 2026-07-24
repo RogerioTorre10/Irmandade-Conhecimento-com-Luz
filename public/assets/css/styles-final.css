@@ -144,7 +144,9 @@ min-width:220px;
 }
 
 #section-final .final-acoes button {
-  min-height: 50px;
+  min-height: 40px;
+  padding-top: 6px;
+  padding-bottom: 6px;
   font-size: 14px;
 }
 
@@ -193,10 +195,10 @@ min-width:220px;
 
   width: auto !important;
   min-width: 210px !important;
-  min-height: 48px !important;
+  min-height: 38px !important;
 
   margin: 0 auto !important;
-  padding: 10px 18px !important;
+  padding: 6px 18px !important;
 
   border: 2px solid #4a4a4a !important;
   border-radius: 8px !important;
