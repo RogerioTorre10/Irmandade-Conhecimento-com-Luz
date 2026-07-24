@@ -79,15 +79,8 @@
   "confirmCode": "🔐 Confirmer",
   "reenviar_limpeza": "🔄 Renvoyer le code de vérification\n\nSeules les données locales de ce Parcours sur cet appareil seront effacées afin de résoudre d'éventuels problèmes d'envoi.\n\nVotre progression et votre historique seront entièrement préservés.\n\nEnsuite, cliquez de nouveau sur le bouton ENVOYER LE CODE DE VÉRIFICATION."
 },
-  
-  "senha": {
-    "title": "Entrez le Mot-Clé",
-    "p1": "Le Mot-Clé est le secret qui ouvrira votre voyage.",
-    "p2": "Choisissez-le avec soin, car il reflète votre intention.",
-    "p3": "Prêt ? Tapez maintenant et avancez.",
-    "placeholder": "Tapez le Mot-Clé..."
-  },
-  "guia": {
+   
+ "guia": {
   "title": "Choisissez votre Guide",
   "subtitle": "{{nome}}! Sélectionnez celui ou celle qui vous accompagnera dans cette journée.",
   "p1": "Pour libérer le Guide, entrez votre nom",
