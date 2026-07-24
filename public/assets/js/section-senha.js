@@ -785,23 +785,25 @@
   };
 
   const reenviarComLimpeza = async () => {
-    const ok = confirm(
-      '🔄 Reenviar código\n\n' +
-      'Isso vai limpar os dados desta jornada neste dispositivo ' +
-      '(sem afetar seu histórico, outras abas ou outros sites) ' +
-      'e CLICK NOVAMENTE NO BOTÃO EM ENVIAR CÓDIGO.'
-    );
-    if (!ok) return;
+  const ok = confirm(
+    window.i18n?.t('senha.reenviar_limpeza') ||
+    '🔄 Reenviar código\n\n' +
+    'Isso vai limpar os dados desta Jornada neste dispositivo.\n' +
+    '(Sem afetar seu histórico, outras abas ou outros sites.)\n\n' +
+    'Clique novamente no botão ENVIAR CÓDIGO.'
+  );
 
-    // Limpeza profunda do DOMÍNIO ATUAL (não afeta histórico do navegador):
-    limparStorageDominio(SENHA_PRESERVE_KEYS_DEEP); // regenera device_hash
-    limparCookiesDominio();
-    await limparCacheStorage();
-    await limparIndexedDB();
+  if (!ok) return;
 
-    // Dispara o mesmo fluxo do "Enviar código".
-    enviarCodigoManual();
-  };
+  // Limpeza profunda do DOMÍNIO ATUAL:
+  limparStorageDominio(SENHA_PRESERVE_KEYS_DEEP);
+  limparCookiesDominio();
+  await limparCacheStorage();
+  await limparIndexedDB();
+
+  // Dispara o mesmo fluxo do "Enviar código".
+  enviarCodigoManual();
+};
 
   const btnEnviar2FA =
     root.querySelector('#btn-enviar-2fa');
