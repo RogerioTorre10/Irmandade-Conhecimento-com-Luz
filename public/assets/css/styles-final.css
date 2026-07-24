@@ -900,3 +900,45 @@ min-width:220px;
     }
   }
 }
+
+/* ============================================================
+   FIX v7 — ESPAÇO NO FINAL DO TEXTO E ACIMA DA BORDA DO PAINEL
+   Objetivo: garantir que a última linha da devolutiva seja
+   visível ao rolar até o fim, sem ficar por trás da borda
+   inferior do pergaminho/painel.
+   Estratégia:
+   1) Padding-bottom generoso DENTRO da caixa (o scroll passa
+      além do texto real, revelando a última linha).
+   2) Margem inferior maior FORA da caixa, afastando ela da
+      borda do pergaminho.
+   ============================================================ */
+
+#section-final .final-guide-feedback {
+  /* espaço interno extra no fim — o scroll rola "além" do texto */
+  padding-bottom: 56px !important;
+  /* afasta a caixa da borda inferior do pergaminho */
+  margin-bottom: 36px !important;
+  scroll-padding-bottom: 56px !important;
+}
+
+/* Pseudo-elemento como colchão final — garante espaço extra
+   depois da última linha mesmo se o conteúdo for injetado sem
+   margem inferior por outros scripts. */
+#section-final .final-guide-feedback::after {
+  content: "" !important;
+  display: block !important;
+  height: 24px !important;
+  width: 100% !important;
+  pointer-events: none !important;
+}
+
+@media (max-width: 768px) {
+  #section-final .final-guide-feedback {
+    padding-bottom: 48px !important;
+    margin-bottom: 28px !important;
+    scroll-padding-bottom: 48px !important;
+  }
+  #section-final .final-guide-feedback::after {
+    height: 20px !important;
+  }
+}
