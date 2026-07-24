@@ -78,7 +78,7 @@
   "resendCode": "🔄 Effacer les données locales de ce Parcours sur cet appareil et réessayer.",
   "confirmCode": "🔐 Confirmer",
   "reenviar_limpeza": "🔄 Renvoyer le code de vérification\n\nSeules les données locales de ce Parcours sur cet appareil seront effacées afin de résoudre d'éventuels problèmes d'envoi.\n\nVotre progression et votre historique seront entièrement préservés.\n\nEnsuite, cliquez de nouveau sur le bouton ENVOYER LE CODE DE VÉRIFICATION."
-}
+},
   
   "senha": {
     "title": "Entrez le Mot-Clé",
