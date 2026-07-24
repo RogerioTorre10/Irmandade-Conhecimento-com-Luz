@@ -67,13 +67,19 @@
 },
 
 "senha": {
-  "title": "Confirmez votre accès",
-  "p1": "Le code de vérification envoyé par e-mail activera votre Voyage.",
+  "title": "Confirmer votre accès",
+  "p1": "Le code de vérification envoyé par e-mail active votre Parcours.",
   "p2": "Il s'agit d'une expérience personnelle, éducative et symbolique.",
   "p3": "En poursuivant, vous confirmez avoir lu et accepté ces conditions.",
-  "placeholder": "Saisissez le code de vérification...",
-  "reenviar_limpeza": "🔄 Renvoyer le code\n\nCela effacera les données de ce parcours sur cet appareil.\n(Cela n'affecte pas votre historique, les autres onglets ni les autres sites.)\n\nEnsuite, cliquez de nouveau sur le bouton ENVOYER LE CODE."
-},
+  "codePlaceholder": "Saisissez le code de vérification...",
+  "emailPlaceholder": "Saisissez votre adresse e-mail...",
+  "sendCode": "✉️ Envoyer le code de vérification",
+  "resendInfo": "Vous avez des difficultés à recevoir le code ? Cliquez sur le bouton ci-dessous.",
+  "resendCode": "🔄 Effacer les données locales de ce Parcours sur cet appareil et réessayer.",
+  "confirmCode": "🔐 Confirmer",
+  "reenviar_limpeza": "🔄 Renvoyer le code de vérification\n\nSeules les données locales de ce Parcours sur cet appareil seront effacées afin de résoudre d'éventuels problèmes d'envoi.\n\nVotre progression et votre historique seront entièrement préservés.\n\nEnsuite, cliquez de nouveau sur le bouton ENVOYER LE CODE DE VÉRIFICATION."
+}
+  
   "senha": {
     "title": "Entrez le Mot-Clé",
     "p1": "Le Mot-Clé est le secret qui ouvrira votre voyage.",
