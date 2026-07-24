@@ -68,13 +68,16 @@
    "li9": "Sua forma de falar com o Guia também reflete seu diálogo interior.",
    "li10": "Ao aceitar, você declara compreender e concordar com estes termos."
   },
+  
   "senha": {
    "title": "Confirme seu Acesso",
    "p1": "O código enviado por e-mail libera sua Jornada.",
    "p2": "Esta é uma experiência pessoal, educativa e simbólica.",
    "p3": "Ao prosseguir, você declara estar ciente dos termos.",
    "placeholder": "Digite o código recebido..."
+   "reenviar_limpeza": "🔄 Reenviar código\n\nIsso irá limpar os dados desta Jornada neste dispositivo.\n(Não afeta seu histórico, outras abas ou outros sites.)\n\nDepois clique novamente no botão ENVIAR CÓDIGO."
   },
+  
  "guia": {
   "title": "Escolha seu Guia",
   "subtitle": "Olá, {{nome}}! Escolha seu guia para a Jornada.",
