@@ -71,9 +71,15 @@
   "p1": "Der per E-Mail gesendete Bestätigungscode aktiviert Ihre Reise.",
   "p2": "Dies ist eine persönliche, symbolische und bildungsorientierte Erfahrung.",
   "p3": "Mit dem Fortfahren bestätigen Sie, dass Sie die Bedingungen gelesen und akzeptiert haben.",
-  "placeholder": "Bestätigungscode eingeben...",
-  "reenviar_limpeza": "🔄 Code erneut senden\n\nDadurch werden die Daten dieser Reise auf diesem Gerät gelöscht.\n(Dies hat keine Auswirkungen auf Ihren Verlauf, andere Tabs oder andere Websites.)\n\nKlicken Sie anschließend erneut auf CODE SENDEN."
-},
+  "codePlaceholder": "Bestätigungscode eingeben...",
+  "emailPlaceholder": "E-Mail-Adresse eingeben...",
+  "sendCode": "✉️ Bestätigungscode per E-Mail senden",
+  "resendInfo": "Probleme beim Erhalt des Codes? Klicken Sie auf die Schaltfläche unten.",
+  "resendCode": "🔄 Lokale Daten dieser Reise auf diesem Gerät löschen und erneut versuchen.",
+  "confirmCode": "🔐 Bestätigen",
+  "reenviar_limpeza": "🔄 Bestätigungscode erneut senden\n\nEs werden nur die lokalen Daten dieser Reise auf diesem Gerät gelöscht, um mögliche Übertragungsprobleme zu beheben.\n\nIhr Fortschritt und Ihr Verlauf bleiben erhalten.\n\nKlicken Sie anschließend erneut auf die Schaltfläche BESTÄTIGUNGSCODE SENDEN."
+}
+  
   "guia": {
   "title": "Wähle deinen Guide",
   "subtitle": "Hallo, {{nome}}! Wähle deinen Guide für die Reise.",
