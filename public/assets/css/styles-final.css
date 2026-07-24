@@ -837,4 +837,24 @@ min-width:220px;
     }
   }
 }
+/* FIX FINAL — DEVOLUTIVA PRESA DENTRO DO CONTAINER */
+#section-final .j-arcane-card,
+#section-final .pergaminho-content {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
 
+#section-final .j-arcane-card {
+  overflow: hidden !important;
+}
+
+#section-final .final-guide-feedback {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  box-sizing: border-box !important;
+}
