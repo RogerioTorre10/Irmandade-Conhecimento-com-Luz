@@ -101,14 +101,24 @@ min-width:220px;
 
 /* DEVOLUTIVA — áurea leve e estática, sem custo de animação */
 #section-final .final-guide-feedback {
-  position: relative;
-  margin: 18px auto;
-  padding: 16px;
-  border-radius: 16px;
-  max-height: 420px;
-  overflow-y: auto;
+  position: relative !important;
 
-  border: 1px solid var(--guia-strong);
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+
+  margin: 18px 0 !important;
+  padding: 16px !important;
+
+  box-sizing: border-box !important;
+  align-self: stretch !important;
+
+  max-height: 280px !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+
+  border-radius: 16px !important;
+  border: 1px solid var(--guia-strong) !important;
 
   box-shadow:
     0 0 12px var(--guia-soft),
@@ -117,7 +127,7 @@ min-width:220px;
       var(--guia-main) 38%,
       transparent
     ),
-    inset 0 0 12px rgba(255, 255, 255, 0.035);
+    inset 0 0 12px rgba(255, 255, 255, 0.035) !important;
 }
 
 /* ACTIONS */
