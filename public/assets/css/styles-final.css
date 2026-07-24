@@ -750,17 +750,25 @@ min-width:220px;
   margin: 16px auto 14px !important;
   padding: 16px 18px !important;
 
-  height: auto !important;
-  min-height: 0 !important;
-  max-height: 34dvh !important;
+  /* CAIXA FIXA — não cresce com o texto */
+  height: 320px !important;
+  min-height: 320px !important;
+  max-height: 320px !important;
+  flex: 0 0 320px !important;
 
   overflow-x: hidden !important;
-  overflow-y: auto !important;
+  overflow-y: scroll !important;
   overscroll-behavior: contain !important;
   -webkit-overflow-scrolling: touch !important;
 
   scrollbar-width: thin !important;
   scrollbar-color: rgba(255, 80, 230, 0.58) rgba(0, 0, 0, 0.18) !important;
+}
+
+/* Filhos internos não podem roubar o scroll da caixa */
+#section-final .final-guide-feedback > * {
+  max-height: none !important;
+  overflow: visible !important;
 }
 
 #section-final .final-guide-feedback::-webkit-scrollbar {
@@ -810,7 +818,10 @@ min-width:220px;
   #section-final .final-guide-feedback {
     width: calc(100% - 12px) !important;
     max-width: calc(100% - 12px) !important;
-    max-height: 32dvh !important;
+    height: 260px !important;
+    min-height: 260px !important;
+    max-height: 260px !important;
+    flex: 0 0 260px !important;
     margin-top: 14px !important;
     padding: 14px 16px !important;
   }
@@ -855,4 +866,35 @@ min-width:220px;
   margin-left: 0 !important;
   margin-right: 0 !important;
   box-sizing: border-box !important;
+  /* Reafirma altura fixa para não ser sobrescrita */
+  height: 320px !important;
+  min-height: 320px !important;
+  max-height: 320px !important;
+  flex: 0 0 320px !important;
+  overflow-y: scroll !important;
+}
+
+@media (max-width: 768px) {
+  #section-final .final-guide-feedback {
+    height: 260px !important;
+    min-height: 260px !important;
+    max-height: 260px !important;
+    flex: 0 0 260px !important;
+  }
+}
+
+/* Aumenta um pouco a altura do pergaminho/painel */
+@supports selector(body:has(#section-final)) {
+  body:has(#section-final) #jornada-canvas {
+    height: calc(100dvh - 108px) !important;
+    max-height: calc(100dvh - 108px) !important;
+  }
+}
+@media (max-width: 768px) {
+  @supports selector(body:has(#section-final)) {
+    body:has(#section-final) #jornada-canvas {
+      height: calc(100dvh - 88px) !important;
+      max-height: calc(100dvh - 88px) !important;
+    }
+  }
 }
