@@ -67,13 +67,19 @@
 },
 
 "senha": {
-  "title": "Confirma tu Acceso",
-  "p1": "El código enviado a tu correo electrónico desbloqueará tu Viaje.",
+  "title": "Confirmar acceso",
+  "p1": "El código de verificación enviado por correo electrónico activa tu Jornada.",
   "p2": "Esta es una experiencia personal, educativa y simbólica.",
   "p3": "Al continuar, confirmas que has leído y aceptado estos términos.",
-  "placeholder": "Introduce el código de verificación...",
-  "reenviar_limpeza": "🔄 Reenviar código\n\nEsto eliminará los datos de esta Jornada en este dispositivo.\n(No afecta tu historial, otras pestañas ni otros sitios web.)\n\nDespués vuelve a pulsar el botón ENVIAR CÓDIGO."
-},
+  "codePlaceholder": "Introduce el código de verificación...",
+  "emailPlaceholder": "Introduce tu correo electrónico...",
+  "sendCode": "✉️ Enviar código por correo electrónico",
+  "resendInfo": "¿Tienes problemas para recibir el código? Haz clic en el botón de abajo.",
+  "resendCode": "🔄 Borrar los datos locales de esta Jornada en este dispositivo e intentarlo de nuevo.",
+  "confirmCode": "🔐 Confirmar",
+  "reenviar_limpeza": "🔄 Reenviar código de verificación\n\nSolo se eliminarán los datos locales de esta Jornada en este dispositivo para resolver posibles problemas de envío.\n\nTu progreso y tu historial permanecerán intactos.\n\nDespués, vuelve a pulsar el botón ENVIAR CÓDIGO."
+}
+  
   "guia": {
   "title": "Elige tu Guía",
   "subtitle": "{{nome}}! Selecciona quién te acompañará en esta jornada.",
