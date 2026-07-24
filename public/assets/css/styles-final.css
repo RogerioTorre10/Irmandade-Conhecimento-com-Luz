@@ -942,3 +942,111 @@ min-width:220px;
     height: 20px !important;
   }
 }
+
+/* ============================================================
+   FIX v8 — DEVOLUTIVA COMO NO PRINT 2
+   Objetivo:
+   - voltar a caixa da devolutiva para um visor menor e fixo;
+   - impedir que ela cresça com o texto;
+   - manter somente a rolagem interna dela para ler o conteúdo;
+   - evitar que o fim do texto fique escondido atrás da base do painel.
+   Cole este arquivo completo substituindo o CSS final anterior.
+   ============================================================ */
+
+#section-final .final-guide-feedback {
+  display: block !important;
+  position: relative !important;
+  z-index: 8 !important;
+  box-sizing: border-box !important;
+
+  /* caixa menor e centralizada, como no print 2 */
+  width: calc(100% - 48px) !important;
+  max-width: 360px !important;
+  min-width: 0 !important;
+  margin: 12px auto 18px !important;
+
+  /* altura travada: a caixa não cresce junto com o texto */
+  height: 132px !important;
+  min-height: 132px !important;
+  max-height: 132px !important;
+  flex: 0 0 132px !important;
+
+  /* rolagem interna do texto */
+  overflow-x: hidden !important;
+  overflow-y: scroll !important;
+  overscroll-behavior: contain !important;
+  -webkit-overflow-scrolling: touch !important;
+  scrollbar-gutter: stable !important;
+
+  /* folga inferior dentro do visor para a última linha aparecer */
+  padding: 12px 18px 30px !important;
+  scroll-padding-bottom: 30px !important;
+}
+
+/* Nenhum filho interno pode criar outra barra ou aumentar a caixa */
+#section-final .final-guide-feedback > * {
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+/* colchão final: permite rolar um pouco além da última linha */
+#section-final .final-guide-feedback::after {
+  content: "" !important;
+  display: block !important;
+  width: 100% !important;
+  height: 18px !important;
+  pointer-events: none !important;
+}
+
+/* mantém a barra interna visível e sutil */
+#section-final .final-guide-feedback::-webkit-scrollbar {
+  width: 6px !important;
+  height: 6px !important;
+  display: block !important;
+}
+
+#section-final .final-guide-feedback::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.18) !important;
+  border-radius: 999px !important;
+}
+
+#section-final .final-guide-feedback::-webkit-scrollbar-thumb {
+  background: rgba(255, 80, 230, 0.58) !important;
+  border-radius: 999px !important;
+  box-shadow: 0 0 6px rgba(255, 80, 230, 0.35) !important;
+}
+
+#section-final .final-guide-feedback::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 80, 230, 0.78) !important;
+}
+
+/* Mobile: visor ainda menor para não bater na base do painel */
+@media (max-width: 768px) {
+  #section-final .final-guide-feedback {
+    width: calc(100% - 64px) !important;
+    max-width: 270px !important;
+    height: 112px !important;
+    min-height: 112px !important;
+    max-height: 112px !important;
+    flex: 0 0 112px !important;
+    margin: 10px auto 16px !important;
+    padding: 10px 14px 28px !important;
+    scroll-padding-bottom: 28px !important;
+  }
+
+  #section-final .final-guide-feedback::after {
+    height: 16px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  #section-final .final-guide-feedback {
+    width: calc(100% - 44px) !important;
+    max-width: 250px !important;
+    height: 108px !important;
+    min-height: 108px !important;
+    max-height: 108px !important;
+    flex: 0 0 108px !important;
+  }
+}
+
