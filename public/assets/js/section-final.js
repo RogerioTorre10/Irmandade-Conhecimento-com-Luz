@@ -1422,47 +1422,139 @@ function removerFinalDuplicado(texto) {
   }
 
   // ================================
+  // LIMPEZA DE ESTADO LOCAL (mesma lógica da section-senha)
+  // Segurança: a jornada é validada no backend (pagamento + código + senha).
+  // Apagar o storage NUNCA concede acesso — apenas libera o dispositivo
+  // que estaria preso ao relógio de 72h de uma jornada JÁ CONCLUÍDA.
+  // ================================
+  const FINAL_PRESERVE_KEYS = ['i18n_lang', 'lang', 'jc.lang', 'jornada.lang'];
+
+  function limparStorageDominioFinal(preserveKeys) {
+    try {
+      const backup = {};
+      preserveKeys.forEach((k) => {
+        const v = localStorage.getItem(k);
+        if (v !== null) backup[k] = v;
+      });
+      localStorage.clear();
+      sessionStorage.clear();
+      Object.entries(backup).forEach(([k, v]) => localStorage.setItem(k, v));
+    } catch (e) {
+      console.warn('[final] limpeza de storage falhou (ignorado):', e);
+    }
+  }
+
+  function limparCookiesDominioFinal() {
+    try {
+      const cookies = document.cookie ? document.cookie.split(';') : [];
+      const paths = ['/', location.pathname];
+      const host = location.hostname;
+      const domains = ['', host, '.' + host];
+      cookies.forEach((c) => {
+        const name = c.split('=')[0].trim();
+        if (!name) return;
+        paths.forEach((p) => {
+          domains.forEach((d) => {
+            document.cookie =
+              name + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=' + p +
+              (d ? '; domain=' + d : '') + '; SameSite=Lax';
+          });
+        });
+      });
+    } catch (e) {
+      console.warn('[final] limpeza de cookies falhou (ignorado):', e);
+    }
+  }
+
+  async function limparCacheStorageFinal() {
+    if (!('caches' in window)) return;
+    try {
+      const keys = await caches.keys();
+      await Promise.all(keys.map((k) => caches.delete(k)));
+    } catch (e) {
+      console.warn('[final] limpeza de Cache Storage falhou (ignorado):', e);
+    }
+  }
+
+  async function limparIndexedDBFinal() {
+    try {
+      if (typeof indexedDB === 'undefined' || !indexedDB.databases) return;
+      const dbs = await indexedDB.databases();
+      await Promise.all(
+        (dbs || []).map((db) => {
+          if (!db?.name) return Promise.resolve();
+          return new Promise((res) => {
+            const req = indexedDB.deleteDatabase(db.name);
+            req.onsuccess = req.onerror = req.onblocked = () => res();
+          });
+        })
+      );
+    } catch (e) {
+      console.warn('[final] limpeza de IndexedDB falhou (ignorado):', e);
+    }
+  }
+
+  // Limpeza profunda: jornada concluída → dispositivo liberado (sem histórico).
+  async function limparJornadaAoSairFinal() {
+    limparStorageDominioFinal(FINAL_PRESERVE_KEYS);
+    limparCookiesDominioFinal();
+    await Promise.race([
+      Promise.all([limparCacheStorageFinal(), limparIndexedDBFinal()]),
+      sleep(1200) // não travar a saída se o navegador demorar
+    ]);
+  }
+  
+  // ================================
   // VOLTAR AO PORTAL
   // ================================
-  function handleVoltarInicio() {
-  if (finalReturning) return;
-  finalReturning = true;
+    function handleVoltarInicio() {
+    if (finalReturning) return;
+    finalReturning = true;
 
-  const src = FINAL_MOVIE;
+    const src = FINAL_MOVIE;
+    let cleaned = false;
 
-  const goPortal = () => {
-    window.location.href = HOME_URL;
-  };
+    // Limpa SEMPRE antes de sair (idempotente, roda uma única vez)
+    const limparEIr = async () => {
+      if (cleaned) return;
+      cleaned = true;
+      try { await limparJornadaAoSairFinal(); } catch {}
+      window.location.href = HOME_URL;
+    };
 
-  if (typeof window.playBlockTransition === 'function') {
-    window.playBlockTransition(src, 'portal', {
-      useGoldBorder: true,
-      pulse: true,
-      ambientBlur: true,
-      onEnd: goPortal,
-      onEnded: goPortal,
-      nextSectionId: 'portal'
-    });
+    const goPortal = () => { limparEIr(); };
 
-    setTimeout(goPortal, 16000);
-    return;
+    // dispara a limpeza já no clique (garante execução mesmo se o vídeo travar)
+    limparJornadaAoSairFinal().catch(() => {});
+
+    if (typeof window.playBlockTransition === 'function') {
+      window.playBlockTransition(src, 'portal', {
+        useGoldBorder: true,
+        pulse: true,
+        ambientBlur: true,
+        onEnd: goPortal,
+        onEnded: goPortal,
+        nextSectionId: 'portal'
+      });
+      setTimeout(goPortal, 16000);
+      return;
+    }
+
+    if (typeof window.playVideo === 'function') {
+      window.playVideo(src, {
+        useGoldBorder: true,
+        pulse: true,
+        ambientBlur: true,
+        onEnded: goPortal,
+        onEnd: goPortal
+      });
+      setTimeout(goPortal, 16000);
+      return;
+    }
+
+    goPortal();
   }
 
-  if (typeof window.playVideo === 'function') {
-    window.playVideo(src, {
-      useGoldBorder: true,
-      pulse: true,
-      ambientBlur: true,
-      onEnded: goPortal,
-      onEnd: goPortal
-    });
-
-    setTimeout(goPortal, 16000);
-    return;
-  }
-
-  goPortal();
-}
   // ================================
   // UI DE BOTÕES FINAL
   // ================================
