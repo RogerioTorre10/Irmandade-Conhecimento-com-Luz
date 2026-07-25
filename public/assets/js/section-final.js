@@ -14,7 +14,7 @@
 
   const SECTION_ID = 'section-final';
   const HOME_URL = 'https://irmandade-conhecimento-com-luz.onrender.com/portal.html';
-  const FINAL_MOVIE = '/assets/videos/filme-5-fim-da-jornada.mp4';
+  const FINAL_MOVIE = '/assets/videos/filme-6-Pleno-Total.mp4';
 
   let started = false;
   let finalReturning = false;
