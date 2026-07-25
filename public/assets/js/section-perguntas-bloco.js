@@ -455,10 +455,17 @@
     if (totalFill)
       totalFill.style.width = `${(currentBlock / totalBlocks) * 100}%`;
 
+    const totalQuestions = getBlockQuestionsCount(bloco) || 1;
+    const currentQuestion = Math.min(
+      getCurrentQuestionIndex(bloco) + 1,
+      totalQuestions
+    );
     const questionValue = document.getElementById('progress-question-value');
     const questionFill = document.getElementById('progress-question-fill');
-    if (questionValue) questionValue.textContent = `1 / 1`;
-    if (questionFill) questionFill.style.width = '100%';
+    if (questionValue)
+      questionValue.textContent = `${currentQuestion} / ${totalQuestions}`;
+    if (questionFill)
+      questionFill.style.width = `${(currentQuestion / totalQuestions) * 100}%`;
 
     const blockValue = document.getElementById('progress-block-value');
     const blockFill = document.getElementById('progress-block-fill');
@@ -1016,16 +1023,65 @@
     return Number(bloco.totalQuestions || bloco.total || 0);
   }
 
+  function questionIndexKey(bloco) {
+    return `jp:${bloco?.id || 'bloco'}:idx`;
+  }
+
   function getCurrentQuestionIndex(bloco) {
     if (!bloco) return 0;
-    if (typeof bloco.currentIndex === 'number') return bloco.currentIndex;
-    if (typeof bloco.questionIndex === 'number') return bloco.questionIndex;
-    if (typeof bloco.idx === 'number') return bloco.idx;
+    const total = getBlockQuestionsCount(bloco) || 1;
     const raw =
-      sessionStorage.getItem(`jp:${bloco.id}:idx`) ||
-      sessionStorage.getItem(`bloco:${bloco.id}:idx`) ||
-      '0';
-    return Number(raw || 0);
+      sessionStorage.getItem(questionIndexKey(bloco)) ??
+      localStorage.getItem(questionIndexKey(bloco));
+    let idx = Number(raw);
+    if (!Number.isFinite(idx) || idx < 0) idx = 0;
+    if (idx > total - 1) idx = total - 1;
+    return idx;
+  }
+
+  function setCurrentQuestionIndex(bloco, idx) {
+    if (!bloco) return 0;
+    const total = getBlockQuestionsCount(bloco) || 1;
+    const safe = Math.max(0, Math.min(Number(idx) || 0, total - 1));
+    try {
+      sessionStorage.setItem(questionIndexKey(bloco), String(safe));
+      localStorage.setItem(questionIndexKey(bloco), String(safe));
+    } catch {}
+    State.questionIndex = safe;
+    return safe;
+  }
+
+  // Faz o upsert da devolutiva de UMA pergunta dentro do registro do bloco
+  function upsertPerguntaFeedback(bloco, qIndex, entry) {
+    const blocoId = bloco?.id || '';
+    const todos = getStoredBlockFeedbacks();
+    const anterior = todos.find((item) => item?.blocoId === blocoId) || {};
+    const outros = todos.filter((item) => item?.blocoId !== blocoId);
+    const perguntas = Array.isArray(anterior.perguntas)
+      ? anterior.perguntas.slice()
+      : [];
+    perguntas[qIndex] = { ...(perguntas[qIndex] || {}), ...entry };
+
+    outros.push({
+      ...anterior,
+      blocoId,
+      blocoTitulo: bloco?.title || bloco?.id || 'Bloco',
+      respostas: getAllAnswersFromBlock(bloco),
+      devolutiva: String(entry?.devolutiva || anterior.devolutiva || '').trim(),
+      texto: String(entry?.devolutiva || anterior.texto || '').trim(),
+      devolutivaFinal: String(anterior?.devolutivaFinal || '').trim(),
+      blockFinal: Boolean(anterior?.blockFinal),
+      perguntas,
+    });
+
+    setStoredBlockFeedbacks(outros);
+    return perguntas;
+  }
+
+  function getPerguntaFeedback(bloco, qIndex) {
+    const blocoId = bloco?.id || '';
+    const reg = getStoredBlockFeedbacks().find((it) => it?.blocoId === blocoId);
+    return String(reg?.perguntas?.[qIndex]?.devolutiva || '').trim();
   }
 
   function isLastQuestionOfBlock(bloco) {
@@ -1039,9 +1095,8 @@
     const out = [];
     for (let i = 0; i < total; i++) {
       try {
-        const val = getAnswer(bloco, i);
-        const txt = String(val || '').trim();
-        if (txt) out.push(txt);
+        const txt = String(getAnswer(bloco, i) || '').trim();
+        if (txt) out.push(`${getQuestionText(bloco, i)}\n${txt}`);
       } catch {}
     }
     return out;
@@ -1407,7 +1462,11 @@
 
   async function maybeHandleBlockClosure(section, bloco) {
     if (!isLastQuestionOfBlock(bloco)) {
-      goNext(bloco);
+      // ainda há perguntas neste bloco: avança para a próxima
+      setCurrentQuestionIndex(bloco, getCurrentQuestionIndex(bloco) + 1);
+      stopSpeaking();
+      clearAnswerUI();
+      await renderBloco(section);
       return;
     }
 
@@ -1503,7 +1562,7 @@
   }
 
   // ─── Bind dos botões ─────────────────────────────────────────────────────────
-  function bindButtons(section, bloco, perguntaText) {
+  function bindButtons(section, bloco, perguntaText, qIndex = 0) {
     const btnTTS = $('#jp-btn-falar', section);
     const btnMic = $('#jp-btn-mic', section);
     const btnApagar = $('#jp-btn-apagar', section);
@@ -1517,7 +1576,9 @@
       btnTTS.onclick = async (ev) => {
         ev.preventDefault();
         stopSpeaking();
-        await speakQuestionOrGuideResponse(perguntaText);
+        await speakQuestionOrGuideResponse(
+          getQuestionText(bloco, getCurrentQuestionIndex(bloco))
+        );
       };
     }
 
@@ -1597,7 +1658,8 @@
             return;
           }
 
-          saveAnswer(bloco, 0, val);
+          const idxAtual = getCurrentQuestionIndex(bloco);
+          saveAnswer(bloco, idxAtual, val);
           setContinueState(section, 'loading');
 
           await setGuideResponse(
@@ -1626,9 +1688,7 @@
           const _anteriorParcial =
             getStoredBlockFeedbacks().find((it) => it?.blocoId === _blocoIdAtual) || {};
           const _parcialTxt = String(
-            _anteriorParcial?.perguntas?.[0]?.devolutiva ||
-              _anteriorParcial?.devolutiva ||
-              ''
+            _anteriorParcial?.perguntas?.[idxAtual]?.devolutiva || ''
           ).trim();
 
           const result = await requestGuideFeedbackWithFallback({
@@ -1637,7 +1697,7 @@
             blocoNome: bloco?.title || bloco?.id || 'Bloco',
             respostas: [val],
             idioma: getLang() || document.documentElement.lang || 'pt-BR',
-            pergunta: getQuestionText(bloco, 0),
+            pergunta: getQuestionText(bloco, idxAtual),
             resposta: val,
             dadosPessoais,
             parcial: _parcialTxt,
@@ -1657,37 +1717,15 @@
             return;
           }
 
-          const blocoId = bloco?.id || '';
-          const existentes = getStoredBlockFeedbacks().filter(
-            (item) => item?.blocoId !== blocoId
-          );
-          const anterior =
-            getStoredBlockFeedbacks().find(
-              (item) => item?.blocoId === blocoId
-            ) || {};
-
-          existentes.push({
-            blocoId,
-            blocoTitulo: bloco?.title || bloco?.id || 'Bloco',
-            respostas: [val],
+          upsertPerguntaFeedback(bloco, idxAtual, {
+            index: idxAtual,
+            perguntaId: getQuestionId(bloco, idxAtual),
+            pergunta: getQuestionText(bloco, idxAtual),
+            resposta: val,
             devolutiva: texto,
-            texto,
-            // Preserva a devolutiva final do bloco (se já foi entregue antes)
-            // — não pode ser perdida por este save de pergunta.
-            devolutivaFinal: String(anterior?.devolutivaFinal || '').trim(),
-            blockFinal: Boolean(anterior?.blockFinal),
-            perguntas: [
-              {
-                pergunta: getQuestionText(bloco, 0),
-                resposta: val,
-                devolutiva: texto,
-              },
-            ],
             guiaUsado: result?.guiaUsado || normalizeGuide(guia),
             source: result?.source || 'desconhecida',
           });
-
-          setStoredBlockFeedbacks(existentes);
 
           await setGuideResponse(
             texto,
@@ -1726,7 +1764,7 @@
 
     State.sectionId = sectionId;
     State.bloco = bloco;
-    State.questionIndex = 0;
+    State.questionIndex = getCurrentQuestionIndex(bloco);
     State.mounted = true;
 
     // Para mic de bloco anterior antes de renderizar novo
@@ -1755,10 +1793,14 @@
       $('#answer-input', section) ||
       $('textarea', section);
 
-    const perguntaText = getQuestionText(bloco, 0);
+    const qIndex = State.questionIndex;
+    const totalPerguntas = getBlockQuestionsCount(bloco) || 1;
+    const perguntaText = getQuestionText(bloco, qIndex);
+    section.dataset.questionIndex = String(qIndex);
+    section.dataset.questionTotal = String(totalPerguntas);
 
     if (textarea) {
-      textarea.value = getAnswer(bloco, 0);
+      textarea.value = getAnswer(bloco, qIndex);
       textarea.focus();
     }
 
@@ -1768,11 +1810,11 @@
     try {
       const _prev =
         getStoredBlockFeedbacks().find((it) => it?.blocoId === bloco?.id) || null;
+      const _isUltima = qIndex >= totalPerguntas - 1;
       const _prevTxt = String(
-        (_prev?.blockFinal && _prev?.devolutivaFinal) ||
-          _prev?.devolutivaFinal ||
-          _prev?.perguntas?.[0]?.devolutiva ||
-          _prev?.devolutiva ||
+        (_isUltima && _prev?.blockFinal && _prev?.devolutivaFinal) ||
+          _prev?.perguntas?.[qIndex]?.devolutiva ||
+          getPerguntaFeedback(bloco, qIndex) ||
           ''
       ).trim();
       if (_prevTxt) {
@@ -1785,7 +1827,7 @@
       setContinueState(section, 'idle');
     }
     updateProgress(bloco);
-    bindButtons(section, bloco, perguntaText);
+    bindButtons(section, bloco, perguntaText, qIndex);
 
     if (questionEl) {
       questionEl.textContent = '';
@@ -1797,7 +1839,11 @@
       await typeQuestion(questionEl, perguntaText, 28, true);
     }
 
-    log('Bloco renderizado:', bloco.id);
+    log(
+      'Bloco renderizado:',
+      bloco.id,
+      `pergunta ${qIndex + 1}/${totalPerguntas}`
+    );
   }
 
   // ─── Eventos globais ─────────────────────────────────────────────────────────
@@ -1836,6 +1882,20 @@
     },
     getState() {
       return { ...State };
+    },
+    irParaPergunta(idx) {
+      const section = getCurrentSection();
+      const bloco = State.bloco || getBlocoAtual(getSectionId(section));
+      if (!section || !bloco) return;
+      setCurrentQuestionIndex(bloco, idx);
+      renderBloco(section);
+    },
+    reiniciarBloco() {
+      const section = getCurrentSection();
+      const bloco = State.bloco || getBlocoAtual(getSectionId(section));
+      if (!section || !bloco) return;
+      setCurrentQuestionIndex(bloco, 0);
+      renderBloco(section);
     },
   };
 
