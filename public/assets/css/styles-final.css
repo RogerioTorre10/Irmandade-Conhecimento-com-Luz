@@ -1245,3 +1245,70 @@ min-width:220px;
     padding: 12px 12px 26px !important;
   }
 }
+
+/* ============================================================
+   v11 — SCROLL ESTÁVEL NO MOBILE (corrige o "volta pro topo")
+   Causa: html E body estavam ambos como scroller (overflow-y:auto)
+   e a altura usava 100dvh — quando a barra de endereço do
+   Safari/Chrome some ao rolar, o dvh muda, a página é
+   recalculada e o navegador devolve o scroll para o topo.
+   Correção: UM único scroller (o html) + altura em svh (estável,
+   não muda com a barra de endereço) + sem âncoras de rolagem.
+   Este bloco fica por último e vence todos os anteriores.
+   ============================================================ */
+
+@media (max-width: 768px) {
+
+  /* 1) Só o HTML rola. Altura estável (svh não oscila). */
+  html:has(#section-final),
+  html {
+    height: auto !important;
+    min-height: 100svh !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    overscroll-behavior-y: none !important;   /* sem rubber-band/refresh */
+    scroll-behavior: auto !important;         /* sem rolagem "suave" automática */
+    overflow-anchor: none !important;         /* impede reposicionamento automático */
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  /* 2) BODY deixa de ser scroller (era o 2º scroller que brigava) */
+  body:has(#section-final),
+  body {
+    height: auto !important;
+    min-height: 100svh !important;
+    max-height: none !important;
+    overflow-y: visible !important;
+    overflow-x: hidden !important;
+    position: static !important;
+    overflow-anchor: none !important;
+  }
+
+  /* 3) Nada dentro da final reancora a rolagem sozinho */
+  body:has(#section-final) .container,
+  body:has(#section-final) #jornada-canvas,
+  body:has(#section-final) #jornada-content-wrapper,
+  body:has(#section-final) #section-conteudo,
+  #section-final,
+  #section-final * {
+    overflow-anchor: none !important;
+    scroll-snap-type: none !important;
+    scroll-snap-align: none !important;
+  }
+
+  /* 4) Caixa da devolutiva: rola sozinha sem empurrar a página */
+  #section-final .final-guide-feedback {
+    max-height: 46svh !important;             /* svh no lugar de vh */
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;  /* não repassa o scroll pro html */
+    overflow-anchor: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (max-width: 380px) {
+  #section-final .final-guide-feedback {
+    max-height: 44svh !important;
+  }
+}
