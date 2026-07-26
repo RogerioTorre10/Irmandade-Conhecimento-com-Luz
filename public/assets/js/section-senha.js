@@ -686,39 +686,25 @@
              );
            }
 
-            window.toast?.('Acesso confirmado.', 'success');
+       window.toast?.('Acesso confirmado.', 'success');
 
-      // === TRANSIÇÃO COM VÍDEO ===
-      const videoSrc = getTransitionSrc(root, btnNext);
-      const irParaGuia = () => { try { window.JC?.show?.(NEXT_SECTION_ID); } catch {} };
-
-      const VT = window.VIDEO_TRANSICAO || window.VideoTransicao || window.JCVideo;
-      let disparou = false;
+      const irParaGuia = () => window.JC?.show?.('section-guia');
 
       try {
-        if (VT) {
-          const fn = VT.play || VT.playTransition || VT.run || VT.start || VT.transicao;
-          if (typeof fn === 'function') {
-            disparou = true;
-            await fn.call(VT, {
-              src: videoSrc,
-              next: NEXT_SECTION_ID,
-              from: SECTION_ID,
-              onEnd: irParaGuia
-            });
-            // se a lib não navegar sozinha, garantimos a troca
-            if (document.getElementById(SECTION_ID)?.classList.contains(HIDE_CLASS) === false) {
-              irParaGuia();
-            }
-          }
+        const src = (typeof getTransitionSrc === 'function')
+          ? getTransitionSrc()
+          : '/assets/video/filme-senha-confirmada.mp4';
+
+        if (typeof window.playTransitionVideo === 'function' && src) {
+          // ele mesmo navega para 'section-guia' ao terminar
+          window.playTransitionVideo(src, 'section-guia');
+        } else {
+          irParaGuia();
         }
       } catch (vErr) {
-        console.warn('[JCSenha] falha no vídeo de transição, seguindo direto:', vErr);
-        disparou = false;
+        console.warn('[senha] falha no vídeo de transição:', vErr);
+        irParaGuia();
       }
-
-      if (!disparou) irParaGuia();
-
       } catch (err) {
         console.error('[JCSenha] erro ao confirmar 2FA:', err);
         btnNext.removeAttribute('disabled');
