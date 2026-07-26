@@ -1135,3 +1135,113 @@ min-width:220px;
     flex: 0 0 180px !important;
   }
 }
+
+
+/* ============================================================
+   FIX v10 — MOBILE: A CAIXA DA DEVOLUTIVA VOLTA A APARECER
+   Causa do sumiço: o cartão (.j-arcane-card) e os wrappers
+   continuavam com `overflow:hidden` + alturas travadas em
+   100dvh, então a devolutiva (que fica no fim do cartão)
+   era recortada e nunca chegava à tela.
+   Solução (mesma lógica da Intro): abaixo de 768px NADA
+   recorta e NADA tem altura fixa — quem rola é a página.
+   A devolutiva vira um bloco normal, com rolagem interna
+   apenas se o texto for muito longo.
+   Este bloco fica por último e vence todos os anteriores.
+   ============================================================ */
+
+@media (max-width: 768px) {
+
+  /* 1) Página rola normalmente (destrava html/body) */
+  html:has(#section-final),
+  body:has(#section-final),
+  html,
+  body {
+    height: auto !important;
+    min-height: 100dvh !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    overscroll-behavior: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  /* 2) Nenhum ancestral recorta nem trava altura */
+  body:has(#section-final) .container,
+  body:has(#section-final) #jornada-canvas,
+  body:has(#section-final) #jornada-content-wrapper,
+  body:has(#section-final) #section-conteudo,
+  #section-final,
+  #section-final .final-pergaminho-wrapper,
+  #section-final .final-panel,
+  #section-final .j-panel-glow,
+  #section-final .j-perg-v-inner,
+  #section-final .final-wrap,
+  #section-final .j-arcane-card,
+  #section-final .pergaminho-content,
+  #section-final .final-container,
+  #section-final .final-content {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+    flex: 0 0 auto !important;
+  }
+
+  /* largura do pergaminho no celular */
+  body:has(#section-final) #jornada-canvas {
+    width: calc(100vw - 16px) !important;
+    max-width: calc(100vw - 16px) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding-bottom: 24px !important;
+  }
+
+  #section-final {
+    display: block !important;
+    padding: 12px 0 64px !important;
+  }
+
+  #section-final .j-panel-glow,
+  #section-final .final-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* 3) A caixa da devolutiva: visível, largura cheia,
+        altura flexível com teto legível */
+  #section-final .final-guide-feedback {
+    display: block !important;
+    position: relative !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: 140px !important;
+    max-height: 46vh !important;
+    flex: 0 0 auto !important;
+    margin: 16px 0 24px !important;
+    padding: 14px 14px 28px !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+  }
+
+  #section-final .final-guide-feedback > * {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+}
+
+@media (max-width: 380px) {
+  #section-final .final-guide-feedback {
+    min-height: 130px !important;
+    max-height: 44vh !important;
+    padding: 12px 12px 26px !important;
+  }
+}
