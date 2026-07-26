@@ -686,11 +686,38 @@
              );
            }
 
-      window.toast?.('Acesso confirmado.', 'success');
+            window.toast?.('Acesso confirmado.', 'success');
 
-      if (window.JC?.show) {
-        window.JC.show('section-guia');
+      // === TRANSIÇÃO COM VÍDEO ===
+      const videoSrc = getTransitionSrc(root, btnNext);
+      const irParaGuia = () => { try { window.JC?.show?.(NEXT_SECTION_ID); } catch {} };
+
+      const VT = window.VIDEO_TRANSICAO || window.VideoTransicao || window.JCVideo;
+      let disparou = false;
+
+      try {
+        if (VT) {
+          const fn = VT.play || VT.playTransition || VT.run || VT.start || VT.transicao;
+          if (typeof fn === 'function') {
+            disparou = true;
+            await fn.call(VT, {
+              src: videoSrc,
+              next: NEXT_SECTION_ID,
+              from: SECTION_ID,
+              onEnd: irParaGuia
+            });
+            // se a lib não navegar sozinha, garantimos a troca
+            if (document.getElementById(SECTION_ID)?.classList.contains(HIDE_CLASS) === false) {
+              irParaGuia();
+            }
+          }
+        }
+      } catch (vErr) {
+        console.warn('[JCSenha] falha no vídeo de transição, seguindo direto:', vErr);
+        disparou = false;
       }
+
+      if (!disparou) irParaGuia();
 
       } catch (err) {
         console.error('[JCSenha] erro ao confirmar 2FA:', err);
