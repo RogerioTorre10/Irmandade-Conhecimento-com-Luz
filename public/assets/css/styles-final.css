@@ -1050,3 +1050,88 @@ min-width:220px;
   }
 }
 
+
+/* ============================================================
+   FIX v9 — MOBILE: DESTRAVA O SCROLL DA PÁGINA
+   Problema: no mobile o painel ficava curto e a caixa da
+   devolutiva não aparecia, porque html/body estavam travados
+   em 100dvh com overflow hidden e o #jornada-canvas ficava
+   com altura fixa menor que o conteúdo.
+   Solução: abaixo de 768px a rolagem volta a ser a da página
+   (como na Intro). O pergaminho cresce com o conteúdo e a
+   única barra interna que permanece é a da devolutiva.
+   ============================================================ */
+
+@media (max-width: 768px) {
+  @supports selector(body:has(#section-final)) {
+    html:has(#section-final),
+    body:has(#section-final) {
+      height: auto !important;
+      min-height: 100dvh !important;
+      max-height: none !important;
+      overflow-x: hidden !important;
+      overflow-y: auto !important;
+      overscroll-behavior: auto !important;
+      scrollbar-width: none !important;
+      -webkit-overflow-scrolling: touch !important;
+    }
+
+    body:has(#section-final) .container {
+      height: auto !important;
+      min-height: 0 !important;
+      max-height: none !important;
+      overflow: visible !important;
+    }
+
+    /* o pergaminho deixa de ser um scroller no mobile */
+    body:has(#section-final) #jornada-canvas {
+      width: calc(100vw - 16px) !important;
+      max-width: calc(100vw - 16px) !important;
+      height: auto !important;
+      min-height: 0 !important;
+      max-height: none !important;
+      overflow-x: hidden !important;
+      overflow-y: visible !important;
+      padding-bottom: 24px !important;
+    }
+
+    body:has(#section-final) #jornada-canvas::-webkit-scrollbar {
+      width: 0 !important;
+      height: 0 !important;
+      display: none !important;
+    }
+  }
+
+  /* iOS/Safari: não travar mais a página nesta largura */
+  #section-final {
+    min-height: 0 !important;
+    height: auto !important;
+    padding-bottom: 40px !important;
+  }
+
+  /* a caixa da devolutiva volta a ter altura legível no celular */
+  #section-final .final-guide-feedback {
+    width: calc(100% - 24px) !important;
+    max-width: 100% !important;
+    height: 200px !important;
+    min-height: 200px !important;
+    max-height: 200px !important;
+    flex: 0 0 200px !important;
+    margin: 12px auto 24px !important;
+    padding: 12px 14px 32px !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+  }
+}
+
+@media (max-width: 380px) {
+  #section-final .final-guide-feedback {
+    width: calc(100% - 18px) !important;
+    max-width: 100% !important;
+    height: 180px !important;
+    min-height: 180px !important;
+    max-height: 180px !important;
+    flex: 0 0 180px !important;
+  }
+}
