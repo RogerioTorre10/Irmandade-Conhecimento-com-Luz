@@ -10,18 +10,16 @@ const STATIC_DIR = path.join(__dirname, "public");
 // Utilitário de log com timestamp
 const log = (...args) => console.log(`[${new Date().toLocaleString()}]`, ...args);
 
-// CORS liberado para origens confiáveis
-app.use(cors({
-  origin: [
-    "http://localhost:3000",
-    "http://localhost:5173",
-    "https://irmandade-conhecimento-com-luz.onrender.com"
-  ],
-  credentials: true,
-}));
+// ✅ CORS liberado para QUALQUER origem (inclusive "null", que é a origem
+// dentro do iframe da Hotmart). Sem isso a página fica preta no checkout.
+app.use(cors({ origin: true, credentials: false }));
+app.options("*", cors());
 
-// Logging de requisições
+// ✅ Permitir que o site seja exibido dentro do iframe da Hotmart
 app.use((req, res, next) => {
+  res.removeHeader("X-Frame-Options");
+  res.setHeader("Content-Security-Policy", "frame-ancestors *");
+  res.setHeader("Access-Control-Allow-Origin", "*");
   log(`${req.method} ${req.url}`);
   next();
 });
@@ -30,6 +28,7 @@ app.use((req, res, next) => {
 app.use(express.static(STATIC_DIR, {
   extensions: ["html"],
   setHeaders: (res, filePath) => {
+    res.set("Access-Control-Allow-Origin", "*");
     if (filePath.endsWith(".json")) res.set("Content-Type", "application/json");
     if (filePath.endsWith(".js")) res.set("Content-Type", "application/javascript");
     if (filePath.endsWith(".mp4")) res.set("Content-Type", "video/mp4");
@@ -40,6 +39,7 @@ app.use(express.static(STATIC_DIR, {
 app.get("/assets/js/i18n/:lang.json", async (req, res) => {
   const lang = req.params.lang;
   const filePath = path.join(STATIC_DIR, "assets", "js", "i18n", `${lang}.json`);
+  res.setHeader("Access-Control-Allow-Origin", "*");
   try {
     await fs.access(filePath);
     log(`Servindo /assets/js/i18n/${lang}.json`);
@@ -64,7 +64,14 @@ app.get("/assets/js/i18n/:lang.json", async (req, res) => {
 
 app.get("*", async (req, res, next) => {
   // Ignora arquivos estáticos
-  if (req.path.endsWith(".js") || req.path.endsWith(".json") || req.path.endsWith(".css") || req.path.endsWith(".woff")) {
+  if (
+    req.path.endsWith(".js") ||
+    req.path.endsWith(".json") ||
+    req.path.endsWith(".css") ||
+    req.path.endsWith(".woff") ||
+    req.path.endsWith(".woff2") ||
+    req.path.endsWith(".ttf")
+  ) {
     return next();
   }
 
@@ -79,7 +86,6 @@ app.get("*", async (req, res, next) => {
     }
   }
 });
-
 
 // Inicialização do servidor
 app.listen(PORT, () => {
