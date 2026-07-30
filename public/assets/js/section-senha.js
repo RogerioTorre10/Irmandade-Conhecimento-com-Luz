@@ -749,125 +749,114 @@
   });
 }
 
-  // ===== Limpeza de estado local =====
-  // A jornada real é validada no backend (auth/start + auth/verify + pagamento).
-  // O storage só guarda estado de UI e o device_hash. Apagar isso NUNCA concede
-  // acesso — apenas destrava o participante preso a uma sessão anterior.
+  // ===== BOTÕES DE ACESSO E REENVIO =====
 
-  // ENVIAR (primeiro envio): limpeza leve, preserva device_hash e idioma.
-  const SENHA_PRESERVE_KEYS_LIGHT = ['jornada_device_hash', 'i18n_lang', 'lang'];
+const btnEnviar2FA =
+  root.querySelector('#btn-enviar-2fa');
 
-  // REENVIAR (com confirmação): limpeza profunda, device_hash é REGENERADO.
-  const SENHA_PRESERVE_KEYS_DEEP = ['i18n_lang', 'lang'];
+const btnReenviar2FA =
+  root.querySelector('#btn-reenviar-2fa');
 
-  const limparStorageDominio = (preserveKeys) => {
-    try {
-      const backup = {};
-      preserveKeys.forEach((k) => {
-        const v = localStorage.getItem(k);
-        if (v !== null) backup[k] = v;
-      });
-      localStorage.clear();
-      sessionStorage.clear();
-      Object.entries(backup).forEach(([k, v]) => localStorage.setItem(k, v));
-    } catch (e) {
-      console.warn('[JCSenha] limpeza de storage falhou (ignorado):', e);
+
+// O botão central executa a mesma validação
+// do botão Confirmar/Entrar.
+if (
+  btnEnviar2FA &&
+  btnEnviar2FA.dataset.boundSend !== '1'
+) {
+  btnEnviar2FA.dataset.boundSend = '1';
+
+  btnEnviar2FA.addEventListener(
+    'click',
+    () => {
+      btnNext.click();
     }
-  };
-
-  const limparCookiesDominio = () => {
-    try {
-      const cookies = document.cookie ? document.cookie.split(';') : [];
-      const paths = ['/', location.pathname];
-      const host = location.hostname;
-      const domains = ['', host, '.' + host];
-      cookies.forEach((c) => {
-        const name = c.split('=')[0].trim();
-        if (!name) return;
-        paths.forEach((p) => {
-          domains.forEach((d) => {
-            document.cookie =
-              name + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=' + p +
-              (d ? '; domain=' + d : '') + '; SameSite=Lax';
-          });
-        });
-      });
-    } catch (e) {
-      console.warn('[JCSenha] limpeza de cookies falhou (ignorado):', e);
-    }
-  };
-
-  const limparCacheStorage = async () => {
-    if (!('caches' in window)) return;
-    try {
-      const keys = await caches.keys();
-      await Promise.all(keys.map((k) => caches.delete(k)));
-    } catch (e) {
-      console.warn('[JCSenha] limpeza de Cache Storage falhou (ignorado):', e);
-    }
-  };
-
-  const limparIndexedDB = async () => {
-    try {
-      if (typeof indexedDB === 'undefined' || !indexedDB.databases) return;
-      const dbs = await indexedDB.databases();
-      await Promise.all(
-        (dbs || []).map((db) => {
-          if (!db?.name) return Promise.resolve();
-          return new Promise((res) => {
-            const req = indexedDB.deleteDatabase(db.name);
-            req.onsuccess = req.onerror = req.onblocked = () => res();
-          });
-        })
-      );
-    } catch (e) {
-      console.warn('[JCSenha] limpeza de IndexedDB falhou (ignorado):', e);
-    }
-  };
-
-  const enviarCodigoManual = async () => {
-    // Envio normal: limpa estado antigo mas mantém device_hash.
-    limparStorageDominio(SENHA_PRESERVE_KEYS_LIGHT);
-    btnNext.dataset.authStage = 'start';
-    btnNext.click();
-  };
-
-  const reenviarComLimpeza = async () => {
-  const ok = confirm(
-    window.i18n?.t('senha.reenviar_limpeza') ||
-    '🔄 Reenviar código\n\n' +
-    'Isso vai limpar os dados desta Jornada neste dispositivo.\n' +
-    '(Sem afetar seu histórico, outras abas ou outros sites.)\n\n' +
-    'Clique novamente no botão ENVIAR CÓDIGO.'
   );
+}
 
-  if (!ok) return;
 
-  // Limpeza profunda do DOMÍNIO ATUAL:
-  limparStorageDominio(SENHA_PRESERVE_KEYS_DEEP);
-  limparCookiesDominio();
-  await limparCacheStorage();
-  await limparIndexedDB();
+// Reenvia apenas uma cópia da mesma senha JCL.
+if (
+  btnReenviar2FA &&
+  btnReenviar2FA.dataset.boundResend !== '1'
+) {
+  btnReenviar2FA.dataset.boundResend = '1';
 
-  // Dispara o mesmo fluxo do "Enviar código".
-  enviarCodigoManual();
-};
+  btnReenviar2FA.addEventListener(
+    'click',
+    async () => {
+      const emailInput =
+        root.querySelector('#senha-email');
 
-  const btnEnviar2FA =
-    root.querySelector('#btn-enviar-2fa');
+      const email =
+        (emailInput?.value || '')
+          .trim()
+          .toLowerCase();
 
-  const btnReenviar2FA =
-    root.querySelector('#btn-reenviar-2fa');
+      if (!email) {
+        window.toast?.(
+          'Digite primeiro o e-mail utilizado na compra.',
+          'warning'
+        );
 
-  if (btnEnviar2FA && btnEnviar2FA.dataset.boundSend !== '1') {
-    btnEnviar2FA.dataset.boundSend = '1';
-    btnEnviar2FA.addEventListener('click', enviarCodigoManual);
-  }
+        emailInput?.focus();
+        return;
+      }
 
-  if (btnReenviar2FA && btnReenviar2FA.dataset.boundResend !== '1') {
-    btnReenviar2FA.dataset.boundResend = '1';
-    btnReenviar2FA.addEventListener('click', reenviarComLimpeza);
-  }
+      btnReenviar2FA.setAttribute(
+        'disabled',
+        'true'
+      );
+
+      try {
+        const resp = await fetch(
+          `${API_BASE}/hotmart/reenviar-codigo`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              email
+            })
+          }
+        );
+
+        let data = {};
+
+        try {
+          data = await resp.json();
+        } catch {
+          data = {};
+        }
+
+        window.toast?.(
+          data?.message ||
+          'Se houver uma compra elegível para este e-mail, enviaremos a senha.',
+          resp.ok ? 'success' : 'info'
+        );
+
+      } catch (err) {
+        console.error(
+          '[JCSenha] falha ao solicitar reenvio:',
+          err
+        );
+
+        window.toast?.(
+          'Não foi possível solicitar o reenvio neste momento.',
+          'error'
+        );
+
+      } finally {
+        setTimeout(() => {
+          btnReenviar2FA.removeAttribute(
+            'disabled'
+          );
+        }, 60000);
+      }
+    }
+  );
+}
 
     root.dataset.transitionReady = 'true';
     root.dataset.senhaInitialized = 'true';
