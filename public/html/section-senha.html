@@ -16,7 +16,7 @@
               data-speed="50"
               data-i18n="senha.title"
               data-i18n-text="senha.title"
-              data-text="Digite o Código">
+              data-text="Digite sua Senha">
           </h2>
 
           <p id="senha-instr2"
@@ -26,7 +26,7 @@
              data-speed="50"
              data-i18n="senha.p1"
              data-i18n-text="senha.p1"
-             data-text="O código foi enviado para o seu e-mail.">
+             data-text="Use a senha recebida após a confirmação da compra.">
           </p>
 
           <p id="senha-instr3"
@@ -36,7 +36,7 @@
              data-speed="50"
              data-i18n="senha.p2"
              data-i18n-text="senha.p2"
-             data-text="Verifique sua caixa de entrada e também o spam.">
+             data-text="Informe o mesmo e-mail utilizado na compra.">
           </p>
 
           <p id="senha-instr4"
@@ -46,26 +46,27 @@
              data-speed="50"
              data-i18n="senha.p3"
              data-i18n-text="senha.p3"
-             data-text="Digite o código para confirmar sua jornada.">
+             data-text="A senha e o e-mail serão validados juntos para liberar sua Jornada.">
           </p>
 
-         <div class="senha-input-wrap senha-code-row on-pergaminho">
-         <input id="senha-input"
-           class="input-espinhos input-senha"
-           type="password"
-           maxlength="6"
-           inputmode="numeric"
-           placeholder="Digite o código enviado..."
-           data-i18n-placeholder="senha.codePlaceholder"
-           aria-label="Digite o código de confirmação" />
+          <div class="senha-input-wrap senha-code-row on-pergaminho">
+            <input id="senha-input"
+                   class="input-espinhos input-senha"
+                   type="password"
+                   maxlength="18"
+                   autocomplete="off"
+                   autocapitalize="characters"
+                   spellcheck="false"
+                   placeholder="Digite a senha JCL-XXXX-XXXX-XXXX"
+                   aria-label="Digite a senha recebida após a compra" />
 
-         <button class="btn btn-toggle-senha"
-           data-action="toggle-password"
-           type="button"
-           aria-label="Alternar visibilidade do código">
-          👁️
-        </button>
-       </div>
+            <button class="btn btn-toggle-senha"
+                    data-action="toggle-password"
+                    type="button"
+                    aria-label="Mostrar ou ocultar a senha">
+              👁️
+            </button>
+          </div>
 
           <div class="senha-input-wrap senha-email-row on-pergaminho">
             <input id="senha-email"
@@ -81,9 +82,8 @@
             <button id="btn-enviar-2fa"
                     class="btn btn-stone senha-btn-wide"
                     type="button"
-                    data-i18n="senha.sendCode"
-                    data-text="Enviar código por e-mail">
-              ✉️ Enviar código por e-mail
+                    data-text="Entrar na Jornada">
+              🔐 Entrar na Jornada
             </button>
           </div>
 
@@ -95,16 +95,15 @@
             <div class="senha-copy-mini"
                  data-i18n="senha.resendInfo"
                  data-i18n-text="senha.resendInfo"
-                 data-text="Dificuldade em solicitar o código? Click no botão abaixo">
-              Dificuldade em solicitar o código? Click no botão abaixo?
+                 data-text="Perdeu ou apagou a senha recebida? Solicite uma cópia abaixo.">
+              Perdeu ou apagou a senha recebida? Solicite uma cópia abaixo.
             </div>
 
             <button id="btn-reenviar-2fa"
                     class="btn btn-stone senha-btn-wide"
                     type="button"
-                    data-i18n="senha.resendCode"
-                    data-text="Limpeza do cache. Após click novamente no botão 'ENVIAR CÓDIGO">
-              🔁 Limpeza do cache. Após click novamente no botão 'ENVIAR CÓDIGO
+                    data-text="Reenviar minha senha">
+              🔁 Reenviar minha senha
             </button>
           </div>
 
@@ -120,11 +119,10 @@
           <button id="btn-senha-avancar"
             class="btn btn-stone"
                type="button"
-               data-i18n="senha.confirmCode"
-               data-text="Confirmar Código"
+               data-text="Entrar na Jornada"
                data-next-section="section-guia"
-               aria-label="Confirmar código e avançar">
-            🔐 Confirmar
+               aria-label="Validar senha e entrar">
+            🔐 Entrar
           </button>
         </div>
         </div>
