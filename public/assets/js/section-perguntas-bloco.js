@@ -1271,11 +1271,18 @@
       resposta: body.resposta,
     });
 
+    const IS_HOMOLOG =
+      window.location.hostname.includes('homolog');
+
     const API_BASE = String(
       window.APP_CONFIG?.API_BASE ||
-        'https://lumen-backend-api.onrender.com/api'
+      (
+        IS_HOMOLOG
+          ? 'https://lumen-backend-homolog.onrender.com/api'
+          : 'https://lumen-backend-api.onrender.com/api'
+      )
     ).replace(/\/$/, '');
-
+    
     const endpoints = [`${API_BASE}/jornada/devolutiva-bloco`];
     let ultimoErro = null;
 
