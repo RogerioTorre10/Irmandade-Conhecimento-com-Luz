@@ -51,12 +51,16 @@
 
           <div class="senha-input-wrap senha-code-row on-pergaminho">
             <input id="senha-input"
+                   name="jornada_codigo_acesso"
                    class="input-espinhos input-senha"
-                   type="password"
+                   type="text"
                    maxlength="18"
-                   autocomplete="off"
+                   autocomplete="one-time-code"
+                   autocorrect="off"
                    autocapitalize="characters"
                    spellcheck="false"
+                   data-lpignore="true"
+                   data-1p-ignore="true"
                    placeholder="Digite a senha JCL-XXXX-XXXX-XXXX"
                    aria-label="Digite a senha recebida após a compra" />
 
