@@ -3,8 +3,9 @@
 // Inclui mapa de seções e aliases para máxima compatibilidade.
 
 (function () {
-  // >>> Ajuste AQUI se seu backend mudar <<<
-  const DEFAULT_API_BASE     = "https://lumen-backend-api.onrender.com/api"; // com /api
+  // >>> Detecta automaticamente Produção ou Homolog <<<
+  const IS_HOMOLOG = location.hostname.includes("homolog");
+  const DEFAULT_API_BASE = IS_HOMOLOG? "https://lumen-backend-homolog.onrender.com/api" : "https://lumen-backend-api.onrender.com/api";
   const DEFAULT_STORAGE_KEY  = "jornada_essencial_v1";
   const DEFAULT_PASS         = "IRMANDADE"; // Alinhado com jornada-auth.js
 
@@ -17,7 +18,7 @@
   // Config geral da aplicação (mantém o que já existir e garante defaults)
 window.APP_CONFIG = Object.assign(
   {
-    ENV: "prod",
+    ENV: IS_HOMOLOG ? "homolog" : "prod",
     API_BASE: API_BASE_NORM,
     STORAGE_KEY: DEFAULT_STORAGE_KEY,
     PASS: DEFAULT_PASS,
