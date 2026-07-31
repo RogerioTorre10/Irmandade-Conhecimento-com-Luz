@@ -28,15 +28,26 @@
   }
 
   function pickApiBase() {
-    const cfg = (window.APP_CONFIG && window.APP_CONFIG.API_BASE)
-      ? window.APP_CONFIG.API_BASE
-      : '';
+  const isHomolog =
+    window.location.hostname.includes('homolog');
 
-    if (cfg) return normalizeBase(cfg);
-    if (window.API_BASE) return normalizeBase(window.API_BASE);
+  const automaticBase = isHomolog
+    ? 'https://lumen-backend-homolog.onrender.com/api'
+    : 'https://lumen-backend-api.onrender.com/api';
 
-    return normalizeBase('https://lumen-backend-api.onrender.com/api');
+  const cfg =
+    window.APP_CONFIG?.API_BASE || '';
+
+  if (cfg) {
+    return normalizeBase(cfg);
   }
+
+  if (window.API_BASE) {
+    return normalizeBase(window.API_BASE);
+  }
+
+  return normalizeBase(automaticBase);
+}
 
   const API_PRIMARY = pickApiBase();
   const PDF_PATHS = [
