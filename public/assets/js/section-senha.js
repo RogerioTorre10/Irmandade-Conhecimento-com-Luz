@@ -768,8 +768,76 @@ if (
 
   btnEnviar2FA.addEventListener(
     'click',
-    () => {
-      btnNext.click();
+    async () => {
+      const emailInput =
+        root.querySelector('#senha-email');
+
+      const email =
+        (emailInput?.value || '')
+          .trim()
+          .toLowerCase();
+
+      if (!email) {
+        window.toast?.(
+          'Digite primeiro o e-mail utilizado na compra.',
+          'warning'
+        );
+
+        emailInput?.focus();
+        return;
+      }
+
+      btnEnviar2FA.setAttribute(
+        'disabled',
+        'true'
+      );
+
+      try {
+        const resp = await fetch(
+          `${API_BASE}/hotmart/reenviar-codigo`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              email
+            })
+          }
+        );
+
+        let data = {};
+
+        try {
+          data = await resp.json();
+        } catch {
+          data = {};
+        }
+
+        window.toast?.(
+          data?.message ||
+          'Se houver uma compra aprovada para este e-mail, enviaremos a senha.',
+          resp.ok ? 'success' : 'info'
+        );
+
+      } catch (err) {
+        console.error(
+          '[JCSenha] falha ao enviar senha:',
+          err
+        );
+
+        window.toast?.(
+          'Não foi possível solicitar o envio neste momento.',
+          'error'
+        );
+
+      } finally {
+        setTimeout(() => {
+          btnEnviar2FA.removeAttribute(
+            'disabled'
+          );
+        }, 60000);
+      }
     }
   );
 }
