@@ -21,9 +21,16 @@
     return;
   }
 
+  const IS_HOMOLOG =
+    window.location.hostname.includes('homolog');
+
   const API =
     window.APP_CONFIG?.API_BASE ||
-    'https://lumen-backend-api.onrender.com/api';
+    ( 
+      IS_HOMOLOG
+        ? 'https://lumen-backend-homolog.onrender.com/api'
+        : 'https://lumen-backend-api.onrender.com/api'
+  );
 
   const PUBLIC_SECTIONS = new Set([
     'section-intro',
