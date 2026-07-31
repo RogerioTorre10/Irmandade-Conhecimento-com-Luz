@@ -405,10 +405,16 @@
     } catch {}
   }
 
-  async function initOnce(root, triggerToken) {
+  const IS_HOMOLOG =
+  window.location.hostname.includes('homolog');
+
   const API_BASE =
-    window.APP_CONFIG?.API_BASE ||
-    'https://lumen-backend-api.onrender.com/api';
+  window.APP_CONFIG?.API_BASE ||
+  (
+    IS_HOMOLOG
+      ? 'https://lumen-backend-homolog.onrender.com/api'
+      : 'https://lumen-backend-api.onrender.com/api'
+  );
 
   if (!root) return;
   if (triggerToken !== window.JCSenha.state.initToken) return;
