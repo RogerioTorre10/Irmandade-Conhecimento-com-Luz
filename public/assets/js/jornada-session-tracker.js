@@ -593,4 +593,25 @@ function horasRestantes() {
   );
 }
    
+document.addEventListener(
+  'jornada:activated',
+  () => {
+    console.log(
+      '[JORNADA_SESSION][72H] Ativação recebida. Iniciando contador.'
+    );
+
+    iniciarContador();
+  }
+);
+
+if (document.readyState === 'loading') {
+  document.addEventListener(
+    'DOMContentLoaded',
+    iniciarTrackerAutomaticamente,
+    { once: true }
+  );
+} else {
+  iniciarTrackerAutomaticamente();
+}   
+   
 })();
