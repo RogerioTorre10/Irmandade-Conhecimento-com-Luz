@@ -3,56 +3,27 @@
 // Inclui mapa de seções e aliases para máxima compatibilidade.
 
 (function () {
-  'use strict';
+  // >>> Ajuste AQUI se seu backend mudar <<<
+  const DEFAULT_API_BASE     = "https://lumen-backend-api.onrender.com/api"; // com /api
+  const DEFAULT_STORAGE_KEY  = "jornada_essencial_v1";
+  const DEFAULT_PASS         = "IRMANDADE"; // Alinhado com jornada-auth.js
 
-  const hostname = window.location.hostname.toLowerCase().trim();
+  function normalizeBase(u) { return String(u || "").replace(/\/+$/, ""); }
 
-  const IS_HOMOLOG =
-    hostname.includes('homolog') ||
-    hostname === 'irmandade-conhecimento-com-luz-1.onrender.com';
+  const baseFromPage   = (window.APP_CONFIG && window.APP_CONFIG.API_BASE) || DEFAULT_API_BASE;
+  const API_BASE_NORM  = normalizeBase(baseFromPage);           // ex.: https://.../api
+  const API_URL_NO_API = API_BASE_NORM.replace(/\/api$/, "");   // ex.: https://... (sem /api)
 
-  const DEFAULT_API_BASE = IS_HOMOLOG
-    ? 'https://lumen-backend-homolog.onrender.com/api'
-    : 'https://lumen-backend-api.onrender.com/api';
-
-  const DEFAULT_STORAGE_KEY = IS_HOMOLOG
-    ? 'jornada_essencial_homolog_v1'
-    : 'jornada_essencial_v1';
-
-  const DEFAULT_PASS = 'IRMANDADE';
-
-  function normalizeBase(url) {
-    return String(url || '').replace(/\/+$/, '');
-  }
-
-  const baseFromPage =
-    (window.APP_CONFIG && window.APP_CONFIG.API_BASE) ||
-    DEFAULT_API_BASE;
-
-  const API_BASE_NORM = normalizeBase(baseFromPage);
-  const API_URL_NO_API = API_BASE_NORM.replace(/\/api$/, '');
-
-  window.APP_CONFIG = Object.assign(
-    {
-      ENV: IS_HOMOLOG ? 'homolog' : 'prod',
-      API_BASE: API_BASE_NORM,
-      STORAGE_KEY: DEFAULT_STORAGE_KEY,
-      PASS: DEFAULT_PASS,
-      API_URL: API_URL_NO_API
-    },
-    window.APP_CONFIG || {}
-  );
-
-  window.API_BASE = API_BASE_NORM;
-
-  console.log('[CONFIG][AMBIENTE]', {
-    HOSTNAME: hostname,
-    IS_HOMOLOG,
+  // Config geral da aplicação (mantém o que já existir e garante defaults)
+window.APP_CONFIG = Object.assign(
+  {
+    ENV: "prod",
     API_BASE: API_BASE_NORM,
-    ENV: window.APP_CONFIG.ENV
-  });
-
-})();
+    STORAGE_KEY: DEFAULT_STORAGE_KEY,
+    PASS: DEFAULT_PASS,
+  },
+  window.APP_CONFIG || {}
+);
 
 // ========================================
 // CONFIG DE VOZ E DATILOGRAFIA
