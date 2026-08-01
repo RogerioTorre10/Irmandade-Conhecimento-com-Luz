@@ -409,12 +409,12 @@
   window.location.hostname.includes('homolog');
 
   const API_BASE =
-  window.APP_CONFIG?.API_BASE ||
-  (
     IS_HOMOLOG
       ? 'https://lumen-backend-homolog.onrender.com/api'
-      : 'https://lumen-backend-api.onrender.com/api'
-  );
+      : (
+        window.APP_CONFIG?.API_BASE ||
+        'https://lumen-backend-api.onrender.com/api'
+      );
 
   async function initOnce(root, triggerToken) {
     if (!root) return;
