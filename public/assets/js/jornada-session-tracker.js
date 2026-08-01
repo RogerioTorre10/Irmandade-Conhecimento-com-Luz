@@ -523,6 +523,53 @@ function horasRestantes() {
   // ============================================
 
   async function iniciarTrackerAutomaticamente() {
+  /*
+   * FLUXO NOVO:
+   * usa o prazo oficial gravado pelo backend/Guardião.
+   */
+  const guardianRemaining =
+    window.JORNADA_SESSION?.remainingMs;
+
+  const deadlineGuardiao =
+    localStorage.getItem(
+      'jornada_deadline_at'
+    );
+
+  const deadlineMs = deadlineGuardiao
+    ? (
+        Number.isFinite(Number(deadlineGuardiao))
+          ? Number(deadlineGuardiao)
+          : Date.parse(deadlineGuardiao)
+      )
+    : NaN;
+
+  if (
+    (
+      typeof guardianRemaining === 'number' &&
+      guardianRemaining > 0
+    ) ||
+    (
+      Number.isFinite(deadlineMs) &&
+      deadlineMs > now()
+    )
+  ) {
+    iniciarContador();
+
+    console.log(
+      '[JORNADA_SESSION][72H] Contador iniciado pelo prazo oficial do Guardião.',
+      {
+        guardianRemaining,
+        deadlineGuardiao
+      }
+    );
+
+    return;
+  }
+
+  /*
+   * COMPATIBILIDADE:
+   * mantém o funcionamento das sessões antigas.
+   */
   const st = load();
 
   if (
@@ -545,15 +592,5 @@ function horasRestantes() {
     '[JORNADA_SESSION][72H] Nenhuma sessão ativa encontrada para retomada.'
   );
 }
-
-if (document.readyState === 'loading') {
-  document.addEventListener(
-    'DOMContentLoaded',
-    iniciarTrackerAutomaticamente,
-    { once: true }
-  );
-} else {
-  iniciarTrackerAutomaticamente();
-}
-
+   
 })();
