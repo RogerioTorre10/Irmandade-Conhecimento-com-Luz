@@ -262,6 +262,27 @@
   // ============================================
 
   function tempoRestante() {
+
+  // Primeiro tenta usar o Guardião v2
+  if (
+    window.JORNADA_SESSION &&
+    typeof window.JORNADA_SESSION.remainingMs === 'number'
+  ) {
+
+    const totalMs = Math.max(
+      0,
+      window.JORNADA_SESSION.remainingMs
+    );
+
+    return {
+      totalMs,
+      horas: Math.floor(totalMs / 3600000),
+      minutos: Math.floor((totalMs % 3600000) / 60000),
+      segundos: Math.floor((totalMs % 60000) / 1000)
+    };
+  }
+
+  // Compatibilidade com o tracker antigo
   const st = load();
 
   if (!st.deadline_at) {
