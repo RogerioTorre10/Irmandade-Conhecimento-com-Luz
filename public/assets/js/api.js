@@ -28,25 +28,33 @@
   }
 
   function pickApiBase() {
+  const hostname =
+    window.location.hostname
+      .toLowerCase()
+      .trim();
+
   const isHomolog =
-    window.location.hostname.includes('homolog');
+    hostname.includes('homolog') ||
+    hostname ===
+      'irmandade-conhecimento-com-luz-1.onrender.com';
 
-  const automaticBase = isHomolog
-    ? 'https://lumen-backend-homolog.onrender.com/api'
-    : 'https://lumen-backend-api.onrender.com/api';
-
-  const cfg =
-    window.APP_CONFIG?.API_BASE || '';
-
-  if (cfg) {
-    return normalizeBase(cfg);
+  /*
+   * No ambiente homolog, a URL do backend homolog
+   * tem prioridade absoluta, mesmo que APP_CONFIG
+   * ainda esteja configurado como produção.
+   */
+  if (isHomolog) {
+    return normalizeBase(
+      'https://lumen-backend-homolog.onrender.com/api'
+    );
   }
 
-  if (window.API_BASE) {
-    return normalizeBase(window.API_BASE);
-  }
+  const configuredBase =
+    window.APP_CONFIG?.API_BASE ||
+    window.API_BASE ||
+    'https://lumen-backend-api.onrender.com/api';
 
-  return normalizeBase(automaticBase);
+  return normalizeBase(configuredBase);
 }
 
   const API_PRIMARY = pickApiBase();
