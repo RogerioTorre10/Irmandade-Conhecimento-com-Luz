@@ -405,16 +405,33 @@
     } catch {}
   }
 
+  const HOSTNAME =
+    window.location.hostname
+      .toLowerCase()
+      .trim();
+
   const IS_HOMOLOG =
-  window.location.hostname.includes('homolog');
+    HOSTNAME.includes('homolog') ||
+    HOSTNAME ===
+      'irmandade-conhecimento-com-luz-1.onrender.com';
 
   const API_BASE =
     IS_HOMOLOG
       ? 'https://lumen-backend-homolog.onrender.com/api'
       : (
         window.APP_CONFIG?.API_BASE ||
+        window.API_BASE ||
         'https://lumen-backend-api.onrender.com/api'
       );
+
+  console.log(
+    '[JCSenha][AMBIENTE]',
+    {
+      HOSTNAME,
+      IS_HOMOLOG,
+      API_BASE
+    }
+  );
 
   async function initOnce(root, triggerToken) {
     if (!root) return;
