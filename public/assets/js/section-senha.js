@@ -405,10 +405,16 @@
     } catch {}
   }
 
-  async function initOnce(root, triggerToken) {
+  const IS_HOMOLOG =
+  window.location.hostname.includes('homolog');
+
   const API_BASE =
-    window.APP_CONFIG?.API_BASE ||
-    'https://lumen-backend-api.onrender.com/api';
+  window.APP_CONFIG?.API_BASE ||
+  (
+    IS_HOMOLOG
+      ? 'https://lumen-backend-homolog.onrender.com/api'
+      : 'https://lumen-backend-api.onrender.com/api'
+  );
 
   if (!root) return;
   if (triggerToken !== window.JCSenha.state.initToken) return;
@@ -520,319 +526,411 @@
   btnNext.dataset.boundNext = '1';
 
   btnNext.addEventListener('click', async () => {
-    const etapa = btnNext.dataset.authStage || 'start';
+    const senhaInput = root.querySelector('#senha-input');
+    const emailInput = root.querySelector('#senha-email');
 
-    const senhaInput2FA = root.querySelector('#senha-input');
-    const emailInput2FA = root.querySelector('#senha-email');
+    const senhaDigitada = (senhaInput?.value || '')
+      .trim()
+      .toUpperCase();
 
-    if (etapa === 'start') {
-      const senhaDigitada =
-        (senhaInput2FA?.value || '').trim() || 'TESTE123';
+    const email = (emailInput?.value || '')
+      .trim()
+      .toLowerCase();
 
-      const email =
-        (emailInput2FA?.value || '').trim();
+    if (!email) {
+      window.toast?.(
+        'Digite o mesmo e-mail utilizado na compra.',
+        'warning'
+      );
+      emailInput?.focus();
+      return;
+    }
 
-      if (!email) {
-        window.toast?.('Digite seu e-mail.', 'warning');
-        emailInput2FA?.focus();
-        return;
-      }
+    if (!senhaDigitada) {
+      window.toast?.(
+        'Digite a senha recebida após a compra.',
+        'warning'
+      );
+      senhaInput?.focus();
+      return;
+    }
 
-      saveSenha(senhaDigitada);
-      sessionStorage.setItem('jornada.email', email);
-      sessionStorage.setItem('jornada.senha', senhaDigitada);
+    const formatoJCL =
+      /^JCL-[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}$/;
 
-      btnNext.setAttribute('disabled', 'true');
+    if (!formatoJCL.test(senhaDigitada)) {
+      window.toast?.(
+        'Confira a senha. Use o formato JCL-XXXX-XXXX-XXXX.',
+        'warning'
+      );
+      senhaInput?.focus();
+      return;
+    }
 
-      try {
-        const resp = await fetch(`${API_BASE}/auth/start`, {
+    saveSenha(senhaDigitada);
+
+    sessionStorage.setItem(
+      'jornada.email',
+      email
+    );
+
+    sessionStorage.setItem(
+      'jornada.senha',
+      senhaDigitada
+    );
+
+    sessionStorage.setItem(
+      'jornada.codigo_jornada',
+      senhaDigitada
+    );
+
+    btnNext.setAttribute('disabled', 'true');
+
+    try {
+      const resp = await fetch(
+        `${API_BASE}/auth/start`,
+        {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json'
+          },
           body: JSON.stringify({
             email,
             senha: senhaDigitada,
-            device_hash: localStorage.getItem('jornada_device_hash') || 'browser'
+            device_hash:
+              localStorage.getItem(
+                'jornada_device_hash'
+              ) || 'browser'
           })
-        });
-
-        const data = await resp.json();
-
-        if (data?.reautenticacao_necessaria ||data?.reason ==='reautenticacao_necessaria') {
-        await window.JORNADA_SESSION.concluirReautenticacao({email,codigo_jornada:
-        data.codigo_jornada,started_at:
-        data.started_at,deadline_at:
-        data.deadline_at,last_section:'section-guia'
-      });
-
-        window.toast?.('Sessão restaurada com sucesso.','success');
-        window.JC?.show('section-guia');
-        return;
         }
+      );
 
-        if (!resp.ok || !data.ok) {
-          throw new Error(data?.detail || data?.message || 'Senha inválida.');
-        }
-
-        window.toast?.('Código enviado ao e-mail.', 'success');
-
-        senhaInput2FA.value = '';
-        senhaInput2FA.placeholder = 'Digite o código recebido por e-mail';
-        senhaInput2FA.setAttribute('inputmode', 'numeric');
-
-        btnNext.dataset.authStage = 'verify';
-        btnNext.removeAttribute('disabled');
-        return;
-
-      } catch (err) {
-        console.error('[JCSenha] erro ao iniciar 2FA:', err);
-        btnNext.removeAttribute('disabled');
-        window.toast?.(err.message || 'Erro ao validar senha.', 'error');
-        return;
-      }
-    }
-
-    if (etapa === 'verify') {
-      const code =
-        (senhaInput2FA?.value || '').trim();
-
-      const email =
-        sessionStorage.getItem('jornada.email') ||
-        (emailInput2FA?.value || '').trim();
-
-      const senhaSalva =
-        sessionStorage.getItem('jornada.senha_original') ||
-        sessionStorage.getItem('jornada.senha') ||
-        '';
-
-      if (!code) {
-        window.toast?.('Digite o código recebido.', 'warning');
-        senhaInput2FA?.focus();
-        return;
-      }
-
-      if (!email) {
-        window.toast?.('E-mail não encontrado. Reenvie o código.', 'warning');
-        emailInput2FA?.focus();
-        return;
-      }
-
-      btnNext.setAttribute('disabled', 'true');
+      let data = {};
 
       try {
-        const resp = await fetch(`${API_BASE}/auth/verify`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email,
-            senha: senhaSalva,
-            code,
-            device_hash: localStorage.getItem('jornada_device_hash') || 'browser'
-          })
-        });
+        data = await resp.json();
+      } catch {
+        data = {};
+      }
 
-        const data = await resp.json();
+      if (
+        !resp.ok ||
+        !data?.ok ||
+        !data?.authenticated
+      ) {
+        throw new Error(
+          data?.detail ||
+          data?.message ||
+          'Não foi possível validar o acesso.'
+        );
+      }
 
-        if (!resp.ok || !data.ok) {
-          throw new Error(data?.detail || data?.message || 'Código inválido.');
-        }
+      const codigoJornada =
+        data.codigo_jornada ||
+        data.senha ||
+        senhaDigitada;
 
-      await window.JORNADA_SESSION.registrarAtivacao({ email, codigo_jornada: data.codigo_jornada,
-        started_at: data.started_at, deadline_at: data.deadline_at, last_section:'section-guia'
-      });
+      const startedAt =
+        data.started_at ||
+        data.created_at ||
+        null;
 
-       if (
-          window.JORNADA_TIMER &&
-          typeof window.JORNADA_TIMER.iniciarSessao === 'function'
+      const deadlineAt =
+        data.deadline_at ||
+        data.expires_at ||
+        null;
+
+      localStorage.setItem(
+        'jornada_codigo',
+        codigoJornada
+      );
+
+      localStorage.setItem(
+        'jornada_email',
+        email
+      );
+
+      if (startedAt) {
+        localStorage.setItem(
+          'jornada_started_at',
+          String(startedAt)
+        );
+      }
+
+      if (deadlineAt) {
+        localStorage.setItem(
+          'jornada_deadline_at',
+          String(deadlineAt)
+        );
+      }
+
+      try {
+        if (
+          window.JORNADA_SESSION &&
+          typeof window.JORNADA_SESSION
+            .registrarAtivacao === 'function'
         ) {
-          try {
-            const sessao72h =
-              await window.JORNADA_TIMER.iniciarSessao({
-                email
-              });
+          await window.JORNADA_SESSION
+            .registrarAtivacao({
+              email,
+              codigo_jornada: codigoJornada,
+              started_at: startedAt,
+              deadline_at: deadlineAt,
+              last_section: 'section-guia'
+            });
+        }
 
-            if (sessao72h?.criado_em) {
-              localStorage.setItem(
-                'jornada_started_at',
-                String(sessao72h.criado_em)
-              );
-            }
-
-            if (sessao72h?.deadline_at) {
-              localStorage.setItem(
-                'jornada_deadline_at',
-                String(sessao72h.deadline_at)
-              );
-            }
-
-            console.log(
-              '[JCSenha][72H] Sessão iniciada ou preservada:',
-              sessao72h
-             );
-
-            await window.JORNADA_SESSION.atualizarEstado({
+        if (
+          window.JORNADA_SESSION &&
+          typeof window.JORNADA_SESSION
+            .atualizarEstado === 'function'
+        ) {
+          await window.JORNADA_SESSION
+            .atualizarEstado({
               last_section: 'section-guia',
-              estado_tela: '2fa_confirmado'
-           });
+              estado_tela: data.resume
+                ? 'senha_validada_retomada'
+                : 'senha_validada'
+            });
+        }
+      } catch (sessionErr) {
+        console.warn(
+          '[JCSenha] acesso validado, mas a sincronização auxiliar falhou:',
+          sessionErr
+        );
+      }
 
-            } catch (sessionErr) {
-              console.error(
-                '[JCSenha][72H] Falha ao iniciar contador:',
-                sessionErr
-              );
-            }
-           } else {
-             console.warn(
-               '[JCSenha][72H] JORNADA_TIMER não está disponível.'
-             );
-           }
+      window.toast?.(
+        data.resume
+          ? 'Acesso confirmado. Retomando sua Jornada.'
+          : 'Acesso confirmado.',
+        'success'
+      );
 
-       window.toast?.('Acesso confirmado.', 'success');
-
-      const irParaGuia = () => window.JC?.show?.('section-guia');
+      const irParaGuia = () => {
+        window.JC?.show?.(NEXT_SECTION_ID);
+      };
 
       try {
-        const src = (typeof getTransitionSrc === 'function')
-          ? getTransitionSrc()
-          : '/assets/video/filme-senha-confirmada.mp4';
+        const src = getTransitionSrc(
+          root,
+          btnNext
+        );
 
-        if (typeof window.playTransitionVideo === 'function' && src) {
-          // ele mesmo navega para 'section-guia' ao terminar
-          window.playTransitionVideo(src, 'section-guia');
+        if (
+          typeof window.playTransitionVideo ===
+            'function' &&
+          src
+        ) {
+          window.playTransitionVideo(
+            src,
+            NEXT_SECTION_ID
+          );
         } else {
           irParaGuia();
         }
-      } catch (vErr) {
-        console.warn('[senha] falha no vídeo de transição:', vErr);
+      } catch (videoErr) {
+        console.warn(
+          '[JCSenha] falha no filme de transição:',
+          videoErr
+        );
+
         irParaGuia();
       }
-      } catch (err) {
-        console.error('[JCSenha] erro ao confirmar 2FA:', err);
-        btnNext.removeAttribute('disabled');
-        window.toast?.(err.message || 'Erro ao confirmar código.', 'error');
-      }
+
+    } catch (err) {
+      console.error(
+        '[JCSenha] erro ao validar e-mail e senha JCL:',
+        err
+      );
+
+      btnNext.removeAttribute('disabled');
+
+      window.toast?.(
+        err.message ||
+        'Não foi possível validar o acesso.',
+        'error'
+      );
     }
   });
 }
 
-  // ===== Limpeza de estado local =====
-  // A jornada real é validada no backend (auth/start + auth/verify + pagamento).
-  // O storage só guarda estado de UI e o device_hash. Apagar isso NUNCA concede
-  // acesso — apenas destrava o participante preso a uma sessão anterior.
+  // ===== BOTÕES DE ACESSO E REENVIO =====
 
-  // ENVIAR (primeiro envio): limpeza leve, preserva device_hash e idioma.
-  const SENHA_PRESERVE_KEYS_LIGHT = ['jornada_device_hash', 'i18n_lang', 'lang'];
+const btnEnviar2FA =
+  root.querySelector('#btn-enviar-2fa');
 
-  // REENVIAR (com confirmação): limpeza profunda, device_hash é REGENERADO.
-  const SENHA_PRESERVE_KEYS_DEEP = ['i18n_lang', 'lang'];
+const btnReenviar2FA =
+  root.querySelector('#btn-reenviar-2fa');
 
-  const limparStorageDominio = (preserveKeys) => {
-    try {
-      const backup = {};
-      preserveKeys.forEach((k) => {
-        const v = localStorage.getItem(k);
-        if (v !== null) backup[k] = v;
-      });
-      localStorage.clear();
-      sessionStorage.clear();
-      Object.entries(backup).forEach(([k, v]) => localStorage.setItem(k, v));
-    } catch (e) {
-      console.warn('[JCSenha] limpeza de storage falhou (ignorado):', e);
-    }
-  };
 
-  const limparCookiesDominio = () => {
-    try {
-      const cookies = document.cookie ? document.cookie.split(';') : [];
-      const paths = ['/', location.pathname];
-      const host = location.hostname;
-      const domains = ['', host, '.' + host];
-      cookies.forEach((c) => {
-        const name = c.split('=')[0].trim();
-        if (!name) return;
-        paths.forEach((p) => {
-          domains.forEach((d) => {
-            document.cookie =
-              name + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=' + p +
-              (d ? '; domain=' + d : '') + '; SameSite=Lax';
-          });
-        });
-      });
-    } catch (e) {
-      console.warn('[JCSenha] limpeza de cookies falhou (ignorado):', e);
-    }
-  };
+// O botão central executa a mesma validação
+// do botão Confirmar/Entrar.
+if (
+  btnEnviar2FA &&
+  btnEnviar2FA.dataset.boundSend !== '1'
+) {
+  btnEnviar2FA.dataset.boundSend = '1';
 
-  const limparCacheStorage = async () => {
-    if (!('caches' in window)) return;
-    try {
-      const keys = await caches.keys();
-      await Promise.all(keys.map((k) => caches.delete(k)));
-    } catch (e) {
-      console.warn('[JCSenha] limpeza de Cache Storage falhou (ignorado):', e);
-    }
-  };
+  btnEnviar2FA.addEventListener(
+    'click',
+    async () => {
+      const emailInput =
+        root.querySelector('#senha-email');
 
-  const limparIndexedDB = async () => {
-    try {
-      if (typeof indexedDB === 'undefined' || !indexedDB.databases) return;
-      const dbs = await indexedDB.databases();
-      await Promise.all(
-        (dbs || []).map((db) => {
-          if (!db?.name) return Promise.resolve();
-          return new Promise((res) => {
-            const req = indexedDB.deleteDatabase(db.name);
-            req.onsuccess = req.onerror = req.onblocked = () => res();
-          });
-        })
+      const email =
+        (emailInput?.value || '')
+          .trim()
+          .toLowerCase();
+
+      if (!email) {
+        window.toast?.(
+          'Digite primeiro o e-mail utilizado na compra.',
+          'warning'
+        );
+
+        emailInput?.focus();
+        return;
+      }
+
+      btnEnviar2FA.setAttribute(
+        'disabled',
+        'true'
       );
-    } catch (e) {
-      console.warn('[JCSenha] limpeza de IndexedDB falhou (ignorado):', e);
+
+      try {
+        const resp = await fetch(
+          `${API_BASE}/hotmart/reenviar-codigo`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              email
+            })
+          }
+        );
+
+        let data = {};
+
+        try {
+          data = await resp.json();
+        } catch {
+          data = {};
+        }
+
+        window.toast?.(
+          data?.message ||
+          'Se houver uma compra aprovada para este e-mail, enviaremos a senha.',
+          resp.ok ? 'success' : 'info'
+        );
+
+      } catch (err) {
+        console.error(
+          '[JCSenha] falha ao enviar senha:',
+          err
+        );
+
+        window.toast?.(
+          'Não foi possível solicitar o envio neste momento.',
+          'error'
+        );
+
+      } finally {
+        setTimeout(() => {
+          btnEnviar2FA.removeAttribute(
+            'disabled'
+          );
+        }, 60000);
+      }
     }
-  };
-
-  const enviarCodigoManual = async () => {
-    // Envio normal: limpa estado antigo mas mantém device_hash.
-    limparStorageDominio(SENHA_PRESERVE_KEYS_LIGHT);
-    btnNext.dataset.authStage = 'start';
-    btnNext.click();
-  };
-
-  const reenviarComLimpeza = async () => {
-  const ok = confirm(
-    window.i18n?.t('senha.reenviar_limpeza') ||
-    '🔄 Reenviar código\n\n' +
-    'Isso vai limpar os dados desta Jornada neste dispositivo.\n' +
-    '(Sem afetar seu histórico, outras abas ou outros sites.)\n\n' +
-    'Clique novamente no botão ENVIAR CÓDIGO.'
   );
+}
 
-  if (!ok) return;
 
-  // Limpeza profunda do DOMÍNIO ATUAL:
-  limparStorageDominio(SENHA_PRESERVE_KEYS_DEEP);
-  limparCookiesDominio();
-  await limparCacheStorage();
-  await limparIndexedDB();
+// Reenvia apenas uma cópia da mesma senha JCL.
+if (
+  btnReenviar2FA &&
+  btnReenviar2FA.dataset.boundResend !== '1'
+) {
+  btnReenviar2FA.dataset.boundResend = '1';
 
-  // Dispara o mesmo fluxo do "Enviar código".
-  enviarCodigoManual();
-};
+  btnReenviar2FA.addEventListener(
+    'click',
+    async () => {
+      const emailInput =
+        root.querySelector('#senha-email');
 
-  const btnEnviar2FA =
-    root.querySelector('#btn-enviar-2fa');
+      const email =
+        (emailInput?.value || '')
+          .trim()
+          .toLowerCase();
 
-  const btnReenviar2FA =
-    root.querySelector('#btn-reenviar-2fa');
+      if (!email) {
+        window.toast?.(
+          'Digite primeiro o e-mail utilizado na compra.',
+          'warning'
+        );
 
-  if (btnEnviar2FA && btnEnviar2FA.dataset.boundSend !== '1') {
-    btnEnviar2FA.dataset.boundSend = '1';
-    btnEnviar2FA.addEventListener('click', enviarCodigoManual);
-  }
+        emailInput?.focus();
+        return;
+      }
 
-  if (btnReenviar2FA && btnReenviar2FA.dataset.boundResend !== '1') {
-    btnReenviar2FA.dataset.boundResend = '1';
-    btnReenviar2FA.addEventListener('click', reenviarComLimpeza);
-  }
+      btnReenviar2FA.setAttribute(
+        'disabled',
+        'true'
+      );
+
+      try {
+        const resp = await fetch(
+          `${API_BASE}/hotmart/reenviar-codigo`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              email
+            })
+          }
+        );
+
+        let data = {};
+
+        try {
+          data = await resp.json();
+        } catch {
+          data = {};
+        }
+
+        window.toast?.(
+          data?.message ||
+          'Se houver uma compra elegível para este e-mail, enviaremos a senha.',
+          resp.ok ? 'success' : 'info'
+        );
+
+      } catch (err) {
+        console.error(
+          '[JCSenha] falha ao solicitar reenvio:',
+          err
+        );
+
+        window.toast?.(
+          'Não foi possível solicitar o reenvio neste momento.',
+          'error'
+        );
+
+      } finally {
+        setTimeout(() => {
+          btnReenviar2FA.removeAttribute(
+            'disabled'
+          );
+        }, 60000);
+      }
+    }
+  );
+}
 
     root.dataset.transitionReady = 'true';
     root.dataset.senhaInitialized = 'true';
