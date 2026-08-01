@@ -238,38 +238,38 @@
   }
 
   function normalizeParagraph(el, { clear = false } = {}) {
-  if (!el) return false;
+    if (!el) return false;
 
-  const key = el.dataset?.i18nText;
-  const translated =
-    (key && window.i18n?.t ? window.i18n.t(key) : null);
+    const key = el.dataset?.i18nText;
+    const translated =
+      (key && window.i18n?.t ? window.i18n.t(key) : null);
 
-  const source = (
-    (translated && translated !== key ? translated : null) ||
-    el.getAttribute('data-text') ||
-    el.dataset?.text ||
-    el.textContent ||
-    ''
-  ).trim();
+    const source = (
+      (translated && translated !== key ? translated : null) ||
+      el.getAttribute('data-text') ||
+      el.dataset?.text ||
+      el.textContent ||
+      ''
+    ).trim();
 
-  if (!source) return false;
+    if (!source) return false;
 
-  el.dataset.text = source;
-  el.setAttribute('data-text', source);
+    el.dataset.text = source;
+    el.setAttribute('data-text', source);
 
-  el.classList.remove('typing-active', 'typing-done', 'type-done');
-  el.removeAttribute('data-spoken');
-  el.removeAttribute('data-typed');
-  el.removeAttribute('aria-busy');
+    el.classList.remove('typing-active', 'typing-done', 'type-done');
+    el.removeAttribute('data-spoken');
+    el.removeAttribute('data-typed');
+    el.removeAttribute('aria-busy');
 
-  if (clear) {
-    el.textContent = '';
-  } else if (!el.textContent.trim()) {
-    el.textContent = source;
+    if (clear) {
+      el.textContent = '';
+    } else if (!el.textContent.trim()) {
+      el.textContent = source;
+    }
+
+    return true;
   }
-
-  return true;
-}
 
   function prepareTypingNodes(root, { clear = false } = {}) {
     if (!root) return;
@@ -297,96 +297,95 @@
     }
   }
 
- async function typeOnce(el, { speed = TYPING_SPEED, speak = true, voiceCtx = null, runToken = 0 } = {}) {
-  if (!el) return;
-  if (runToken !== window.JCSenha.state.activeRunToken) return;
+  async function typeOnce(el, { speed = TYPING_SPEED, speak = true, voiceCtx = null, runToken = 0 } = {}) {
+    if (!el) return;
+    if (runToken !== window.JCSenha.state.activeRunToken) return;
 
-  const key = el.dataset?.i18nText;
-  const translated =
-    (key && window.i18n?.t ? window.i18n.t(key) : null);
+    const key = el.dataset?.i18nText;
+    const translated =
+      (key && window.i18n?.t ? window.i18n.t(key) : null);
 
-  const rawText =
-    (translated && translated !== key ? translated : null) ||
-    el.dataset?.text ||
-    el.getAttribute('data-text') ||
-    el.textContent ||
-    '';
+    const rawText =
+      (translated && translated !== key ? translated : null) ||
+      el.dataset?.text ||
+      el.getAttribute('data-text') ||
+      el.textContent ||
+      '';
 
-  const text = String(rawText).trim();
-  if (!text) return;
+    const text = String(rawText).trim();
+    if (!text) return;
 
-  el.dataset.text = text;
-  el.setAttribute('data-text', text);
+    el.dataset.text = text;
+    el.setAttribute('data-text', text);
 
-  window.G = window.G || {};
-  const prevLock = !!window.G.__typingLock;
-  window.G.__typingLock = true;
+    window.G = window.G || {};
+    const prevLock = !!window.G.__typingLock;
+    window.G.__typingLock = true;
 
-  el.textContent = '';
-  el.classList.add('typing-active');
-  el.classList.remove('typing-done', 'type-done');
-  el.removeAttribute('data-spoken');
-  el.setAttribute('aria-busy', 'true');
+    el.textContent = '';
+    el.classList.add('typing-active');
+    el.classList.remove('typing-done', 'type-done');
+    el.removeAttribute('data-spoken');
+    el.setAttribute('aria-busy', 'true');
 
-  let usedFallback = false;
+    let usedFallback = false;
 
-  if (typeof window.runTyping === 'function') {
-    await new Promise((resolve) => {
-      try {
-        window.runTyping(el, text, () => resolve(), {
-          speed,
-          cursor: true
-        });
-      } catch (err) {
-        console.warn('[JCSenha] runTyping falhou, fallback local', err);
-        usedFallback = true;
-        resolve();
-      }
-    });
-  } else {
-    usedFallback = true;
-  }
-
-  if (runToken !== window.JCSenha.state.activeRunToken) return;
-
-  if (usedFallback) {
-    await localType(el, text, speed);
-  }
-
-  el.classList.remove('typing-active');
-  el.classList.add('typing-done');
-  el.removeAttribute('aria-busy');
-  el.setAttribute('data-typed', 'true');
-
-  window.G.__typingLock = prevLock;
-
-  if (speak && text && !el.dataset.spoken && runToken === window.JCSenha.state.activeRunToken) {
-    try {
-      if (window.EffectCoordinator?.speak) {
-        if (!el.dataset.spoken) {
-          cancelAllSpeech();
+    if (typeof window.runTyping === 'function') {
+      await new Promise((resolve) => {
+        try {
+          window.runTyping(el, text, () => resolve(), {
+            speed,
+            cursor: true
+          });
+        } catch (err) {
+          console.warn('[JCSenha] runTyping falhou, fallback local', err);
+          usedFallback = true;
+          resolve();
         }
-
-      const speakOptions = {
-        rate: voiceCtx?.rate ?? 1.0,
-        pitch: voiceCtx?.pitch ?? 1.0,
-        lang: voiceCtx?.lang ?? document.documentElement.lang ?? 'pt-BR',
-        gender: voiceCtx?.voiceGender ?? 'female',
-        guide: voiceCtx?.guide ?? 'lumen',
-        style: voiceCtx?.style ?? 'acolhedora'
-      };
-
-      await window.EffectCoordinator.speak(text, speakOptions);
-      el.dataset.spoken = 'true';
-      }
-
-    } catch (err) {
-      console.error('[JCSenha] erro no TTS:', err);
+      });
+    } else {
+      usedFallback = true;
     }
-  }
 
-  await sleep(80);
-}
+    if (runToken !== window.JCSenha.state.activeRunToken) return;
+
+    if (usedFallback) {
+      await localType(el, text, speed);
+    }
+
+    el.classList.remove('typing-active');
+    el.classList.add('typing-done');
+    el.removeAttribute('aria-busy');
+    el.setAttribute('data-typed', 'true');
+
+    window.G.__typingLock = prevLock;
+
+    if (speak && text && !el.dataset.spoken && runToken === window.JCSenha.state.activeRunToken) {
+      try {
+        if (window.EffectCoordinator?.speak) {
+          if (!el.dataset.spoken) {
+            cancelAllSpeech();
+          }
+
+          const speakOptions = {
+            rate: voiceCtx?.rate ?? 1.0,
+            pitch: voiceCtx?.pitch ?? 1.0,
+            lang: voiceCtx?.lang ?? document.documentElement.lang ?? 'pt-BR',
+            gender: voiceCtx?.voiceGender ?? 'female',
+            guide: voiceCtx?.guide ?? 'lumen',
+            style: voiceCtx?.style ?? 'acolhedora'
+          };
+
+          await window.EffectCoordinator.speak(text, speakOptions);
+          el.dataset.spoken = 'true';
+        }
+      } catch (err) {
+        console.error('[JCSenha] erro no TTS:', err);
+      }
+    }
+
+    await sleep(80);
+  }
 
   function getTransitionSrc(root, btn) {
     return (btn?.dataset?.transitionSrc)
@@ -406,18 +405,19 @@
   }
 
   const IS_HOMOLOG =
-  window.location.hostname.includes('homolog');
+    window.location.hostname.includes('homolog');
 
   const API_BASE =
-  window.APP_CONFIG?.API_BASE ||
-  (
-    IS_HOMOLOG
-      ? 'https://lumen-backend-homolog.onrender.com/api'
-      : 'https://lumen-backend-api.onrender.com/api'
-  );
+    window.APP_CONFIG?.API_BASE ||
+    (
+      IS_HOMOLOG
+        ? 'https://lumen-backend-homolog.onrender.com/api'
+        : 'https://lumen-backend-api.onrender.com/api'
+    );
 
-  if (!root) return;
-  if (triggerToken !== window.JCSenha.state.initToken) return;
+  async function initOnce(root, triggerToken) {
+    if (!root) return;
+    if (triggerToken !== window.JCSenha.state.initToken) return;
 
     root.dataset.senhaInitialized = 'false';
     root.dataset.transitionReady = 'false';
@@ -522,415 +522,241 @@
       });
     }
 
-   if (btnNext.dataset.boundNext !== '1') {
-  btnNext.dataset.boundNext = '1';
+    if (btnNext.dataset.boundNext !== '1') {
+      btnNext.dataset.boundNext = '1';
 
-  btnNext.addEventListener('click', async () => {
-    const senhaInput = root.querySelector('#senha-input');
-    const emailInput = root.querySelector('#senha-email');
+      btnNext.addEventListener('click', async () => {
+        const senhaInput = root.querySelector('#senha-input');
+        const emailInput = root.querySelector('#senha-email');
 
-    const senhaDigitada = (senhaInput?.value || '')
-      .trim()
-      .toUpperCase();
+        const senhaDigitada = (senhaInput?.value || '').trim().toUpperCase();
+        const email = (emailInput?.value || '').trim().toLowerCase();
 
-    const email = (emailInput?.value || '')
-      .trim()
-      .toLowerCase();
-
-    if (!email) {
-      window.toast?.(
-        'Digite o mesmo e-mail utilizado na compra.',
-        'warning'
-      );
-      emailInput?.focus();
-      return;
-    }
-
-    if (!senhaDigitada) {
-      window.toast?.(
-        'Digite a senha recebida após a compra.',
-        'warning'
-      );
-      senhaInput?.focus();
-      return;
-    }
-
-    const formatoJCL =
-      /^JCL-[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}$/;
-
-    if (!formatoJCL.test(senhaDigitada)) {
-      window.toast?.(
-        'Confira a senha. Use o formato JCL-XXXX-XXXX-XXXX.',
-        'warning'
-      );
-      senhaInput?.focus();
-      return;
-    }
-
-    saveSenha(senhaDigitada);
-
-    sessionStorage.setItem(
-      'jornada.email',
-      email
-    );
-
-    sessionStorage.setItem(
-      'jornada.senha',
-      senhaDigitada
-    );
-
-    sessionStorage.setItem(
-      'jornada.codigo_jornada',
-      senhaDigitada
-    );
-
-    btnNext.setAttribute('disabled', 'true');
-
-    try {
-      const resp = await fetch(
-        `${API_BASE}/auth/start`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            email,
-            senha: senhaDigitada,
-            device_hash:
-              localStorage.getItem(
-                'jornada_device_hash'
-              ) || 'browser'
-          })
+        if (!email) {
+          window.toast?.('Digite o mesmo e-mail utilizado na compra.', 'warning');
+          emailInput?.focus();
+          return;
         }
-      );
 
-      let data = {};
+        if (!senhaDigitada) {
+          window.toast?.('Digite a senha recebida após a compra.', 'warning');
+          senhaInput?.focus();
+          return;
+        }
 
-      try {
-        data = await resp.json();
-      } catch {
-        data = {};
-      }
+        const formatoJCL =
+          /^JCL-[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}$/;
 
-      if (
-        !resp.ok ||
-        !data?.ok ||
-        !data?.authenticated
-      ) {
-        throw new Error(
-          data?.detail ||
-          data?.message ||
-          'Não foi possível validar o acesso.'
-        );
-      }
+        if (!formatoJCL.test(senhaDigitada)) {
+          window.toast?.('Confira a senha. Use o formato JCL-XXXX-XXXX-XXXX.', 'warning');
+          senhaInput?.focus();
+          return;
+        }
 
-      const codigoJornada =
-        data.codigo_jornada ||
-        data.senha ||
-        senhaDigitada;
+        saveSenha(senhaDigitada);
 
-      const startedAt =
-        data.started_at ||
-        data.created_at ||
-        null;
+        sessionStorage.setItem('jornada.email', email);
+        sessionStorage.setItem('jornada.senha', senhaDigitada);
+        sessionStorage.setItem('jornada.codigo_jornada', senhaDigitada);
 
-      const deadlineAt =
-        data.deadline_at ||
-        data.expires_at ||
-        null;
+        btnNext.setAttribute('disabled', 'true');
 
-      localStorage.setItem(
-        'jornada_codigo',
-        codigoJornada
-      );
-
-      localStorage.setItem(
-        'jornada_email',
-        email
-      );
-
-      if (startedAt) {
-        localStorage.setItem(
-          'jornada_started_at',
-          String(startedAt)
-        );
-      }
-
-      if (deadlineAt) {
-        localStorage.setItem(
-          'jornada_deadline_at',
-          String(deadlineAt)
-        );
-      }
-
-      try {
-        if (
-          window.JORNADA_SESSION &&
-          typeof window.JORNADA_SESSION
-            .registrarAtivacao === 'function'
-        ) {
-          await window.JORNADA_SESSION
-            .registrarAtivacao({
+        try {
+          const resp = await fetch(`${API_BASE}/auth/start`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
               email,
-              codigo_jornada: codigoJornada,
-              started_at: startedAt,
-              deadline_at: deadlineAt,
-              last_section: 'section-guia'
-            });
-        }
-
-        if (
-          window.JORNADA_SESSION &&
-          typeof window.JORNADA_SESSION
-            .atualizarEstado === 'function'
-        ) {
-          await window.JORNADA_SESSION
-            .atualizarEstado({
-              last_section: 'section-guia',
-              estado_tela: data.resume
-                ? 'senha_validada_retomada'
-                : 'senha_validada'
-            });
-        }
-      } catch (sessionErr) {
-        console.warn(
-          '[JCSenha] acesso validado, mas a sincronização auxiliar falhou:',
-          sessionErr
-        );
-      }
-
-      window.toast?.(
-        data.resume
-          ? 'Acesso confirmado. Retomando sua Jornada.'
-          : 'Acesso confirmado.',
-        'success'
-      );
-
-      const irParaGuia = () => {
-        window.JC?.show?.(NEXT_SECTION_ID);
-      };
-
-      try {
-        const src = getTransitionSrc(
-          root,
-          btnNext
-        );
-
-        if (
-          typeof window.playTransitionVideo ===
-            'function' &&
-          src
-        ) {
-          window.playTransitionVideo(
-            src,
-            NEXT_SECTION_ID
-          );
-        } else {
-          irParaGuia();
-        }
-      } catch (videoErr) {
-        console.warn(
-          '[JCSenha] falha no filme de transição:',
-          videoErr
-        );
-
-        irParaGuia();
-      }
-
-    } catch (err) {
-      console.error(
-        '[JCSenha] erro ao validar e-mail e senha JCL:',
-        err
-      );
-
-      btnNext.removeAttribute('disabled');
-
-      window.toast?.(
-        err.message ||
-        'Não foi possível validar o acesso.',
-        'error'
-      );
-    }
-  });
-}
-
-  // ===== BOTÕES DE ACESSO E REENVIO =====
-
-const btnEnviar2FA =
-  root.querySelector('#btn-enviar-2fa');
-
-const btnReenviar2FA =
-  root.querySelector('#btn-reenviar-2fa');
-
-
-// O botão central executa a mesma validação
-// do botão Confirmar/Entrar.
-if (
-  btnEnviar2FA &&
-  btnEnviar2FA.dataset.boundSend !== '1'
-) {
-  btnEnviar2FA.dataset.boundSend = '1';
-
-  btnEnviar2FA.addEventListener(
-    'click',
-    async () => {
-      const emailInput =
-        root.querySelector('#senha-email');
-
-      const email =
-        (emailInput?.value || '')
-          .trim()
-          .toLowerCase();
-
-      if (!email) {
-        window.toast?.(
-          'Digite primeiro o e-mail utilizado na compra.',
-          'warning'
-        );
-
-        emailInput?.focus();
-        return;
-      }
-
-      btnEnviar2FA.setAttribute(
-        'disabled',
-        'true'
-      );
-
-      try {
-        const resp = await fetch(
-          `${API_BASE}/hotmart/reenviar-codigo`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              email
+              senha: senhaDigitada,
+              device_hash: localStorage.getItem('jornada_device_hash') || 'browser'
             })
-          }
-        );
+          });
 
-        let data = {};
+          let data = {};
+          try {
+            data = await resp.json();
+          } catch {
+            data = {};
+          }
+
+          if (!resp.ok || !data?.ok || !data?.authenticated) {
+            throw new Error(
+              data?.detail || data?.message || 'Não foi possível validar o acesso.'
+            );
+          }
+
+          const codigoJornada = data.codigo_jornada || data.senha || senhaDigitada;
+          const startedAt = data.started_at || data.created_at || null;
+          const deadlineAt = data.deadline_at || data.expires_at || null;
+
+          localStorage.setItem('jornada_codigo', codigoJornada);
+          localStorage.setItem('jornada_email', email);
+
+          if (startedAt) {
+            localStorage.setItem('jornada_started_at', String(startedAt));
+          }
+
+          if (deadlineAt) {
+            localStorage.setItem('jornada_deadline_at', String(deadlineAt));
+          }
+
+          try {
+            if (
+              window.JORNADA_SESSION &&
+              typeof window.JORNADA_SESSION.registrarAtivacao === 'function'
+            ) {
+              await window.JORNADA_SESSION.registrarAtivacao({
+                email,
+                codigo_jornada: codigoJornada,
+                started_at: startedAt,
+                deadline_at: deadlineAt,
+                last_section: 'section-guia'
+              });
+            }
+
+            if (
+              window.JORNADA_SESSION &&
+              typeof window.JORNADA_SESSION.atualizarEstado === 'function'
+            ) {
+              await window.JORNADA_SESSION.atualizarEstado({
+                last_section: 'section-guia',
+                estado_tela: data.resume ? 'senha_validada_retomada' : 'senha_validada'
+              });
+            }
+          } catch (sessionErr) {
+            console.warn(
+              '[JCSenha] acesso validado, mas a sincronização auxiliar falhou:',
+              sessionErr
+            );
+          }
+
+          window.toast?.(
+            data.resume
+              ? 'Acesso confirmado. Retomando sua Jornada.'
+              : 'Acesso confirmado.',
+            'success'
+          );
+
+          const irParaGuia = () => {
+            window.JC?.show?.(NEXT_SECTION_ID);
+          };
+
+          try {
+            const src = getTransitionSrc(root, btnNext);
+
+            if (typeof window.playTransitionVideo === 'function' && src) {
+              window.playTransitionVideo(src, NEXT_SECTION_ID);
+            } else {
+              irParaGuia();
+            }
+          } catch (videoErr) {
+            console.warn('[JCSenha] falha no filme de transição:', videoErr);
+            irParaGuia();
+          }
+        } catch (err) {
+          console.error('[JCSenha] erro ao validar e-mail e senha JCL:', err);
+          btnNext.removeAttribute('disabled');
+          window.toast?.(err.message || 'Não foi possível validar o acesso.', 'error');
+        }
+      });
+    }
+
+    // ===== BOTÕES DE ACESSO E REENVIO =====
+
+    const btnEnviar2FA = root.querySelector('#btn-enviar-2fa');
+    const btnReenviar2FA = root.querySelector('#btn-reenviar-2fa');
+
+    // O botão central executa a mesma validação do botão Confirmar/Entrar.
+    if (btnEnviar2FA && btnEnviar2FA.dataset.boundSend !== '1') {
+      btnEnviar2FA.dataset.boundSend = '1';
+
+      btnEnviar2FA.addEventListener('click', async () => {
+        const emailInput = root.querySelector('#senha-email');
+        const email = (emailInput?.value || '').trim().toLowerCase();
+
+        if (!email) {
+          window.toast?.('Digite primeiro o e-mail utilizado na compra.', 'warning');
+          emailInput?.focus();
+          return;
+        }
+
+        btnEnviar2FA.setAttribute('disabled', 'true');
 
         try {
-          data = await resp.json();
-        } catch {
-          data = {};
+          const resp = await fetch(`${API_BASE}/hotmart/reenviar-codigo`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+          });
+
+          let data = {};
+          try {
+            data = await resp.json();
+          } catch {
+            data = {};
+          }
+
+          window.toast?.(
+            data?.message ||
+            'Se houver uma compra aprovada para este e-mail, enviaremos a senha.',
+            resp.ok ? 'success' : 'info'
+          );
+        } catch (err) {
+          console.error('[JCSenha] falha ao enviar senha:', err);
+          window.toast?.('Não foi possível solicitar o envio neste momento.', 'error');
+        } finally {
+          setTimeout(() => {
+            btnEnviar2FA.removeAttribute('disabled');
+          }, 60000);
+        }
+      });
+    }
+
+    // Reenvia apenas uma cópia da mesma senha JCL.
+    if (btnReenviar2FA && btnReenviar2FA.dataset.boundResend !== '1') {
+      btnReenviar2FA.dataset.boundResend = '1';
+
+      btnReenviar2FA.addEventListener('click', async () => {
+        const emailInput = root.querySelector('#senha-email');
+        const email = (emailInput?.value || '').trim().toLowerCase();
+
+        if (!email) {
+          window.toast?.('Digite primeiro o e-mail utilizado na compra.', 'warning');
+          emailInput?.focus();
+          return;
         }
 
-        window.toast?.(
-          data?.message ||
-          'Se houver uma compra aprovada para este e-mail, enviaremos a senha.',
-          resp.ok ? 'success' : 'info'
-        );
-
-      } catch (err) {
-        console.error(
-          '[JCSenha] falha ao enviar senha:',
-          err
-        );
-
-        window.toast?.(
-          'Não foi possível solicitar o envio neste momento.',
-          'error'
-        );
-
-      } finally {
-        setTimeout(() => {
-          btnEnviar2FA.removeAttribute(
-            'disabled'
-          );
-        }, 60000);
-      }
-    }
-  );
-}
-
-
-// Reenvia apenas uma cópia da mesma senha JCL.
-if (
-  btnReenviar2FA &&
-  btnReenviar2FA.dataset.boundResend !== '1'
-) {
-  btnReenviar2FA.dataset.boundResend = '1';
-
-  btnReenviar2FA.addEventListener(
-    'click',
-    async () => {
-      const emailInput =
-        root.querySelector('#senha-email');
-
-      const email =
-        (emailInput?.value || '')
-          .trim()
-          .toLowerCase();
-
-      if (!email) {
-        window.toast?.(
-          'Digite primeiro o e-mail utilizado na compra.',
-          'warning'
-        );
-
-        emailInput?.focus();
-        return;
-      }
-
-      btnReenviar2FA.setAttribute(
-        'disabled',
-        'true'
-      );
-
-      try {
-        const resp = await fetch(
-          `${API_BASE}/hotmart/reenviar-codigo`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              email
-            })
-          }
-        );
-
-        let data = {};
+        btnReenviar2FA.setAttribute('disabled', 'true');
 
         try {
-          data = await resp.json();
-        } catch {
-          data = {};
-        }
+          const resp = await fetch(`${API_BASE}/hotmart/reenviar-codigo`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+          });
 
-        window.toast?.(
-          data?.message ||
-          'Se houver uma compra elegível para este e-mail, enviaremos a senha.',
-          resp.ok ? 'success' : 'info'
-        );
+          let data = {};
+          try {
+            data = await resp.json();
+          } catch {
+            data = {};
+          }
 
-      } catch (err) {
-        console.error(
-          '[JCSenha] falha ao solicitar reenvio:',
-          err
-        );
-
-        window.toast?.(
-          'Não foi possível solicitar o reenvio neste momento.',
-          'error'
-        );
-
-      } finally {
-        setTimeout(() => {
-          btnReenviar2FA.removeAttribute(
-            'disabled'
+          window.toast?.(
+            data?.message ||
+            'Se houver uma compra elegível para este e-mail, enviaremos a senha.',
+            resp.ok ? 'success' : 'info'
           );
-        }, 60000);
-      }
+        } catch (err) {
+          console.error('[JCSenha] falha ao solicitar reenvio:', err);
+          window.toast?.('Não foi possível solicitar o reenvio neste momento.', 'error');
+        } finally {
+          setTimeout(() => {
+            btnReenviar2FA.removeAttribute('disabled');
+          }, 60000);
+        }
+      });
     }
-  );
-}
 
     root.dataset.transitionReady = 'true';
     root.dataset.senhaInitialized = 'true';
