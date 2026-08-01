@@ -437,7 +437,7 @@
       console.warn('[JCSenha] section não ficou visível a tempo; mantendo texto fallback');
       return;
     }
-  }
+  
     ensureVisible(root);
 
     let instr1, instr2, instr3, instr4, input, toggle, btnNext, btnPrev;
