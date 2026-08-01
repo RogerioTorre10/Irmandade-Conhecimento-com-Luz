@@ -394,7 +394,7 @@
       || '/assets/videos/filme-senha-confirmada.mp4';
   }
 
-  function saveSenha(value) {
+  async function initOnce(root, myToken) {
     try {
       if (window.JC?.data) {
         window.JC.data.senha = value;
