@@ -424,7 +424,6 @@
     root.dataset.transitionReady = 'false';
 
     cancelAllSpeech();
-
     prepareTypingNodes(root, { clear: false });
 
     await waitForTransitionUnlock();
