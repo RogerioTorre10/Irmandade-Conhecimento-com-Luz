@@ -58,6 +58,13 @@
 }
 
   const API_PRIMARY = pickApiBase();
+  console.log(
+  '[API][AMBIENTE]',
+  {
+    hostname: window.location.hostname,
+    API_PRIMARY
+  }
+);
   const PDF_PATHS = [
   '/jornada/essencial/pdf',
   '/jornada-essencial/pdf',
