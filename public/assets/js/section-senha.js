@@ -824,7 +824,10 @@ if (
 
       if (!email) {
         window.toast?.(
-          'Digite primeiro o e-mail utilizado na compra.',
+          tSenha(
+            'emailRequired',
+            'Digite primeiro o e-mail utilizado na compra.'
+          )
           'warning'
         );
 
@@ -861,7 +864,10 @@ if (
 
         window.toast?.(
           data?.message ||
-          'Se houver uma compra aprovada para este e-mail, enviaremos a senha.',
+            tSenha(
+              'sendNeutralMessage',
+              'Se houver uma compra aprovada para este e-mail, enviaremos a senha.'
+          )
           resp.ok ? 'success' : 'info'
         );
 
@@ -872,7 +878,10 @@ if (
         );
 
         window.toast?.(
-          'Não foi possível solicitar o envio neste momento.',
+          tSenha(
+            'sendError',
+            'Não foi possível solicitar o envio neste momento.'
+          )
           'error'
         );
 
@@ -908,7 +917,10 @@ if (
 
       if (!email) {
         window.toast?.(
-          'Digite primeiro o e-mail utilizado na compra.',
+          tSenha(
+            'emailRequired',
+            'Digite primeiro o e-mail utilizado na compra.'
+          )
           'warning'
         );
 
@@ -945,7 +957,10 @@ if (
 
         window.toast?.(
           data?.message ||
-          'Se houver uma compra elegível para este e-mail, enviaremos a senha.',
+            tSenha(
+              'resendNeutralMessage',
+              'Se houver uma compra elegível para este e-mail, enviaremos a senha.'
+            )
           resp.ok ? 'success' : 'info'
         );
 
@@ -956,7 +971,10 @@ if (
         );
 
         window.toast?.(
-          'Não foi possível solicitar o reenvio neste momento.',
+          tSenha(
+            'resendError',
+            'Não foi possível solicitar o reenvio neste momento.'
+          )
           'error'
         );
 
