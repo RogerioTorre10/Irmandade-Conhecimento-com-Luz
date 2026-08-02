@@ -469,7 +469,7 @@
       btnPrev = await waitForElement('#btn-senha-prev', { within: root });
     } catch (e) {
       console.error('[JCSenha] elementos não encontrados:', e);
-      window.toast?.('Erro: elementos da seção Senha não carregados.', 'error');
+      window.toast?.(tSenha('sectionLoadError', 'Erro: os elementos da seção Senha não foram carregados.'),'error');
       return;
     }
 
