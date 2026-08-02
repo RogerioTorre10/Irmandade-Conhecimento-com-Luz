@@ -731,8 +731,14 @@
 
       window.toast?.(
         data.resume
-          ? 'Acesso confirmado. Retomando sua Jornada.'
-          : 'Acesso confirmado.',
+          ? tSenha(
+            'accessResumed',
+            'Acesso confirmado. Retomando sua Jornada.'
+          )
+          : tSenha(
+            'accessConfirmed',
+            'Acesso confirmado.'
+          ),
         'success'
       );
 
