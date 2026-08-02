@@ -555,19 +555,25 @@
       .toLowerCase();
 
     if (!email) {
-      window.toast?.(
-        'Digite o mesmo e-mail utilizado na compra.',
-        'warning'
-      );
+     window.toast?.(
+       tSenha(
+        'purchaseEmailRequired',
+        'Digite o mesmo e-mail utilizado na compra.'
+       ),
+       'warning'
+     );
       emailInput?.focus();
       return;
     }
 
     if (!senhaDigitada) {
-      window.toast?.(
-        'Digite a senha recebida após a compra.',
-        'warning'
-      );
+     window.toast?.(
+       tSenha(
+         'passwordRequired',
+         'Digite a senha recebida após a compra.'
+       ),
+       'warning'
+     );
       senhaInput?.focus();
       return;
     }
@@ -577,7 +583,10 @@
 
     if (!formatoJCL.test(senhaDigitada)) {
       window.toast?.(
-        'Confira a senha. Use o formato JCL-XXXX-XXXX-XXXX.',
+        tSenha(
+          'invalidPasswordFormat',
+          'Confira a senha. Use o formato JCL-XXXX-XXXX-XXXX.'
+        ),
         'warning'
       );
       senhaInput?.focus();
@@ -638,7 +647,10 @@
         throw new Error(
           data?.detail ||
           data?.message ||
-          'Não foi possível validar o acesso.'
+          tSenha(
+            'validationError',
+            'Não foi possível validar o acesso.'
+          )
         );
       }
 
@@ -764,8 +776,12 @@
       btnNext.removeAttribute('disabled');
 
       window.toast?.(
+        window.toast?.(
         err.message ||
-        'Não foi possível validar o acesso.',
+        tSenha(
+          'validationError',
+          'Não foi possível validar o acesso.'
+        ),
         'error'
       );
     }
