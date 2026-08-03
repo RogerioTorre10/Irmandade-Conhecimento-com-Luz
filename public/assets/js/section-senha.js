@@ -802,8 +802,14 @@ const btnReenviar2FA =
   root.querySelector('#btn-reenviar-2fa');
 
 const resendInfoEl =
-  root.querySelector('.senha-copy-mini');   
+  root.querySelector('.senha-copy-mini');
 
+if (resendInfoEl) {
+  resendInfoEl.textContent = tSenha(
+    'resendInfo',
+    'Dificuldade em solicitar o código? Clique no botão abaixo.'
+  );
+}  
 
 // O botão central executa a mesma validação
 // do botão Confirmar/Entrar.
@@ -988,15 +994,8 @@ if (
         }, 60000);
       }
     }
-  );
-
-    if (resendInfoEl) {
-      resendInfoEl.textContent = tSenha(
-        'resendInfo',
-        'Dificuldade em solicitar o código? Clique no botão abaixo.'
-      );
-    }
-  }
+  );   
+ }
 
     root.dataset.transitionReady = 'true';
     root.dataset.senhaInitialized = 'true';
