@@ -75,6 +75,7 @@
   "emailPurchasePlaceholder": "Die beim Kauf verwendete E-Mail-Adresse eingeben …",
   "sendPassword": "✉️ Passwort per E-Mail senden",
   "resendPassword": "🔄 Mein Passwort erneut senden",
+  "resendInfo": "Probleme beim Anfordern des Codes? Klicken Sie auf die Schaltfläche unten.",
   "enterJourney": "🔐 Die Reise betreten",
   "enter": "🔐 Eintreten",
   "termsNotice": "Wenn du fortfährst, bestätigst du, dass du diese Bedingungen zur Kenntnis genommen hast.",
