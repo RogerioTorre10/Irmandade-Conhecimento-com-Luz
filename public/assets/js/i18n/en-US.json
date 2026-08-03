@@ -84,6 +84,7 @@
   "emailPurchasePlaceholder": "Enter the email address used for the purchase...",
   "sendPassword": "✉️ Send password by email",
   "resendPassword": "🔄 Resend my password",
+  "resendInfo": "Having trouble requesting your code? Click the button below.",
   "enterJourney": "🔐 Enter the Journey",
   "enter": "🔐 Enter",
   "termsNotice": "By proceeding, you declare that you understand these terms.",
