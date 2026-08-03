@@ -50,91 +50,103 @@
           </p>
 
           <div class="senha-input-wrap senha-code-row on-pergaminho">
-            <input id="senha-input"
-                   name="jornada_codigo_acesso"
-                   class="input-espinhos input-senha"
-                   type="text"
-                   maxlength="18"
-                   autocomplete="one-time-code"
-                   autocorrect="off"
-                   autocapitalize="characters"
-                   spellcheck="false"
-                   data-lpignore="true"
-                   data-1p-ignore="true"
-                   placeholder="Digite a senha JCL-XXXX-XXXX-XXXX"
-                   aria-label="Digite a senha recebida após a compra" />
+  <input id="senha-input"
+         name="jornada_codigo_acesso"
+         class="input-espinhos input-senha"
+         type="text"
+         maxlength="18"
+         autocomplete="one-time-code"
+         autocorrect="off"
+         autocapitalize="characters"
+         spellcheck="false"
+         data-lpignore="true"
+         data-1p-ignore="true"
+         placeholder="Digite a senha JCL-XXXX-XXXX-XXXX"
+         data-i18n-placeholder="senha.accessCodePlaceholder"
+         aria-label="Digite a senha recebida após a compra" />
 
-            <button class="btn btn-toggle-senha"
-                    data-action="toggle-password"
-                    type="button"
-                    aria-label="Mostrar ou ocultar a senha">
-              👁️
-            </button>
-          </div>
+  <button class="btn btn-toggle-senha"
+          data-action="toggle-password"
+          type="button"
+          aria-label="Mostrar ou ocultar a senha">
+    👁️
+  </button>
+</div>
 
-          <div class="senha-input-wrap senha-email-row on-pergaminho">
-            <input id="senha-email"
-                   class="input-espinhos input-email"
-                   type="email"
-                   placeholder="Digite seu e-mail..."
-                   autocomplete="email"
-                   data-i18n-placeholder="senha.emailPlaceholder"
-                   aria-label="Digite seu e-mail" />
-          </div>
+<div class="senha-input-wrap senha-email-row on-pergaminho">
+  <input id="senha-email"
+         class="input-espinhos input-email"
+         type="email"
+         placeholder="Digite o e-mail utilizado na compra..."
+         autocomplete="email"
+         data-i18n-placeholder="senha.emailPurchasePlaceholder"
+         aria-label="Digite o e-mail utilizado na compra" />
+</div>
 
-          <div class="senha-send-wrap">
-            <button id="btn-enviar-2fa"
-                   class="btn btn-stone senha-btn-wide"
-                   type="button"
-                   data-text="Enviar senha por e-mail"
-                   aria-label="Enviar senha para o e-mail da compra">
-                   ✉️ Enviar senha por e-mail
-            </button>
-          </div>
+<div class="senha-send-wrap">
+  <button id="btn-enviar-2fa"
+          class="btn btn-stone senha-btn-wide"
+          type="button"
+          data-i18n="senha.sendPassword"
+          data-i18n-text="senha.sendPassword"
+          data-text="✉️ Enviar senha por e-mail"
+          aria-label="Enviar senha para o e-mail da compra">
+    ✉️ Enviar senha por e-mail
+  </button>
+</div>
 
-          <div class="senha-divider">
-            <span>◈</span>
-          </div>
+<div class="senha-divider">
+  <span>◈</span>
+</div>
 
-          <div class="senha-reenvio-wrap">
-            <div class="senha-copy-mini"
-                 data-i18n="senha.resendInfo"
-                 data-i18n-text="senha.resendInfo"
-                 data-text="Perdeu ou apagou a senha recebida? Solicite uma cópia abaixo.">
-              Perdeu ou apagou a senha recebida? Solicite uma cópia abaixo.
-            </div>
+<div class="senha-reenvio-wrap">
+  <div class="senha-copy-mini"
+       data-i18n="senha.resendInfo"
+       data-i18n-text="senha.resendInfo"
+       data-text="Dificuldade em solicitar o código? Clique no botão abaixo.">
+    Dificuldade em solicitar o código? Clique no botão abaixo.
+  </div>
 
-            <button id="btn-reenviar-2fa"
-                    class="btn btn-stone senha-btn-wide"
-                    type="button"
-                    data-text="Reenviar minha senha">
-              🔁 Reenviar minha senha
-            </button>
-          </div>
+  <button id="btn-reenviar-2fa"
+          class="btn btn-stone senha-btn-wide"
+          type="button"
+          data-i18n="senha.resendPassword"
+          data-i18n-text="senha.resendPassword"
+          data-text="🔄 Reenviar minha senha">
+    🔄 Reenviar minha senha
+  </button>
+</div>
 
-          <div class="senha-actions">
-            <button id="btn-senha-prev"
-               class="btn btn-stone"
-               data-i18n="common.back"
-               data-text="Voltar"
-               aria-label="Voltar">
-            😢 Voltar
-          </button>
+<div class="senha-actions">
+  <button id="btn-senha-prev"
+          class="btn btn-stone"
+          type="button"
+          data-i18n="common.back"
+          data-i18n-text="common.back"
+          data-text="Voltar"
+          aria-label="Voltar">
+    😢 Voltar
+  </button>
 
-          <button id="btn-senha-avancar"
-            class="btn btn-stone"
-               type="button"
-               data-text="Entrar na Jornada"
-               data-next-section="section-guia"
-               aria-label="Validar senha e entrar">
-            🔐 Entrar
-          </button>
-        </div>
-        </div>
+  <button id="btn-senha-avancar"
+          class="btn btn-stone"
+          type="button"
+          data-i18n="senha.enter"
+          data-i18n-text="senha.enter"
+          data-text="🔐 Entrar"
+          data-next-section="section-guia"
+          aria-label="Validar senha e entrar">
+    🔐 Entrar
+  </button>
+</div>
 
-         <div id="guia-error" class="guia-error" style="display:none;">
-            Não foi possível validar o código.
-          </div>        
+<div id="guia-error"
+     class="guia-error"
+     style="display:none;"
+     data-i18n="senha.validationError"
+     data-i18n-text="senha.validationError">
+  Não foi possível validar o acesso.
+</div>
       </div>
     </div>
   </div>
