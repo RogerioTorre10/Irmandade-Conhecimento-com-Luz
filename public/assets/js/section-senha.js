@@ -801,6 +801,9 @@ const btnEnviar2FA =
 const btnReenviar2FA =
   root.querySelector('#btn-reenviar-2fa');
 
+const resendInfoEl =
+  root.querySelector('.senha-copy-mini');   
+
 
 // O botão central executa a mesma validação
 // do botão Confirmar/Entrar.
