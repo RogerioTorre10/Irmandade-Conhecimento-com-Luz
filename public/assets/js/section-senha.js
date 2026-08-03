@@ -782,7 +782,6 @@
       btnNext.removeAttribute('disabled');
 
       window.toast?.(
-        window.toast?.(
         err.message ||
         tSenha(
           'validationError',
