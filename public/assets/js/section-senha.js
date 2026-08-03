@@ -866,7 +866,7 @@ if (
             tSenha(
               'sendNeutralMessage',
               'Se houver uma compra aprovada para este e-mail, enviaremos a senha.'
-          )
+          ),
           resp.ok ? 'success' : 'info'
         );
 
