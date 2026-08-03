@@ -826,7 +826,7 @@ if (
           tSenha(
             'emailRequired',
             'Digite primeiro o e-mail utilizado na compra.'
-          )
+          ),
           'warning'
         );
 
