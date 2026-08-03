@@ -75,6 +75,7 @@
   "emailPurchasePlaceholder": "Introduce el correo utilizado en la compra...",
   "sendPassword": "✉️ Enviar contraseña por correo",
   "resendPassword": "🔄 Reenviar mi contraseña",
+  "resendInfo": "¿Tiene problemas para solicitar el código? Pulse el botón de abajo.",
   "enterJourney": "🔐 Entrar en la Jornada",
   "enter": "🔐 Entrar",
   "termsNotice": "Al continuar, declaras que conoces estos términos.",
