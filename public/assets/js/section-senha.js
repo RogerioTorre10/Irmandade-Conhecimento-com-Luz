@@ -880,7 +880,7 @@ if (
           tSenha(
             'sendError',
             'Não foi possível solicitar o envio neste momento.'
-          )
+          ),
           'error'
         );
 
@@ -919,7 +919,7 @@ if (
           tSenha(
             'emailRequired',
             'Digite primeiro o e-mail utilizado na compra.'
-          )
+          ),
           'warning'
         );
 
@@ -959,7 +959,7 @@ if (
             tSenha(
               'resendNeutralMessage',
               'Se houver uma compra elegível para este e-mail, enviaremos a senha.'
-            )
+            ),
           resp.ok ? 'success' : 'info'
         );
 
@@ -973,7 +973,7 @@ if (
           tSenha(
             'resendError',
             'Não foi possível solicitar o reenvio neste momento.'
-          )
+          ),
           'error'
         );
 
