@@ -863,9 +863,9 @@ if (
 
         window.toast?.(
           data?.message ||
-            tSenha(
-              'sendNeutralMessage',
-              'Se houver uma compra aprovada para este e-mail, enviaremos a senha.'
+          tSenha(
+            'sendNeutralMessage',
+            'Se houver uma compra aprovada para este e-mail, enviaremos a senha.'
           ),
           resp.ok ? 'success' : 'info'
         );
