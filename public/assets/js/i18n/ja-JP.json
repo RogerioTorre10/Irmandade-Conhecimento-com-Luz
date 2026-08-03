@@ -75,6 +75,7 @@
   "emailPurchasePlaceholder": "購入時に使用したメールアドレスを入力してください…",
   "sendPassword": "✉️ パスワードをメールで送信",
   "resendPassword": "🔄 パスワードを再送信",
+  "resendInfo": "認証コードを受け取れませんか？下のボタンを押してください。",
   "enterJourney": "🔐 旅を始める",
   "enter": "🔐 入る",
   "termsNotice": "続行することで、本利用条件を確認し、同意したものとみなされます。",
