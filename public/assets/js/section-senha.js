@@ -28,6 +28,28 @@
 
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+  function tSenha(key, fallback = '') {
+  try {
+    const chave = `senha.${key}`;
+    const traduzido = window.i18n?.t?.(chave);
+
+    if (
+      typeof traduzido === 'string' &&
+      traduzido.trim() &&
+      traduzido !== chave
+    ) {
+      return traduzido.trim();
+    }
+  } catch (err) {
+    console.warn(
+      `[JCSenha][i18n] Falha ao traduzir senha.${key}:`,
+      err
+    );
+  }
+
+  return fallback;
+} 
+
   async function waitForElement(selector, { within = document, timeout = 8000, step = 100 } = {}) {
     const t0 = performance.now();
     return new Promise((resolve, reject) => {
