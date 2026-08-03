@@ -989,6 +989,13 @@ if (
       }
     }
   );
+
+    if (resendInfoEl) {
+      resendInfoEl.textContent = tSenha(
+        'resendInfo',
+        'Dificuldade em solicitar o código? Clique no botão abaixo.'
+      );
+    }
 }
 
     root.dataset.transitionReady = 'true';
