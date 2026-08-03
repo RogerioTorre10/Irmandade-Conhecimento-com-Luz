@@ -996,7 +996,7 @@ if (
         'Dificuldade em solicitar o código? Clique no botão abaixo.'
       );
     }
-}
+
 
     root.dataset.transitionReady = 'true';
     root.dataset.senhaInitialized = 'true';
