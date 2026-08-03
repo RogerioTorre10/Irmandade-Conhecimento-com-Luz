@@ -75,6 +75,7 @@
   "emailPurchasePlaceholder": "请输入购买时使用的电子邮箱……",
   "sendPassword": "✉️ 通过电子邮件发送密码",
   "resendPassword": "🔄 重新发送我的密码",
+  "resendInfo": "无法收到验证码？请点击下面的按钮。",
   "enterJourney": "🔐 进入旅程",
   "enter": "🔐 进入",
   "termsNotice": "继续操作即表示您已知悉并同意这些条款。",
