@@ -1526,9 +1526,13 @@
 
       if (!textoFinal) {
         console.warn('[BLOCO] devolutiva do bloco vazia');
-        setContinueState(section, 'retry');
-        return;
-      }
+
+      // Restaura os elementos para permitir nova tentativa.
+      section.classList.remove('is-block-feedback-mode');
+
+      setContinueState(section, 'retry');
+      return;
+     }
 
       const blocoId = bloco?.id || '';
       const anteriores = getStoredBlockFeedbacks();
