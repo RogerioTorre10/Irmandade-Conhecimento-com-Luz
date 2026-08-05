@@ -1824,9 +1824,15 @@
     const perguntaText = getQuestionText(bloco, qIndex);
     section.dataset.questionIndex = String(qIndex);
     section.dataset.questionTotal = String(totalPerguntas);
-
+   
     if (textarea) {
       textarea.value = getAnswer(bloco, qIndex);
+
+      textarea.placeholder = t(
+        'questions.answerPlaceholder',
+        'Digite sua resposta com verdade e calma...'
+      );
+
       textarea.focus();
     }
 
