@@ -211,33 +211,57 @@
   );
 }
 
-function setFinalReplayState(
-  section,
-  state = 'ready'
-) {
+function setFinalReplayState(section, state = 'ready') {
   const btn = getFinalReplayButton(section);
 
   if (!btn) return;
 
-  const textoNormal = t(
+  const traduzir = (chave, fallback) => {
+    try {
+      if (typeof window.t === 'function') {
+        const resultado = window.t(chave);
+
+        if (
+          resultado &&
+          typeof resultado === 'string' &&
+          resultado !== chave
+        ) {
+          return resultado;
+        }
+      }
+
+      if (typeof t === 'function') {
+        const resultado = t(chave);
+
+        if (
+          resultado &&
+          typeof resultado === 'string' &&
+          resultado !== chave
+        ) {
+          return resultado;
+        }
+      }
+    } catch (erro) {
+      console.warn('[FINAL] Falha ao traduzir botão:', chave, erro);
+    }
+
+    return fallback;
+  };
+
+  const textoNormal = traduzir(
     'final.replay',
-    '🔊 Ler novamente'
+    'Ler novamente'
   );
 
-  const textoLendo = t(
+  const textoLendo = traduzir(
     'final.reading',
-    '🔊 Lendo...'
+    'Lendo...'
   );
-
-  if (!btn.dataset.originalText) {
-    btn.dataset.originalText = textoNormal;
-  }
 
   if (state === 'hidden') {
     btn.hidden = true;
     btn.disabled = true;
     btn.dataset.busy = '0';
-    btn.textContent = textoNormal;
     return;
   }
 
@@ -246,13 +270,13 @@ function setFinalReplayState(
   if (state === 'reading') {
     btn.disabled = true;
     btn.dataset.busy = '1';
-    btn.textContent = textoLendo;
+    btn.innerHTML = `🔊 <span>${textoLendo}</span>`;
     return;
   }
 
   btn.disabled = false;
   btn.dataset.busy = '0';
-  btn.textContent = textoNormal;
+  btn.innerHTML = `🔊 <span>${textoNormal}</span>`;
 }
 
   function readJsonStorage(key, fallback) {
