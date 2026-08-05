@@ -1571,9 +1571,12 @@
       goNext(bloco);
     } catch (e) {
       console.error('[BLOCO] erro ao gerar devolutiva do bloco:', e);
+
+    // Restaura a interface se ocorrer erro.
+      section.classList.remove('is-block-feedback-mode');
+
       setContinueState(section, 'retry');
     }
-  }
 
   // ─── Estado do botão Continuar ───────────────────────────────────────────────
   function setContinueState(section, state) {
