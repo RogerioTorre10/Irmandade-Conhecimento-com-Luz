@@ -1828,11 +1828,10 @@
     if (textarea) {
       textarea.value = getAnswer(bloco, qIndex);
 
-      textarea.placeholder = t(
-        'questions.answerPlaceholder',
+      textarea.placeholder = uiText(
+        'answer_placeholder',
         'Digite sua resposta com verdade e calma...'
-      );
-
+    );
       textarea.focus();
     }
 
