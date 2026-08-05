@@ -1803,8 +1803,12 @@
   // ─── Render principal ────────────────────────────────────────────────────────
   async function renderBloco(section) {
     const sectionId = getSectionId(section);
+
     if (!sectionId || !sectionId.startsWith('section-perguntas-')) return;
 
+  // Novo bloco: restaura pergunta, barras, resposta e controles.
+    section.classList.remove('is-block-feedback-mode');
+    
     const bloco = getBlocoAtual(sectionId);
     if (!bloco) {
       warn('Bloco não encontrado para', sectionId);
