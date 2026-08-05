@@ -1480,6 +1480,25 @@
     try {
       setContinueState(section, 'loading');
 
+    // ====================================================
+    // MODO DEVOLUTIVA DO BLOCO
+    // ====================================================
+
+    [
+        '.perguntas-top',
+        '.perguntas-middle',
+        '.jp-answer-wrap',
+        '.perguntas-controls'
+    ].forEach(sel => {
+
+        const el = section.querySelector(sel);
+
+        if (el) {
+            el.style.display = 'none';
+        }
+
+    });
+
       const lead = getBlockClosingLead(bloco);
       if (lead) {
         await setGuideResponse(lead, 'info');
