@@ -292,6 +292,7 @@
   "perguntas": {
     "feedback_placeholder": "Devolutiva do Guia.",
     "answer_placeholder": "Digite sua resposta com verdade e calma...",
+    "guide_feedback_label": "Devolutiva do Guia",
     "guide_reflecting": "Guia refletindo",
     "guide_response_label": "Devolutiva do Guia",
     "continue": "Continuar",
