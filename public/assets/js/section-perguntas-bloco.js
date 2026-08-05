@@ -1945,6 +1945,22 @@
       renderBloco(section);
     },
   };
+  
+  document.addEventListener('i18n:changed', () => {
+    const section = getCurrentSection();
+    const textarea =
+      section &&
+      ($('#jp-answer-input', section) ||
+        $('#answer-input', section) ||
+        $('textarea', section));
+
+    if (textarea) {
+      textarea.placeholder = uiText(
+        'answer_placeholder',
+        'Digite sua resposta com verdade e calma...'
+      );
+    }
+  });
 
   log('inicializado.');
 })(window, document);
