@@ -196,8 +196,24 @@
 
   function uiText(key, fallback = '') {
     const lang = getLang();
+
+    // 1) tenta o JSON de idioma carregado (perguntas.<chave>)
+    try {
+      if (typeof window.i18n?.t === 'function') {
+        const full = `perguntas.${key}`;
+        const v = window.i18n.t(full);
+        if (v && typeof v === 'string' && v.trim() && v !== full && v !== key) {
+          return v;
+        }
+        if (Array.isArray(v) && v.length) return v;
+      }
+    } catch {}
+
+    // 2) tabela interna do módulo
     const pack = I18N_UI[lang] || I18N_UI['pt-BR'];
-    return pack?.[key] ?? fallback;
+    if (pack?.[key] != null) return pack[key];
+
+    return fallback;
   }
 
   function uiFormat(text, vars = {}) {
