@@ -288,7 +288,7 @@
   },
   "perguntas": {
     "feedback_placeholder": "ガイドからのフィードバック。",
-    "answer_placeholder": "落ち着いて、正直に入力してください…", 
+    "answer_placeholder": "正直に、落ち着いて答えを入力してください...", 
     "guide_reflecting": "ガイドが考えています",
     "guide_response_label": "ガイドからの返答",
     "continue": "続ける",
