@@ -1019,3 +1019,39 @@ body[data-guia="arian"] .perguntas-controls .btn-perguntas {
     width: 4px;
   }
 }
+
+/* =========================================================
+   MODO DEVOLUTIVA FINAL DO BLOCO
+   Mantém apenas container, glow e caixa da devolutiva
+========================================================= */
+
+section[id^="section-perguntas-"].is-block-feedback-mode
+.perguntas-top,
+
+section[id^="section-perguntas-"].is-block-feedback-mode
+.perguntas-middle,
+
+section[id^="section-perguntas-"].is-block-feedback-mode
+.jp-answer-wrap,
+
+section[id^="section-perguntas-"].is-block-feedback-mode
+.perguntas-controls {
+  display: none !important;
+}
+
+/* Destaca a devolutiva durante o encerramento */
+section[id^="section-perguntas-"].is-block-feedback-mode
+#jp-ai-response-wrap {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Mantém o pergaminho centralizado e limpo */
+section[id^="section-perguntas-"].is-block-feedback-mode
+.perguntas-pergaminho {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
