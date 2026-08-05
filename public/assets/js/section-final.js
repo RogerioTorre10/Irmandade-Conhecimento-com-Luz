@@ -219,15 +219,15 @@ function setFinalReplayState(
 
   if (!btn) return;
 
-  const textoNormal = t(
-    'final.replay',
-    '🔊 Ler novamente'
-  );
+  const textoNormal = `🔊 ${t(
+  'final.listenAgain',
+  'Ler novamente'
+)}`;
 
-  const textoLendo = t(
-    'final.reading',
-    '🔊 Lendo...'
-  );
+  const textoLendo = `🔊 ${t(
+  'final.reading',
+  'Lendo...'
+)}`;
 
   if (!btn.dataset.originalText) {
     btn.dataset.originalText = textoNormal;
