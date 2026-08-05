@@ -289,6 +289,7 @@
   "perguntas": {
     "feedback_placeholder": "Devolutiva del Guía.",
     "answer_placeholder": "Escribe tu respuesta con sinceridad y calma...",
+    "guide_feedback_label": "Devolución del Guía",
     "guide_reflecting": "Guía reflexionando",
     "guide_response_label": "Respuesta del Guía",
     "continue": "Continuar",
