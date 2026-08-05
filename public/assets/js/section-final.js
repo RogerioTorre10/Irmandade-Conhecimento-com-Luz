@@ -211,57 +211,33 @@
   );
 }
 
-function setFinalReplayState(section, state = 'ready') {
+function setFinalReplayState(
+  section,
+  state = 'ready'
+) {
   const btn = getFinalReplayButton(section);
 
   if (!btn) return;
 
-  const traduzir = (chave, fallback) => {
-    try {
-      if (typeof window.t === 'function') {
-        const resultado = window.t(chave);
-
-        if (
-          resultado &&
-          typeof resultado === 'string' &&
-          resultado !== chave
-        ) {
-          return resultado;
-        }
-      }
-
-      if (typeof t === 'function') {
-        const resultado = t(chave);
-
-        if (
-          resultado &&
-          typeof resultado === 'string' &&
-          resultado !== chave
-        ) {
-          return resultado;
-        }
-      }
-    } catch (erro) {
-      console.warn('[FINAL] Falha ao traduzir botão:', chave, erro);
-    }
-
-    return fallback;
-  };
-
-  const textoNormal = traduzir(
+  const textoNormal = t(
     'final.replay',
-    'Ler novamente'
+    '🔊 Ler novamente'
   );
 
-  const textoLendo = traduzir(
+  const textoLendo = t(
     'final.reading',
-    'Lendo...'
+    '🔊 Lendo...'
   );
+
+  if (!btn.dataset.originalText) {
+    btn.dataset.originalText = textoNormal;
+  }
 
   if (state === 'hidden') {
     btn.hidden = true;
     btn.disabled = true;
     btn.dataset.busy = '0';
+    btn.textContent = textoNormal;
     return;
   }
 
@@ -270,13 +246,13 @@ function setFinalReplayState(section, state = 'ready') {
   if (state === 'reading') {
     btn.disabled = true;
     btn.dataset.busy = '1';
-    btn.innerHTML = `🔊 <span>${textoLendo}</span>`;
+    btn.textContent = textoLendo;
     return;
   }
 
   btn.disabled = false;
   btn.dataset.busy = '0';
-  btn.innerHTML = `🔊 <span>${textoNormal}</span>`;
+  btn.textContent = textoNormal;
 }
 
   function readJsonStorage(key, fallback) {
@@ -1446,139 +1422,47 @@ function removerFinalDuplicado(texto) {
   }
 
   // ================================
-  // LIMPEZA DE ESTADO LOCAL (mesma lógica da section-senha)
-  // Segurança: a jornada é validada no backend (pagamento + código + senha).
-  // Apagar o storage NUNCA concede acesso — apenas libera o dispositivo
-  // que estaria preso ao relógio de 72h de uma jornada JÁ CONCLUÍDA.
-  // ================================
-  const FINAL_PRESERVE_KEYS = ['i18n_lang', 'lang', 'jc.lang', 'jornada.lang'];
-
-  function limparStorageDominioFinal(preserveKeys) {
-    try {
-      const backup = {};
-      preserveKeys.forEach((k) => {
-        const v = localStorage.getItem(k);
-        if (v !== null) backup[k] = v;
-      });
-      localStorage.clear();
-      sessionStorage.clear();
-      Object.entries(backup).forEach(([k, v]) => localStorage.setItem(k, v));
-    } catch (e) {
-      console.warn('[final] limpeza de storage falhou (ignorado):', e);
-    }
-  }
-
-  function limparCookiesDominioFinal() {
-    try {
-      const cookies = document.cookie ? document.cookie.split(';') : [];
-      const paths = ['/', location.pathname];
-      const host = location.hostname;
-      const domains = ['', host, '.' + host];
-      cookies.forEach((c) => {
-        const name = c.split('=')[0].trim();
-        if (!name) return;
-        paths.forEach((p) => {
-          domains.forEach((d) => {
-            document.cookie =
-              name + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=' + p +
-              (d ? '; domain=' + d : '') + '; SameSite=Lax';
-          });
-        });
-      });
-    } catch (e) {
-      console.warn('[final] limpeza de cookies falhou (ignorado):', e);
-    }
-  }
-
-  async function limparCacheStorageFinal() {
-    if (!('caches' in window)) return;
-    try {
-      const keys = await caches.keys();
-      await Promise.all(keys.map((k) => caches.delete(k)));
-    } catch (e) {
-      console.warn('[final] limpeza de Cache Storage falhou (ignorado):', e);
-    }
-  }
-
-  async function limparIndexedDBFinal() {
-    try {
-      if (typeof indexedDB === 'undefined' || !indexedDB.databases) return;
-      const dbs = await indexedDB.databases();
-      await Promise.all(
-        (dbs || []).map((db) => {
-          if (!db?.name) return Promise.resolve();
-          return new Promise((res) => {
-            const req = indexedDB.deleteDatabase(db.name);
-            req.onsuccess = req.onerror = req.onblocked = () => res();
-          });
-        })
-      );
-    } catch (e) {
-      console.warn('[final] limpeza de IndexedDB falhou (ignorado):', e);
-    }
-  }
-
-  // Limpeza profunda: jornada concluída → dispositivo liberado (sem histórico).
-  async function limparJornadaAoSairFinal() {
-    limparStorageDominioFinal(FINAL_PRESERVE_KEYS);
-    limparCookiesDominioFinal();
-    await Promise.race([
-      Promise.all([limparCacheStorageFinal(), limparIndexedDBFinal()]),
-      sleep(1200) // não travar a saída se o navegador demorar
-    ]);
-  }
-  
-  // ================================
   // VOLTAR AO PORTAL
   // ================================
-    function handleVoltarInicio() {
-    if (finalReturning) return;
-    finalReturning = true;
+  function handleVoltarInicio() {
+  if (finalReturning) return;
+  finalReturning = true;
 
-    const src = FINAL_MOVIE;
-    let cleaned = false;
+  const src = FINAL_MOVIE;
 
-    // Limpa SEMPRE antes de sair (idempotente, roda uma única vez)
-    const limparEIr = async () => {
-      if (cleaned) return;
-      cleaned = true;
-      try { await limparJornadaAoSairFinal(); } catch {}
-      window.location.href = HOME_URL;
-    };
+  const goPortal = () => {
+    window.location.href = HOME_URL;
+  };
 
-    const goPortal = () => { limparEIr(); };
+  if (typeof window.playBlockTransition === 'function') {
+    window.playBlockTransition(src, 'portal', {
+      useGoldBorder: true,
+      pulse: true,
+      ambientBlur: true,
+      onEnd: goPortal,
+      onEnded: goPortal,
+      nextSectionId: 'portal'
+    });
 
-    // dispara a limpeza já no clique (garante execução mesmo se o vídeo travar)
-    limparJornadaAoSairFinal().catch(() => {});
-
-    if (typeof window.playBlockTransition === 'function') {
-      window.playBlockTransition(src, 'portal', {
-        useGoldBorder: true,
-        pulse: true,
-        ambientBlur: true,
-        onEnd: goPortal,
-        onEnded: goPortal,
-        nextSectionId: 'portal'
-      });
-      setTimeout(goPortal, 16000);
-      return;
-    }
-
-    if (typeof window.playVideo === 'function') {
-      window.playVideo(src, {
-        useGoldBorder: true,
-        pulse: true,
-        ambientBlur: true,
-        onEnded: goPortal,
-        onEnd: goPortal
-      });
-      setTimeout(goPortal, 16000);
-      return;
-    }
-
-    goPortal();
+    setTimeout(goPortal, 16000);
+    return;
   }
 
+  if (typeof window.playVideo === 'function') {
+    window.playVideo(src, {
+      useGoldBorder: true,
+      pulse: true,
+      ambientBlur: true,
+      onEnded: goPortal,
+      onEnd: goPortal
+    });
+
+    setTimeout(goPortal, 16000);
+    return;
+  }
+
+  goPortal();
+}
   // ================================
   // UI DE BOTÕES FINAL
   // ================================
