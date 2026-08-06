@@ -1483,6 +1483,68 @@
     return uiFormat(frases[idx], { blocoNome });
   }
 
+  // ─── Modo "devolutiva do bloco em página única" ──────────────────────────────
+  function enterBlockFeedbackMode(section) {
+    if (!section) return;
+    section.classList.add('is-block-feedback-mode');
+    removeBlockNextBtn(section);
+    try {
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (_) {}
+  }
+
+  function exitBlockFeedbackMode(section) {
+    if (!section) return;
+    section.classList.remove('is-block-feedback-mode');
+    removeBlockNextBtn(section);
+    // limpa eventuais display:none inline deixados por versões anteriores
+    [
+      '.perguntas-top',
+      '.perguntas-middle',
+      '.jp-answer-wrap',
+      '.perguntas-controls',
+    ].forEach((sel) => {
+      const el = section.querySelector(sel);
+      if (el && el.style.display === 'none') el.style.display = '';
+    });
+  }
+
+  function removeBlockNextBtn(section) {
+    const old = section?.querySelector('.jp-block-next-wrap');
+    if (old) old.remove();
+  }
+
+  function showBlockNextBtn(section, bloco) {
+    if (!section) return;
+    removeBlockNextBtn(section);
+
+    const wrap = document.createElement('div');
+    wrap.className = 'jp-block-next-wrap';
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'jp-block-next-btn';
+    btn.textContent = uiText('continue', 'Continuar');
+    btn.addEventListener(
+      'click',
+      () => {
+        btn.disabled = true;
+        exitBlockFeedbackMode(section);
+        goNext(bloco);
+      },
+      { once: true }
+    );
+
+    wrap.appendChild(btn);
+
+    const host =
+      section.querySelector('#jp-ai-response-wrap') ||
+      section.querySelector('.jp-ai-response-wrap');
+
+    if (host && host.parentNode) host.parentNode.insertBefore(wrap, host.nextSibling);
+    else section.appendChild(wrap);
+  }
+
   async function maybeHandleBlockClosure(section, bloco) {
     if (!isLastQuestionOfBlock(bloco)) {
       // ainda há perguntas neste bloco: avança para a próxima
@@ -1496,30 +1558,11 @@
     try {
       setContinueState(section, 'loading');
 
-      section.classList.add('is-block-feedback-mode');
-
-      const lead = getBlockClosingLead(bloco);
-
-    // ====================================================
-    // MODO DEVOLUTIVA DO BLOCO
-    // ====================================================
-
-    [
-        '.perguntas-top',
-        '.perguntas-middle',
-        '.jp-answer-wrap',
-        '.perguntas-controls'
-    ].forEach(sel => {
-
-        const el = section.querySelector(sel);
-
-        if (el) {
-            el.style.display = 'none';
-        }
-
-    });
-      
-      section.classList.add('is-block-feedback-mode');
+      // ====================================================
+      // MODO DEVOLUTIVA DO BLOCO
+      // Oculta tudo e mantém apenas glow + container + caixa
+      // ====================================================
+      enterBlockFeedbackMode(section);
 
       const lead = getBlockClosingLead(bloco);
       if (lead) {
@@ -1532,13 +1575,11 @@
 
       if (!textoFinal) {
         console.warn('[BLOCO] devolutiva do bloco vazia');
-
-      // Restaura os elementos para permitir nova tentativa.
-      section.classList.remove('is-block-feedback-mode');
-
-      setContinueState(section, 'retry');
-      return;
-     }
+        // Restaura os elementos para permitir nova tentativa.
+        exitBlockFeedbackMode(section);
+        setContinueState(section, 'retry');
+        return;
+      }
 
       const blocoId = bloco?.id || '';
       const anteriores = getStoredBlockFeedbacks();
@@ -1573,17 +1614,17 @@
         result?.source || 'desconhecida'
       );
 
-      await new Promise((r) => setTimeout(r, 1800));
-      goNext(bloco);
+      // O participante confirma a leitura da devolutiva antes de seguir.
+      showBlockNextBtn(section, bloco);
     } catch (e) {
       console.error('[BLOCO] erro ao gerar devolutiva do bloco:', e);
 
-    // Restaura a interface se ocorrer erro.
-      section.classList.remove('is-block-feedback-mode');
-
+      // Restaura a interface se ocorrer erro.
+      exitBlockFeedbackMode(section);
       setContinueState(section, 'retry');
     }
   }
+
   
   // ─── Estado do botão Continuar ───────────────────────────────────────────────
   function setContinueState(section, state) {
@@ -1726,7 +1767,7 @@
           if (isLastQuestionOfBlock(bloco)) {
             setContinueState(section, 'loading');
 
-            section.classList.add('is-block-feedback-mode');
+            enterBlockFeedbackMode(section);
 
             await maybeHandleBlockClosure(section, bloco);
             return;
@@ -1829,7 +1870,7 @@
     if (!sectionId || !sectionId.startsWith('section-perguntas-')) return;
 
   // Novo bloco: restaura pergunta, barras, resposta e controles.
-    section.classList.remove('is-block-feedback-mode');
+    exitBlockFeedbackMode(section);
     
     const bloco = getBlocoAtual(sectionId);
     if (!bloco) {
