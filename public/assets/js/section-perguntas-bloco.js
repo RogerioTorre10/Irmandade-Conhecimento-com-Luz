@@ -1802,7 +1802,7 @@
             perguntaId: getQuestionId(bloco, idxAtual),   // ✅ novo
             resposta: val,
            dadosPessoais,
-           parcial: parcialTxt,
+           parcial: _parcialTxt,
           });
           const texto = String(result?.texto || '').trim();
 
