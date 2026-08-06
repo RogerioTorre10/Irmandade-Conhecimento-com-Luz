@@ -1496,6 +1496,10 @@
     try {
       setContinueState(section, 'loading');
 
+      section.classList.add('is-block-feedback-mode');
+
+      const lead = getBlockClosingLead(bloco);
+
     // ====================================================
     // MODO DEVOLUTIVA DO BLOCO
     // ====================================================
