@@ -1795,17 +1795,16 @@
           ).trim();
 
           const result = await requestGuideFeedbackWithFallback({
-            nome,
-            guia,
-            blocoNome: bloco?.title || bloco?.id || 'Bloco',
+            nome, guia,
+            blocoNome: bloco?.title || bloco?.id || "Bloco",
             respostas: [val],
-            idioma: getLang() || document.documentElement.lang || 'pt-BR',
+            idioma: getLang() || document.documentElement.lang || "pt-BR",
             pergunta: getQuestionText(bloco, idxAtual),
+            perguntaId: getQuestionId(bloco, idxAtual),   // ✅ novo
             resposta: val,
-            dadosPessoais,
-            parcial: _parcialTxt,
+           dadosPessoais,
+           parcial: parcialTxt,
           });
-
           const texto = String(result?.texto || '').trim();
 
           if (!texto) {
