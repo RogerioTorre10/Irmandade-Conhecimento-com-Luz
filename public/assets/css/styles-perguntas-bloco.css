@@ -1025,33 +1025,64 @@ body[data-guia="arian"] .perguntas-controls .btn-perguntas {
    Mantém apenas container, glow e caixa da devolutiva
 ========================================================= */
 
-section[id^="section-perguntas-"].is-block-feedback-mode
-.perguntas-top,
-
-section[id^="section-perguntas-"].is-block-feedback-mode
-.perguntas-middle,
-
-section[id^="section-perguntas-"].is-block-feedback-mode
-.jp-answer-wrap,
-
-section[id^="section-perguntas-"].is-block-feedback-mode
-.perguntas-controls {
+section[id^="section-perguntas-"].is-block-feedback-mode .perguntas-top,
+section[id^="section-perguntas-"].is-block-feedback-mode .perguntas-middle,
+section[id^="section-perguntas-"].is-block-feedback-mode .jp-answer-wrap,
+section[id^="section-perguntas-"].is-block-feedback-mode #jp-answer-input,
+section[id^="section-perguntas-"].is-block-feedback-mode .jp-question-typed,
+section[id^="section-perguntas-"].is-block-feedback-mode #jp-question-typed,
+section[id^="section-perguntas-"].is-block-feedback-mode .jp-progress,
+section[id^="section-perguntas-"].is-block-feedback-mode .jp-progress-wrap,
+section[id^="section-perguntas-"].is-block-feedback-mode .perguntas-controls {
   display: none !important;
 }
 
 /* Destaca a devolutiva durante o encerramento */
-section[id^="section-perguntas-"].is-block-feedback-mode
-#jp-ai-response-wrap {
+section[id^="section-perguntas-"].is-block-feedback-mode #jp-ai-response-wrap,
+section[id^="section-perguntas-"].is-block-feedback-mode .jp-ai-response-wrap {
   display: block !important;
   opacity: 1 !important;
   visibility: visible !important;
+  margin: 0 auto;
 }
 
 /* Mantém o pergaminho centralizado e limpo */
-section[id^="section-perguntas-"].is-block-feedback-mode
-.perguntas-pergaminho {
+section[id^="section-perguntas-"].is-block-feedback-mode .perguntas-pergaminho,
+section[id^="section-perguntas-"].is-block-feedback-mode .j-panel-glow {
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
+
+/* Botão único que aparece após a devolutiva do bloco ficar pronta */
+.jp-block-next-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 18px auto 4px;
+}
+
+.jp-block-next-btn {
+  font-family: "Cardo", serif;
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+  padding: 12px 28px;
+  border-radius: 999px;
+  cursor: pointer;
+  color: #1a1206;
+  border: 1px solid rgba(255, 225, 160, 0.85);
+  background: var(--gold-gradient);
+  box-shadow: 0 0 18px rgba(255, 210, 120, 0.45);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+}
+
+.jp-block-next-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 26px rgba(255, 220, 150, 0.65);
+}
+
+.jp-block-next-btn:active {
+  transform: translateY(1px);
+  opacity: 0.9;
+}
+
 
