@@ -1239,32 +1239,23 @@
 
   // ─── API / Devolutiva ────────────────────────────────────────────────────────
   async function requestGuideFeedbackWithFallback(params) {
-    const {
-      nome,
-      guia,
-      blocoNome,
-      respostas,
-      idioma,
-      pergunta,
-      resposta,
-      dadosPessoais,
-      parcial,
-    } = params;
+  const { nome, guia, blocoNome, respostas, idioma, pergunta, perguntaId, resposta, dadosPessoais, parcial } = params;
+  const guiaNorm = normalizeGuide(guia) || "lumen";
+  const lang = getLang() || idioma || "pt-BR";
 
-    const guiaNorm = normalizeGuide(guia || 'lumen');
-    const lang = getLang() || idioma || 'pt-BR';
-
-    const body = {
-      nome: nome || 'Participante',
-      guia: guiaNorm,
-      bloco: blocoNome || 'Bloco',
-      respostas: Array.isArray(respostas) ? respostas : [],
-      idioma: lang,
-      pergunta: pergunta || '',
-      resposta: resposta || '',
-      dadosPessoais: dadosPessoais || {},
-      parcial: String(parcial || '').trim(),
-    };
+  const body = {
+    nome: nome || "Participante",
+    guia: guiaNorm,
+    bloco: blocoNome || "Bloco",
+    respostas: Array.isArray(respostas) ? respostas : [],
+    idioma: lang,
+    pergunta: pergunta || "",
+    perguntaId: perguntaId || "",   // ✅ novo
+    resposta: resposta || "",
+    dadosPessoais: dadosPessoais || {},
+    parcial: String(parcial || "").trim()
+  };
+  ...
 
     if (body.parcial.length >= 900) {
       return {
