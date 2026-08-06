@@ -387,9 +387,18 @@
     const label = document.querySelector('.jp-ai-response-label');
 
     if (label) {
-      label.textContent = uiText('guide_feedback_label', 'Devolutiva do Guia');
-    }
+      const section = label.closest(
+        'section[id^="section-perguntas-"]'
+      );
 
+    const modoSintese =
+      section?.classList.contains('is-block-feedback-mode');
+
+    label.textContent = modoSintese
+      ? uiText('block_summary_label', 'Síntese do Bloco')
+      : uiText('guide_feedback_label', 'Devolutiva do Guia');
+   }
+    
     if (!wrap || !box) return;
 
     const content = String(text || '').trim();
