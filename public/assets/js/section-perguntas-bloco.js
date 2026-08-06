@@ -1237,9 +1237,36 @@
     };
   }
 
+  // ─── Memória da jornada (histórico cumulativo enviado à IA) ──────────────────
+  function buildHistoricoJornada(limite = 12) {
+    try {
+      const blocos = getStoredBlockFeedbacks() || [];
+      const itens = [];
+      blocos.forEach((b) => {
+        const perguntas = Array.isArray(b?.perguntas) ? b.perguntas : [];
+        perguntas.forEach((p) => {
+          const resposta = String(p?.resposta || '').trim();
+          if (!resposta) return;
+          itens.push({
+            bloco: String(b?.blocoTitulo || b?.blocoId || '').trim(),
+            pergunta: String(p?.pergunta || '').trim(),
+            resposta,
+            devolutiva: String(p?.devolutiva || '').trim(),
+          });
+        });
+      });
+      return itens.slice(-limite);
+    } catch (e) {
+      console.warn(MOD, 'historico indisponivel', e);
+      return [];
+    }
+  }
+
   // ─── API / Devolutiva ────────────────────────────────────────────────────────
   async function requestGuideFeedbackWithFallback(params) {
   const { nome, guia, blocoNome, respostas, idioma, pergunta, perguntaId, resposta, dadosPessoais, parcial } = params;
+  // 'bloco' = síntese do bloco | 'individual' = devolutiva de uma resposta
+  const modo = params.modo === 'bloco' ? 'bloco' : 'individual';
   const guiaNorm = normalizeGuide(guia) || "lumen";
   const lang = getLang() || idioma || "pt-BR";
 
@@ -1253,10 +1280,13 @@
     perguntaId: perguntaId || "",   // ✅ novo
     resposta: resposta || "",
     dadosPessoais: dadosPessoais || {},
-    parcial: String(parcial || "").trim()
+    parcial: String(parcial || "").trim(),
+    historico: buildHistoricoJornada(),
   };
-  
-    if (body.parcial.length >= 900) {
+
+    // O atalho de cache só vale para a SÍNTESE DO BLOCO.
+    // Devolutiva individual sempre passa pela análise pergunta x resposta.
+    if (modo === 'bloco' && body.parcial.length >= 900) {
       return {
         ok: true,
         texto: body.parcial,
@@ -1289,7 +1319,10 @@
       )
     ).replace(/\/$/, '');
     
-    const endpoints = [`${API_BASE}/jornada/devolutiva-bloco`];
+    const endpoints =
+      modo === 'bloco'
+        ? [`${API_BASE}/jornada/devolutiva-bloco`]
+        : [`${API_BASE}/jornada/devolutiva`];
     let ultimoErro = null;
 
     for (const endpoint of endpoints) {
@@ -1460,6 +1493,7 @@
       resposta: respostas[respostas.length - 1] || '',
       dadosPessoais,
       parcial,
+      modo: 'bloco',
     });
   }
 
@@ -1803,6 +1837,7 @@
             resposta: val,
            dadosPessoais,
            parcial: _parcialTxt,
+           modo: 'individual',
           });
           const texto = String(result?.texto || '').trim();
 
