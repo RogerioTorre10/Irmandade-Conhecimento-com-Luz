@@ -1255,8 +1255,7 @@
     dadosPessoais: dadosPessoais || {},
     parcial: String(parcial || "").trim()
   };
-  ...
-
+  
     if (body.parcial.length >= 900) {
       return {
         ok: true,
