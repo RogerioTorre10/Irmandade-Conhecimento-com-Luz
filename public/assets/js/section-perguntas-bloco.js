@@ -1495,50 +1495,60 @@
   // ─── Modo "devolutiva do bloco em página única" ──────────────────────────────
   function enterBlockFeedbackMode(section) {
     if (!section) return;
-    section.classList.add('is-block-feedback-mode');
     removeBlockNextBtn(section);
-    try {
-      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } catch (_) {}
-  }
-
-  function enterBlockFeedbackMode(section) {
-    if (!section) return;
-
-    removeBlockNextBtn(section);
-
-    // Estado inicial da transição.
+    
+    /* Estado inicial da transição */
     section.classList.add('is-block-feedback-entering');
 
-    // Interrompe fala, microfone e foco da resposta anterior.
-    stopSpeaking();
-    forceStopMic();
-
-    const textarea = section.querySelector(
-      '#jp-answer-input, .jp-answer-input'
+    /* Remove estados anteriores */
+    section.classList.remove(
+        'is-block-feedback-visible',
+        'is-block-feedback-mode'
     );
-
-    if (textarea) textarea.blur();
-
-    // Faz a tela voltar suavemente ao início.
-    try {
-      section.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      });
-    } catch (_) {}
-
-    // Pequena pausa visual antes de revelar a síntese.
-    window.setTimeout(() => {
-      section.classList.add('is-block-feedback-mode');
-
-    requestAnimationFrame(() => {
-      section.classList.add('is-block-feedback-visible');
-      section.classList.remove('is-block-feedback-entering');
-    });
-  }, 320);
+    
+    /* Pequena pausa para o cérebro perceber
+       que um ciclo terminou */
+    setTimeout(() => {
+        section.classList.add('is-block-feedback-mode');
+        requestAnimationFrame(() => {
+            section.classList.add(
+                'is-block-feedback-visible'
+            );
+            section.classList.remove(
+                'is-block-feedback-entering'
+            );
+        });
+    }, 350);
 }
 
+  function exitBlockFeedbackMode(section) {
+    if (!section) return;
+
+    section.classList.remove(
+      'is-block-feedback-mode',
+      'is-block-feedback-entering',
+      'is-block-feedback-visible'
+    );
+
+    removeBlockNextBtn(section);
+
+    [
+      '.perguntas-top',
+      '.progress-top',
+      '.perguntas-middle',
+      '.progress-middle',
+      '.jp-answer-wrap',
+      '.jp-answer-frame',
+      '.perguntas-controls'
+    ].forEach((sel) => {
+      const el = section.querySelector(sel);
+
+      if (el && el.style.display === 'none') {
+        el.style.display = '';
+      }
+    });
+  }
+  
   function removeBlockNextBtn(section) {
     const old = section?.querySelector('.jp-block-next-wrap');
     if (old) old.remove();
