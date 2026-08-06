@@ -1085,4 +1085,170 @@ section[id^="section-perguntas-"].is-block-feedback-mode .j-panel-glow {
   opacity: 0.9;
 }
 
+/* ==========================================================
+   MODO CONTEMPLAÇÃO
+   Animação cinematográfica do fechamento do bloco
+========================================================== */
 
+/* ------------------------------
+   Estado inicial
+-------------------------------*/
+
+section[id^="section-perguntas-"] .perguntas-top,
+section[id^="section-perguntas-"] .perguntas-middle,
+section[id^="section-perguntas-"] .jp-answer-wrap,
+section[id^="section-perguntas-"] .perguntas-controls{
+    transition:
+        opacity .45s ease,
+        transform .45s ease,
+        filter .45s ease;
+}
+
+/* ------------------------------
+   Fade da pergunta
+-------------------------------*/
+
+section[id^="section-perguntas-"].is-block-feedback-entering
+.perguntas-top,
+
+section[id^="section-perguntas-"].is-block-feedback-entering
+.perguntas-middle,
+
+section[id^="section-perguntas-"].is-block-feedback-entering
+.jp-answer-wrap,
+
+section[id^="section-perguntas-"].is-block-feedback-entering
+.perguntas-controls{
+
+    opacity:0;
+
+    transform:translateY(-12px);
+
+    filter:blur(4px);
+
+    pointer-events:none;
+}
+
+/* ------------------------------
+   Glow cresce
+-------------------------------*/
+
+section[id^="section-perguntas-"].is-block-feedback-entering
+.j-panel-glow{
+
+    transition:
+        box-shadow .8s ease,
+        transform .8s ease;
+
+    transform:scale(1.025);
+
+    box-shadow:
+
+        0 0 24px var(--guia-soft),
+
+        0 0 42px var(--guia-main),
+
+        0 0 90px color-mix(
+            in srgb,
+            var(--guia-main) 40%,
+            transparent
+        );
+}
+
+/* ------------------------------
+   Caixa nasce
+-------------------------------*/
+
+section[id^="section-perguntas-"]
+#jp-ai-response-wrap{
+
+    transition:
+
+        opacity .60s ease,
+
+        transform .60s ease;
+
+}
+
+/* estado escondido */
+
+section[id^="section-perguntas-"].is-block-feedback-entering
+#jp-ai-response-wrap{
+
+    opacity:0;
+
+    transform:translateY(24px);
+
+}
+
+/* estado visível */
+
+section[id^="section-perguntas-"].is-block-feedback-visible
+#jp-ai-response-wrap{
+
+    opacity:1;
+
+    transform:translateY(0);
+
+}
+
+/* ------------------------------
+   Botão Continuar
+-------------------------------*/
+
+.jp-block-next-wrap{
+
+    opacity:0;
+
+    transform:translateY(18px);
+
+    transition:
+
+        opacity .45s ease,
+
+        transform .45s ease;
+
+}
+
+.jp-block-next-wrap.show{
+
+    opacity:1;
+
+    transform:translateY(0);
+
+}
+
+/* ------------------------------
+   Pulso do glow
+-------------------------------*/
+
+section[id^="section-perguntas-"].is-block-feedback-visible
+.j-panel-glow{
+
+    animation:
+
+        contemplacaoGlow 4s ease-in-out infinite;
+
+}
+
+@keyframes contemplacaoGlow{
+
+    0%{
+
+        transform:scale(1);
+
+    }
+
+    50%{
+
+        transform:scale(1.018);
+
+    }
+
+    100%{
+
+        transform:scale(1);
+
+    }
+
+}
