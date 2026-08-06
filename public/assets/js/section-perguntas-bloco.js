@@ -1514,6 +1514,8 @@
         }
 
     });
+      
+      section.classList.add('is-block-feedback-mode');
 
       const lead = getBlockClosingLead(bloco);
       if (lead) {
@@ -1577,7 +1579,8 @@
 
       setContinueState(section, 'retry');
     }
-
+  }
+  
   // ─── Estado do botão Continuar ───────────────────────────────────────────────
   function setContinueState(section, state) {
     if (!section) return;
