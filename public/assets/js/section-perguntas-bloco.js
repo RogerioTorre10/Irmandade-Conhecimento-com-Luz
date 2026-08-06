@@ -52,7 +52,7 @@
   const I18N_UI = {
     'pt-BR': {
       guide_feedback_label: 'Devolutiva do Guia',
-      guide_reflecting: 'Guia refletindo...',
+      guide_reflecting: 'Síntese do bloco...',
       continue: 'Continuar',
       retry: 'Tentar novamente',
       write_answer_first: 'Escreva sua resposta antes de continuar.',
@@ -72,7 +72,7 @@
     },
     'en-US': {
       guide_feedback_label: 'Guide Feedback',
-      guide_reflecting: 'Guide reflecting...',
+      guide_reflecting: 'Block synthesis...',
       continue: 'Continue',
       retry: 'Try again',
       write_answer_first: 'Write your answer before continuing.',
@@ -92,7 +92,7 @@
     },
     'es-ES': {
       guide_feedback_label: 'Devolución del Guía',
-      guide_reflecting: 'Guía reflexionando...',
+      guide_reflecting: 'Síntesis del bloque...',
       continue: 'Continuar',
       retry: 'Intentar de nuevo',
       write_answer_first: 'Escribe tu respuesta antes de continuar.',
@@ -112,7 +112,7 @@
     },
     'fr-FR': {
       guide_feedback_label: 'Retour du Guide',
-      guide_reflecting: 'Le guide réfléchit...',
+      guide_reflecting: 'Synthèse du bloc...',
       continue: 'Continuer',
       retry: 'Réessayer',
       write_answer_first: 'Écrivez votre réponse avant de continuer.',
@@ -131,7 +131,7 @@
     },
     'de-DE': {
       guide_feedback_label: 'Rückmeldung des Guides',
-      guide_reflecting: 'Der Guide reflektiert...',
+      guide_reflecting: 'Synthese des Blocks...',
       continue: 'Weiter',
       retry: 'Erneut versuchen',
       write_answer_first: 'Schreiben Sie Ihre Antwort, bevor Sie fortfahren.',
@@ -151,7 +151,7 @@
     },
     'ja-JP': {
       guide_feedback_label: 'ガイドからの返答',
-      guide_reflecting: 'ガイドが熟考しています...',
+      guide_reflecting: 'ブロックの要約...',
       continue: '続ける',
       retry: '再試行',
       write_answer_first: '続ける前に回答を書いてください。',
@@ -171,7 +171,7 @@
     },
     'zh-CN': {
       guide_feedback_label: '向导反馈',
-      guide_reflecting: '向导正在思索...',
+      guide_reflecting: '板块综述...',
       continue: '继续',
       retry: '重试',
       write_answer_first: '请先写下你的回答，再继续。',
@@ -387,18 +387,9 @@
     const label = document.querySelector('.jp-ai-response-label');
 
     if (label) {
-      const section = label.closest(
-        'section[id^="section-perguntas-"]'
-      );
+      label.textContent = uiText('guide_feedback_label', 'Devolutiva do Guia');
+    }
 
-    const modoSintese =
-      section?.classList.contains('is-block-feedback-mode');
-
-    label.textContent = modoSintese
-      ? uiText('block_summary_label', 'Síntese do Bloco')
-      : uiText('guide_feedback_label', 'Devolutiva do Guia');
-   }
-    
     if (!wrap || !box) return;
 
     const content = String(text || '').trim();
@@ -1495,60 +1486,29 @@
   // ─── Modo "devolutiva do bloco em página única" ──────────────────────────────
   function enterBlockFeedbackMode(section) {
     if (!section) return;
+    section.classList.add('is-block-feedback-mode');
     removeBlockNextBtn(section);
-    
-    /* Estado inicial da transição */
-    section.classList.add('is-block-feedback-entering');
-
-    /* Remove estados anteriores */
-    section.classList.remove(
-        'is-block-feedback-visible',
-        'is-block-feedback-mode'
-    );
-    
-    /* Pequena pausa para o cérebro perceber
-       que um ciclo terminou */
-    setTimeout(() => {
-        section.classList.add('is-block-feedback-mode');
-        requestAnimationFrame(() => {
-            section.classList.add(
-                'is-block-feedback-visible'
-            );
-            section.classList.remove(
-                'is-block-feedback-entering'
-            );
-        });
-    }, 350);
-}
+    try {
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (_) {}
+  }
 
   function exitBlockFeedbackMode(section) {
     if (!section) return;
-
-    section.classList.remove(
-      'is-block-feedback-mode',
-      'is-block-feedback-entering',
-      'is-block-feedback-visible'
-    );
-
+    section.classList.remove('is-block-feedback-mode');
     removeBlockNextBtn(section);
-
+    // limpa eventuais display:none inline deixados por versões anteriores
     [
       '.perguntas-top',
-      '.progress-top',
       '.perguntas-middle',
-      '.progress-middle',
       '.jp-answer-wrap',
-      '.jp-answer-frame',
-      '.perguntas-controls'
+      '.perguntas-controls',
     ].forEach((sel) => {
       const el = section.querySelector(sel);
-
-      if (el && el.style.display === 'none') {
-        el.style.display = '';
-      }
+      if (el && el.style.display === 'none') el.style.display = '';
     });
   }
-  
+
   function removeBlockNextBtn(section) {
     const old = section?.querySelector('.jp-block-next-wrap');
     if (old) old.remove();
@@ -1678,7 +1638,7 @@
 
     if (state === 'loading') {
       btn.disabled = true;
-      btn.textContent = uiText('guide_reflecting', 'Guia refletindo...');
+      btn.textContent = uiText('guide_reflecting', 'Síntese do bloco...');
       btn.classList.add('is-loading');
       return;
     }
