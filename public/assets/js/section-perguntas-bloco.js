@@ -1502,21 +1502,42 @@
     } catch (_) {}
   }
 
-  function exitBlockFeedbackMode(section) {
+  function enterBlockFeedbackMode(section) {
     if (!section) return;
-    section.classList.remove('is-block-feedback-mode');
+
     removeBlockNextBtn(section);
-    // limpa eventuais display:none inline deixados por versões anteriores
-    [
-      '.perguntas-top',
-      '.perguntas-middle',
-      '.jp-answer-wrap',
-      '.perguntas-controls',
-    ].forEach((sel) => {
-      const el = section.querySelector(sel);
-      if (el && el.style.display === 'none') el.style.display = '';
+
+    // Estado inicial da transição.
+    section.classList.add('is-block-feedback-entering');
+
+    // Interrompe fala, microfone e foco da resposta anterior.
+    stopSpeaking();
+    forceStopMic();
+
+    const textarea = section.querySelector(
+      '#jp-answer-input, .jp-answer-input'
+    );
+
+    if (textarea) textarea.blur();
+
+    // Faz a tela voltar suavemente ao início.
+    try {
+      section.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    } catch (_) {}
+
+    // Pequena pausa visual antes de revelar a síntese.
+    window.setTimeout(() => {
+      section.classList.add('is-block-feedback-mode');
+
+    requestAnimationFrame(() => {
+      section.classList.add('is-block-feedback-visible');
+      section.classList.remove('is-block-feedback-entering');
     });
-  }
+  }, 320);
+}
 
   function removeBlockNextBtn(section) {
     const old = section?.querySelector('.jp-block-next-wrap');
