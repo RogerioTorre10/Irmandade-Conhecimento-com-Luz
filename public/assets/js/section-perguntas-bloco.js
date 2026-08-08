@@ -1474,13 +1474,17 @@
       };
     }
 
-// Não reutilizar devolutivas individuais como síntese do bloco.
-// Se ainda não existe blockFinal, o backend DEVE gerar uma síntese nova.
-    const parcial = '';
-
-    if (!respostas.length) {
-     return { ok: false, texto: '', source: 'empty_block_answers' };
-    }
+    if (!respostas.length) {console.warn('[BLOCO] nenhuma resposta encontrada para síntese', blocoId);
+      return { ok: false, texto: '', source: 'empty_block_answers' };
+     }
+    
+    console.log('[BLOCO][GERANDO_SINTESE_REAL]', {
+      blocoId,
+      blocoNome,
+      totalRespostas: respostas.length,
+      guia: normalizeGuide(guia),
+      idioma,
+    });    
 
     return requestGuideFeedbackWithFallback({
       nome,
