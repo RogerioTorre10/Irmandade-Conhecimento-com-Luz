@@ -1469,18 +1469,32 @@
     // RETOMADA CIRÚRGICA (nível 2): se não há bloco final salvo, tenta usar
     // devolutivas por pergunta concatenadas como parcial para o backend
     // curto-circuitar por tamanho (>=900).
-    let parcial = _blockFinalTxt || String(anterior?.devolutiva || anterior?.texto || '').trim();
-    if (!parcial) {
-      const partes = Array.isArray(anterior?.perguntas) ? anterior.perguntas : [];
-      const concat = partes
-        .map((p) => String(p?.devolutiva || '').trim())
-        .filter(Boolean)
-        .join('\n\n');
-      if (concat) parcial = concat;
+    const _blockFinalTxt =
+      String(anterior?.devolutivaFinal || '').trim();
+
+    if (anterior?.blockFinal && _blockFinalTxt) {
+      return {
+        ok: true,
+        texto: _blockFinalTxt,
+        guiaUsado: normalizeGuide(
+          document.body.dataset.guia || 'lumen'
+        ),
+        guiaSolicitado: normalizeGuide(
+          document.body.dataset.guia || 'lumen'
+        ),
+        fallbackUsed: false,
+        provider: 'frontend_block_cache',
+        providerDivergente: false,
+        source: 'frontend_block_cache',
+      };
     }
 
+// Não reutilizar devolutivas individuais como síntese do bloco.
+// Se ainda não existe blockFinal, o backend DEVE gerar uma síntese nova.
+    const parcial = '';
+
     if (!respostas.length) {
-      return { ok: false, texto: '', source: 'empty_block_answers' };
+     return { ok: false, texto: '', source: 'empty_block_answers' };
     }
 
     return requestGuideFeedbackWithFallback({
