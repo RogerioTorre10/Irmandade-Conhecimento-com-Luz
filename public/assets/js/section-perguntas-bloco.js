@@ -1282,22 +1282,7 @@
     dadosPessoais: dadosPessoais || {},
     parcial: String(parcial || "").trim(),
     historico: buildHistoricoJornada(),
-  };
-
-    // O atalho de cache só vale para a SÍNTESE DO BLOCO.
-    // Devolutiva individual sempre passa pela análise pergunta x resposta.
-    if (modo === 'bloco' && body.parcial.length >= 900) {
-      return {
-        ok: true,
-        texto: body.parcial,
-        guiaUsado: guiaNorm,
-        guiaSolicitado: guiaNorm,
-        fallbackUsed: false,
-        provider: 'frontend_cache',
-        providerDivergente: false,
-        source: 'frontend_cache',
-      };
-    }
+  };    
 
     console.log('[DEVOLUTIVA][API][REQUEST]', {
       guia: guiaNorm,
