@@ -1412,93 +1412,129 @@
   }
 
   async function gerarDevolutivaDoBloco(bloco) {
-    const nome =
-      sessionStorage.getItem('jornada.nome') ||
-      localStorage.getItem('JORNADA_NOME') ||
-      localStorage.getItem('jc.nome') ||
-      'Participante';
+  const nome =
+    sessionStorage.getItem('jornada.nome') ||
+    localStorage.getItem('JORNADA_NOME') ||
+    localStorage.getItem('jc.nome') ||
+    'Participante';
 
-    const guia =
-      sessionStorage.getItem('jornada.guia') ||
-      localStorage.getItem('JORNADA_GUIA') ||
-      localStorage.getItem('jornada.guia') ||
-      document.body.dataset.guia ||
-      'lumen';
+  const guia =
+    sessionStorage.getItem('jornada.guia') ||
+    localStorage.getItem('JORNADA_GUIA') ||
+    localStorage.getItem('jornada.guia') ||
+    document.body.dataset.guia ||
+    'lumen';
 
-    const idioma =
-      getLang() || document.documentElement.lang || 'pt-BR';
-    const respostas = getAllAnswersFromBlock(bloco);
-    const blocoNome = bloco?.title || bloco?.id || 'Bloco';
-    const dadosPessoais = buildDadosPessoaisPayload();
-    const blocoId = bloco?.id || '';
-    const anterior = getStoredBlockFeedbacks().find((item) => item?.blocoId === blocoId) || {};
+  const idioma =
+    getLang() ||
+    document.documentElement.lang ||
+    'pt-BR';
 
-    // RETOMADA CIRÚRGICA (nível 1): se já foi entregue devolutiva final do
-    // bloco em execução anterior, reaproveita SEM chamar a IA — independente
-    // do tamanho do texto. Isso evita nova cobrança de tokens quando o
-    // participante retoma exatamente neste ponto.
-    const _blockFinalTxt = String(anterior?.devolutivaFinal || '').trim();
-    if (anterior?.blockFinal && _blockFinalTxt) {
-      return {
-        ok: true,
-        texto: _blockFinalTxt,
-        guiaUsado: normalizeGuide(document.body.dataset.guia || 'lumen'),
-        guiaSolicitado: normalizeGuide(document.body.dataset.guia || 'lumen'),
-        fallbackUsed: false,
-        provider: 'frontend_block_cache',
-        providerDivergente: false,
-        source: 'frontend_block_cache',
-      };
-    }
+  const respostas = getAllAnswersFromBlock(bloco);
 
-    // RETOMADA CIRÚRGICA (nível 2): se não há bloco final salvo, tenta usar
-    // devolutivas por pergunta concatenadas como parcial para o backend
-    // curto-circuitar por tamanho (>=900).
-    const _blockFinalTxt =
-      String(anterior?.devolutivaFinal || '').trim();
+  const blocoNome =
+    bloco?.title ||
+    bloco?.id ||
+    'Bloco';
 
-    if (anterior?.blockFinal && _blockFinalTxt) {
-      return {
-        ok: true,
-        texto: _blockFinalTxt,
-        guiaUsado: normalizeGuide(
-          document.body.dataset.guia || 'lumen'
-        ),
-        guiaSolicitado: normalizeGuide(
-          document.body.dataset.guia || 'lumen'
-        ),
-        fallbackUsed: false,
-        provider: 'frontend_block_cache',
-        providerDivergente: false,
-        source: 'frontend_block_cache',
-      };
-    }
+  const dadosPessoais = buildDadosPessoaisPayload();
 
-    if (!respostas.length) {console.warn('[BLOCO] nenhuma resposta encontrada para síntese', blocoId);
-      return { ok: false, texto: '', source: 'empty_block_answers' };
-     }
-    
-    console.log('[BLOCO][GERANDO_SINTESE_REAL]', {
-      blocoId,
-      blocoNome,
-      totalRespostas: respostas.length,
-      guia: normalizeGuide(guia),
-      idioma,
-    });    
+  const blocoId = bloco?.id || '';
 
-    return requestGuideFeedbackWithFallback({
-      nome,
-      guia,
-      blocoNome,
-      respostas,
-      idioma,
-      pergunta: '',
-      resposta: respostas[respostas.length - 1] || '',
-      dadosPessoais,
-      parcial,
-      modo: 'bloco',
-    });
+  const anterior =
+    getStoredBlockFeedbacks().find(
+      (item) => item?.blocoId === blocoId
+    ) || {};
+
+  // =========================================================
+  // RETOMADA:
+  // somente uma síntese REAL já concluída pode ser reutilizada.
+  // Devolutivas individuais nunca substituem a síntese do bloco.
+  // =========================================================
+
+  const blockFinalTxt =
+    String(anterior?.devolutivaFinal || '').trim();
+
+  if (anterior?.blockFinal && blockFinalTxt) {
+    console.log(
+      '[BLOCO][CACHE] reutilizando síntese final já concluída',
+      blocoId
+    );
+
+    return {
+      ok: true,
+      texto: blockFinalTxt,
+      guiaUsado: normalizeGuide(
+        document.body.dataset.guia || guia || 'lumen'
+      ),
+      guiaSolicitado: normalizeGuide(
+        guia || 'lumen'
+      ),
+      fallbackUsed: false,
+      provider: 'frontend_block_cache',
+      providerDivergente: false,
+      source: 'frontend_block_cache',
+    };
   }
+
+  // =========================================================
+  // SEM RESPOSTAS = não há bloco para sintetizar.
+  // =========================================================
+
+  if (!respostas.length) {
+    console.warn(
+      '[BLOCO] nenhuma resposta encontrada para síntese',
+      blocoId
+    );
+
+    return {
+      ok: false,
+      texto: '',
+      source: 'empty_block_answers',
+    };
+  }
+
+  // =========================================================
+  // IMPORTANTE:
+  // parcial fica vazio de propósito.
+  //
+  // NÃO reutilizar:
+  // - devolutiva da pergunta 10;
+  // - devolutiva de qualquer pergunta;
+  // - concatenação das devolutivas individuais.
+  //
+  // O backend deve gerar uma NOVA síntese usando as
+  // respostas completas do bloco.
+  // =========================================================
+
+  console.log('[BLOCO][GERANDO_SINTESE_REAL]', {
+    blocoId,
+    blocoNome,
+    totalRespostas: respostas.length,
+    guia: normalizeGuide(guia),
+    idioma,
+  });
+
+  return requestGuideFeedbackWithFallback({
+    nome,
+    guia,
+    blocoNome,
+    respostas,
+    idioma,
+
+    // Síntese de bloco NÃO representa uma pergunta individual.
+    pergunta: '',
+    perguntaId: '',
+    resposta: '',
+
+    dadosPessoais,
+
+    // Nunca curto-circuitar usando devolutiva individual.
+    parcial: '',
+
+    modo: 'bloco',
+  });
+}
 
   function getBlockClosingLead(bloco) {
     const blocoNome = bloco?.title || bloco?.id || 'este bloco';
