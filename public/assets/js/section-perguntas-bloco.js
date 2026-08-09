@@ -1822,29 +1822,15 @@
 
           saveAnswer(bloco, idxAtual, val);
 
-          // ====================================================
-          // ÚLTIMA PERGUNTA DO BLOCO
-          // Vai diretamente para a devolutiva final do bloco.
-          // Não mostra devolutiva individual da pergunta 10.
-          // ====================================================
-          if (isLastQuestionOfBlock(bloco)) {
-            setContinueState(section, 'loading');
+          setContinueState(section, 'loading');
 
-            enterBlockFeedbackMode(section);
-
-            await maybeHandleBlockClosure(section, bloco);
-            return;
-         }
-
-         setContinueState(section, 'loading');
-
-         await setGuideResponse(
-           uiText(
-             'thinking_about_answer',
-             'Só um momento, vou refletir sobre sua resposta...'
-         ),
-         'info'
-       );
+          await setGuideResponse(
+            uiText(
+              'thinking_about_answer',
+              'Só um momento, vou refletir sobre sua resposta...'
+          ),
+          'info'
+        );
           const guia =
             sessionStorage.getItem('jornada.guia') ||
             localStorage.getItem('JORNADA_GUIA') ||
