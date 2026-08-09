@@ -1894,6 +1894,44 @@
             return;
           }
 
+          const tipoResposta =
+            String(result?.tipoResposta || '').trim().toLowerCase();
+
+          if (tipoResposta === 'retratacao') {
+
+            console.log('[PERGUNTA][RETRATACAO]', {
+              bloco: bloco?.id,
+              pergunta: idxAtual + 1,
+              texto: val,
+            });
+
+          // A retratação NÃO é resposta da pergunta atual.
+          removeAnswer(bloco, idxAtual);
+
+          // Exibe a resposta do Guia normalmente.
+          await setGuideResponse(
+            texto,
+            result?.fallbackUsed ? 'warning' : 'success'
+          );
+
+          // Marca que o próximo clique deve retornar à MESMA pergunta.
+         section.dataset.awaitingReanswer = '1';
+
+         // Mantemos estado ready apenas para permitir o clique.
+         setContinueState(section, 'ready');
+
+         const btn = section.querySelector('#jp-btn-confirmar');
+
+         if (btn) {
+           btn.textContent = uiText(
+             'answer_question_again',
+             'Responder pergunta'
+         );
+       }
+
+       return;
+    }
+
           upsertPerguntaFeedback(bloco, idxAtual, {
             index: idxAtual,
             perguntaId: getQuestionId(bloco, idxAtual),
