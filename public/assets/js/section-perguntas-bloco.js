@@ -1820,9 +1820,54 @@
           const state = section?.dataset?.continueState || 'idle';
 
           if (state === 'ready') {
-            await maybeHandleBlockClosure(section, bloco);
+
+            // =====================================================
+            // RETRATAÇÃO:
+            // não avança. Retorna à MESMA pergunta para respondê-la.
+            // =====================================================
+            if (section.dataset.awaitingReanswer === '1') {
+
+              delete section.dataset.awaitingReanswer;
+
+              forceStopMic();
+              stopSpeaking();
+
+              // limpa somente resposta/devolutiva visual
+              clearAnswerUI();
+
+              // mantém exatamente o mesmo índice da pergunta
+              setContinueState(section, 'idle');
+
+              const btn = section.querySelector('#jp-btn-confirmar');
+
+              if (btn) {
+                btn.textContent = uiText(
+                'confirm',
+                'Confirmar'
+              );
+            }
+
+            const ta = section.querySelector('#jp-answer-input');
+
+              if (ta) {
+                ta.value = '';
+                ta.focus();
+              }
+
+            console.log(
+              '[PERGUNTA][RETRATACAO] retornou à pergunta aguardada',
+              {
+                bloco: bloco?.id,
+                pergunta: getCurrentQuestionIndex(bloco) + 1,
+              }
+            );
+
             return;
-          }
+        }
+
+        await maybeHandleBlockClosure(section, bloco);
+        return;
+    }
           if (state === 'loading') return;
 
           const val = String(textarea?.value || '').trim();
