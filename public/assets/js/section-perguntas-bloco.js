@@ -1377,6 +1377,12 @@
           providerDivergente,
           source: data?.source || data?.provider || data?.guia || endpoint,
           auditOnly: providerDivergente && !fallbackUsed,
+          tipoResposta: data?.tipoResposta || '',
+          disciplina: data?.disciplina || null,
+          acaoDisciplina: data?.acaoDisciplina || '',
+          nivelDisciplina: Number(data?.nivelDisciplina || 0),
+          bloqueioSegundos: Number(data?.bloqueioSegundos || 0),
+          encerrarJornada: data?.encerrarJornada === true,
         };
       } catch (error) {
         ultimoErro = error;
