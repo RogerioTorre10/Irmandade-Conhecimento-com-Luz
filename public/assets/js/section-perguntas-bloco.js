@@ -375,6 +375,16 @@
     localStorage.setItem(answerKey(bloco, qIndex), String(value || ''));
   }
 
+  function removeAnswer(bloco, qIndex) {
+    if (!bloco) return;
+
+    try {
+      localStorage.removeItem(answerKey(bloco, qIndex));
+    } catch (e) {
+      console.warn('[PERGUNTAS][ANSWER] falha ao remover resposta:', e);
+    }
+  }
+
   function getAnswer(bloco, qIndex) {
     if (!bloco) return '';
     return localStorage.getItem(answerKey(bloco, qIndex)) || '';
