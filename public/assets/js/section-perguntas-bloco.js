@@ -1272,6 +1272,43 @@
     }
   }
 
+  // ─── Identidade operacional da Jornada ───────────────────────────────────────
+function getJornadaOperationalIdentity() {
+  try {
+    const progress = safeJson(
+      sessionStorage.getItem('JORNADA_PROGRESS'),
+      {}
+    ) || {};
+
+    const email = String(
+      progress.email ||
+      progress?.progresso_json_temp?.email ||
+      ''
+    ).trim().toLowerCase();
+
+    const codigo_jornada = String(
+      progress.codigo_jornada ||
+      progress.codigoJornada ||
+      ''
+    ).trim();
+
+    return {
+      email,
+      codigo_jornada,
+    };
+  } catch (e) {
+    console.warn(
+      '[JORNADA][IDENTIDADE] falha ao recuperar identidade operacional:',
+      e
+    );
+
+    return {
+      email: '',
+      codigo_jornada: '',
+    };
+  }
+}
+
   // ─── API / Devolutiva ────────────────────────────────────────────────────────
   async function requestGuideFeedbackWithFallback(params) {
   const { nome, guia, blocoNome, respostas, idioma, pergunta, perguntaId, resposta, dadosPessoais, parcial } = params;
@@ -1279,6 +1316,7 @@
   const modo = params.modo === 'bloco' ? 'bloco' : 'individual';
   const guiaNorm = normalizeGuide(guia) || "lumen";
   const lang = getLang() || idioma || "pt-BR";
+  const jornadaIdentity = getJornadaOperationalIdentity(); 
 
   const body = {
     nome: nome || "Participante",
@@ -1292,6 +1330,8 @@
     dadosPessoais: dadosPessoais || {},
     parcial: String(parcial || "").trim(),
     historico: buildHistoricoJornada(),
+    codigo_jornada: jornadaIdentity.codigo_jornada,
+    email: jornadaIdentity.email,
   };    
 
     console.log('[DEVOLUTIVA][API][REQUEST]', {
@@ -1300,6 +1340,8 @@
       bloco: body.bloco,
       pergunta: body.pergunta,
       resposta: body.resposta,
+      codigo_jornada: body.codigo_jornada || '(ausente)',
+      email_presente: Boolean(body.email),
     });
 
     const IS_HOMOLOG =
