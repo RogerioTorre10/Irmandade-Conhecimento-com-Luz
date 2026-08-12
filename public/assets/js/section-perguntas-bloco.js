@@ -1747,370 +1747,674 @@ function getJornadaOperationalIdentity() {
   }
 
   
-  // ─── Estado do botão Continuar ───────────────────────────────────────────────
-  function setContinueState(section, state) {
-    if (!section) return;
-    section.dataset.continueState = state || 'idle';
+  // ─── Estado do botão Continuar ────────────────────────────────────────────────
+function setContinueState(section, state) {
+  if (!section) return;
 
-    const btn = section.querySelector('#jp-btn-confirmar');
-    if (!btn) return;
+  section.dataset.continueState = state || 'idle';
 
-    btn.classList.remove('is-loading', 'is-ready', 'is-error');
+  const btn = section.querySelector('#jp-btn-confirmar');
+  if (!btn) return;
 
-    if (state === 'loading') {
-      btn.disabled = true;
-      btn.textContent = uiText('guide_reflecting', 'Síntese do bloco...');
-      btn.classList.add('is-loading');
-      return;
-    }
-    if (state === 'ready') {
-      btn.disabled = false;
-      btn.textContent = uiText('continue', 'Continuar');
-      btn.classList.add('is-ready');
-      return;
-    }
-    if (state === 'error') {
-      btn.disabled = false;
-      btn.textContent = uiText('retry', 'Tentar novamente');
-      btn.classList.add('is-error');
-      return;
-    }
-    btn.disabled = false;
-    btn.textContent = uiText('continue', 'Continuar');
+  btn.classList.remove(
+    'is-loading',
+    'is-ready',
+    'is-error'
+  );
+
+  if (state === 'loading') {
+    btn.disabled = true;
+    btn.textContent = uiText(
+      'guide_reflecting',
+      'Síntese do bloco...'
+    );
+    btn.classList.add('is-loading');
+    return;
   }
 
-  // ─── Bind dos botões ─────────────────────────────────────────────────────────
-  function bindButtons(section, bloco, perguntaText, qIndex = 0) {
-    const btnTTS = $('#jp-btn-falar', section);
-    const btnMic = $('#jp-btn-mic', section);
-    const btnApagar = $('#jp-btn-apagar', section);
-    const btnConfirm = $('#jp-btn-confirmar', section);
-    const textarea = $('#jp-answer-input', section);
+  if (state === 'ready') {
+    btn.disabled = false;
+    btn.textContent = uiText(
+      'continue',
+      'Continuar'
+    );
+    btn.classList.add('is-ready');
+    return;
+  }
 
-    [btnTTS, btnMic, btnApagar, btnConfirm].forEach(bindPressFx);
+  if (state === 'error') {
+    btn.disabled = false;
+    btn.textContent = uiText(
+      'retry',
+      'Tentar novamente'
+    );
+    btn.classList.add('is-error');
+    return;
+  }
 
-    // ── Botão TTS ──
-    if (btnTTS) {
-      btnTTS.onclick = async (ev) => {
-        ev.preventDefault();
-        stopSpeaking();
-        await speakQuestionOrGuideResponse(
-          getQuestionText(bloco, getCurrentQuestionIndex(bloco))
+  btn.disabled = false;
+  btn.textContent = uiText(
+    'continue',
+    'Continuar'
+  );
+}
+
+
+// ─── Bind dos botões ─────────────────────────────────────────────────────────
+function bindButtons(section, bloco, perguntaText, qIndex = 0) {
+
+  const btnTTS = $('#jp-btn-falar', section);
+  const btnMic = $('#jp-btn-mic', section);
+  const btnApagar = $('#jp-btn-apagar', section);
+  const btnConfirm = $('#jp-btn-confirmar', section);
+  const textarea = $('#jp-answer-input', section);
+
+  [
+    btnTTS,
+    btnMic,
+    btnApagar,
+    btnConfirm
+  ].forEach(bindPressFx);
+
+
+  // =====================================================
+  // BOTÃO TTS
+  // =====================================================
+
+  if (btnTTS) {
+    btnTTS.onclick = async (ev) => {
+      ev.preventDefault();
+
+      stopSpeaking();
+
+      await speakQuestionOrGuideResponse(
+        getQuestionText(
+          bloco,
+          getCurrentQuestionIndex(bloco)
+        )
+      );
+    };
+  }
+
+
+  // =====================================================
+  // BOTÃO MICROFONE
+  // =====================================================
+
+  if (btnMic) {
+
+    // Remove listeners antigos clonando o nó.
+    const newBtn = btnMic.cloneNode(true);
+
+    btnMic.parentNode?.replaceChild(
+      newBtn,
+      btnMic
+    );
+
+    updateMicButtonState(false);
+
+    newBtn.onclick = (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+
+      if (
+        !window.JORNADA_MICRO ||
+        typeof window.JORNADA_MICRO.toggle !== 'function'
+      ) {
+        console.error(
+          '[MIC] Motor JORNADA_MICRO não está disponível.'
         );
-      };
-    }
 
-    // ── Botão MIC ── CORREÇÃO CENTRAL
-    if (btnMic) {
-  // Remove listeners antigos clonando o nó
-     const newBtn = btnMic.cloneNode(true);
-     btnMic.parentNode?.replaceChild(newBtn, btnMic);
+        updateMicButtonState(false);
 
-     updateMicButtonState(false);
+        if (typeof window.toast === 'function') {
+          window.toast(
+            '🎤 O microfone ainda não está disponível. Recarregue a página.'
+          );
+        }
 
-  newBtn.onclick = (ev) => {
-    ev.preventDefault();
-    ev.stopPropagation();
+        return;
+      }
 
-    if (
-      !window.JORNADA_MICRO ||
-      typeof window.JORNADA_MICRO.toggle !== 'function'
-    ) {
-      console.error(
-        '[MIC] Motor JORNADA_MICRO não está disponível.'
+      window.JORNADA_MICRO.toggle(
+        textarea,
+        {
+          button: newBtn,
+          lang: getLang()
+        }
+      );
+    };
+  }
+
+
+  // =====================================================
+  // BOTÃO APAGAR
+  // =====================================================
+
+  if (btnApagar) {
+    btnApagar.onclick = (ev) => {
+      ev.preventDefault();
+
+      clearAnswerUI();
+
+      setContinueState(
+        section,
+        'idle'
+      );
+    };
+  }
+
+
+  // =====================================================
+  // BOTÃO CONFIRMAR / CONTINUAR
+  // =====================================================
+
+  if (btnConfirm) {
+
+    btnConfirm.onclick = async (ev) => {
+
+      ev.preventDefault();
+
+
+      // =================================================
+      // 1. ENCERRAMENTO DEFINITIVO
+      // =================================================
+
+      const jornadaEncerrada =
+        localStorage.getItem(
+          'jornada.disciplina.encerrada'
+        ) === '1' ||
+        sessionStorage.getItem(
+          'jornada.disciplina.encerrada'
+        ) === '1';
+
+      if (jornadaEncerrada) {
+
+        console.error(
+          '[JORNADA][DISCIPLINA] tentativa de avanço após encerramento'
+        );
+
+        alert(
+          'Esta Jornada foi encerrada por reincidência nas violações das regras de convivência.'
+        );
+
+        return;
+      }
+
+
+      // =================================================
+      // 2. BLOQUEIO TEMPORÁRIO
+      // =================================================
+
+      const bloqueadoAte = Number(
+        localStorage.getItem(
+          'jornada.disciplina.bloqueadoAte'
+        ) ||
+        sessionStorage.getItem(
+          'jornada.disciplina.bloqueadoAte'
+        ) ||
+        0
       );
 
-      updateMicButtonState(false);
+      if (bloqueadoAte > Date.now()) {
 
-      if (typeof window.toast === 'function') {
-        window.toast(
-          '🎤 O microfone ainda não está disponível. Recarregue a página.'
+        const restanteSegundos = Math.ceil(
+          (bloqueadoAte - Date.now()) / 1000
+        );
+
+        const minutos = Math.ceil(
+          restanteSegundos / 60
+        );
+
+        console.warn(
+          '[JORNADA][DISCIPLINA] avanço bloqueado',
+          {
+            restanteSegundos,
+            minutos
+          }
+        );
+
+        alert(
+          `Esta Jornada está temporariamente suspensa. ` +
+          `Aguarde aproximadamente ${minutos} minuto(s) antes de continuar.`
+        );
+
+        return;
+      }
+
+
+      // Prazo da suspensão terminou.
+      if (
+        bloqueadoAte > 0 &&
+        bloqueadoAte <= Date.now()
+      ) {
+        localStorage.removeItem(
+          'jornada.disciplina.bloqueadoAte'
+        );
+
+        sessionStorage.removeItem(
+          'jornada.disciplina.bloqueadoAte'
+        );
+
+        delete section.dataset.disciplinaBloqueada;
+
+        console.log(
+          '[JORNADA][DISCIPLINA] suspensão temporária encerrada'
         );
       }
 
-      return;
-    }
 
-    window.JORNADA_MICRO.toggle(textarea, {
-      button: newBtn,
-      lang: getLang()
-    });
-  };
-}
+      // =================================================
+      // PROTEÇÃO CONTRA CLIQUE DUPLO
+      // =================================================
 
-    // ── Botão Apagar ──
-    if (btnApagar) {
-      btnApagar.onclick = (ev) => {
-        ev.preventDefault();
-        clearAnswerUI();
-        setContinueState(section, 'idle');
-      };
-    }
+      if (
+        btnConfirm.dataset.busy === '1'
+      ) {
+        return;
+      }
 
-    // ── Botão Continuar ──
-    if (btnConfirm) {
-      btnConfirm.onclick = async (ev) => {
-        ev.preventDefault();        
-        const bloqueadoAte = Number(
-          localStorage.getItem(
-            'jornada.disciplina.bloqueadoAte'
-          ) || 0
-        );
-    
-        if (bloqueadoAte > Date.now()) {
-    
-          const restanteSegundos = Math.ceil(
-            (bloqueadoAte - Date.now()) / 1000
-          );
-    
-          const minutos = Math.ceil(
-            restanteSegundos / 60
-          );
-    
-          alert(
-            `Esta Jornada está temporariamente suspensa. ` +
-            `Aguarde aproximadamente ${minutos} minuto(s) antes de continuar.`
-          );
-    
-          return;
-        }
-    
-        if (
-          bloqueadoAte > 0 &&
-          bloqueadoAte <= Date.now()
-        ) {
-          localStorage.removeItem(
-            'jornada.disciplina.bloqueadoAte'
-          );
-    
-          sessionStorage.removeItem(
-            'jornada.disciplina.bloqueadoAte'
-          );
-    
-          delete section.dataset.disciplinaBloqueada;
-        }
-    
-    
-        if (btnConfirm.dataset.busy === '1') return;
-    
-        btnConfirm.dataset.busy = '1';
-        btnConfirm.disabled = true;
-    
-        forceStopMic();
+      btnConfirm.dataset.busy = '1';
+      btnConfirm.disabled = true;
 
-        try {
-          const state = section?.dataset?.continueState || 'idle';
 
-          if (state === 'ready') {
+      // Para o microfone sempre.
+      forceStopMic();
 
-            // =====================================================
-            // RETRATAÇÃO:
-            // não avança. Retorna à MESMA pergunta para respondê-la.
-            // =====================================================
-            if (section.dataset.awaitingReanswer === '1') {
 
-              delete section.dataset.awaitingReanswer;
+      try {
 
-              forceStopMic();
-              stopSpeaking();
+        const state =
+          section?.dataset?.continueState ||
+          'idle';
 
-              // limpa somente resposta/devolutiva visual
-              clearAnswerUI();
 
-              // mantém exatamente o mesmo índice da pergunta
-              setContinueState(section, 'idle');
+        // =================================================
+        // SEGUNDO CLIQUE:
+        // devolutiva já foi exibida
+        // =================================================
 
-              const btn = section.querySelector('#jp-btn-confirmar');
+        if (state === 'ready') {
 
-              if (btn) {
-                btn.textContent = uiText(
+
+          // ===============================================
+          // RETRATAÇÃO
+          //
+          // Não avança.
+          // Volta exatamente à pergunta que ficou pendente.
+          // ===============================================
+
+          const reanswerKey =
+            `jornada:reanswer:${bloco?.id || 'bloco'}`;
+
+          const pendingRaw =
+            sessionStorage.getItem(
+              reanswerKey
+            );
+
+          const pendingIndex =
+            pendingRaw !== null
+              ? Number(pendingRaw)
+              : null;
+
+          const temRetratacaoPendente =
+            section.dataset.awaitingReanswer === '1' ||
+            Number.isInteger(pendingIndex);
+
+
+          if (temRetratacaoPendente) {
+
+            const idxRetorno =
+              Number.isInteger(pendingIndex)
+                ? pendingIndex
+                : getCurrentQuestionIndex(bloco);
+
+
+            // Fixa o índice antes de qualquer limpeza.
+            setCurrentQuestionIndex(
+              bloco,
+              idxRetorno
+            );
+
+
+            delete section.dataset.awaitingReanswer;
+
+            sessionStorage.removeItem(
+              reanswerKey
+            );
+
+
+            forceStopMic();
+            stopSpeaking();
+
+
+            // Limpa resposta/devolutiva visual,
+            // mas NÃO muda de pergunta.
+            clearAnswerUI();
+
+
+            setContinueState(
+              section,
+              'idle'
+            );
+
+
+            const btn =
+              section.querySelector(
+                '#jp-btn-confirmar'
+              );
+
+            if (btn) {
+              btn.textContent = uiText(
                 'confirm',
                 'Confirmar'
               );
             }
 
-            const ta = section.querySelector('#jp-answer-input');
 
-              if (ta) {
-                ta.value = '';
-                ta.focus();
-              }
+            const ta =
+              section.querySelector(
+                '#jp-answer-input'
+              );
+
+            if (ta) {
+              ta.value = '';
+              ta.focus();
+            }
+
 
             console.log(
-              '[PERGUNTA][RETRATACAO] retornou à pergunta aguardada',
+              '[PERGUNTA][RETRATACAO] pergunta restaurada',
               {
                 bloco: bloco?.id,
-                pergunta: getCurrentQuestionIndex(bloco) + 1,
+                pergunta: idxRetorno + 1
               }
             );
 
-            return;
-        }
 
-        await maybeHandleBlockClosure(section, bloco);
-        return;
-    }
-          if (state === 'loading') return;
-
-          const val = String(textarea?.value || '').trim();
-          const dadosPessoais = buildDadosPessoaisPayload();
-
-          if (!val) {
-            showMissingAnswerFeedback();
-            textarea?.focus();
+            // CRÍTICO:
+            // não deixa cair em maybeHandleBlockClosure().
             return;
           }
 
-          const idxAtual = getCurrentQuestionIndex(bloco);
 
-          saveAnswer(bloco, idxAtual, val);
+          // Sem retratação pendente:
+          // comportamento normal.
+          await maybeHandleBlockClosure(
+            section,
+            bloco
+          );
 
-          setContinueState(section, 'loading');
+          return;
+        }
 
-          await setGuideResponse(
-            uiText(
-              'thinking_about_answer',
-              'Só um momento, vou refletir sobre sua resposta...'
+
+        if (state === 'loading') {
+          return;
+        }
+
+
+        // =================================================
+        // PRIMEIRO CLIQUE:
+        // envia resposta à API
+        // =================================================
+
+        const val = String(
+          textarea?.value || ''
+        ).trim();
+
+
+        const dadosPessoais =
+          buildDadosPessoaisPayload();
+
+
+        if (!val) {
+
+          showMissingAnswerFeedback();
+
+          textarea?.focus();
+
+          return;
+        }
+
+
+        const idxAtual =
+          getCurrentQuestionIndex(bloco);
+
+
+        // Salva provisoriamente.
+        // Se for retratação, será removida depois.
+        saveAnswer(
+          bloco,
+          idxAtual,
+          val
+        );
+
+
+        setContinueState(
+          section,
+          'loading'
+        );
+
+
+        await setGuideResponse(
+          uiText(
+            'thinking_about_answer',
+            'Só um momento, vou refletir sobre sua resposta...'
           ),
           'info'
         );
-          const guia =
-            sessionStorage.getItem('jornada.guia') ||
-            localStorage.getItem('JORNADA_GUIA') ||
-            localStorage.getItem('jornada.guia') ||
-            document.body.dataset.guia ||
-            'lumen';
 
-          const nome =
-            sessionStorage.getItem('jornada.nome') ||
-            localStorage.getItem('JORNADA_NOME') ||
-            localStorage.getItem('jc.nome') ||
-            'Participante';
 
-          // === RETOMADA CIRÚRGICA: reaproveita devolutiva já salva no bloco/pergunta ===
-          const _blocoIdAtual = bloco?.id || '';
-          const _anteriorParcial =
-            getStoredBlockFeedbacks().find((it) => it?.blocoId === _blocoIdAtual) || {};
-          const _parcialTxt = String(
-            _anteriorParcial?.perguntas?.[idxAtual]?.devolutiva || ''
-          ).trim();
+        const guia =
+          sessionStorage.getItem(
+            'jornada.guia'
+          ) ||
+          localStorage.getItem(
+            'JORNADA_GUIA'
+          ) ||
+          localStorage.getItem(
+            'jornada.guia'
+          ) ||
+          document.body.dataset.guia ||
+          'lumen';
 
-          const result = await requestGuideFeedbackWithFallback({
-            nome, guia,
-            blocoNome: bloco?.title || bloco?.id || "Bloco",
+
+        const nome =
+          sessionStorage.getItem(
+            'jornada.nome'
+          ) ||
+          localStorage.getItem(
+            'JORNADA_NOME'
+          ) ||
+          localStorage.getItem(
+            'jc.nome'
+          ) ||
+          'Participante';
+
+
+        // =================================================
+        // RETOMADA CIRÚRGICA
+        // =================================================
+
+        const _blocoIdAtual =
+          bloco?.id || '';
+
+
+        const _anteriorParcial =
+          getStoredBlockFeedbacks().find(
+            (it) =>
+              it?.blocoId === _blocoIdAtual
+          ) || {};
+
+
+        const _parcialTxt = String(
+          _anteriorParcial
+            ?.perguntas
+            ?.[idxAtual]
+            ?.devolutiva || ''
+        ).trim();
+
+
+        // =================================================
+        // CHAMADA À API
+        // =================================================
+
+        const result =
+          await requestGuideFeedbackWithFallback({
+            nome,
+            guia,
+
+            blocoNome:
+              bloco?.title ||
+              bloco?.id ||
+              'Bloco',
+
             respostas: [val],
-            idioma: getLang() || document.documentElement.lang || "pt-BR",
-            pergunta: getQuestionText(bloco, idxAtual),
-            perguntaId: getQuestionId(bloco, idxAtual),   // ✅ novo
-            resposta: val,
-           dadosPessoais,
-           parcial: _parcialTxt,
-           modo: 'individual',
-          });
-          const texto = String(result?.texto || '').trim();
 
-          const acaoDisciplina =
-            String(result?.acaoDisciplina || '').trim();
-          
-          const bloqueioSegundos =
-            Number(result?.bloqueioSegundos || 0);
-          
-          if (
-            acaoDisciplina === 'bloqueio_temporario' &&
-            bloqueioSegundos > 0
-          ) {
-            const bloqueadoAte =
-              Date.now() + (bloqueioSegundos * 1000);
-          
-            localStorage.setItem(
-              'jornada.disciplina.bloqueadoAte',
-              String(bloqueadoAte)
-            );
-          
-            sessionStorage.setItem(
-              'jornada.disciplina.bloqueadoAte',
-              String(bloqueadoAte)
-            );
-          
-            section.dataset.disciplinaBloqueada = '1';
-          
-            console.warn(
-              '[JORNADA][DISCIPLINA][BLOQUEIO]',
-              {
-                segundos: bloqueioSegundos,
-                bloqueadoAte
-              }
-            );
-          }
-                    
-          if (!texto) {
-            await setGuideResponse(
-              uiText(
-                'connection_oscillated',
-                'A conexão com o guia oscilou neste momento. Toque em "Tentar novamente" para buscar a devolutiva.'
+            idioma:
+              getLang() ||
+              document.documentElement.lang ||
+              'pt-BR',
+
+            pergunta:
+              getQuestionText(
+                bloco,
+                idxAtual
               ),
-              'warn'
-            );
-            setContinueState(section, 'error');
-            return;
-          }
 
-          const tipoResposta =
-            String(result?.tipoResposta || '').trim().toLowerCase();
+            perguntaId:
+              getQuestionId(
+                bloco,
+                idxAtual
+              ),
 
-          if (tipoResposta === 'retratacao') {
-
-            console.log('[PERGUNTA][RETRATACAO]', {
-              bloco: bloco?.id,
-              pergunta: idxAtual + 1,
-              texto: val,
-            });
-
-          // A retratação NÃO é resposta da pergunta atual.
-          removeAnswer(bloco, idxAtual);
-
-          // Exibe a resposta do Guia normalmente.
-          await setGuideResponse(
-            texto,
-            result?.fallbackUsed ? 'warning' : 'success'
-          );
-
-          // Marca que o próximo clique deve retornar à MESMA pergunta.
-         section.dataset.awaitingReanswer = '1';
-
-         // Mantemos estado ready apenas para permitir o clique.
-         setContinueState(section, 'ready');
-
-         const btn = section.querySelector('#jp-btn-confirmar');
-
-         if (btn) {
-           btn.textContent = uiText(
-             'answer_question_again',
-             'Responder pergunta'
-         );
-       }
-
-       return;
-    }
-
-          upsertPerguntaFeedback(bloco, idxAtual, {
-            index: idxAtual,
-            perguntaId: getQuestionId(bloco, idxAtual),
-            pergunta: getQuestionText(bloco, idxAtual),
             resposta: val,
-            devolutiva: texto,
-            guiaUsado: result?.guiaUsado || normalizeGuide(guia),
-            source: result?.source || 'desconhecida',
+
+            dadosPessoais,
+
+            parcial:
+              _parcialTxt,
+
+            modo:
+              'individual'
           });
 
-          await setGuideResponse(
-            texto,
-            result?.fallbackUsed ? 'warning' : 'success'
+
+        const texto = String(
+          result?.texto || ''
+        ).trim();
+
+
+        // =================================================
+        // CONSEQUÊNCIA DISCIPLINAR RECEBIDA DO BACKEND
+        // =================================================
+
+        const acaoDisciplina = String(
+          result?.acaoDisciplina || ''
+        ).trim();
+
+
+        const bloqueioSegundos = Number(
+          result?.bloqueioSegundos || 0
+        );
+
+
+        // =================================================
+        // NÍVEL 4 — SUSPENSÃO TEMPORÁRIA
+        // Aceita os dois nomes para compatibilidade.
+        // =================================================
+
+        if (
+          (
+            acaoDisciplina === 'bloqueio_temporario' ||
+            acaoDisciplina === 'pausa_temporaria'
+          ) &&
+          bloqueioSegundos > 0
+        ) {
+
+          const novoBloqueadoAte =
+            Date.now() +
+            (bloqueioSegundos * 1000);
+
+
+          localStorage.setItem(
+            'jornada.disciplina.bloqueadoAte',
+            String(novoBloqueadoAte)
           );
 
-          setContinueState(section, 'ready');
-        } catch (err) {
-          console.error('[PERGUNTAS_BLOCO] erro no confirmar:', err);
+
+          sessionStorage.setItem(
+            'jornada.disciplina.bloqueadoAte',
+            String(novoBloqueadoAte)
+          );
+
+
+          section.dataset.disciplinaBloqueada =
+            '1';
+
+
+          console.warn(
+            '[JORNADA][DISCIPLINA][BLOQUEIO]',
+            {
+              nivel:
+                result?.nivelDisciplina,
+
+              segundos:
+                bloqueioSegundos,
+
+              bloqueadoAte:
+                novoBloqueadoAte
+            }
+          );
+        }
+
+
+        // =================================================
+        // NÍVEL 5 — ENCERRAMENTO DEFINITIVO
+        // =================================================
+
+        if (
+          result?.encerrarJornada === true ||
+          acaoDisciplina === 'encerrar_por_conduta' ||
+          acaoDisciplina === 'encerrar'
+        ) {
+
+          localStorage.setItem(
+            'jornada.disciplina.encerrada',
+            '1'
+          );
+
+
+          sessionStorage.setItem(
+            'jornada.disciplina.encerrada',
+            '1'
+          );
+
+
+          section.dataset.disciplinaEncerrada =
+            '1';
+
+
+          console.error(
+            '[JORNADA][DISCIPLINA][ENCERRADA]',
+            {
+              nivel:
+                result?.nivelDisciplina,
+
+              acao:
+                acaoDisciplina
+            }
+          );
+        }
+
+
+        // =================================================
+        // GARANTE DEVOLUTIVA
+        // =================================================
+
+        if (!texto) {
+
           await setGuideResponse(
             uiText(
               'connection_oscillated',
@@ -2118,14 +2422,210 @@ function getJornadaOperationalIdentity() {
             ),
             'warn'
           );
-          setContinueState(section, 'error');
-        } finally {
-          btnConfirm.dataset.busy = '0';
-          btnConfirm.disabled = false;
+
+
+          setContinueState(
+            section,
+            'error'
+          );
+
+
+          return;
         }
-      };
-    }
+
+
+        // =================================================
+        // CLASSIFICAÇÃO DA RESPOSTA
+        // =================================================
+
+        const tipoResposta = String(
+          result?.tipoResposta || ''
+        )
+          .trim()
+          .toLowerCase();
+
+
+        // =================================================
+        // RETRATAÇÃO
+        //
+        // NÃO é resposta da pergunta.
+        // Mantém índice atual até nova resposta real.
+        // =================================================
+
+        if (
+          tipoResposta === 'retratacao'
+        ) {
+
+          console.log(
+            '[PERGUNTA][RETRATACAO]',
+            {
+              bloco:
+                bloco?.id,
+
+              pergunta:
+                idxAtual + 1,
+
+              texto:
+                val
+            }
+          );
+
+
+          // Remove o pedido de desculpas da
+          // resposta oficial da pergunta.
+          removeAnswer(
+            bloco,
+            idxAtual
+          );
+
+
+          // Garante que a pergunta atual
+          // continue sendo a mesma.
+          setCurrentQuestionIndex(
+            bloco,
+            idxAtual
+          );
+
+
+          // Persiste qual pergunta aguarda resposta.
+          const reanswerKey =
+            `jornada:reanswer:${bloco?.id || 'bloco'}`;
+
+
+          sessionStorage.setItem(
+            reanswerKey,
+            String(idxAtual)
+          );
+
+
+          section.dataset.awaitingReanswer =
+            '1';
+
+
+          // Mostra a resposta do Guia.
+          await setGuideResponse(
+            texto,
+            result?.fallbackUsed
+              ? 'warning'
+              : 'success'
+          );
+
+
+          // Ready apenas para permitir
+          // o clique em "Responder pergunta".
+          setContinueState(
+            section,
+            'ready'
+          );
+
+
+          const btn =
+            section.querySelector(
+              '#jp-btn-confirmar'
+            );
+
+
+          if (btn) {
+            btn.textContent = uiText(
+              'answer_question_again',
+              'Responder pergunta'
+            );
+          }
+
+
+          // Não registra como resposta/reflexão.
+          return;
+        }
+
+
+        // =================================================
+        // RESPOSTA NORMAL / INTERVENÇÃO DISCIPLINAR
+        // =================================================
+
+        upsertPerguntaFeedback(
+          bloco,
+          idxAtual,
+          {
+            index:
+              idxAtual,
+
+            perguntaId:
+              getQuestionId(
+                bloco,
+                idxAtual
+              ),
+
+            pergunta:
+              getQuestionText(
+                bloco,
+                idxAtual
+              ),
+
+            resposta:
+              val,
+
+            devolutiva:
+              texto,
+
+            guiaUsado:
+              result?.guiaUsado ||
+              normalizeGuide(guia),
+
+            source:
+              result?.source ||
+              'desconhecida'
+          }
+        );
+
+
+        await setGuideResponse(
+          texto,
+          result?.fallbackUsed
+            ? 'warning'
+            : 'success'
+        );
+
+
+        setContinueState(
+          section,
+          'ready'
+        );
+
+
+      } catch (err) {
+
+        console.error(
+          '[PERGUNTAS_BLOCO] erro no confirmar:',
+          err
+        );
+
+
+        await setGuideResponse(
+          uiText(
+            'connection_oscillated',
+            'A conexão com o guia oscilou neste momento. Toque em "Tentar novamente" para buscar a devolutiva.'
+          ),
+          'warn'
+        );
+
+
+        setContinueState(
+          section,
+          'error'
+        );
+
+
+      } finally {
+
+        btnConfirm.dataset.busy = '0';
+
+        // Só libera fisicamente o botão.
+        // A disciplina é verificada no próximo clique.
+        btnConfirm.disabled = false;
+      }
+    };
   }
+}
 
   // ─── Render principal ────────────────────────────────────────────────────────
   async function renderBloco(section) {
