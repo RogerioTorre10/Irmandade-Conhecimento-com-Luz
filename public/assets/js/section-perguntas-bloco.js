@@ -1850,12 +1850,52 @@ function getJornadaOperationalIdentity() {
     // ── Botão Continuar ──
     if (btnConfirm) {
       btnConfirm.onclick = async (ev) => {
-        ev.preventDefault();
+        ev.preventDefault();        
+        const bloqueadoAte = Number(
+          localStorage.getItem(
+            'jornada.disciplina.bloqueadoAte'
+          ) || 0
+        );
+    
+        if (bloqueadoAte > Date.now()) {
+    
+          const restanteSegundos = Math.ceil(
+            (bloqueadoAte - Date.now()) / 1000
+          );
+    
+          const minutos = Math.ceil(
+            restanteSegundos / 60
+          );
+    
+          alert(
+            `Esta Jornada está temporariamente suspensa. ` +
+            `Aguarde aproximadamente ${minutos} minuto(s) antes de continuar.`
+          );
+    
+          return;
+        }
+    
+        if (
+          bloqueadoAte > 0 &&
+          bloqueadoAte <= Date.now()
+        ) {
+          localStorage.removeItem(
+            'jornada.disciplina.bloqueadoAte'
+          );
+    
+          sessionStorage.removeItem(
+            'jornada.disciplina.bloqueadoAte'
+          );
+    
+          delete section.dataset.disciplinaBloqueada;
+        }
+    
+    
         if (btnConfirm.dataset.busy === '1') return;
+    
         btnConfirm.dataset.busy = '1';
         btnConfirm.disabled = true;
-
-        // PARA O MICROFONE SEMPRE ao clicar Continuar
+    
         forceStopMic();
 
         try {
