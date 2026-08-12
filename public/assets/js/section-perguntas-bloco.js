@@ -1969,6 +1969,40 @@ function getJornadaOperationalIdentity() {
           });
           const texto = String(result?.texto || '').trim();
 
+          const acaoDisciplina =
+            String(result?.acaoDisciplina || '').trim();
+          
+          const bloqueioSegundos =
+            Number(result?.bloqueioSegundos || 0);
+          
+          if (
+            acaoDisciplina === 'bloqueio_temporario' &&
+            bloqueioSegundos > 0
+          ) {
+            const bloqueadoAte =
+              Date.now() + (bloqueioSegundos * 1000);
+          
+            localStorage.setItem(
+              'jornada.disciplina.bloqueadoAte',
+              String(bloqueadoAte)
+            );
+          
+            sessionStorage.setItem(
+              'jornada.disciplina.bloqueadoAte',
+              String(bloqueadoAte)
+            );
+          
+            section.dataset.disciplinaBloqueada = '1';
+          
+            console.warn(
+              '[JORNADA][DISCIPLINA][BLOQUEIO]',
+              {
+                segundos: bloqueioSegundos,
+                bloqueadoAte
+              }
+            );
+          }
+                    
           if (!texto) {
             await setGuideResponse(
               uiText(
