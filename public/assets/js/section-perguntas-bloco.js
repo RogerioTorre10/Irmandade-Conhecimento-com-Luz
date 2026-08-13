@@ -1396,9 +1396,16 @@ function getJornadaOperationalIdentity() {
           data?.texto || data?.devolutivaFinal || data?.devolutiva || ''
         ).trim();
 
-        const providerNorm = normalizeGuide(
-          data?.provider || data?.source || data?.guia || guiaNorm
+        const guiaRetornado = normalizeGuide(
+          data?.guia || guiaNorm
         );
+        
+        const providerRaw = String(
+          data?.provider ||
+          data?.source ||
+          ''
+        ).trim();
+        
         const fallbackUsed = Boolean(data?.fallback || data?.fallbackUsed);
 
         if (!texto) {
@@ -1410,32 +1417,94 @@ function getJornadaOperationalIdentity() {
           continue;
         }
 
-        const providerDivergente = providerNorm !== guiaNorm;
+        const providerDivergente =
+          guiaRetornado !== guiaNorm;
+        
         if (providerDivergente) {
           console.warn('[PROVIDER ALERT]', {
             solicitado: guiaNorm,
             retornado: providerNorm,
+            provider: providerRaw,
             fallback: fallbackUsed,
           });
         }
 
         return {
           ok: true,
+        
           texto,
-          guiaUsado: providerNorm,
+        
+          guiaUsado: guiaRetornado,
           guiaSolicitado: guiaNorm,
+        
           fallbackUsed,
-          provider: providerNorm,
+        
+          provider:
+            providerRaw ||
+            data?.source ||
+            'desconhecido',
+        
           providerDivergente,
-          source: data?.source || data?.provider || data?.guia || endpoint,
-          auditOnly: providerDivergente && !fallbackUsed,
-          tipoResposta: data?.tipoResposta || '',
-          disciplina: data?.disciplina || null,
-          acaoDisciplina: data?.acaoDisciplina || '',
-          nivelDisciplina: Number(data?.nivelDisciplina || 0),
-          bloqueioSegundos: Number(data?.bloqueioSegundos || 0),
-          encerrarJornada: data?.encerrarJornada === true,
-        };
+        
+          source:
+            data?.source ||
+            data?.provider ||
+            data?.guia ||
+            endpoint,
+        
+          auditOnly:
+            providerDivergente &&
+            !fallbackUsed,
+        
+          // =====================================================
+          // CLASSIFICAÇÃO / DISCIPLINA
+          // =====================================================
+        
+          tipoResposta:
+            String(
+              data?.tipoResposta || ''
+            )
+              .trim()
+              .toLowerCase(),
+        
+          disciplina:
+            data?.disciplina || null,
+        
+          acaoDisciplina:
+            String(
+              data?.acaoDisciplina ??
+              data?.disciplina?.acao ??
+              'continuar'
+            ).trim(),
+        
+          nivelDisciplina:
+            Number(
+              data?.nivelDisciplina ??
+              data?.disciplina?.nivel ??
+              0
+            ),
+        
+          agressoes:
+            Number(
+              data?.agressoes ??
+              data?.disciplina?.agressoes ??
+              0
+            ),
+        
+          bloqueioSegundos:
+            Number(
+              data?.bloqueioSegundos ??
+              data?.disciplina?.bloqueio_segundos ??
+              0
+            ),
+        
+          encerrarJornada:
+            Boolean(
+              data?.encerrarJornada ??
+              data?.disciplina?.encerrar ??
+              false
+            ),
+          };
       } catch (error) {
         ultimoErro = error;
         console.error('[ERRO API]', error);
