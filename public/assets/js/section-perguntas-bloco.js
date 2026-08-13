@@ -1534,6 +1534,13 @@ function getJornadaOperationalIdentity() {
       provider: 'frontend_local_fallback',
       providerDivergente: false,
       source: 'frontend_local_fallback',
+      tipoResposta: '',
+      disciplina: null,
+      acaoDisciplina: 'continuar',
+      nivelDisciplina: 0,
+      agressoes: 0,
+      bloqueioSegundos: 0,
+      encerrarJornada: false,
       error: String(ultimoErro?.message || ultimoErro || ''),
     };
   }
