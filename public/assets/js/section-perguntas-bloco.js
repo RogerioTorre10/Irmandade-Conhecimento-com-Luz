@@ -1504,7 +1504,7 @@ function getJornadaOperationalIdentity() {
               data?.disciplina?.encerrar ??
               false
             ),
-          };
+        };
       } catch (error) {
         ultimoErro = error;
         console.error('[ERRO API]', error);
