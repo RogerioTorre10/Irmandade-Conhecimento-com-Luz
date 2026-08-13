@@ -2036,123 +2036,106 @@ function bindButtons(section, bloco, perguntaText, qIndex = 0) {
 
         if (state === 'ready') {
 
-
-          // ===============================================
-          // RETRATAÇÃO
-          //
-          // Não avança.
-          // Volta exatamente à pergunta que ficou pendente.
-          // ===============================================
-
-          const reanswerKey =
-            `jornada:reanswer:${bloco?.id || 'bloco'}`;
-
-          const pendingRaw =
-            sessionStorage.getItem(
-              reanswerKey
-            );
-
-          const pendingIndex =
-            pendingRaw !== null
-              ? Number(pendingRaw)
-              : null;
-
-          const temRetratacaoPendente =
-            section.dataset.awaitingReanswer === '1' ||
-            Number.isInteger(pendingIndex);
-
-
-          if (temRetratacaoPendente) {
-
-            const idxRetorno =
-              Number.isInteger(pendingIndex)
-                ? pendingIndex
-                : getCurrentQuestionIndex(bloco);
-
-
-            // Fixa o índice antes de qualquer limpeza.
-            setCurrentQuestionIndex(
-              bloco,
-              idxRetorno
-            );
-
-
-            delete section.dataset.awaitingReanswer;
-
-            sessionStorage.removeItem(
-              reanswerKey
-            );
-
-
-            forceStopMic();
-            stopSpeaking();
-
-
-            // Limpa resposta/devolutiva visual,
-            // mas NÃO muda de pergunta.
-            clearAnswerUI();
-
-
-            setContinueState(
-              section,
-              'idle'
-            );
-
-
-            const btn =
-              section.querySelector(
-                '#jp-btn-confirmar'
-              );
-
-            if (btn) {
-              btn.textContent = uiText(
-                'confirm',
-                'Confirmar'
-              );
-            }
-
-
-            const ta =
-              section.querySelector(
-                '#jp-answer-input'
-              );
-
-            if (ta) {
-              ta.value = '';
-              ta.focus();
-            }
-
-
-            console.log(
-              '[PERGUNTA][RETRATACAO] pergunta restaurada',
-              {
-                bloco: bloco?.id,
-                pergunta: idxRetorno + 1
-              }
-            );
-
-
-            // CRÍTICO:
-            // não deixa cair em maybeHandleBlockClosure().
-            return;
-          }
-
-
-          // Sem retratação pendente:
-          // comportamento normal.
-          await maybeHandleBlockClosure(
-            section,
-            bloco
+        // =====================================================
+        // RETRATAÇÃO
+        // Não avança.
+        // Retorna exatamente à pergunta que ficou pendente.
+        // =====================================================
+      
+        const reanswerKey =
+          `jornada:reanswer:${bloco?.id || 'bloco'}`;
+      
+        const pendingReanswerRaw =
+          sessionStorage.getItem(reanswerKey);
+      
+        const pendingReanswer =
+          pendingReanswerRaw !== null
+            ? Number(pendingReanswerRaw)
+            : null;
+      
+        const temRetratacaoPendente =
+          section.dataset.awaitingReanswer === '1' ||
+          Number.isInteger(pendingReanswer);
+      
+        if (temRetratacaoPendente) {
+      
+          const idxRetorno =
+            Number.isInteger(pendingReanswer)
+              ? pendingReanswer
+              : getCurrentQuestionIndex(bloco);
+      
+          // Fixa a pergunta aguardada ANTES de qualquer limpeza.
+          setCurrentQuestionIndex(
+            bloco,
+            idxRetorno
           );
-
+      
+          // Limpa os marcadores da retratação.
+          delete section.dataset.awaitingReanswer;
+      
+          sessionStorage.removeItem(
+            reanswerKey
+          );
+      
+          forceStopMic();
+          stopSpeaking();
+      
+          // Limpa resposta e devolutiva,
+          // sem avançar para outra pergunta.
+          clearAnswerUI();
+      
+          setContinueState(
+            section,
+            'idle'
+          );
+      
+          const btn =
+            section.querySelector('#jp-btn-confirmar');
+      
+          if (btn) {
+            btn.textContent = uiText(
+              'confirm',
+              'Confirmar'
+            );
+          }
+      
+          const ta =
+            section.querySelector('#jp-answer-input');
+      
+          if (ta) {
+            ta.value = '';
+            ta.focus();
+          }
+      
+          console.log(
+            '[PERGUNTA][RETRATACAO] pergunta restaurada',
+            {
+              bloco: bloco?.id,
+              pergunta: idxRetorno + 1
+            }
+          );
+      
+          // CRÍTICO:
+          // não deixa cair em maybeHandleBlockClosure()
           return;
         }
-
+      
+        // =====================================================
+        // SEM RETRATAÇÃO:
+        // comportamento normal
+        // =====================================================
+      
+        await maybeHandleBlockClosure(
+          section,
+          bloco
+        );
+      
+        return;
+      }
 
         if (state === 'loading') {
           return;
         }
-
 
         // =================================================
         // PRIMEIRO CLIQUE:
