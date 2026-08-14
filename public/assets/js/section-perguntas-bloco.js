@@ -2498,7 +2498,13 @@ function bindButtons(section, bloco, perguntaText, qIndex = 0) {
         // =================================================
 
         const tipoResposta = String(
-          result?.tipoResposta || ''
+          result?.tipoResposta ||
+          (
+            result?.provider === 'intervencao_retratacao' ||
+            result?.source === 'intervencao_retratacao'
+              ? 'retratacao'
+              : ''
+          )
         )
           .trim()
           .toLowerCase();
