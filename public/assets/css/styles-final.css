@@ -1324,5 +1324,10 @@ min-width:220px;
     max-width: 100% !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
+    height: clamp(220px, 32vh, 300px) !important;
+    min-height: 220px !important;
+    max-height: 300px !important;
+    flex: 0 0 clamp(220px, 32vh, 300px) !important;
+    overflow-y: auto !important; 
   }
 }
