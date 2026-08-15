@@ -1312,3 +1312,17 @@ min-width:220px;
     max-height: 44svh !important;
   }
 }
+
+/* ============================================================
+   FIX v12 — DESKTOP: DEVOLUTIVA NA LARGURA DO PERGAMINHO
+   Somente desktop. Mobile permanece intocado.
+   ============================================================ */
+
+@media (min-width: 901px) {
+  #section-final .final-guide-feedback {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+}
