@@ -1315,27 +1315,26 @@ min-width:220px;
 
 @media (min-width: 769px) {
 
-  /* 1) A caixa deixa de ser um "visor" fixo e vira bloco fluido */
+  /* 1) A caixa fica DENTRO do fluxo do container */
   #section-final .final-guide-feedback {
-    display: block !important;
-    position: relative !important;
+    position: static !important;   /* nada de absolute/fixed */
+    float: none !important;
+    inset: auto !important;
+    transform: none !important;
 
-    width: 100% !important;
+    display: block !important;
+    width: auto !important;
     max-width: 100% !important;
-    margin: 16px 0 14px !important;
-    padding: 18px 20px 22px !important;
+    margin: 16px 0 18px !important;
+    padding: 16px 18px 20px !important;
     box-sizing: border-box !important;
 
-    /* ALTURA AUTOMÁTICA — cresce conforme o texto */
     height: auto !important;
-    min-height: 180px !important;
+    min-height: 0 !important;
     max-height: none !important;
     flex: 0 0 auto !important;
 
-    /* sem scroll interno / sem barra */
     overflow: visible !important;
-    overflow-x: visible !important;
-    overflow-y: visible !important;
     scrollbar-width: none !important;
     -ms-overflow-style: none !important;
   }
@@ -1346,19 +1345,21 @@ min-width:220px;
     display: none !important;
   }
 
-  /* 2) Conteúdo interno nunca corta nem cria segundo scroll */
+  /* 2) Texto interno sem corte e sem segundo scroll */
   #section-final .final-guide-feedback > *,
   #section-final .final-guide-feedback p,
   #section-final #finalGuideText,
   #section-final .final-guide-text {
+    position: static !important;
     height: auto !important;
     max-height: none !important;
     overflow: visible !important;
     -webkit-line-clamp: unset !important;
-    display: block !important;
+    white-space: normal !important;
+    word-break: break-word !important;
   }
 
-  /* 3) Os pais precisam deixar o cartão esticar */
+  /* 3) O container cresce junto (sem altura travada e sem cortar) */
   #section-final .j-arcane-card,
   #section-final .pergaminho-content,
   #section-final .final-panel,
@@ -1368,12 +1369,23 @@ min-width:220px;
   #section-final .final-container,
   #section-final .final-content {
     height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    contain: none !important;
+  }
+
+  /* 4) A seção acompanha e quem rola é a página/pergaminho */
+  #section-final {
+    height: auto !important;
+    min-height: 100dvh !important;
     max-height: none !important;
     overflow: visible !important;
   }
 
-  /* 4) Quem rola é o pergaminho (mesmo comportamento do mobile) */
   body:has(#section-final) #jornada-canvas {
+    height: auto !important;
+    max-height: none !important;
     overflow-y: auto !important;
   }
 }
