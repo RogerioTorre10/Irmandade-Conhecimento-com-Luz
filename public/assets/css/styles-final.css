@@ -1313,28 +1313,6 @@ min-width:220px;
   }
 }
 
-/* ============================================================
-   FIX v13 — DESKTOP: DEVOLUTIVA FLEXÍVEL COMO NO MOBILE
-   ============================================================ */
-
-@media (min-width: 901px) {
-  #section-final .final-guide-feedback {
-    width: 100% !important;
-    max-width: 100% !important;
-
-    height: auto !important;
-    min-height: 220px !important;
-    max-height: 46vh !important;
-    flex: 0 0 auto !important;
-
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-  }
-}
-
 @media (min-width: 769px) {
 
   /* 1) A caixa fica DENTRO do fluxo do container */
