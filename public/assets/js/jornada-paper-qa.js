@@ -19,3211 +19,797 @@
 
   const CONFIG = {
     'pt-BR': [
-    {
-      sectionId: 'section-perguntas-raizes',
-      id: 'raizes',
-      index: 0,
-      title: 'Bloco 1 — Raízes',
-      data_i18n: 'bloco_raizes_title',
-      nextSection: 'section-perguntas-reflexoes',
-      transitionVideo: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
-      questions: [
-        {
-          number: 1,
-          block: 1,
-          theme: 'criacao_familiar',
-          id: 'q01_criacao',
-          label: 'Por quem você foi criado? Pais biológicos, apenas um deles, familiares, pais adotivos ou outra pessoa?',
-          data_i18n: 'q01_criacao'
-        },
-        {
-          number: 2,
-          block: 1,
-          theme: 'individualidade',
-          id: 'q02_filho_unico',        
-          label: 'Você é filho único ou tem irmãos? Como essa realidade marcou seu senso de individualidade?',
-          data_i18n: 'q02_filho_unico'
-        },
-        {
-          number: 3,
-          block: 1,
-          theme: 'irmaos',
-          id: 'q03_irmaos',        
-          label: 'Se tem ou tivesse irmãos, quantos seriam? Qual é ou seria seu lugar entre eles: primogênito, do meio ou caçula?',
-          data_i18n: 'q03_irmaos'
-        },
-        {
-          number: 4,
-          block: 1,
-          theme: 'privacoes',
-          id: 'q04_privacoes',        
-          label: 'Você já passou fome ou viveu privações severas na infância? Como isso influenciou sua forma de enxergar a vida?',
-          data_i18n: 'q04_privacoes'
-        },
-        {
-          number: 5,
-          block: 1,
-          theme: 'deficiencia',
-          id: 'q05_deficiencia',        
-          label: 'Você possui alguma deficiência social, física ou cognitiva? Já sofreu preconceito por causa dela?',
-          data_i18n: 'q05_deficiencia'
-        },
-        {
-          number: 6,
-          block: 1,
-          theme: 'escolaridade',
-          id: 'q06_escolaridade',        
-          label: 'Qual é o seu nível de escolaridade? Como você avalia o investimento que fez em sua própria formação?',
-          data_i18n: 'q06_escolaridade'
-        },
-        {
-          number: 7,
-          block: 1,
-          theme: 'estado_civil',
-          id: 'q07_estado_civil',        
-          label: 'Como o seu estado civil hoje influencia o momento que você está vivendo?',
-          data_i18n: 'q07_estado_civil'
-        },
-        {
-          number: 8,
-          block: 1,
-          theme: 'identidade',
-          id: 'q08_identidade',        
-          label: 'Você se lembra da primeira vez em que percebeu que era alguém único no mundo? Quantos anos tinha?',
-          data_i18n: 'q08_identidade'
-        },
-        {
-          number: 9,
-          block: 1,
-          theme: 'silencio',
-          id: 'q09_silencio',        
-          label: 'Como é sua relação com o silêncio? Ele o incomoda ou o acalma?',
-          data_i18n: 'q09_silencio'
-        },
-        {
-          number: 10,
-          block: 1,
-          theme: 'crianca_interior',
-          id: 'q10_crianca',        
-          label: 'Se você pudesse conversar com a criança que ainda habita em você, o que diria a ela?',
-          data_i18n: 'q10_crianca'
-        }
-      ]   
-    },
-    {
-      sectionId: 'section-perguntas-reflexoes',
-      id: 'reflexoes',
-      index: 1,
-      title: 'Bloco 2 — Reflexões',
-      data_i18n: 'bloco_reflexoes_title',
-      nextSection: 'section-perguntas-crescimento',
-      transitionVideo: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4',
-      questions: [
-        {
-          number: 11,
-          block: 2,
-          theme: 'vida',
-          id: 'q11_percepcao_vida',
-          label: 'Como você tem percebido a sua própria vida até aqui?',
-          data_i18n: 'q11_percepcao_vida'
-        },
-        {
-          number: 12,
-          block: 2,
-          theme: 'empatia',
-          id: 'q12_percepcao_outros',    
-          label: 'Como você enxerga a vida das pessoas ao seu redor?',
-          data_i18n: 'q12_percepcao_outros'
-        },
-        {
-          number: 13,
-          block: 2,
-          theme: 'traumas',
-          id: 'q13_traumas',    
-          label: 'Como você lida com os seus traumas? Consegue falar sobre eles?',
-          data_i18n: 'q13_traumas'
-        },
-        {
-          number: 14,
-          block: 2,
-          theme: 'verdade',
-          id: 'q14_verdade',    
-          label: 'Você acredita que existe uma verdade maior ou que tudo depende do olhar de cada pessoa?',
-          data_i18n: 'q14_verdade'
-        },
-        {
-          number: 15,
-          block: 2,
-          theme: 'vicios',
-          id: 'q15_vicios',    
-          label: 'Qual é o seu maior vício? Por que acredita que ele surgiu? Já tentou vencê-lo? Percebe também outros vícios mais sutis ou emocionais em você?',
-          data_i18n: 'q15_vicios'
-        },
-        {
-          number: 16,
-          block: 2,
-          theme: 'doenca',
-          id: 'q16_doenca',    
-          label: 'O que a doença representa para você? Está enfrentando alguma condição de saúde neste momento?',
-          data_i18n: 'q16_doenca'
-        },
-        {
-          number: 17,
-          block: 2,
-          theme: 'solidao',
-          id: 'q17_presenca',    
-          label: 'Existe alguém que você gostaria de ter ao seu lado neste momento? Por que essa pessoa não está presente?',
-          data_i18n: 'q17_presenca'
-        },
-        {
-          number: 18,
-          block: 2,
-          theme: 'morte',
-          id: 'q18_morte',    
-          label: 'Como você percebe a morte? Ela desperta medo, conforto ou curiosidade?',
-          data_i18n: 'q18_morte'
-        },
-        {
-          number: 19,
-          block: 2,
-          theme: 'espiritualidade',
-          id: 'q19_doenca_espiritual',
-          label: 'Como você compreende a enfermidade? Ela pode ter algum significado ou propósito em determinados momentos da vida?',
-          data_i18n: 'q19_doenca_espiritual'
-        },
-        {
-          number: 20,
-          block: 2,
-          theme: 'sentido_doenca',
-          id: 'q20_sentido_doenca',
-          label: 'Você acredita que algumas doenças podem refletir sombras internas ou fazer parte de um processo de crescimento espiritual?',    
-          data_i18n: 'q20_sentido_doenca'
-        }
-      ]
-    },
-    {
-      sectionId: 'section-perguntas-crescimento',
-      id: 'crescimento',
-      index: 2,
-      title: 'Bloco 3 — Crescimento',
-      data_i18n: 'bloco_crescimento_title',
-      nextSection: 'section-perguntas-integracao',
-      transitionVideo: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4',
-      questions: [
-        {
-          number: 21,
-          block: 3,
-          theme: 'sentido_da_vida',
-          id: 'q21_sentido_vida',
-          label: 'Como você percebe o sentido da vida? Existe um propósito maior ou tudo acontece por acaso?',
-          data_i18n: 'q21_sentido_vida'
-        },
-        {
-          number: 22,
-          block: 3,
-          theme: 'espiritualidade',
-          id: 'q22_espiritualidade',
-          label: 'Você acredita em Deus, em um ser supremo, na espiritualidade ou em algo além do que podemos ver?',
-          data_i18n: 'q22_espiritualidade'
-        },
-        {
-          number: 23,
-          block: 3,
-          theme: 'experiencia_espiritual',
-          id: 'q23_guia_invisivel',
-          label: 'Você já se sentiu guiado por algo invisível? Pode contar uma experiência marcante?',
-          data_i18n: 'q23_guia_invisivel'
-        },
-        {
-          number: 24,
-          block: 3,
-          theme: 'dor_emocional',
-          id: 'q24_dor_emocional',
-          label: 'Qual foi a maior dor emocional que você já enfrentou? Como conseguiu lidar com ela?',
-          data_i18n: 'q24_dor_emocional'
-        },
-        {
-          number: 25,
-          block: 3,
-          theme: 'superacao',
-          id: 'q25_superacao',
-          label: 'Qual foi a maior superação da sua vida? Que força você descobriu naquele momento?',
-          data_i18n: 'q25_superacao'
-        },
-        {
-          number: 26,
-          block: 3,
-          theme: 'medos',
-          id: 'q26_medos',
-          label: 'Do que você mais tem medo hoje? O que esse medo pode estar tentando lhe mostrar?',
-          data_i18n: 'q26_medos'
-        },
-        {
-          number: 27,
-          block: 3,
-          theme: 'autocuidado',
-          id: 'q27_esquecimento_de_si',
-          label: 'Por que você acredita que acabou se esquecendo de si mesmo? Quando foi a última vez que recebeu um elogio que realmente o marcou?',
-          data_i18n: 'q27_esquecimento_de_si'
-        },
-        {
-          number: 28,
-          block: 3,
-          theme: 'prioridade_pessoal',
-          id: 'q28_prioridade',
-          label: 'Por que você acredita que, muitas vezes, não consegue se colocar como prioridade?',
-          data_i18n: 'q28_prioridade'
-        },
-        {
-          number: 29,
-          block: 3,
-          theme: 'autoestima',
-          id: 'q29_autoestima',
-          label: 'Você costuma reconhecer e elogiar a si mesmo? Em quais momentos isso acontece?',
-          data_i18n: 'q29_autoestima'
-        },
-        {
-          number: 30,
-          block: 3,
-          theme: 'sonhos',
-          id: 'q30_sonhos',
-          label: 'Você se vê como alguém que ajuda sonhos a nascerem ou como alguém que, sem perceber, acaba enterrando os próprios sonhos e os de outras pessoas?',
-          data_i18n: 'q30_sonhos'
-        }
-      ]
-    },
-    {
-      sectionId: 'section-perguntas-integracao',
-      id: 'integracao',
-      index: 3,
-      title: 'Bloco 4 — Integração',
-      data_i18n: 'bloco_integracao_title',
-      nextSection: 'section-perguntas-sintese',
-      transitionVideo: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4',
-      questions: [
-        {
-          number: 31,
-          block: 4,
-          theme: 'maior_sonho',
-          id: 'q31_maior_sonho',
-          label: 'Qual é o seu maior sonho hoje? Algo que faz você sorrir só de imaginar.',
-          data_i18n: 'q31_maior_sonho'
-        },
-        {
-          number: 32,
-          block: 4,
-          theme: 'barreiras',
-          id: 'q32_barreiras',
-          label: 'O que você acredita que o impede de realizá-lo? Essas barreiras são internas, externas ou ambas?',
-          data_i18n: 'q32_barreiras'
-        },
-        {
-          number: 33,
-          block: 4,
-          theme: 'proposito',
-          id: 'q33_proposito',
-          label: 'Você sente que está vivendo o seu propósito ou ainda está em busca dele?',
-          data_i18n: 'q33_proposito'
-        },
-        {
-          number: 34,
-          block: 4,
-          theme: 'chamado_interior',
-          id: 'q34_chamado_interior',
-          label: 'Existe um chamado interior, uma vontade silenciosa, que você tem ignorado?',
-          data_i18n: 'q34_chamado_interior'
-        },
-        {
-          number: 35,
-          block: 4,
-          theme: 'origem_dos_medos',
-          id: 'q35_origem_medos',
-          label: 'Os seus medos estão ligados a qual situação ou sentimento específico?',
-          data_i18n: 'q35_origem_medos'
-        },
-        {
-          number: 36,
-          block: 4,
-          theme: 'decisoes_e_limites',
-          id: 'q36_decisoes_limites',
-          label: 'Você sente que deixa de tomar certas decisões por medo ou acaba aceitando situações que o humilham?',
-          data_i18n: 'q36_decisoes_limites'
-        },
-        {
-          number: 37,
-          block: 4,
-          theme: 'acolhimento_do_sofrimento',
-          id: 'q37_acolhimento_sofrimento',
-          label: 'O que você diria para alguém que está sofrendo profundamente neste momento?',
-          data_i18n: 'q37_acolhimento_sofrimento'
-        },
-        {
-          number: 38,
-          block: 4,
-          theme: 'vida_alem_da_terra',
-          id: 'q38_vida_alem_terra',
-          label: 'Você acredita que existe vida além do nosso planeta Terra ou que toda a existência acontece apenas aqui?',
-          data_i18n: 'q38_vida_alem_terra'
-        },
-        {
-          number: 39,
-          block: 4,
-          theme: 'legado',
-          id: 'q39_legado',
-          label: 'Como você gostaria de ser lembrado quando não estiver mais aqui? Que legado deseja deixar?',
-          data_i18n: 'q39_legado'
-        },
-        {
-          number: 40,
-          block: 4,
-          theme: 'destino_dos_sonhos',
-          id: 'q40_destino_sonhos',
-          label: 'O que aconteceu com os sonhos que você teve — e os quais nunca chegou a realizar?',
-          data_i18n: 'q40_destino_sonhos'
-        }
-      ]
-    },
-    {
-      sectionId: 'section-perguntas-sintese',
-      id: 'sintese',
-      index: 4,
-      title: 'Bloco 5 — Síntese e Entrega',
-      data_i18n: 'bloco_sintese_title',
-      nextSection: 'section-final',
-      transitionVideo: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4',
-      questions: [
-        {
-          number: 41,
-          block: 5,
-          theme: 'choro',
-          id: 'q41_choro',
-          label: 'Você tem chorado com frequência? Consegue identificar o que costuma provocar esse choro?',
-          data_i18n: 'q41_choro'
-        },
-        {
-          number: 42,
-          block: 5,
-          theme: 'origem_do_choro',
-          id: 'q42_origem_choro',
-          label: 'Esse choro nasce de um vazio interior, de uma perda ou de um arrependimento?',
-          data_i18n: 'q42_origem_choro'
-        },
-        {
-          number: 43,
-          block: 5,
-          theme: 'expressao_da_dor',
-          id: 'q43_expressao_dor',
-          label: 'Quando o choro chega, o que predomina: o silêncio, a busca por algo que intensifique esse sentimento ou a raiva querendo se manifestar?',
-          data_i18n: 'q43_expressao_dor'
-        },
-        {
-          number: 44,
-          block: 5,
-          theme: 'tristeza_depressao',
-          id: 'q44_tristeza_depressao',
-          label: 'Você se sente triste ou acredita estar vivendo um estado depressivo? Consegue perceber a diferença entre essas duas experiências?',
-          data_i18n: 'q44_tristeza_depressao'
-        },
-        {
-          number: 45,
-          block: 5,
-          theme: 'ajuda_profissional',
-          id: 'q45_ajuda_profissional',
-          label: 'Se você acredita estar vivendo um estado depressivo, já pensou em procurar ajuda profissional para compreender melhor o que está sentindo?',
-          data_i18n: 'q45_ajuda_profissional'
-        },
-        {
-          number: 46,
-          block: 5,
-          theme: 'comportamento_relacional',
-          id: 'q46_comportamento_relacional',
-          label: 'Nas suas relações, você se considera uma pessoa mais assertiva/agressiva ou mais submissa?',
-          data_i18n: 'q46_comportamento_relacional'
-        },
-        {
-          number: 47,
-          block: 5,
-          theme: 'autopercepcao',
-          id: 'q47_autopercepcao',
-          label: 'Você sente que, às vezes, é difícil conviver consigo mesmo ou costuma carregar mágoa ou raiva por decisões que considera equivocadas?',
-          data_i18n: 'q47_autopercepcao'
-        },
-        {
-          number: 48,
-          block: 5,
-          theme: 'autoimagem',
-          id: 'q48_autoimagem',
-          label: 'Você se considera uma pessoa interessante ou acredita ser alguém sem muito interesse para os outros?',
-          data_i18n: 'q48_autoimagem'
-        },
-        {
-          number: 49,
-          block: 5,
-          theme: 'limites',
-          id: 'q49_limites',
-          label: 'Você tem dificuldade em dizer "não" para as pessoas?',
-          data_i18n: 'q49_limites'
-        },
-        {
-          number: 50,
-          block: 5,
-          theme: 'morte',
-          id: 'q50_morte',
-          label: 'Você tem medo de morrer? Muitas vezes, o medo está menos na morte em si e mais na forma como ela pode acontecer. Como você percebe isso em você?',
-          data_i18n: 'q50_morte'
-        }
-      ]
-    }
-  ],
+
+{
+  sectionId: 'section-perguntas-raizes',
+  id: 'raizes',
+  index: 0,
+  title: 'Bloco 1 — Raízes',
+  data_i18n: 'bloco_raizes_title',
+  nextSection: 'section-perguntas-reflexoes',
+  transitionVideo: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
+  questions: [
+    { number: 1, block: 1, theme: 'criacao_familiar', id: 'q01_criacao', label: 'Quem te criou — seus pais biológicos, apenas um deles, outros familiares, pais adotivos ou alguém fora desse círculo? Descreva brevemente essa presença.', data_i18n: 'q01_criacao' },
+    { number: 2, block: 1, theme: 'individualidade', id: 'q02_filho_unico', label: 'Você cresceu como filho único ou teve irmãos? De que forma essa condição moldou o modo como você se vê como indivíduo — mais independente, mais solitário, mais dividido?', data_i18n: 'q02_filho_unico' },
+    { number: 3, block: 1, theme: 'irmaos', id: 'q03_irmaos', label: 'Se você tem ou teve irmãos, qual era (ou seria) seu lugar entre eles — primogênito, do meio ou caçula? Que peso ou vantagem esse lugar trouxe para sua história?', data_i18n: 'q03_irmaos' },
+    { number: 4, block: 1, theme: 'privacoes', id: 'q04_privacoes', label: 'Houve fome ou privações severas na sua infância? Se sim, qual marca isso deixou na forma como você hoje lida com escassez, segurança ou merecimento?', data_i18n: 'q04_privacoes' },
+    { number: 5, block: 1, theme: 'deficiencia', id: 'q05_deficiencia', label: 'Você convive com alguma limitação social, física ou cognitiva? Já sentiu o peso do preconceito por causa dela — e como isso se reflete em você hoje?', data_i18n: 'q05_deficiencia' },
+    { number: 6, block: 1, theme: 'escolaridade', id: 'q06_escolaridade', label: 'Qual é seu nível de escolaridade? Olhando para trás, você sente que investiu o suficiente em sua própria formação, ou existe um vazio de aprendizado que ainda te incomoda?', data_i18n: 'q06_escolaridade' },
+    { number: 7, block: 1, theme: 'estado_civil', id: 'q07_estado_civil', label: 'Seu estado civil atual — sozinho, casado, separado, em relacionamento — está te fortalecendo ou pesando neste momento da sua vida?', data_i18n: 'q07_estado_civil' },
+    { number: 8, block: 1, theme: 'identidade', id: 'q08_identidade', label: 'Você lembra o instante exato em que percebeu, por conta própria, que era alguém único no mundo? Que idade você tinha, e o que sentiu?', data_i18n: 'q08_identidade' },
+    { number: 9, block: 1, theme: 'silencio', id: 'q09_silencio', label: 'Qual é sua relação real com o silêncio — ele te incomoda porque expõe algo, ou te acalma porque te devolve a você mesmo?', data_i18n: 'q09_silencio' },
+    { number: 10, block: 1, theme: 'crianca_interior', id: 'q10_crianca', label: 'Se pudesse falar agora com a criança que você foi — a que carregou tudo isso que você acabou de contar —, o que diria a ela?', data_i18n: 'q10_crianca' }
+  ]
+},
+
+{
+  sectionId: 'section-perguntas-reflexoes',
+  id: 'reflexoes',
+  index: 1,
+  title: 'Bloco 2 — Reflexões',
+  data_i18n: 'bloco_reflexoes_title',
+  nextSection: 'section-perguntas-crescimento',
+  transitionVideo: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4',
+  questions: [
+    { number: 11, block: 2, theme: 'vida', id: 'q11_percepcao_vida', label: 'Depois de revisitar suas raízes, como você tem percebido a sua própria vida até aqui — como conquista, como sobrevivência, ou como algo ainda em suspenso?', data_i18n: 'q11_percepcao_vida' },
+    { number: 12, block: 2, theme: 'empatia', id: 'q12_percepcao_outros', label: 'E a vida das pessoas ao seu redor — você enxerga com empatia genuína ou com distância e julgamento?', data_i18n: 'q12_percepcao_outros' },
+    { number: 13, block: 2, theme: 'traumas', id: 'q13_traumas', label: 'Como você lida com seus traumas: enfrenta-os de frente, ou evita até nomeá-los? Consegue falar sobre eles agora, com a mesma sinceridade de antes?', data_i18n: 'q13_traumas' },
+    { number: 14, block: 2, theme: 'verdade', id: 'q14_verdade', label: 'Você acredita que existe uma verdade maior, acima de tudo, ou que cada verdade é apenas o reflexo do olhar de quem a enxerga?', data_i18n: 'q14_verdade' },
+    { number: 15, block: 2, theme: 'vicios', id: 'q15_vicios', label: 'Qual é o seu maior vício — declarado ou disfarçado? De onde ele nasceu, você já tentou vencê-lo, e existem outros vícios mais sutis, emocionais, que você raramente admite ter?', data_i18n: 'q15_vicios' },
+    { number: 16, block: 2, theme: 'doenca', id: 'q16_doenca', label: 'O que a doença representa para você? Existe alguma condição de saúde — física ou emocional — te atravessando agora mesmo?', data_i18n: 'q16_doenca' },
+    { number: 17, block: 2, theme: 'solidao', id: 'q17_presenca', label: 'Existe alguém que você gostaria de ter ao seu lado neste exato momento? O que impede essa pessoa de estar presente — distância, orgulho, ou algo que nunca foi dito?', data_i18n: 'q17_presenca' },
+    { number: 18, block: 2, theme: 'morte', id: 'q18_morte', label: 'Como você percebe a morte hoje — como medo, como alívio, ou como curiosidade genuína sobre o que vem depois?', data_i18n: 'q18_morte' },
+    { number: 19, block: 2, theme: 'espiritualidade', id: 'q19_doenca_espiritual', label: 'Você acredita que a doença pode carregar um significado, um recado, ou um propósito escondido em certos momentos da vida?', data_i18n: 'q19_doenca_espiritual' },
+    { number: 20, block: 2, theme: 'sentido_doenca', id: 'q20_sentido_doenca', label: 'Indo mais a fundo: você acha que algumas doenças refletem sombras internas não resolvidas, ou fazem parte de um processo de crescimento espiritual?', data_i18n: 'q20_sentido_doenca' }
+  ]
+},
+
+{
+  sectionId: 'section-perguntas-crescimento',
+  id: 'crescimento',
+  index: 2,
+  title: 'Bloco 3 — Crescimento',
+  data_i18n: 'bloco_crescimento_title',
+  nextSection: 'section-perguntas-integracao',
+  transitionVideo: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4',
+  questions: [
+    { number: 21, block: 3, theme: 'sentido_da_vida', id: 'q21_sentido_vida', label: 'Depois de tudo que você já revelou, qual é, para você, o sentido da vida — existe um propósito maior guiando tudo, ou é o acaso que decide?', data_i18n: 'q21_sentido_vida' },
+    { number: 22, block: 3, theme: 'espiritualidade', id: 'q22_espiritualidade', label: 'Você acredita em Deus, em um ser supremo, em espiritualidade, ou em algo que ultrapassa o que os olhos conseguem ver?', data_i18n: 'q22_espiritualidade' },
+    { number: 23, block: 3, theme: 'experiencia_espiritual', id: 'q23_guia_invisivel', label: 'Já sentiu, em algum momento, que foi guiado por algo invisível? Existe uma experiência marcante que comprove isso para você?', data_i18n: 'q23_guia_invisivel' },
+    { number: 24, block: 3, theme: 'dor_emocional', id: 'q24_dor_emocional', label: 'Qual foi a maior dor emocional que você já enfrentou — e qual foi, de fato, o caminho que usou para atravessá-la?', data_i18n: 'q24_dor_emocional' },
+    { number: 25, block: 3, theme: 'superacao', id: 'q25_superacao', label: 'E qual foi a sua maior superação? Que força você descobriu em si mesmo exatamente no momento em que tudo parecia perdido?', data_i18n: 'q25_superacao' },
+    { number: 26, block: 3, theme: 'medos', id: 'q26_medos', label: 'Do que você mais tem medo hoje? O que esse medo, se você parar para escutá-lo, está tentando te mostrar?', data_i18n: 'q26_medos' },
+    { number: 27, block: 3, theme: 'autocuidado', id: 'q27_esquecimento_de_si', label: 'Por que você acredita que, em algum momento, deixou de se colocar em primeiro lugar? Quando foi a última vez que recebeu um elogio que realmente tocou você?', data_i18n: 'q27_esquecimento_de_si' },
+    { number: 28, block: 3, theme: 'prioridade_pessoal', id: 'q28_prioridade', label: 'Por que, muitas vezes, você tem dificuldade em se tratar como prioridade — mesmo sabendo que precisa?', data_i18n: 'q28_prioridade' },
+    { number: 29, block: 3, theme: 'autoestima', id: 'q29_autoestima', label: 'Você costuma reconhecer e elogiar a si mesmo, sem depender da validação de ninguém? Em quais momentos isso realmente acontece?', data_i18n: 'q29_autoestima' },
+    { number: 30, block: 3, theme: 'sonhos', id: 'q30_sonhos', label: 'Você se vê como alguém que ajuda sonhos — seus e de outros — a nascerem, ou como alguém que, sem perceber, tem enterrado esses sonhos ao longo do caminho?', data_i18n: 'q30_sonhos' }
+  ]
+},
+
+{
+  sectionId: 'section-perguntas-integracao',
+  id: 'integracao',
+  index: 3,
+  title: 'Bloco 4 — Integração',
+  data_i18n: 'bloco_integracao_title',
+  nextSection: 'section-perguntas-sintese',
+  transitionVideo: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4',
+  questions: [
+    { number: 31, block: 4, theme: 'maior_sonho', id: 'q31_maior_sonho', label: 'Depois de olhar para seus medos e sonhos enterrados: qual é o seu maior sonho hoje — aquele que faz você sorrir só de imaginar?', data_i18n: 'q31_maior_sonho' },
+    { number: 32, block: 4, theme: 'barreiras', id: 'q32_barreiras', label: 'O que você acredita que te impede de realizá-lo? Essas barreiras vêm de dentro, de fora, ou das duas coisas ao mesmo tempo?', data_i18n: 'q32_barreiras' },
+    { number: 33, block: 4, theme: 'proposito', id: 'q33_proposito', label: 'Você sente que já está vivendo o seu propósito, ou ainda está em busca dele — sem saber exatamente por onde continuar?', data_i18n: 'q33_proposito' },
+    { number: 34, block: 4, theme: 'chamado_interior', id: 'q34_chamado_interior', label: 'Existe um chamado interior, uma vontade silenciosa, que você tem ignorado repetidamente, mesmo sabendo que ela ainda pulsa?', data_i18n: 'q34_chamado_interior' },
+    { number: 35, block: 4, theme: 'origem_dos_medos', id: 'q35_origem_medos', label: 'Voltando aos seus medos: a qual situação ou sentimento específico eles estão realmente ligados, no fundo?', data_i18n: 'q35_origem_medos' },
+    { number: 36, block: 4, theme: 'decisoes_e_limites', id: 'q36_decisoes_limites', label: 'Você sente que deixa de tomar certas decisões por medo, ou que acaba aceitando situações que te diminuem só para evitar o confronto?', data_i18n: 'q36_decisoes_limites' },
+    { number: 37, block: 4, theme: 'acolhimento_do_sofrimento', id: 'q37_acolhimento_sofrimento', label: 'Se alguém estivesse diante de você agora, sofrendo profundamente, o que você diria a essa pessoa — e você conseguiria dizer o mesmo a si mesmo?', data_i18n: 'q37_acolhimento_sofrimento' },
+    { number: 38, block: 4, theme: 'vida_alem_da_terra', id: 'q38_vida_alem_terra', label: 'Você acredita que existe vida além do nosso planeta, ou que toda a existência se limita ao que conhecemos aqui?', data_i18n: 'q38_vida_alem_terra' },
+    { number: 39, block: 4, theme: 'legado', id: 'q39_legado', label: 'Como você gostaria de ser lembrado quando não estiver mais aqui? Que legado, além de bens ou palavras, você deseja deixar?', data_i18n: 'q39_legado' },
+    { number: 40, block: 4, theme: 'destino_dos_sonhos', id: 'q40_destino_sonhos', label: 'O que de fato aconteceu com os sonhos que você teve e nunca chegou a realizar — eles morreram, esperam, ou você parou de acreditar neles?', data_i18n: 'q40_destino_sonhos' }
+  ]
+},
+
+{
+  sectionId: 'section-perguntas-sintese',
+  id: 'sintese',
+  index: 4,
+  title: 'Bloco 5 — Síntese e Entrega',
+  data_i18n: 'bloco_sintese_title',
+  nextSection: 'section-final',
+  transitionVideo: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4',
+  questions: [
+    { number: 41, block: 5, theme: 'choro', id: 'q41_choro', label: 'Você tem chorado com frequência nos últimos tempos? Consegue identificar, com honestidade, o que realmente dispara esse choro?', data_i18n: 'q41_choro' },
+    { number: 42, block: 5, theme: 'origem_do_choro', id: 'q42_origem_choro', label: 'Esse choro nasce de um vazio interior, de uma perda concreta, ou de um arrependimento que você carrega em silêncio?', data_i18n: 'q42_origem_choro' },
+    { number: 43, block: 5, theme: 'expressao_da_dor', id: 'q43_expressao_dor', label: 'Quando a dor chega, o que predomina em você — o silêncio que isola, a busca por algo que intensifique esse sentimento, ou a raiva que quer explodir?', data_i18n: 'q43_expressao_dor' },
+    { number: 44, block: 5, theme: 'tristeza_depressao', id: 'q44_tristeza_depressao', label: 'Você sente apenas tristeza passageira, ou acredita estar vivendo algo mais profundo, como um estado depressivo? Consegue distinguir claramente as duas coisas em você?', data_i18n: 'q44_tristeza_depressao' },
+    { number: 45, block: 5, theme: 'ajuda_profissional', id: 'q45_ajuda_profissional', label: 'Se você reconhece esse estado mais profundo, já considerou buscar ajuda profissional para compreender melhor o que sente — ou ainda resiste a esse passo?', data_i18n: 'q45_ajuda_profissional' },
+    { number: 46, block: 5, theme: 'comportamento_relacional', id: 'q46_comportamento_relacional', label: 'Nas suas relações, você se reconhece mais como alguém assertivo (ou até agressivo), ou mais como alguém submisso, que evita conflito a qualquer custo?', data_i18n: 'q46_comportamento_relacional' },
+    { number: 47, block: 5, theme: 'autopercepcao', id: 'q47_autopercepcao', label: 'Existem momentos em que é difícil até conviver com você mesmo — carregando mágoa ou raiva por decisões que hoje considera equivocadas?', data_i18n: 'q47_autopercepcao' },
+    { number: 48, block: 5, theme: 'autoimagem', id: 'q48_autoimagem', label: 'No fundo, você se vê como alguém interessante e valioso, ou acredita, mesmo que em segredo, ser alguém de pouco interesse para os outros?', data_i18n: 'q48_autoimagem' },
+    { number: 49, block: 5, theme: 'limites', id: 'q49_limites', label: 'Você tem dificuldade real em dizer "não" às pessoas — mesmo quando isso significa se trair por dentro?', data_i18n: 'q49_limites' },
+    { number: 50, block: 5, theme: 'morte', id: 'q50_morte', label: 'Para fechar: você tem medo de morrer? E, sendo ainda mais honesto — esse medo está na morte em si, ou na forma como ela pode acontecer? O que essa resposta revela sobre tudo que você compartilhou até aqui?', data_i18n: 'q50_morte' }
+  ]
+ }
+],
 
     'en-US': [
-    {
-      sectionId: 'section-perguntas-raizes',
-      id: 'raizes',
-      index: 0,
-      title: 'Block 1 — Roots',
-      data_i18n: 'bloco_raizes_title',
-      nextSection: 'section-perguntas-reflexoes',
-      transitionVideo: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
-      questions: [
-        {
-          number: 1,
-          block: 1,
-          theme: 'criacao_familiar',
-          id: 'q01_criacao',
-          label: 'Who raised you? Biological parents, only one of them, relatives, adoptive parents, or someone else?',
-          data_i18n: 'q01_criacao'
-        },
-        {
-          number: 2,
-          block: 1,
-          theme: 'individualidade',
-          id: 'q02_filho_unico',        
-          label: 'Are you an only child or do you have siblings? How has this reality shaped your sense of individuality?',
-          data_i18n: 'q02_filho_unico'
-        },
-        {
-          number: 3,
-          block: 1,
-          theme: 'irmaos',
-          id: 'q03_irmaos',        
-          label: 'If you have or had siblings, how many? What is or would be your place among them: first-born, middle, or youngest child?',
-          data_i18n: 'q03_irmaos'
-        },
-        {
-          number: 4,
-          block: 1,
-          theme: 'privacoes',
-          id: 'q04_privacoes',        
-          label: 'Did you experience hunger or severe hardships during your childhood? How did that influence the way you view life?',
-          data_i18n: 'q04_privacoes'
-        },
-        {
-          number: 5,
-          block: 1,
-          theme: 'deficiencia',
-          id: 'q05_deficiencia',        
-          label: 'Do you have any social, physical, or cognitive disability? Have you ever faced prejudice because of it?',
-          data_i18n: 'q05_deficiencia'
-        },
-        {
-          number: 6,
-          block: 1,
-          theme: 'escolaridade',
-          id: 'q06_escolaridade',        
-          label: 'What is your level of education? How do you evaluate the investment you made in your development?',
-          data_i18n: 'q06_escolaridade'
-        },
-        {
-          number: 7,
-          block: 1,
-          theme: 'estado_civil',
-          id: 'q07_estado_civil',        
-          label: 'How does your current marital status influence the moment you are experiencing right now?',
-          data_i18n: 'q07_estado_civil'
-        },
-        {
-          number: 8,
-          block: 1,
-          theme: 'identidade',
-          id: 'q08_identidade',        
-          label: 'Do you remember the first time you realized you were someone unique in the world? How old were you?',
-          data_i18n: 'q08_identidade'
-        },
-        {
-          number: 9,
-          block: 1,
-          theme: 'silencio',
-          id: 'q09_silencio',        
-          label: 'What is your relationship with silence? Does it make you uncomfortable or does it calm you?',
-          data_i18n: 'q09_silencio'
-        },
-        {
-          number: 10,
-          block: 1,
-          theme: 'crianca_interior',
-          id: 'q10_crianca',        
-          label: 'If you could talk to the child that still lives within you, what would you say to them?',
-          data_i18n: 'q10_crianca'
-        }
-      ]   
-    },
-    {
-      sectionId: 'section-perguntas-reflexoes',
-      id: 'reflexoes',
-      index: 1,
-      title: 'Block 2 — Reflections',
-      data_i18n: 'bloco_reflexoes_title',
-      nextSection: 'section-perguntas-crescimento',
-      transitionVideo: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4',
-      questions: [
-        {
-          number: 11,
-          block: 2,
-          theme: 'vida',
-          id: 'q11_percepcao_vida',
-          label: 'How have you perceived your own life up to this point?',
-          data_i18n: 'q11_percepcao_vida'
-        },
-        {
-          number: 12,
-          block: 2,
-          theme: 'empatia',
-          id: 'q12_percepcao_outros',    
-          label: 'How do you view the lives of the people around you?',
-          data_i18n: 'q12_percepcao_outros'
-        },
-        {
-          number: 13,
-          block: 2,
-          theme: 'traumas',
-          id: 'q13_traumas',    
-          label: 'How do you deal with your traumas? Are you able to talk about them?',
-          data_i18n: 'q13_traumas'
-        },
-        {
-          number: 14,
-          block: 2,
-          theme: 'verdade',
-          id: 'q14_verdade',    
-          label: 'Do you believe there is a greater truth, or does everything depend on each person’s perspective?',
-          data_i18n: 'q14_verdade'
-        },
-        {
-          number: 15,
-          block: 2,
-          theme: 'vicios',
-          id: 'q15_vicios',    
-          label: 'What is your greatest vice or addiction? Why do you think it emerged? Have you tried to overcome it? Do you also notice other subtler or more emotional dependencies within yourself?',
-          data_i18n: 'q15_vicios'
-        },
-        {
-          number: 16,
-          block: 2,
-          theme: 'doenca',
-          id: 'q16_doenca',    
-          label: 'What does illness represent to you? Are you facing any health condition at this moment?',
-          data_i18n: 'q16_doenca'
-        },
-        {
-          number: 17,
-          block: 2,
-          theme: 'solidao',
-          id: 'q17_presenca',    
-          label: 'Is there someone you wish was by your side right now? Why is this person not present?',
-          data_i18n: 'q17_presenca'
-        },
-        {
-          number: 18,
-          block: 2,
-          theme: 'morte',
-          id: 'q18_morte',    
-          label: 'How do you perceive death? Does it evoke fear, comfort, or curiosity?',
-          data_i18n: 'q18_morte'
-        },
-        {
-          number: 19,
-          block: 2,
-          theme: 'espiritualidade',
-          id: 'q19_doenca_espiritual',
-          label: 'How do you understand illness? Can it carry some meaning or purpose at certain times in life?',
-          data_i18n: 'q19_doenca_espiritual'
-        },
-        {
-          number: 20,
-          block: 2,
-          theme: 'sentido_doenca',
-          id: 'q20_sentido_doenca',
-          label: 'Do you believe that some illnesses can reflect internal shadows or be part of a process of spiritual growth?',    
-          data_i18n: 'q20_sentido_doenca'
-        }
-      ]
-    },
-    {
-      sectionId: 'section-perguntas-crescimento',
-      id: 'crescimento',
-      index: 2,
-      title: 'Block 3 — Growth',
-      data_i18n: 'bloco_crescimento_title',
-      nextSection: 'section-perguntas-integracao',
-      transitionVideo: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4',
-      questions: [
-        {
-          number: 21,
-          block: 3,
-          theme: 'sentido_da_vida',
-          id: 'q21_sentido_vida',
-          label: 'How do you perceive the meaning of life? Is there a higher purpose, or does everything happen by chance?',
-          data_i18n: 'q21_sentido_vida'
-        },
-        {
-          number: 22,
-          block: 3,
-          theme: 'espiritualidade',
-          id: 'q22_espiritualidade',
-          label: 'Do you believe in God, a supreme being, spirituality, or something beyond what we can see?',
-          data_i18n: 'q22_espiritualidade'
-        },
-        {
-          number: 23,
-          block: 3,
-          theme: 'experiencia_espiritual',
-          id: 'q23_guia_invisivel',
-          label: 'Have you ever felt guided by something invisible? Can you share a meaningful experience?',
-          data_i18n: 'q23_guia_invisivel'
-        },
-        {
-          number: 24,
-          block: 3,
-          theme: 'dor_emocional',
-          id: 'q24_dor_emocional',
-          label: 'What was the greatest emotional pain you have ever faced? How did you manage to cope with it?',
-          data_i18n: 'q24_dor_emocional'
-        },
-        {
-          number: 25,
-          block: 3,
-          theme: 'superacao',
-          id: 'q25_superacao',
-          label: 'What was the greatest triumph or breakthrough in your life? What strength did you discover within yourself at that moment?',
-          data_i18n: 'q25_superacao'
-        },
-        {
-          number: 26,
-          block: 3,
-          theme: 'medos',
-          id: 'q26_medos',
-          label: 'What are you most afraid of today? What might this fear be trying to show you?',
-          data_i18n: 'q26_medos'
-        },
-        {
-          number: 27,
-          block: 3,
-          theme: 'autocuidado',
-          id: 'q27_esquecimento_de_si',
-          label: 'Why do you believe you ended up forgetting about yourself? When was the last time you received a compliment that truly left a mark on you?',
-          data_i18n: 'q27_esquecimento_de_si'
-        },
-        {
-          number: 28,
-          block: 3,
-          theme: 'prioridade_pessoal',
-          id: 'q28_prioridade',
-          label: 'Why do you believe that you often struggle to place yourself as a priority?',
-          data_i18n: 'q28_prioridade'
-        },
-        {
-          number: 29,
-          block: 3,
-          theme: 'autoestima',
-          id: 'q29_autoestima',
-          label: 'Do you habitually recognize and praise yourself? In what moments does that happen?',
-          data_i18n: 'q29_autoestima'
-        },
-        {
-          number: 30,
-          block: 3,
-          theme: 'sonhos',
-          id: 'q30_sonhos',
-          label: 'Do you see yourself as someone who helps dreams come to life, or as someone who, without realizing it, ends up burying their own dreams and those of others?',
-          data_i18n: 'q30_sonhos'
-        }
-      ]
-    },
-    {
-      sectionId: 'section-perguntas-integracao',
-      id: 'integracao',
-      index: 3,
-      title: 'Block 4 — Integration',
-      data_i18n: 'bloco_integracao_title',
-      nextSection: 'section-perguntas-sintese',
-      transitionVideo: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4',
-      questions: [
-        {
-          number: 31,
-          block: 4,
-          theme: 'maior_sonho',
-          id: 'q31_maior_sonho',
-          label: 'What is your greatest dream today? Something that makes you smile just by imagining it.',
-          data_i18n: 'q31_maior_sonho'
-        },
-        {
-          number: 32,
-          block: 4,
-          theme: 'barreiras',
-          id: 'q32_barreiras',
-          label: 'What do you believe prevents you from achieving it? Are these barriers internal, external, or both?',
-          data_i18n: 'q32_barreiras'
-        },
-        {
-          number: 33,
-          block: 4,
-          theme: 'proposito',
-          id: 'q33_proposito',
-          label: 'Do you feel you are living your purpose, or are you still searching for it?',
-          data_i18n: 'q33_proposito'
-        },
-        {
-          number: 34,
-          block: 4,
-          theme: 'chamado_interior',
-          id: 'q34_chamado_interior',
-          label: 'Is there an inner calling, a silent desire, that you have been ignoring?',
-          data_i18n: 'q34_chamado_interior'
-        },
-        {
-          number: 35,
-          block: 4,
-          theme: 'origem_dos_medos',
-          id: 'q35_origem_medos',
-          label: 'To what specific situation or feeling are your fears linked?',
-          data_i18n: 'q35_origem_medos'
-        },
-        {
-          number: 36,
-          block: 4,
-          theme: 'decisoes_e_limites',
-          id: 'q36_decisoes_limites',
-          label: 'Do you feel that you hold back from making certain decisions out of fear, or end up accepting situations that demean you?',
-          data_i18n: 'q36_decisoes_limites'
-        },
-        {
-          number: 37,
-          block: 4,
-          theme: 'acolhimento_do_sofrimento',
-          id: 'q37_acolhimento_sofrimento',
-          label: 'What would you say to someone who is suffering deeply at this moment?',
-          data_i18n: 'q37_acolhimento_sofrimento'
-        },
-        {
-          number: 38,
-          block: 4,
-          theme: 'vida_alem_da_terra',
-          id: 'q38_vida_alem_terra',
-          label: 'Do you believe that life exists beyond our planet Earth, or do you believe that all existence happens only here?',
-          data_i18n: 'q38_vida_alem_terra'
-        },
-        {
-          number: 39,
-          block: 4,
-          theme: 'legado',
-          id: 'q39_legado',
-          label: 'How would you like to be remembered when you are no longer here? What legacy do you wish to leave behind?',
-          data_i18n: 'q39_legado'
-        },
-        {
-          number: 40,
-          block: 4,
-          theme: 'destino_dos_sonhos',
-          id: 'q40_destino_sonhos',
-          label: 'What happened to the dreams you once had — and which you never managed to fulfill?',
-          data_i18n: 'q40_destino_sonhos'
-        }
-      ]
-    },
-    {
-      sectionId: 'section-perguntas-sintese',
-      id: 'sintese',
-      index: 4,
-      title: 'Block 5 — Synthesis and Offering',
-      data_i18n: 'bloco_sintese_title',
-      nextSection: 'section-final',
-      transitionVideo: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4',
-      questions: [
-        {
-          number: 41,
-          block: 5,
-          theme: 'choro',
-          id: 'q41_choro',
-          label: 'Have you been crying frequently? Can you identify what usually triggers this crying?',
-          data_i18n: 'q41_choro'
-        },
-        {
-          number: 42,
-          block: 5,
-          theme: 'origem_do_choro',
-          id: 'q42_origem_choro',
-          label: 'Does this crying stem from an inner emptiness, a loss, or a regret?',
-          data_i18n: 'q42_origem_choro'
-        },
-        {
-          number: 43,
-          block: 5,
-          theme: 'expressao_da_dor',
-          id: 'q43_expressao_dor',
-          label: 'When the tears come, what dominates: silence, a search for something that intensifies this feeling, or anger wanting to manifest?',
-          data_i18n: 'q43_expressao_dor'
-        },
-        {
-          number: 44,
-          block: 5,
-          theme: 'tristeza_depressao',
-          id: 'q44_tristeza_depressao',
-          label: 'Do you feel sad, or do you believe you are living in a depressive state? Can you perceive the difference between these two experiences?',
-          data_i18n: 'q44_tristeza_depressao'
-        },
-        {
-          number: 45,
-          block: 5,
-          theme: 'ajuda_profissional',
-          id: 'q45_ajuda_profissional',
-          label: 'If you believe you are living in a depressive state, have you thought about seeking professional help to better understand what you are feeling?',
-          data_i18n: 'q45_ajuda_profissional'
-        },
-        {
-          number: 46,
-          block: 5,
-          theme: 'comportamento_relacional',
-          id: 'q46_comportamento_relacional',
-          label: 'In your relationships, do you consider yourself to be a more aggressive or a more submissive person?',
-          data_i18n: 'q46_comportamento_relacional'
-        },
-        {
-          number: 47,
-          block: 5,
-          theme: 'autopercepcao',
-          id: 'q47_autopercepcao',
-          label: 'Do you feel that, sometimes, it is difficult to live with yourself, or do you carry anger over decisions you consider mistaken?',
-          data_i18n: 'q47_autopercepcao'
-        },
-        {
-          number: 48,
-          block: 5,
-          theme: 'autoimagem',
-          id: 'q48_autoimagem',
-          label: 'Do you consider yourself an interesting person, or do you believe you are someone of little interest to others?',
-          data_i18n: 'q48_autoimagem'
-        },
-        {
-          number: 49,
-          block: 5,
-          theme: 'limites',
-          id: 'q49_limites',
-          label: 'Do you have difficulty saying "no" to people?',
-          data_i18n: 'q49_limites'
-        },
-        {
-          number: 50,
-          block: 5,
-          theme: 'morte',
-          id: 'q50_morte',
-          label: 'Are you afraid of dying? Often, the fear lies less in death itself and more in how it might happen. How do you perceive this within yourself?',
-          data_i18n: 'q50_morte'
-        }
-      ]
-    }
-  ],
+
+{
+  sectionId: 'section-perguntas-raizes',
+  id: 'raizes',
+  index: 0,
+  title: 'Block 1 — Roots',
+  data_i18n: 'bloco_raizes_title',
+  nextSection: 'section-perguntas-reflexoes',
+  transitionVideo: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
+  questions: [
+    { number: 1, block: 1, theme: 'criacao_familiar', id: 'q01_criacao', label: 'Who raised you — your biological parents, just one of them, other relatives, adoptive parents, or someone outside that circle? Briefly describe that presence.', data_i18n: 'q01_criacao' },
+    { number: 2, block: 1, theme: 'individualidade', id: 'q02_filho_unico', label: 'Did you grow up as an only child or did you have siblings? How did that shape the way you see yourself as an individual — more independent, more alone, more torn?', data_i18n: 'q02_filho_unico' },
+    { number: 3, block: 1, theme: 'irmaos', id: 'q03_irmaos', label: 'If you have or had siblings, where did you fall among them — oldest, middle, or youngest? What weight or advantage did that spot bring to your story?', data_i18n: 'q03_irmaos' },
+    { number: 4, block: 1, theme: 'privacoes', id: 'q04_privacoes', label: 'Was there hunger or serious hardship in your childhood? If so, what mark did it leave on how you deal with scarcity, security, or feeling worthy today?', data_i18n: 'q04_privacoes' },
+    { number: 5, block: 1, theme: 'deficiencia', id: 'q05_deficiencia', label: 'Do you live with any social, physical, or cognitive limitation? Have you felt the sting of prejudice because of it — and how does that show up in you now?', data_i18n: 'q05_deficiencia' },
+    { number: 6, block: 1, theme: 'escolaridade', id: 'q06_escolaridade', label: "What's your education level? Looking back, do you feel you invested enough in your own growth, or is there a gap in your learning that still bothers you?", data_i18n: 'q06_escolaridade' },
+    { number: 7, block: 1, theme: 'estado_civil', id: 'q07_estado_civil', label: 'Your current relationship status — single, married, separated, dating — is it strengthening you or weighing you down right now?', data_i18n: 'q07_estado_civil' },
+    { number: 8, block: 1, theme: 'identidade', id: 'q08_identidade', label: 'Do you remember the exact moment you realized, on your own, that you were someone unique in the world? How old were you, and what did you feel?', data_i18n: 'q08_identidade' },
+    { number: 9, block: 1, theme: 'silencio', id: 'q09_silencio', label: "What's your real relationship with silence — does it unsettle you because it exposes something, or does it calm you because it brings you back to yourself?", data_i18n: 'q09_silencio' },
+    { number: 10, block: 1, theme: 'crianca_interior', id: 'q10_crianca', label: 'If you could talk right now to the child you once were — the one who carried everything you just shared — what would you tell them?', data_i18n: 'q10_crianca' }
+  ]
+},
+
+{
+  sectionId: 'section-perguntas-reflexoes',
+  id: 'reflexoes',
+  index: 1,
+  title: 'Block 2 — Reflections',
+  data_i18n: 'bloco_reflexoes_title',
+  nextSection: 'section-perguntas-crescimento',
+  transitionVideo: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4',
+  questions: [
+    { number: 11, block: 2, theme: 'vida', id: 'q11_percepcao_vida', label: "After revisiting your roots, how have you come to see your own life so far — as an achievement, as survival, or as something still up in the air?", data_i18n: 'q11_percepcao_vida' },
+    { number: 12, block: 2, theme: 'empatia', id: 'q12_percepcao_outros', label: 'And the lives of the people around you — do you see them with genuine empathy, or with distance and judgment?', data_i18n: 'q12_percepcao_outros' },
+    { number: 13, block: 2, theme: 'traumas', id: 'q13_traumas', label: 'How do you deal with your traumas: do you face them head-on, or avoid even naming them? Can you talk about them now with the same honesty as before?', data_i18n: 'q13_traumas' },
+    { number: 14, block: 2, theme: 'verdade', id: 'q14_verdade', label: "Do you believe there's a greater truth above everything, or that every truth is just a reflection of the eyes that see it?", data_i18n: 'q14_verdade' },
+    { number: 15, block: 2, theme: 'vicios', id: 'q15_vicios', label: "What's your biggest vice — the one you admit to, or the one you hide? Where did it come from, have you tried to beat it, and are there subtler, emotional vices you rarely admit to having?", data_i18n: 'q15_vicios' },
+    { number: 16, block: 2, theme: 'doenca', id: 'q16_doenca', label: 'What does illness mean to you? Is there any health condition — physical or emotional — going through you right now?', data_i18n: 'q16_doenca' },
+    { number: 17, block: 2, theme: 'solidao', id: 'q17_presenca', label: "Is there someone you'd like to have by your side right now? What's keeping that person away — distance, pride, or something that was never said?", data_i18n: 'q17_presenca' },
+    { number: 18, block: 2, theme: 'morte', id: 'q18_morte', label: 'How do you see death today — as fear, as relief, or as genuine curiosity about what comes next?', data_i18n: 'q18_morte' },
+    { number: 19, block: 2, theme: 'espiritualidade', id: 'q19_doenca_espiritual', label: 'Do you believe illness can carry a meaning, a message, or a hidden purpose at certain moments in life?', data_i18n: 'q19_doenca_espiritual' },
+    { number: 20, block: 2, theme: 'sentido_doenca', id: 'q20_sentido_doenca', label: 'Going deeper: do you think some illnesses reflect unresolved inner shadows, or are part of a spiritual growth process?', data_i18n: 'q20_sentido_doenca' }
+  ]
+},
+
+{
+  sectionId: 'section-perguntas-crescimento',
+  id: 'crescimento',
+  index: 2,
+  title: 'Block 3 — Growth',
+  data_i18n: 'bloco_crescimento_title',
+  nextSection: 'section-perguntas-integracao',
+  transitionVideo: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4',
+  questions: [
+    { number: 21, block: 3, theme: 'sentido_da_vida', id: 'q21_sentido_vida', label: 'After everything you already revealed, what does life mean to you — is there a greater purpose guiding it all, or is it chance that decides?', data_i18n: 'q21_sentido_vida' },
+    { number: 22, block: 3, theme: 'espiritualidade', id: 'q22_espiritualidade', label: 'Do you believe in God, in a supreme being, in spirituality, or in something beyond what the eyes can see?', data_i18n: 'q22_espiritualidade' },
+    { number: 23, block: 3, theme: 'experiencia_espiritual', id: 'q23_guia_invisivel', label: 'Have you ever felt, at some point, that you were guided by something invisible? Is there a striking experience that proves that to you?', data_i18n: 'q23_guia_invisivel' },
+    { number: 24, block: 3, theme: 'dor_emocional', id: 'q24_dor_emocional', label: 'What was the greatest emotional pain you have ever faced — and what path did you actually use to get through it?', data_i18n: 'q24_dor_emocional' },
+    { number: 25, block: 3, theme: 'superacao', id: 'q25_superacao', label: 'And what was your greatest triumph? What strength did you discover in yourself right at the moment everything seemed lost?', data_i18n: 'q25_superacao' },
+    { number: 26, block: 3, theme: 'medos', id: 'q26_medos', label: 'What are you most afraid of today? If you stop to really listen to that fear, what is it trying to show you?', data_i18n: 'q26_medos' },
+    { number: 27, block: 3, theme: 'autocuidado', id: 'q27_esquecimento_de_si', label: 'Why do you believe that, at some point, you stopped putting yourself first? When was the last time you got a compliment that truly touched you?', data_i18n: 'q27_esquecimento_de_si' },
+    { number: 28, block: 3, theme: 'prioridade_pessoal', id: 'q28_prioridade', label: 'Why do you often struggle to treat yourself as a priority — even knowing you need to?', data_i18n: 'q28_prioridade' },
+    { number: 29, block: 3, theme: 'autoestima', id: 'q29_autoestima', label: "Do you tend to recognize and praise yourself, without depending on anyone else's validation? In which moments does that actually happen?", data_i18n: 'q29_autoestima' },
+    { number: 30, block: 3, theme: 'sonhos', id: 'q30_sonhos', label: "Do you see yourself as someone who helps dreams — yours and others' — come to life, or as someone who, without realizing it, has been burying those dreams along the way?", data_i18n: 'q30_sonhos' }
+  ]
+},
+
+{
+  sectionId: 'section-perguntas-integracao',
+  id: 'integracao',
+  index: 3,
+  title: 'Block 4 — Integration',
+  data_i18n: 'bloco_integracao_title',
+  nextSection: 'section-perguntas-sintese',
+  transitionVideo: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4',
+  questions: [
+    { number: 31, block: 4, theme: 'maior_sonho', id: 'q31_maior_sonho', label: "After looking at your fears and buried dreams: what's your biggest dream today — the one that makes you smile just imagining it?", data_i18n: 'q31_maior_sonho' },
+    { number: 32, block: 4, theme: 'barreiras', id: 'q32_barreiras', label: 'What do you believe is stopping you from making it happen? Do those barriers come from inside, from outside, or both at once?', data_i18n: 'q32_barreiras' },
+    { number: 33, block: 4, theme: 'proposito', id: 'q33_proposito', label: "Do you feel like you're already living your purpose, or are you still searching for it — without quite knowing which way to go?", data_i18n: 'q33_proposito' },
+    { number: 34, block: 4, theme: 'chamado_interior', id: 'q34_chamado_interior', label: "Is there an inner calling, a quiet urge, that you keep ignoring, even knowing it's still pulsing inside you?", data_i18n: 'q34_chamado_interior' },
+    { number: 35, block: 4, theme: 'origem_dos_medos', id: 'q35_origem_medos', label: 'Going back to your fears: what situation or feeling are they actually tied to, deep down?', data_i18n: 'q35_origem_medos' },
+    { number: 36, block: 4, theme: 'decisoes_e_limites', id: 'q36_decisoes_limites', label: 'Do you feel like you avoid certain decisions out of fear, or that you end up accepting situations that diminish you just to avoid confrontation?', data_i18n: 'q36_decisoes_limites' },
+    { number: 37, block: 4, theme: 'acolhimento_do_sofrimento', id: 'q37_acolhimento_sofrimento', label: 'If someone were standing in front of you right now, deeply suffering, what would you tell them — and could you say the same thing to yourself?', data_i18n: 'q37_acolhimento_sofrimento' },
+    { number: 38, block: 4, theme: 'vida_alem_da_terra', id: 'q38_vida_alem_terra', label: "Do you believe there's life beyond our planet, or that all existence is limited to what we know here?", data_i18n: 'q38_vida_alem_terra' },
+    { number: 39, block: 4, theme: 'legado', id: 'q39_legado', label: "How would you like to be remembered when you're no longer here? What legacy, beyond belongings or words, do you want to leave behind?", data_i18n: 'q39_legado' },
+    { number: 40, block: 4, theme: 'destino_dos_sonhos', id: 'q40_destino_sonhos', label: 'What actually happened to the dreams you had and never got to fulfill — did they die, are they waiting, or did you just stop believing in them?', data_i18n: 'q40_destino_sonhos' }
+  ]
+},
+
+{
+  sectionId: 'section-perguntas-sintese',
+  id: 'sintese',
+  index: 4,
+  title: 'Block 5 — Synthesis & Delivery',
+  data_i18n: 'bloco_sintese_title',
+  nextSection: 'section-final',
+  transitionVideo: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4',
+  questions: [
+    { number: 41, block: 5, theme: 'choro', id: 'q41_choro', label: 'Have you been crying often lately? Can you honestly identify what really triggers that crying?', data_i18n: 'q41_choro' },
+    { number: 42, block: 5, theme: 'origem_do_choro', id: 'q42_origem_choro', label: 'Does that crying come from an inner emptiness, a concrete loss, or a regret you carry in silence?', data_i18n: 'q42_origem_choro' },
+    { number: 43, block: 5, theme: 'expressao_da_dor', id: 'q43_expressao_dor', label: 'When the pain hits, what takes over — the silence that isolates you, the urge to chase something that intensifies the feeling, or the anger wanting to explode?', data_i18n: 'q43_expressao_dor' },
+    { number: 44, block: 5, theme: 'tristeza_depressao', id: 'q44_tristeza_depressao', label: 'Do you feel just passing sadness, or do you believe you are going through something deeper, like a depressive state? Can you clearly tell the two apart in yourself?', data_i18n: 'q44_tristeza_depressao' },
+    { number: 45, block: 5, theme: 'ajuda_profissional', id: 'q45_ajuda_profissional', label: 'If you recognize that deeper state, have you considered seeking professional help to better understand what you are feeling — or are you still resisting that step?', data_i18n: 'q45_ajuda_profissional' },
+    { number: 46, block: 5, theme: 'comportamento_relacional', id: 'q46_comportamento_relacional', label: 'In your relationships, do you see yourself more as assertive (or even aggressive), or more as submissive, avoiding conflict at all costs?', data_i18n: 'q46_comportamento_relacional' },
+    { number: 47, block: 5, theme: 'autopercepcao', id: 'q47_autopercepcao', label: 'Are there moments when it is even hard to live with yourself — carrying resentment or anger over decisions you now consider mistakes?', data_i18n: 'q47_autopercepcao' },
+    { number: 48, block: 5, theme: 'autoimagem', id: 'q48_autoimagem', label: 'Deep down, do you see yourself as someone interesting and worthwhile, or do you believe, even secretly, that you are someone of little interest to others?', data_i18n: 'q48_autoimagem' },
+    { number: 49, block: 5, theme: 'limites', id: 'q49_limites', label: 'Do you genuinely struggle to say "no" to people — even when it means betraying yourself inside?', data_i18n: 'q49_limites' },
+    { number: 50, block: 5, theme: 'morte', id: 'q50_morte', label: 'To close: are you afraid of dying? And being even more honest — is that fear about death itself, or about how it might happen? What does that answer reveal about everything you have shared so far?', data_i18n: 'q50_morte' }
+  ]
+}
+
+],
 
     'fr-FR': [
-    {
-      sectionId: 'section-perguntas-raizes',
-      id: 'raizes',
-      index: 0,
-      title: 'Bloc 1 — Racines',
-      data_i18n: 'bloco_raizes_title',
-      nextSection: 'section-perguntas-reflexoes',
-      transitionVideo: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
-      questions: [
-        {
-          number: 1,
-          block: 1,
-          theme: 'criacao_familiar',
-          id: 'q01_criacao',
-          label: 'Par qui avez-vous été élevé ? Vos parents biologiques, un seul d’entre eux, des membres de votre famille, des parents adoptifs ou quelqu’un d’autre ?',
-          data_i18n: 'q01_criacao'
-        },
-        {
-          number: 2,
-          block: 1,
-          theme: 'individualidade',
-          id: 'q02_filho_unico',        
-          label: 'Êtes-vous enfant unique ou avez-vous des frères et sœurs ? Comment cette réalité a-t-elle marqué votre sens de l’individualité ?',
-          data_i18n: 'q02_filho_unico'
-        },
-        {
-          number: 3,
-          block: 1,
-          theme: 'irmaos',
-          id: 'q03_irmaos',        
-          label: 'Si vous avez ou aviez des frères et sœurs, combien ? Quelle est ou serait votre place parmi eux : aîné, cadet (du milieu) ou benjamin ?',
-          data_i18n: 'q03_irmaos'
-        },
-        {
-          number: 4,
-          block: 1,
-          theme: 'privacoes',
-          id: 'q04_privacoes',        
-          label: 'Avez-vous souffert de la faim ou vécu de graves privations pendant votre enfance ? Comment cela a-t-il influencé votre vision de la vie ?',
-          data_i18n: 'q04_privacoes'
-        },
-        {
-          number: 5,
-          block: 1,
-          theme: 'deficiencia',
-          id: 'q05_deficiencia',        
-          label: 'Souffrez-vous d’un handicap social, physique ou cognitif ? Avez-vous déjà été victime de préjugés à cause de cela ?',
-          data_i18n: 'q05_deficiencia'
-        },
-        {
-          number: 6,
-          block: 1,
-          theme: 'escolaridade',
-          id: 'q06_escolaridade',        
-          label: 'Quel est votre niveau d’études ? Comment évaluez-vous l’investissement que vous avez consacré à votre formation ?',
-          data_i18n: 'q06_escolaridade'
-        },
-        {
-          number: 7,
-          block: 1,
-          theme: 'estado_civil',
-          id: 'q07_estado_civil',        
-          label: 'Comment votre situation amoureuse ou maritale actuelle influence-t-elle le moment que vous vivez aujourd’hui ?',
-          data_i18n: 'q07_estado_civil'
-        },
-        {
-          number: 8,
-          block: 1,
-          theme: 'identidade',
-          id: 'q08_identidade',        
-          label: 'Vous souvenez-vous de la première fois où vous avez réalisé que vous étiez une personne unique au monde ? Quel âge aviez-vous ?',
-          data_i18n: 'q08_identidade'
-        },
-        {
-          number: 9,
-          block: 1,
-          theme: 'silencio',
-          id: 'q09_silencio',        
-          label: 'Quelle est votre relation avec le silence ? Vous dérange-t-il ou vous apaise-t-il ?',
-          data_i18n: 'q09_silencio'
-        },
-        {
-          number: 10,
-          block: 1,
-          theme: 'crianca_interior',
-          id: 'q10_crianca',        
-          label: 'Si vous pouviez parler à l’enfant qui habite encore en vous, que lui diriez-vous ?',
-          data_i18n: 'q10_crianca'
-        }
-      ]   
-    },
-    {
-      sectionId: 'section-perguntas-reflexoes',
-      id: 'reflexoes',
-      index: 1,
-      title: 'Bloc 2 — Réflexions',
-      data_i18n: 'bloco_reflexoes_title',
-      nextSection: 'section-perguntas-crescimento',
-      transitionVideo: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4',
-      questions: [
-        {
-          number: 11,
-          block: 2,
-          theme: 'vida',
-          id: 'q11_percepcao_vida',
-          label: 'Comment avez-vous perçu votre propre vie jusqu’à présent ?',
-          data_i18n: 'q11_percepcao_vida'
-        },
-        {
-          number: 12,
-          block: 2,
-          theme: 'empatia',
-          id: 'q12_percepcao_outros',    
-          label: 'Comment voyez-vous la vie des gens qui vous entourent ?',
-          data_i18n: 'q12_percepcao_outros'
-        },
-        {
-          number: 13,
-          block: 2,
-          theme: 'traumas',
-          id: 'q13_traumas',    
-          label: 'Comment gérez-vous vos traumas ? Arrivez-vous à en parler ?',
-          data_i18n: 'q13_traumas'
-        },
-        {
-          number: 14,
-          block: 2,
-          theme: 'verdade',
-          id: 'q14_verdade',    
-          label: 'Croyez-vous qu’il existe une vérité supérieure ou que tout dépend du regard de chacun ?',
-          data_i14n: 'q14_verdade'
-        },
-        {
-          number: 15,
-          block: 2,
-          theme: 'vicios',
-          id: 'q15_vicios',    
-          label: 'Quel est votre plus grand vice ou dépendance ? Pourquoi pensez-vous qu’il est apparu ? Avez-vous déjà essayé de le surmonter ? Remarquez-vous également en vous d’autres dépendances plus subtiles ou émotionnelles ?',
-          data_i18n: 'q15_vicios'
-        },
-        {
-          number: 16,
-          block: 2,
-          theme: 'doenca',
-          id: 'q16_doenca',    
-          label: 'Que représente la maladie pour vous ? Traversez-vous un problème de santé en ce moment ?',
-          data_i18n: 'q16_doenca'
-        },
-        {
-          number: 17,
-          block: 2,
-          theme: 'solidao',
-          id: 'q17_presenca',    
-          label: 'Y a-t-il quelqu’un que vous aimeriez avoir à vos côtés en ce moment ? Pourquoi cette personne n’est-elle pas présente ?',
-          data_i18n: 'q17_presenca'
-        },
-        {
-          number: 18,
-          block: 2,
-          theme: 'morte',
-          id: 'q18_morte',    
-          label: 'Comment percevez-vous la mort ? Éveille-t-elle en vous de la peur, du réconfort ou de la curiosité ?',
-          data_i18n: 'q18_morte'
-        },
-        {
-          number: 19,
-          block: 2,
-          theme: 'espiritualidade',
-          id: 'q19_doenca_espiritual',
-          label: 'Comment comprenez-vous la maladie ? Peut-elle avoir un sens ou un but à certains moments de la vie ?',
-          data_i18n: 'q19_doenca_espiritual'
-        },
-        {
-          number: 20,
-          block: 2,
-          theme: 'sentido_doenca',
-          id: 'q20_sentido_doenca',
-          label: 'Croyez-vous que certaines maladies peuvent refléter des zones d’ombre intérieures ou faire partie d’un processus de croissance spirituelle ?',    
-          data_i18n: 'q20_sentido_doenca'
-        }
-      ]
-    },
-    {
-      sectionId: 'section-perguntas-crescimento',
-      id: 'crescimento',
-      index: 2,
-      title: 'Bloc 3 — Croissance',
-      data_i18n: 'bloco_crescimento_title',
-      nextSection: 'section-perguntas-integracao',
-      transitionVideo: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4',
-      questions: [
-        {
-          number: 21,
-          block: 3,
-          theme: 'sentido_da_vida',
-          id: 'q21_sentido_vida',
-          label: 'Comment percevez-vous le sens de la vie ? Existe-t-il un but supérieur ou tout arrive-t-il par hasard ?',
-          data_i18n: 'q21_sentido_vida'
-        },
-        {
-          number: 22,
-          block: 3,
-          theme: 'espiritualidade',
-          id: 'q22_espiritualidade',
-          label: 'Croyez-vous en Dieu, en un être suprême, en la spiritualité ou en quelque chose au-delà de ce que nous pouvons voir ?',
-          data_i18n: 'q22_espiritualidade'
-        },
-        {
-          number: 23,
-          block: 3,
-          theme: 'experiencia_espiritual',
-          id: 'q23_guia_invisivel',
-          label: 'Vous êtes-vous déjà senti guidé par quelque chose d’invisible ? Pouvez-vous raconter une expérience marquante ?',
-          data_i18n: 'q23_guia_invisivel'
-        },
-        {
-          number: 24,
-          block: 3,
-          theme: 'dor_emocional',
-          id: 'q24_dor_emocional',
-          label: 'Quelle a été la plus grande douleur émotionnelle à laquelle vous avez dû faire face ? Comment avez-vous réussi à la surmonter ?',
-          data_i18n: 'q24_dor_emocional'
-        },
-        {
-          number: 25,
-          block: 3,
-          theme: 'superacao',
-          id: 'q25_superacao',
-          label: 'Quel a été le plus grand dépassement de soi ou triomphe de votre vie ? Quelle force avez-vous découverte en vous à ce moment-là ?',
-          data_i18n: 'q25_superacao'
-        },
-        {
-          number: 26,
-          block: 3,
-          theme: 'medos',
-          id: 'q26_medos',
-          label: 'De quoi avez-vous le plus peur aujourd’hui ? Que pourrait essayer de vous montrer cette peur ?',
-          data_i18n: 'q26_medos'
-        },
-        {
-          number: 27,
-          block: 3,
-          theme: 'autocuidado',
-          id: 'q27_esquecimento_de_si',
-          label: 'Pourquoi pensez-vous avoir fini par vous oublier vous-même ? À quand remonte la dernière fois que vous avez reçu un compliment qui vous a vraiment marqué ?',
-          data_i18n: 'q27_esquecimento_de_si'
-        },
-        {
-          number: 28,
-          block: 3,
-          theme: 'prioridade_pessoal',
-          id: 'q28_prioridade',
-          label: 'Pourquoi pensez-vous que, bien souvent, vous n’arrivez de pas faire de vous-même une priorité ?',
-          data_i18n: 'q28_prioridade'
-        },
-        {
-          number: 29,
-          block: 3,
-          theme: 'autoestima',
-          id: 'q29_autoestima',
-          label: 'Avez-vous l’habitude de vous reconnaître et de vous féliciter vous-même ? À quels moments cela se produit-il ?',
-          data_i18n: 'q29_autoestima'
-        },
-        {
-          number: 30,
-          block: 3,
-          theme: 'sonhos',
-          id: 'q30_sonhos',
-          label: 'Vous voyez-vous comme quelqu’un qui aide les rêves à naître, ou como quelqu’un qui, sans s’en rendre compte, finit par enterrer ses propres rêves et ceux des autres ?',
-          data_i18n: 'q30_sonhos'
-        }
-      ]
-    },
-    {
-      sectionId: 'section-perguntas-integracao',
-      id: 'integracao',
-      index: 3,
-      title: 'Bloc 4 — Intégration',
-      data_i18n: 'bloco_integracao_title',
-      nextSection: 'section-perguntas-sintese',
-      transitionVideo: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4',
-      questions: [
-        {
-          number: 31,
-          block: 4,
-          theme: 'maior_sonho',
-          id: 'q31_maior_sonho',
-          label: 'Quel est votre plus grand rêve aujourd’hui ? Quelque chose qui vous fait sourire rien qu’en l’imaginant.',
-          data_i18n: 'q31_maior_sonho'
-        },
-        {
-          number: 32,
-          block: 4,
-          theme: 'barreiras',
-          id: 'q32_barreiras',
-          label: 'Qu’est-ce qui, selon vous, vous empêche de o réaliser ? Ces barrières sont-elles intérieures, extérieures ou les deux ?',
-          data_i18n: 'q32_barreiras'
-        },
-        {
-          number: 33,
-          block: 4,
-          theme: 'proposito',
-          id: 'q33_proposito',
-          label: 'Avez-vous le sentiment de vivre votre mission de vie ou êtes-vous encore à sa recherche ?',
-          data_i18n: 'q33_proposito'
-        },
-        {
-          number: 34,
-          block: 4,
-          theme: 'chamado_interior',
-          id: 'q34_chamado_interior',
-          label: 'Existe-t-il un appel intérieur, un désir silencieux, que vous avez ignoré jusqu’à présent ?',
-          data_i18n: 'q34_chamado_interior'
-        },
-        {
-          number: 35,
-          block: 4,
-          theme: 'origem_dos_medos',
-          id: 'q35_origem_medos',
-          label: 'À quelle situation ou à quel sentiment spécifique vos peurs sont-elles liées ?',
-          data_i18n: 'q35_origem_medos'
-        },
-        {
-          number: 36,
-          block: 4,
-          theme: 'decisoes_e_limites',
-          id: 'q36_decisoes_limites',
-          label: 'Avez-vous le sentiment de renoncer à prendre certaines décisions par peur, ou de finir par accepter des situations qui vous rabaissent ?',
-          data_i18n: 'q36_decisoes_limites'
-        },
-        {
-          number: 37,
-          block: 4,
-          theme: 'acolhimento_do_sofrimento',
-          id: 'q37_acolhimento_sofrimento',
-          label: 'Que diriez-vous à quelqu’un qui souffre profondément en ce moment même ?',
-          data_i18n: 'q37_acolhimento_sofrimento'
-        },
-        {
-          number: 38,
-          block: 4,
-          theme: 'vida_alem_da_terra',
-          id: 'q38_vida_alem_terra',
-          label: 'Croyez-vous qu’il existe de la vie au-delà de notre planète Terre, ou pensez-vous que toute l’existence se déroule uniquement ici ?',
-          data_i18n: 'q38_vida_alem_terra'
-        },
-        {
-          number: 39,
-          block: 4,
-          theme: 'legado',
-          id: 'q39_legado',
-          label: 'Comment aimeriez-vous que l’on se souvienne de vous lorsque vous ne serez plus là ? Quel héritage (legs) souhaitez-vous laisser ?',
-          data_i18n: 'q39_legado'
-        },
-        {
-          number: 40,
-          block: 4,
-          theme: 'destino_dos_sonhos',
-          id: 'q40_destino_sonhos',
-          label: 'Qu’est-il advenu des rêves que vous aviez autrefois — et que vous n’avez jamais réussi à réaliser ?',
-          data_i18n: 'q40_destino_sonhos'
-        }
-      ]
-    },
-    {
-      sectionId: 'section-perguntas-sintese',
-      id: 'sintese',
-      index: 4,
-      title: 'Bloc 5 — Synthèse et Offrande',
-      data_i18n: 'bloco_sintese_title',
-      nextSection: 'section-final',
-      transitionVideo: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4',
-      questions: [
-        {
-          number: 41,
-          block: 5,
-          theme: 'choro',
-          id: 'q41_choro',
-          label: 'Pleurez-vous fréquemment ces derniers temps ? Pouvez-vous identifier ce qui provoque généralement ces larmes ?',
-          data_i18n: 'q41_choro'
-        },
-        {
-          number: 42,
-          block: 5,
-          theme: 'origem_do_choro',
-          id: 'q42_origem_choro',
-          label: 'Ces pleurs naissent-ils d’un vide intérieur, d’une perte ou d’un regret ?',
-          data_i18n: 'q42_origem_choro'
-        },
-        {
-          number: 43,
-          block: 5,
-          theme: 'expressao_da_dor',
-          id: 'q43_expressao_dor',
-          label: 'Quand les larmes viennent, qu’est-ce qui prédomine : le silence, la recherche de quelque chose qui intensifie ce sentiment, ou la colère qui cherche à se manifester ?',
-          data_i18n: 'q43_expressao_dor'
-        },
-        {
-          number: 44,
-          block: 5,
-          theme: 'tristeza_depressao',
-          id: 'q44_tristeza_depressao',
-          label: 'Vous sentez-vous triste ou pensez-vous vivre un état dépressif ? Arrivez-vous à percevoir la différence entre ces deux expériences ?',
-          data_i18n: 'q44_tristeza_depressao'
-        },
-        {
-          number: 45,
-          block: 5,
-          theme: 'ajuda_profissional',
-          id: 'q45_ajuda_profissional',
-          label: 'Si vous pensez vivre un état dépressif, avez-vous envisagé de chercher une aide professionnelle pour mieux comprendre ce que vous ressentez ?',
-          data_i18n: 'q45_ajuda_profissional'
-        },
-        {
-          number: 46,
-          block: 5,
-          theme: 'comportamento_relacional',
-          id: 'q46_comportamento_relacional',
-          label: 'Dans vos relations, vous considérez-vous comme une personne plutôt agressive ou plutôt soumise ?',
-          data_i18n: 'q46_comportamento_relacional'
-        },
-        {
-          number: 47,
-          block: 5,
-          theme: 'autopercepcao',
-          id: 'q47_autopercepcao',
-          label: 'Trouvez-vous que, parfois, il est difficile de vivre avec vous-même, ou portez-vous en vous de la colère face à des décisions que vous jugez erronées ?',
-          data_i18n: 'q47_autopercepcao'
-        },
-        {
-          number: 48,
-          block: 5,
-          theme: 'autoimagem',
-          id: 'q48_autoimagem',
-          label: 'Vous considérez-vous comme une personne intéressante, ou pensez-vous être quelqu’un de peu d’intérêt pour les autres ?',
-          data_i18n: 'q48_autoimagem'
-        },
-        {
-          number: 49,
-          block: 5,
-          theme: 'limites',
-          id: 'q49_limites',
-          label: 'Avez-vous du mal à dire « non » aux gens ?',
-          data_i18n: 'q49_limites'
-        },
-        {
-          number: 50,
-          block: 5,
-          theme: 'morte',
-          id: 'q50_morte',
-          label: 'Avez-vous peur de mourir ? Souvent, la peur réside moins dans la mort elle-même que dans la manière dont elle pourrait survenir. Comment percevez-vous cela en vous ?',
-          data_i18n: 'q50_morte'
-        }
-      ]
-    }
-  ],  
+
+{
+  sectionId: 'section-perguntas-raizes',
+  id: 'raizes',
+  index: 0,
+  title: 'Bloc 1 — Racines',
+  data_i18n: 'bloco_raizes_title',
+  nextSection: 'section-perguntas-reflexoes',
+  transitionVideo: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
+  questions: [
+    { number: 1, block: 1, theme: 'criacao_familiar', id: 'q01_criacao', label: 'Qui t\'a élevé — tes parents biologiques, un seul d\'entre eux, d\'autres membres de la famille, des parents adoptifs, ou quelqu\'un d\'autre en dehors de ce cercle ? Décris brièvement cette présence.', data_i18n: 'q01_criacao' },
+    { number: 2, block: 1, theme: 'individualidade', id: 'q02_filho_unico', label: 'As-tu grandi comme enfant unique ou avais-tu des frères et sœurs ? En quoi cette réalité a-t-elle façonné ta façon de te percevoir en tant qu\'individu — plus indépendant, plus seul, plus divisé ?', data_i18n: 'q02_filho_unico' },
+    { number: 3, block: 1, theme: 'irmaos', id: 'q03_irmaos', label: 'Si tu as ou avais des frères et sœurs, quelle était (ou serait) ta place parmi eux — l\'aîné, celui du milieu, ou le plus jeune ? Quel poids ou quel avantage cette place a-t-elle apporté à ton histoire ?', data_i18n: 'q03_irmaos' },
+    { number: 4, block: 1, theme: 'privacoes', id: 'q04_privacoes', label: 'Y a-t-il eu de la faim ou de graves privations pendant ton enfance ? Si oui, quelle marque cela a-t-il laissée sur ta façon de gérer le manque, la sécurité ou le sentiment de mérite aujourd\'hui ?', data_i18n: 'q04_privacoes' },
+    { number: 5, block: 1, theme: 'deficiencia', id: 'q05_deficiencia', label: 'Vis-tu avec une limitation sociale, physique ou cognitive ? As-tu déjà ressenti le poids des préjugés à cause de ça — et comment cela se reflète-t-il en toi aujourd\'hui ?', data_i18n: 'q05_deficiencia' },
+    { number: 6, block: 1, theme: 'escolaridade', id: 'q06_escolaridade', label: 'Quel est ton niveau d\'études ? En y repensant, sens-tu que tu as suffisamment investi dans ta propre formation, ou existe-t-il un vide d\'apprentissage qui te dérange encore ?', data_i18n: 'q06_escolaridade' },
+    { number: 7, block: 1, theme: 'estado_civil', id: 'q07_estado_civil', label: 'Ta situation sentimentale actuelle — seul, marié, séparé, en couple — te renforce-t-elle ou te pèse-t-elle en ce moment de ta vie ?', data_i18n: 'q07_estado_civil' },
+    { number: 8, block: 1, theme: 'identidade', id: 'q08_identidade', label: 'Te souviens-tu de l\'instant exact où tu as réalisé, par toi-même, que tu étais quelqu\'un d\'unique au monde ? Quel âge avais-tu, et qu\'as-tu ressenti ?', data_i18n: 'q08_identidade' },
+    { number: 9, block: 1, theme: 'silencio', id: 'q09_silencio', label: 'Quelle est ta relation réelle avec le silence — te dérange-t-il parce qu\'il expose quelque chose, ou t\'apaise-t-il parce qu\'il te ramène à toi-même ?', data_i18n: 'q09_silencio' },
+    { number: 10, block: 1, theme: 'crianca_interior', id: 'q10_crianca', label: 'Si tu pouvais parler maintenant à l\'enfant que tu étais — celui qui a porté tout ce que tu viens de raconter — que lui dirais-tu ?', data_i18n: 'q10_crianca' }
+  ]
+},
+
+{
+  sectionId: 'section-perguntas-reflexoes',
+  id: 'reflexoes',
+  index: 1,
+  title: 'Bloc 2 — Réflexions',
+  data_i18n: 'bloco_reflexoes_title',
+  nextSection: 'section-perguntas-crescimento',
+  transitionVideo: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4',
+  questions: [
+    { number: 11, block: 2, theme: 'vida', id: 'q11_percepcao_vida', label: 'Après avoir revisité tes racines, comment perçois-tu ta propre vie jusqu\'à présent — comme une réussite, comme une survie, ou comme quelque chose encore en suspens ?', data_i18n: 'q11_percepcao_vida' },
+    { number: 12, block: 2, theme: 'empatia', id: 'q12_percepcao_outros', label: 'Et la vie des gens autour de toi — la regardes-tu avec une empathie sincère, ou avec distance et jugement ?', data_i18n: 'q12_percepcao_outros' },
+    { number: 13, block: 2, theme: 'traumas', id: 'q13_traumas', label: 'Comment gères-tu tes traumatismes : les affrontes-tu de face, ou évites-tu même de les nommer ? Peux-tu en parler maintenant avec la même sincérité qu\'avant ?', data_i18n: 'q13_traumas' },
+    { number: 14, block: 2, theme: 'verdade', id: 'q14_verdade', label: 'Crois-tu qu\'il existe une vérité plus grande, au-dessus de tout, ou que chaque vérité n\'est que le reflet du regard de celui qui la perçoit ?', data_i18n: 'q14_verdade' },
+    { number: 15, block: 2, theme: 'vicios', id: 'q15_vicios', label: 'Quel est ton plus grand vice — avoué ou caché ? D\'où vient-il, as-tu déjà essayé de le vaincre, et existe-t-il d\'autres vices plus subtils, émotionnels, que tu admets rarement avoir ?', data_i18n: 'q15_vicios' },
+    { number: 16, block: 2, theme: 'doenca', id: 'q16_doenca', label: 'Que représente la maladie pour toi ? Traverses-tu actuellement une condition de santé — physique ou émotionnelle ?', data_i18n: 'q16_doenca' },
+    { number: 17, block: 2, theme: 'solidao', id: 'q17_presenca', label: 'Y a-t-il quelqu\'un que tu aimerais avoir à tes côtés en ce moment précis ? Qu\'est-ce qui empêche cette personne d\'être présente — la distance, l\'orgueil, ou quelque chose qui n\'a jamais été dit ?', data_i18n: 'q17_presenca' },
+    { number: 18, block: 2, theme: 'morte', id: 'q18_morte', label: 'Comment perçois-tu la mort aujourd\'hui — comme une peur, comme un soulagement, ou comme une curiosité sincère envers ce qui vient après ?', data_i18n: 'q18_morte' },
+    { number: 19, block: 2, theme: 'espiritualidade', id: 'q19_doenca_espiritual', label: 'Crois-tu que la maladie puisse porter un sens, un message, ou un but caché à certains moments de la vie ?', data_i18n: 'q19_doenca_espiritual' },
+    { number: 20, block: 2, theme: 'sentido_doenca', id: 'q20_sentido_doenca', label: 'En allant plus loin : penses-tu que certaines maladies reflètent des ombres intérieures non résolues, ou font partie d\'un processus de croissance spirituelle ?', data_i18n: 'q20_sentido_doenca' }
+  ]
+},
+
+{
+  sectionId: 'section-perguntas-crescimento',
+  id: 'crescimento',
+  index: 2,
+  title: 'Bloc 3 — Croissance',
+  data_i18n: 'bloco_crescimento_title',
+  nextSection: 'section-perguntas-integracao',
+  transitionVideo: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4',
+  questions: [
+    { number: 21, block: 3, theme: 'sentido_da_vida', id: 'q21_sentido_vida', label: 'Après tout ce que tu as déjà révélé, quel est, pour toi, le sens de la vie — existe-t-il un but plus grand qui guide tout, ou est-ce le hasard qui décide ?', data_i18n: 'q21_sentido_vida' },
+    { number: 22, block: 3, theme: 'espiritualidade', id: 'q22_espiritualidade', label: 'Crois-tu en Dieu, en un être suprême, en la spiritualité, ou en quelque chose qui dépasse ce que les yeux peuvent voir ?', data_i18n: 'q22_espiritualidade' },
+    { number: 23, block: 3, theme: 'experiencia_espiritual', id: 'q23_guia_invisivel', label: 'As-tu déjà senti, à un moment donné, que tu étais guidé par quelque chose d\'invisible ? Existe-t-il une expérience marquante qui te le prouve ?', data_i18n: 'q23_guia_invisivel' },
+    { number: 24, block: 3, theme: 'dor_emocional', id: 'q24_dor_emocional', label: 'Quelle a été la plus grande douleur émotionnelle que tu aies jamais affrontée — et quel chemin as-tu réellement utilisé pour la traverser ?', data_i18n: 'q24_dor_emocional' },
+    { number: 25, block: 3, theme: 'superacao', id: 'q25_superacao', label: 'Et quelle a été ta plus grande victoire sur toi-même ? Quelle force as-tu découverte en toi exactement au moment où tout semblait perdu ?', data_i18n: 'q25_superacao' },
+    { number: 26, block: 3, theme: 'medos', id: 'q26_medos', label: 'De quoi as-tu le plus peur aujourd\'hui ? Si tu prends le temps de l\'écouter, qu\'est-ce que cette peur essaie de te montrer ?', data_i18n: 'q26_medos' },
+    { number: 27, block: 3, theme: 'autocuidado', id: 'q27_esquecimento_de_si', label: 'Pourquoi crois-tu qu\'à un moment donné, tu as cessé de te mettre en priorité ? Quand as-tu reçu, pour la dernière fois, un compliment qui t\'a vraiment touché ?', data_i18n: 'q27_esquecimento_de_si' },
+    { number: 28, block: 3, theme: 'prioridade_pessoal', id: 'q28_prioridade', label: 'Pourquoi as-tu souvent du mal à te traiter comme une priorité — même en sachant que tu en as besoin ?', data_i18n: 'q28_prioridade' },
+    { number: 29, block: 3, theme: 'autoestima', id: 'q29_autoestima', label: 'As-tu l\'habitude de te reconnaître et de te féliciter toi-même, sans dépendre de la validation de qui que ce soit ? Dans quels moments cela arrive-t-il vraiment ?', data_i18n: 'q29_autoestima' },
+    { number: 30, block: 3, theme: 'sonhos', id: 'q30_sonhos', label: 'Te vois-tu comme quelqu\'un qui aide les rêves — les tiens et ceux des autres — à naître, ou comme quelqu\'un qui, sans s\'en rendre compte, a enterré ces rêves en chemin ?', data_i18n: 'q30_sonhos' }
+  ]
+},
+
+{
+  sectionId: 'section-perguntas-integracao',
+  id: 'integracao',
+  index: 3,
+  title: 'Bloc 4 — Intégration',
+  data_i18n: 'bloco_integracao_title',
+  nextSection: 'section-perguntas-sintese',
+  transitionVideo: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4',
+  questions: [
+    { number: 31, block: 4, theme: 'maior_sonho', id: 'q31_maior_sonho', label: 'Après avoir regardé tes peurs et tes rêves enterrés : quel est ton plus grand rêve aujourd\'hui — celui qui te fait sourire juste en l\'imaginant ?', data_i18n: 'q31_maior_sonho' },
+    { number: 32, block: 4, theme: 'barreiras', id: 'q32_barreiras', label: 'Qu\'est-ce qui, selon toi, t\'empêche de le réaliser ? Ces barrières viennent-elles de l\'intérieur, de l\'extérieur, ou des deux à la fois ?', data_i18n: 'q32_barreiras' },
+    { number: 33, block: 4, theme: 'proposito', id: 'q33_proposito', label: 'Sens-tu que tu vis déjà ton but, ou es-tu encore à sa recherche — sans savoir exactement par où continuer ?', data_i18n: 'q33_proposito' },
+    { number: 34, block: 4, theme: 'chamado_interior', id: 'q34_chamado_interior', label: 'Existe-t-il un appel intérieur, une envie silencieuse, que tu ignores sans cesse, même en sachant qu\'elle pulse encore en toi ?', data_i18n: 'q34_chamado_interior' },
+    { number: 35, block: 4, theme: 'origem_dos_medos', id: 'q35_origem_medos', label: 'Revenant à tes peurs : à quelle situation ou sentiment spécifique sont-elles réellement liées, au fond ?', data_i18n: 'q35_origem_medos' },
+    { number: 36, block: 4, theme: 'decisoes_e_limites', id: 'q36_decisoes_limites', label: 'Sens-tu que tu évites de prendre certaines décisions par peur, ou que tu finis par accepter des situations qui te rabaissent juste pour éviter la confrontation ?', data_i18n: 'q36_decisoes_limites' },
+    { number: 37, block: 4, theme: 'acolhimento_do_sofrimento', id: 'q37_acolhimento_sofrimento', label: 'Si quelqu\'un se trouvait devant toi en ce moment, souffrant profondément, que lui dirais-tu — et pourrais-tu te dire la même chose à toi-même ?', data_i18n: 'q37_acolhimento_sofrimento' },
+    { number: 38, block: 4, theme: 'vida_alem_da_terra', id: 'q38_vida_alem_terra', label: 'Crois-tu qu\'il existe une vie au-delà de notre planète, ou que toute existence se limite à ce que nous connaissons ici ?', data_i18n: 'q38_vida_alem_terra' },
+    { number: 39, block: 4, theme: 'legado', id: 'q39_legado', label: 'Comment aimerais-tu être retenu(e) quand tu ne seras plus ici ? Quel héritage, au-delà des biens ou des mots, souhaites-tu laisser ?', data_i18n: 'q39_legado' },
+    { number: 40, block: 4, theme: 'destino_dos_sonhos', id: 'q40_destino_sonhos', label: 'Que sont réellement devenus les rêves que tu as eus et que tu n\'as jamais réalisés — sont-ils morts, attendent-ils, ou as-tu simplement cessé d\'y croire ?', data_i18n: 'q40_destino_sonhos' }
+  ]
+},
+
+{
+  sectionId: 'section-perguntas-sintese',
+  id: 'sintese',
+  index: 4,
+  title: 'Bloc 5 — Synthèse et remise',
+  data_i18n: 'bloco_sintese_title',
+  nextSection: 'section-final',
+  transitionVideo: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4',
+  questions: [
+    { number: 41, block: 5, theme: 'choro', id: 'q41_choro', label: 'As-tu pleuré souvent ces derniers temps ? Peux-tu identifier, honnêtement, ce qui déclenche vraiment ces pleurs ?', data_i18n: 'q41_choro' },
+    { number: 42, block: 5, theme: 'origem_do_choro', id: 'q42_origem_choro', label: 'Ces pleurs naissent-ils d\'un vide intérieur, d\'une perte concrète, ou d\'un regret que tu portes en silence ?', data_i18n: 'q42_origem_choro' },
+    { number: 43, block: 5, theme: 'expressao_da_dor', id: 'q43_expressao_dor', label: 'Quand la douleur arrive, qu\'est-ce qui domine en toi — le silence qui isole, la recherche de quelque chose qui intensifie ce sentiment, ou la colère qui veut exploser ?', data_i18n: 'q43_expressao_dor' },
+    { number: 44, block: 5, theme: 'tristeza_depressao', id: 'q44_tristeza_depressao', label: 'Ressens-tu seulement une tristesse passagère, ou crois-tu vivre quelque chose de plus profond, comme un état dépressif ? Arrives-tu à distinguer clairement les deux en toi ?', data_i18n: 'q44_tristeza_depressao' },
+    { number: 45, block: 5, theme: 'ajuda_profissional', id: 'q45_ajuda_profissional', label: 'Si tu reconnais cet état plus profond, as-tu déjà envisagé de chercher une aide professionnelle pour mieux comprendre ce que tu ressens — ou résistes-tu encore à cette étape ?', data_i18n: 'q45_ajuda_profissional' },
+    { number: 46, block: 5, theme: 'comportamento_relacional', id: 'q46_comportamento_relacional', label: 'Dans tes relations, te reconnais-tu davantage comme quelqu\'un d\'affirmé (voire agressif), ou plutôt comme quelqu\'un de soumis, qui évite le conflit à tout prix ?', data_i18n: 'q46_comportamento_relacional' },
+    { number: 47, block: 5, theme: 'autopercepcao', id: 'q47_autopercepcao', label: 'Y a-t-il des moments où il est même difficile de vivre avec toi-même — en portant du ressentiment ou de la colère pour des décisions que tu considères aujourd\'hui comme des erreurs ?', data_i18n: 'q47_autopercepcao' },
+    { number: 48, block: 5, theme: 'autoimagem', id: 'q48_autoimagem', label: 'Au fond, te vois-tu comme quelqu\'un d\'intéressant et de valable, ou crois-tu, même secrètement, être quelqu\'un de peu d\'intérêt pour les autres ?', data_i18n: 'q48_autoimagem' },
+    { number: 49, block: 5, theme: 'limites', id: 'q49_limites', label: 'As-tu vraiment du mal à dire « non » aux gens — même quand cela signifie te trahir toi-même intérieurement ?', data_i18n: 'q49_limites' },
+    { number: 50, block: 5, theme: 'morte', id: 'q50_morte', label: 'Pour conclure : as-tu peur de mourir ? Et en étant encore plus honnête — cette peur porte-t-elle sur la mort elle-même, ou sur la manière dont elle pourrait arriver ? Que révèle cette réponse sur tout ce que tu as partagé jusqu\'ici ?', data_i18n: 'q50_morte' }
+  ]
+ }      
+],  
     
    'es-ES': [
-    {
-      sectionId: 'section-perguntas-raizes',
-      id: 'raizes',
-      index: 0,
-      title: 'Bloque 1 — Raíces',
-      data_i18n: 'bloco_raizes_title',
-      nextSection: 'section-perguntas-reflexoes',
-      transitionVideo: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
-      questions: [
-        {
-          number: 1,
-          block: 1,
-          theme: 'criacao_familiar',
-          id: 'q01_criacao',
-          label: '¿Por quién fuiste criado? ¿Padres biológicos, solo uno de ellos, familiares, padres adoptivos u otra persona?',
-          data_i18n: 'q01_criacao'
-        },
-        {
-          number: 2,
-          block: 1,
-          theme: 'individualidade',
-          id: 'q02_filho_unico',        
-          label: '¿Eres hijo único o tienes hermanos? ¿Cómo marcó esta realidad tu sentido de individualidad?',
-          data_i18n: 'q02_filho_unico'
-        },
-        {
-          number: 3,
-          block: 1,
-          theme: 'irmaos',
-          id: 'q03_irmaos',        
-          label: 'Si tienes o hubieras tenido hermanos, ¿cuántos? ¿Cuál es o sería tu lugar entre ellos: primogénito, hermano mediano o el menor?',
-          data_i18n: 'q03_irmaos'
-        },
-        {
-          number: 4,
-          block: 1,
-          theme: 'privacoes',
-          id: 'q04_privacoes',        
-          label: '¿Pasaste hambre o viviste privaciones severas en tu infancia? ¿Cómo influyó eso en tu forma de ver la vida?',
-          data_i18n: 'q04_privacoes'
-        },
-        {
-          number: 5,
-          block: 1,
-          theme: 'deficiencia',
-          id: 'q05_deficiencia',        
-          label: '¿Tienes alguna discapacidad social, física o cognitiva? ¿Has sufrido prejuicios a causa de ella?',
-          data_i18n: 'q05_deficiencia'
-        },
-        {
-          number: 6,
-          block: 1,
-          theme: 'escolaridade',
-          id: 'q06_escolaridade',        
-          label: '¿Cuál es tu nivel de escolaridad? ¿Cómo evalúas la inversión que hiciste en tu formación?',
-          data_i18n: 'q06_escolaridade'
-        },
-        {
-          number: 7,
-          block: 1,
-          theme: 'estado_civil',
-          id: 'q07_estado_civil',        
-          label: '¿Cómo influye tu estado civil actual en el momento que estás viviendo hoy?',
-          data_i18n: 'q07_estado_civil'
-        },
-        {
-          number: 8,
-          block: 1,
-          theme: 'identidade',
-          id: 'q08_identidade',        
-          label: '¿Recuerdas la primera vez que te diste cuenta de que eras alguien único en el mundo? ¿Cuántos años tenías?',
-          data_i18n: 'q08_identidade'
-        },
-        {
-          number: 9,
-          block: 1,
-          theme: 'silencio',
-          id: 'q09_silencio',        
-          label: '¿Cómo es tu relación con el silencio? ¿Te incomoda o te tranquiliza?',
-          data_i18n: 'q09_silencio'
-        },
-        {
-          number: 10,
-          block: 1,
-          theme: 'crianca_interior',
-          id: 'q10_crianca',        
-          label: 'Si pudieras hablar con el niño que aún habita en ti, ¿qué le dirías?',
-          data_i18n: 'q10_crianca'
-        }
-      ]   
-    },
-    {
-      sectionId: 'section-perguntas-reflexoes',
-      id: 'reflexoes',
-      index: 1,
-      title: 'Bloque 2 — Reflexiones',
-      data_i18n: 'bloco_reflexoes_title',
-      nextSection: 'section-perguntas-crescimento',
-      transitionVideo: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4',
-      questions: [
-        {
-          number: 11,
-          block: 2,
-          theme: 'vida',
-          id: 'q11_percepcao_vida',
-          label: '¿Cómo has percibido tu propia vida hasta este momento?',
-          data_i18n: 'q11_percepcao_vida'
-        },
-        {
-          number: 12,
-          block: 2,
-          theme: 'empatia',
-          id: 'q12_percepcao_outros',    
-          label: '¿Cómo ves la vida de las personas que te rodean?',
-          data_i18n: 'q12_percepcao_outros'
-        },
-        {
-          number: 13,
-          block: 2,
-          theme: 'traumas',
-          id: 'q13_traumas',    
-          label: '¿Cómo lidas con tus traumas? ¿Eres capaz de hablar de ellos?',
-          data_i18n: 'q13_traumas'
-        },
-        {
-          number: 14,
-          block: 2,
-          theme: 'verdade',
-          id: 'q14_verdade',    
-          label: '¿Crees que existe una verdad mayor ou que todo depende de la mirada de cada persona?',
-          data_i18n: 'q14_verdade'
-        },
-        {
-          number: 15,
-          block: 2,
-          theme: 'vicios',
-          id: 'q15_vicios',    
-          label: '¿Cuál es tu mayor vicio o adicción? ¿Por qué crees que surgió? ¿Has intentado vencerlo? ¿Notas también otros vicios más sutiles o emocionales en ti?',
-          data_i18n: 'q15_vicios'
-        },
-        {
-          number: 16,
-          block: 2,
-          theme: 'doenca',
-          id: 'q16_doenca',    
-          label: '¿Qué representa la enfermedad para ti? ¿Estás enfrentando alguna condición de salud en este momento?',
-          data_i18n: 'q16_doenca'
-        },
-        {
-          number: 17,
-          block: 2,
-          theme: 'solidao',
-          id: 'q17_presenca',    
-          label: '¿Hay alguien que te gustaría tener a tu lado en este momento? ¿Por qué esa persona no está presente?',
-          data_i18n: 'q17_presenca'
-        },
-        {
-          number: 18,
-          block: 2,
-          theme: 'morte',
-          id: 'q18_morte',    
-          label: '¿Cómo percibes la muerte? ¿Despierta en ti miedo, consuelo o curiosidad?',
-          data_i18n: 'q18_morte'
-        },
-        {
-          number: 19,
-          block: 2,
-          theme: 'espiritualidade',
-          id: 'q19_doenca_espiritual',
-          label: '¿Cómo comprendes la enfermedad? ¿Puede tener algún significado o propósito en determinados momentos de la vida?',
-          data_i18n: 'q19_doenca_espiritual'
-        },
-        {
-          number: 20,
-          block: 2,
-          theme: 'sentido_doenca',
-          id: 'q20_sentido_doenca',
-          label: '¿Crees que algunas enfermedades pueden reflejar sombras internas o formar parte de un proceso de crecimiento espiritual?',    
-          data_i18n: 'q20_sentido_doenca'
-        }
-      ]
-    },
-    {
-      sectionId: 'section-perguntas-crescimento',
-      id: 'crescimento',
-      index: 2,
-      title: 'Bloque 3 — Crecimiento',
-      data_i18n: 'bloco_crescimento_title',
-      nextSection: 'section-perguntas-integracao',
-      transitionVideo: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4',
-      questions: [
-        {
-          number: 21,
-          block: 3,
-          theme: 'sentido_da_vida',
-          id: 'q21_sentido_vida',
-          label: '¿Cómo percibes el sentido de la vida? ¿Existe un propósito mayor o todo sucede por casualidad?',
-          data_i18n: 'q21_sentido_vida'
-        },
-        {
-          number: 22,
-          block: 3,
-          theme: 'espiritualidade',
-          id: 'q22_espiritualidade',
-          label: '¿Crees en Dios, en un ser supremo, en la espiritualidad o en algo más allá de lo que podemos ver?',
-          data_i18n: 'q22_espiritualidade'
-        },
-        {
-          number: 23,
-          block: 3,
-          theme: 'experiencia_espiritual',
-          id: 'q23_guia_invisivel',
-          label: '¿Te he sentido alguna vez guiado por algo invisible? ¿Podrías contar una experiencia significativa?',
-          data_i18n: 'q23_guia_invisivel'
-        },
-        {
-          number: 24,
-          block: 3,
-          theme: 'dor_emocional',
-          id: 'q24_dor_emocional',
-          label: '¿Cuál ha sido el mayor dolor emocional que has enfrentado? ¿Cómo lograste lidiar con él?',
-          data_i18n: 'q24_dor_emocional'
-        },
-        {
-          number: 25,
-          block: 3,
-          theme: 'superacao',
-          id: 'q25_superacao',
-          label: '¿Cuál ha sido la mayor superación de tu vida? ¿Qué fuerza descubriste en ti en ese momento?',
-          data_i18n: 'q25_superacao'
-        },
-        {
-          number: 26,
-          block: 3,
-          theme: 'medos',
-          id: 'q26_medos',
-          label: '¿A qué le tienes más miedo hoy? ¿Qué podría estar intentando mostrarte ese miedo?',
-          data_i18n: 'q26_medos'
-        },
-        {
-          number: 27,
-          block: 3,
-          theme: 'autocuidado',
-          id: 'q27_esquecimento_de_si',
-          label: '¿Por qué crees que terminaste olvidándote de ti mismo? ¿Cuándo fue la última vez que recibiste un cumplido que realmente te marcó?',
-          data_i18n: 'q27_esquecimento_de_si'
-        },
-        {
-          number: 28,
-          block: 3,
-          theme: 'prioridade_pessoal',
-          id: 'q28_prioridade',
-          label: '¿Por qué crees que, a menudo, no logras ponerte a ti mismo como prioridad?',
-          data_i18n: 'q28_prioridade'
-        },
-        {
-          number: 29,
-          block: 3,
-          theme: 'autoestima',
-          id: 'q29_autoestima',
-          label: '¿Sueles reconocerte y elogiarse a ti mismo? ¿In qué momentos sucede eso?',
-          data_i18n: 'q29_autoestima'
-        },
-        {
-          number: 30,
-          block: 3,
-          theme: 'sonhos',
-          id: 'q30_sonhos',
-          label: '¿Te ves como alguien que ayuda a que nazcan los sueños, o como alguien que, sin darse cuenta, termina enterrando sus propios sueños y los de los demás?',
-          data_i18n: 'q30_sonhos'
-        }
-      ]
-    },
-    {
-      sectionId: 'section-perguntas-integracao',
-      id: 'integracao',
-      index: 3,
-      title: 'Bloque 4 — Integración',
-      data_i18n: 'bloco_integracao_title',
-      nextSection: 'section-perguntas-sintese',
-      transitionVideo: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4',
-      questions: [
-        {
-          number: 31,
-          block: 4,
-          theme: 'maior_sonho',
-          id: 'q31_maior_sonho',
-          label: '¿Cuál es tu mayor sueño hoy? Algo que te haga sonreír con solo imaginarlo.',
-          data_i18n: 'q31_maior_sonho'
-        },
-        {
-          number: 32,
-          block: 4,
-          theme: 'barreiras',
-          id: 'q32_barreiras',
-          label: '¿Qué crees que te impide realizarlo? ¿Esas barreras son internas, externas o ambas?',
-          data_i18n: 'q32_barreiras'
-        },
-        {
-          number: 33,
-          block: 4,
-          theme: 'proposito',
-          id: 'q33_proposito',
-          label: '¿Sientes que estás viviendo tu propósito o todavía estás en busca de él?',
-          data_i18n: 'q33_proposito'
-        },
-        {
-          number: 34,
-          block: 4,
-          theme: 'chamado_interior',
-          id: 'q34_chamado_interior',
-          label: '¿Existe un llamado interior, un deseo silencioso, que has estado ignorando?',
-          data_i18n: 'q34_chamado_interior'
-        },
-        {
-          number: 35,
-          block: 4,
-          theme: 'origem_dos_medos',
-          id: 'q35_origem_medos',
-          label: '¿Tus miedos están vinculados a qué situación o sentimiento específico?',
-          data_i18n: 'q35_origem_medos'
-        },
-        {
-          number: 36,
-          block: 4,
-          theme: 'decisoes_e_limites',
-          id: 'q36_decisoes_limites',
-          label: '¿Sientes que dejas de tomar ciertas decisiones por miedo, o terminas aceptando situaciones que te humillan?',
-          data_i18n: 'q36_decisoes_limites'
-        },
-        {
-          number: 37,
-          block: 4,
-          theme: 'acolhimento_do_sofrimento',
-          id: 'q37_acolhimento_sofrimento',
-          label: '¿Qué le dirías a alguien que está sufriendo profundamente en este momento?',
-          data_i18n: 'q37_acolhimento_sofrimento'
-        },
-        {
-          number: 38,
-          block: 4,
-          theme: 'vida_alem_da_terra',
-          id: 'q38_vida_alem_terra',
-          label: '¿Crees que existe vida más allá de nuestro planeta Tierra, o crees que toda la existencia ocurre solo aquí?',
-          data_i18n: 'q38_vida_alem_terra'
-        },
-        {
-          number: 39,
-          block: 4,
-          theme: 'legado',
-          id: 'q39_legado',
-          label: '¿Cómo te gustaría ser recordado cuando ya no estés aquí? ¿Qué legado deseas dejar?',
-          data_i18n: 'q39_legado'
-        },
-        {
-          number: 40,
-          block: 4,
-          theme: 'destino_dos_sonhos',
-          id: 'q40_destino_sonhos',
-          label: '¿Qué pasó con los sueños que alguna vez tuviste — y que nunca llegaste a realizar?',
-          data_i18n: 'q40_destino_sonhos'
-        }
-      ]
-    },
-    {
-      sectionId: 'section-perguntas-sintese',
-      id: 'sintese',
-      index: 4,
-      title: 'Bloque 5 — Síntesis y Entrega',
-      data_i18n: 'bloco_sintese_title',
-      nextSection: 'section-final',
-      transitionVideo: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4',
-      questions: [
-        {
-          number: 41,
-          block: 5,
-          theme: 'choro',
-          id: 'q41_choro',
-          label: '¿Has estado llorando con frecuencia? ¿Puedes identificar qué suele provocar ese llanto?',
-          data_i18n: 'q41_choro'
-        },
-        {
-          number: 42,
-          block: 5,
-          theme: 'origem_do_choro',
-          id: 'q42_origem_choro',
-          label: '¿Este llanto nace de un vacío interior, de una pérdida o de un arrepentimiento?',
-          data_i18n: 'q42_origem_choro'
-        },
-        {
-          number: 43,
-          block: 5,
-          theme: 'expressao_da_dor',
-          id: 'q43_expressao_dor',
-          label: 'Cuando llega el llanto, ¿qué predomina: el silencio, la búsqueda de algo que intensifique ese sentimiento, o la rabia queriendo manifestarse?',
-          data_i18n: 'q43_expressao_dor'
-        },
-        {
-          number: 44,
-          block: 5,
-          theme: 'tristeza_depressao',
-          id: 'q44_tristeza_depressao',
-          label: '¿Te sientes triste o crees estar viviendo un estado depresivo? ¿Consigues percibir la diferencia entre estas dos experiencias?',
-          data_i18n: 'q44_tristeza_depressao'
-        },
-        {
-          number: 45,
-          block: 5,
-          theme: 'ajuda_profissional',
-          id: 'q45_ajuda_profissional',
-          label: 'Si crees estar viviendo un estado depresivo, ¿has pensado en buscar ayuda profesional para comprender mejor lo que estás sintiendo?',
-          data_i18n: 'q45_ajuda_profissional'
-        },
-        {
-          number: 46,
-          block: 5,
-          theme: 'comportamento_relacional',
-          id: 'q46_comportamento_relacional',
-          label: 'In tus relaciones, ¿te consideras una persona más agresiva o más sumisa?',
-          data_i18n: 'q46_comportamento_relacional'
-        },
-        {
-          number: 47,
-          block: 5,
-          theme: 'autopercepcao',
-          id: 'q47_autopercepcao',
-          label: '¿Sientes que, a veces, es difícil convivir contigo mismo, o sueles cargar con rabia por decisiones que consideras equivocadas?',
-          data_i18n: 'q47_autopercepcao'
-        },
-        {
-          number: 48,
-          block: 5,
-          theme: 'autoimagem',
-          id: 'q48_autoimagem',
-          label: '¿Te consideras una persona interesante, o crees ser alguien sin mucho interés para los demás?',
-          data_i18n: 'q48_autoimagem'
-        },
-        {
-          number: 49,
-          block: 5,
-          theme: 'limites',
-          id: 'q49_limites',
-          label: '¿Tienes dificultad para decir "no" a las personas?',
-          data_i18n: 'q49_limites'
-        },
-        {
-          number: 50,
-          block: 5,
-          theme: 'morte',
-          id: 'q50_morte',
-          label: '¿Tienes miedo de morir? Muchas veces, el miedo está menos en la muerte en sí y más en la forma en que puede suceder. ¿Cómo percibes esto en ti?',
-          data_i18n: 'q50_morte'
-        }
-      ]
-    }
-  ],
+
+{
+  sectionId: 'section-perguntas-raizes',
+  id: 'raizes',
+  index: 0,
+  title: 'Bloque 1 — Raíces',
+  data_i18n: 'bloco_raizes_title',
+  nextSection: 'section-perguntas-reflexoes',
+  transitionVideo: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
+  questions: [
+    { number: 1, block: 1, theme: 'criacao_familiar', id: 'q01_criacao', label: '¿Quién te crió — tus padres biológicos, solo uno de ellos, otros familiares, padres adoptivos, o alguien fuera de ese círculo? Describe brevemente esa presencia.', data_i18n: 'q01_criacao' },
+    { number: 2, block: 1, theme: 'individualidade', id: 'q02_filho_unico', label: '¿Creciste como hijo único o tuviste hermanos? ¿De qué manera esa condición marcó tu forma de verte como individuo — más independiente, más solo, más dividido?', data_i18n: 'q02_filho_unico' },
+    { number: 3, block: 1, theme: 'irmaos', id: 'q03_irmaos', label: 'Si tienes o tuviste hermanos, ¿cuál era (o sería) tu lugar entre ellos — el mayor, el del medio o el menor? ¿Qué peso o ventaja trajo ese lugar a tu historia?', data_i18n: 'q03_irmaos' },
+    { number: 4, block: 1, theme: 'privacoes', id: 'q04_privacoes', label: '¿Hubo hambre o privaciones severas en tu infancia? Si es así, ¿qué huella dejó eso en cómo manejas hoy la escasez, la seguridad o el sentirte merecedor?', data_i18n: 'q04_privacoes' },
+    { number: 5, block: 1, theme: 'deficiencia', id: 'q05_deficiencia', label: '¿Vives con alguna limitación social, física o cognitiva? ¿Alguna vez sentiste el peso del prejuicio por eso — y cómo se refleja eso en ti hoy?', data_i18n: 'q05_deficiencia' },
+    { number: 6, block: 1, theme: 'escolaridade', id: 'q06_escolaridade', label: '¿Cuál es tu nivel educativo? Mirando hacia atrás, ¿sientes que invertiste lo suficiente en tu propia formación, o hay un vacío de aprendizaje que todavía te incomoda?', data_i18n: 'q06_escolaridade' },
+    { number: 7, block: 1, theme: 'estado_civil', id: 'q07_estado_civil', label: 'Tu estado civil actual — soltero, casado, separado, en una relación — ¿te está fortaleciendo o pesando en este momento de tu vida?', data_i18n: 'q07_estado_civil' },
+    { number: 8, block: 1, theme: 'identidade', id: 'q08_identidade', label: '¿Recuerdas el instante exacto en que te diste cuenta, por tu cuenta, de que eras alguien único en el mundo? ¿Qué edad tenías, y qué sentiste?', data_i18n: 'q08_identidade' },
+    { number: 9, block: 1, theme: 'silencio', id: 'q09_silencio', label: '¿Cuál es tu relación real con el silencio — te incomoda porque expone algo, o te calma porque te devuelve a ti mismo?', data_i18n: 'q09_silencio' },
+    { number: 10, block: 1, theme: 'crianca_interior', id: 'q10_crianca', label: 'Si pudieras hablar ahora con el niño que fuiste — el que cargó con todo lo que acabas de contar —, ¿qué le dirías?', data_i18n: 'q10_crianca' }
+  ]
+},
+
+{
+  sectionId: 'section-perguntas-reflexoes',
+  id: 'reflexoes',
+  index: 1,
+  title: 'Bloque 2 — Reflexiones',
+  data_i18n: 'bloco_reflexoes_title',
+  nextSection: 'section-perguntas-crescimento',
+  transitionVideo: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4',
+  questions: [
+    { number: 11, block: 2, theme: 'vida', id: 'q11_percepcao_vida', label: 'Después de revisitar tus raíces, ¿cómo has percibido tu propia vida hasta ahora — como un logro, como supervivencia, o como algo aún en suspenso?', data_i18n: 'q11_percepcao_vida' },
+    { number: 12, block: 2, theme: 'empatia', id: 'q12_percepcao_outros', label: '¿Y la vida de las personas a tu alrededor — la ves con empatía genuina o con distancia y juicio?', data_i18n: 'q12_percepcao_outros' },
+    { number: 13, block: 2, theme: 'traumas', id: 'q13_traumas', label: '¿Cómo manejas tus traumas: los enfrentas de frente, o evitas incluso nombrarlos? ¿Puedes hablar de ellos ahora con la misma sinceridad que antes?', data_i18n: 'q13_traumas' },
+    { number: 14, block: 2, theme: 'verdade', id: 'q14_verdade', label: '¿Crees que existe una verdad mayor, por encima de todo, o que cada verdad es solo el reflejo de la mirada de quien la ve?', data_i18n: 'q14_verdade' },
+    { number: 15, block: 2, theme: 'vicios', id: 'q15_vicios', label: '¿Cuál es tu mayor vicio — declarado o disfrazado? ¿De dónde nació, ya intentaste vencerlo, y existen otros vicios más sutiles, emocionales, que casi nunca admites tener?', data_i18n: 'q15_vicios' },
+    { number: 16, block: 2, theme: 'doenca', id: 'q16_doenca', label: '¿Qué representa la enfermedad para ti? ¿Existe alguna condición de salud — física o emocional — atravesándote justo ahora?', data_i18n: 'q16_doenca' },
+    { number: 17, block: 2, theme: 'solidao', id: 'q17_presenca', label: '¿Existe alguien a quien te gustaría tener a tu lado en este momento exacto? ¿Qué impide que esa persona esté presente — la distancia, el orgullo, o algo que nunca se dijo?', data_i18n: 'q17_presenca' },
+    { number: 18, block: 2, theme: 'morte', id: 'q18_morte', label: '¿Cómo percibes la muerte hoy — como miedo, como alivio, o como curiosidad genuina sobre lo que viene después?', data_i18n: 'q18_morte' },
+    { number: 19, block: 2, theme: 'espiritualidade', id: 'q19_doenca_espiritual', label: '¿Crees que la enfermedad puede cargar un significado, un mensaje, o un propósito escondido en ciertos momentos de la vida?', data_i18n: 'q19_doenca_espiritual' },
+    { number: 20, block: 2, theme: 'sentido_doenca', id: 'q20_sentido_doenca', label: 'Yendo más a fondo: ¿crees que algunas enfermedades reflejan sombras internas no resueltas, o forman parte de un proceso de crecimiento espiritual?', data_i18n: 'q20_sentido_doenca' }
+  ]
+},
+
+{
+  sectionId: 'section-perguntas-crescimento',
+  id: 'crescimento',
+  index: 2,
+  title: 'Bloque 3 — Crecimiento',
+  data_i18n: 'bloco_crescimento_title',
+  nextSection: 'section-perguntas-integracao',
+  transitionVideo: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4',
+  questions: [
+    { number: 21, block: 3, theme: 'sentido_da_vida', id: 'q21_sentido_vida', label: 'Después de todo lo que ya has revelado, ¿cuál es, para ti, el sentido de la vida — existe un propósito mayor guiando todo, o es el azar quien decide?', data_i18n: 'q21_sentido_vida' },
+    { number: 22, block: 3, theme: 'espiritualidade', id: 'q22_espiritualidade', label: '¿Crees en Dios, en un ser supremo, en la espiritualidad, o en algo que va más allá de lo que los ojos pueden ver?', data_i18n: 'q22_espiritualidade' },
+    { number: 23, block: 3, theme: 'experiencia_espiritual', id: 'q23_guia_invisivel', label: '¿Alguna vez has sentido que fuiste guiado por algo invisible? ¿Existe una experiencia marcante que lo compruebe para ti?', data_i18n: 'q23_guia_invisivel' },
+    { number: 24, block: 3, theme: 'dor_emocional', id: 'q24_dor_emocional', label: '¿Cuál fue el mayor dolor emocional que has enfrentado — y cuál fue, en verdad, el camino que usaste para atravesarlo?', data_i18n: 'q24_dor_emocional' },
+    { number: 25, block: 3, theme: 'superacao', id: 'q25_superacao', label: '¿Y cuál fue tu mayor superación? ¿Qué fuerza descubriste en ti mismo justo en el momento en que todo parecía perdido?', data_i18n: 'q25_superacao' },
+    { number: 26, block: 3, theme: 'medos', id: 'q26_medos', label: '¿A qué le tienes más miedo hoy? ¿Qué está intentando mostrarte ese miedo si te detienes a escucharlo?', data_i18n: 'q26_medos' },
+    { number: 27, block: 3, theme: 'autocuidado', id: 'q27_esquecimento_de_si', label: '¿Por qué crees que, en algún momento, dejaste de ponerte en primer lugar? ¿Cuándo fue la última vez que recibiste un elogio que realmente te tocó?', data_i18n: 'q27_esquecimento_de_si' },
+    { number: 28, block: 3, theme: 'prioridade_pessoal', id: 'q28_prioridade', label: '¿Por qué, muchas veces, te cuesta tratarte como una prioridad — aun sabiendo que lo necesitas?', data_i18n: 'q28_prioridade' },
+    { number: 29, block: 3, theme: 'autoestima', id: 'q29_autoestima', label: '¿Sueles reconocerte y elogiarte a ti mismo, sin depender de la validación de nadie? ¿En qué momentos eso realmente sucede?', data_i18n: 'q29_autoestima' },
+    { number: 30, block: 3, theme: 'sonhos', id: 'q30_sonhos', label: '¿Te ves como alguien que ayuda a nacer sueños — tuyos y de otros — o como alguien que, sin darse cuenta, ha ido enterrando esos sueños en el camino?', data_i18n: 'q30_sonhos' }
+  ]
+},
+
+{
+  sectionId: 'section-perguntas-integracao',
+  id: 'integracao',
+  index: 3,
+  title: 'Bloque 4 — Integración',
+  data_i18n: 'bloco_integracao_title',
+  nextSection: 'section-perguntas-sintese',
+  transitionVideo: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4',
+  questions: [
+    { number: 31, block: 4, theme: 'maior_sonho', id: 'q31_maior_sonho', label: 'Después de mirar tus miedos y sueños enterrados: ¿cuál es tu mayor sueño hoy — el que te hace sonreír solo con imaginarlo?', data_i18n: 'q31_maior_sonho' },
+    { number: 32, block: 4, theme: 'barreiras', id: 'q32_barreiras', label: '¿Qué crees que te impide realizarlo? ¿Esas barreras vienen de adentro, de afuera, o de ambas cosas a la vez?', data_i18n: 'q32_barreiras' },
+    { number: 33, block: 4, theme: 'proposito', id: 'q33_proposito', label: '¿Sientes que ya estás viviendo tu propósito, o todavía estás en su búsqueda — sin saber exactamente por dónde seguir?', data_i18n: 'q33_proposito' },
+    { number: 34, block: 4, theme: 'chamado_interior', id: 'q34_chamado_interior', label: '¿Existe un llamado interior, una voluntad silenciosa, que has ignorado repetidamente, aun sabiendo que todavía late en ti?', data_i18n: 'q34_chamado_interior' },
+    { number: 35, block: 4, theme: 'origem_dos_medos', id: 'q35_origem_medos', label: 'Volviendo a tus miedos: ¿a qué situación o sentimiento específico están realmente ligados, en el fondo?', data_i18n: 'q35_origem_medos' },
+    { number: 36, block: 4, theme: 'decisoes_e_limites', id: 'q36_decisoes_limites', label: '¿Sientes que dejas de tomar ciertas decisiones por miedo, o que terminas aceptando situaciones que te disminuyen solo para evitar el enfrentamiento?', data_i18n: 'q36_decisoes_limites' },
+    { number: 37, block: 4, theme: 'acolhimento_do_sofrimento', id: 'q37_acolhimento_sofrimento', label: 'Si alguien estuviera frente a ti ahora, sufriendo profundamente, ¿qué le dirías — y podrías decirte lo mismo a ti mismo?', data_i18n: 'q37_acolhimento_sofrimento' },
+    { number: 38, block: 4, theme: 'vida_alem_da_terra', id: 'q38_vida_alem_terra', label: '¿Crees que existe vida más allá de nuestro planeta, o que toda la existencia se limita a lo que conocemos aquí?', data_i18n: 'q38_vida_alem_terra' },
+    { number: 39, block: 4, theme: 'legado', id: 'q39_legado', label: '¿Cómo te gustaría ser recordado cuando ya no estés aquí? ¿Qué legado, más allá de bienes o palabras, deseas dejar?', data_i18n: 'q39_legado' },
+    { number: 40, block: 4, theme: 'destino_dos_sonhos', id: 'q40_destino_sonhos', label: '¿Qué pasó realmente con los sueños que tuviste y nunca llegaste a realizar — murieron, esperan, o simplemente dejaste de creer en ellos?', data_i18n: 'q40_destino_sonhos' }
+  ]
+},
+
+{
+  sectionId: 'section-perguntas-sintese',
+  id: 'sintese',
+  index: 4,
+  title: 'Bloque 5 — Síntesis y entrega',
+  data_i18n: 'bloco_sintese_title',
+  nextSection: 'section-final',
+  transitionVideo: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4',
+  questions: [
+    { number: 41, block: 5, theme: 'choro', id: 'q41_choro', label: '¿Has estado llorando con frecuencia últimamente? ¿Puedes identificar, con honestidad, qué es lo que realmente dispara ese llanto?', data_i18n: 'q41_choro' },
+    { number: 42, block: 5, theme: 'origem_do_choro', id: 'q42_origem_choro', label: '¿Ese llanto nace de un vacío interior, de una pérdida concreta, o de un arrepentimiento que cargas en silencio?', data_i18n: 'q42_origem_choro' },
+    { number: 43, block: 5, theme: 'expressao_da_dor', id: 'q43_expressao_dor', label: 'Cuando llega el dolor, ¿qué predomina en ti — el silencio que aísla, la búsqueda de algo que intensifique ese sentimiento, o la rabia que quiere estallar?', data_i18n: 'q43_expressao_dor' },
+    { number: 44, block: 5, theme: 'tristeza_depressao', id: 'q44_tristeza_depressao', label: '¿Sientes solo tristeza pasajera, o crees que estás viviendo algo más profundo, como un estado depresivo? ¿Puedes distinguir claramente las dos cosas en ti?', data_i18n: 'q44_tristeza_depressao' },
+    { number: 45, block: 5, theme: 'ajuda_profissional', id: 'q45_ajuda_profissional', label: 'Si reconoces ese estado más profundo, ¿ya has considerado buscar ayuda profesional para entender mejor lo que sientes — o aún te resistes a ese paso?', data_i18n: 'q45_ajuda_profissional' },
+    { number: 46, block: 5, theme: 'comportamento_relacional', id: 'q46_comportamento_relacional', label: 'En tus relaciones, ¿te reconoces más como alguien asertivo (o incluso agresivo), o más como alguien sumiso, que evita el conflicto a cualquier costo?', data_i18n: 'q46_comportamento_relacional' },
+    { number: 47, block: 5, theme: 'autopercepcao', id: 'q47_autopercepcao', label: '¿Existen momentos en que es difícil incluso convivir contigo mismo — cargando rencor o rabia por decisiones que hoy consideras equivocadas?', data_i18n: 'q47_autopercepcao' },
+    { number: 48, block: 5, theme: 'autoimagem', id: 'q48_autoimagem', label: 'En el fondo, ¿te ves como alguien interesante y valioso, o crees, aunque sea en secreto, ser alguien de poco interés para los demás?', data_i18n: 'q48_autoimagem' },
+    { number: 49, block: 5, theme: 'limites', id: 'q49_limites', label: '¿Tienes dificultad real para decir "no" a las personas — incluso cuando eso significa traicionarte por dentro?', data_i18n: 'q49_limites' },
+    { number: 50, block: 5, theme: 'morte', id: 'q50_morte', label: 'Para cerrar: ¿tienes miedo de morir? Y siendo aún más honesto — ¿ese miedo está en la muerte en sí, o en la forma en que puede ocurrir? ¿Qué revela esa respuesta sobre todo lo que has compartido hasta aquí?', data_i18n: 'q50_morte' }
+  ]
+ }
+],
 
     'de-DE': [
-    {
-      sectionId: 'section-perguntas-raizes',
-      id: 'raizes',
-      index: 0,
-      title: 'Block 1 — Wurzeln',
-      data_i18n: 'bloco_raizes_title',
-      nextSection: 'section-perguntas-reflexoes',
-      transitionVideo: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
-      questions: [
-        {
-          number: 1,
-          block: 1,
-          theme: 'criacao_familiar',
-          id: 'q01_criacao',
-          label: 'Von wem wurden Sie aufgezogen? Von Ihren leiblichen Eltern, nur einem von ihnen, Verwandten, Adoptiveltern oder jemand anderem?',
-          data_i18n: 'q01_criacao'
-        },
-        {
-          number: 2,
-          block: 1,
-          theme: 'individualidade',
-          id: 'q02_filho_unico',        
-          label: 'Sind Sie ein Einzelkind oder haben Sie Geschwister? Wie hat diese Realität Ihr Bewusstsein für Ihre eigene Individualität geprägt?',
-          data_i18n: 'q02_filho_unico'
-        },
-        {
-          number: 3,
-          block: 1,
-          theme: 'irmaos',
-          id: 'q03_irmaos',        
-          label: 'Wenn Sie Geschwister haben oder gehabt hätten, wie viele? Welchen Platz nehmen Sie oder würden Sie unter ihnen einnehmen: Erstgeborenes, mittleres oder jüngstes Kind?',
-          data_i18n: 'q03_irmaos'
-        },
-        {
-          number: 4,
-          block: 1,
-          theme: 'privacoes',
-          id: 'q04_privacoes',        
-          label: 'Haben Sie in Ihrer Kindheit Hunger gelitten oder schwere Entbehrungen erlebt? Wie hat dies Ihre Sichtweise auf das Leben beeinflusst?',
-          data_i18n: 'q04_privacoes'
-        },
-        {
-          number: 5,
-          block: 1,
-          theme: 'deficiencia',
-          id: 'q05_deficiencia',        
-          label: 'Haben Sie eine soziale, körperliche oder kognitive Beeinträchtigung? Haben Sie deshalb jemals Vorurteile erfahren?',
-          data_i18n: 'q05_deficiencia'
-        },
-        {
-          number: 6,
-          block: 1,
-          theme: 'escolaridade',
-          id: 'q06_escolaridade',        
-          label: 'Welchen Bildungsstand haben Sie? Wie bewerten Sie die Investition, die Sie in Ihre Ausbildung getätigt haben?',
-          data_i18n: 'q06_escolaridade'
-        },
-        {
-          number: 7,
-          block: 1,
-          theme: 'estado_civil',
-          id: 'q07_estado_civil',        
-          label: 'Wie beeinflusst Ihr aktueller Familienstand den Lebensabschnitt, in dem Sie sich heute befinden?',
-          data_i18n: 'q07_estado_civil'
-        },
-        {
-          number: 8,
-          block: 1,
-          theme: 'identidade',
-          id: 'q08_identidade',        
-          label: 'Erinnern Sie sich an das erste Mal, als Ihnen bewusst wurde, dass Sie ein einzigartiger Mensch auf dieser Welt sind? Wie alt waren Sie da?',
-          data_i18n: 'q08_identidade'
-        },
-        {
-          number: 9,
-          block: 1,
-          theme: 'silencio',
-          id: 'q09_silencio',        
-          label: 'Wie ist Ihre Beziehung zur Stille? Beunruhigt sie Sie oder beruhigt sie Sie?',
-          data_i18n: 'q09_silencio'
-        },
-        {
-          number: 10,
-          block: 1,
-          theme: 'crianca_interior',
-          id: 'q10_crianca',        
-          label: 'Wenn Sie mit dem Kind sprechen könnten, das immer noch in Ihnen wohnt, was würden Sie ihm sagen?',
-          data_i18n: 'q10_crianca'
-        }
-      ]   
-    },
-    {
-      sectionId: 'section-perguntas-reflexoes',
-      id: 'reflexoes',
-      index: 1,
-      title: 'Block 2 — Reflexionen',
-      data_i18n: 'bloco_reflexoes_title',
-      nextSection: 'section-perguntas-crescimento',
-      transitionVideo: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4',
-      questions: [
-        {
-          number: 11,
-          block: 2,
-          theme: 'vida',
-          id: 'q11_percepcao_vida',
-          label: 'Wie haben Sie Ihr eigenes Leben bis hierher wahrgenommen?',
-          data_i18n: 'q11_percepcao_vida'
-        },
-        {
-          number: 12,
-          block: 2,
-          theme: 'empatia',
-          id: 'q12_percepcao_outros',    
-          label: 'Wie nehmen Sie das Leben der Menschen um Sie herum wahr?',
-          data_i18n: 'q12_percepcao_outros'
-        },
-        {
-          number: 13,
-          block: 2,
-          theme: 'traumas',
-          id: 'q13_traumas',    
-          label: 'Wie gehen Sie mit Ihren Traumata um? Können Sie darüber sprechen?',
-          data_i18n: 'q13_traumas'
-        },
-        {
-          number: 14,
-          block: 2,
-          theme: 'verdade',
-          id: 'q14_verdade',    
-          label: 'Glauben Sie, dass es eine übergeordnete Wahrheit gibt, oder hängt alles vom Blickwinkel des Einzelnen ab?',
-          data_i18n: 'q14_verdade'
-        },
-        {
-          number: 15,
-          block: 2,
-          theme: 'vicios',
-          id: 'q15_vicios',    
-          label: 'Was ist Ihre größte Sucht oder Abhängigkeit? Warum ist sie Ihrer Meinung nach entstanden? Haben Sie versucht, sie zu überwinden? Bemerken Sie auch andere, subtilere oder emotionale Abhängigkeiten in sich?',
-          data_i18n: 'q15_vicios'
-        },
-        {
-          number: 16,
-          block: 2,
-          theme: 'doenca',
-          id: 'q16_doenca',    
-          label: 'Was bedeutet Krankheit für Sie? Sind Sie in diesem Moment mit einer gesundheitlichen Einschränkung konfrontiert?',
-          data_i18n: 'q16_doenca'
-        },
-        {
-          number: 17,
-          block: 2,
-          theme: 'solidao',
-          id: 'q17_presenca',    
-          label: 'Gibt es jemanden, den Sie in diesem Moment gerne an Ihrer Seite hätten? Warum ist diese Person nicht anwesend?',
-          data_i18n: 'q17_presenca'
-        },
-        {
-          number: 18,
-          block: 2,
-          theme: 'morte',
-          id: 'q18_morte',    
-          label: 'Wie nehmen Sie den Tod wahr? Löst er in Ihnen Angst, Trost oder Neugierde aus?',
-          data_i18n: 'q18_morte'
-        },
-        {
-          number: 19,
-          block: 2,
-          theme: 'espiritualidade',
-          id: 'q19_doenca_espiritual',
-          label: 'Wie verstehen Sie Krankheit? Kann sie in bestimmten Momenten des Lebens eine Bedeutung oder einen Zweck erfüllen?',
-          data_i18n: 'q19_doenca_espiritual'
-        },
-        {
-          number: 20,
-          block: 2,
-          theme: 'sentido_doenca',
-          id: 'q20_sentido_doenca',
-          label: 'Glauben Sie, dass manche Krankheiten innere Schatten widerspiegeln oder Teil eines spirituellen Wachstumsprozesses sein können?',    
-          data_i18n: 'q20_sentido_doenca'
-        }
-      ]
-    },
-    {
-      sectionId: 'section-perguntas-crescimento',
-      id: 'crescimento',
-      index: 2,
-      title: 'Block 3 — Wachstum',
-      data_i18n: 'bloco_crescimento_title',
-      nextSection: 'section-perguntas-integracao',
-      transitionVideo: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4',
-      questions: [
-        {
-          number: 21,
-          block: 3,
-          theme: 'sentido_da_vida',
-          id: 'q21_sentido_vida',
-          label: 'Wie nehmen Sie den Sinn des Lebens wahr? Gibt es einen höheren Zweck oder geschieht alles durch Zufall?',
-          data_i18n: 'q21_sentido_vida'
-        },
-        {
-          number: 22,
-          block: 3,
-          theme: 'espiritualidade',
-          id: 'q22_espiritualidade',
-          label: 'Glauben Sie an Gott, an ein höchstes Wesen, an Spiritualität oder an etwas, das über das Sichtbare hinausgeht?',
-          data_i18n: 'q22_espiritualidade'
-        },
-        {
-          number: 23,
-          block: 3,
-          theme: 'experiencia_espiritual',
-          id: 'q23_guia_invisivel',
-          label: 'Haben Sie sich jemals von etwas Unsichtbarem geführt gefühlt? Können Sie von einer prägenden Erfahrung erzählen?',
-          data_i18n: 'q23_guia_invisivel'
-        },
-        {
-          number: 24,
-          block: 3,
-          theme: 'dor_emocional',
-          id: 'q24_dor_emocional',
-          label: 'Was war der größte seelische Schmerz, dem Sie sich je stellen mussten? Wie ist es Ihnen gelungen, damit umzugehen?',
-          data_i18n: 'q24_dor_emocional'
-        },
-        {
-          number: 25,
-          block: 3,
-          theme: 'superacao',
-          id: 'q25_superacao',
-          label: 'Was war die größte Überwindung oder der größte Triumph in Ihrem Leben? Welche Kraft haben Sie in jenem Moment in sich entdeckt?',
-          data_i18n: 'q25_superacao'
-        },
-        {
-          number: 26,
-          block: 3,
-          theme: 'medos',
-          id: 'q26_medos',
-          label: 'Wovor haben Sie heute am meisten Angst? Was könnte diese Angst versuchen, Ihnen zu zeigen?',
-          data_i18n: 'q26_medos'
-        },
-        {
-          number: 27,
-          block: 3,
-          theme: 'autocuidado',
-          id: 'q27_esquecimento_de_si',
-          label: 'Warum glauben Sie, dass Sie sich selbst am Ende aus den Augen verloren haben? Wann haben Sie das letzte Mal ein Kompliment erhalten, das Sie wirklich tief berührt hat?',
-          data_i18n: 'q27_esquecimento_de_si'
-        },
-        {
-          number: 28,
-          block: 3,
-          theme: 'prioridade_pessoal',
-          id: 'q28_prioridade',
-          label: 'Warum glauben Sie, dass es Ihnen oft schwerfällt, sich selbst an erste Stelle zu setzen?',
-          data_i18n: 'q28_prioridade'
-        },
-        {
-          number: 29,
-          block: 3,
-          theme: 'autoestima',
-          id: 'q29_autoestima',
-          label: 'Pflegen Sie es, sich selbst anzuerkennen und zu loben? In welchen Momenten geschieht das?',
-          data_i18n: 'q29_autoestima'
-        },
-        {
-          number: 30,
-          block: 3,
-          theme: 'sonhos',
-          id: 'q30_sonhos',
-          label: 'Sehen Sie sich als jemanden, der hilft, Träume zum Leben zu erwecken, oder als jemanden, der, ohne es zu merken, seine eigenen Träume und die der anderen begräbt?',
-          data_i18n: 'q30_sonhos'
-        }
-      ]
-    },
-    {
-      sectionId: 'section-perguntas-integracao',
-      id: 'integracao',
-      index: 3,
-      title: 'Block 4 — Integration',
-      data_i18n: 'bloco_integracao_title',
-      nextSection: 'section-perguntas-sintese',
-      transitionVideo: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4',
-      questions: [
-        {
-          number: 31,
-          block: 4,
-          theme: 'maior_sonho',
-          id: 'q31_maior_sonho',
-          label: 'Was ist heute Ihr größter Traum? Etwas, das Sie allein bei der Vorstellung zum Lächeln bringt.',
-          data_i18n: 'q31_maior_sonho'
-        },
-        {
-          number: 32,
-          block: 4,
-          theme: 'barreiras',
-          id: 'q32_barreiras',
-          label: 'Was hindert Sie Ihrer Meinung nach daran, ihn zu verwirklichen? Sind diese Barrieren innerer Natur, äußerer Natur oder beides?',
-          data_i18n: 'q32_barreiras'
-        },
-        {
-          number: 33,
-          block: 4,
-          theme: 'proposito',
-          id: 'q33_proposito',
-          label: 'Haben Sie das Gefühl, Ihre Berufung zu leben, oder sind Sie noch auf der Suche danach?',
-          data_i18n: 'q33_proposito'
-        },
-        {
-          number: 34,
-          block: 4,
-          theme: 'chamado_interior',
-          id: 'q34_chamado_interior',
-          label: 'Gibt es einen inneren Ruf, ein stilles Verlangen, das Sie bisher ignoriert haben?',
-          data_i18n: 'q34_chamado_interior'
-        },
-        {
-          number: 35,
-          block: 4,
-          theme: 'origem_dos_medos',
-          id: 'q35_origem_medos',
-          label: 'Mit welcher spezifischen Situation oder welchem Gefühl sind Ihre Ängste verknüpft?',
-          data_i18n: 'q35_origem_medos'
-        },
-        {
-          number: 36,
-          block: 4,
-          theme: 'decisoes_e_limites',
-          id: 'q36_decisoes_limites',
-          label: 'Haben Sie das Gefühl, dass Sie aus Angst davor zurückschrecken, bestimmte Entscheidungen zu treffen, oder dass Sie letztendlich Situationen akzeptieren, die Sie herabsetzen?',
-          data_i18n: 'q36_decisoes_limites'
-        },
-        {
-          number: 37,
-          block: 4,
-          theme: 'acolhimento_do_sofrimento',
-          id: 'q37_acolhimento_sofrimento',
-          label: 'Was würden Sie jemandem sagen, der in diesem Moment tiefes Leid erfährt?',
-          data_i18n: 'q37_acolhimento_sofrimento'
-        },
-        {
-          number: 38,
-          block: 4,
-          theme: 'vida_alem_da_terra',
-          id: 'q38_vida_alem_terra',
-          label: 'Glauben Sie, dass es Leben außerhalb unseres Planeten Erde gibt, oder glauben Sie, dass alles Dasein nur hier stattfindet?',
-          data_i18n: 'q38_vida_alem_terra'
-        },
-        {
-          number: 39,
-          block: 4,
-          theme: 'legado',
-          id: 'q39_legado',
-          label: 'Wie möchten Sie in Erinnerung bleiben, wenn Sie nicht mehr hier sind? Welches Vermächtnis möchten Sie hinterlassen?',
-          data_i18n: 'q39_legado'
-        },
-        {
-          number: 40,
-          block: 4,
-          theme: 'destino_dos_sonhos',
-          id: 'q40_destino_sonhos',
-          label: 'Was ist aus den Träumen geworden, die Sie einst hatten — und die Sie nie verwirklichen konnten?',
-          data_i18n: 'q40_destino_sonhos'
-        }
-      ]
-    },
-    {
-      sectionId: 'section-perguntas-sintese',
-      id: 'sintese',
-      index: 4,
-      title: 'Block 5 — Synthese und Übergabe',
-      data_i18n: 'bloco_sintese_title',
-      nextSection: 'section-final',
-      transitionVideo: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4',
-      questions: [
-        {
-          number: 41,
-          block: 5,
-          theme: 'choro',
-          id: 'q41_choro',
-          label: 'Haben Sie in letzter Zeit häufig geweint? Können Sie erkennen, was dieses Weinen meistens auslöst?',
-          data_i18n: 'q41_choro'
-        },
-        {
-          number: 42,
-          block: 5,
-          theme: 'origem_do_choro',
-          id: 'q42_origem_choro',
-          label: 'Entspringt dieses Weinen einer inneren Leere, einem Verlust oder einem Bedauern?',
-          data_i18n: 'q42_origem_choro'
-        },
-        {
-          number: 43,
-          block: 5,
-          theme: 'expressao_da_dor',
-          id: 'q43_expressao_dor',
-          label: 'Wenn die Tränen kommen, was überwiegt dann: die Stille, die Suche nach etwas, das dieses Gefühl verstärkt, oder die Wut, die sich Luft machen will?',
-          data_i18n: 'q43_expressao_dor'
-        },
-        {
-          number: 44,
-          block: 5,
-          theme: 'tristeza_depressao',
-          id: 'q44_tristeza_depressao',
-          label: 'Fühlen Sie sich traurig oder glauben Sie, sich in einem depressiven Zustand zu befinden? Können Sie den Unterschied zwischen diesen beiden Erfahrungen wahrnehmen?',
-          data_i18n: 'q44_tristeza_depressao'
-        },
-        {
-          number: 45,
-          block: 5,
-          theme: 'ajuda_profissional',
-          id: 'q45_ajuda_profissional',
-          label: 'Wenn Sie glauben, sich in einem depressiven Zustand zu befinden, haben Sie schon einmal darüber nachgedacht, professionelle Hilfe in Anspruch zu nehmen, um besser zu verstehen, was Sie fühlen?',
-          data_i18n: 'q45_ajuda_profissional'
-        },
-        {
-          number: 46,
-          block: 5,
-          theme: 'comportamento_relacional',
-          id: 'q46_comportamento_relacional',
-          label: 'Betrachten Sie sich in Ihren Beziehungen eher als einen aggressiveren oder als einen unterwürfigeren Menschen?',
-          data_i18n: 'q46_comportamento_relacional'
-        },
-        {
-          number: 47,
-          block: 5,
-          theme: 'autopercepcao',
-          id: 'q47_autopercepcao',
-          label: 'Haben Sie das Gefühl, dass es manchmal schwierig ist, mit sich selbst zusammenzuleben, oder tragen Sie Wut über Entscheidungen in sich, die Sie für falsch halten?',
-          data_i18n: 'q47_autopercepcao'
-        },
-        {
-          number: 48,
-          block: 5,
-          theme: 'autoimagem',
-          id: 'q48_autoimagem',
-          label: 'Halten Sie sich für einen interessanten Menschen oder glauben Sie, jemand zu sein, der für andere wenig von Interesse ist?',
-          data_i18n: 'q48_autoimagem'
-        },
-        {
-          number: 49,
-          block: 5,
-          theme: 'limites',
-          id: 'q49_limites',
-          label: 'Fällt es Ihnen schwer, "Nein" zu den Menschen zu sagen?',
-          data_i18n: 'q49_limites'
-        },
-        {
-          number: 50,
-          block: 5,
-          theme: 'morte',
-          id: 'q50_morte',
-          label: 'Haben Sie Angst vor dem Sterben? Oft liegt die Angst weniger im Tod selbst als vielmehr in der Art und Weise, wie er eintreten könnte. Wie nehmen Sie das bei sich wahr?',
-          data_i18n: 'q50_morte'
-        }
-      ]
-    }
-  ],
+
+{
+  sectionId: 'section-perguntas-raizes',
+  id: 'raizes',
+  index: 0,
+  title: 'Block 1 — Wurzeln',
+  data_i18n: 'bloco_raizes_title',
+  nextSection: 'section-perguntas-reflexoes',
+  transitionVideo: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
+  questions: [
+    { number: 1, block: 1, theme: 'criacao_familiar', id: 'q01_criacao', label: 'Wer hat dich aufgezogen — deine biologischen Eltern, nur einer von ihnen, andere Verwandte, Adoptiveltern, oder jemand außerhalb dieses Kreises? Beschreibe diese Präsenz kurz.', data_i18n: 'q01_criacao' },
+    { number: 2, block: 1, theme: 'individualidade', id: 'q02_filho_unico', label: 'Bist du als Einzelkind aufgewachsen oder hattest du Geschwister? Wie hat das deine Art geprägt, dich als Individuum zu sehen — unabhängiger, einsamer, zerrissener?', data_i18n: 'q02_filho_unico' },
+    { number: 3, block: 1, theme: 'irmaos', id: 'q03_irmaos', label: 'Wenn du Geschwister hast oder hattest, welchen Platz hattest (oder hättest) du unter ihnen — der Älteste, der Mittlere oder der Jüngste? Welches Gewicht oder welchen Vorteil hat dieser Platz deiner Geschichte gebracht?', data_i18n: 'q03_irmaos' },
+    { number: 4, block: 1, theme: 'privacoes', id: 'q04_privacoes', label: 'Gab es in deiner Kindheit Hunger oder schwere Entbehrungen? Wenn ja, welche Spur hat das darin hinterlassen, wie du heute mit Knappheit, Sicherheit oder Selbstwert umgehst?', data_i18n: 'q04_privacoes' },
+    { number: 5, block: 1, theme: 'deficiencia', id: 'q05_deficiencia', label: 'Lebst du mit einer sozialen, körperlichen oder kognitiven Einschränkung? Hast du je das Gewicht von Vorurteilen deswegen gespürt — und wie spiegelt sich das heute in dir wider?', data_i18n: 'q05_deficiencia' },
+    { number: 6, block: 1, theme: 'escolaridade', id: 'q06_escolaridade', label: 'Was ist dein Bildungsstand? Wenn du zurückblickst, hast du das Gefühl, genug in deine eigene Bildung investiert zu haben, oder gibt es eine Lücke, die dich noch stört?', data_i18n: 'q06_escolaridade' },
+    { number: 7, block: 1, theme: 'estado_civil', id: 'q07_estado_civil', label: 'Beeinflusst dein aktueller Beziehungsstatus — allein, verheiratet, getrennt, in einer Beziehung — dich gerade eher stärkend oder belastend?', data_i18n: 'q07_estado_civil' },
+    { number: 8, block: 1, theme: 'identidade', id: 'q08_identidade', label: 'Erinnerst du dich an den genauen Moment, in dem dir selbst klar wurde, dass du jemand Einzigartiges auf der Welt bist? Wie alt warst du, und was hast du gefühlt?', data_i18n: 'q08_identidade' },
+    { number: 9, block: 1, theme: 'silencio', id: 'q09_silencio', label: 'Wie ist deine wahre Beziehung zur Stille — stört sie dich, weil sie etwas offenlegt, oder beruhigt sie dich, weil sie dich zu dir selbst zurückbringt?', data_i18n: 'q09_silencio' },
+    { number: 10, block: 1, theme: 'crianca_interior', id: 'q10_crianca', label: 'Wenn du jetzt mit dem Kind sprechen könntest, das du warst — dem, das all das getragen hat, was du gerade erzählt hast — was würdest du ihm sagen?', data_i18n: 'q10_crianca' }
+  ]
+},
+
+{
+  sectionId: 'section-perguntas-reflexoes',
+  id: 'reflexoes',
+  index: 1,
+  title: 'Block 2 — Reflexionen',
+  data_i18n: 'bloco_reflexoes_title',
+  nextSection: 'section-perguntas-crescimento',
+  transitionVideo: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4',
+  questions: [
+    { number: 11, block: 2, theme: 'vida', id: 'q11_percepcao_vida', label: 'Nachdem du deine Wurzeln noch einmal betrachtet hast: Wie hast du dein eigenes Leben bisher wahrgenommen — als Erfolg, als Überleben, oder als etwas, das noch in der Schwebe ist?', data_i18n: 'q11_percepcao_vida' },
+    { number: 12, block: 2, theme: 'empatia', id: 'q12_percepcao_outros', label: 'Und das Leben der Menschen um dich herum — siehst du es mit echter Empathie oder mit Distanz und Urteil?', data_i18n: 'q12_percepcao_outros' },
+    { number: 13, block: 2, theme: 'traumas', id: 'q13_traumas', label: 'Wie gehst du mit deinen Traumata um: stellst du dich ihnen direkt, oder vermeidest du es sogar, sie zu benennen? Kannst du jetzt darüber sprechen, mit derselben Ehrlichkeit wie früher?', data_i18n: 'q13_traumas' },
+    { number: 14, block: 2, theme: 'verdade', id: 'q14_verdade', label: 'Glaubst du, dass es eine größere Wahrheit über allem gibt, oder dass jede Wahrheit nur ein Spiegelbild des Blicks ist, der sie sieht?', data_i18n: 'q14_verdade' },
+    { number: 15, block: 2, theme: 'vicios', id: 'q15_vicios', label: 'Was ist dein größtes Laster — offen gezeigt oder versteckt? Wo kommt es her, hast du schon versucht, es zu überwinden, und gibt es subtilere, emotionale Laster, die du kaum zugibst zu haben?', data_i18n: 'q15_vicios' },
+    { number: 16, block: 2, theme: 'doenca', id: 'q16_doenca', label: 'Was bedeutet Krankheit für dich? Gibt es gerade eine gesundheitliche Situation — körperlich oder emotional — die dich durchzieht?', data_i18n: 'q16_doenca' },
+    { number: 17, block: 2, theme: 'solidao', id: 'q17_presenca', label: 'Gibt es jemanden, den du dir gerade an deiner Seite wünschen würdest? Was hält diese Person davon ab, präsent zu sein — Entfernung, Stolz, oder etwas, das nie gesagt wurde?', data_i18n: 'q17_presenca' },
+    { number: 18, block: 2, theme: 'morte', id: 'q18_morte', label: 'Wie nimmst du den Tod heute wahr — als Angst, als Erleichterung, oder als echte Neugier auf das, was danach kommt?', data_i18n: 'q18_morte' },
+    { number: 19, block: 2, theme: 'espiritualidade', id: 'q19_doenca_espiritual', label: 'Glaubst du, dass Krankheit eine Bedeutung, eine Botschaft oder einen verborgenen Zweck in bestimmten Lebensmomenten tragen kann?', data_i18n: 'q19_doenca_espiritual' },
+    { number: 20, block: 2, theme: 'sentido_doenca', id: 'q20_sentido_doenca', label: 'Noch tiefer: Denkst du, dass manche Krankheiten ungelöste innere Schatten widerspiegeln, oder Teil eines spirituellen Wachstumsprozesses sind?', data_i18n: 'q20_sentido_doenca' }
+  ]
+},
+
+{
+  sectionId: 'section-perguntas-crescimento',
+  id: 'crescimento',
+  index: 2,
+  title: 'Block 3 — Wachstum',
+  data_i18n: 'bloco_crescimento_title',
+  nextSection: 'section-perguntas-integracao',
+  transitionVideo: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4',
+  questions: [
+    { number: 21, block: 3, theme: 'sentido_da_vida', id: 'q21_sentido_vida', label: 'Nach allem, was du bereits offenbart hast: Was ist für dich der Sinn des Lebens — gibt es einen größeren Zweck, der alles leitet, oder entscheidet der Zufall?', data_i18n: 'q21_sentido_vida' },
+    { number: 22, block: 3, theme: 'espiritualidade', id: 'q22_espiritualidade', label: 'Glaubst du an Gott, an ein höheres Wesen, an Spiritualität, oder an etwas, das über das hinausgeht, was die Augen sehen können?', data_i18n: 'q22_espiritualidade' },
+    { number: 23, block: 3, theme: 'experiencia_espiritual', id: 'q23_guia_invisivel', label: 'Hast du je das Gefühl gehabt, von etwas Unsichtbarem geleitet zu werden? Gibt es eine eindrückliche Erfahrung, die dir das beweist?', data_i18n: 'q23_guia_invisivel' },
+    { number: 24, block: 3, theme: 'dor_emocional', id: 'q24_dor_emocional', label: 'Was war der größte emotionale Schmerz, dem du je begegnet bist — und welchen Weg hast du tatsächlich benutzt, um ihn zu durchqueren?', data_i18n: 'q24_dor_emocional' },
+    { number: 25, block: 3, theme: 'superacao', id: 'q25_superacao', label: 'Und was war dein größter Triumph? Welche Kraft hast du in dir entdeckt, genau in dem Moment, als alles verloren schien?', data_i18n: 'q25_superacao' },
+    { number: 26, block: 3, theme: 'medos', id: 'q26_medos', label: 'Wovor hast du heute am meisten Angst? Was versucht dir diese Angst zu zeigen, wenn du dir Zeit nimmst, sie zu hören?', data_i18n: 'q26_medos' },
+    { number: 27, block: 3, theme: 'autocuidado', id: 'q27_esquecimento_de_si', label: 'Warum glaubst du, dass du irgendwann aufgehört hast, dich selbst an erste Stelle zu setzen? Wann hast du zuletzt ein Kompliment bekommen, das dich wirklich berührt hat?', data_i18n: 'q27_esquecimento_de_si' },
+    { number: 28, block: 3, theme: 'prioridade_pessoal', id: 'q28_prioridade', label: 'Warum fällt es dir oft schwer, dich selbst als Priorität zu behandeln — obwohl du weißt, dass du es brauchst?', data_i18n: 'q28_prioridade' },
+    { number: 29, block: 3, theme: 'autoestima', id: 'q29_autoestima', label: 'Erkennst und lobst du dich selbst, ohne von der Bestätigung anderer abhängig zu sein? In welchen Momenten passiert das wirklich?', data_i18n: 'q29_autoestima' },
+    { number: 30, block: 3, theme: 'sonhos', id: 'q30_sonhos', label: 'Siehst du dich als jemanden, der Träume — deine eigenen und die anderer — zum Leben erweckt, oder als jemanden, der, ohne es zu merken, diese Träume auf dem Weg begraben hat?', data_i18n: 'q30_sonhos' }
+  ]
+},
+
+{
+  sectionId: 'section-perguntas-integracao',
+  id: 'integracao',
+  index: 3,
+  title: 'Block 4 — Integration',
+  data_i18n: 'bloco_integracao_title',
+  nextSection: 'section-perguntas-sintese',
+  transitionVideo: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4',
+  questions: [
+    { number: 31, block: 4, theme: 'maior_sonho', id: 'q31_maior_sonho', label: 'Nachdem du deine Ängste und begrabenen Träume betrachtet hast: Was ist heute dein größter Traum — der, der dich schon beim bloßen Vorstellen lächeln lässt?', data_i18n: 'q31_maior_sonho' },
+    { number: 32, block: 4, theme: 'barreiras', id: 'q32_barreiras', label: 'Was glaubst du, hält dich davon ab, ihn zu verwirklichen? Kommen diese Barrieren von innen, von außen, oder von beidem gleichzeitig?', data_i18n: 'q32_barreiras' },
+    { number: 33, block: 4, theme: 'proposito', id: 'q33_proposito', label: 'Hast du das Gefühl, deinen Zweck bereits zu leben, oder bist du noch auf der Suche danach — ohne genau zu wissen, wie es weitergeht?', data_i18n: 'q33_proposito' },
+    { number: 34, block: 4, theme: 'chamado_interior', id: 'q34_chamado_interior', label: 'Gibt es einen inneren Ruf, einen stillen Wunsch, den du immer wieder ignorierst, auch wenn du weißt, dass er noch in dir pulsiert?', data_i18n: 'q34_chamado_interior' },
+    { number: 35, block: 4, theme: 'origem_dos_medos', id: 'q35_origem_medos', label: 'Zurück zu deinen Ängsten: Mit welcher konkreten Situation oder Gefühl sind sie im Grunde wirklich verbunden?', data_i18n: 'q35_origem_medos' },
+    { number: 36, block: 4, theme: 'decisoes_e_limites', id: 'q36_decisoes_limites', label: 'Hast du das Gefühl, bestimmte Entscheidungen aus Angst zu vermeiden, oder Situationen zu akzeptieren, die dich herabsetzen, nur um Konfrontation zu vermeiden?', data_i18n: 'q36_decisoes_limites' },
+    { number: 37, block: 4, theme: 'acolhimento_do_sofrimento', id: 'q37_acolhimento_sofrimento', label: 'Wenn jemand jetzt vor dir stünde und tief leiden würde, was würdest du ihm sagen — und könntest du dir selbst dasselbe sagen?', data_i18n: 'q37_acolhimento_sofrimento' },
+    { number: 38, block: 4, theme: 'vida_alem_da_terra', id: 'q38_vida_alem_terra', label: 'Glaubst du, dass es Leben außerhalb unseres Planeten gibt, oder dass sich die gesamte Existenz auf das beschränkt, was wir hier kennen?', data_i18n: 'q38_vida_alem_terra' },
+    { number: 39, block: 4, theme: 'legado', id: 'q39_legado', label: 'Wie möchtest du in Erinnerung bleiben, wenn du nicht mehr hier bist? Welches Vermächtnis, jenseits von Besitz oder Worten, möchtest du hinterlassen?', data_i18n: 'q39_legado' },
+    { number: 40, block: 4, theme: 'destino_dos_sonhos', id: 'q40_destino_sonhos', label: 'Was ist eigentlich aus den Träumen geworden, die du hattest und nie erfüllt hast — sind sie gestorben, warten sie, oder hast du einfach aufgehört, an sie zu glauben?', data_i18n: 'q40_destino_sonhos' }
+  ]
+},
+
+{
+  sectionId: 'section-perguntas-sintese',
+  id: 'sintese',
+  index: 4,
+  title: 'Block 5 — Synthese und Übergabe',
+  data_i18n: 'bloco_sintese_title',
+  nextSection: 'section-final',
+  transitionVideo: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4',
+  questions: [
+    { number: 41, block: 5, theme: 'choro', id: 'q41_choro', label: 'Hast du in letzter Zeit oft geweint? Kannst du ehrlich benennen, was dieses Weinen wirklich auslöst?', data_i18n: 'q41_choro' },
+    { number: 42, block: 5, theme: 'origem_do_choro', id: 'q42_origem_choro', label: 'Entsteht dieses Weinen aus einer inneren Leere, aus einem konkreten Verlust, oder aus einem Bedauern, das du im Stillen trägst?', data_i18n: 'q42_origem_choro' },
+    { number: 43, block: 5, theme: 'expressao_da_dor', id: 'q43_expressao_dor', label: 'Wenn der Schmerz kommt, was überwiegt bei dir — die Stille, die isoliert, die Suche nach etwas, das dieses Gefühl verstärkt, oder die Wut, die explodieren will?', data_i18n: 'q43_expressao_dor' },
+    { number: 44, block: 5, theme: 'tristeza_depressao', id: 'q44_tristeza_depressao', label: 'Fühlst du nur vorübergehende Traurigkeit, oder glaubst du, etwas Tieferes zu erleben, wie einen depressiven Zustand? Kannst du die beiden klar in dir unterscheiden?', data_i18n: 'q44_tristeza_depressao' },
+    { number: 45, block: 5, theme: 'ajuda_profissional', id: 'q45_ajuda_profissional', label: 'Wenn du diesen tieferen Zustand erkennst, hast du schon erwogen, professionelle Hilfe zu suchen, um besser zu verstehen, was du fühlst — oder widersetzt du dich diesem Schritt noch?', data_i18n: 'q45_ajuda_profissional' },
+    { number: 46, block: 5, theme: 'comportamento_relacional', id: 'q46_comportamento_relacional', label: 'In deinen Beziehungen: Siehst du dich eher als durchsetzungsfähig (oder sogar aggressiv), oder eher als unterwürfig, der Konflikte um jeden Preis vermeidet?', data_i18n: 'q46_comportamento_relacional' },
+    { number: 47, block: 5, theme: 'autopercepcao', id: 'q47_autopercepcao', label: 'Gibt es Momente, in denen es sogar schwierig ist, mit dir selbst zu leben — weil du Groll oder Wut über Entscheidungen trägst, die du heute für falsch hältst?', data_i18n: 'q47_autopercepcao' },
+    { number: 48, block: 5, theme: 'autoimagem', id: 'q48_autoimagem', label: 'Siehst du dich im Grunde als jemanden Interessanten und Wertvollen, oder glaubst du, auch wenn nur heimlich, jemand von geringem Interesse für andere zu sein?', data_i18n: 'q48_autoimagem' },
+    { number: 49, block: 5, theme: 'limites', id: 'q49_limites', label: 'Fällt es dir wirklich schwer, „nein" zu Menschen zu sagen — selbst wenn das bedeutet, dich innerlich selbst zu verraten?', data_i18n: 'q49_limites' },
+    { number: 50, block: 5, theme: 'morte', id: 'q50_morte', label: 'Zum Abschluss: Hast du Angst vor dem Tod? Und noch ehrlicher — liegt diese Angst im Tod selbst, oder in der Art, wie er geschehen könnte? Was verrät diese Antwort über alles, was du bisher geteilt hast?', data_i18n: 'q50_morte' }
+  ]
+ }
+],
 
     'ja-JP': [
-    {
-      sectionId: 'section-perguntas-raizes',
-      id: 'raizes',
-      index: 0,
-      title: 'ブロック 1 — ルーツ（根源）',
-      data_i18n: 'bloco_raizes_title',
-      nextSection: 'section-perguntas-reflexoes',
-      transitionVideo: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
-      questions: [
-        {
-          number: 1,
-          block: 1,
-          theme: 'criacao_familiar',
-          id: 'q01_criacao',
-          label: 'あなたは誰に育てられましたか？ 実の父母、どちらか一方のみ、親族、養父母、あるいは他の誰かでしょうか？',
-          data_i18n: 'q01_criacao'
-        },
-        {
-          number: 2,
-          block: 1,
-          theme: 'individualidade',
-          id: 'q02_filho_unico',        
-          label: 'あなたは一人っ子ですか、それとも兄弟姉妹がいますか？ その現実は、あなたの主体性や個人の意識にどのような影響を与えましたか？',
-          data_i18n: 'q02_filho_unico'
-        },
-        {
-          number: 3,
-          block: 1,
-          theme: 'irmaos',
-          id: 'q03_irmaos',        
-          label: '兄弟姉妹がいる（またはいた）場合、何人ですか？ あなたはその中でどのような立ち位置ですか、またはなるはずでしたか：第一子（長子）、真ん中、あるいは末っ子ですか？',
-          data_i18n: 'q03_irmaos'
-        },
-        {
-          number: 4,
-          block: 1,
-          theme: 'privacoes',
-          id: 'q04_privacoes',        
-          label: '幼少期に飢えや深刻な困窮を経験したことはありますか？ その経験は、あなたの人生観にどのような影響を与えましたか？',
-          data_i18n: 'q04_privacoes'
-        },
-        {
-          number: 5,
-          block: 1,
-          theme: 'deficiencia',
-          id: 'q05_deficiencia',        
-          label: 'あなたは社会的、身体的、または認知的な障害を持っていますか？ それが原因で偏見や差別に直面したことはありますか？',
-          data_i18n: 'q05_deficiencia'
-        },
-        {
-          number: 6,
-          block: 1,
-          theme: 'escolaridade',
-          id: 'q06_escolaridade',        
-          label: 'あなたの最終学歴は何ですか？ ご自身の教育や自己投資について、どのように評価していますか？',
-          data_i18n: 'q06_escolaridade'
-        },
-        {
-          number: 7,
-          block: 1,
-          theme: 'estado_civil',
-          id: 'q07_estado_civil',        
-          label: '現在のあなたの婚姻状況（独身、既婚など）は、いま歩んでいる人生の瞬間にどのような影響を与えていますか？',
-          data_i18n: 'q07_estado_civil'
-        },
-        {
-          number: 8,
-          block: 1,
-          theme: 'identidade',
-          id: 'q08_identidade',        
-          label: '自分が世界で唯一無二の存在であると初めて気づいた時のことを覚えていますか？ 当時、あなたは何歳でしたか？',
-          data_i18n: 'q08_identidade'
-        },
-        {
-          number: 9,
-          block: 1,
-          theme: 'silencio',
-          id: 'q09_silencio',        
-          label: 'あなたと「静寂」との関係はどのようなものですか？ 静寂はあなたを不安にさせますか、それとも心を落ち着かせてくれますか？',
-          data_i18n: 'q09_silencio'
-        },
-        {
-          number: 10,
-          block: 1,
-          theme: 'crianca_interior',
-          id: 'q10_crianca',        
-          label: '今でもあなたの中に生き続けている「内なる子ども（インナーチャイルド）」と話ができるとしたら、その子に何と言ってあげたいですか？',
-          data_i18n: 'q10_crianca'
-        }
-      ]   
-    },
-    {
-      sectionId: 'section-perguntas-reflexoes',
-      id: 'reflexoes',
-      index: 1,
-      title: 'ブロック 2 — 内省（リフレクション）',
-      data_i18n: 'bloco_reflexoes_title',
-      nextSection: 'section-perguntas-crescimento',
-      transitionVideo: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4',
-      questions: [
-        {
-          number: 11,
-          block: 2,
-          theme: 'vida',
-          id: 'q11_percepcao_vida',
-          label: 'あなたはこれまでの自分の人生をどのように捉えてきましたか？',
-          data_i18n: 'q11_percepcao_vida'
-        },
-        {
-          number: 12,
-          block: 2,
-          theme: 'empatia',
-          id: 'q12_percepcao_outros',    
-          label: 'あなたの周りにいる人々の人生を、あなたどのように見ていますか？',
-          data_i18n: 'q12_percepcao_outros'
-        },
-        {
-          number: 13,
-          block: 2,
-          theme: 'traumas',
-          id: 'q13_traumas',    
-          label: 'あなたは自分のトラウマ（心の傷）とどのように向き合っていますか？ それについて誰かに話すことはできますか？',
-          data_i18n: 'q13_traumas'
-        },
-        {
-          number: 14,
-          block: 2,
-          theme: 'verdade',
-          id: 'q14_verdade',    
-          label: 'あなたは「絶対的な一つの真実」が存在すると信じますか、それともすべては一人ひとりの見方次第だと信じますか？',
-          data_i18n: 'q14_verdade'
-        },
-        {
-          number: 15,
-          block: 2,
-          theme: 'vicios',
-          id: 'q15_vicios',    
-          label: 'あなたにとって最大の依存（悪癖・執着）は何ですか？ なぜそれが生まれたのだと思いますか？ それを克服しようと試みたことはありますか？ また、自分の中に他の微細な、あるいは感情的な依存があることにも気づいていますか？',
-          data_i18n: 'q15_vicios'
-        },
-        {
-          number: 16,
-          block: 2,
-          theme: 'doenca',
-          id: 'q16_doenca',    
-          label: 'あなたにとって「病気」とは何を象徴していますか？ 現在、何らかの健康上の問題に直面していますか？',
-          data_i18n: 'q16_doenca'
-        },
-        {
-          number: 17,
-          block: 2,
-          theme: 'solidao',
-          id: 'q17_presenca',    
-          label: 'この瞬間、あなたのそばにいてほしいと思う人はいますか？ なぜその人は今、ここにいないのでしょうか？',
-          data_i18n: 'q17_presenca'
-        },
-        {
-          number: 18,
-          block: 2,
-          theme: 'morte',
-          id: 'q18_morte',    
-          label: 'あなたは「死」をどのように捉えていますか？ それは恐怖、安らぎ、あるいは好奇心のどれを呼び起こしますか？',
-          data_i18n: 'q18_morte'
-        },
-        {
-          number: 19,
-          block: 2,
-          theme: 'espiritualidade',
-          id: 'q19_doenca_espiritual',
-          label: 'あなたは病気をどのように理解していますか？ 人生の特定の時期において、病気が何らかの意味や目的を持つことはあると思いますか？',
-          data_i18n: 'q19_doenca_espiritual'
-        },
-        {
-          number: 20,
-          block: 2,
-          theme: 'sentido_doenca',
-          id: 'q20_sentido_doenca',
-          label: 'ある種の病気は、内なる影（シャドウ）を反映していたり、霊的な成長（スピリチュアルな成熟）のプロセスの一部であったりすると信じますか？',    
-          data_i18n: 'q20_sentido_doenca'
-        }
-      ]
-    },
-    {
-      sectionId: 'section-perguntas-crescimento',
-      id: 'crescimento',
-      index: 2,
-      title: 'ブロック 3 — 成長（グロウ）',
-      data_i18n: 'bloco_crescimento_title',
-      nextSection: 'section-perguntas-integracao',
-      transitionVideo: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4',
-      questions: [
-        {
-          number: 21,
-          block: 3,
-          theme: 'sentido_da_vida',
-          id: 'q21_sentido_vida',
-          label: 'あなたは人生の意味をどのように捉えていますか？ 何か大いなる目的が存在するのでしょうか、それともすべては偶然に過ぎないのでしょうか？',
-          data_i18n: 'q21_sentido_vida'
-        },
-        {
-          number: 22,
-          block: 3,
-          theme: 'espiritualidade',
-          id: 'q22_espiritualidade',
-          label: 'あなたは神、至高の存在、スピリチュアリティ（霊性）、あるいは目に見えるものを超えた何かを信じていますか？',
-          data_i18n: 'q22_espiritualidade'
-        },
-        {
-          number: 23,
-          block: 3,
-          theme: 'experiencia_espiritual',
-          id: 'q23_guia_invisivel',
-          label: '目に見えない何かに導かれていると感じたことはありますか？ あなたの人生で心に残る経験があれば教えてください。',
-          data_i18n: 'q23_guia_invisivel'
-        },
-        {
-          number: 24,
-          block: 3,
-          theme: 'dor_emocional',
-          id: 'q24_dor_emocional',
-          label: 'あなたがこれまでに直面した最大の感情的な痛み（心の苦しみ）は何ですか？ それにどのように対処してきましたか？',
-          data_i18n: 'q24_dor_emocional'
-        },
-        {
-          number: 25,
-          block: 3,
-          theme: 'superacao',
-          id: 'q25_superacao',
-          label: 'あなたの人生における最大の乗り越え（克服・大いなる変容）は何でしたか？ その瞬間、自分の中にどのような強さを発見しましたか？',
-          data_i18n: 'q25_superacao'
-        },
-        {
-          number: 26,
-          block: 3,
-          theme: 'medos',
-          id: 'q26_medos',
-          label: '現在、あなたが最も恐れているものは何ですか？ その恐怖は、あなたに何を伝えようとしているのでしょうか？',
-          data_i18n: 'q26_medos'
-        },
-        {
-          number: 27,
-          block: 3,
-          theme: 'autocuidado',
-          id: 'q27_esquecimento_de_si',
-          label: 'なぜ自分自身のことを置き去りにして（忘れて）しまったのだと思いますか？ 最後に心から嬉しいと感じる褒め言葉を受け取ったのはいつですか？',
-          data_i18n: 'q27_esquecimento_de_si'
-        },
-        {
-          number: 28,
-          block: 3,
-          theme: 'prioridade_pessoal',
-          id: 'q28_prioridade',
-          label: 'なぜ、自分自身を最優先にすることができない場合が多いのだと思いますか？',
-          data_i18n: 'q28_prioridade'
-        },
-        {
-          number: 29,
-          block: 3,
-          theme: 'autoestima',
-          id: 'q29_autoestima',
-          label: 'あなたは普段、自分自身を認め、褒めることをしていますか？ それはどのような時に起こりますか？',
-          data_i18n: 'q29_autoestima'
-        },
-        {
-          number: 30,
-          block: 3,
-          theme: 'sonhos',
-          id: 'q30_sonhos',
-          label: 'あなたは自分を「誰かの夢が生まれるのを助ける人」だと思いますか、それとも「気づかないうちに、自分や他人の夢を葬ってしまっている人」だと思いますか？',
-          data_i18n: 'q30_sonhos'
-        }
-      ]
-    },
-    {
-      sectionId: 'section-perguntas-integracao',
-      id: 'integracao',
-      index: 3,
-      title: 'ブロック 4 — 統合（インテグレーション）',
-      data_i18n: 'bloco_integracao_title',
-      nextSection: 'section-perguntas-sintese',
-      transitionVideo: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4',
-      questions: [
-        {
-          number: 31,
-          block: 4,
-          theme: 'maior_sonho',
-          id: 'q31_maior_sonho',
-          label: '現在のあなたの最大の夢は何ですか？ 想像するだけで自然と笑顔になってしまうようなことは何でしょうか？',
-          data_i18n: 'q31_maior_sonho'
-        },
-        {
-          number: 32,
-          block: 4,
-          theme: 'barreiras',
-          id: 'q32_barreiras',
-          label: 'それを実現するのを妨げているものは何だと思いますか？ その障壁は内面的なものですか、外的なものですか、あるいはその両方でしょうか？',
-          data_i18n: 'q32_barreiras'
-        },
-        {
-          number: 33,
-          block: 4,
-          theme: 'proposito',
-          id: 'q33_proposito',
-          label: 'あなたは自分の天命（ライフパーパス）を生きていると感じますか、それとも未だそれを探し求めている最中ですか？',
-          data_i18n: 'q33_proposito'
-        },
-        {
-          number: 34,
-          block: 4,
-          theme: 'chamado_interior',
-          id: 'q34_chamado_interior',
-          label: 'あなたがこれまで無視し続けてきた、内なる呼び声（静かなる衝動・魂の願い）はありますか？',
-          data_i18n: 'q34_chamado_interior'
-        },
-        {
-          number: 35,
-          block: 4,
-          theme: 'origem_dos_medos',
-          id: 'q35_origem_medos',
-          label: 'あなたの恐怖は、どのような特定の状況や感情に結びついていますか？',
-          data_i18n: 'q35_origem_medos'
-        },
-        {
-          number: 36,
-          block: 4,
-          theme: 'decisoes_e_limites',
-          id: 'q36_decisoes_limites',
-          label: '恐怖のあまり、特定の決断を下すことを避けてしまったり、自分を貶めるような状況を甘んじて受け入れてしまったりしていると感じますか？',
-          data_i18n: 'q36_decisoes_limites'
-        },
-        {
-          number: 37,
-          block: 4,
-          theme: 'acolhimento_do_sofrimento',
-          id: 'q37_acolhimento_sofrimento',
-          label: '今、深い苦しみの中にある人に対して、あなたなら何と言葉をかけますか？',
-          data_i18n: 'q37_acolhimento_sofrimento'
-        },
-        {
-          number: 38,
-          block: 4,
-          theme: 'vida_alem_da_terra',
-          id: 'q38_vida_alem_terra',
-          label: 'あなたは、この地球以外の惑星にも生命が存在すると信じますか、それともすべての存在はこの地球上だけにしかないと信じますか？',
-          data_i18n: 'q38_vida_alem_terra'
-        },
-        {
-          number: 39,
-          block: 4,
-          theme: 'legado',
-          id: 'q39_legado',
-          label: '自分がこの世を去ったとき、どのように記憶されていたいですか？ どのような遺産（レガシー）を遺したいですか？',
-          data_i18n: 'q39_legado'
-        },
-        {
-          number: 40,
-          block: 4,
-          theme: 'destino_dos_sonhos',
-          id: 'q40_destino_sonhos',
-          label: 'あなたがかつて抱きながら、ついぞ実現することのなかった夢たちは、その後どうなりましたか？',
-          data_i18n: 'q40_destino_sonhos'
-        }
-      ]
-    },
-    {
-      sectionId: 'section-perguntas-sintese',
-      id: 'sintese',
-      index: 4,
-      title: 'ブロック 5 — 統合と引き渡し（ offering ）',
-      data_i18n: 'bloco_sintese_title',
-      nextSection: 'section-final',
-      transitionVideo: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4',
-      questions: [
-        {
-          number: 41,
-          block: 5,
-          theme: 'choro',
-          id: 'q41_choro',
-          label: '最近、頻繁に涙を流すことがありますか？ 何がその涙を引き起こしているのか、思い当たる理由はありますか？',
-          data_i18n: 'q41_choro'
-        },
-        {
-          number: 42,
-          block: 5,
-          theme: 'origem_do_choro',
-          id: 'q42_origem_choro',
-          label: 'その涙は、内なる虚無感、何かを失った喪失感、あるいは後悔から生まれているものですか？',
-          data_i18n: 'q42_origem_choro'
-        },
-        {
-          number: 43,
-          block: 5,
-          theme: 'expressao_da_dor',
-          id: 'q43_expressao_dor',
-          label: '涙が溢れるとき、あなたの中で何が優位になりますか：静寂ですか、その感情をさらに強める何かを求めることですか、あるいは現れようとする怒り（苛立ち）ですか？',
-          data_i18n: 'q43_expressao_dor'
-        },
-        {
-          number: 44,
-          block: 5,
-          theme: 'tristeza_depressao',
-          id: 'q44_tristeza_depressao',
-          label: 'あなたはただ悲しみを感じていますか、それとも「うつ状態」にあると感じますか？ これら二つの経験の違いを認識できていますか？',
-          data_i18n: 'q44_tristeza_depressao'
-        },
-        {
-          number: 45,
-          block: 5,
-          theme: 'ajuda_profissional',
-          id: 'q45_ajuda_profissional',
-          label: 'もし自分がうつ状態にあると感じる場合、自分が抱えている感情をより深く理解するために、専門家（プロフェッショナル）の助けを借りることを考えたことはありますか？',
-          data_i18n: 'q45_ajuda_profissional'
-        },
-        {
-          number: 46,
-          block: 5,
-          theme: 'comportamento_relacional',
-          id: 'q46_comportamento_relacional',
-          label: '人間関係において、自分はどちらかといえば攻撃的な（強く出る）タイプだと思いますか、それとも従属的な（一歩引く）タイプだと思いますか？',
-          data_i18n: 'q46_comportamento_relacional'
-        },
-        {
-          number: 47,
-          block: 5,
-          theme: 'autopercepcao',
-          id: 'q47_autopercepcao',
-          label: '時折、自分自身と付き合っていくことが難しいと感じたり、間違ったと思う過去の決断に対して怒りを抱え続けたりしていますか？',
-          data_i18n: 'q47_autopercepcao'
-        },
-        {
-          number: 48,
-          block: 5,
-          theme: 'autoimagem',
-          id: 'q48_autoimagem',
-          label: 'あなたは自分を「魅力的な（興味深い）人間」だと思いますか、それとも「他人にとってあまり面白みのない人間」だと思いますか？',
-          data_i18n: 'q48_autoimagem'
-        },
-        {
-          number: 49,
-          block: 5,
-          theme: 'limites',
-          id: 'q49_limites',
-          label: '他人に対して「NO（いいえ）」と言うことに難しさを感じていますか？',
-          data_i18n: 'q49_limites'
-        },
-        {
-          number: 50,
-          block: 5,
-          theme: 'morte',
-          id: 'q50_morte',
-          label: '死ぬことが怖いですか？ 多くの場合、恐怖は「死そのもの」よりも「それがどのように訪れるか（死に方）」にあります。ご自身の中でこれをどのように感じていますか？',
-          data_i18n: 'q50_morte'
-        }
-      ]
-    }
-  ],
+
+{
+  sectionId: 'section-perguntas-raizes',
+  id: 'raizes',
+  index: 0,
+  title: 'ブロック1 — ルーツ',
+  data_i18n: 'bloco_raizes_title',
+  nextSection: 'section-perguntas-reflexoes',
+  transitionVideo: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
+  questions: [
+    { number: 1, block: 1, theme: 'criacao_familiar', id: 'q01_criacao', label: 'あなたを育てたのは誰ですか——実の両親、そのうちの一人だけ、他の親族、養父母、それともその輪の外にいる誰かですか？その存在について簡単に教えてください。', data_i18n: 'q01_criacao' },
+    { number: 2, block: 1, theme: 'individualidade', id: 'q02_filho_unico', label: 'あなたは一人っ子として育ちましたか、それは兄弟姉妹がいましたか？その状況は、あなたが自分自身を個人としてどう見るか——より独立的に、より孤独に、より分裂した感じに——どう影響しましたか？', data_i18n: 'q02_filho_unico' },
+    { number: 3, block: 1, theme: 'irmaos', id: 'q03_irmaos', label: '兄弟姉妹がいる（いた）場合、あなたはその中でどの立場でしたか（または、なるはずでしたか）——長子、中間、それとも末っ子？その立場は、あなたの物語にどんな重みや利点をもたらしましたか？', data_i18n: 'q03_irmaos' },
+    { number: 4, block: 1, theme: 'privacoes', id: 'q04_privacoes', label: '子供の頃、ひどい飢えや欠乏を経験しましたか？もしそうなら、それは今のあなたが欠乏や安心感、価値を感じることにどんな影響を残しましたか？', data_i18n: 'q04_privacoes' },
+    { number: 5, block: 1, theme: 'deficiencia', id: 'q05_deficiencia', label: 'あなたは何か社会的、身体的、または認知的な制約を抱えて生きていますか？そのために偏見の重さを感じたことはありますか——それは今のあなたにどう反映されていますか？', data_i18n: 'q05_deficiencia' },
+    { number: 6, block: 1, theme: 'escolaridade', id: 'q06_escolaridade', label: 'あなたの学歴はどのくらいですか？振り返ってみて、自分自身の教育に十分な投資をしたと感じますか、それとも今も気になる学びの空白がありますか？', data_i18n: 'q06_escolaridade' },
+    { number: 7, block: 1, theme: 'estado_civil', id: 'q07_estado_civil', label: 'あなたの現在の結婚・恋愛状況——独身、結婚、別居、交際中——は、今のあなたを強めていますか、それとも重荷になっていますか？', data_i18n: 'q07_estado_civil' },
+    { number: 8, block: 1, theme: 'identidade', id: 'q08_identidade', label: '自分が世界で唯一無二の存在だと自分自身で気づいた、その正確な瞬間を覚えていますか？何歳のときで、何を感じましたか？', data_i18n: 'q08_identidade' },
+    { number: 9, block: 1, theme: 'silencio', id: 'q09_silencio', label: '静寂との本当の関係はどんなものですか——それは何かを露呈させるから不安になりますか、それとも自分自身へ戻してくれるから安心しますか？', data_i18n: 'q09_silencio' },
+    { number: 10, block: 1, theme: 'crianca_interior', id: 'q10_crianca', label: 'もし今、あなたがかつてだった子供に話しかけられるなら——今話してくれたすべてを抱えてきたその子に——何を伝えますか？', data_i18n: 'q10_crianca' }
+  ]
+},
+
+{
+  sectionId: 'section-perguntas-reflexoes',
+  id: 'reflexoes',
+  index: 1,
+  title: 'ブロック2 — 振り返り',
+  data_i18n: 'bloco_reflexoes_title',
+  nextSection: 'section-perguntas-crescimento',
+  transitionVideo: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4',
+  questions: [
+    { number: 11, block: 2, theme: 'vida', id: 'q11_percepcao_vida', label: '自分のルーツを振り返った後、これまでの自分の人生をどう捉えていますか——達成として、生き残りとして、それともまだ宙に浮いた何かとして？', data_i18n: 'q11_percepcao_vida' },
+    { number: 12, block: 2, theme: 'empatia', id: 'q12_percepcao_outros', label: 'そして、周りの人たちの人生については——本当の共感を持って見ていますか、それとも距離感や評価を持って見ていますか？', data_i18n: 'q12_percepcao_outros' },
+    { number: 13, block: 2, theme: 'traumas', id: 'q13_traumas', label: 'トラウマにどう対処していますか：正面から向き合いますか、それとも名前をつけることさえ避けますか？以前と同じ誠実さで、今それについて話せますか？', data_i18n: 'q13_traumas' },
+    { number: 14, block: 2, theme: 'verdade', id: 'q14_verdade', label: 'すべてを超える大きな真実が存在すると信じていますか、それとも真実はそれを見る者の視点の反映に過ぎないと思いますか？', data_i18n: 'q14_verdade' },
+    { number: 15, block: 2, theme: 'vicios', id: 'q15_vicios', label: 'あなたの最大の悪癖は何ですか——認めているものか、隠しているものか？それはどこから来て、克服しようとしたことはありますか、そして、あまり認めていないもっと微妙で感情的な悪癖はありますか？', data_i18n: 'q15_vicios' },
+    { number: 16, block: 2, theme: 'doenca', id: 'q16_doenca', label: '病気はあなたにとって何を意味しますか？今まさに、身体的または感情的な健康状態を経験していますか？', data_i18n: 'q16_doenca' },
+    { number: 17, block: 2, theme: 'solidao', id: 'q17_presenca', label: '今この瞬間、隣にいてほしい人はいますか？その人を今そこにいさせないもの——距離、プライド、それとも決して言われなかった何か——は何ですか？', data_i18n: 'q17_presenca' },
+    { number: 18, block: 2, theme: 'morte', id: 'q18_morte', label: '今、死をどう感じていますか——恐怖として、安堵として、それともその先に何があるのかへの純粋な興味として？', data_i18n: 'q18_morte' },
+    { number: 19, block: 2, theme: 'espiritualidade', id: 'q19_doenca_espiritual', label: '病気は人生のある時に、意味やメッセージ、または隠れた目的を持つことがあると信じますか？', data_i18n: 'q19_doenca_espiritual' },
+    { number: 20, block: 2, theme: 'sentido_doenca', id: 'q20_sentido_doenca', label: 'さらに深く：一部の病気は解決されていない内なる影を反映している、あるいは精神的成長のプロセスの一部だと思いますか？', data_i18n: 'q20_sentido_doenca' }
+  ]
+},
+
+{
+  sectionId: 'section-perguntas-crescimento',
+  id: 'crescimento',
+  index: 2,
+  title: 'ブロック3 — 成長',
+  data_i18n: 'bloco_crescimento_title',
+  nextSection: 'section-perguntas-integracao',
+  transitionVideo: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4',
+  questions: [
+    { number: 21, block: 3, theme: 'sentido_da_vida', id: 'q21_sentido_vida', label: 'すでに語ってきたすべての後で、あなたにとって人生の意味とは何ですか——すべてを導く大きな目的があるのか、それとも偶然が決めるのか？', data_i18n: 'q21_sentido_vida' },
+    { number: 22, block: 3, theme: 'espiritualidade', id: 'q22_espiritualidade', label: '神、あるいは至高の存在、スピリチュアリティ、または目に見えるものを超えた何かを信じますか？', data_i18n: 'q22_espiritualidade' },
+    { number: 23, block: 3, theme: 'experiencia_espiritual', id: 'q23_guia_invisivel', label: '目に見えない何かに導かれていると感じたことはありますか？それを証明する印象的な経験はありますか？', data_i18n: 'q23_guia_invisivel' },
+    { number: 24, block: 3, theme: 'dor_emocional', id: 'q24_dor_emocional', label: 'これまでに経験した最大の感情的な痛みは何でしたか——そして実際にそれを乗り越えるために使った道は何でしたか？', data_i18n: 'q24_dor_emocional' },
+    { number: 25, block: 3, theme: 'superacao', id: 'q25_superacao', label: 'そして、あなたの最大の克服は何でしたか？すべてが失われたと思えたその瞬間に、あなたは自分の中にどんな力を見出しましたか？', data_i18n: 'q25_superacao' },
+    { number: 26, block: 3, theme: 'medos', id: 'q26_medos', label: '今、最も恐れているものは何ですか？その恐れに耳を傾けたら、それはあなたに何を示そうとしていますか？', data_i18n: 'q26_medos' },
+    { number: 27, block: 3, theme: 'autocuidado', id: 'q27_esquecimento_de_si', label: 'ある時点で自分を優先することをやめてしまったのはなぜだと思いますか？本当に心に響く褒め言葉を最後に受けたのはいつですか？', data_i18n: 'q27_esquecimento_de_si' },
+    { number: 28, block: 3, theme: 'prioridade_pessoal', id: 'q28_prioridade', label: '多くの場合、自分を優先することが難しいのはなぜだと思いますか——それが必要だと分かっていても？', data_i18n: 'q28_prioridade' },
+    { number: 29, block: 3, theme: 'autoestima', id: 'q29_autoestima', label: '誰の承認にも頼らず、自分自身を認めて褒めることはよくありますか？それが実際に起こるのはどんな瞬間ですか？', data_i18n: 'q29_autoestima' },
+    { number: 30, block: 3, theme: 'sonhos', id: 'q30_sonhos', label: 'あなたは自分自身や他人の夢が生まれるのを助ける人だと思いますか、それとも、気づかないうちに、その夢を道の途中で埋めてしまった人だと思いますか？', data_i18n: 'q30_sonhos' }
+  ]
+},
+
+{
+  sectionId: 'section-perguntas-integracao',
+  id: 'integracao',
+  index: 3,
+  title: 'ブロック4 — 統合',
+  data_i18n: 'bloco_integracao_title',
+  nextSection: 'section-perguntas-sintese',
+  transitionVideo: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4',
+  questions: [
+    { number: 31, block: 4, theme: 'maior_sonho', id: 'q31_maior_sonho', label: '恐れと埋もれた夢を見つめた後、今のあなたの最大の夢は何ですか——想像するだけで笑顔になるものは？', data_i18n: 'q31_maior_sonho' },
+    { number: 32, block: 4, theme: 'barreiras', id: 'q32_barreiras', label: 'それを実現することを妨げているのは何だと思いますか？その障壁は内側から来るのか、外側から来るのか、それとも両方からですか？', data_i18n: 'q32_barreiras' },
+    { number: 33, block: 4, theme: 'proposito', id: 'q33_proposito', label: 'すでに自分の目的を生きていると感じますか、それともまだそれを探している最中で、どう進めばいいか正確にはわからない状態ですか？', data_i18n: 'q33_proposito' },
+    { number: 34, block: 4, theme: 'chamado_interior', id: 'q34_chamado_interior', label: 'まだ脈打っていると知っていても、あなたが繰り返し無視している内なる呼び声、静かな願望はありますか？', data_i18n: 'q34_chamado_interior' },
+    { number: 35, block: 4, theme: 'origem_dos_medos', id: 'q35_origem_medos', label: 'あなたの恐れに戻りましょう：それらは実際には、どんな具体的な状況や感情に結びついていますか？', data_i18n: 'q35_origem_medos' },
+    { number: 36, block: 4, theme: 'decisoes_e_limites', id: 'q36_decisoes_limites', label: '恐れのために特定の決断を避けている、あるいは対立を避けるためだけに自分を軽んじる状況を受け入れてしまっていると感じますか？', data_i18n: 'q36_decisoes_limites' },
+    { number: 37, block: 4, theme: 'acolhimento_do_sofrimento', id: 'q37_acolhimento_sofrimento', label: '今、誰かがあなたの前で深く苦しんでいたら、その人に何を言いますか——そして自分自身にも同じことを言えますか？', data_i18n: 'q37_acolhimento_sofrimento' },
+    { number: 38, block: 4, theme: 'vida_alem_da_terra', id: 'q38_vida_alem_terra', label: '私たちの惑星の外に生命があると信じますか、それとも存在のすべてがここで知っているものに限られると思いますか？', data_i18n: 'q38_vida_alem_terra' },
+    { number: 39, block: 4, theme: 'legado', id: 'q39_legado', label: 'もうここにいなくなったとき、どう覚えられたいですか？財産や言葉を超えて、どんな遺産を残したいですか？', data_i18n: 'q39_legado' },
+    { number: 40, block: 4, theme: 'destino_dos_sonhos', id: 'q40_destino_sonhos', label: '実現しなかった夢に、実際に何が起きたのですか——それらは死んでしまったのか、待っているのか、それとも単に信じることをやめたのですか？', data_i18n: 'q40_destino_sonhos' }
+  ]
+},
+
+{
+  sectionId: 'section-perguntas-sintese',
+  id: 'sintese',
+  index: 4,
+  title: 'ブロック5 — 統合と締めくくり',
+  data_i18n: 'bloco_sintese_title',
+  nextSection: 'section-final',
+  transitionVideo: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4',
+  questions: [
+    { number: 41, block: 5, theme: 'choro', id: 'q41_choro', label: '最近、頻繁に泣いていますか？その涙を本当に引き起こしているものを、正直に見極めることはできますか？', data_i18n: 'q41_choro' },
+    { number: 42, block: 5, theme: 'origem_do_choro', id: 'q42_origem_choro', label: 'その涙は内なる空虚さ、具体的な喪失、それとも静かに抱えている後悔から来ていますか？', data_i18n: 'q42_origem_choro' },
+    { number: 43, block: 5, theme: 'expressao_da_dor', id: 'q43_expressao_dor', label: '痛みが訪れるとき、あなたの中で優勢になるのは何ですか——孤立させる沈黙、その感情を強める何かを探す行動、それとも爆発したがる怒りですか？', data_i18n: 'q43_expressao_dor' },
+    { number: 44, block: 5, theme: 'tristeza_depressao', id: 'q44_tristeza_depressao', label: 'あなたが感じているのは一時的な悲しみだけですか、それともうつ状態のような、もっと深いものを経験していると思いますか？その二つをはっきりと自分の中で区別できますか？', data_i18n: 'q44_tristeza_depressao' },
+    { number: 45, block: 5, theme: 'ajuda_profissional', id: 'q45_ajuda_profissional', label: 'もしその深い状態を自分の中に認めているなら、感じていることをより理解するために専門的な助けを求めることをすでに考えましたか——それとも、その一歩にまだ抵抗していますか？', data_i18n: 'q45_ajuda_profissional' },
+    { number: 46, block: 5, theme: 'comportamento_relacional', id: 'q46_comportamento_relacional', label: 'あなたの人間関係において、自分をより主張的な人（あるいは攻撃的な人）だと思いますか、それとも何としても対立を避ける従順な人だと思いますか？', data_i18n: 'q46_comportamento_relacional' },
+    { number: 47, block: 5, theme: 'autopercepcao', id: 'q47_autopercepcao', label: '自分自身と一緒にいることさえ難しい瞬間はありますか——今では間違いだったと考える決断に対する恨みや怒りを抱えていますか？', data_i18n: 'q47_autopercepcao' },
+    { number: 48, block: 5, theme: 'autoimagem', id: 'q48_autoimagem', label: '心の奥では、自分を興味深く価値のある人間だと見ていますか、それとも、密かにでも、他人にとってあまり興味を持たれない人間だと信じていますか？', data_i18n: 'q48_autoimagem' },
+    { number: 49, block: 5, theme: 'limites', id: 'q49_limites', label: '人に「いいえ」と言うことに本当に苦労していますか——それが内心で自分自身を裏切ることを意味してでも？', data_i18n: 'q49_limites' },
+    { number: 50, block: 5, theme: 'morte', id: 'q50_morte', label: '最後に：死ぬことを恐れていますか？そして、さらに正直に言うと——その恐れは死そのものにあるのか、それがどのように起こるかという方法にあるのか？その答えは、これまで共有してきたすべてについて何を明らかにしますか？', data_i18n: 'q50_morte' }
+  ]
+ }
+],
 
     'zh-CN': [
-    {
-      sectionId: 'section-perguntas-raizes',
-      id: 'raizes',
-      index: 0,
-      title: '第一部分 — 根源',
-      data_i18n: 'bloco_raizes_title',
-      nextSection: 'section-perguntas-reflexoes',
-      transitionVideo: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
-      questions: [
-        {
-          number: 1,
-          block: 1,
-          theme: 'criacao_familiar',
-          id: 'q01_criacao',
-          label: '您是由谁抚养长大的？亲生父母、单亲、亲戚、养父母还是其他人？',
-          data_i18n: 'q01_criacao'
-        },
-        {
-          number: 2,
-          block: 1,
-          theme: 'individualidade',
-          id: 'q02_filho_unico',        
-          label: '您是独生子女还是有兄弟姐妹？这一现实如何塑造了您的独立个体意识？',
-          data_i18n: 'q02_filho_unico'
-        },
-        {
-          number: 3,
-          block: 1,
-          theme: 'irmaos',
-          id: 'q03_irmaos',        
-          label: '如果您有（或曾有）兄弟姐妹，共有几个？您在他们当中处于（或本应处于）什么位置：长子/长女、排行中间还是老幺？',
-          data_i18n: 'q03_irmaos'
-        },
-        {
-          number: 4,
-          block: 1,
-          theme: 'privacoes',
-          id: 'q04_privacoes',        
-          label: '您在童年时期是否经历过饥饿或严重的匮乏？这如何影响了您看待生活的方式？',
-          data_i18n: 'q04_privacoes'
-        },
-        {
-          number: 5,
-          block: 1,
-          theme: 'deficiencia',
-          id: 'q05_deficiencia',        
-          label: '您是否存在某种社交、身体或认知上的障碍？您是否曾因此遭受过偏见？',
-          data_i18n: 'q05_deficiencia'
-        },
-        {
-          number: 6,
-          block: 1,
-          theme: 'escolaridade',
-          id: 'q06_escolaridade',        
-          label: '您的受教育程度如何？您如何评价自己在个人成长与教育上的投入？',
-          data_i18n: 'q06_escolaridade'
-        },
-        {
-          number: 7,
-          block: 1,
-          theme: 'estado_civil',
-          id: 'q07_estado_civil',        
-          label: '您目前的婚姻或情感状态如何影响着您当下的生活阶段？',
-          data_i18n: 'q07_estado_civil'
-        },
-        {
-          number: 8,
-          block: 1,
-          theme: 'identidade',
-          id: 'q08_identidade',        
-          label: '您还记得自己第一次意识到自己是这个世界上独一无二的个体的时刻吗？当时您几岁？',
-          data_i18n: 'q08_identidade'
-        },
-        {
-          number: 9,
-          block: 1,
-          theme: 'silencio',
-          id: 'q09_silencio',        
-          label: '您与“寂静”的关系是怎样的？它会让您感到内心不安，还是能让您平静下来？',
-          data_i18n: 'q09_silencio'
-        },
-        {
-          number: 10,
-          block: 1,
-          theme: 'crianca_interior',
-          id: 'q10_crianca',        
-          label: '如果您能与依旧居住在您内心的那个孩子对话，您会对他/她倾诉些什么？',
-          data_i18n: 'q10_crianca'
-        }
-      ]   
-    },
-    {
-      sectionId: 'section-perguntas-reflexoes',
-      id: 'reflexoes',
-      index: 1,
-      title: '第二部分 — 内省',
-      data_i18n: 'bloco_reflexoes_title',
-      nextSection: 'section-perguntas-crescimento',
-      transitionVideo: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4',
-      questions: [
-        {
-          number: 11,
-          block: 2,
-          theme: 'vida',
-          id: 'q11_percepcao_vida',
-          label: '走到今天，您是如何看待和感知自己过往的人生路程的？',
-          data_i18n: 'q11_percepcao_vida'
-        },
-        {
-          number: 12,
-          block: 2,
-          theme: 'empatia',
-          id: 'q12_percepcao_outros',    
-          label: '您是如何看待周围其他人的生活的？',
-          data_i18n: 'q12_percepcao_outros'
-        },
-        {
-          number: 13,
-          block: 2,
-          theme: 'traumas',
-          id: 'q13_traumas',    
-          label: '您是如何应对自己的心理创伤的？您能够坦然地谈论它们吗？',
-          data_i18n: 'q13_traumas'
-        },
-        {
-          number: 14,
-          block: 2,
-          theme: 'verdade',
-          id: 'q14_verdade',    
-          label: '您相信存在一个更高的绝对真理，还是认为一切都仅仅取决于每个人的主观视角？',
-          data_i18n: 'q14_verdade'
-        },
-        {
-          number: 15,
-          block: 2,
-          theme: 'vicios',
-          id: 'q15_vicios',    
-          label: '您最大的恶习、瘾好或执念是什么？您认为它是因何而生的？您曾尝试去战胜它吗？您是否也察觉到自己内心其他更隐蔽或情感上的依赖？',
-          data_i18n: 'q15_vicios'
-        },
-        {
-          number: 16,
-          block: 2,
-          theme: 'doenca',
-          id: 'q16_doenca',    
-          label: '对您而言，疾病象征着什么？您目前是否正面临着某种健康状况的困扰？',
-          data_i18n: 'q16_doenca'
-        },
-        {
-          number: 17,
-          block: 2,
-          theme: 'solidao',
-          id: 'q17_presenca',    
-          label: '此时此刻，是否有哪个人是您特别希望他/她陪伴在身边的？为什么那个人不在这里？',
-          data_i18n: 'q17_presenca'
-        },
-        {
-          number: 18,
-          block: 2,
-          theme: 'morte',
-          id: 'q18_morte',    
-          label: '您是如何看待死亡的？它唤起的是您的恐惧、慰藉还是好奇心？',
-          data_i18n: 'q18_morte'
-        },
-        {
-          number: 19,
-          block: 2,
-          theme: 'espiritualidade',
-          id: 'q19_doenca_espiritual',
-          label: '您对疾病的理解是怎样的？在生命中的某些特定时刻，它是否可能带有某种意义或目的？',
-          data_i18n: 'q19_doenca_espiritual'
-        },
-        {
-          number: 20,
-          block: 2,
-          theme: 'sentido_doenca',
-          id: 'q20_sentido_doenca',
-          label: '您是否相信某些疾病可能反映了内在的阴影，或是精神与灵性成长过程中的一部分？',    
-          data_i18n: 'q20_sentido_doenca'
-        }
-      ]
-    },
-    {
-      sectionId: 'section-perguntas-crescimento',
-      id: 'crescimento',
-      index: 2,
-      title: '第三部分 — 成长',
-      data_i18n: 'bloco_crescimento_title',
-      nextSection: 'section-perguntas-integracao',
-      transitionVideo: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4',
-      questions: [
-        {
-          number: 21,
-          block: 3,
-          theme: 'sentido_da_vida',
-          id: 'q21_sentido_vida',
-          label: '您是如何理解生命的意义的？是否存在一个更高的宿命与目的，还是说一切都只是偶然发生的？',
-          data_i18n: 'q21_sentido_vida'
-        },
-        {
-          number: 22,
-          block: 3,
-          theme: 'espiritualidade',
-          id: 'q22_espiritualidade',
-          label: '您是否相信上帝、至高无上的存在、灵性，或是某些超越我们肉眼可见的事物？',
-          data_i18n: 'q22_espiritualidade'
-        },
-        {
-          number: 23,
-          block: 3,
-          theme: 'experiencia_espiritual',
-          id: 'q23_guia_invisivel',
-          label: '您是否曾感到被某种无形的力量所指引？能否分享一次刻骨铭心的经历？',
-          data_i18n: 'q23_guia_invisivel'
-        },
-        {
-          number: 24,
-          block: 3,
-          theme: 'dor_emocional',
-          id: 'q24_dor_emocional',
-          label: '您曾经历过的最大的情感痛苦是什么？您是如何设法去面对和渡过难关的？',
-          data_i18n: 'q24_dor_emocional'
-        },
-        {
-          number: 25,
-          block: 3,
-          theme: 'superacao',
-          id: 'q25_superacao',
-          label: '您一生中最大的超越与蜕变是什么？在那一刻，您在自己内心深处发现了怎样的力量？',
-          data_i18n: 'q25_superacao'
-        },
-        {
-          number: 26,
-          block: 3,
-          theme: 'medos',
-          id: 'q26_medos',
-          label: '今天您最恐惧的是什么？这种恐惧可能试图在向您昭示些什么？',
-          data_i18n: 'q26_medos'
-        },
-        {
-          number: 27,
-          block: 3,
-          theme: 'autocuidado',
-          id: 'q27_esquecimento_de_si',
-          label: '为什么您认为自己最终会迷失并遗忘了自我？上一次您收到让您真正铭记在心的由衷赞美是在什么时候？',
-          data_i18n: 'q27_esquecimento_de_si'
-        },
-        {
-          number: 28,
-          block: 3,
-          theme: 'prioridade_pessoal',
-          id: 'q28_prioridade',
-          label: '您认为自己为什么常常无法将自我放在第一位去珍视？',
-          data_i18n: 'q28_prioridade'
-        },
-        {
-          number: 29,
-          block: 3,
-          theme: 'autoestima',
-          id: 'q29_autoestima',
-          label: '您经常有意识地去认可并赞美自己吗？这通常发生在哪些时刻？',
-          data_i18n: 'q29_autoestima'
-        },
-        {
-          number: 30,
-          block: 3,
-          theme: 'sonhos',
-          id: 'q30_sonhos',
-          label: '您觉得自己是一个助力他人梦想诞生的人，还是一个在不知不觉中亲手埋葬了自己和他人梦想的人？',
-          data_i18n: 'q30_sonhos'
-        }
-      ]
-    },
-    {
-      sectionId: 'section-perguntas-integracao',
-      id: 'integracao',
-      index: 3,
-      title: '第四部分 — 整合',
-      data_i18n: 'bloco_integracao_title',
-      nextSection: 'section-perguntas-sintese',
-      transitionVideo: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4',
-      questions: [
-        {
-          number: 31,
-          block: 4,
-          theme: 'maior_sonho',
-          id: 'q31_maior_sonho',
-          label: '如今您最大的梦想是什么？那些光是想象一下就会让您展露笑颜的事物。',
-          data_i18n: 'q31_maior_sonho'
-        },
-        {
-          number: 32,
-          block: 4,
-          theme: 'barreiras',
-          id: 'q32_barreiras',
-          label: '您认为是什么在阻碍着您去实现它？这些障碍是源于内在、外在，还是两者兼有？',
-          data_i18n: 'q32_barreiras'
-        },
-        {
-          number: 33,
-          block: 4,
-          theme: 'proposito',
-          id: 'q33_proposito',
-          label: '您觉得您正在活出自己的天命与人生使命，还是依然处于寻找它的途中？',
-          data_i18n: 'q33_proposito'
-        },
-        {
-          number: 34,
-          block: 4,
-          theme: 'chamado_interior',
-          id: 'q34_chamado_interior',
-          label: '是否存在一个被您一直以来刻意忽略的内在召唤，或是那份无声的渴望？',
-          data_i18n: 'q34_chamado_interior'
-        },
-        {
-          number: 35,
-          block: 4,
-          theme: 'origem_dos_medos',
-          id: 'q35_origem_medos',
-          label: '您的那些恐惧，都深层联结着怎样的特定情境或情感？',
-          data_i18n: 'q35_origem_medos'
-        },
-        {
-          number: 36,
-          block: 4,
-          theme: 'decisoes_e_limites',
-          id: 'q36_decisoes_limites',
-          label: '您是否感到自己由于恐惧而逃避做出某些决定，或者最终妥协接受了那些令您尊严受损的处境？',
-          data_i18n: 'q36_decisoes_limites'
-        },
-        {
-          number: 37,
-          block: 4,
-          theme: 'acolhimento_do_sofrimento',
-          id: 'q37_acolhimento_sofrimento',
-          label: '对于此时此刻正深陷痛苦煎熬中的人，您会对他/她留下怎样的真诚致语？',
-          data_i18n: 'q37_acolhimento_sofrimento'
-        },
-        {
-          number: 38,
-          block: 4,
-          theme: 'vida_alem_da_terra',
-          id: 'q38_vida_alem_terra',
-          label: '您是否相信在我们的地球之外还存在生命，还是相信宇宙间所有的生命和存在都仅仅发生在这里？',
-          data_i18n: 'q38_vida_alem_terra'
-        },
-        {
-          number: 39,
-          block: 4,
-          theme: 'legado',
-          id: 'q39_legado',
-          label: '当您未来离开这个世界时，您希望如何被世人铭记？您期许自己能留下怎样的精神遗产？',
-          data_i18n: 'q39_legado'
-        },
-        {
-          number: 40,
-          block: 4,
-          theme: 'destino_dos_sonhos',
-          id: 'q40_destino_sonhos',
-          label: '那些您曾经拥有、却最终未能达成和实现的梦想，后来都怎样了？',
-          data_i18n: 'q40_destino_sonhos'
-        }
-      ]
-    },
-    {
-      sectionId: 'section-perguntas-sintese',
-      id: 'sintese',
-      index: 4,
-      title: '第五部分 — 综合与交付',
-      data_i18n: 'bloco_sintese_title',
-      nextSection: 'section-final',
-      transitionVideo: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4',
-      questions: [
-        {
-          number: 41,
-          block: 5,
-          theme: 'choro',
-          id: 'q41_choro',
-          label: '您最近是否经常流泪痛哭？您能否察觉到通常是什么导火索引发了这番哭泣？',
-          data_i18n: 'q41_choro'
-        },
-        {
-          number: 42,
-          block: 5,
-          theme: 'origem_do_choro',
-          id: 'q42_origem_choro',
-          label: '这份泪水是源于内心的空虚、某种失去的创伤，还是深层的悔恨？',
-          data_i18n: 'q42_origem_choro'
-        },
-        {
-          number: 43,
-          block: 5,
-          theme: 'expressao_da_dor',
-          id: 'q43_expressao_dor',
-          label: '当哭泣降临时，您身上占据主导的是什么：是无言的沉默、寻找能加剧痛苦的事物，还是内心渴望宣泄的愤怒？',
-          data_i18n: 'q43_expressao_dor'
-        },
-        {
-          number: 44,
-          block: 5,
-          theme: 'tristeza_depressao',
-          id: 'q44_tristeza_depressao',
-          label: '您只是感到日常的悲伤，还是认为自己正处于某种抑郁状态中？您能否清晰辨别出这两种体验之间的本质不同？',
-          data_i18n: 'q44_tristeza_depressao'
-        },
-        {
-          number: 45,
-          block: 5,
-          theme: 'ajuda_profissional',
-          id: 'q45_ajuda_profissional',
-          label: '如果您认为自己正饱受抑郁状态的折磨，您是否考虑过寻求专业心理咨询的帮助，以更深层地理清内心的真实感受？',
-          data_i18n: 'q45_ajuda_profissional'
-        },
-        {
-          number: 46,
-          block: 5,
-          theme: 'comportamento_relacional',
-          id: 'q46_comportamento_relacional',
-          label: '在人际关系和相处中，您认为自己是一个更倾向于表现出攻击性（强势）的人，还是一个更倾向于顺从（妥协）的人？',
-          data_i18n: 'q46_comportamento_relacional'
-        },
-        {
-          number: 47,
-          block: 5,
-          theme: 'autopercepcao',
-          id: 'q47_autopercepcao',
-          label: '您是否有时觉得很难与自己和谐共处，或者常常对那些您认为错误的过往抉择怀恨在心？',
-          data_i18n: 'q47_autopercepcao'
-        },
-        {
-          number: 48,
-          block: 5,
-          theme: 'autoimagem',
-          id: 'q48_autoimagem',
-          label: '您认为自己是一个充满魅力、丰富有趣的人，还是坚信自己对他人而言是个索然无味的人？',
-          data_i18n: 'q48_autoimagem'
-        },
-        {
-          number: 49,
-          block: 5,
-          theme: 'limites',
-          id: 'q49_limites',
-          label: '您是否很难对别人的索求或抗拒坦然地说出“不”？',
-          data_i18n: 'q49_limites'
-        },
-        {
-          number: 50,
-          block: 5,
-          theme: 'morte',
-          id: 'q50_morte',
-          label: '您害怕面临死亡吗？在很多时候，恐惧往往不在于死亡的终点本身，而更在于它可能降临的痛苦方式。您在自身中是如何感知到这一点的？',
-          data_i18n: 'q50_morte'
-        }
-      ]
-    }
+
+{
+  sectionId: 'section-perguntas-raizes',
+  id: 'raizes',
+  index: 0,
+  title: '第一板块 — 根源',
+  data_i18n: 'bloco_raizes_title',
+  nextSection: 'section-perguntas-reflexoes',
+  transitionVideo: VIDEO_BASE + 'filme-1-entrando-na-jornada.mp4',
+  questions: [
+    { number: 1, block: 1, theme: 'criacao_familiar', id: 'q01_criacao', label: '是谁把你养大的——你的生身父母、其中一位、其他亲属、养父母，还是这个圈子之外的某个人？请简单描述一下这个人的存在。', data_i18n: 'q01_criacao' },
+    { number: 2, block: 1, theme: 'individualidade', id: 'q02_filho_unico', label: '你是独生子女，还是有兄弟姐妹？这种情况如何塑造了你看待自己作为个体的方式——更独立、更孤独、还是更分裂？', data_i18n: 'q02_filho_unico' },
+    { number: 3, block: 1, theme: 'irmaos', id: 'q03_irmaos', label: '如果你有（或曾经有）兄弟姐妹，你在他们中排第几——老大、中间还是最小？这个位置给你的人生带来了怎样的重量或优势？', data_i18n: 'q03_irmaos' },
+    { number: 4, block: 1, theme: 'privacoes', id: 'q04_privacoes', label: '你童年时期经历过饥饿或严重的物质匮乏吗？如果有，这在你今天面对匮乏、安全感或自我价值时留下了怎样的印记？', data_i18n: 'q04_privacoes' },
+    { number: 5, block: 1, theme: 'deficiencia', id: 'q05_deficiencia', label: '你是否带着某种社交、身体或认知上的限制生活？你有没有因此感受到偏见的重量——这在今天的你身上又是如何体现的？', data_i18n: 'q05_deficiencia' },
+    { number: 6, block: 1, theme: 'escolaridade', id: 'q06_escolaridade', label: '你的学历是什么？回头看看，你觉得自己在自我教育上投入够了吗，还是内心还有一块让你不安的学习空白？', data_i18n: 'q06_escolaridade' },
+    { number: 7, block: 1, theme: 'estado_civil', id: 'q07_estado_civil', label: '你现在的婚姻/感情状态——单身、已婚、分居、恋爱中——是在支撑你，还是在这个人生阶段给你增加负担？', data_i18n: 'q07_estado_civil' },
+    { number: 8, block: 1, theme: 'identidade', id: 'q08_identidade', label: '你还记得那个你自己意识到自己是世界上独一无二的存在的确切瞬间吗？你当时几岁，感受到了什么？', data_i18n: 'q08_identidade' },
+    { number: 9, block: 1, theme: 'silencio', id: 'q09_silencio', label: '你和沉默的真实关系是怎样的——它是因为暴露了某些东西而让你不安，还是因为让你回到自己而让你安心？', data_i18n: 'q09_silencio' },
+    { number: 10, block: 1, theme: 'crianca_interior', id: 'q10_crianca', label: '如果你现在能对曾经的那个孩子说话——那个承载了你刚刚说的一切的孩子——你会对他说什么？', data_i18n: 'q10_crianca' }
   ]
-  };
+},
+
+{
+  sectionId: 'section-perguntas-reflexoes',
+  id: 'reflexoes',
+  index: 1,
+  title: '第二板块 — 反思',
+  data_i18n: 'bloco_reflexoes_title',
+  nextSection: 'section-perguntas-crescimento',
+  transitionVideo: VIDEO_BASE + 'filme-2-dentro-da-jornada.mp4',
+  questions: [
+    { number: 11, block: 2, theme: 'vida', id: 'q11_percepcao_vida', label: '在重新审视你的根源之后，你如何看待自己至今为止的人生——是成就、是生存，还是某种仍悬而未决的东西？', data_i18n: 'q11_percepcao_vida' },
+    { number: 12, block: 2, theme: 'empatia', id: 'q12_percepcao_outros', label: '而你身边的人的生活呢——你是用真诚的同理心去看，还是带着距离和评判？', data_i18n: 'q12_percepcao_outros' },
+    { number: 13, block: 2, theme: 'traumas', id: 'q13_traumas', label: '你是如何处理自己的创伤的：正面面对，还是连提及都尽量回避？现在你能像以前一样真诚地谈论它们吗？', data_i18n: 'q13_traumas' },
+    { number: 14, block: 2, theme: 'verdade', id: 'q14_verdade', label: '你相信存在一个高于一切的更大的真相，还是认为每一个真相都只是看待它的那个人的视角的反映？', data_i18n: 'q14_verdade' },
+    { number: 15, block: 2, theme: 'vicios', id: 'q15_vicios', label: '你最大的恶习是什么——是承认的，还是隐藏的？它从何而来，你有没有试图战胜它，是否还有一些更微妙、更情绪化的恶习你很少承认自己有？', data_i18n: 'q15_vicios' },
+    { number: 16, block: 2, theme: 'doenca', id: 'q16_doenca', label: '疾病对你来说意味着什么？此刻，你是否正在经历某种健康状况——身体上或情绪上的？', data_i18n: 'q16_doenca' },
+    { number: 17, block: 2, theme: 'solidao', id: 'q17_presenca', label: '此刻你希望有谁在你身边吗？是什么阻碍了那个人在场——距离、骄傲，还是某些从未说出口的话？', data_i18n: 'q17_presenca' },
+    { number: 18, block: 2, theme: 'morte', id: 'q18_morte', label: '今天的你如何看待死亡——是恐惧、是解脱，还是对之后会发生什么的真正好奇？', data_i18n: 'q18_morte' },
+    { number: 19, block: 2, theme: 'espiritualidade', id: 'q19_doenca_espiritual', label: '你相信疾病在生命的某些时刻可能承载着某种意义、某个信息，或某个隐藏的目的吗？', data_i18n: 'q19_doenca_espiritual' },
+    { number: 20, block: 2, theme: 'sentido_doenca', id: 'q20_sentido_doenca', label: '更进一步说：你认为有些疾病反映的是尚未解决的内在阴影，还是精神成长过程的一部分？', data_i18n: 'q20_sentido_doenca' }
+  ]
+},
+
+{
+  sectionId: 'section-perguntas-crescimento',
+  id: 'crescimento',
+  index: 2,
+  title: '第三板块 — 成长',
+  data_i18n: 'bloco_crescimento_title',
+  nextSection: 'section-perguntas-integracao',
+  transitionVideo: VIDEO_BASE + 'filme-3-traumas-na-jornada.mp4',
+  questions: [
+    { number: 21, block: 3, theme: 'sentido_da_vida', id: 'q21_sentido_vida', label: '在你已经揭示的一切之后，对你来说，生命的意义是什么——是有一个更大的目的在引导一切，还是一切都由偶然决定？', data_i18n: 'q21_sentido_vida' },
+    { number: 22, block: 3, theme: 'espiritualidade', id: 'q22_espiritualidade', label: '你信仰上帝、某个至高存在、灵性，还是超越肉眼所见的某种东西？', data_i18n: 'q22_espiritualidade' },
+    { number: 23, block: 3, theme: 'experiencia_espiritual', id: 'q23_guia_invisivel', label: '你有没有在某个时刻感觉自己被某种看不见的力量引导过？有没有一段令人印象深刻的经历能向你证明这一点？', data_i18n: 'q23_guia_invisivel' },
+    { number: 24, block: 3, theme: 'dor_emocional', id: 'q24_dor_emocional', label: '你曾经经历过的最大情感痛苦是什么——你实际上是用什么方式走过它的？', data_i18n: 'q24_dor_emocional' },
+    { number: 25, block: 3, theme: 'superacao', id: 'q25_superacao', label: '而你最大的一次自我超越是什么？在一切似乎都已失去的那个时刻，你在自己身上发现了怎样的力量？', data_i18n: 'q25_superacao' },
+    { number: 26, block: 3, theme: 'medos', id: 'q26_medos', label: '今天你最害怕的是什么？如果你停下来倾听这份恐惧，它想向你展示什么？', data_i18n: 'q26_medos' },
+    { number: 27, block: 3, theme: 'autocuidado', id: 'q27_esquecimento_de_si', label: '你认为自己在某个时刻为什么停止把自己放在第一位？你最后一次收到真正触动你的赞美是什么时候？', data_i18n: 'q27_esquecimento_de_si' },
+    { number: 28, block: 3, theme: 'prioridade_pessoal', id: 'q28_prioridade', label: '为什么你常常很难把自己当作优先事项——即使你知道自己需要这样做？', data_i18n: 'q28_prioridade' },
+    { number: 29, block: 3, theme: 'autoestima', id: 'q29_autoestima', label: '你是否习惯于认可和赞美自己，而不依赖任何人的认可？这种情况真正发生在哪些时刻？', data_i18n: 'q29_autoestima' },
+    { number: 30, block: 3, theme: 'sonhos', id: 'q30_sonhos', label: '你把自己看作是帮助梦想——你自己的和别人的——诞生的人，还是那个在不知不觉中，一路上把这些梦想埋葬掉的人？', data_i18n: 'q30_sonhos' }
+  ]
+},
+
+{
+  sectionId: 'section-perguntas-integracao',
+  id: 'integracao',
+  index: 3,
+  title: '第四板块 — 整合',
+  data_i18n: 'bloco_integracao_title',
+  nextSection: 'section-perguntas-sintese',
+  transitionVideo: VIDEO_BASE + 'filme-4-aproximando-do-final.mp4',
+  questions: [
+    { number: 31, block: 4, theme: 'maior_sonho', id: 'q31_maior_sonho', label: '在审视了你的恐惧和被埋葬的梦想之后：你今天最大的梦想是什么——那个只要想到就会让你微笑的梦想？', data_i18n: 'q31_maior_sonho' },
+    { number: 32, block: 4, theme: 'barreiras', id: 'q32_barreiras', label: '你认为是什么阻碍了你实现它？这些障碍来自内部，来自外部，还是两者兼有？', data_i18n: 'q32_barreiras' },
+    { number: 33, block: 4, theme: 'proposito', id: 'q33_proposito', label: '你觉得自己已经在实现自己的目标了，还是仍在寻找它——并不确切知道该往哪个方向走？', data_i18n: 'q33_proposito' },
+    { number: 34, block: 4, theme: 'chamado_interior', id: 'q34_chamado_interior', label: '有没有一种内心的呼唤，一种无声的渴望，你一直反复忽视，即使你知道它仍在你心里跳动？', data_i18n: 'q34_chamado_interior' },
+    { number: 35, block: 4, theme: 'origem_dos_medos', id: 'q35_origem_medos', label: '回到你的恐惧：它们实际上，从根本上说，与什么具体的情境或感受相关联？', data_i18n: 'q35_origem_medos' },
+    { number: 36, block: 4, theme: 'decisoes_e_limites', id: 'q36_decisoes_limites', label: '你觉得自己是因为恐惧而不去做某些决定，还是最终接受了那些贬低自己的处境，只是为了避免冲突？', data_i18n: 'q36_decisoes_limites' },
+    { number: 37, block: 4, theme: 'acolhimento_do_sofrimento', id: 'q37_acolhimento_sofrimento', label: '如果现在有人站在你面前，深陷痛苦之中，你会对他说什么——你能对自己说同样的话吗？', data_i18n: 'q37_acolhimento_sofrimento' },
+    { number: 38, block: 4, theme: 'vida_alem_da_terra', id: 'q38_vida_alem_terra', label: '你相信在我们这个星球之外存在生命，还是认为所有的存在都局限于我们在这里所知道的？', data_i18n: 'q38_vida_alem_terra' },
+    { number: 39, block: 4, theme: 'legado', id: 'q39_legado', label: '当你不再在这里的时候，你希望被如何记住？除了财产或言语之外，你希望留下怎样的遗产？', data_i18n: 'q39_legado' },
+    { number: 40, block: 4, theme: 'destino_dos_sonhos', id: 'q40_destino_sonhos', label: '你曾经有过、却从未实现的那些梦想，究竟发生了什么——它们死了、还在等待，还是你只是不再相信它们了？', data_i18n: 'q40_destino_sonhos' }
+  ]
+},
+
+{
+  sectionId: 'section-perguntas-sintese',
+  id: 'sintese',
+  index: 4,
+  title: '第五板块 — 总结与交付',
+  data_i18n: 'bloco_sintese_title',
+  nextSection: 'section-final',
+  transitionVideo: VIDEO_BASE + 'filme-5-fim-da-jornada.mp4',
+  questions: [
+    { number: 41, block: 5, theme: 'choro', id: 'q41_choro', label: '最近你经常哭泣吗？你能诚实地识别出真正引发这种哭泣的原因吗？', data_i18n: 'q41_choro' },
+    { number: 42, block: 5, theme: 'origem_do_choro', id: 'q42_origem_choro', label: '这种哭泣是源于内心的空虚、一次具体的失去，还是你默默背负的一份遗憾？', data_i18n: 'q42_origem_choro' },
+    { number: 43, block: 5, theme: 'expressao_da_dor', id: 'q43_expressao_dor', label: '当痛苦来临时，你身上占主导的是什么——那种让人孤立的沉默，还是想寻找某种能加剧这种情绪的东西，或者是想要爆发的怒气？', data_i18n: 'q43_expressao_dor' },
+    { number: 44, block: 5, theme: 'tristeza_depressao', id: 'q44_tristeza_depressao', label: '你感受到的只是暂时的悲伤，还是你相信自己正在经历更深层的东西，比如一种抑郁状态？你能清楚地在自己身上分辨这两者吗？', data_i18n: 'q44_tristeza_depressao' },
+    { number: 45, block: 5, theme: 'ajuda_profissional', id: 'q45_ajuda_profissional', label: '如果你认识到那种更深层的状态，你有没有考虑过寻求专业帮助，以更好地理解自己的感受——还是你仍在抵制这一步？', data_i18n: 'q45_ajuda_profissional' },
+    { number: 46, block: 5, theme: 'comportamento_relacional', id: 'q46_comportamento_relacional', label: '在你的人际关系中，你更认为自己是一个果断（甚至有点强势）的人，还是一个顺从、不惜一切代价避免冲突的人？', data_i18n: 'q46_comportamento_relacional' },
+    { number: 47, block: 5, theme: 'autopercepcao', id: 'q47_autopercepcao', label: '有没有一些时刻，甚至连和自己相处都很困难——因为对如今认为是错误的决定，你怀有怨恨或愤怒？', data_i18n: 'q47_autopercepcao' },
+    { number: 48, block: 5, theme: 'autoimagem', id: 'q48_autoimagem', label: '在内心深处，你把自己看作是一个有趣、有价值的人，还是相信，即使是暗地里，自己是一个对别人没什么吸引力的人？', data_i18n: 'q48_autoimagem' },
+    { number: 49, block: 5, theme: 'limites', id: 'q49_limites', label: '你是否真的很难对别人说"不"——即使这意味着你在内心背叛了自己？', data_i18n: 'q49_limites' },
+    { number: 50, block: 5, theme: 'morte', id: 'q50_morte', label: '最后一个问题：你害怕死亡吗？更诚实地说——这种恐惧是针对死亡本身，还是针对它可能发生的方式？这个答案揭示了你迄今为止分享的一切中的什么？', data_i18n: 'q50_morte' }
+  ]
+ }
+] 
+};
 
   function detectLang() {
     const htmlLang = document.documentElement.lang;
