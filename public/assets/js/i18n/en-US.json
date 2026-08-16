@@ -74,18 +74,32 @@
   "li9": "The way you speak to your Guide also reflects the way you speak to yourself.",
   "li10": "By continuing, you confirm that you understand and accept these terms."
 },
+  
 "senha": {
   "title": "Confirm Your Access",
   "p1": "The verification code sent by email unlocks your Journey.",
   "p2": "This is a personal, educational, and symbolic experience.",
   "p3": "By continuing, you confirm that you have read and accepted these terms.",
-  "codePlaceholder": "Enter the verification code...",
-  "emailPlaceholder": "Enter your email...",
-  "sendCode": "✉️ Send verification code",
-  "resendInfo": "Having trouble receiving the code? Click the button below.",
-  "resendCode": "🔄 Clear this Journey's local data on this device and try again.",
-  "confirmCode": "🔐 Confirm",
-  "reenviar_limpeza": "🔄 Resend verification code\n\nOnly this Journey's local data on this device will be cleared to resolve possible delivery issues.\n\nYour progress and history will remain preserved.\n\nAfter that, click the SEND VERIFICATION CODE button again."
+  "accessCodePlaceholder": "Enter the password JCL-XXXX-XXXX-XXXX",
+  "emailPurchasePlaceholder": "Enter the email address used for the purchase...",
+  "sendPassword": "✉️ Send password by email",
+  "resendPassword": "🔄 Resend my password",
+  "resendInfo": "Having trouble requesting your code? Click the button below.",
+  "enterJourney": "🔐 Enter the Journey",
+  "enter": "🔐 Enter",
+  "termsNotice": "By proceeding, you declare that you understand these terms.",
+  "emailRequired": "First enter the email address used for the purchase.",
+  "purchaseEmailRequired": "Enter the same email address used for the purchase.",
+  "passwordRequired": "Enter the password received after the purchase.",
+  "invalidPasswordFormat": "Check the password. Use the format JCL-XXXX-XXXX-XXXX.",
+  "sendNeutralMessage": "If an approved purchase exists for this email address, we will send the password.",
+  "resendNeutralMessage": "If an eligible purchase exists for this email address, we will send the password.",
+  "sendError": "The delivery request could not be completed at this time.",
+  "resendError": "The resend request could not be completed at this time.",
+  "validationError": "Access could not be validated.",
+  "accessConfirmed": "Access confirmed.",
+  "accessResumed": "Access confirmed. Resuming your Journey.",
+  "sectionLoadError": "Error: the Access section elements could not be loaded."
 },
   
   "guia": {
@@ -283,7 +297,10 @@
   },
   "perguntas": {
     "feedback_placeholder": "Guide's Feedback.",
+    "answer_placeholder": "Write your answer with honesty and calm...",
+    "guide_feedback_label": "Guide Feedback",
     "guide_reflecting": "Guide reflecting",
+    "guide_response_label": "Guide's response",
     "continue": "Continue",
     "block_feedback_waiting": [
       "CONGRATULATIONS!!! We have completed {blocoNome}. I am gathering the most precious signals...",
@@ -293,6 +310,7 @@
       "Stage completed: {blocoNome}. I now collect the echoes to respond with all the light you shared."
     ]
   },
+  
   "final": {
   "title": "End of the Journey",
   "p1": "Your answers have been received with honor by the Brotherhood.",
@@ -303,6 +321,9 @@
   "pdf": "Download PDF",
   "selfie": "Download SelfieCard",
   "back": "Back to Portal",
+  "listenAgain": "Listen again",
+  "reading": "Reading...",
+  "completed": "Completed",  
   "thinking": "Reflecting...",
   "error": "Error generating feedback.",
   "selfieUnavailable": "Selfie not available yet",
