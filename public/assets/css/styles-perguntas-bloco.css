@@ -1019,3 +1019,129 @@ body[data-guia="arian"] .perguntas-controls .btn-perguntas {
     width: 4px;
   }
 }
+
+/* =========================================================
+   MODO DEVOLUTIVA FINAL DO BLOCO
+   Mantém apenas container, glow e caixa da devolutiva
+========================================================= */
+
+section[id^="section-perguntas-"].is-block-feedback-mode .perguntas-top,
+section[id^="section-perguntas-"].is-block-feedback-mode .perguntas-middle,
+section[id^="section-perguntas-"].is-block-feedback-mode .jp-answer-wrap,
+section[id^="section-perguntas-"].is-block-feedback-mode #jp-answer-input,
+section[id^="section-perguntas-"].is-block-feedback-mode .jp-question-typed,
+section[id^="section-perguntas-"].is-block-feedback-mode #jp-question-typed,
+section[id^="section-perguntas-"].is-block-feedback-mode .jp-progress,
+section[id^="section-perguntas-"].is-block-feedback-mode .jp-progress-wrap,
+section[id^="section-perguntas-"].is-block-feedback-mode .perguntas-controls,
+/* régua / barras de progresso */
+section[id^="section-perguntas-"].is-block-feedback-mode .progress-top,
+section[id^="section-perguntas-"].is-block-feedback-mode .progress-middle,
+section[id^="section-perguntas-"].is-block-feedback-mode .progress-total,
+section[id^="section-perguntas-"].is-block-feedback-mode .progress-inline,
+section[id^="section-perguntas-"].is-block-feedback-mode #progress-inline,
+section[id^="section-perguntas-"].is-block-feedback-mode .jp-progress-inline,
+section[id^="section-perguntas-"].is-block-feedback-mode .jp-progress-bar,
+section[id^="section-perguntas-"].is-block-feedback-mode .progress-bar,
+section[id^="section-perguntas-"].is-block-feedback-mode .barra-progresso,
+section[id^="section-perguntas-"].is-block-feedback-mode .perg-progress-outer,
+section[id^="section-perguntas-"].is-block-feedback-mode #progress-block-outer,
+section[id^="section-perguntas-"].is-block-feedback-mode #progress-question-outer,
+/* contadores 10/10 */
+section[id^="section-perguntas-"].is-block-feedback-mode .jp-progress-value,
+section[id^="section-perguntas-"].is-block-feedback-mode .progress-value,
+section[id^="section-perguntas-"].is-block-feedback-mode #progress-question-value,
+section[id^="section-perguntas-"].is-block-feedback-mode #progress-block-value,
+section[id^="section-perguntas-"].is-block-feedback-mode #progress-total-value,
+section[id^="section-perguntas-"].is-block-feedback-mode .jp-question-counter,
+section[id^="section-perguntas-"].is-block-feedback-mode .question-counter,
+section[id^="section-perguntas-"].is-block-feedback-mode .contador-perguntas {
+  display: none !important;
+}
+
+/* Destaca a devolutiva durante o encerramento */
+section[id^="section-perguntas-"].is-block-feedback-mode #jp-ai-response-wrap,
+section[id^="section-perguntas-"].is-block-feedback-mode .jp-ai-response-wrap {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  margin: 0 auto;
+}
+
+/* Mantém o pergaminho centralizado e limpo */
+section[id^="section-perguntas-"].is-block-feedback-mode .perguntas-pergaminho,
+section[id^="section-perguntas-"].is-block-feedback-mode .j-panel-glow {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Botão único que aparece após a devolutiva do bloco ficar pronta */
+.jp-block-next-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 22px auto 8px;
+}
+
+.jp-block-next-btn {
+  position: relative;
+  font-family: "Cardo", serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 14px 34px;
+  border-radius: 999px;
+  cursor: pointer;
+  color: #1a1206;
+  border: 1px solid rgba(255, 238, 190, 0.95);
+  background: var(--gold-gradient);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
+  box-shadow:
+    0 0 14px rgba(255, 225, 150, 0.85),
+    0 0 34px rgba(255, 205, 110, 0.6),
+    0 0 68px rgba(255, 190, 90, 0.4),
+    inset 0 0 18px rgba(255, 245, 210, 0.55);
+  animation: jpBlockNextGlow 2.4s ease-in-out infinite;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+}
+
+@keyframes jpBlockNextGlow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 14px rgba(255, 225, 150, 0.8),
+      0 0 34px rgba(255, 205, 110, 0.55),
+      0 0 68px rgba(255, 190, 90, 0.35),
+      inset 0 0 18px rgba(255, 245, 210, 0.5);
+  }
+  50% {
+    box-shadow:
+      0 0 22px rgba(255, 240, 190, 1),
+      0 0 52px rgba(255, 215, 130, 0.85),
+      0 0 100px rgba(255, 195, 95, 0.6),
+      inset 0 0 26px rgba(255, 250, 225, 0.75);
+  }
+}
+
+.jp-block-next-btn:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 26px rgba(255, 245, 200, 1),
+    0 0 60px rgba(255, 220, 140, 0.9),
+    0 0 120px rgba(255, 200, 100, 0.65),
+    inset 0 0 28px rgba(255, 250, 230, 0.8);
+}
+
+.jp-block-next-btn:active {
+  transform: translateY(1px);
+  opacity: 0.9;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jp-block-next-btn {
+    animation: none;
+  }
+}
+
+
+
