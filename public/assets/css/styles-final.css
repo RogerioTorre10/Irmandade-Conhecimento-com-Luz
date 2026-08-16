@@ -1332,8 +1332,41 @@ min-width:220px;
 
     overflow-x: hidden !important;
     overflow-y: auto !important;
-  }
-}
+  
 
+  
+      
+          position: relative !important;
+          inset: auto !important;
+          float: none !important;
+          transform: none !important;
+          display: block !important;
+          width: calc(100% - 16px) !important;
+          max-width: calc(100% - 16px) !important;
+          height: auto !important;
+          min-height: 0 !important;
+          max-height: none !important;
+          flex: 0 0 auto !important;
+          margin: 16px auto 20px !important;
+          box-sizing: border-box !important;
+          overflow: visible !important;
+        }
 
+        #section-final .final-guide-feedback > * {
+          max-height: none !important;
+          overflow: visible !important;
+        }
 
+        #section-final .pergaminho-content,
+        #section-final .j-arcane-card {
+          height: auto !important;
+          min-height: 0 !important;
+          max-height: none !important;
+        }
+
+        body:has(#section-final) #jornada-canvas {
+          overflow-x: hidden !important;
+          overflow-y: auto !important;
+        }
+      }
+    
