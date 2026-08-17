@@ -290,8 +290,68 @@
     });
   }
 
+  // ============================================================
+  // TRAVA DE NAVEGAÇÃO — impede bypass manual via JC.show()
+  // ============================================================
+
+  const SECOES_PUBLICAS_JORNADA = new Set([
+    'section-intro',
+    'section-termos1',
+    'section-termos2',
+    'section-senha'
+  ]);
+
+  function jornadaTemAcessoValidado() {
+    const authOk =
+      localStorage.getItem('jornada_auth_ok') === '1';
+
+    const codigo =
+      localStorage.getItem('jornada_codigo') ||
+      sessionStorage.getItem('jornada.codigo_jornada') ||
+      '';
+
+    const email =
+      localStorage.getItem('jornada_email') ||
+      sessionStorage.getItem('jornada.email') ||
+      '';
+
+    const deadlineRaw =
+      localStorage.getItem('jornada_deadline_at') ||
+      '';
+
+    if (!authOk || !codigo || !email || !deadlineRaw) {
+      return false;
+    }
+
+    const deadline = Number(deadlineRaw);
+
+    if (!Number.isFinite(deadline) || deadline <= 0) {
+      return false;
+    }
+
+    return Date.now() < deadline;
+  }
+
   async function show(sectionId, opts) {
     const force = !!(opts && opts.force);
+    // Segurança: nenhuma seção privada pode ser aberta
+    // manualmente pelo console sem uma Jornada autenticada e válida.
+    if (
+      !SECOES_PUBLICAS_JORNADA.has(sectionId) &&
+      !jornadaTemAcessoValidado()
+    ) {
+      console.warn(
+        '[JC][SECURITY] Acesso bloqueado à seção privada:',
+        sectionId
+      );
+
+      window.toast?.(
+        'Valide seu acesso para continuar a Jornada.',
+        'warning'
+      );
+
+      sectionId = 'section-senha';
+    }
     if (window.JORNADA_SESSION?.reauthRequired && sectionId !== 'section-senha' && !force) {
       console.warn('[JC] Redirecionando para reautenticação.');
       sectionId = 'section-senha';
