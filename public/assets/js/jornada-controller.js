@@ -550,6 +550,7 @@ const dentro72h =
       }
       isTransitioning = false;
     }
+  }
 
   (function resetJornadaIfNewRun() {
     const runId = String(Date.now());
