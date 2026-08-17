@@ -28,6 +28,28 @@
 
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+  function tSenha(key, fallback = '') {
+  try {
+    const chave = `senha.${key}`;
+    const traduzido = window.i18n?.t?.(chave);
+
+    if (
+      typeof traduzido === 'string' &&
+      traduzido.trim() &&
+      traduzido !== chave
+    ) {
+      return traduzido.trim();
+    }
+  } catch (err) {
+    console.warn(
+      `[JCSenha][i18n] Falha ao traduzir senha.${key}:`,
+      err
+    );
+  }
+
+  return fallback;
+} 
+
   async function waitForElement(selector, { within = document, timeout = 8000, step = 100 } = {}) {
     const t0 = performance.now();
     return new Promise((resolve, reject) => {
@@ -405,19 +427,18 @@
     } catch {}
   }
 
-  async function initOnce(root, triggerToken) {
   const API_BASE =
-    window.APP_CONFIG?.API_BASE ||
-    'https://lumen-backend-api.onrender.com/api';
+  window.APP_CONFIG?.API_BASE ||
+  'https://lumen-backend-api.onrender.com/api';
 
-  if (!root) return;
-  if (triggerToken !== window.JCSenha.state.initToken) return;
+  async function initOnce(root, triggerToken) {
+    if (!root) return;
+    if (triggerToken !== window.JCSenha.state.initToken) return;
 
     root.dataset.senhaInitialized = 'false';
     root.dataset.transitionReady = 'false';
 
     cancelAllSpeech();
-
     prepareTypingNodes(root, { clear: false });
 
     await waitForTransitionUnlock();
@@ -431,7 +452,7 @@
       console.warn('[JCSenha] section não ficou visível a tempo; mantendo texto fallback');
       return;
     }
-
+  
     ensureVisible(root);
 
     let instr1, instr2, instr3, instr4, input, toggle, btnNext, btnPrev;
@@ -446,7 +467,7 @@
       btnPrev = await waitForElement('#btn-senha-prev', { within: root });
     } catch (e) {
       console.error('[JCSenha] elementos não encontrados:', e);
-      window.toast?.('Erro: elementos da seção Senha não carregados.', 'error');
+      window.toast?.(tSenha('sectionLoadError', 'Erro: os elementos da seção Senha não foram carregados.'),'error');
       return;
     }
 
@@ -532,19 +553,25 @@
       .toLowerCase();
 
     if (!email) {
-      window.toast?.(
-        'Digite o mesmo e-mail utilizado na compra.',
-        'warning'
-      );
+     window.toast?.(
+       tSenha(
+        'purchaseEmailRequired',
+        'Digite o mesmo e-mail utilizado na compra.'
+       ),
+       'warning'
+     );
       emailInput?.focus();
       return;
     }
 
     if (!senhaDigitada) {
-      window.toast?.(
-        'Digite a senha recebida após a compra.',
-        'warning'
-      );
+     window.toast?.(
+       tSenha(
+         'passwordRequired',
+         'Digite a senha recebida após a compra.'
+       ),
+       'warning'
+     );
       senhaInput?.focus();
       return;
     }
@@ -554,7 +581,10 @@
 
     if (!formatoJCL.test(senhaDigitada)) {
       window.toast?.(
-        'Confira a senha. Use o formato JCL-XXXX-XXXX-XXXX.',
+        tSenha(
+          'invalidPasswordFormat',
+          'Confira a senha. Use o formato JCL-XXXX-XXXX-XXXX.'
+        ),
         'warning'
       );
       senhaInput?.focus();
@@ -615,7 +645,10 @@
         throw new Error(
           data?.detail ||
           data?.message ||
-          'Não foi possível validar o acesso.'
+          tSenha(
+            'validationError',
+            'Não foi possível validar o acesso.'
+          )
         );
       }
 
@@ -696,8 +729,14 @@
 
       window.toast?.(
         data.resume
-          ? 'Acesso confirmado. Retomando sua Jornada.'
-          : 'Acesso confirmado.',
+          ? tSenha(
+            'accessResumed',
+            'Acesso confirmado. Retomando sua Jornada.'
+          )
+          : tSenha(
+            'accessConfirmed',
+            'Acesso confirmado.'
+          ),
         'success'
       );
 
@@ -742,7 +781,10 @@
 
       window.toast?.(
         err.message ||
-        'Não foi possível validar o acesso.',
+        tSenha(
+          'validationError',
+          'Não foi possível validar o acesso.'
+        ),
         'error'
       );
     }
@@ -757,6 +799,15 @@ const btnEnviar2FA =
 const btnReenviar2FA =
   root.querySelector('#btn-reenviar-2fa');
 
+const resendInfoEl =
+  root.querySelector('.senha-copy-mini');
+
+if (resendInfoEl) {
+  resendInfoEl.textContent = tSenha(
+    'resendInfo',
+    'Dificuldade em solicitar o código? Clique no botão abaixo.'
+  );
+}  
 
 // O botão central executa a mesma validação
 // do botão Confirmar/Entrar.
@@ -779,7 +830,10 @@ if (
 
       if (!email) {
         window.toast?.(
-          'Digite primeiro o e-mail utilizado na compra.',
+          tSenha(
+            'emailRequired',
+            'Digite primeiro o e-mail utilizado na compra.'
+          ),
           'warning'
         );
 
@@ -816,7 +870,10 @@ if (
 
         window.toast?.(
           data?.message ||
-          'Se houver uma compra aprovada para este e-mail, enviaremos a senha.',
+          tSenha(
+            'sendNeutralMessage',
+            'Se houver uma compra aprovada para este e-mail, enviaremos a senha.'
+          ),
           resp.ok ? 'success' : 'info'
         );
 
@@ -827,7 +884,10 @@ if (
         );
 
         window.toast?.(
-          'Não foi possível solicitar o envio neste momento.',
+          tSenha(
+            'sendError',
+            'Não foi possível solicitar o envio neste momento.'
+          ),
           'error'
         );
 
@@ -863,7 +923,10 @@ if (
 
       if (!email) {
         window.toast?.(
-          'Digite primeiro o e-mail utilizado na compra.',
+          tSenha(
+            'emailRequired',
+            'Digite primeiro o e-mail utilizado na compra.'
+          ),
           'warning'
         );
 
@@ -900,7 +963,10 @@ if (
 
         window.toast?.(
           data?.message ||
-          'Se houver uma compra elegível para este e-mail, enviaremos a senha.',
+            tSenha(
+              'resendNeutralMessage',
+              'Se houver uma compra elegível para este e-mail, enviaremos a senha.'
+            ),
           resp.ok ? 'success' : 'info'
         );
 
@@ -911,7 +977,10 @@ if (
         );
 
         window.toast?.(
-          'Não foi possível solicitar o reenvio neste momento.',
+          tSenha(
+            'resendError',
+            'Não foi possível solicitar o reenvio neste momento.'
+          ),
           'error'
         );
 
@@ -923,8 +992,8 @@ if (
         }, 60000);
       }
     }
-  );
-}
+  );   
+ }
 
     root.dataset.transitionReady = 'true';
     root.dataset.senhaInitialized = 'true';
