@@ -361,6 +361,11 @@
     isTransitioning = true;
     console.log('[JC.show] Iniciando:', sectionId);
     try {
+      const jornadaWrapper = document.getElementById('jornada-content-wrapper');
+      if (jornadaWrapper) {
+        jornadaWrapper.style.visibility = 'hidden';
+        jornadaWrapper.style.opacity = '0';
+      }
       const cleanId = sectionId.replace(/^section-/, '');
       let section = await window.carregarEtapa(cleanId);
       if (section && section.id !== sectionId) { section.id = sectionId; }
@@ -368,6 +373,16 @@
       if (!section) { throw new Error(`Seção ${sectionId} não encontrada`); }
       await applyI18nToSection(sectionId, section);
       await prepareTyping(section);
+      if (jornadaWrapper) {
+        await new Promise(resolve =>
+          requestAnimationFrame(() =>
+            requestAnimationFrame(resolve)
+          )
+        );
+
+        jornadaWrapper.style.visibility = 'visible';
+        jornadaWrapper.style.opacity = '1';
+      }
       window.JC.currentSection = sectionId;
       lastShownSection = sectionId;
       try {
