@@ -823,11 +823,50 @@ if (showCursor) element.appendChild(caret);
     }
 
     if (utt) {
-      try { speechSynthesis.cancel(); } catch {}
-      try { speechSynthesis.speak(utt); } catch { speechDone = true; }
-      await new Promise(r => setTimeout(r, 90));
+      const langLower =
+        String(lang || '')
+          .toLowerCase();
+    
+      const isCJK =
+        langLower.startsWith('ja') ||
+        langLower.startsWith('zh');
+    
+      const isMobile =
+        /android|iphone|ipad|ipod|mobile/i.test(
+          navigator.userAgent || ''
+        );
+    
+      try {
+        speechSynthesis.cancel();
+      } catch {}
+    
+      // Mobile + Japonês/Chinês:
+      // dá tempo real para o cancel anterior terminar
+      // antes de iniciar o novo utterance.
+      if (isMobile && isCJK) {
+        await new Promise(
+          resolve => setTimeout(resolve, 220)
+        );
+    
+        try {
+          speechSynthesis.resume();
+        } catch {}
+      }
+    
+      try {
+        speechSynthesis.speak(utt);
+      } catch {
+        speechDone = true;
+      }
+    
+      await new Promise(
+        resolve =>
+          setTimeout(
+            resolve,
+            isMobile && isCJK ? 180 : 90
+          )
+      );
     }
-
     await window.runTyping(element, clean, null, {
       speed: typingSpeed,
       cursor: options.cursor ?? true,
