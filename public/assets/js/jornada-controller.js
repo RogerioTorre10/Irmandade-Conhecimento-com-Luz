@@ -201,12 +201,28 @@
         } else if (typeof window.runTyping === 'function') {
           await window.runTyping(el, text, () => {}, { speed: elementSpeed, cursor: elementCursor, forceReplay: true });
         }
-        if (window.JORNADA_VOICE?.speakLive) {
-          await window.JORNADA_VOICE.speakLive(text, {
-            lang: document.documentElement.lang || window.i18n?.lang || 'pt-BR',
-            guide: document.body.dataset.guia || 'lumen',
-            kind: voiceKind
-          });
+        if (typeof window.typeAndSpeak === 'function') {
+          await window.typeAndSpeak(
+            el,
+            text,
+            elementSpeed,
+            {
+              cursor: elementCursor,
+              forceReplay: true,
+              kind: voiceKind
+            }
+          );
+        } else if (typeof window.runTyping === 'function') {
+          await window.runTyping(
+            el,
+            text,
+            () => {},
+            {
+              speed: elementSpeed,
+              cursor: elementCursor,
+              forceReplay: true
+            }
+          );
         }
         el.classList.remove('typing-active');
         el.classList.add('typing-done');
