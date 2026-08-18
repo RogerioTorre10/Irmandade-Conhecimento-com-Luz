@@ -106,46 +106,92 @@
   return __voices;
 }
 
-  function __ensureVoicesReady(timeoutMs = 1600) {
-    if (!('speechSynthesis' in window)) return Promise.resolve();
+  function __ensureVoicesReady(timeoutMs = 3200) {
+  if (!('speechSynthesis' in window)) {
+    return Promise.resolve();
+  }
 
-    __loadVoicesNow();
-    if (__voices.length) return Promise.resolve();
+  // Sempre tenta atualizar primeiro.
+  __loadVoicesNow();
 
-    if (!__voicesPromise) {
-      __voicesPromise = new Promise((resolve) => {
-        const t0 = Date.now();
-        let done = false;
+  if (__voices.length) {
+    return Promise.resolve();
+  }
 
-        const finish = () => {
-          if (done) return;
-          done = true;
-          resolve();
-        };
-
-        const tick = () => {
-          __loadVoicesNow();
-          if (__voices.length) return finish();
-          if (Date.now() - t0 > timeoutMs) return finish();
-          setTimeout(tick, 80);
-        };
-
-        try {
-          const prev = speechSynthesis.onvoiceschanged;
-          speechSynthesis.onvoiceschanged = () => {
-            try { if (typeof prev === 'function') prev(); } catch {}
-            __loadVoicesNow();
-            finish();
-          };
-        } catch {}
-
-        tick();
-      });
-    }
-
+  // Se ainda existe uma espera em andamento, reutiliza.
+  if (__voicesPromise) {
     return __voicesPromise;
   }
 
+  __voicesPromise = new Promise((resolve) => {
+    const t0 = Date.now();
+    let done = false;
+    let timer = null;
+
+    const finish = () => {
+      if (done) return;
+
+      done = true;
+
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+      }
+
+      // Última tentativa antes de liberar.
+      __loadVoicesNow();
+
+      // CRÍTICO:
+      // libera a Promise armazenada para permitir
+      // nova tentativa posteriormente no mobile.
+      __voicesPromise = null;
+
+      resolve();
+    };
+
+    const tick = () => {
+      if (done) return;
+
+      __loadVoicesNow();
+
+      if (__voices.length) {
+        finish();
+        return;
+      }
+
+      if ((Date.now() - t0) >= timeoutMs) {
+        finish();
+        return;
+      }
+
+      timer = setTimeout(tick, 100);
+    };
+
+    try {
+      const previous =
+        speechSynthesis.onvoiceschanged;
+
+      speechSynthesis.onvoiceschanged = () => {
+        try {
+          if (typeof previous === 'function') {
+            previous();
+          }
+        } catch {}
+
+        __loadVoicesNow();
+
+        if (__voices.length) {
+          finish();
+        }
+      };
+    } catch {}
+
+    tick();
+  });
+
+  return __voicesPromise;
+}
+  
   function __voiceNameScore(name, profile = {}, lang = '') {
     const n = String(name || '').toLowerCase();
     const L = String(lang || '').toLowerCase();
