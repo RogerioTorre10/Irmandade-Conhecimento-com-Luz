@@ -565,7 +565,14 @@ const dentro72h =
       console.warn('[JC.init] Falha ao iniciar seção salva, voltando para intro:', err);
       await show('section-intro');
     } finally {
-      isInitializing = false;
+      const jornadaWrapper = document.getElementById('jornada-content-wrapper');
+    
+      if (jornadaWrapper) {
+        jornadaWrapper.style.visibility = 'visible';
+        jornadaWrapper.style.opacity = '1';
+      }
+    
+      isTransitioning = false;
     }
   }
 
