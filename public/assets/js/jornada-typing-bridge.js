@@ -961,6 +961,10 @@ function __ttsDebugPanel(data = {}) {
           speechSynthesis.resume();
         } catch {}
       }
+
+      __ttsDebugPanel({
+        status: 'CHAMANDO SPEAK'
+      });
     
       try {
         speechSynthesis.speak(utt);
