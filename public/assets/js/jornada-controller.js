@@ -197,11 +197,6 @@
             sectionId?.startsWith('section-perguntas') ? 'question' :
             sectionId === 'section-final' ? 'final' : 'default');
         if (typeof window.typeAndSpeak === 'function') {
-          await window.typeAndSpeak(el, text, elementSpeed, { cursor: elementCursor, forceReplay: true, kind: voiceKind });
-        } else if (typeof window.runTyping === 'function') {
-          await window.runTyping(el, text, () => {}, { speed: elementSpeed, cursor: elementCursor, forceReplay: true });
-        }
-        if (typeof window.typeAndSpeak === 'function') {
           await window.typeAndSpeak(
             el,
             text,
