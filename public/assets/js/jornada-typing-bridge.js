@@ -702,6 +702,27 @@ if (showCursor) element.appendChild(caret);
     const guide = String(options.guide || getGuideNow() || 'lumen').toLowerCase();
     const tuning = getGuideSpeechTuning(guide, lang);
 
+    const __debugLangLower = String(lang || '').toLowerCase();
+
+    const __debugIsCJK =
+      __debugLangLower.startsWith('ja') ||
+      __debugLangLower.startsWith('zh');
+    
+    const __debugIsMobile =
+      /android|iphone|ipad|ipod|mobile/i.test(
+        navigator.userAgent || ''
+      );
+    
+    __ttsDebugPanel({
+      lang,
+      guide,
+      mobile: __debugIsMobile,
+      cjk: __debugIsCJK,
+      status: 'PREPARANDO',
+      error: '',
+      text: clean
+    });
+
     const clean = String(text).replace(/\s+/g, ' ').trim();
     if (!clean) return;
 
