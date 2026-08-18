@@ -901,6 +901,12 @@ function __ttsDebugPanel(data = {}) {
       try { await __applyVoice(utt, lang); } catch {}
     }
 
+    __ttsDebugPanel({
+      voice: utt.voice?.name || '(default)',
+      voiceLang: utt.voice?.lang || utt.lang || '(sem idioma)',
+      status: 'VOZ PRONTA'
+    });
+
     if (utt) {
       const langLower =
         String(lang || '')
