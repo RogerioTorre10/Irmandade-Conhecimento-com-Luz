@@ -925,10 +925,28 @@ function __ttsDebugPanel(data = {}) {
       try { await __applyVoice(utt, lang); } catch {}
     }
 
+    const __realLang = String(lang || getLangNow() || 'pt-BR');
+    const __realLangLower = __realLang.toLowerCase();
+    
+    const __realIsCJK =
+      __realLangLower.startsWith('ja') ||
+      __realLangLower.startsWith('zh');
+    
+    const __realIsMobile =
+      /android|iphone|ipad|ipod|mobile/i.test(
+        navigator.userAgent || ''
+      );
+    
     __ttsDebugPanel({
-      voice: utt.voice?.name || '(default)',
-      voiceLang: utt.voice?.lang || utt.lang || '(sem idioma)',
-      status: 'VOZ PRONTA'
+      lang: __realLang,
+      guide,
+      voice: utt?.voice?.name || '(default)',
+      voiceLang: utt?.voice?.lang || utt?.lang || '(sem idioma)',
+      mobile: __realIsMobile,
+      cjk: __realIsCJK,
+      status: 'VOZ PRONTA',
+      error: '',
+      text: clean
     });
 
     if (utt) {
