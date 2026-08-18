@@ -887,6 +887,13 @@ function __ttsDebugPanel(data = {}) {
       utt.volume = options.volume ?? tuning.volume;
 
       utt.onstart = () => {
+        __ttsDebugPanel({
+          status: 'ONSTART ✅',
+          voice: utt.voice?.name || '(default)',
+          voiceLang: utt.voice?.lang || utt.lang || '-',
+          error: ''
+        });
+      
         typingLog('typeAndSpeak iniciou', {
           lang: utt.lang,
           guide,
@@ -894,9 +901,26 @@ function __ttsDebugPanel(data = {}) {
           typingSpeed
         });
       };
-
-      utt.onend = () => { speechDone = true; };
-      utt.onerror = () => { speechDone = true; };
+      
+      utt.onend = () => {
+        speechDone = true;
+      
+        __ttsDebugPanel({
+          status: 'ONEND ✅'
+        });
+      };
+      
+      utt.onerror = (ev) => {
+        speechDone = true;
+      
+        __ttsDebugPanel({
+          status: 'ONERROR ❌',
+          error:
+            ev?.error ||
+            ev?.name ||
+            'erro desconhecido'
+        });
+      };
 
       try { await __applyVoice(utt, lang); } catch {}
     }
