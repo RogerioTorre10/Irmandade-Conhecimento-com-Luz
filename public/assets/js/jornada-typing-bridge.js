@@ -830,7 +830,11 @@ function __ttsDebugPanel(data = {}) {
       `CJK: ${String(d.cjk ?? '-')}\n` +
       `STATUS: ${d.status || '-'}\n` +
       `ERROR: ${d.error || '-'}\n` +
-      `TEXT: ${String(d.text || '').slice(0, 120)}`;
+      `TEXT: ${String(d.text || '').slice(0, 120)}\n` +
+      `VOICES: ${
+        (speechSynthesis.getVoices?.() || [])
+          .map(v => `${v.name} [${v.lang}]`)
+          .join(' | ') || 'NENHUMA'}`;
   } catch (err) {
     console.warn('[TTS DEBUG]', err);
   }
