@@ -62,8 +62,8 @@
                    data-lpignore="true"
                    data-1p-ignore="true"
                    placeholder="Digite a senha JCL-XXXX-XXXX-XXXX"
-                   aria-label="Digite a senha recebida após a compra" />
-
+                   data-i18n-placeholder="senha.accessCodePlaceholder"
+                   aria-label="Digite a senha recebida após a compra"
             <button class="btn btn-toggle-senha"
                     data-action="toggle-password"
                     type="button"
@@ -78,7 +78,7 @@
                    type="email"
                    placeholder="Digite seu e-mail..."
                    autocomplete="email"
-                   data-i18n-placeholder="senha.emailPlaceholder"
+                   data-i18n-placeholder="senha.emailPurchasePlaceholder"
                    aria-label="Digite seu e-mail" />
           </div>
 
@@ -86,6 +86,8 @@
             <button id="btn-enviar-2fa"
                    class="btn btn-stone senha-btn-wide"
                    type="button"
+                   data-i18n="senha.sendPassword"
+                   data-i18n-text="senha.sendPassword"
                    data-text="Enviar senha por e-mail"
                    aria-label="Enviar senha para o e-mail da compra">
                    ✉️ Enviar senha por e-mail
@@ -107,6 +109,8 @@
             <button id="btn-reenviar-2fa"
                     class="btn btn-stone senha-btn-wide"
                     type="button"
+                    data-i18n="senha.resendPassword"
+                    data-i18n-text="senha.resendPassword"
                     data-text="Reenviar minha senha">
               🔁 Reenviar minha senha
             </button>
@@ -114,19 +118,22 @@
 
           <div class="senha-actions">
             <button id="btn-senha-prev"
-               class="btn btn-stone"
-               data-i18n="common.back"
-               data-text="Voltar"
-               aria-label="Voltar">
-            😢 Voltar
-          </button>
+                    class="btn btn-stone"
+                    data-i18n="common.back"
+                    data-i18n-text="common.back"
+                    data-text="Voltar"
+                    aria-label="Voltar">
+              😢 Voltar
+            </button>
 
           <button id="btn-senha-avancar"
-            class="btn btn-stone"
-               type="button"
-               data-text="Entrar na Jornada"
-               data-next-section="section-guia"
-               aria-label="Validar senha e entrar">
+                  class="btn btn-stone"
+                  type="button"
+                  data-i18n="senha.enter"
+                  data-i18n-text="senha.enter"
+                  data-text="Entrar na Jornada"
+                  data-next-section="section-guia"
+                  aria-label="Validar senha e entrar">
             🔐 Entrar
           </button>
         </div>
