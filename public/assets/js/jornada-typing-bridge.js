@@ -702,27 +702,6 @@ if (showCursor) element.appendChild(caret);
     const guide = String(options.guide || getGuideNow() || 'lumen').toLowerCase();
     const tuning = getGuideSpeechTuning(guide, lang);
 
-    const __debugLangLower = String(lang || '').toLowerCase();
-
-    const __debugIsCJK =
-      __debugLangLower.startsWith('ja') ||
-      __debugLangLower.startsWith('zh');
-    
-    const __debugIsMobile =
-      /android|iphone|ipad|ipod|mobile/i.test(
-        navigator.userAgent || ''
-      );
-    
-    __ttsDebugPanel({
-      lang,
-      guide,
-      mobile: __debugIsMobile,
-      cjk: __debugIsCJK,
-      status: 'PREPARANDO',
-      error: '',
-      text: clean
-    });
-
     const clean = String(text).replace(/\s+/g, ' ').trim();
     if (!clean) return;
 
@@ -778,68 +757,6 @@ if (showCursor) element.appendChild(caret);
       });
   };
 
-  // =========================================================
-// DEBUG TEMPORÁRIO TTS MOBILE — REMOVER APÓS O TESTE
-// =========================================================
-function __ttsDebugPanel(data = {}) {
-  try {
-    let box = document.getElementById('tts-debug-mobile');
-
-    if (!box) {
-      box = document.createElement('div');
-      box.id = 'tts-debug-mobile';
-
-      Object.assign(box.style, {
-        position: 'fixed',
-        left: '8px',
-        right: '8px',
-        bottom: '8px',
-        zIndex: '999999',
-        padding: '10px',
-        background: 'rgba(0,0,0,.92)',
-        color: '#00ff88',
-        border: '1px solid #00ff88',
-        borderRadius: '8px',
-        fontSize: '12px',
-        lineHeight: '1.4',
-        fontFamily: 'monospace',
-        whiteSpace: 'pre-wrap',
-        maxHeight: '38vh',
-        overflowY: 'auto'
-      });
-
-      document.body.appendChild(box);
-    }
-
-    const atual = window.__TTS_DEBUG_STATE || {};
-
-    window.__TTS_DEBUG_STATE = {
-      ...atual,
-      ...data
-    };
-
-    const d = window.__TTS_DEBUG_STATE;
-
-    box.textContent =
-      `TTS DEBUG\n` +
-      `LANG: ${d.lang || '-'}\n` +
-      `GUIDE: ${d.guide || '-'}\n` +
-      `VOICE: ${d.voice || '-'}\n` +
-      `VOICE LANG: ${d.voiceLang || '-'}\n` +
-      `MOBILE: ${String(d.mobile ?? '-')}\n` +
-      `CJK: ${String(d.cjk ?? '-')}\n` +
-      `STATUS: ${d.status || '-'}\n` +
-      `ERROR: ${d.error || '-'}\n` +
-      `TEXT: ${String(d.text || '').slice(0, 120)}\n` +
-      `VOICES: ${
-        (speechSynthesis.getVoices?.() || [])
-          .map(v => `${v.name} [${v.lang}]`)
-          .join(' | ') || 'NENHUMA'}`;
-  } catch (err) {
-    console.warn('[TTS DEBUG]', err);
-  }
-}
-
   window.typeAndSpeak = async function (element, text, speed = 42, options = {}) {
     if (!text || !element) return;
 
@@ -891,13 +808,6 @@ function __ttsDebugPanel(data = {}) {
       utt.volume = options.volume ?? tuning.volume;
 
       utt.onstart = () => {
-        __ttsDebugPanel({
-          status: 'ONSTART ✅',
-          voice: utt.voice?.name || '(default)',
-          voiceLang: utt.voice?.lang || utt.lang || '-',
-          error: ''
-        });
-      
         typingLog('typeAndSpeak iniciou', {
           lang: utt.lang,
           guide,
@@ -905,53 +815,12 @@ function __ttsDebugPanel(data = {}) {
           typingSpeed
         });
       };
-      
-      utt.onend = () => {
-        speechDone = true;
-      
-        __ttsDebugPanel({
-          status: 'ONEND ✅'
-        });
-      };
-      
-      utt.onerror = (ev) => {
-        speechDone = true;
-      
-        __ttsDebugPanel({
-          status: 'ONERROR ❌',
-          error:
-            ev?.error ||
-            ev?.name ||
-            'erro desconhecido'
-        });
-      };
+
+      utt.onend = () => { speechDone = true; };
+      utt.onerror = () => { speechDone = true; };
 
       try { await __applyVoice(utt, lang); } catch {}
     }
-
-    const __realLang = String(lang || getLangNow() || 'pt-BR');
-    const __realLangLower = __realLang.toLowerCase();
-    
-    const __realIsCJK =
-      __realLangLower.startsWith('ja') ||
-      __realLangLower.startsWith('zh');
-    
-    const __realIsMobile =
-      /android|iphone|ipad|ipod|mobile/i.test(
-        navigator.userAgent || ''
-      );
-    
-    __ttsDebugPanel({
-      lang: __realLang,
-      guide,
-      voice: utt?.voice?.name || '(default)',
-      voiceLang: utt?.voice?.lang || utt?.lang || '(sem idioma)',
-      mobile: __realIsMobile,
-      cjk: __realIsCJK,
-      status: 'VOZ PRONTA',
-      error: '',
-      text: clean
-    });
 
     if (utt) {
       const langLower =
@@ -983,10 +852,6 @@ function __ttsDebugPanel(data = {}) {
           speechSynthesis.resume();
         } catch {}
       }
-
-      __ttsDebugPanel({
-        status: 'CHAMANDO SPEAK'
-      });
     
       try {
         speechSynthesis.speak(utt);
