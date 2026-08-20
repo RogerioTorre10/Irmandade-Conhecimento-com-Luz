@@ -315,31 +315,36 @@
   function jornadaTemAcessoValidado() {
     const authOk =
       localStorage.getItem('jornada_auth_ok') === '1';
-
+  
     const codigo =
       localStorage.getItem('jornada_codigo') ||
       sessionStorage.getItem('jornada.codigo_jornada') ||
       '';
-
+  
     const email =
       localStorage.getItem('jornada_email') ||
       sessionStorage.getItem('jornada.email') ||
       '';
-
+  
     const deadlineRaw =
       localStorage.getItem('jornada_deadline_at') ||
       '';
-
+  
     if (!authOk || !codigo || !email || !deadlineRaw) {
       return false;
     }
-
-    const deadline = Number(deadlineRaw);
-
+  
+    const deadlineNumerico = Number(deadlineRaw);
+  
+    const deadline =
+      Number.isFinite(deadlineNumerico) && deadlineNumerico > 0
+        ? deadlineNumerico
+        : Date.parse(deadlineRaw);
+  
     if (!Number.isFinite(deadline) || deadline <= 0) {
       return false;
     }
-
+  
     return Date.now() < deadline;
   }
 
