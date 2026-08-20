@@ -682,6 +682,10 @@
         '1'
       );
 
+      if (window.JORNADA_SESSION) {
+        window.JORNADA_SESSION.reauthRequired = false;
+      }
+
       if (startedAt) {
         localStorage.setItem(
           'jornada_started_at',
