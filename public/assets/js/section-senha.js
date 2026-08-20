@@ -677,6 +677,11 @@
         email
       );
 
+      localStorage.setItem(
+        'jornada_auth_ok',
+        '1'
+      );
+
       if (startedAt) {
         localStorage.setItem(
           'jornada_started_at',
