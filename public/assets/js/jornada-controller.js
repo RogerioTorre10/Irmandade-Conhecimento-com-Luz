@@ -347,7 +347,7 @@
   
     return Date.now() < deadline;
   }
-
+  
   async function show(sectionId, opts) {
     const force = !!(opts && opts.force);
     // Segurança: nenhuma seção privada pode ser aberta
