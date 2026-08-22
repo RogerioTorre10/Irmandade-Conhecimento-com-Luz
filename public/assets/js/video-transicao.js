@@ -360,10 +360,23 @@
       }
     };
 
-    const onCanPlay = safeOnce(() => {
-      log('Vídeo carregado, iniciando reprodução:', href);
-      try { fitFrameToVideo(frame, video); } catch (_) {}
-      tryPlayBoth();
+    const onCanPlay = safeOnce(async () => {
+      log('Vídeo carregado e pronto:', href);
+    
+      try {
+        fitFrameToVideo(frame, video);
+      } catch (_) {}
+    
+      // garante PRIMEIRO FRAME
+      try {
+        video.pause();
+        ambient.pause();
+    
+        video.currentTime = 0;
+        ambient.currentTime = 0;
+      } catch (_) {}
+    
+      await tryPlayBoth();
     });
 
     const onEnded = safeOnce(() => {
