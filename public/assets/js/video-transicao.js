@@ -271,6 +271,10 @@
 
     const { overlay, frame, video, ambient, skip } = buildPortal();
 
+    overlay.style.opacity = '1';
+    overlay.style.visibility = 'visible';
+    overlay.style.pointerEvents = 'auto';
+    
     fitFrameToVideo(frame, { videoWidth: 16, videoHeight: 9 });
 
     const onResize = () => fitFrameToVideo(frame, video);
