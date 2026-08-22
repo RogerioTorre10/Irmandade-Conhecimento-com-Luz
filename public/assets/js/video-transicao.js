@@ -319,51 +319,44 @@
     
       playStarted = true;
     
+      // Garante início absoluto.
       try {
         video.pause();
         ambient.pause();
-      } catch (_) {}
     
-      try {
         video.currentTime = 0;
         ambient.currentTime = 0;
       } catch (_) {}
     
-      // O portal deve estar efetivamente visível ANTES do play.
-      overlay.classList.add('show');
+      // Primeiro deixa o portal efetivamente visível.
       overlay.classList.remove('hide');
+      overlay.classList.add('show');
       overlay.style.opacity = '1';
+      overlay.style.visibility = 'visible';
     
-      // aguarda dois frames reais de pintura do navegador
       await new Promise(resolve => {
-        requestAnimationFrame(() => {
-          requestAnimationFrame(resolve);
-        });
+        requestAnimationFrame(() => requestAnimationFrame(resolve));
       });
     
       try {
         video.currentTime = 0;
-        ambient.currentTime = 0;
-      } catch (_) {}
     
-      try {
-        await ambient.play();
-        log('Ambient tocando.');
-      } catch (err) {
-        warn('Falha ao tocar ambient:', err?.message || err);
-      }
-    
-      try {
         await video.play();
-        log('Vídeo principal tocando desde o início.');
-      } catch (err) {
-        warn('Falha ao tocar vídeo principal:', err?.message || err);
     
-        // permite uma tentativa posterior real
+        log(
+          'Vídeo principal iniciado.',
+          'currentTime=', video.currentTime,
+          'duration=', video.duration
+        );
+      } catch (err) {
         playStarted = false;
+    
+        warn(
+          'Falha ao tocar vídeo principal:',
+          err?.message || err
+        );
       }
     };
-
     const onCanPlay = safeOnce(async () => {
       log('Vídeo carregado e pronto:', href);
     
