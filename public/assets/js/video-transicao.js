@@ -43,14 +43,7 @@
       }
     };
   }
-
-  function onKeydown(e) {
-    if (e.key === 'Escape') {
-      log('Vídeo pulado pelo usuário (Esc)');
-      cleanup();
-    }
-  }
-
+  
   function fitFrameToVideo(frame, video) {
   if (!frame) return;
 
