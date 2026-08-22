@@ -318,27 +318,32 @@
 
     document.addEventListener('keydown', onKeydown, true);
 
+    let playStarted = false;
+
     const tryPlayBoth = async () => {
+      if (playStarted) return;
+      if (!document.body.contains(video)) return;
+    
+      playStarted = true;
+    
       try { ambient.currentTime = 0; } catch (_) {}
       try { video.currentTime = 0; } catch (_) {}
-
+    
       try {
         await ambient.play();
         log('Ambient tocando.');
       } catch (err) {
         warn('Falha ao tocar ambient:', err?.message || err);
       }
-
+    
       try {
         await video.play();
         log('Vídeo principal tocando.');
       } catch (err) {
         warn('Falha ao tocar vídeo principal:', err?.message || err);
-        video.muted = true;
-        ambient.muted = true;
-
-        try { await ambient.play(); } catch (_) {}
-        try { await video.play(); } catch (_) {}
+    
+        // libera somente uma nova tentativa real
+        playStarted = false;
       }
     };
 
@@ -373,10 +378,15 @@
     ambient.load();
 
     setTimeout(() => {
+      if (!isPlaying) return;
+      if (!document.body.contains(video)) return;
       if (!video.paused) return;
+    
       warn('Fallback play acionado.');
+    
+      playStarted = false;
       tryPlayBoth();
-    }, 800);
+    }, 1200);
 
     setTimeout(() => {
       if (isPlaying) {
