@@ -411,6 +411,12 @@
       warn('Fallback play acionado.');
     
       playStarted = false;
+    
+      try {
+        video.currentTime = 0;
+        ambient.currentTime = 0;
+      } catch (_) {}
+    
       tryPlayBoth();
     }, 1200);
 
