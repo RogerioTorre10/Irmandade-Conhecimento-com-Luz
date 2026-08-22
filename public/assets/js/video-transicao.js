@@ -315,8 +315,32 @@
     
       playStarted = true;
     
-      try { ambient.currentTime = 0; } catch (_) {}
-      try { video.currentTime = 0; } catch (_) {}
+      try {
+        video.pause();
+        ambient.pause();
+      } catch (_) {}
+    
+      try {
+        video.currentTime = 0;
+        ambient.currentTime = 0;
+      } catch (_) {}
+    
+      // O portal deve estar efetivamente visível ANTES do play.
+      overlay.classList.add('show');
+      overlay.classList.remove('hide');
+      overlay.style.opacity = '1';
+    
+      // aguarda dois frames reais de pintura do navegador
+      await new Promise(resolve => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(resolve);
+        });
+      });
+    
+      try {
+        video.currentTime = 0;
+        ambient.currentTime = 0;
+      } catch (_) {}
     
       try {
         await ambient.play();
@@ -327,11 +351,11 @@
     
       try {
         await video.play();
-        log('Vídeo principal tocando.');
+        log('Vídeo principal tocando desde o início.');
       } catch (err) {
         warn('Falha ao tocar vídeo principal:', err?.message || err);
     
-        // libera somente uma nova tentativa real
+        // permite uma tentativa posterior real
         playStarted = false;
       }
     };
