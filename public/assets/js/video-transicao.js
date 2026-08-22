@@ -308,9 +308,7 @@
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) finishAndGo();
     });
-
-    document.addEventListener('keydown', onKeydown, true);
-
+    
     let playStarted = false;
 
     const tryPlayBoth = async () => {
