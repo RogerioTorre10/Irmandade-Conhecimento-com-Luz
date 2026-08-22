@@ -104,9 +104,7 @@
 
       document.body.style.overflow = '';
       document.documentElement.style.overflow = '';
-
-      document.removeEventListener('keydown', onKeydown, true);
-
+      
       window.__TRANSITION_LOCK = false;
       window.JORNADA_TRANSICAO_ATIVA = false;
       document.body.classList.remove('is-transitioning');
