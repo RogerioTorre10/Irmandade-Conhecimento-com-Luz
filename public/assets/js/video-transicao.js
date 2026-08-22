@@ -357,6 +357,7 @@
         );
       }
     };
+    
     const onCanPlay = safeOnce(async () => {
       log('Vídeo carregado e pronto:', href);
     
@@ -364,18 +365,9 @@
         fitFrameToVideo(frame, video);
       } catch (_) {}
     
-      // garante PRIMEIRO FRAME
-      try {
-        video.pause();
-        ambient.pause();
-    
-        video.currentTime = 0;
-        ambient.currentTime = 0;
-      } catch (_) {}
-    
       await tryPlayBoth();
     });
-
+    
     const onEnded = safeOnce(() => {
       log('Vídeo finalizado:', href);
       finishAndGo();
@@ -387,8 +379,7 @@
     });
 
     video.addEventListener('loadedmetadata', () => fitFrameToVideo(frame, video), { once: true });
-    video.addEventListener('canplaythrough', onCanPlay, { once: true });
-    video.addEventListener('loadeddata', onCanPlay, { once: true });
+    video.addEventListener('canplay', onCanPlay, { once: true });
     video.addEventListener('ended', onEnded, { once: true });
     video.addEventListener('error', onError, { once: true });
 
