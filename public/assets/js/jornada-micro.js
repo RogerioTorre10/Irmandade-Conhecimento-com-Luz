@@ -31,17 +31,133 @@
   function log(...args)  { console.log(MOD, ...args); }
   function warn(...args) { console.warn(MOD, ...args); }
 
-  function getLang() {
-    return (
-      window.i18n?.lang ||
-      window.i18n?.currentLang ||
-      document.documentElement.lang ||
-      sessionStorage.getItem('jornada.lang') ||
-      localStorage.getItem('JORNADA_LANG') ||
-      'pt-BR'
-    );
+  function normalizeSpeechLang(lang) {
+  const raw = String(lang || '').trim().replace('_', '-');
+  const low = raw.toLowerCase();
+
+  const map = {
+    'pt': 'pt-BR',
+    'pt-br': 'pt-BR',
+
+    'en': 'en-US',
+    'en-us': 'en-US',
+
+    'es': 'es-ES',
+    'es-es': 'es-ES',
+
+    'fr': 'fr-FR',
+    'fr-fr': 'fr-FR',
+
+    'de': 'de-DE',
+    'de-de': 'de-DE',
+
+    'ja': 'ja-JP',
+    'ja-jp': 'ja-JP',
+    'jp': 'ja-JP',
+
+    'zh': 'zh-CN',
+    'zh-cn': 'zh-CN',
+    'zh-hans': 'zh-CN'
+  };
+
+  if (map[low]) return map[low];
+
+  if (low.startsWith('pt')) return 'pt-BR';
+  if (low.startsWith('en')) return 'en-US';
+  if (low.startsWith('es')) return 'es-ES';
+  if (low.startsWith('fr')) return 'fr-FR';
+  if (low.startsWith('de')) return 'de-DE';
+  if (low.startsWith('ja') || low.startsWith('jp')) return 'ja-JP';
+  if (low.startsWith('zh')) return 'zh-CN';
+
+  return '';
+}
+
+
+function getJourneyLang() {
+  return normalizeSpeechLang(
+    window.i18n?.lang ||
+    window.i18n?.currentLang ||
+    document.documentElement.lang ||
+    sessionStorage.getItem('jornada.lang') ||
+    localStorage.getItem('JORNADA_LANG') ||
+    'pt-BR'
+  ) || 'pt-BR';
+}
+
+
+function getSpeechLang(opts = {}) {
+  /*
+   * IMPORTANTE:
+   * idioma visual da Jornada ≠ idioma do reconhecimento de voz.
+   *
+   * Prioridade:
+   * 1. idioma enviado explicitamente pelo componente;
+   * 2. idioma de fala escolhido/salvo pelo participante;
+   * 3. idioma principal do navegador/dispositivo;
+   * 4. idioma da Jornada como último fallback;
+   * 5. pt-BR.
+   */
+
+  const explicit =
+    normalizeSpeechLang(opts.speechLang) ||
+    normalizeSpeechLang(opts.lang);
+
+  if (explicit) return explicit;
+
+
+  const saved =
+    normalizeSpeechLang(sessionStorage.getItem('jornada.speechLang')) ||
+    normalizeSpeechLang(localStorage.getItem('JORNADA_SPEECH_LANG'));
+
+  if (saved) return saved;
+
+
+  const browserLang =
+    normalizeSpeechLang(navigator.languages?.[0]) ||
+    normalizeSpeechLang(navigator.language);
+
+  if (browserLang) return browserLang;
+
+
+  return getJourneyLang() || 'pt-BR';
+}
+
+
+function setSpeechLang(lang, persist = true) {
+  const normalized = normalizeSpeechLang(lang);
+
+  if (!normalized) {
+    warn('idioma de fala inválido:', lang);
+    return false;
   }
 
+  state.opts = state.opts || {};
+  state.opts.speechLang = normalized;
+
+  try {
+    sessionStorage.setItem('jornada.speechLang', normalized);
+
+    if (persist) {
+      localStorage.setItem('JORNADA_SPEECH_LANG', normalized);
+    }
+  } catch (_) {}
+
+  /*
+   * Se existir reconhecimento ativo, atualiza para o próximo ciclo.
+   * Não abortamos a fala atual no meio.
+   */
+  try {
+    if (state.rec) {
+      state.rec.lang = normalized;
+    }
+  } catch (_) {}
+
+  log('idioma de fala definido:', normalized);
+
+  return true;
+}
+  
   function isMobile() { return /iphone|ipad|ipod|android/i.test(navigator.userAgent || ''); }
   function isIOS()    { return /iphone|ipad|ipod/i.test(navigator.userAgent || ''); }
   function isSafari() {
@@ -231,10 +347,20 @@
 
   function buildRecognizer() {
     if (!SR) return null;
-
+  
     const rec = new SR();
-
-    rec.lang = state.opts.lang || getLang() || 'pt-BR';
+  
+    rec.lang = getSpeechLang(state.opts);
+  
+    log(
+      'reconhecimento configurado:',
+      {
+        speechLang: rec.lang,
+        journeyLang: getJourneyLang(),
+        browserLang: navigator.language
+      }
+    );
+  
     rec.continuous = !(isIOS() || isSafari());
     rec.interimResults = true;
     rec.maxAlternatives = 1;
@@ -492,9 +618,34 @@
     start,
     stop,
     toggle,
-    isActive() {
-      return window.__MIC_WANT__ === true || window.__MIC_ACTIVE__ === true;
+  
+    setSpeechLang,
+  
+    getSpeechLang() {
+      return getSpeechLang(state.opts);
     },
+  
+    getJourneyLang,
+  
+    clearSpeechLang() {
+      try {
+        sessionStorage.removeItem('jornada.speechLang');
+        localStorage.removeItem('JORNADA_SPEECH_LANG');
+      } catch (_) {}
+  
+      if (state.opts) {
+        delete state.opts.speechLang;
+        delete state.opts.lang;
+      }
+  
+      log('idioma de fala personalizado removido');
+    },
+  
+    isActive() {
+      return window.__MIC_WANT__ === true ||
+             window.__MIC_ACTIVE__ === true;
+    },
+  
     _state: state
   };
 
