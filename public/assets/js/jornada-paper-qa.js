@@ -308,7 +308,7 @@
     'Was tun Sie noch immer, um zu beweisen, dass Sie wertvoll sind — und wem, tief in Ihrem Inneren, glauben Sie das beweisen zu müssen?',
     'Wenn Sie nichts mehr beweisen, niemanden vor allem schützen, niemandem gefallen und keine Erwartungen erfüllen müssten, was würde sich zuerst an Ihrer Lebensweise ändern?',
     'Gibt es etwas, das Sie vergeben, annehmen, beenden, aussprechen, beginnen oder zurücklassen müssen, damit Sie nicht weiter nach einer Geschichte leben, die bereits vorbei ist? Was?',
-    'Nachdem du diese 50 Fragen durchlaufen hast, sprich oder schreibe, ohne zu lange nachzudenken, drei Wörter oder sehr kurze Ausdrücke. Die erste Antwort soll sagen: Was musste ich lange Zeit sein? Die zweite Antwort: Um was zu erreichen? Und die dritte Antwort: Was erkenne ich heute, sein oder tun zu können?',
+    'Nachdem du diese 50 Fragen durchlaufen hast, sprich oder schreibe, ohne zu lange nachzudenken, drei Wörter oder sehr kurze Ausdrücke. Die erste Antwort soll sagen: Was musste ich lange Zeit sein? Die zweite Antwort: Um was zu erreichen oder zu bekommen? Und die dritte Antwort: Was erkenne ich heute, sein oder tun zu können?',
   ];
 
   TEXTS['ja-JP'] = [
