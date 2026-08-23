@@ -1007,11 +1007,30 @@ section[id^="section-perguntas-"] .jp-ai-response-wrap {
     min-height: 0 !important;
     max-height: none !important;
     overflow: visible !important;
+  }  
+}
+
+/* =========================================================
+   MOBILE — DEVOLUTIVA EXPANDE COM O CONTEÚDO
+   ========================================================= */
+@media screen and (max-width: 768px) {
+
+  html body section[id^="section-perguntas-"]
+  #jp-ai-response.jp-ai-response {
+    display: block !important;
+
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    overflow: visible !important;
+    overflow-y: visible !important;
+    overflow-x: visible !important;
+
+    contain: none !important;
   }
 
 }
-
-
 
 
 
