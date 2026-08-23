@@ -1008,12 +1008,6 @@ section[id^="section-perguntas-"] .jp-ai-response-wrap {
     max-height: none !important;
     overflow: visible !important;
   }  
-}
-
-/* =========================================================
-   MOBILE — DEVOLUTIVA EXPANDE COM O CONTEÚDO
-   ========================================================= */
-@media screen and (max-width: 768px) {
 
   html body section[id^="section-perguntas-"]
   #jp-ai-response.jp-ai-response {
