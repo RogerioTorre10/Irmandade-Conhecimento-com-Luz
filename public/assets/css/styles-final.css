@@ -1328,8 +1328,8 @@ min-width:220px;
 }
 
 /* ============================================================
-   FIX v13 — DESKTOP: DEVOLUTIVA TOTALMENTE FLUIDA
-   A caixa cresce conforme o texto.
+   FIX v13 — DESKTOP: DEVOLUTIVA COM SCROLL INTERNO ELEGANTE
+   Mantém ações visíveis e leitura confortável.
    Somente desktop — mobile permanece intocado.
    ============================================================ */
 
@@ -1342,20 +1342,28 @@ min-width:220px;
     max-width: 100% !important;
     min-width: 0 !important;
 
-    height: auto !important;
-    min-height: 140px !important;
-    max-height: none !important;
+    /* altura confortável, semelhante à experiência mobile */
+    height: clamp(320px, 48vh, 520px) !important;
+    min-height: 320px !important;
+    max-height: 520px !important;
 
     flex: 0 0 auto !important;
 
     margin-left: 0 !important;
     margin-right: 0 !important;
 
-    overflow: visible !important;
-    overflow-x: visible !important;
-    overflow-y: visible !important;
+    /* volta o scroll interno */
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    overscroll-behavior: contain !important;
+    scrollbar-gutter: stable !important;
 
     box-sizing: border-box !important;
+
+    /* folga para a última linha não ficar escondida */
+    padding-bottom: 34px !important;
+    scroll-padding-bottom: 34px !important;
   }
 
 }
