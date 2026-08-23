@@ -1008,22 +1008,6 @@ section[id^="section-perguntas-"] .jp-ai-response-wrap {
     max-height: none !important;
     overflow: visible !important;
   }  
-
-  html body section[id^="section-perguntas-"]
-  #jp-ai-response.jp-ai-response {
-    display: block !important;
-
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
-
-    overflow: visible !important;
-    overflow-y: visible !important;
-    overflow-x: visible !important;
-
-    contain: none !important;
-  }
-
 }
 
 
