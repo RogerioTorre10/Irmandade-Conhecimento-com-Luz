@@ -305,115 +305,197 @@
       }, 900);
     });
                                  
-    skip.addEventListener('click', finishAndGo);
+    skip.addEventListener('click', () => finishAndGo());
 
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) finishAndGo();
     });
     
     let playStarted = false;
+    let playAttemptInFlight = false;
+    let playbackSafetyTimer = null;
+    let loadSafetyTimer = null;
 
-    const tryPlayBoth = async () => {
-      if (playStarted) return;
-      if (!document.body.contains(video)) return;
-    
-      playStarted = true;
-    
-      // Garante início absoluto.
-      try {
-        video.pause();
-        ambient.pause();
-    
-        video.currentTime = 0;
-        ambient.currentTime = 0;
-      } catch (_) {}
-    
-      // Primeiro deixa o portal efetivamente visível.
-      overlay.classList.remove('hide');
-      overlay.classList.add('show');
-      overlay.style.opacity = '1';
-      overlay.style.visibility = 'visible';
-    
-      await new Promise(resolve => {
-        requestAnimationFrame(() => requestAnimationFrame(resolve));
-      });
-    
-      try {
-        video.currentTime = 0;
-    
-        await video.play();
-    
-        log(
-          'Vídeo principal iniciado.',
-          'currentTime=', video.currentTime,
-          'duration=', video.duration
-        );
-      } catch (err) {
-        playStarted = false;
-    
-        warn(
-          'Falha ao tocar vídeo principal:',
-          err?.message || err
-        );
+    const clearTransitionTimers = () => {
+      if (playbackSafetyTimer) {
+        clearTimeout(playbackSafetyTimer);
+        playbackSafetyTimer = null;
+      }
+      if (loadSafetyTimer) {
+        clearTimeout(loadSafetyTimer);
+        loadSafetyTimer = null;
       }
     };
-    
-    const onCanPlay = safeOnce(async () => {
-      log('Vídeo carregado e pronto:', href);
-    
+
+    const finishSafely = () => {
+      clearTransitionTimers();
+      finishAndGo();
+    };
+
+    // O relógio de segurança da exibição só nasce DEPOIS que o vídeo
+    // realmente entrou em reprodução. Assim, tempo de rede/buffer não
+    // consome o tempo visual da transição.
+    const armPlaybackSafety = () => {
+      if (playbackSafetyTimer) clearTimeout(playbackSafetyTimer);
+
+      const durationMs = Number.isFinite(video.duration) && video.duration > 0
+        ? Math.ceil(video.duration * 1000)
+        : 10000;
+
+      playbackSafetyTimer = setTimeout(() => {
+        if (!isPlaying) return;
+        warn('Timeout de segurança APÓS início real da reprodução.');
+        finishSafely();
+      }, durationMs + 5000);
+    };
+
+    const tryPlayBoth = async () => {
+      if (playStarted || playAttemptInFlight) return;
+      if (!document.body.contains(video)) return;
+
+      playAttemptInFlight = true;
+
       try {
-        fitFrameToVideo(frame, video);
-      } catch (_) {}
-    
-      await tryPlayBoth();
-    });
-    
+        // Não usamos pause() aqui: um pause durante uma Promise de play()
+        // pendente é justamente o que produz "play() interrupted by pause()".
+        if (video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
+          playAttemptInFlight = false;
+          return;
+        }
+
+        // Reinício absoluto antes do ÚNICO play válido.
+        if (Math.abs(video.currentTime) > 0.05) {
+          video.currentTime = 0;
+        }
+
+        overlay.classList.remove('hide');
+        overlay.classList.add('show');
+        overlay.style.opacity = '1';
+        overlay.style.visibility = 'visible';
+
+        await new Promise(resolve => {
+          requestAnimationFrame(() => requestAnimationFrame(resolve));
+        });
+
+        if (!document.body.contains(video)) {
+          playAttemptInFlight = false;
+          return;
+        }
+
+        await video.play();
+
+        // Só consideramos iniciado depois que play() realmente resolveu.
+        playStarted = true;
+        playAttemptInFlight = false;
+        clearTimeout(loadSafetyTimer);
+        loadSafetyTimer = null;
+
+        // Ambient é apenas decorativo. Tenta acompanhar sem interferir no
+        // vídeo principal; qualquer falha dele é ignorada.
+        try {
+          if (ambient.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+            ambient.currentTime = video.currentTime;
+            ambient.play().catch(() => {});
+          }
+        } catch (_) {}
+
+        log(
+          'Vídeo principal iniciado REALMENTE.',
+          'currentTime=', video.currentTime,
+          'duration=', video.duration,
+          'readyState=', video.readyState
+        );
+
+        armPlaybackSafety();
+      } catch (err) {
+        playAttemptInFlight = false;
+        playStarted = false;
+        warn('Falha ao tocar vídeo principal:', err?.message || err);
+      }
+    };
+
+    // loadeddata garante que já existe um frame real disponível.
+    const onLoadedData = () => {
+      try { fitFrameToVideo(frame, video); } catch (_) {}
+      tryPlayBoth();
+    };
+
+    // canplay funciona como segunda porta de entrada, sem duplicar play().
+    const onCanPlay = () => {
+      log('Vídeo carregado e pronto:', href);
+      try { fitFrameToVideo(frame, video); } catch (_) {}
+      tryPlayBoth();
+    };
+
+    const onPlaying = () => {
+      // Defesa extra contra navegadores que resolvem play() antes de o
+      // primeiro frame avançar visualmente.
+      if (!playStarted) {
+        playStarted = true;
+        playAttemptInFlight = false;
+      }
+      if (!playbackSafetyTimer) armPlaybackSafety();
+      log('Evento playing confirmado em', video.currentTime);
+    };
+
+    const onWaiting = () => {
+      log('Buffering detectado em', video.currentTime);
+    };
+
     const onEnded = safeOnce(() => {
       log('Vídeo finalizado:', href);
-      finishAndGo();
+      finishSafely();
     });
 
     const onError = safeOnce((ev) => {
       warn('Erro ao carregar vídeo:', href, ev);
-      finishAndGo();
+      finishSafely();
     });
 
-    video.addEventListener('loadedmetadata', () => fitFrameToVideo(frame, video), { once: true });
+    video.addEventListener('loadedmetadata', () => {
+      try {
+        video.currentTime = 0;
+        fitFrameToVideo(frame, video);
+      } catch (_) {}
+    }, { once: true });
+
+    video.addEventListener('loadeddata', onLoadedData, { once: true });
     video.addEventListener('canplay', onCanPlay, { once: true });
+    video.addEventListener('playing', onPlaying);
+    video.addEventListener('waiting', onWaiting);
     video.addEventListener('ended', onEnded, { once: true });
     video.addEventListener('error', onError, { once: true });
 
+    // Cache-busting mantido, mas ambos recebem exatamente a mesma URL.
     const finalSrc = href + (href.includes('?') ? '&' : '?') + 't=' + Date.now();
 
     video.src = finalSrc;
     ambient.src = finalSrc;
 
+    // Um único load por elemento.
     video.load();
     ambient.load();
 
-    setTimeout(() => {
-      if (!isPlaying) return;
+    // Fallback de CARREGAMENTO, não de duração. Ele não encerra a
+    // transição aos 18 s nem reinicia currentTime enquanto um play() existe.
+    // Apenas tenta iniciar novamente caso eventos de mídia tenham sido
+    // perdidos pelo navegador.
+    loadSafetyTimer = setTimeout(() => {
+      if (!isPlaying || playStarted || playAttemptInFlight) return;
       if (!document.body.contains(video)) return;
-      if (!video.paused) return;
-    
-      warn('Fallback play acionado.');
-    
-      playStarted = false;
-    
-      try {
-        video.currentTime = 0;
-        ambient.currentTime = 0;
-      } catch (_) {}
-    
-      tryPlayBoth();
-    }, 1200);
 
+      warn('Fallback de carregamento acionado; tentando iniciar sem reset concorrente.');
+      tryPlayBoth();
+    }, 2500);
+
+    // Última proteção contra arquivo/rede realmente travados ANTES do play.
+    // Diferente do antigo timeout de 18 s, esta proteção só trata falha de
+    // carregamento e não simula que o filme terminou normalmente.
     setTimeout(() => {
-      if (isPlaying) {
-        warn('Timeout de segurança da transição.');
-        finishAndGo();
-      }
-    }, 18000);
+      if (!isPlaying || playStarted) return;
+      warn('Vídeo não conseguiu iniciar após 20 s; liberando a jornada por segurança.');
+      finishSafely();
+    }, 20000);
   }
 
   window.playTransitionVideo = playTransitionVideo;
@@ -461,7 +543,7 @@
       setTimeout(() => {
         document.removeEventListener('transition:ended', onEnded, true);
         finish();
-      }, 19000);
+      }, 40000);
     };
 
     log('playBlockTransition instalado (runner de blocos).');
