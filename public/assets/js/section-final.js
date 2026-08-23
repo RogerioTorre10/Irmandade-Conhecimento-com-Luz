@@ -1133,12 +1133,22 @@ function buildGuideFallbackText(guiaRaw, nomeRaw) {
 
   const texto = String(
     data?.devolutivaFinal ||
+    data?.devolutiva_final ||
+    data?.devolutiva ||
+    data?.textoFinal ||
+    data?.texto_final ||
     data?.texto ||
     data?.text ||
     data?.message ||
     ''
   ).trim();
 
+  console.log('[FINAL][API][PARSE]', {
+    keys: Object.keys(data || {}),
+    chars: texto.length,
+    provider: data?.provider || data?.source || data?.guia || null
+  });
+  
   if (!texto) {
     throw new Error('Resposta vazia da devolutiva final');
   }
