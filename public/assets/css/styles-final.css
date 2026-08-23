@@ -1352,8 +1352,8 @@ min-width:220px;
     margin-right: 0 !important;
 
     overflow: visible !important;
-    overflow-x: visible !important;
-    overflow-y: visible !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
 
     overscroll-behavior: contain !important;
     scrollbar-gutter: stable !important;
