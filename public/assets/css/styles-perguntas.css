@@ -950,3 +950,30 @@ body{
     transform: translateX(120%);
   }
 }
+
+/* =========================================================
+   MOBILE — DEVOLUTIVA DO GUIA CRESCE COM O CONTEÚDO
+   ========================================================= */
+@media (max-width: 768px) {
+
+  #jp-ai-response-wrap,
+  .jp-ai-response-wrap {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    overflow-y: visible !important;
+    flex: none !important;
+  }
+
+  .pergaminho-content {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+}
+
+}
+
