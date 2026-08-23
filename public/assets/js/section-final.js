@@ -1260,7 +1260,7 @@ function removerFinalDuplicado(texto) {
 
   // Remove repetição exata das últimas 1 a 3 frases
   for (let qtd = 3; qtd >= 1; qtd--) {
-    const frases = txt.match(/[^.!?…]+[.!?…]+/g) || [];
+    const frases = txt.match(/[^.!?…。！？]+[.!?…。！？]+/g) || [];
     if (frases.length < qtd * 2) continue;
 
     const fim = frases.slice(-qtd).join(' ').replace(/\s+/g, ' ').trim();
