@@ -1053,7 +1053,7 @@ function buildFinalSynthesisPayload() {
   const txt = String(text || '').replace(/\s+/g, ' ').trim();
   if (!txt) return true;
   if (txt.length < minChars) return true;
-  const sentences = txt.split(/[.!?]+/).map(s => s.trim()).filter(Boolean);
+  const sentences = txt.split(/[.!?。！？]+/).map(s => s.trim()).filter(Boolean);
   if (sentences.length < minSentences) return true;
   return false;
 }
