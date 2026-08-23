@@ -90,7 +90,7 @@
       'O que você ainda faz para provar que tem valor — e para quem, no fundo, sente que precisa provar isso?',
       'Se você não precisasse mais provar nada, proteger ninguém de tudo, agradar ninguém nem corresponder a nenhuma expectativa, o que mudaria primeiro na maneira como vive?',
       'Existe algo que você precisa perdoar, aceitar, encerrar, dizer, começar ou deixar para trás para não continuar vivendo segundo uma história que já passou? O quê?',
-      'Depois de atravessar estas 50 perguntas, complete sem pensar demais: “Durante muito tempo eu precisei ser ______ para conseguir ______. Hoje percebo que posso ______.”'
+      'Depois de atravessar estas 50 perguntas, fale ou escreva, sem pensar demais, três palavras ou expressões bem curtas. A primeira resposta deve dizer: durante muito tempo, o que eu precisei ser? A segunda resposta: para conseguir o quê? E a terceira resposta: hoje percebo que posso ser ou fazer o quê?'
     ],
     'en-US': [
       'Who was most present in raising you? When you needed protection, comfort, or help, whom did you turn to — and what usually happened?',
@@ -142,7 +142,7 @@
       'What do you still do to prove that you have value — and to whom, deep down, do you feel you need to prove it?',
       'If you no longer had to prove anything, protect everyone from everything, please anyone, or meet any expectation, what would change first in the way you live?',
       'Is there something you need to forgive, accept, end, say, begin, or leave behind so that you do not keep living according to a story that has already passed? What?',
-      'After going through these 50 questions, complete this without thinking too much: “For a long time I needed to be ______ in order to ______. Today I realize I can ______.”'
+      'After going through these 50 questions, speak or write, without thinking too much, three words or very short expressions. The first answer should say: for a long time, what did I need to be? The second answer: in order to achieve what? And the third answer: today, what do I realize I can be or do?',
     ],
     'es-ES': [],
     'fr-FR': [],
@@ -203,7 +203,7 @@
     '¿Qué sigues haciendo para demostrar que tienes valor y a quién, en el fondo, sientes que necesitas demostrárselo?',
     'Si ya no tuvieras que demostrar nada, proteger a todos de todo, agradar a nadie ni responder a ninguna expectativa, ¿qué cambiaría primero en tu forma de vivir?',
     '¿Hay algo que necesitas perdonar, aceptar, terminar, decir, comenzar o dejar atrás para no seguir viviendo según una historia que ya pasó? ¿Qué?',
-    'Después de atravesar estas 50 preguntas, completa sin pensarlo demasiado: “Durante mucho tiempo necesité ser ______ para conseguir ______. Hoy comprendo que puedo ______.”'
+    'Después de recorrer estas 50 preguntas, habla o escribe, sin pensarlo demasiado, tres palabras o expresiones muy breves. La primera respuesta debe decir: durante mucho tiempo, ¿qué necesité ser? La segunda respuesta: ¿para conseguir qué? Y la tercera respuesta: hoy, ¿qué percibo que puedo ser o hacer?',
   ];
 
   TEXTS['fr-FR'] = [
@@ -256,7 +256,7 @@
     'Que faites-vous encore pour prouver que vous avez de la valeur — et à qui, au fond, sentez-vous devoir le prouver ?',
     'Si vous n’aviez plus rien à prouver, personne à protéger de tout, personne à satisfaire et aucune attente à remplir, qu’est-ce qui changerait d’abord dans votre manière de vivre ?',
     'Y a-t-il quelque chose que vous devez pardonner, accepter, terminer, dire, commencer ou laisser derrière vous afin de ne plus vivre selon une histoire déjà passée ? Quoi ?',
-    'Après avoir traversé ces 50 questions, complétez sans trop réfléchir : « Pendant longtemps, j’ai dû être ______ pour pouvoir ______. Aujourd’hui, je comprends que je peux ______. »'
+    'Après avoir parcouru ces 50 questions, dites ou écrivez, sans trop réfléchir, trois mots ou expressions très courtes. La première réponse doit dire : pendant longtemps, qu’ai-je eu besoin d’être ? La deuxième réponse : pour obtenir quoi ? Et la troisième réponse : aujourd’hui, qu’est-ce que je réalise pouvoir être ou faire ?',
   ];
   TEXTS['de-DE'] = [
     'Wer war in Ihrer Erziehung am stärksten präsent? Wenn Sie Schutz, Trost oder Hilfe brauchten, an wen wandten Sie sich — und was geschah gewöhnlich?',
@@ -308,7 +308,7 @@
     'Was tun Sie noch immer, um zu beweisen, dass Sie wertvoll sind — und wem, tief in Ihrem Inneren, glauben Sie das beweisen zu müssen?',
     'Wenn Sie nichts mehr beweisen, niemanden vor allem schützen, niemandem gefallen und keine Erwartungen erfüllen müssten, was würde sich zuerst an Ihrer Lebensweise ändern?',
     'Gibt es etwas, das Sie vergeben, annehmen, beenden, aussprechen, beginnen oder zurücklassen müssen, damit Sie nicht weiter nach einer Geschichte leben, die bereits vorbei ist? Was?',
-    'Nachdem Sie diese 50 Fragen durchlaufen haben, ergänzen Sie ohne lange nachzudenken: „Lange Zeit musste ich ______ sein, um ______ zu können. Heute erkenne ich, dass ich ______ kann.“'
+    'Nachdem du diese 50 Fragen durchlaufen hast, sprich oder schreibe, ohne zu lange nachzudenken, drei Wörter oder sehr kurze Ausdrücke. Die erste Antwort soll sagen: Was musste ich lange Zeit sein? Die zweite Antwort: Um was zu erreichen oder zu bekommen? Und die dritte Antwort: Was erkenne ich heute, sein oder tun zu können?',
   ];
 
   TEXTS['ja-JP'] = [
@@ -361,7 +361,7 @@
     '自分には価値があると証明するために、今もしていることは何ですか？そして心の奥では、誰にそれを証明しなければならないと感じていますか？',
     'もう何も証明せず、誰かをすべてから守ろうとせず、誰にも好かれようとせず、どんな期待にも応えなくてよいとしたら、あなたの生き方で最初に変わることは何ですか？',
     'すでに過ぎ去った物語に従って生き続けないために、許す、受け入れる、終わらせる、伝える、始める、手放す必要があることはありますか？それは何ですか？',
-    'この50の質問を歩んだ今、あまり考えすぎずに空欄を埋めてください。「長い間、私は ______ するために ______ でいる必要があった。今は、______ できると気づいている。」'
+    'この50の問いを振り返ったあと、あまり考えすぎずに、三つの言葉、またはとても短い表現を話すか書いてください。最初の答えは「長い間、私は何である必要があったのか」。二つ目の答えは「何を得るためだったのか」。三つ目の答えは「今、私は何になれる、または何ができると気づいているのか」です。',
   ];
   TEXTS['zh-CN'] = [
     '在你的成长过程中，谁最常陪伴和照顾你？当你需要保护、安慰或帮助时，你会向谁求助——通常会发生什么？',
@@ -413,7 +413,7 @@
     '为了证明自己有价值，你现在仍在做什么？而在内心深处，你觉得自己究竟需要向谁证明这一点？',
     '如果你不再需要证明任何事、不必保护所有人免受一切伤害、不必讨好任何人，也不必满足任何期待，你的生活方式最先会发生什么变化？',
     '为了不再按照一个已经过去的故事继续生活，你是否需要原谅、接受、结束、说出、开始或放下什么？是什么？',
-    '走过这50个问题之后，请不要想太久，完成这句话：“很长一段时间里，为了能够 ______，我必须成为 ______。现在我意识到，我可以 ______。”'
+    '走过这50个问题之后，请不要想得太多，说出或写下三个词或非常简短的表达。第一个回答是：很长一段时间里，我觉得自己必须成为什么样的人？第二个回答是：为了得到什么？第三个回答是：今天，我意识到自己可以成为什么样的人，或者可以做什么？'
   ];
 
   const BLOCK_TITLES = {
