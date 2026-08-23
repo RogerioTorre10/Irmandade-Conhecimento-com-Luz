@@ -793,8 +793,6 @@ body{
       overflow-y: visible !important;
       overflow-x: visible !important;
       padding: 10px 12px !important;
-      scrollbar-width: thin;
-      scrollbar-color: rgba(255,220,120,.95) rgba(255,255,255,.08);
   }
 
   section[id^="section-perguntas-"] .jp-ai-response::-webkit-scrollbar,
