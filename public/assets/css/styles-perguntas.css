@@ -973,7 +973,45 @@ body{
     overflow: visible !important;
   }
 
-}
+
+section[id^="section-perguntas-"] .jp-ai-response-wrap {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  section[id^="section-perguntas-"] .jp-ai-response,
+  section[id^="section-perguntas-"] #jp-ai-response {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    overflow: visible !important;
+    overflow-y: visible !important;
+    overflow-x: visible !important;
+
+    -webkit-overflow-scrolling: auto !important;
+  }
+
+  section[id^="section-perguntas-"] .perguntas-pergaminho-wrapper,
+  section[id^="section-perguntas-"] .perguntas-panel,
+  section[id^="section-perguntas-"] .perguntas-wrap,
+  section[id^="section-perguntas-"] .parchment-rough,
+  section[id^="section-perguntas-"] .parchment-inner-rough,
+  section[id^="section-perguntas-"] .pergaminho-content,
+  section[id^="section-perguntas-"] .j-panel-glow,
+  section[id^="section-perguntas-"] .j-perg-v-inner,
+  section[id^="section-perguntas-"] .j-arcane-card {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
 
 }
+
+
+
+
 
