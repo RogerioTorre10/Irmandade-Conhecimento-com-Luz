@@ -1342,10 +1342,9 @@ min-width:220px;
     max-width: 100% !important;
     min-width: 0 !important;
 
-   /* altura confortável, semelhante à experiência mobile */
-    height: clamp(320px, 48vh, 520px) !important;
-    min-height: 320px !important;
-    max-height: 520px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
 
     flex: 0 0 auto !important;
 
