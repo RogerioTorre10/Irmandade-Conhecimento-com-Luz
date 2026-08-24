@@ -1,6 +1,7 @@
 /* /assets/js/jornada-paper-qa.js
  * JORNADA ESSENCIAL — MAPA PSICOEMOCIONAL v1
- * Fonte oficial: 5 blocos / 50 perguntas / 7 idiomas.
+ * TESTE RÁPIDO: 5 blocos / 1 pergunta por bloco / 7 idiomas.
+ * Seleção: Q01, Q11, Q21, Q31 e Q50.
  * Não renderiza UI, não controla progresso e não controla navegação.
  */
 (function (window) {
@@ -308,7 +309,7 @@
     'Was tun Sie noch immer, um zu beweisen, dass Sie wertvoll sind — und wem, tief in Ihrem Inneren, glauben Sie das beweisen zu müssen?',
     'Wenn Sie nichts mehr beweisen, niemanden vor allem schützen, niemandem gefallen und keine Erwartungen erfüllen müssten, was würde sich zuerst an Ihrer Lebensweise ändern?',
     'Gibt es etwas, das Sie vergeben, annehmen, beenden, aussprechen, beginnen oder zurücklassen müssen, damit Sie nicht weiter nach einer Geschichte leben, die bereits vorbei ist? Was?',
-    'Nachdem du diese 50 Fragen durchlaufen hast, sprich oder schreibe, ohne zu lange nachzudenken, drei Wörter oder sehr kurze Ausdrücke. Die erste Antwort soll sagen: Was musste ich lange Zeit sein? Die zweite Antwort: Um was zu erreichen oder zu bekommen? Und die dritte Antwort: Was erkenne ich heute, sein oder tun zu können?',
+    'Nachdem du diese 50 Fragen durchlaufen hast, sprich oder schreibe, ohne zu lange nachzudenken, drei Wörter oder sehr kurze Ausdrücke. Die erste Antwort soll sagen: Was musste ich lange Zeit sein? Die zweite Antwort: Um was zu erreichen? Und die dritte Antwort: Was erkenne ich heute, sein oder tun zu können?',
   ];
 
   TEXTS['ja-JP'] = [
@@ -446,17 +447,33 @@
     };
   }
 
+  // ============================================================
+  // TESTE RÁPIDO — 1 pergunta por bloco
+  // Mantém os 5 blocos, vídeos, IDs, temas, eixos e API pública.
+  //
+  // Bloco 1 -> Q01
+  // Bloco 2 -> Q11
+  // Bloco 3 -> Q21
+  // Bloco 4 -> Q31
+  // Bloco 5 -> Q50 (síntese das três respostas-chave)
+  // ============================================================
+  const QUICK_TEST_QUESTION_INDEXES = [0, 10, 20, 30, 49];
+
   function makeBlocks(lang) {
-    return BLOCK_META.map((meta, index) => ({
-      sectionId: meta.sectionId,
-      id: meta.id,
-      index,
-      title: BLOCK_TITLES[lang][index],
-      data_i18n: meta.data_i18n,
-      nextSection: meta.nextSection,
-      transitionVideo: meta.transitionVideo,
-      questions: Array.from({ length: 10 }, (_, offset) => makeQuestion(lang, index * 10 + offset))
-    }));
+    return BLOCK_META.map((meta, index) => {
+      const questionIndex = QUICK_TEST_QUESTION_INDEXES[index];
+
+      return {
+        sectionId: meta.sectionId,
+        id: meta.id,
+        index,
+        title: BLOCK_TITLES[lang][index],
+        data_i18n: meta.data_i18n,
+        nextSection: meta.nextSection,
+        transitionVideo: meta.transitionVideo,
+        questions: [makeQuestion(lang, questionIndex)]
+      };
+    });
   }
 
   const CONFIG = {};
@@ -493,8 +510,11 @@
 
   Object.keys(CONFIG).forEach((lang) => {
     const total = CONFIG[lang].reduce((acc, b) => acc + b.questions.length, 0);
-    if (CONFIG[lang].length !== 5 || total !== 50) {
-      console.error(`${MOD} Config inválida para ${lang}:`, { blocos: CONFIG[lang].length, perguntas: total });
+    if (CONFIG[lang].length !== 5 || total !== 5) {
+      console.error(`${MOD} Config TESTE inválida para ${lang}:`, {
+        blocos: CONFIG[lang].length,
+        perguntas: total
+      });
     }
   });
 
@@ -502,5 +522,5 @@
   window.JORNADA_BLOCKS = getBlocks();
   window.blockTranslations = CONFIG;
 
-  console.log(`${MOD} Mapa Psicoemocional v1 carregado. Idioma:`, detectLang(), 'Blocos:', getTotalBlocks(), 'Perguntas:', getGlobalQuestionTotal());
+  console.log(`${MOD} TESTE RÁPIDO carregado. Idioma:`, detectLang(), 'Blocos:', getTotalBlocks(), 'Perguntas:', getGlobalQuestionTotal());
 })(window);
