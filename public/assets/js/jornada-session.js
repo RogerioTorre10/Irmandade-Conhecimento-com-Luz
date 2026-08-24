@@ -240,6 +240,67 @@
   }
 
   // =====================================================
+  // PRAZO OFICIAL — SERVIDOR É A AUTORIDADE
+  // =====================================================
+
+  function parseDeadlineMs(value) {
+    if (value == null || value === '') return null;
+
+    const numeric = Number(value);
+    if (Number.isFinite(numeric) && numeric > 0) {
+      return numeric;
+    }
+
+    const parsed = Date.parse(String(value));
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+
+  function persistOfficialDeadline(value, source = 'server') {
+    const incomingMs = parseDeadlineMs(value);
+    if (incomingMs == null) return false;
+
+    localStorage.setItem(
+      STORAGE.DEADLINE_AT,
+      String(incomingMs)
+    );
+
+    console.log(
+      '[GUARDIÃO][PRAZO] deadline oficial aplicado:',
+      new Date(incomingMs).toISOString(),
+      'fonte=',
+      source
+    );
+
+    emit('jornada:deadline-updated', {
+      deadline_at: incomingMs,
+      source
+    });
+
+    return true;
+  }
+
+  function persistOfficialStartedAt(value, source = 'server') {
+    if (value == null || value === '') return false;
+
+    const parsed = Date.parse(String(value));
+    if (!Number.isFinite(parsed)) return false;
+
+    localStorage.setItem(
+      STORAGE.STARTED_AT,
+      new Date(parsed).toISOString()
+    );
+
+    console.log(
+      '[GUARDIÃO][PRAZO] início oficial aplicado:',
+      new Date(parsed).toISOString(),
+      'fonte=',
+      source
+    );
+
+    return true;
+  }
+
+  // =====================================================
   // DEVICE HASH
   // =====================================================
 
@@ -865,40 +926,27 @@
       );
     }
 
-    if (snapshot.started_at) {
-      localStorage.setItem(
-        STORAGE.STARTED_AT,
-        String(snapshot.started_at)
-      );
-    }
+    // PRAZO: o backend é a fonte oficial.
+    // Prioridade: expires_at remoto > deadline_at remoto > snapshot.
+    // O valor local nunca vence um prazo devolvido pelo servidor.
+    persistOfficialStartedAt(
+      data.started_at ||
+      snapshot.started_at,
+      data.started_at ? 'retomar.data.started_at' : 'retomar.snapshot.started_at'
+    );
 
-    if (snapshot.deadline_at) {
-      localStorage.setItem(
-        STORAGE.DEADLINE_AT,
-        String(snapshot.deadline_at)
-      );
-    }
-
-    if (data.started_at) {
-      localStorage.setItem(
-        STORAGE.STARTED_AT,
-        String(data.started_at)
-      );
-    }
-
-    if (data.deadline_at) {
-      localStorage.setItem(
-        STORAGE.DEADLINE_AT,
-        String(data.deadline_at)
-      );
-    }
-
-    if (data.expires_at) {
-      localStorage.setItem(
-        STORAGE.DEADLINE_AT,
-        String(data.expires_at)
-      );
-    }
+    persistOfficialDeadline(
+      data.expires_at ||
+      data.deadline_at ||
+      snapshot.deadline_at,
+      data.expires_at
+        ? 'retomar.data.expires_at'
+        : (
+            data.deadline_at
+              ? 'retomar.data.deadline_at'
+              : 'retomar.snapshot.deadline_at'
+          )
+    );
 
     state.lastRemoteSnapshot = data;
     state.restored = true;
@@ -1049,12 +1097,11 @@
         }
 
         if (data.expires_at || data.deadline_at) {
-          localStorage.setItem(
-            STORAGE.DEADLINE_AT,
-            String(
-              data.expires_at ||
-              data.deadline_at
-            )
+          persistOfficialDeadline(
+            data.expires_at || data.deadline_at,
+            data.expires_at
+              ? 'reauth.data.expires_at'
+              : 'reauth.data.deadline_at'
           );
         }
 
@@ -1220,43 +1267,69 @@
       '1'
     );
 
-    if (payload.codigo_jornada) {
-      localStorage.setItem(
-        STORAGE.CODIGO,
-        String(payload.codigo_jornada)
+    const codigoAnterior =
+      localStorage.getItem(STORAGE.CODIGO);
+
+    const codigoRecebido =
+      payload.codigo_jornada
+        ? String(payload.codigo_jornada)
+        : '';
+
+    // Se for outra Jornada/licença, elimina relógio residual da anterior.
+    if (
+      codigoRecebido &&
+      codigoAnterior &&
+      codigoAnterior !== codigoRecebido
+    ) {
+      localStorage.removeItem(STORAGE.STARTED_AT);
+      localStorage.removeItem(STORAGE.DEADLINE_AT);
+
+      console.log(
+        '[GUARDIÃO][PRAZO] nova jornada detectada; relógio local anterior removido.'
       );
     }
 
-    const currentStartedAt =
-      localStorage.getItem(STORAGE.STARTED_AT);
+    if (codigoRecebido) {
+      localStorage.setItem(
+        STORAGE.CODIGO,
+        codigoRecebido
+      );
+    }
 
-    const currentDeadlineAt =
-      localStorage.getItem(STORAGE.DEADLINE_AT);
-
-    const startedAt =
-      currentStartedAt ||
+    const serverStartedAt =
       payload.started_at ||
       payload.criado_em ||
       null;
 
-    const deadlineAt =
-      currentDeadlineAt ||
-      payload.deadline_at ||
+    const serverDeadlineAt =
       payload.expires_at ||
+      payload.deadline_at ||
       null;
 
-    if (startedAt) {
-      localStorage.setItem(
-        STORAGE.STARTED_AT,
-        String(startedAt)
-      );
+    // Se o servidor informou os tempos, eles vencem SEMPRE.
+    // Só usamos o storage antigo quando o backend não trouxe valor algum.
+    if (!persistOfficialStartedAt(serverStartedAt, 'ativacao.server')) {
+      const currentStartedAt =
+        localStorage.getItem(STORAGE.STARTED_AT);
+
+      if (currentStartedAt) {
+        persistOfficialStartedAt(
+          currentStartedAt,
+          'ativacao.local-fallback'
+        );
+      }
     }
 
-    if (deadlineAt) {
-      localStorage.setItem(
-        STORAGE.DEADLINE_AT,
-        String(deadlineAt)
-      );
+    if (!persistOfficialDeadline(serverDeadlineAt, 'ativacao.server')) {
+      const currentDeadlineAt =
+        localStorage.getItem(STORAGE.DEADLINE_AT);
+
+      if (currentDeadlineAt) {
+        persistOfficialDeadline(
+          currentDeadlineAt,
+          'ativacao.local-fallback'
+        );
+      }
     }
 
     const section =
@@ -1720,6 +1793,14 @@
 
     get remainingMs() {
       return getRemainingMs();
+    },
+
+    get deadlineAt() {
+      return localStorage.getItem(STORAGE.DEADLINE_AT);
+    },
+
+    get startedAt() {
+      return localStorage.getItem(STORAGE.STARTED_AT);
     }
 
   };
