@@ -663,9 +663,23 @@
   }
 
   async function loadGuias() {
-    const r = await fetch(DATA_URL, { cache: 'no-store' });
-    if (!r.ok) throw new Error(`GET ${DATA_URL} -> ${r.status}`);
-    return r.json();
+    const fetchJson = async (url, options = {}) => {
+      const r = await fetch(url, options);
+      if (!r.ok) throw new Error(`GET ${url} -> ${r.status}`);
+      const data = await r.json();
+      if (!Array.isArray(data) || !data.length) {
+        throw new Error(`GET ${url} -> JSON de guias vazio/inválido`);
+      }
+      return data;
+    };
+
+    try {
+      return await fetchJson(DATA_URL, { cache: 'default' });
+    } catch (err1) {
+      console.warn('[GUIA] primeira tentativa falhou; tentando novamente:', err1);
+      const sep = DATA_URL.includes('?') ? '&' : '?';
+      return await fetchJson(`${DATA_URL}${sep}retry=${Date.now()}`, { cache: 'reload' });
+    }
   }
 
   function renderButtons(optionsBox, guias) {
@@ -920,11 +934,15 @@
   // INIT
   // =====================================================
   async function initOnce(root) {
-    if (!root || root.dataset.guiaInitialized === 'true') return;
-    root.dataset.guiaInitialized = 'true';
+    if (!root) return;
+    if (root.dataset.guiaInitialized === 'true') return;
+    if (root.dataset.guiaInitializing === 'true') return;
 
-    await waitForTransitionUnlock();
-    ensureVisible(root);
+    root.dataset.guiaInitializing = 'true';
+
+    try {
+      await waitForTransitionUnlock();
+      ensureVisible(root);
 
     const els = pick(root);
     if (els.guiaTexto) {
@@ -1007,12 +1025,16 @@
       }
 
       hideNotice(root);
-    } catch {
+    } catch (err) {
+      console.error('[GUIA] falha ao carregar/renderizar guias:', err);
+      delete root.dataset.guiaInitialized;
+      delete root.dataset.guiaInitializing;
+
       showNotice(
         root,
         tGuide(
           'guia.load_error',
-          'Não foi possível carregar os guias. Tente novamente mais tarde.'
+          'Não foi possível carregar os guias. Toque em continuar novamente para tentar de novo.'
         ),
         { speak: false }
       );
@@ -1208,6 +1230,16 @@
         applyGuideThemeVars();
       } catch {}
     }, 50);
+
+    root.dataset.guiaInitialized = 'true';
+    delete root.dataset.guiaInitializing;
+
+    } catch (err) {
+      console.error('[GUIA] init recuperável falhou:', err);
+      delete root.dataset.guiaInitialized;
+      delete root.dataset.guiaInitializing;
+      ensureVisible(root);
+    }
   }
   }
   // =====================================================
