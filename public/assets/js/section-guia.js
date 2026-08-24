@@ -531,11 +531,31 @@
 
     if (typeof window.runTyping === 'function') {
       await new Promise((res) => {
+        let finished = false;
+
+        const done = () => {
+          if (finished) return;
+          finished = true;
+          clearTimeout(safetyTimer);
+          res();
+        };
+
+        const estimatedMs = Math.max(
+          2500,
+          Math.min(12000, (msg.length * Math.max(12, speed)) + 1800)
+        );
+
+        const safetyTimer = setTimeout(() => {
+          console.warn('[GUIA][TYPING] timeout de segurança — liberando fluxo.');
+          usedFallback = false; // preserva texto já digitado; apenas não trava.
+          done();
+        }, estimatedMs);
+
         try {
-          window.runTyping(el, msg, () => res(), { speed, cursor: true });
+          window.runTyping(el, msg, done, { speed, cursor: true });
         } catch {
           usedFallback = true;
-          res();
+          done();
         }
       });
     } else {
@@ -579,10 +599,32 @@
         const voice = pickVoiceForGuide(lang);
         if (voice) utter.voice = voice;
 
+        // Safari/iPhone: speechSynthesis pode não disparar onend/onerror.
+        // Nunca permitimos que o TTS bloqueie a inicialização da Section Guia.
         await new Promise((resolve) => {
-          utter.onend = () => resolve();
-          utter.onerror = () => resolve();
-          window.speechSynthesis.speak(utter);
+          let finished = false;
+
+          const done = () => {
+            if (finished) return;
+            finished = true;
+            clearTimeout(safetyTimer);
+            resolve();
+          };
+
+          utter.onend = done;
+          utter.onerror = done;
+
+          const safetyTimer = setTimeout(() => {
+            console.warn('[GUIA][TTS] timeout de segurança — liberando fluxo.');
+            try { window.speechSynthesis?.cancel?.(); } catch {}
+            done();
+          }, 6500);
+
+          try {
+            window.speechSynthesis.speak(utter);
+          } catch (_) {
+            done();
+          }
         });
 
         await sleep(TTS_LATCH_MS);
@@ -1009,7 +1051,9 @@
     }
 
     try {
+      console.log('[GUIA] iniciando carregamento de guias...');
       guias = await loadGuias();
+      console.log('[GUIA] guias carregados:', Array.isArray(guias) ? guias.length : 0);
 
       if (topBox) renderButtons(topBox, guias);
       if (bottomBox) renderButtons(bottomBox, guias);
