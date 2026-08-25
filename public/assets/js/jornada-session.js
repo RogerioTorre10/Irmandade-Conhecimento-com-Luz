@@ -818,6 +818,33 @@
     const snapshot =
       data.progresso_json_temp || {};
 
+    // RETOMADA SERVER-FIRST (especialmente Safari/iOS):
+    // preserva o checkpoint remoto em sessionStorage para que os módulos
+    // de UI saibam exatamente o que já foi consumido e o que ainda falta.
+    try {
+      sessionStorage.setItem('JORNADA_RESTORE_MODE', '1');
+      sessionStorage.setItem(
+        'JORNADA_REMOTE_LAST_SECTION',
+        String(data.last_section || snapshot.last_section || '')
+      );
+      sessionStorage.setItem(
+        'JORNADA_REMOTE_LAST_BLOCK',
+        String(data.last_block ?? snapshot.last_block ?? '')
+      );
+      sessionStorage.setItem(
+        'JORNADA_REMOTE_LAST_QUESTION',
+        String(toIntSafe(data.last_question ?? snapshot.last_question ?? 0))
+      );
+      sessionStorage.setItem(
+        'JORNADA_REMOTE_DEVOLUTIVA_CONCLUIDA',
+        (data.devolutiva_concluida ?? snapshot.devolutiva_concluida) ? '1' : '0'
+      );
+      sessionStorage.setItem(
+        'JORNADA_REMOTE_ESTADO_TELA',
+        String(data.estado_tela ?? snapshot.estado_tela ?? '')
+      );
+    } catch (_) {}
+
     if (snapshot.respostas) {
       sessionStorage.setItem(
         'JORNADA_RESPOSTAS',
@@ -1089,6 +1116,18 @@
       );
 
       if (reason === 'reautenticacao_necessaria') {
+        // Mesmo quando o dispositivo precisa se reautenticar, o checkpoint
+        // remoto continua sendo a fonte de verdade. Restauramos o snapshot
+        // ANTES de abrir a senha para não perder section/bloco/pergunta no iOS.
+        if (
+          data.last_section ||
+          data.last_block != null ||
+          data.last_question != null ||
+          data.progresso_json_temp
+        ) {
+          restoreStorageFromSnapshot(data);
+        }
+
         if (data.codigo_jornada) {
           localStorage.setItem(
             STORAGE.CODIGO,
@@ -1107,13 +1146,20 @@
 
         setReauthRequired(true, normalized);
 
-        state.restored = false;
+        state.restored = Boolean(
+          data.last_section ||
+          data.progresso_json_temp
+        );
 
         return {
           ...normalized,
           retomar: false,
           reautenticacao_necessaria: true,
-          preserve_progress: true
+          preserve_progress: true,
+          resume_section:
+            data.last_section ||
+            localStorage.getItem(STORAGE.LAST_SECTION) ||
+            null
         };
       }
 
@@ -1427,12 +1473,15 @@
         STORAGE.LAST_SECTION
       );
 
-    const safeResumeSection =
+    // Se a retomada anterior trouxe checkpoint remoto, ele já foi restaurado
+    // em localStorage. Nunca voltar para section-guia por falta de storage local.
+    let safeResumeSection =
       previousSection &&
       !isPublicSection(previousSection)
         ? previousSection
         : normalizeSection(
             payload.last_section ||
+            sessionStorage.getItem('JORNADA_REMOTE_LAST_SECTION') ||
             'section-guia'
           );
 
@@ -1444,21 +1493,39 @@
 
     setReauthRequired(false);
 
+    // Reconsulta o servidor APÓS validar o novo dispositivo. Isso fecha a
+    // lacuna do Safari/iOS e restaura o snapshot completo antes de navegar.
+    let refreshed = null;
+    try {
+      refreshed = await retomar({ afterReauth: true });
+      if (
+        refreshed?.retomar &&
+        refreshed?.last_section &&
+        !isPublicSection(refreshed.last_section)
+      ) {
+        safeResumeSection = normalizeSection(refreshed.last_section);
+      }
+    } catch (err) {
+      console.warn('[GUARDIÃO][REAUTH] refresh remoto falhou; usando checkpoint preservado.', err);
+    }
+
+    try {
+      sessionStorage.setItem('JORNADA_RESTORE_MODE', '1');
+    } catch (_) {}
+
+    const detail = {
+      ...activation,
+      ...(refreshed && typeof refreshed === 'object' ? refreshed : {}),
+      reautenticada: true,
+      resume_section: safeResumeSection
+    };
+
     emit(
       'jornada:reauth-success',
-      {
-        ...activation,
-        resume_section:
-          safeResumeSection
-      }
+      detail
     );
 
-    return {
-      ...activation,
-      reautenticada: true,
-      resume_section:
-        safeResumeSection
-    };
+    return detail;
   }
 
    // =====================================================
