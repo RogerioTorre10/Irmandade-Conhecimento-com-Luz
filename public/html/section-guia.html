@@ -39,11 +39,11 @@
   // =====================================================
   function tGuide(key, fallback = '', vars = {}) {
     let txt = window.i18n?.t?.(key) || fallback;
-
+  
     txt = String(txt).replace(/\{\{\s*(\w+)\s*\}\}/g, (_, token) => {
       return vars[token] != null ? String(vars[token]) : `{{${token}}}`;
     });
-
+  
     return txt;
   }
 
@@ -70,29 +70,31 @@
   // HELPERS
   // =====================================================
   function canonGuia(u) {
-  const s = String(u || '').trim().toLowerCase();
+    const s = String(u || '').trim().toLowerCase();
+  
+    if (!s) return 'lumen';
+    if (s.includes('lumen')) return 'lumen';
+    if (s.includes('zion')) return 'zion';
+    if (s.includes('arian')) return 'arian';
+  
+    return 'lumen';
+  }
 
-  if (!s) return 'lumen';
+function ensureVisible(el) {
+  if (!el) return;
 
-  if (s.includes('lumen')) return 'lumen';
-  if (s.includes('zion')) return 'zion';
-  if (s.includes('arian')) return 'arian';
-
-  return 'lumen'; // fallback seguro
+  el.classList.remove(HIDE_CLASS);
+  el.setAttribute('aria-hidden', 'false');
+  el.style.removeProperty('display');
+  el.style.removeProperty('opacity');
+  el.style.removeProperty('visibility');
 }
 
-  function ensureVisible(el) {
-    if (!el) return;
-    el.classList.remove(HIDE_CLASS);
-    el.setAttribute('aria-hidden', 'false');
-    el.style.removeProperty('display');
-    el.style.removeProperty('opacity');
-    el.style.removeProperty('visibility');
-  }
-
-  function safeSpeechCancel() {
-    try { window.speechSynthesis?.cancel?.(); } catch {}
-  }
+function safeSpeechCancel() {
+  try {
+    window.speechSynthesis?.cancel?.();
+  } catch {}
+}
 
   function readSavedGuide() {
     return canonGuia(
