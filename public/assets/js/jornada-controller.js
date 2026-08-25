@@ -668,6 +668,34 @@ const dentro72h =
     }
   });
 
+  // ============================================================
+  // RETOMADA APÓS REAUTENTICAÇÃO — Safari/iOS
+  // ============================================================
+  document.addEventListener('jornada:reauth-success', (e) => {
+    const resume =
+      e?.detail?.resume_section ||
+      e?.detail?.last_section ||
+      localStorage.getItem('jornada_last_section');
+
+    if (!resume || SECOES_IGNORADAS_RESTORE.includes(resume)) return;
+
+    try {
+      sessionStorage.setItem('JORNADA_RESTORE_MODE', '1');
+    } catch (_) {}
+
+    // A section-senha pode terminar seu próprio fluxo no mesmo tick.
+    // Um pequeno defer garante que o checkpoint remoto seja a última navegação.
+    setTimeout(async () => {
+      try {
+        console.log('[JC][REAUTH_RESUME] Retomando checkpoint remoto:', resume);
+        await show(resume, { force: true });
+        window.toast?.('✅ Jornada restaurada no ponto em que você parou.', 'success');
+      } catch (err) {
+        console.warn('[JC][REAUTH_RESUME] falha ao abrir checkpoint:', err);
+      }
+    }, 120);
+  });
+
   window.JC = {
     ...existingJC,
     init,
