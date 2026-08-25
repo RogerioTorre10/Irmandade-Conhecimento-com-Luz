@@ -12,6 +12,13 @@
   const TTS_LATCH_MS = 600;
   const DATA_URL = '/assets/data/guias.json';
 
+  // Fallback local: garante os 3 guias mesmo se Safari/iPhone falhar no fetch.
+  const GUIAS_FALLBACK = [
+    { id: 'lumen', nome: 'Lumen', descricao: 'Lumen — Voz do Despertar.' },
+    { id: 'zion',  nome: 'Zion',  descricao: 'Zion — Guerreiro do Sistema.' },
+    { id: 'arian', nome: 'Arian', descricao: 'Arian — Guardião do Invisível.' }
+  ];
+
   // UX: confirmação em 2 passos
   const ARM_TIMEOUT_MS = 35000;
   const HOVER_DELAY_MS = 150;
@@ -532,11 +539,12 @@
     if (typeof window.runTyping === 'function') {
       await new Promise((res) => {
         let finished = false;
+        let safetyTimer = null;
 
         const done = () => {
           if (finished) return;
           finished = true;
-          clearTimeout(safetyTimer);
+          if (safetyTimer) clearTimeout(safetyTimer);
           res();
         };
 
@@ -545,9 +553,8 @@
           Math.min(12000, (msg.length * Math.max(12, speed)) + 1800)
         );
 
-        const safetyTimer = setTimeout(() => {
-          console.warn('[GUIA][TYPING] timeout de segurança — liberando fluxo.');
-          usedFallback = false; // preserva texto já digitado; apenas não trava.
+        safetyTimer = setTimeout(() => {
+          console.warn('[GUIA][TYPING] timeout de segurança; liberando fluxo.');
           done();
         }, estimatedMs);
 
@@ -599,23 +606,22 @@
         const voice = pickVoiceForGuide(lang);
         if (voice) utter.voice = voice;
 
-        // Safari/iPhone: speechSynthesis pode não disparar onend/onerror.
-        // Nunca permitimos que o TTS bloqueie a inicialização da Section Guia.
         await new Promise((resolve) => {
           let finished = false;
+          let safetyTimer = null;
 
           const done = () => {
             if (finished) return;
             finished = true;
-            clearTimeout(safetyTimer);
+            if (safetyTimer) clearTimeout(safetyTimer);
             resolve();
           };
 
           utter.onend = done;
           utter.onerror = done;
 
-          const safetyTimer = setTimeout(() => {
-            console.warn('[GUIA][TTS] timeout de segurança — liberando fluxo.');
+          safetyTimer = setTimeout(() => {
+            console.warn('[GUIA][TTS] timeout de segurança; liberando fluxo.');
             try { window.speechSynthesis?.cancel?.(); } catch {}
             done();
           }, 6500);
@@ -708,6 +714,7 @@
     const fetchJson = async (url, options = {}) => {
       const r = await fetch(url, options);
       if (!r.ok) throw new Error(`GET ${url} -> ${r.status}`);
+
       const data = await r.json();
       if (!Array.isArray(data) || !data.length) {
         throw new Error(`GET ${url} -> JSON de guias vazio/inválido`);
@@ -718,9 +725,18 @@
     try {
       return await fetchJson(DATA_URL, { cache: 'default' });
     } catch (err1) {
-      console.warn('[GUIA] primeira tentativa falhou; tentando novamente:', err1);
-      const sep = DATA_URL.includes('?') ? '&' : '?';
-      return await fetchJson(`${DATA_URL}${sep}retry=${Date.now()}`, { cache: 'reload' });
+      console.warn('[GUIA] primeira tentativa falhou:', err1);
+
+      try {
+        const sep = DATA_URL.includes('?') ? '&' : '?';
+        return await fetchJson(
+          `${DATA_URL}${sep}retry=${Date.now()}`,
+          { cache: 'reload' }
+        );
+      } catch (err2) {
+        console.warn('[GUIA] usando fallback local dos 3 guias:', err2);
+        return GUIAS_FALLBACK.map(g => ({ ...g }));
+      }
     }
   }
 
@@ -1005,6 +1021,29 @@
     const topBox = root.querySelector('.guia-options-top');
     const bottomBox = root.querySelector('.guia-options-bottom');
 
+    // iPhone/Safari: mostra os três guias imediatamente.
+    // Fetch/TTS passam a ser melhorias, nunca dependências para o fluxo.
+    try {
+      if (topBox) {
+        renderButtons(topBox, GUIAS_FALLBACK);
+        topBox.classList.remove('disabled');
+        topBox.classList.add('enabled');
+        topBox.style.setProperty('display', 'grid', 'important');
+        topBox.style.setProperty('visibility', 'visible', 'important');
+        topBox.style.setProperty('opacity', '1', 'important');
+      }
+
+      if (bottomBox) {
+        renderButtons(bottomBox, GUIAS_FALLBACK);
+        bottomBox.style.setProperty('display', 'grid', 'important');
+        bottomBox.style.setProperty('visibility', 'visible', 'important');
+      }
+
+      console.log('[GUIA] fallback visual imediato: 3 guias renderizados.');
+    } catch (e) {
+      console.warn('[GUIA] falha no fallback visual imediato:', e);
+    }
+
     els.nameInput.addEventListener('input', () => {
   const start = els.nameInput.selectionStart;
   const end = els.nameInput.selectionEnd;
@@ -1045,15 +1084,16 @@
       els.confirmBtn.style.removeProperty('opacity');
     }
 
-    // título
+    // Título/TTS não pode bloquear os guias no Safari/iPhone.
     if (els.title && !els.title.classList.contains('typing-done')) {
-      await typeOnce(els.title, null, { speed: 34, speak: true });
+      typeOnce(els.title, null, { speed: 34, speak: true })
+        .catch((e) => console.warn('[GUIA] título/TTS não bloqueante:', e));
     }
 
     try {
-      console.log('[GUIA] iniciando carregamento de guias...');
+      console.log('[GUIA] iniciando carregamento remoto...');
       guias = await loadGuias();
-      console.log('[GUIA] guias carregados:', Array.isArray(guias) ? guias.length : 0);
+      console.log('[GUIA] guias disponíveis:', guias.length);
 
       if (topBox) renderButtons(topBox, guias);
       if (bottomBox) renderButtons(bottomBox, guias);
@@ -1070,19 +1110,11 @@
 
       hideNotice(root);
     } catch (err) {
-      console.error('[GUIA] falha ao carregar/renderizar guias:', err);
-      delete root.dataset.guiaInitialized;
-      delete root.dataset.guiaInitializing;
+      console.warn('[GUIA] carregamento remoto falhou; mantendo fallback local:', err);
+      guias = GUIAS_FALLBACK.map(g => ({ ...g }));
 
-      showNotice(
-        root,
-        tGuide(
-          'guia.load_error',
-          'Não foi possível carregar os guias. Toque em continuar novamente para tentar de novo.'
-        ),
-        { speak: false }
-      );
-      return;
+      if (topBox) renderButtons(topBox, guias);
+      if (bottomBox) renderButtons(bottomBox, guias);
     }
 
     guideButtons = [
@@ -1278,13 +1310,14 @@
     root.dataset.guiaInitialized = 'true';
     delete root.dataset.guiaInitializing;
 
+    } // fecha if (els.guiaTexto) externo
+
     } catch (err) {
       console.error('[GUIA] init recuperável falhou:', err);
       delete root.dataset.guiaInitialized;
       delete root.dataset.guiaInitializing;
       ensureVisible(root);
     }
-  }
   }
   // =====================================================
   // BIND GLOBAL
