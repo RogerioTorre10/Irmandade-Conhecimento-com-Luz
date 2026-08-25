@@ -1003,6 +1003,9 @@
       ensureVisible(root);
 
     const els = pick(root);
+    if (els.guiaTexto) {
+    const nomeAtual =
+    (els.nameInput?.value || sessionStorage.getItem('jornada.nome') || '').trim().toUpperCase();
 
   if (els.guiaTexto) {
   els.guiaTexto.dataset.text = '';
@@ -1306,6 +1309,8 @@
 
     root.dataset.guiaInitialized = 'true';
     delete root.dataset.guiaInitializing;
+
+    } // fecha if (els.guiaTexto) externo
 
     } catch (err) {
       console.error('[GUIA] init recuperável falhou:', err);
