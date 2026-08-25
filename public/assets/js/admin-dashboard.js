@@ -12,6 +12,23 @@ function fmtDate(v){if(!v)return'—';const d=new Date(v);return Number.isNaN(d.
 function moneyBRL(v){const n=Number(v||0);return n>0?new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',minimumFractionDigits:4,maximumFractionDigits:4}).format(n):'—'}
 function moneyUSD(v){const n=Number(v||0);return n>0?new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:4,maximumFractionDigits:6}).format(n):'—'}
 function cost(x){return Number(x?.custo_ia_brl||0)>0?moneyBRL(x.custo_ia_brl):moneyUSD(x?.custo_ia_usd)}
+function fmtRestante(x){
+ const st=norm(x?.status_jornada);
+ if(st.includes('concl'))return'Concluída';
+ if(st.includes('expir'))return'Encerrado';
+ const v=x?.tempo_restante;
+ if(typeof v==='string'&&v.trim()&&v!=='[object Object]')return v.trim();
+ const sec=Number(x?.tempo_restante_segundos ?? (v&&typeof v==='object'?(v.segundos??v.seconds??v.total_segundos??v.total_seconds):NaN));
+ if(Number.isFinite(sec)){
+   const t=Math.max(0,Math.floor(sec)),h=Math.floor(t/3600),m=Math.floor((t%3600)/60);
+   return `${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}min`;
+ }
+ if(v&&typeof v==='object'){
+   const h=Number(v.horas??v.hours),m=Number(v.minutos??v.minutes);
+   if(Number.isFinite(h)||Number.isFinite(m))return `${String(Number.isFinite(h)?h:0).padStart(2,'0')}h ${String(Number.isFinite(m)?m:0).padStart(2,'0')}min`;
+ }
+ return'—';
+}
 function badge(v){const s=norm(v);let c='neutral';if(s.includes('concl')||s==='aprovado')c='ok';else if(s.includes('expir')||s.includes('revog'))c='bad';else if(s.includes('andamento')||s==='ativo')c='blue';else if(s.includes('pendent'))c='warn';return`<span class="badge ${c}">${esc(v||'—')}</span>`}
 async function api(){const r=await fetch(`${API_BASE}${ENDPOINT}?limite=1000&dias=30`,{cache:'no-store',headers:{Accept:'application/json','X-Admin-Secret':state.secret}});let d={};try{d=await r.json()}catch(_){ }if(!r.ok){const e=new Error(d?.detail||`HTTP ${r.status}`);e.status=r.status;throw e}return d}
 function setLive(ok,t){E.dot.classList.toggle('off',!ok);E.liveText.textContent=t||(ok?'Conectado':'Falha')}
@@ -19,7 +36,7 @@ function renderMetrics(){const r=state.data?.resumo||{},h=state.data?.hotmart_re
 function journeys(){const q=norm(E.busca.value),st=norm(E.status.value),g=norm(E.guia.value),lang=norm(E.idioma.value);return(state.data?.jornadas_admin||[]).filter(x=>{const bag=norm([x.codigo_jornada,x.email,x.pedido_id,x.cidade,x.estado,x.pais,x.guia,x.idioma,x.provider,x.modelo].join(' '));if(q&&!bag.includes(q))return false;if(st&&!norm(x.status_jornada).includes(st)&&!norm(x.status_pagamento).includes(st))return false;if(g&&norm(x.guia)!==g)return false;if(lang&&norm(x.idioma)!==lang)return false;return true})}
 function hotmart(){const q=norm(E.busca.value),st=norm(E.status.value);return(state.data?.compras_hotmart||[]).filter(x=>{const bag=norm([x.transaction_id,x.email,x.nome,x.codigo_jornada,x.product_id].join(' '));if(q&&!bag.includes(q))return false;if(st&&!norm(x.status).includes(st))return false;return true})}
 function renderJ(){const rows=journeys();E.count.textContent=`${rows.length} registro${rows.length===1?'':'s'}`;E.empty.classList.toggle('hidden',rows.length>0);E.bodyJornadas.innerHTML=rows.map(x=>`<tr>
-<td class="mono">${esc(x.codigo_jornada||'—')}</td><td>${esc(x.email||'—')}</td><td>${badge(x.status_jornada)}</td><td><span class="badge gold">${esc(x.guia||'—')}</span></td><td>${esc(x.idioma||'—')}</td><td>${esc(x.pais||'—')}</td><td>${esc(x.estado||'—')}</td><td>${esc(x.cidade||'—')}</td><td>${esc(x.provider||'—')}</td><td class="mono">${esc(x.modelo||'—')}</td><td>${num(x.tokens_entrada)}</td><td>${num(x.tokens_saida)}</td><td>${num(x.tokens_total)}</td><td>${esc(cost(x))}</td><td>${esc(x.last_block??'—')}</td><td>${esc(x.last_question??'—')}</td><td>${esc(x.status_jornada==='concluida'?'Concluída':x.tempo_restante||'—')}</td><td>${esc(fmtDate(x.atualizado_em||x.finished_at||x.started_at||x.created_at))}</td>
+<td class="mono">${esc(x.codigo_jornada||'—')}</td><td>${esc(x.email||'—')}</td><td>${badge(x.status_jornada)}</td><td><span class="badge gold">${esc(x.guia||'—')}</span></td><td>${esc(x.idioma||'—')}</td><td>${esc(x.pais||'—')}</td><td>${esc(x.estado||'—')}</td><td>${esc(x.cidade||'—')}</td><td>${esc(x.provider||'—')}</td><td class="mono">${esc(x.modelo||'—')}</td><td>${num(x.tokens_entrada)}</td><td>${num(x.tokens_saida)}</td><td>${num(x.tokens_total)}</td><td>${esc(cost(x))}</td><td>${esc(x.last_block??'—')}</td><td>${esc(x.last_question??'—')}</td><td>${esc(fmtRestante(x))}</td><td>${esc(fmtDate(x.atualizado_em||x.finished_at||x.started_at||x.created_at))}</td>
 </tr>`).join('')}
 function renderH(){const rows=hotmart();E.count.textContent=`${rows.length} compra${rows.length===1?'':'s'}`;E.empty.classList.toggle('hidden',rows.length>0);E.bodyHotmart.innerHTML=rows.map(x=>`<tr><td class="mono">${esc(x.transaction_id||'—')}</td><td>${esc(x.nome||'—')}</td><td>${esc(x.email||'—')}</td><td>${badge(x.status)}</td><td class="mono">${esc(x.codigo_jornada||'—')}</td><td class="mono">${esc(x.product_id||'—')}</td><td>${esc(fmtDate(x.aprovada_em||x.criada_em))}</td><td>${x.email_acesso_enviado?'<span class="badge ok">Enviado</span>':'<span class="badge warn">Pendente</span>'}</td><td>${esc(x.ultimo_evento||'—')}</td></tr>`).join('')}
 function render(){renderMetrics();const h=state.tab==='hotmart';E.tableJornadas.classList.toggle('hidden',h);E.tableHotmart.classList.toggle('hidden',!h);E.tableTitle.textContent=h?'Compras Hotmart':'Jornadas';h?renderH():renderJ()}
