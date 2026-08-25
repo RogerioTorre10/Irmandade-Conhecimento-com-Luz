@@ -5,64 +5,92 @@
 
 <section
   id="section-guia"
+  class="section j-screen-vert"
   data-section="guia"
   data-transition-src="/assets/videos/filme-eu-na-irmandade.mp4">
   <div class="j-panel-glow guia-panel">
     <div class="j-perg-v-inner">
       <div class="j-arcane-card guia-wrap">
-        
-      <!-- Título com datilografia -->
-      <h2 class="titulo-pergaminho"
-          data-typing="true" data-speed="30" data-cursor="true"
-          data-text="Escolha seu Guia"></h2>
-        
-          <!-- BOTÕES SUPERIORES -->
-<div class="guia-options guia-options-top" data-guia-group="top"
-     aria-label="Guias (pré-visualização)"></div>
-        <!-- PREVIEW OVERLAY (10s) -->
-        <div id="guiaPreviewOverlay" class="guia-preview-overlay" aria-hidden="true">
-        <video id="guiaPreviewVideo"
-         class="guia-preview-video"
-         preload="auto"
-         playsinline
-         muted></video>
-        </div>
 
-     <!-- Nome primeiro -->
-     <div class="guia-name-input on-pergaminho">
-      <label class="sr-only" for="guiaNameInput">Para liberar o Guia, Insira seu nome</label>
-       <input id="guiaNameInput" class="input-espinhos" type="text"
-         placeholder="NOME" autocomplete="name"
-         aria-label="Digite seu nome para a jornada">
-       </div>
+        <div class="guia-panel-inner">
 
-       <div class="guia-confirm-wrap">
-         <button id="btn-confirmar-nome" class="btn btn-stone-espinhos"
-          aria-label="Confirmar nome">Confirmar</button>
-       </div>
-
-      <!-- Caixa medieval para descrição (datilografia + TTS) -->
-      <div class="moldura-grande">
-        <div id="guiaTexto" class="guia-descricao-medieval"
-             data-text="Olá, {{nome}}! Escolha seu guia para a Jornada."></div>
-      </div>        
-                     
-      <!-- Aviso / status da página guia -->
-      <div id="guia-error" class="guia-notice hidden" role="status" aria-live="polite">
-        <span id="guia-notice-text"
+          <h2 class="titulo-pergaminho guia-title"
               data-typing="true"
               data-speed="30"
               data-cursor="true"
-              data-text="AO PASSAR SUAVEMENTE POR CIMA DO BOTÃO SERÁ EXIBIDO O PERFIL DO GUIA. PARA CONFIRMAR, CLIQUE NOVAMENTE OU USE DUPLO CLIQUE.">
-        </span>
-      </div>            
+              data-i18n="guia.title"
+              data-i18n-text="guia.title"
+              data-text="Escolha seu Guia">
+          </h2>
 
-     <!-- BOTÕES INFERIORES -->
-     <div class="guia-options guia-options-bottom disabled"
-     data-guia-group="bottom"
-     aria-label="Guias (seleção final)"></div>                                         
+          <div class="guia-options guia-options-top"
+               data-guia-group="top"
+               aria-label="Guias (pré-visualização)">
+          </div>
 
+          <div id="guiaPreviewOverlay" class="guia-preview-overlay" aria-hidden="true">
+            <video id="guiaPreviewVideo"
+                   class="guia-preview-video"
+                   preload="auto"
+                   playsinline
+                   muted>
+            </video>
+          </div>
+
+          <div class="guia-name-input on-pergaminho">
+            <label class="guia-name-label"
+                   for="guiaNameInput"
+                   data-i18n="guia.p1"
+                   data-i18n-text="guia.p1"
+                   data-text="Para liberar o Guia, Insira seu nome">
+              Para liberar o Guia, Insira seu nome
+            </label>
+
+            <input id="guiaNameInput"
+                   class="input-espinhos"
+                   type="text"
+                   placeholder="NOME"
+                   data-i18n-placeholder="guia.placeholder"
+                   autocomplete="name"
+                   aria-label="Digite seu nome para a jornada">
+          </div>
+
+          <div class="guia-confirm-wrap">
+            <button id="btn-confirmar-nome"
+                    class="btn btn-stone-espinhos"
+                    data-i18n="common.confirm"
+                    data-text="Confirmar"
+                    aria-label="Confirmar nome">
+              Confirmar
+            </button>
+          </div>
+
+          <div class="moldura-grande">
+            <div id="guiaTexto"
+                 class="guia-descricao-medieval"
+                 data-text="Olá, {{nome}}! Escolha seu guia para a Jornada.">
+            </div>
+          </div>
+
+          <div id="guia-error" class="guia-notice hidden" role="status" aria-live="polite">
+            <span id="guia-notice-text"
+                  class="guia-notice-text"
+                  data-typing="true"
+                  data-speed="30"
+                  data-cursor="true"
+                  data-i18n="guia.notice"
+                  data-i18n-text="guia.notice"
+                  data-text="AO PASSAR SUAVEMENTE POR CIMA DO BOTÃO SERÁ EXIBIDO O PERFIL DO GUIA. PARA CONFIRMAR, CLIQUE NOVAMENTE OU USE DUPLO CLIQUE.">
+            </span>
+          </div>
+
+          <div class="guia-options guia-options-bottom disabled"
+               data-guia-group="bottom"
+               aria-label="Guias (seleção final)">
+          </div>
+
+        </div>
+      </div>
     </div>
   </div>
- </div> 
 </section>
