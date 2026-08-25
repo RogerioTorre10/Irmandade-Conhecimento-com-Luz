@@ -39,11 +39,11 @@
   // =====================================================
   function tGuide(key, fallback = '', vars = {}) {
     let txt = window.i18n?.t?.(key) || fallback;
-  
+
     txt = String(txt).replace(/\{\{\s*(\w+)\s*\}\}/g, (_, token) => {
       return vars[token] != null ? String(vars[token]) : `{{${token}}}`;
     });
-  
+
     return txt;
   }
 
@@ -70,31 +70,29 @@
   // HELPERS
   // =====================================================
   function canonGuia(u) {
-    const s = String(u || '').trim().toLowerCase();
-  
-    if (!s) return 'lumen';
-    if (s.includes('lumen')) return 'lumen';
-    if (s.includes('zion')) return 'zion';
-    if (s.includes('arian')) return 'arian';
-  
-    return 'lumen';
+  const s = String(u || '').trim().toLowerCase();
+
+  if (!s) return 'lumen';
+
+  if (s.includes('lumen')) return 'lumen';
+  if (s.includes('zion')) return 'zion';
+  if (s.includes('arian')) return 'arian';
+
+  return 'lumen'; // fallback seguro
+}
+
+  function ensureVisible(el) {
+    if (!el) return;
+    el.classList.remove(HIDE_CLASS);
+    el.setAttribute('aria-hidden', 'false');
+    el.style.removeProperty('display');
+    el.style.removeProperty('opacity');
+    el.style.removeProperty('visibility');
   }
 
-function ensureVisible(el) {
-  if (!el) return;
-
-  el.classList.remove(HIDE_CLASS);
-  el.setAttribute('aria-hidden', 'false');
-  el.style.removeProperty('display');
-  el.style.removeProperty('opacity');
-  el.style.removeProperty('visibility');
-}
-
-function safeSpeechCancel() {
-  try {
-    window.speechSynthesis?.cancel?.();
-  } catch {}
-}
+  function safeSpeechCancel() {
+    try { window.speechSynthesis?.cancel?.(); } catch {}
+  }
 
   function readSavedGuide() {
     return canonGuia(
@@ -1005,9 +1003,6 @@ function safeSpeechCancel() {
       ensureVisible(root);
 
     const els = pick(root);
-    if (els.guiaTexto) {
-    const nomeAtual =
-    (els.nameInput?.value || sessionStorage.getItem('jornada.nome') || '').trim().toUpperCase();
 
   if (els.guiaTexto) {
   els.guiaTexto.dataset.text = '';
@@ -1318,7 +1313,6 @@ function safeSpeechCancel() {
       delete root.dataset.guiaInitializing;
       ensureVisible(root);
     }
-  }
   }
   // =====================================================
   // BIND GLOBAL
