@@ -1416,11 +1416,20 @@
       }
     );
 
+    const saveReason =
+      String(
+        payload.save_reason ||
+        'ativacao_2fa'
+      ).trim();
+
     const saveResult =
       await salvar({
         last_section: section,
-        estado_tela: 'ativada',
-        reason: 'ativacao_2fa'
+        estado_tela:
+          saveReason === 'reauth_device_bind'
+            ? 'reautenticada'
+            : 'ativada',
+        reason: saveReason
       });
 
     return {
@@ -1488,7 +1497,11 @@
     const activation =
       await registrarAtivacao({
         ...payload,
-        last_section: safeResumeSection
+        last_section: safeResumeSection,
+
+        // Este save existe para vincular o novo dispositivo.
+        // O backend deve preservar integralmente o checkpoint remoto já existente.
+        save_reason: 'reauth_device_bind'
       });
 
     setReauthRequired(false);
