@@ -52,7 +52,7 @@
       'Pensando naquela criança que você foi: do que ela mais precisava e talvez não tenha recebido na medida certa?',
       'Depois de lembrar tudo isso, qual característica sua de hoje parece ter nascido naquela época? Não precisa ter certeza — diga o que vier à cabeça.',
       'Hoje, quando algo te faz sentir rejeitado, criticado ou ameaçado, qual costuma ser sua reação mais automática — antes mesmo de pensar?',
-      'Nessa reação, o que você parece estar tentando não sentir de novo?',
+      'Nessa reação, consegue perceber algo que tenta evita sentir isso de novo?',
       'Existe alguma situação que as outras pessoas parecem enfrentar numa boa, mas que em você provoca desconforto, medo, vergonha, raiva ou vontade de fugir? Dê um exemplo real.',
       'Quando você evita, cede, controla, agrada, se cala ou se afasta nessa situação, o que sente logo depois: alívio, segurança, culpa, frustração, poder, vazio?',
       'Existe algo que você faz repetidamente mesmo sabendo que pode se arrepender depois — comer, beber, comprar, trabalhar demais, controlar, agradar, discutir, se isolar, buscar aprovação? O que sente antes e depois?',
