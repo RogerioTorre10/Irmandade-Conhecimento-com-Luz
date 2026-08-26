@@ -2120,95 +2120,6 @@ function bindButtons(section, bloco, perguntaText, qIndex = 0) {
 
     if (state === 'ready') {
 
-    // =====================================================
-    // RETRATAÇÃO
-    // Não avança.
-    // Retorna exatamente à pergunta que ficou pendente.
-    // =====================================================
-  
-    const reanswerKey =
-      `jornada:reanswer:${bloco?.id || 'bloco'}`;
-  
-    const pendingReanswerRaw =
-      sessionStorage.getItem(reanswerKey);
-  
-    const pendingReanswer =
-      pendingReanswerRaw !== null
-        ? Number(pendingReanswerRaw)
-        : null;
-  
-    const temRetratacaoPendente =
-      section.dataset.awaitingReanswer === '1' ||
-      Number.isInteger(pendingReanswer);
-  
-    if (temRetratacaoPendente) {
-  
-      const idxRetorno =
-        Number.isInteger(pendingReanswer)
-          ? pendingReanswer
-          : getCurrentQuestionIndex(bloco);
-  
-      // Fixa a pergunta aguardada ANTES de qualquer limpeza.
-      setCurrentQuestionIndex(
-        bloco,
-        idxRetorno
-      );
-  
-      // Limpa os marcadores da retratação.
-      delete section.dataset.awaitingReanswer;
-  
-      sessionStorage.removeItem(
-        reanswerKey
-      );
-  
-      forceStopMic();
-      stopSpeaking();
-  
-      // Limpa resposta e devolutiva,
-      // sem avançar para outra pergunta.
-      clearAnswerUI();
-  
-      setContinueState(
-        section,
-        'idle'
-      );
-  
-      const btn =
-        section.querySelector('#jp-btn-confirmar');
-  
-      if (btn) {
-        btn.textContent = uiText(
-          'confirm',
-          'Confirmar'
-        );
-      }
-  
-      const ta =
-        section.querySelector('#jp-answer-input');
-  
-      if (ta) {
-        ta.value = '';
-        ta.focus();
-      }
-  
-      console.log(
-        '[PERGUNTA][RETRATACAO] pergunta restaurada',
-        {
-          bloco: bloco?.id,
-          pergunta: idxRetorno + 1
-        }
-      );
-  
-      // CRÍTICO:
-      // não deixa cair em maybeHandleBlockClosure()
-      return;
-    }
-  
-    // =====================================================
-    // SEM RETRATAÇÃO:
-    // comportamento normal
-    // =====================================================
-  
     await maybeHandleBlockClosure(
       section,
       bloco
@@ -2249,8 +2160,7 @@ function bindButtons(section, bloco, perguntaText, qIndex = 0) {
       getCurrentQuestionIndex(bloco);
 
 
-    // Salva provisoriamente.
-    // Se for retratação, será removida depois.
+    // Salva a resposta atual.
     saveAnswer(
       bloco,
       idxAtual,
@@ -2399,117 +2309,7 @@ function bindButtons(section, bloco, perguntaText, qIndex = 0) {
 
 
     // =================================================
-    // CLASSIFICAÇÃO DA RESPOSTA
-    // =================================================
-
-    const tipoResposta = String(
-      result?.tipoResposta ||
-      (
-        result?.provider === 'intervencao_retratacao' ||
-        result?.source === 'intervencao_retratacao'
-          ? 'retratacao'
-          : ''
-      )
-    )
-      .trim()
-      .toLowerCase();
-
-
-    // =================================================
-    // RETRATAÇÃO
-    //
-    // NÃO é resposta da pergunta.
-    // Mantém índice atual até nova resposta real.
-    // =================================================
-
-    if (
-      tipoResposta === 'retratacao'
-    ) {
-
-      console.log(
-        '[PERGUNTA][RETRATACAO]',
-        {
-          bloco:
-            bloco?.id,
-
-          pergunta:
-            idxAtual + 1,
-
-          texto:
-            val
-        }
-      );
-
-
-      // Remove o pedido de desculpas da
-      // resposta oficial da pergunta.
-      removeAnswer(
-        bloco,
-        idxAtual
-      );
-
-
-      // Garante que a pergunta atual
-      // continue sendo a mesma.
-      setCurrentQuestionIndex(
-        bloco,
-        idxAtual
-      );
-
-
-      // Persiste qual pergunta aguarda resposta.
-      const reanswerKey =
-        `jornada:reanswer:${bloco?.id || 'bloco'}`;
-
-
-      sessionStorage.setItem(
-        reanswerKey,
-        String(idxAtual)
-      );
-
-
-      section.dataset.awaitingReanswer =
-        '1';
-
-
-      // Mostra a resposta do Guia.
-      await setGuideResponse(
-        texto,
-        result?.fallbackUsed
-          ? 'warning'
-          : 'success'
-      );
-
-
-      // Ready apenas para permitir
-      // o clique em "Responder pergunta".
-      setContinueState(
-        section,
-        'ready'
-      );
-
-
-      const btn =
-        section.querySelector(
-          '#jp-btn-confirmar'
-        );
-
-
-      if (btn) {
-        btn.textContent = uiText(
-          'answer_question_again',
-          'Responder pergunta'
-        );
-      }
-
-
-      // Não registra como resposta/reflexão.
-      return;
-    }
-
-
-    // =================================================
-    // RESPOSTA NORMAL / INTERVENÇÃO DISCIPLINAR
+    // RESPOSTA NORMAL
     // =================================================
 
     upsertPerguntaFeedback(
@@ -2590,7 +2390,7 @@ function bindButtons(section, bloco, perguntaText, qIndex = 0) {
     btnConfirm.dataset.busy = '0';
 
     // Só libera fisicamente o botão.
-    // A disciplina é verificada no próximo clique.
+    // Mantém o botão disponível para o próximo clique.
      btnConfirm.disabled = false;
     }
   };
