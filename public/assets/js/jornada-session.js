@@ -21,9 +21,16 @@
     return;
   }
 
+  const IS_HOMOLOG =
+    window.location.hostname.includes('homolog');
+
   const API =
     window.APP_CONFIG?.API_BASE ||
-    'https://lumen-backend-api.onrender.com/api';
+    ( 
+      IS_HOMOLOG
+        ? 'https://lumen-backend-homolog.onrender.com/api'
+        : 'https://lumen-backend-api.onrender.com/api'
+  );
 
   const PUBLIC_SECTIONS = new Set([
     'section-intro',
@@ -237,67 +244,6 @@
       remaining != null &&
       remaining <= 0
     );
-  }
-
-  // =====================================================
-  // PRAZO OFICIAL — SERVIDOR É A AUTORIDADE
-  // =====================================================
-
-  function parseDeadlineMs(value) {
-    if (value == null || value === '') return null;
-
-    const numeric = Number(value);
-    if (Number.isFinite(numeric) && numeric > 0) {
-      return numeric;
-    }
-
-    const parsed = Date.parse(String(value));
-    return Number.isFinite(parsed) ? parsed : null;
-  }
-
-  function persistOfficialDeadline(value, source = 'server') {
-    const incomingMs = parseDeadlineMs(value);
-    if (incomingMs == null) return false;
-
-    localStorage.setItem(
-      STORAGE.DEADLINE_AT,
-      String(incomingMs)
-    );
-
-    console.log(
-      '[GUARDIÃO][PRAZO] deadline oficial aplicado:',
-      new Date(incomingMs).toISOString(),
-      'fonte=',
-      source
-    );
-
-    emit('jornada:deadline-updated', {
-      deadline_at: incomingMs,
-      source
-    });
-
-    return true;
-  }
-
-  function persistOfficialStartedAt(value, source = 'server') {
-    if (value == null || value === '') return false;
-
-    const parsed = Date.parse(String(value));
-    if (!Number.isFinite(parsed)) return false;
-
-    localStorage.setItem(
-      STORAGE.STARTED_AT,
-      new Date(parsed).toISOString()
-    );
-
-    console.log(
-      '[GUARDIÃO][PRAZO] início oficial aplicado:',
-      new Date(parsed).toISOString(),
-      'fonte=',
-      source
-    );
-
-    return true;
   }
 
   // =====================================================
@@ -818,33 +764,6 @@
     const snapshot =
       data.progresso_json_temp || {};
 
-    // RETOMADA SERVER-FIRST (especialmente Safari/iOS):
-    // preserva o checkpoint remoto em sessionStorage para que os módulos
-    // de UI saibam exatamente o que já foi consumido e o que ainda falta.
-    try {
-      sessionStorage.setItem('JORNADA_RESTORE_MODE', '1');
-      sessionStorage.setItem(
-        'JORNADA_REMOTE_LAST_SECTION',
-        String(data.last_section || snapshot.last_section || '')
-      );
-      sessionStorage.setItem(
-        'JORNADA_REMOTE_LAST_BLOCK',
-        String(data.last_block ?? snapshot.last_block ?? '')
-      );
-      sessionStorage.setItem(
-        'JORNADA_REMOTE_LAST_QUESTION',
-        String(toIntSafe(data.last_question ?? snapshot.last_question ?? 0))
-      );
-      sessionStorage.setItem(
-        'JORNADA_REMOTE_DEVOLUTIVA_CONCLUIDA',
-        (data.devolutiva_concluida ?? snapshot.devolutiva_concluida) ? '1' : '0'
-      );
-      sessionStorage.setItem(
-        'JORNADA_REMOTE_ESTADO_TELA',
-        String(data.estado_tela ?? snapshot.estado_tela ?? '')
-      );
-    } catch (_) {}
-
     if (snapshot.respostas) {
       sessionStorage.setItem(
         'JORNADA_RESPOSTAS',
@@ -953,27 +872,40 @@
       );
     }
 
-    // PRAZO: o backend é a fonte oficial.
-    // Prioridade: expires_at remoto > deadline_at remoto > snapshot.
-    // O valor local nunca vence um prazo devolvido pelo servidor.
-    persistOfficialStartedAt(
-      data.started_at ||
-      snapshot.started_at,
-      data.started_at ? 'retomar.data.started_at' : 'retomar.snapshot.started_at'
-    );
+    if (snapshot.started_at) {
+      localStorage.setItem(
+        STORAGE.STARTED_AT,
+        String(snapshot.started_at)
+      );
+    }
 
-    persistOfficialDeadline(
-      data.expires_at ||
-      data.deadline_at ||
-      snapshot.deadline_at,
-      data.expires_at
-        ? 'retomar.data.expires_at'
-        : (
-            data.deadline_at
-              ? 'retomar.data.deadline_at'
-              : 'retomar.snapshot.deadline_at'
-          )
-    );
+    if (snapshot.deadline_at) {
+      localStorage.setItem(
+        STORAGE.DEADLINE_AT,
+        String(snapshot.deadline_at)
+      );
+    }
+
+    if (data.started_at) {
+      localStorage.setItem(
+        STORAGE.STARTED_AT,
+        String(data.started_at)
+      );
+    }
+
+    if (data.deadline_at) {
+      localStorage.setItem(
+        STORAGE.DEADLINE_AT,
+        String(data.deadline_at)
+      );
+    }
+
+    if (data.expires_at) {
+      localStorage.setItem(
+        STORAGE.DEADLINE_AT,
+        String(data.expires_at)
+      );
+    }
 
     state.lastRemoteSnapshot = data;
     state.restored = true;
@@ -1116,18 +1048,6 @@
       );
 
       if (reason === 'reautenticacao_necessaria') {
-        // Mesmo quando o dispositivo precisa se reautenticar, o checkpoint
-        // remoto continua sendo a fonte de verdade. Restauramos o snapshot
-        // ANTES de abrir a senha para não perder section/bloco/pergunta no iOS.
-        if (
-          data.last_section ||
-          data.last_block != null ||
-          data.last_question != null ||
-          data.progresso_json_temp
-        ) {
-          restoreStorageFromSnapshot(data);
-        }
-
         if (data.codigo_jornada) {
           localStorage.setItem(
             STORAGE.CODIGO,
@@ -1136,30 +1056,24 @@
         }
 
         if (data.expires_at || data.deadline_at) {
-          persistOfficialDeadline(
-            data.expires_at || data.deadline_at,
-            data.expires_at
-              ? 'reauth.data.expires_at'
-              : 'reauth.data.deadline_at'
+          localStorage.setItem(
+            STORAGE.DEADLINE_AT,
+            String(
+              data.expires_at ||
+              data.deadline_at
+            )
           );
         }
 
         setReauthRequired(true, normalized);
 
-        state.restored = Boolean(
-          data.last_section ||
-          data.progresso_json_temp
-        );
+        state.restored = false;
 
         return {
           ...normalized,
           retomar: false,
           reautenticacao_necessaria: true,
-          preserve_progress: true,
-          resume_section:
-            data.last_section ||
-            localStorage.getItem(STORAGE.LAST_SECTION) ||
-            null
+          preserve_progress: true
         };
       }
 
@@ -1313,69 +1227,43 @@
       '1'
     );
 
-    const codigoAnterior =
-      localStorage.getItem(STORAGE.CODIGO);
-
-    const codigoRecebido =
-      payload.codigo_jornada
-        ? String(payload.codigo_jornada)
-        : '';
-
-    // Se for outra Jornada/licença, elimina relógio residual da anterior.
-    if (
-      codigoRecebido &&
-      codigoAnterior &&
-      codigoAnterior !== codigoRecebido
-    ) {
-      localStorage.removeItem(STORAGE.STARTED_AT);
-      localStorage.removeItem(STORAGE.DEADLINE_AT);
-
-      console.log(
-        '[GUARDIÃO][PRAZO] nova jornada detectada; relógio local anterior removido.'
-      );
-    }
-
-    if (codigoRecebido) {
+    if (payload.codigo_jornada) {
       localStorage.setItem(
         STORAGE.CODIGO,
-        codigoRecebido
+        String(payload.codigo_jornada)
       );
     }
 
-    const serverStartedAt =
+    const currentStartedAt =
+      localStorage.getItem(STORAGE.STARTED_AT);
+
+    const currentDeadlineAt =
+      localStorage.getItem(STORAGE.DEADLINE_AT);
+
+    const startedAt =
+      currentStartedAt ||
       payload.started_at ||
       payload.criado_em ||
       null;
 
-    const serverDeadlineAt =
-      payload.expires_at ||
+    const deadlineAt =
+      currentDeadlineAt ||
       payload.deadline_at ||
+      payload.expires_at ||
       null;
 
-    // Se o servidor informou os tempos, eles vencem SEMPRE.
-    // Só usamos o storage antigo quando o backend não trouxe valor algum.
-    if (!persistOfficialStartedAt(serverStartedAt, 'ativacao.server')) {
-      const currentStartedAt =
-        localStorage.getItem(STORAGE.STARTED_AT);
-
-      if (currentStartedAt) {
-        persistOfficialStartedAt(
-          currentStartedAt,
-          'ativacao.local-fallback'
-        );
-      }
+    if (startedAt) {
+      localStorage.setItem(
+        STORAGE.STARTED_AT,
+        String(startedAt)
+      );
     }
 
-    if (!persistOfficialDeadline(serverDeadlineAt, 'ativacao.server')) {
-      const currentDeadlineAt =
-        localStorage.getItem(STORAGE.DEADLINE_AT);
-
-      if (currentDeadlineAt) {
-        persistOfficialDeadline(
-          currentDeadlineAt,
-          'ativacao.local-fallback'
-        );
-      }
+    if (deadlineAt) {
+      localStorage.setItem(
+        STORAGE.DEADLINE_AT,
+        String(deadlineAt)
+      );
     }
 
     const section =
@@ -1473,15 +1361,12 @@
         STORAGE.LAST_SECTION
       );
 
-    // Se a retomada anterior trouxe checkpoint remoto, ele já foi restaurado
-    // em localStorage. Nunca voltar para section-guia por falta de storage local.
-    let safeResumeSection =
+    const safeResumeSection =
       previousSection &&
       !isPublicSection(previousSection)
         ? previousSection
         : normalizeSection(
             payload.last_section ||
-            sessionStorage.getItem('JORNADA_REMOTE_LAST_SECTION') ||
             'section-guia'
           );
 
@@ -1493,39 +1378,21 @@
 
     setReauthRequired(false);
 
-    // Reconsulta o servidor APÓS validar o novo dispositivo. Isso fecha a
-    // lacuna do Safari/iOS e restaura o snapshot completo antes de navegar.
-    let refreshed = null;
-    try {
-      refreshed = await retomar({ afterReauth: true });
-      if (
-        refreshed?.retomar &&
-        refreshed?.last_section &&
-        !isPublicSection(refreshed.last_section)
-      ) {
-        safeResumeSection = normalizeSection(refreshed.last_section);
-      }
-    } catch (err) {
-      console.warn('[GUARDIÃO][REAUTH] refresh remoto falhou; usando checkpoint preservado.', err);
-    }
-
-    try {
-      sessionStorage.setItem('JORNADA_RESTORE_MODE', '1');
-    } catch (_) {}
-
-    const detail = {
-      ...activation,
-      ...(refreshed && typeof refreshed === 'object' ? refreshed : {}),
-      reautenticada: true,
-      resume_section: safeResumeSection
-    };
-
     emit(
       'jornada:reauth-success',
-      detail
+      {
+        ...activation,
+        resume_section:
+          safeResumeSection
+      }
     );
 
-    return detail;
+    return {
+      ...activation,
+      reautenticada: true,
+      resume_section:
+        safeResumeSection
+    };
   }
 
    // =====================================================
@@ -1734,6 +1601,100 @@
   }
 
   // =====================================================
+  // iOS / SAFARI — FLUSH CIRÚRGICO DO CHECKPOINT
+  // =====================================================
+  // IMPORTANTE:
+  // - não altera o fluxo Android/Desktop;
+  // - não cria um segundo sistema de sessão;
+  // - apenas reforça o envio do snapshot já existente quando
+  //   o Safari vai para background/fecha a página;
+  // - o backend e os endpoints permanecem os mesmos.
+
+  const IS_IOS_SAFARI = (() => {
+    const ua = navigator.userAgent || '';
+    const platform = navigator.platform || '';
+    const touchMac =
+      platform === 'MacIntel' &&
+      Number(navigator.maxTouchPoints || 0) > 1;
+
+    const ios =
+      /iPad|iPhone|iPod/i.test(ua) ||
+      touchMac;
+
+    const webkit =
+      /WebKit/i.test(ua);
+
+    const otherIOSBrowser =
+      /CriOS|FxiOS|EdgiOS|OPiOS/i.test(ua);
+
+    return ios && webkit && !otherIOSBrowser;
+  })();
+
+  function flushIOSCheckpoint(reason = 'ios_background') {
+    if (!IS_IOS_SAFARI) return false;
+    if (!isAuthenticated()) return false;
+
+    const currentSection =
+      normalizeSection(
+        localStorage.getItem(STORAGE.LAST_SECTION)
+      );
+
+    if (isPublicSection(currentSection)) {
+      return false;
+    }
+
+    try {
+      const payload =
+        buildPayload({
+          reason,
+          device_hash:
+            localStorage.getItem(STORAGE.DEVICE) ||
+            undefined
+        });
+
+      if (!payload.email) {
+        return false;
+      }
+
+      // keepalive foi feito exatamente para requisições curtas que
+      // precisam sobreviver ao pagehide/background do navegador.
+      fetch(
+        `${API}/jornada/progresso/salvar`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload),
+          keepalive: true
+        }
+      ).catch((err) => {
+        // Não interfere na navegação nem no fluxo normal.
+        console.warn(
+          '[GUARDIÃO][iOS] flush keepalive não confirmado:',
+          err
+        );
+      });
+
+      console.log(
+        '[GUARDIÃO][iOS] checkpoint enviado:',
+        reason,
+        currentSection
+      );
+
+      return true;
+
+    } catch (err) {
+      console.warn(
+        '[GUARDIÃO][iOS] falha ao preparar checkpoint:',
+        err
+      );
+
+      return false;
+    }
+  }
+
+  // =====================================================
   // EVENTOS GLOBAIS
   // =====================================================
 
@@ -1778,6 +1739,15 @@
         'hidden'
       ) {
 
+        // Safari/iOS: força um flush keepalive mesmo quando o debounce
+        // anterior já marcou dirty=false. Android/Desktop não entram aqui.
+        if (IS_IOS_SAFARI) {
+          flushIOSCheckpoint(
+            'ios_visibilitychange'
+          );
+          return;
+        }
+
         if (
           state.dirty &&
           isAuthenticated()
@@ -1798,6 +1768,15 @@
   window.addEventListener(
     'pagehide',
     () => {
+
+      // Safari/iOS: não depende de Promise serial/debounce durante
+      // o encerramento da página. Android/Desktop preservam a lógica antiga.
+      if (IS_IOS_SAFARI) {
+        flushIOSCheckpoint(
+          'ios_pagehide'
+        );
+        return;
+      }
 
       if (
         state.dirty &&
@@ -1860,14 +1839,6 @@
 
     get remainingMs() {
       return getRemainingMs();
-    },
-
-    get deadlineAt() {
-      return localStorage.getItem(STORAGE.DEADLINE_AT);
-    },
-
-    get startedAt() {
-      return localStorage.getItem(STORAGE.STARTED_AT);
     }
 
   };
