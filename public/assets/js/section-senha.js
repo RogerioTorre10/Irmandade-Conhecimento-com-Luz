@@ -959,11 +959,13 @@ if (
         );
 
       } finally {
+        // O backend já controla elegibilidade/rate limit.
+        // O botão não deve aparentar travamento por 60 segundos.
         setTimeout(() => {
           btnEnviar2FA.removeAttribute(
             'disabled'
           );
-        }, 60000);
+        }, 1200);
       }
     }
   );
