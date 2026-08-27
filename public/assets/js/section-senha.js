@@ -676,12 +676,16 @@
         'jornada_email',
         email
       );
-
+      
       localStorage.setItem(
         'jornada_auth_ok',
         '1'
       );
-      
+
+      if (window.JORNADA_SESSION) {
+        window.JORNADA_SESSION.reauthRequired = false;
+      }
+
       if (startedAt) {
         localStorage.setItem(
           'jornada_started_at',
@@ -696,46 +700,39 @@
         );
       }
 
-      // ============================================================
-      // RETOMADA SEGURA
-      // - Jornada nova: registra ativação e segue para Guia.
-      // - Jornada existente: NÃO grava section-guia sobre o checkpoint.
-      // - A sincronização auxiliar nunca pode travar o botão Entrar.
-      // ============================================================
-      const isResume = !!data.resume;
-
-      if (!isResume) {
-        try {
-          if (
-            window.JORNADA_SESSION &&
-            typeof window.JORNADA_SESSION
-              .registrarAtivacao === 'function'
-          ) {
-            // Não bloqueia a navegação esperando a sincronização auxiliar.
-            Promise.resolve(
-              window.JORNADA_SESSION.registrarAtivacao({
-                email,
-                codigo_jornada: codigoJornada,
-                started_at: startedAt,
-                deadline_at: deadlineAt,
-                last_section: 'section-guia'
-              })
-            ).catch((sessionErr) => {
-              console.warn(
-                '[JCSenha] ativação validada; sincronização auxiliar falhou:',
-                sessionErr
-              );
+      try {
+        if (
+          window.JORNADA_SESSION &&
+          typeof window.JORNADA_SESSION
+            .registrarAtivacao === 'function'
+        ) {
+          await window.JORNADA_SESSION
+            .registrarAtivacao({
+              email,
+              codigo_jornada: codigoJornada,
+              started_at: startedAt,
+              deadline_at: deadlineAt,
+              last_section: 'section-guia'
             });
-          }
-        } catch (sessionErr) {
-          console.warn(
-            '[JCSenha] ativação validada; sincronização auxiliar não iniciada:',
-            sessionErr
-          );
         }
-      } else {
-        console.log(
-          '[JCSenha][RETOMADA] Acesso anterior detectado; preservando checkpoint remoto.'
+
+        if (
+          window.JORNADA_SESSION &&
+          typeof window.JORNADA_SESSION
+            .atualizarEstado === 'function'
+        ) {
+          await window.JORNADA_SESSION
+            .atualizarEstado({
+              last_section: 'section-guia',
+              estado_tela: data.resume
+                ? 'senha_validada_retomada'
+                : 'senha_validada'
+            });
+        }
+      } catch (sessionErr) {
+        console.warn(
+          '[JCSenha] acesso validado, mas a sincronização auxiliar falhou:',
+          sessionErr
         );
       }
 
@@ -756,86 +753,31 @@
         window.JC?.show?.(NEXT_SECTION_ID);
       };
 
-      const retomarOuIrParaGuia = async () => {
-        // Compra/Jornada nova: comportamento original.
-        if (!isResume) {
-          irParaGuia();
-          return;
-        }
+      try {
+        const src = getTransitionSrc(
+          root,
+          btnNext
+        );
 
-        // Retomada: o servidor é a autoridade.
-        try {
-          if (
-            window.JORNADA_SESSION &&
-            typeof window.JORNADA_SESSION
-              .retomar === 'function'
-          ) {
-            const retomada =
-              await window.JORNADA_SESSION.retomar({
-                email,
-                codigo_jornada: codigoJornada
-              });
-
-            const destino =
-              retomada?.last_section ||
-              retomada?.resume_section ||
-              retomada?.section ||
-              null;
-
-            if (destino && destino !== SECTION_ID) {
-              console.log(
-                '[JCSenha][RETOMADA] checkpoint remoto:',
-                destino,
-                retomada?.last_block,
-                retomada?.last_question
-              );
-
-              window.JC?.show?.(destino);
-              return;
-            }
-          }
-        } catch (resumeErr) {
-          console.warn(
-            '[JCSenha][RETOMADA] falha ao consultar checkpoint; usando fluxo seguro:',
-            resumeErr
+        if (
+          typeof window.playTransitionVideo ===
+            'function' &&
+          src
+        ) {
+          window.playTransitionVideo(
+            src,
+            NEXT_SECTION_ID
           );
+        } else {
+          irParaGuia();
         }
+      } catch (videoErr) {
+        console.warn(
+          '[JCSenha] falha no filme de transição:',
+          videoErr
+        );
 
-        // Nunca deixa o participante preso na Senha.
         irParaGuia();
-      };
-
-      if (isResume) {
-        // Em retomada não toca filme para Guia antes de descobrir
-        // qual é a seção real salva no servidor.
-        await retomarOuIrParaGuia();
-      } else {
-        try {
-          const src = getTransitionSrc(
-            root,
-            btnNext
-          );
-
-          if (
-            typeof window.playTransitionVideo ===
-              'function' &&
-            src
-          ) {
-            window.playTransitionVideo(
-              src,
-              NEXT_SECTION_ID
-            );
-          } else {
-            irParaGuia();
-          }
-        } catch (videoErr) {
-          console.warn(
-            '[JCSenha] falha no filme de transição:',
-            videoErr
-          );
-
-          irParaGuia();
-        }
       }
 
     } catch (err) {
@@ -959,13 +901,11 @@ if (
         );
 
       } finally {
-        // O backend já controla elegibilidade/rate limit.
-        // O botão não deve aparentar travamento por 60 segundos.
         setTimeout(() => {
           btnEnviar2FA.removeAttribute(
             'disabled'
           );
-        }, 1200);
+        }, 60000);
       }
     }
   );
