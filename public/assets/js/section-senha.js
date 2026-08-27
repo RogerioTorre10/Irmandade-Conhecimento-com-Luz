@@ -682,10 +682,9 @@
         '1'
       );
 
-      if (window.JORNADA_SESSION) {
-        window.JORNADA_SESSION.reauthRequired = false;
-      }
-
+      // Não atribuir diretamente a reauthRequired:
+      // em JORNADA_SESSION essa propriedade é exposta apenas por getter.
+      // registrarAtivacao()/retomar() já limpam o estado internamente.
       if (startedAt) {
         localStorage.setItem(
           'jornada_started_at',
