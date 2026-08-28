@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>Painel da Irmandade — Jornada Essencial</title>
+<style>
+:root{--bg:#080b11;--p:#101722;--line:rgba(232,198,112,.20);--gold:#e8c670;--text:#f5f0e5;--muted:#a6afbd;--ok:#75d9a2;--warn:#edc86f;--bad:#f18484;--blue:#83baff}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 50% -10%,rgba(232,198,112,.08),transparent 33%),var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select{font:inherit}.hidden{display:none!important}.shell{width:min(1680px,calc(100% - 22px));margin:auto;padding:20px 0 42px}
+.card{background:linear-gradient(180deg,rgba(16,23,34,.98),rgba(10,15,23,.98));border:1px solid var(--line);border-radius:17px;box-shadow:0 14px 38px rgba(0,0,0,.30)}.login{max-width:620px;margin:11vh auto;padding:25px}.brand{display:flex;align-items:center;gap:13px}.seal{width:45px;height:45px;border:1px solid rgba(255,220,130,.35);border-radius:50%;display:grid;place-items:center;font-size:23px}.brand h1,.brand h2{margin:0}.sub{color:var(--muted);font-size:12px;margin-top:4px}.row{display:flex;gap:9px}.field{width:100%;background:#080d14;border:1px solid rgba(255,255,255,.10);color:var(--text);padding:11px 12px;border-radius:11px;outline:none}.field:focus{border-color:rgba(232,198,112,.50)}.btn{border:1px solid var(--line);background:#141c29;color:var(--text);padding:10px 14px;border-radius:11px;cursor:pointer}.btn.primary{background:linear-gradient(#e0bc61,#ad8736);color:#171108;font-weight:800}.btn.danger{color:#ffaaaa;border-color:rgba(241,132,132,.3)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:15px}.actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.live{font-size:12px;color:var(--muted)}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:6px}.dot.off{background:var(--bad)}
+.metrics{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-bottom:10px}.metric{padding:14px;min-height:96px}.metric .k{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}.metric .v{font-size:25px;font-weight:850;margin-top:10px}.metric .h{font-size:11px;color:var(--muted);margin-top:4px}.metrics.secondary{grid-template-columns:repeat(6,minmax(0,1fr));margin-bottom:13px}
+.tabs{display:flex;gap:7px;margin:12px 0;flex-wrap:wrap}.tab{border:1px solid var(--line);background:#0e1520;color:var(--muted);padding:9px 14px;border-radius:999px;cursor:pointer}.tab.active{background:rgba(232,198,112,.12);color:var(--gold);border-color:rgba(232,198,112,.38)}
+.toolbar{padding:11px;display:grid;grid-template-columns:minmax(220px,1.5fr) repeat(3,minmax(130px,.45fr)) auto;gap:9px;margin-bottom:12px}.table-card{overflow:hidden}.table-head{display:flex;justify-content:space-between;padding:14px 15px;border-bottom:1px solid var(--line)}.table-head span{font-size:11px;color:var(--muted)}.wrap{overflow:auto;max-height:68vh}table{width:100%;border-collapse:collapse;min-width:1700px}th{position:sticky;top:0;z-index:2;background:#111925;text-align:left;padding:10px;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#ccd2dc;border-bottom:1px solid rgba(255,255,255,.08)}td{padding:10px;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px;vertical-align:middle}tbody tr:hover{background:rgba(232,198,112,.035)}.mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}.badge{display:inline-flex;padding:4px 8px;border-radius:999px;font-size:10px;font-weight:800;border:1px solid rgba(255,255,255,.10)}.ok{color:#94e4b5}.bad{color:#ffaaaa}.warn{color:#f2d38e}.blue{color:#9fcaff}.neutral{color:#bec6d2}.gold{color:#f3d487}.empty{padding:36px;text-align:center;color:var(--muted)}.foot{font-size:11px;color:var(--muted);text-align:right;margin-top:10px}.status{min-height:20px;margin-top:10px;font-size:12px}.status.error{color:#ff9d9d}
+@media(max-width:1200px){.metrics,.metrics.secondary{grid-template-columns:repeat(3,1fr)}}@media(max-width:760px){.top{flex-direction:column;align-items:flex-start}.metrics,.metrics.secondary{grid-template-columns:repeat(2,1fr)}.toolbar{grid-template-columns:1fr 1fr}.toolbar .search{grid-column:1/-1}.row{flex-direction:column}}
+</style>
+</head>
+<body><main class="shell">
+<section id="login" class="card login">
+<div class="brand"><div class="seal">🕯️</div><div><h2>Painel da Irmandade</h2><div class="sub">Venda → Jornada → Guia → IA → custo → entrega</div></div></div>
+<p style="color:var(--muted);line-height:1.55">Digite a chave administrativa configurada no Backend API.</p>
+<div class="row"><input id="secret" class="field" type="password" placeholder="JORNADA_ADMIN_SECRET"><button id="entrar" class="btn primary">Entrar</button></div><div id="loginStatus" class="status"></div>
+</section>
+
+<section id="dash" class="hidden">
+<header class="top"><div class="brand"><div class="seal">🕯️</div><div><h1>Painel da Irmandade</h1><div class="sub">Jornada Essencial — centro de comando comercial e operacional</div></div></div><div class="actions"><span class="live"><i id="dot" class="dot"></i><span id="liveText">Conectado</span></span><button id="atualizar" class="btn">Atualizar</button><button id="sair" class="btn danger">Sair</button></div></header>
+
+<section class="metrics">
+<article class="card metric"><div class="k">Compras Hotmart</div><div id="mCompras" class="v">0</div><div class="h">recebidas</div></article>
+<article class="card metric"><div class="k">Aprovadas</div><div id="mAprovadas" class="v">0</div><div class="h">pagamento aprovado</div></article>
+<article class="card metric"><div class="k">Em andamento</div><div id="mAndamento" class="v">0</div><div class="h">jornadas ativas</div></article>
+<article class="card metric"><div class="k">Concluídas</div><div id="mConcluidas" class="v">0</div><div class="h">finalizadas</div></article>
+<article class="card metric"><div class="k">Expiradas</div><div id="mExpiradas" class="v">0</div><div class="h">prazo encerrado</div></article>
+<article class="card metric"><div class="k">Taxa conclusão</div><div id="mTaxa" class="v">0%</div><div class="h">sobre jornadas</div></article>
+</section>
+
+<section class="metrics secondary">
+<article class="card metric"><div class="k">Guia mais escolhido</div><div id="mGuia" class="v">—</div><div class="h">preferência</div></article>
+<article class="card metric"><div class="k">Idioma mais usado</div><div id="mIdioma" class="v">—</div><div class="h">idioma da Jornada</div></article>
+<article class="card metric"><div class="k">Tokens entrada</div><div id="mTin" class="v">0</div><div class="h">prompt/input</div></article>
+<article class="card metric"><div class="k">Tokens saída</div><div id="mTout" class="v">0</div><div class="h">completion/output</div></article>
+<article class="card metric"><div class="k">Custo IA total</div><div id="mCusto" class="v">—</div><div class="h">jornadas monitoradas</div></article>
+<article class="card metric"><div class="k">Custo médio</div><div id="mCustoMedio" class="v">—</div><div class="h">por Jornada com uso</div></article>
+</section>
+
+<nav class="tabs"><button class="tab active" data-tab="jornadas">Jornadas</button><button class="tab" data-tab="hotmart">Compras Hotmart</button></nav>
+
+<section class="card toolbar">
+<input id="busca" class="field search" type="search" placeholder="Buscar e-mail, código, pedido, cidade, guia...">
+<select id="status" class="field"><option value="">Todos status</option><option value="em_andamento">Em andamento</option><option value="concluida">Concluída</option><option value="expirada">Expirada</option><option value="aprovado">Aprovada</option></select>
+<select id="guia" class="field"><option value="">Todos os guias</option><option value="lumen">Lumen</option><option value="zion">Zion</option><option value="arian">Arian</option></select>
+<select id="idioma" class="field"><option value="">Todos idiomas</option><option value="pt-BR">pt-BR</option><option value="en-US">en-US</option><option value="es-ES">es-ES</option><option value="fr-FR">fr-FR</option><option value="de-DE">de-DE</option><option value="ja-JP">ja-JP</option><option value="zh-CN">zh-CN</option></select>
+<button id="limpar" class="btn">Limpar</button>
+</section>
+
+<section class="card table-card"><div class="table-head"><strong id="tableTitle">Jornadas</strong><span id="count">0 registros</span></div><div class="wrap">
+<table id="tableJornadas"><thead><tr>
+<th>Código</th><th>Participante</th><th>Status</th><th>Guia</th><th>Idioma</th><th>País</th><th>Estado</th><th>Cidade</th><th>Provider</th><th>Modelo</th><th>Entrada</th><th>Saída</th><th>Total</th><th>Custo IA</th><th>Bloco</th><th>Pergunta</th><th>Restante</th><th>Atividade</th>
+</tr></thead><tbody id="bodyJornadas"></tbody></table>
+<table id="tableHotmart" class="hidden"><thead><tr><th>Transação</th><th>Nome</th><th>E-mail</th><th>Status</th><th>Código</th><th>Produto</th><th>Aprovada em</th><th>E-mail acesso</th><th>Último evento</th></tr></thead><tbody id="bodyHotmart"></tbody></table>
+<div id="empty" class="empty hidden">Nenhum registro encontrado.</div>
+</div></section>
+<div class="foot">Atualização automática a cada 30 segundos · O painel não lê respostas, devolutivas ou conteúdo emocional.</div>
+</section></main>
+<script src="/assets/js/admin-dashboard.js"></script>
+</body></html>
