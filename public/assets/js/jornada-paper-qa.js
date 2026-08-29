@@ -436,16 +436,34 @@
   ];
 
   function makeQuestion(lang, i) {
-    return {
-      number: i + 1,
-      block: Math.floor(i / 10) + 1,
-      theme: THEMES[i],
-      map_axes: MAP_AXES[i].slice(),
-      id: IDS[i],
-      label: TEXTS[lang][i],
-      data_i18n: IDS[i]
-    };
-  }
+  const numeroReal = i + 1;
+
+  return {
+    // Número REAL da pergunta na Jornada original.
+    // No teste rápido, a 5ª pergunta exibida continua sendo a Q50.
+    number: numeroReal,
+
+    // Identificador explícito para o backend.
+    // Ex.: perguntaId = "q50_sintese_transformadora"
+    perguntaId: IDS[i],
+
+    // Número global explícito, útil para payloads que precisem
+    // diferenciar a posição do teste da posição real da Jornada.
+    globalNumber: numeroReal,
+
+    block: Math.floor(i / 10) + 1,
+    theme: THEMES[i],
+    map_axes: MAP_AXES[i].slice(),
+
+    id: IDS[i],
+    label: TEXTS[lang][i],
+    data_i18n: IDS[i],
+
+    // Marca semântica exclusiva da última pergunta.
+    isFinalQuestion: numeroReal === 50,
+    isTemporalSynthesis: numeroReal === 50
+  };
+}
 
   // ============================================================
   // TESTE RÁPIDO — 1 pergunta por bloco
