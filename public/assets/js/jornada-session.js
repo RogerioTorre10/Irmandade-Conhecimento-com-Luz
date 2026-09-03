@@ -1601,6 +1601,100 @@
   }
 
   // =====================================================
+  // iOS / SAFARI — FLUSH CIRÚRGICO DO CHECKPOINT
+  // =====================================================
+  // IMPORTANTE:
+  // - não altera o fluxo Android/Desktop;
+  // - não cria um segundo sistema de sessão;
+  // - apenas reforça o envio do snapshot já existente quando
+  //   o Safari vai para background/fecha a página;
+  // - o backend e os endpoints permanecem os mesmos.
+
+  const IS_IOS_SAFARI = (() => {
+    const ua = navigator.userAgent || '';
+    const platform = navigator.platform || '';
+    const touchMac =
+      platform === 'MacIntel' &&
+      Number(navigator.maxTouchPoints || 0) > 1;
+
+    const ios =
+      /iPad|iPhone|iPod/i.test(ua) ||
+      touchMac;
+
+    const webkit =
+      /WebKit/i.test(ua);
+
+    const otherIOSBrowser =
+      /CriOS|FxiOS|EdgiOS|OPiOS/i.test(ua);
+
+    return ios && webkit && !otherIOSBrowser;
+  })();
+
+  function flushIOSCheckpoint(reason = 'ios_background') {
+    if (!IS_IOS_SAFARI) return false;
+    if (!isAuthenticated()) return false;
+
+    const currentSection =
+      normalizeSection(
+        localStorage.getItem(STORAGE.LAST_SECTION)
+      );
+
+    if (isPublicSection(currentSection)) {
+      return false;
+    }
+
+    try {
+      const payload =
+        buildPayload({
+          reason,
+          device_hash:
+            localStorage.getItem(STORAGE.DEVICE) ||
+            undefined
+        });
+
+      if (!payload.email) {
+        return false;
+      }
+
+      // keepalive foi feito exatamente para requisições curtas que
+      // precisam sobreviver ao pagehide/background do navegador.
+      fetch(
+        `${API}/jornada/progresso/salvar`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload),
+          keepalive: true
+        }
+      ).catch((err) => {
+        // Não interfere na navegação nem no fluxo normal.
+        console.warn(
+          '[GUARDIÃO][iOS] flush keepalive não confirmado:',
+          err
+        );
+      });
+
+      console.log(
+        '[GUARDIÃO][iOS] checkpoint enviado:',
+        reason,
+        currentSection
+      );
+
+      return true;
+
+    } catch (err) {
+      console.warn(
+        '[GUARDIÃO][iOS] falha ao preparar checkpoint:',
+        err
+      );
+
+      return false;
+    }
+  }
+
+  // =====================================================
   // EVENTOS GLOBAIS
   // =====================================================
 
@@ -1645,6 +1739,15 @@
         'hidden'
       ) {
 
+        // Safari/iOS: força um flush keepalive mesmo quando o debounce
+        // anterior já marcou dirty=false. Android/Desktop não entram aqui.
+        if (IS_IOS_SAFARI) {
+          flushIOSCheckpoint(
+            'ios_visibilitychange'
+          );
+          return;
+        }
+
         if (
           state.dirty &&
           isAuthenticated()
@@ -1665,6 +1768,15 @@
   window.addEventListener(
     'pagehide',
     () => {
+
+      // Safari/iOS: não depende de Promise serial/debounce durante
+      // o encerramento da página. Android/Desktop preservam a lógica antiga.
+      if (IS_IOS_SAFARI) {
+        flushIOSCheckpoint(
+          'ios_pagehide'
+        );
+        return;
+      }
 
       if (
         state.dirty &&
