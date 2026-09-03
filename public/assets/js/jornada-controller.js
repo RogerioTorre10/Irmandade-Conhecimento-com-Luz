@@ -197,16 +197,27 @@
             sectionId?.startsWith('section-perguntas') ? 'question' :
             sectionId === 'section-final' ? 'final' : 'default');
         if (typeof window.typeAndSpeak === 'function') {
-          await window.typeAndSpeak(el, text, elementSpeed, { cursor: elementCursor, forceReplay: true, kind: voiceKind });
+          await window.typeAndSpeak(
+            el,
+            text,
+            elementSpeed,
+            {
+              cursor: elementCursor,
+              forceReplay: true,
+              kind: voiceKind
+            }
+          );
         } else if (typeof window.runTyping === 'function') {
-          await window.runTyping(el, text, () => {}, { speed: elementSpeed, cursor: elementCursor, forceReplay: true });
-        }
-        if (window.JORNADA_VOICE?.speakLive) {
-          await window.JORNADA_VOICE.speakLive(text, {
-            lang: document.documentElement.lang || window.i18n?.lang || 'pt-BR',
-            guide: document.body.dataset.guia || 'lumen',
-            kind: voiceKind
-          });
+          await window.runTyping(
+            el,
+            text,
+            () => {},
+            {
+              speed: elementSpeed,
+              cursor: elementCursor,
+              forceReplay: true
+            }
+          );
         }
         el.classList.remove('typing-active');
         el.classList.add('typing-done');
@@ -290,8 +301,73 @@
     });
   }
 
+  // ============================================================
+  // TRAVA DE NAVEGAÇÃO — impede bypass manual via JC.show()
+  // ============================================================
+
+  const SECOES_PUBLICAS_JORNADA = new Set([
+    'section-intro',
+    'section-termos1',
+    'section-termos2',
+    'section-senha'
+  ]);
+
+  function jornadaTemAcessoValidado() {
+    const authOk =
+      localStorage.getItem('jornada_auth_ok') === '1';
+  
+    const codigo =
+      localStorage.getItem('jornada_codigo') ||
+      sessionStorage.getItem('jornada.codigo_jornada') ||
+      '';
+  
+    const email =
+      localStorage.getItem('jornada_email') ||
+      sessionStorage.getItem('jornada.email') ||
+      '';
+  
+    const deadlineRaw =
+      localStorage.getItem('jornada_deadline_at') ||
+      '';
+  
+    if (!authOk || !codigo || !email || !deadlineRaw) {
+      return false;
+    }
+  
+    const deadlineNumerico = Number(deadlineRaw);
+  
+    const deadline =
+      Number.isFinite(deadlineNumerico) && deadlineNumerico > 0
+        ? deadlineNumerico
+        : Date.parse(deadlineRaw);
+  
+    if (!Number.isFinite(deadline) || deadline <= 0) {
+      return false;
+    }
+  
+    return Date.now() < deadline;
+  }
+  
   async function show(sectionId, opts) {
     const force = !!(opts && opts.force);
+    // Segurança: nenhuma seção privada pode ser aberta
+    // manualmente pelo console sem uma Jornada autenticada e válida.
+    if (
+      !SECOES_PUBLICAS_JORNADA.has(sectionId) &&
+      !jornadaTemAcessoValidado()
+    ) {
+      console.warn(
+        '[JC][SECURITY] Acesso bloqueado à seção privada:',
+        sectionId
+      );
+
+      window.toast?.(
+        'Valide seu acesso para continuar a Jornada.',
+        'warning'
+      );
+
+      sectionId = 'section-senha';
+    }
     if (window.JORNADA_SESSION?.reauthRequired && sectionId !== 'section-senha' && !force) {
       console.warn('[JC] Redirecionando para reautenticação.');
       sectionId = 'section-senha';
@@ -300,52 +376,30 @@
     if (sectionId === window.JC.currentSection && !force) { console.log('[JC.show] Já é a seção atual:', sectionId); return; }
     isTransitioning = true;
     console.log('[JC.show] Iniciando:', sectionId);
-
     try {
-    
-      // ============================================================
-      // ANTI-FLASH — congela visualmente a troca de seção
-      // ============================================================
       const jornadaWrapper = document.getElementById('jornada-content-wrapper');
-    
       if (jornadaWrapper) {
         jornadaWrapper.style.visibility = 'hidden';
         jornadaWrapper.style.opacity = '0';
       }
-    
       const cleanId = sectionId.replace(/^section-/, '');
-    
       let section = await window.carregarEtapa(cleanId);
-    
-      if (section && section.id !== sectionId) {
-        section.id = sectionId;
-      }
-    
+      if (section && section.id !== sectionId) { section.id = sectionId; }
       section = await waitForNode('#' + sectionId, 12000);
-    
-      if (!section) {
-        throw new Error(`Seção ${sectionId} não encontrada`);
-      }
-    
+      if (!section) { throw new Error(`Seção ${sectionId} não encontrada`); }
       await applyI18nToSection(sectionId, section);
       await prepareTyping(section);
-    
-      // ============================================================
-      // ANTI-FLASH — nova seção pronta para aparecer
-      // ============================================================
       if (jornadaWrapper) {
         await new Promise(resolve =>
           requestAnimationFrame(() =>
             requestAnimationFrame(resolve)
           )
         );
-    
+
         jornadaWrapper.style.visibility = 'visible';
         jornadaWrapper.style.opacity = '1';
       }
-
-  window.JC.currentSection = sectionId;
-  lastShownSection = sectionId;      window.JC.currentSection = sectionId;
+      window.JC.currentSection = sectionId;
       lastShownSection = sectionId;
       try {
   const authOk =
@@ -612,6 +666,34 @@ const dentro72h =
       await prepareTyping(node);
       await applyTypingAndTTS(sectionId, node, { forceReplay: true });
     }
+  });
+
+  // ============================================================
+  // RETOMADA APÓS REAUTENTICAÇÃO — Safari/iOS
+  // ============================================================
+  document.addEventListener('jornada:reauth-success', (e) => {
+    const resume =
+      e?.detail?.resume_section ||
+      e?.detail?.last_section ||
+      localStorage.getItem('jornada_last_section');
+
+    if (!resume || SECOES_IGNORADAS_RESTORE.includes(resume)) return;
+
+    try {
+      sessionStorage.setItem('JORNADA_RESTORE_MODE', '1');
+    } catch (_) {}
+
+    // A section-senha pode terminar seu próprio fluxo no mesmo tick.
+    // Um pequeno defer garante que o checkpoint remoto seja a última navegação.
+    setTimeout(async () => {
+      try {
+        console.log('[JC][REAUTH_RESUME] Retomando checkpoint remoto:', resume);
+        await show(resume, { force: true });
+        window.toast?.('✅ Jornada restaurada no ponto em que você parou.', 'success');
+      } catch (err) {
+        console.warn('[JC][REAUTH_RESUME] falha ao abrir checkpoint:', err);
+      }
+    }, 120);
   });
 
   window.JC = {
