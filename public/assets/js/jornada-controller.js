@@ -315,39 +315,34 @@
   function jornadaTemAcessoValidado() {
     const authOk =
       localStorage.getItem('jornada_auth_ok') === '1';
-  
+
     const codigo =
       localStorage.getItem('jornada_codigo') ||
       sessionStorage.getItem('jornada.codigo_jornada') ||
       '';
-  
+
     const email =
       localStorage.getItem('jornada_email') ||
       sessionStorage.getItem('jornada.email') ||
       '';
-  
+
     const deadlineRaw =
       localStorage.getItem('jornada_deadline_at') ||
       '';
-  
+
     if (!authOk || !codigo || !email || !deadlineRaw) {
       return false;
     }
-  
-    const deadlineNumerico = Number(deadlineRaw);
-  
-    const deadline =
-      Number.isFinite(deadlineNumerico) && deadlineNumerico > 0
-        ? deadlineNumerico
-        : Date.parse(deadlineRaw);
-  
+
+    const deadline = Number(deadlineRaw);
+
     if (!Number.isFinite(deadline) || deadline <= 0) {
       return false;
     }
-  
+
     return Date.now() < deadline;
   }
-  
+
   async function show(sectionId, opts) {
     const force = !!(opts && opts.force);
     // Segurança: nenhuma seção privada pode ser aberta
@@ -666,34 +661,6 @@ const dentro72h =
       await prepareTyping(node);
       await applyTypingAndTTS(sectionId, node, { forceReplay: true });
     }
-  });
-
-  // ============================================================
-  // RETOMADA APÓS REAUTENTICAÇÃO — Safari/iOS
-  // ============================================================
-  document.addEventListener('jornada:reauth-success', (e) => {
-    const resume =
-      e?.detail?.resume_section ||
-      e?.detail?.last_section ||
-      localStorage.getItem('jornada_last_section');
-
-    if (!resume || SECOES_IGNORADAS_RESTORE.includes(resume)) return;
-
-    try {
-      sessionStorage.setItem('JORNADA_RESTORE_MODE', '1');
-    } catch (_) {}
-
-    // A section-senha pode terminar seu próprio fluxo no mesmo tick.
-    // Um pequeno defer garante que o checkpoint remoto seja a última navegação.
-    setTimeout(async () => {
-      try {
-        console.log('[JC][REAUTH_RESUME] Retomando checkpoint remoto:', resume);
-        await show(resume, { force: true });
-        window.toast?.('✅ Jornada restaurada no ponto em que você parou.', 'success');
-      } catch (err) {
-        console.warn('[JC][REAUTH_RESUME] falha ao abrir checkpoint:', err);
-      }
-    }, 120);
   });
 
   window.JC = {
