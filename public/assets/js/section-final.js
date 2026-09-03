@@ -1053,7 +1053,7 @@ function buildFinalSynthesisPayload() {
   const txt = String(text || '').replace(/\s+/g, ' ').trim();
   if (!txt) return true;
   if (txt.length < minChars) return true;
-  const sentences = txt.split(/[.!?]+/).map(s => s.trim()).filter(Boolean);
+  const sentences = txt.split(/[.!?。！？]+/).map(s => s.trim()).filter(Boolean);
   if (sentences.length < minSentences) return true;
   return false;
 }
@@ -1133,12 +1133,22 @@ function buildGuideFallbackText(guiaRaw, nomeRaw) {
 
   const texto = String(
     data?.devolutivaFinal ||
+    data?.devolutiva_final ||
+    data?.devolutiva ||
+    data?.textoFinal ||
+    data?.texto_final ||
     data?.texto ||
     data?.text ||
     data?.message ||
     ''
   ).trim();
 
+  console.log('[FINAL][API][PARSE]', {
+    keys: Object.keys(data || {}),
+    chars: texto.length,
+    provider: data?.provider || data?.source || data?.guia || null
+  });
+  
   if (!texto) {
     throw new Error('Resposta vazia da devolutiva final');
   }
@@ -1250,7 +1260,7 @@ function removerFinalDuplicado(texto) {
 
   // Remove repetição exata das últimas 1 a 3 frases
   for (let qtd = 3; qtd >= 1; qtd--) {
-    const frases = txt.match(/[^.!?…]+[.!?…]+/g) || [];
+    const frases = txt.match(/[^.!?…。！？]+[.!?…。！？]+/g) || [];
     if (frases.length < qtd * 2) continue;
 
     const fim = frases.slice(-qtd).join(' ').replace(/\s+/g, ' ').trim();
