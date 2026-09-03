@@ -345,9 +345,17 @@
 
   async function show(sectionId, opts) {
     const force = !!(opts && opts.force);
-    // Segurança: nenhuma seção privada pode ser aberta
-    // manualmente pelo console sem uma Jornada autenticada e válida.
+  
+    // ============================================================
+    // HOMOLOG / DEVELOP
+    // JC.show() permanece livre para navegação manual de testes.
+    // A trava de segurança continua ativa somente no PRINCIPAL.
+    // ============================================================
+  
+    const IS_HOMOLOG = true;
+  
     if (
+      !IS_HOMOLOG &&
       !SECOES_PUBLICAS_JORNADA.has(sectionId) &&
       !jornadaTemAcessoValidado()
     ) {
@@ -355,13 +363,24 @@
         '[JC][SECURITY] Acesso bloqueado à seção privada:',
         sectionId
       );
-
+  
       window.toast?.(
         'Valide seu acesso para continuar a Jornada.',
         'warning'
       );
-
+  
       sectionId = 'section-senha';
+    }
+  
+    if (
+      IS_HOMOLOG &&
+      !SECOES_PUBLICAS_JORNADA.has(sectionId) &&
+      !jornadaTemAcessoValidado()
+    ) {
+      console.warn(
+        '[JC][HOMOLOG] Acesso direto de teste liberado:',
+        sectionId
+      );
     }
     if (window.JORNADA_SESSION?.reauthRequired && sectionId !== 'section-senha' && !force) {
       console.warn('[JC] Redirecionando para reautenticação.');
