@@ -853,8 +853,15 @@ if (
         'disabled',
         'true'
       );
-
+      
+      const textoOriginalEnviar =
+        btnEnviar2FA.textContent;
+      
+      btnEnviar2FA.textContent =
+        '⏳ Enviando...';
+      
       try {
+      
         const resp = await fetch(
           `${API_BASE}/hotmart/reenviar-codigo`,
           {
@@ -867,44 +874,41 @@ if (
             })
           }
         );
-
+      
         let data = {};
-
+      
         try {
           data = await resp.json();
         } catch {
           data = {};
         }
-
+      
         window.toast?.(
           data?.message ||
-          tSenha(
-            'sendNeutralMessage',
-            'Se houver uma compra aprovada para este e-mail, enviaremos a senha.'
-          ),
+          'Se houver uma compra aprovada para este e-mail, enviaremos a senha.',
           resp.ok ? 'success' : 'info'
         );
-
+      
       } catch (err) {
+      
         console.error(
           '[JCSenha] falha ao enviar senha:',
           err
         );
-
+      
         window.toast?.(
-          tSenha(
-            'sendError',
-            'Não foi possível solicitar o envio neste momento.'
-          ),
+          'Não foi possível solicitar o envio neste momento.',
           'error'
         );
-
+      
       } finally {
-        setTimeout(() => {
-          btnEnviar2FA.removeAttribute(
-            'disabled'
-          );
-        }, 60000);
+      
+        btnEnviar2FA.removeAttribute(
+          'disabled'
+        );
+      
+        btnEnviar2FA.textContent =
+          textoOriginalEnviar;
       }
     }
   );
