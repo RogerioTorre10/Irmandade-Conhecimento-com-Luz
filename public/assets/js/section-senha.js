@@ -611,6 +611,16 @@
     btnNext.setAttribute('disabled', 'true');
 
     try {
+    
+      console.log(
+        '[JCSenha][AUTH] iniciando POST /auth/start',
+        {
+          email,
+          senha: senhaDigitada,
+          api: `${API_BASE}/auth/start`
+        }
+      );
+    
       const resp = await fetch(
         `${API_BASE}/auth/start`,
         {
@@ -628,7 +638,15 @@
           })
         }
       );
-
+    
+      console.log(
+        '[JCSenha][AUTH] fetch respondeu',
+        {
+          status: resp.status,
+          ok: resp.ok
+        }
+      );
+    
       let data = {};
 
       try {
