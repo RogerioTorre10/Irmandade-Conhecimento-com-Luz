@@ -676,15 +676,16 @@
         'jornada_email',
         email
       );
-      
+
       localStorage.setItem(
         'jornada_auth_ok',
         '1'
       );
 
-      // Não atribuir diretamente a reauthRequired:
-      // em JORNADA_SESSION essa propriedade é exposta apenas por getter.
-      // registrarAtivacao()/retomar() já limpam o estado internamente.
+      if (window.JORNADA_SESSION) {
+        window.JORNADA_SESSION.reauthRequired = false;
+      }
+
       if (startedAt) {
         localStorage.setItem(
           'jornada_started_at',
@@ -853,15 +854,8 @@ if (
         'disabled',
         'true'
       );
-      
-      const textoOriginalEnviar =
-        btnEnviar2FA.textContent;
-      
-      btnEnviar2FA.textContent =
-        '⏳ Enviando...';
-      
+
       try {
-      
         const resp = await fetch(
           `${API_BASE}/hotmart/reenviar-codigo`,
           {
@@ -874,41 +868,44 @@ if (
             })
           }
         );
-      
+
         let data = {};
-      
+
         try {
           data = await resp.json();
         } catch {
           data = {};
         }
-      
+
         window.toast?.(
           data?.message ||
-          'Se houver uma compra aprovada para este e-mail, enviaremos a senha.',
+          tSenha(
+            'sendNeutralMessage',
+            'Se houver uma compra aprovada para este e-mail, enviaremos a senha.'
+          ),
           resp.ok ? 'success' : 'info'
         );
-      
+
       } catch (err) {
-      
         console.error(
           '[JCSenha] falha ao enviar senha:',
           err
         );
-      
+
         window.toast?.(
-          'Não foi possível solicitar o envio neste momento.',
+          tSenha(
+            'sendError',
+            'Não foi possível solicitar o envio neste momento.'
+          ),
           'error'
         );
-      
+
       } finally {
-      
-        btnEnviar2FA.removeAttribute(
-          'disabled'
-        );
-      
-        btnEnviar2FA.textContent =
-          textoOriginalEnviar;
+        setTimeout(() => {
+          btnEnviar2FA.removeAttribute(
+            'disabled'
+          );
+        }, 60000);
       }
     }
   );
