@@ -759,15 +759,59 @@
         );
 
         if (
-          typeof window.playTransitionVideo ===
-            'function' &&
+          typeof window.playTransitionVideo === 'function' &&
           src
         ) {
-          window.playTransitionVideo(
-            src,
+        
+          console.log(
+            '[JCSenha] iniciando transição para:',
             NEXT_SECTION_ID
           );
+        
+          // Segurança: se por qualquer motivo o vídeo não concluir
+          // a navegação, libera o Guia automaticamente.
+          const fallbackGuia = setTimeout(() => {
+        
+            const senhaAtual =
+              document.getElementById('section-senha');
+        
+            const aindaNaSenha =
+              senhaAtual &&
+              !senhaAtual.classList.contains('hidden');
+        
+            if (aindaNaSenha) {
+        
+              console.warn(
+                '[JCSenha] transição não concluiu; ' +
+                'abrindo section-guia por fallback.'
+              );
+        
+              irParaGuia();
+            }
+        
+          }, 12000);
+        
+          try {
+        
+            window.playTransitionVideo(
+              src,
+              NEXT_SECTION_ID
+            );
+        
+          } catch (videoErr) {
+        
+            clearTimeout(fallbackGuia);
+        
+            console.warn(
+              '[JCSenha] falha ao iniciar filme:',
+              videoErr
+            );
+        
+            irParaGuia();
+          }
+        
         } else {
+        
           irParaGuia();
         }
       } catch (videoErr) {
