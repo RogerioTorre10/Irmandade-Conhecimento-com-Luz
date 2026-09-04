@@ -346,31 +346,56 @@
   async function show(sectionId, opts) {
     const force = !!(opts && opts.force);
   
-    // ============================================================
-    // HOMOLOG / DEVELOP
-    // JC.show() permanece livre para navegação manual de testes.
-    // A trava de segurança continua ativa somente no PRINCIPAL.
-    // ============================================================
-  
-    const IS_HOMOLOG = true;
-  
-    if (
-      !IS_HOMOLOG &&
-      !SECOES_PUBLICAS_JORNADA.has(sectionId) &&
-      !jornadaTemAcessoValidado()
-    ) {
-      console.warn(
-        '[JC][SECURITY] Acesso bloqueado à seção privada:',
-        sectionId
-      );
-  
-      window.toast?.(
-        'Valide seu acesso para continuar a Jornada.',
-        'warning'
-      );
-  
-      sectionId = 'section-senha';
-    }
+    // ======================================================
+// HOMOLOG / DEVELOP
+// Libera navegação manual para testes.
+// PRINCIPAL continua protegido.
+// ======================================================
+
+const HOSTNAME = window.location.hostname.toLowerCase();
+
+const IS_HOMOLOG =
+  HOSTNAME === 'irmandade-conhecimento-com-luz-1.onrender.com' ||
+  HOSTNAME.includes('homolog');
+
+console.warn('[JC][AMBIENTE]', {
+  hostname: HOSTNAME,
+  IS_HOMOLOG
+});
+
+const secaoPrivada =
+  !SECOES_PUBLICAS_JORNADA.has(sectionId);
+
+const acessoValidado =
+  jornadaTemAcessoValidado();
+
+if (
+  secaoPrivada &&
+  !acessoValidado
+) {
+
+  if (IS_HOMOLOG) {
+
+    console.warn(
+      '[JC][HOMOLOG] Acesso direto de teste liberado:',
+      sectionId
+    );
+
+  } else {
+
+    console.warn(
+      '[JC][SECURITY] Acesso bloqueado à seção privada:',
+      sectionId
+    );
+
+    window.toast?.(
+      'Valide seu acesso para continuar a jornada.',
+      'warning'
+    );
+
+    sectionId = 'section-senha';
+  }
+}
   
     if (
       IS_HOMOLOG &&
