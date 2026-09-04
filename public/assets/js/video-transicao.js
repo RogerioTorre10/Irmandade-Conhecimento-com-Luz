@@ -156,7 +156,7 @@
     objectFit: 'cover',
     filter: 'blur(30px) brightness(0.78) saturate(1.28)',
     transform: 'scale(1.22)',
-    opacity: '1',
+    opacity: '0',
     zIndex: '1',
     pointerEvents: 'none'
   });
