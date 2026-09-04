@@ -393,11 +393,22 @@
         // Ambient é apenas decorativo. Tenta acompanhar sem interferir no
         // vídeo principal; qualquer falha dele é ignorada.
         try {
+          // O ambient nunca pode aparecer antes de estar sincronizado
+          ambient.style.opacity = '0';
+        
           if (ambient.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
-            ambient.currentTime = video.currentTime;
-            ambient.play().catch(() => {});
+            ambient.currentTime = video.currentTime || 0;
+        
+            await ambient.play();
+        
+            // Só revela o blur depois que ambos já estão rodando juntos
+            ambient.currentTime = video.currentTime || 0;
+            ambient.style.opacity = '1';
           }
-        } catch (_) {}
+        } catch (_) {
+          // Se o ambient falhar, preserva o vídeo principal normalmente.
+          ambient.style.opacity = '0';
+        }
 
         log(
           'Vídeo principal iniciado REALMENTE.',
