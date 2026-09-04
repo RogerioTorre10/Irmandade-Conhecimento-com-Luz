@@ -1,4 +1,4 @@
-// /assets/js/video-transicao.js — PORTAL DOURADO + AMBIENT CANVAS SINCRONIZADO
+// /assets/js/video-transicao.js — PORTAL DOURADO + AMBIENT BLUR FULLSCREEN BLINDADO
 (function () {
   'use strict';
 
@@ -88,8 +88,13 @@
         }
       } catch (_) {}
 
-      // vt-ambient agora é canvas: não possui pause/src/load.
-      // A remoção abaixo é suficiente para liberar seu contexto visual.
+      try {
+        if (ambient) {
+          ambient.pause();
+          ambient.removeAttribute('src');
+          ambient.load();
+        }
+      } catch (_) {}
 
       try { video?.remove(); } catch (_) {}
       try { ambient?.remove(); } catch (_) {}
@@ -141,12 +146,15 @@
     transition: 'opacity 600ms ease'
   });
 
-  // Fundo ambiente derivado do MESMO frame do vídeo principal.
-  // Evita dois decodificadores independentes disputando buffer/sincronia.
-  const ambient = document.createElement('canvas');
+  const ambient = document.createElement('video');
   ambient.id = 'vt-ambient';
   ambient.className = 'vt-video-ambient';
-  ambient.setAttribute('aria-hidden', 'true');
+  ambient.playsInline = true;
+  ambient.autoplay = false;
+  ambient.controls = false;
+  ambient.muted = true;
+  ambient.loop = true;
+  ambient.preload = 'auto';
 
   Object.assign(ambient.style, {
     position: 'fixed',
@@ -156,7 +164,7 @@
     objectFit: 'cover',
     filter: 'blur(30px) brightness(0.78) saturate(1.28)',
     transform: 'scale(1.22)',
-    opacity: '0',
+    opacity: '1',
     zIndex: '1',
     pointerEvents: 'none'
   });
@@ -275,6 +283,8 @@
     const finishAndGo = safeOnce(() => {
       window.removeEventListener('resize', onResize);
 
+      try { ambient.pause(); } catch (_) {}
+
       overlay.classList.remove('show');
       overlay.classList.add('hide');
       overlay.style.opacity = '0';
@@ -306,63 +316,6 @@
     let playbackSafetyTimer = null;
     let loadSafetyTimer = null;
 
-    // ============================================================
-    // AMBIENT CANVAS — copia exatamente o frame do vídeo principal
-    // ============================================================
-    const ambientCtx = ambient.getContext('2d', { alpha: false });
-    let ambientRAF = 0;
-    let ambientRVFC = 0;
-
-    const paintAmbientFrame = () => {
-      if (!ambientCtx || !document.body.contains(video) || !document.body.contains(ambient)) return;
-      if (!video.videoWidth || !video.videoHeight || video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) return;
-
-      const vw = video.videoWidth;
-      const vh = video.videoHeight;
-
-      if (ambient.width !== vw || ambient.height !== vh) {
-        ambient.width = vw;
-        ambient.height = vh;
-      }
-
-      try {
-        ambientCtx.drawImage(video, 0, 0, vw, vh);
-      } catch (_) {}
-    };
-
-    const stopAmbientMirror = () => {
-      if (ambientRAF) {
-        cancelAnimationFrame(ambientRAF);
-        ambientRAF = 0;
-      }
-      if (ambientRVFC && typeof video.cancelVideoFrameCallback === 'function') {
-        try { video.cancelVideoFrameCallback(ambientRVFC); } catch (_) {}
-        ambientRVFC = 0;
-      }
-    };
-
-    const startAmbientMirror = () => {
-      stopAmbientMirror();
-      paintAmbientFrame();
-
-      if (typeof video.requestVideoFrameCallback === 'function') {
-        const onVideoFrame = () => {
-          if (!isPlaying || !document.body.contains(video)) return;
-          paintAmbientFrame();
-          ambientRVFC = video.requestVideoFrameCallback(onVideoFrame);
-        };
-        ambientRVFC = video.requestVideoFrameCallback(onVideoFrame);
-        return;
-      }
-
-      const loop = () => {
-        if (!isPlaying || !document.body.contains(video)) return;
-        paintAmbientFrame();
-        ambientRAF = requestAnimationFrame(loop);
-      };
-      ambientRAF = requestAnimationFrame(loop);
-    };
-
     const clearTransitionTimers = () => {
       if (playbackSafetyTimer) {
         clearTimeout(playbackSafetyTimer);
@@ -376,7 +329,6 @@
 
     const finishSafely = () => {
       clearTransitionTimers();
-      stopAmbientMirror();
       finishAndGo();
     };
 
@@ -438,9 +390,14 @@
         clearTimeout(loadSafetyTimer);
         loadSafetyTimer = null;
 
-        // O fundo desfocado nasce do MESMO frame do vídeo principal.
-        // Não existe mais segundo vídeo, segundo buffer ou segundo relógio.
-        startAmbientMirror();
+        // Ambient é apenas decorativo. Tenta acompanhar sem interferir no
+        // vídeo principal; qualquer falha dele é ignorada.
+        try {
+          if (ambient.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+            ambient.currentTime = video.currentTime;
+            ambient.play().catch(() => {});
+          }
+        } catch (_) {}
 
         log(
           'Vídeo principal iniciado REALMENTE.',
@@ -460,7 +417,6 @@
     // loadeddata garante que já existe um frame real disponível.
     const onLoadedData = () => {
       try { fitFrameToVideo(frame, video); } catch (_) {}
-      paintAmbientFrame();
       tryPlayBoth();
     };
 
@@ -510,11 +466,15 @@
     video.addEventListener('ended', onEnded, { once: true });
     video.addEventListener('error', onError, { once: true });
 
-    // Cache-busting mantido. Apenas o vídeo principal carrega/decodifica o MP4.
+    // Cache-busting mantido, mas ambos recebem exatamente a mesma URL.
     const finalSrc = href + (href.includes('?') ? '&' : '?') + 't=' + Date.now();
 
     video.src = finalSrc;
+    ambient.src = finalSrc;
+
+    // Um único load por elemento.
     video.load();
+    ambient.load();
 
     // Fallback de CARREGAMENTO, não de duração. Ele não encerra a
     // transição aos 18 s nem reinicia currentTime enquanto um play() existe.
