@@ -749,6 +749,9 @@
       );
 
       const irParaGuia = () => {
+
+        console.log('[JCSenha] liberando acesso ao Guia.');
+        
         window.JC?.show?.(NEXT_SECTION_ID);
       };
 
