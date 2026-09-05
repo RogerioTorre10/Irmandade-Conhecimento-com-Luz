@@ -1031,16 +1031,25 @@
 
   function requestCriticalSave(extra = {}) {
     try {
-      window.JORNADA_SESSION?.atualizarEstado?.({
-        last_section: State.sectionId || document.querySelector('section[id^="section-perguntas-"]')?.id || localStorage.getItem('jornada_last_section') || '',
-        last_block: State.bloco?.id || localStorage.getItem('jornada_last_block') || '',
-        last_question: State.questionIndex || 0,
-        devolutiva_concluida: true,
-        critical: true,
-        ...extra,
-      }, { immediate: true, reason: extra.reason || 'devolutiva_salva' });
+      const atualizar = window.JORNADA_SESSION?.atualizarEstado;
+      if (typeof atualizar !== 'function') return Promise.resolve(null);
+
+      return Promise.resolve(
+        atualizar({
+          last_section: State.sectionId || document.querySelector('section[id^="section-perguntas-"]')?.id || localStorage.getItem('jornada_last_section') || '',
+          last_block: State.bloco?.id || localStorage.getItem('jornada_last_block') || '',
+          last_question: State.questionIndex || 0,
+          devolutiva_concluida: true,
+          critical: true,
+          ...extra,
+        }, { immediate: true, reason: extra.reason || 'devolutiva_salva' })
+      ).catch((err) => {
+        console.warn('[DEVOLUTIVA][SAVE][WARN]', err);
+        return null;
+      });
     } catch (err) {
       console.warn('[DEVOLUTIVA][SAVE][WARN]', err);
+      return Promise.resolve(null);
     }
   }
 
@@ -1856,6 +1865,16 @@ function getJornadaOperationalIdentity() {
       // ====================================================
       enterBlockFeedbackMode(section);
 
+      // Checkpoint explícito do subestado: se houver F5 enquanto a síntese
+      // ainda está sendo gerada, a retomada volta ao modo de devolutiva do bloco
+      // e reinicia somente esta síntese — nunca retorna à pergunta já consumida.
+      await requestCriticalSave({
+        last_question: getCurrentQuestionIndex(bloco),
+        estado_tela: 'devolutiva_bloco_gerando',
+        devolutiva_concluida: false,
+        reason: 'devolutiva_bloco_iniciada',
+      });
+
       const lead = getBlockClosingLead(bloco);
       if (lead) {
         await setGuideResponse(lead, 'info');
@@ -1895,7 +1914,18 @@ function getJornadaOperationalIdentity() {
         source: result?.source || 'desconhecida',
       });
 
-      setStoredBlockFeedbacks(outros);
+      // Primeiro grava localmente sem disparar um save paralelo.
+      setStoredBlockFeedbacks(outros, { silent: true });
+
+      // Depois aguarda o checkpoint remoto conter a devolutiva FINAL do bloco.
+      // Só então começamos TTS/datilografia. Assim, um F5 durante ou logo após
+      // a devolutiva não perde blockFinal/devolutivaFinal.
+      await requestCriticalSave({
+        last_question: getCurrentQuestionIndex(bloco),
+        estado_tela: 'devolutiva_bloco',
+        devolutiva_concluida: true,
+        reason: 'devolutiva_bloco_concluida',
+      });
 
       await setGuideResponse(
         textoFinal,
@@ -2464,8 +2494,29 @@ function bindButtons(section, bloco, perguntaText, qIndex = 0) {
     // === RETOMADA SERVER-FIRST / iOS =========================================
     // Durante uma restauração, conteúdo já consumido nunca volta a tocar TTS
     // nem refazer datilografia. O checkpoint remoto decide o próximo passo.
-    const restoreMode = sessionStorage.getItem('JORNADA_RESTORE_MODE') === '1';
+    const remoteLastSection = String(
+      sessionStorage.getItem('JORNADA_REMOTE_LAST_SECTION') || ''
+    ).trim();
+    const remoteLastBlock = String(
+      sessionStorage.getItem('JORNADA_REMOTE_LAST_BLOCK') || ''
+    ).trim();
+    const remoteEstadoTela = String(
+      sessionStorage.getItem('JORNADA_REMOTE_ESTADO_TELA') ||
+      sessionStorage.getItem('jornada.estadoTela') ||
+      ''
+    ).trim();
+
+    const explicitRestore = sessionStorage.getItem('JORNADA_RESTORE_MODE') === '1';
+    const remoteCheckpointMatches =
+      remoteLastSection === sectionId &&
+      (!remoteLastBlock || remoteLastBlock === String(bloco?.id || ''));
+
+    // Fallback importante contra corrida de inicialização: mesmo que outro render
+    // tenha consumido JORNADA_RESTORE_MODE, os marcadores remotos ainda provam
+    // que esta tela nasceu de uma retomada.
+    const restoreMode = explicitRestore || remoteCheckpointMatches;
     let skipQuestionTyping = false;
+    let restartBlockFeedback = false;
 
     try {
       const _prev =
@@ -2487,7 +2538,20 @@ function bindButtons(section, bloco, perguntaText, qIndex = 0) {
         return;
       }
 
-      if (restoreMode && _prev?.blockFinal && _blockFinalTxt && _isUltima) {
+      if (
+        restoreMode &&
+        _isUltima &&
+        remoteEstadoTela === 'devolutiva_bloco_gerando' &&
+        !_prev?.blockFinal
+      ) {
+        // F5 ocorreu enquanto a síntese estava em processamento.
+        // Mantém a UI no modo de devolutiva e refaz somente a síntese do bloco.
+        console.log('[RETOMADA][BLOCO] retomando síntese em processamento:', bloco?.id);
+        enterBlockFeedbackMode(section);
+        setContinueState(section, 'loading');
+        skipQuestionTyping = true;
+        restartBlockFeedback = true;
+      } else if (restoreMode && _prev?.blockFinal && _blockFinalTxt && _isUltima) {
         // Síntese já gerada, mas sem prova de que o clique final foi persistido.
         // Mostra instantaneamente (sem voz) e pede apenas um clique para seguir.
         enterBlockFeedbackMode(section);
@@ -2516,6 +2580,10 @@ function bindButtons(section, bloco, perguntaText, qIndex = 0) {
           // Chegamos ao primeiro conteúdo realmente pendente: volta ao fluxo normal.
           sessionStorage.removeItem('JORNADA_RESTORE_MODE');
           sessionStorage.removeItem('JORNADA_REMOTE_DEVOLUTIVA_CONCLUIDA');
+          sessionStorage.removeItem('JORNADA_REMOTE_LAST_SECTION');
+          sessionStorage.removeItem('JORNADA_REMOTE_LAST_BLOCK');
+          sessionStorage.removeItem('JORNADA_REMOTE_LAST_QUESTION');
+          sessionStorage.removeItem('JORNADA_REMOTE_ESTADO_TELA');
         }
       }
     } catch (err) {
@@ -2524,6 +2592,20 @@ function bindButtons(section, bloco, perguntaText, qIndex = 0) {
     }
     updateProgress(bloco);
     bindButtons(section, bloco, perguntaText, qIndex);
+
+    if (restartBlockFeedback) {
+      if (section.dataset.blockRestoreRunning !== '1') {
+        section.dataset.blockRestoreRunning = '1';
+        setTimeout(async () => {
+          try {
+            await maybeHandleBlockClosure(section, bloco);
+          } finally {
+            delete section.dataset.blockRestoreRunning;
+          }
+        }, 80);
+      }
+      return;
+    }
 
     if (questionEl && !skipQuestionTyping) {
       questionEl.textContent = '';
