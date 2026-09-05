@@ -546,9 +546,35 @@ const dentro72h =
         console.log('[JC][AUTO_RESTORE] Tentando retomar. Local:', secaoLocal);
 
         let secaoRemota = null;
+
         try {
-          const retomada = await window.JORNADA_SESSION?.retomar?.();
-          console.log('[JC][RETOMADA]', retomada);
+        
+          console.log(
+            '[JC][AUTO_RESTORE] Consultando checkpoint remoto...'
+          );
+        
+          const promiseRetomar =
+            window.JORNADA_SESSION?.retomar?.();
+        
+          const timeoutRetomar =
+            new Promise((_, reject) => {
+              setTimeout(() => {
+                reject(
+                  new Error('timeout_retomada_remota')
+                );
+              }, 5000);
+            });
+        
+          const retomada =
+            await Promise.race([
+              promiseRetomar,
+              timeoutRetomar
+            ]);
+        
+          console.log(
+            '[JC][RETOMADA]',
+            retomada
+          );
           if (retomada?.reason === 'reautenticacao_necessaria' || retomada?.reautenticacao_necessaria) {
             // Jornada em andamento porém sem dados novos salvos (página vazia
             // após a senha): NÃO devolver para a section-senha, pois ela recusa
@@ -572,11 +598,59 @@ const dentro72h =
             secaoRemota = retomada.last_section;
           }
         } catch (e) {
-          console.warn('[JC][AUTO_RESTORE][BACKEND_ERR]', e);
-          const fallback = window.JORNADA_SESSION?.getInitialSection?.();
-          if (fallback && fallback !== 'section-intro') {
-            console.log('[JC] Usando snapshot local:', fallback);
-            await show(fallback, { force: true });
+
+          console.warn(
+            '[JC][AUTO_RESTORE][BACKEND_ERR]',
+            e
+          );
+        
+          const localOk =
+            secaoLocal &&
+            !SECOES_IGNORADAS_RESTORE.includes(
+              secaoLocal
+            );
+        
+          if (localOk) {
+        
+            console.log(
+              '[JC][AUTO_RESTORE] ' +
+              'Backend não concluiu a retomada; ' +
+              'usando checkpoint local:',
+              secaoLocal
+            );
+        
+            window.toast?.(
+              '✅ Sua jornada foi restaurada. Bem-vindo(a) de volta! 🙏',
+              'success'
+            );
+        
+            await show(
+              secaoLocal,
+              { force: true }
+            );
+        
+            isInitializing = false;
+            return;
+          }
+        
+          const fallback =
+            window.JORNADA_SESSION?.getInitialSection?.();
+        
+          if (
+            fallback &&
+            fallback !== 'section-intro'
+          ) {
+        
+            console.log(
+              '[JC] Usando snapshot local:',
+              fallback
+            );
+        
+            await show(
+              fallback,
+              { force: true }
+            );
+        
             isInitializing = false;
             return;
           }
