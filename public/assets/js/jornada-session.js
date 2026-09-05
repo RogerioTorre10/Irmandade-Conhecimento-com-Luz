@@ -494,6 +494,23 @@
 
     state.retryCount++;
 
+    if (state.retryCount > 5) {
+
+      console.warn(
+        '[GUARDIÃO] salvamento remoto indisponível. ' +
+        'Snapshot preservado localmente para nova tentativa posterior.'
+      );
+    
+      state.retryCount = 5;
+    
+      localStorage.setItem(
+        STORAGE.PENDING_SAVE,
+        '1'
+      );
+    
+      return;
+    }
+
     const delay =
       Math.min(
         30000,
