@@ -704,12 +704,5 @@ const dentro72h =
     setOrder,
     attachButtonEvents,
     handleSectionLogic
-  };
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init, { once: true });
-  } else {
-    init();
-  }
-
+  };  
 })();
