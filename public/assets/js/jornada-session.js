@@ -983,40 +983,31 @@
       );
     }
 
-    if (snapshot.started_at) {
-      localStorage.setItem(
-        STORAGE.STARTED_AT,
-        String(snapshot.started_at)
-      );
-    }
+    // =====================================================
+    // PRAZO NA RETOMADA
+    // dados oficiais do servidor vencem o snapshot local.
+    // =====================================================
 
-    if (snapshot.deadline_at) {
-      localStorage.setItem(
-        STORAGE.DEADLINE_AT,
-        String(snapshot.deadline_at)
-      );
-    }
+    const officialStartedAt =
+      data.started_at ||
+      snapshot.started_at ||
+      null;
 
-    if (data.started_at) {
-      localStorage.setItem(
-        STORAGE.STARTED_AT,
-        String(data.started_at)
-      );
-    }
+    const officialDeadlineAt =
+      data.expires_at ||
+      data.deadline_at ||
+      snapshot.deadline_at ||
+      null;
 
-    if (data.deadline_at) {
-      localStorage.setItem(
-        STORAGE.DEADLINE_AT,
-        String(data.deadline_at)
-      );
-    }
+    persistOfficialStartedAt(
+      officialStartedAt,
+      'retomada.server'
+    );
 
-    if (data.expires_at) {
-      localStorage.setItem(
-        STORAGE.DEADLINE_AT,
-        String(data.expires_at)
-      );
-    }
+    persistOfficialDeadline(
+      officialDeadlineAt,
+      'retomada.server'
+    );
 
     state.lastRemoteSnapshot = data;
     state.restored = true;
