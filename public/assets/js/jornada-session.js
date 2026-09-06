@@ -1345,36 +1345,57 @@
       );
     }
 
-    const currentStartedAt =
-      localStorage.getItem(STORAGE.STARTED_AT);
+    // =====================================================
+    // PRAZO OFICIAL DA LICENÇA
+    // O servidor sempre vence o relógio local.
+    // =====================================================
 
-    const currentDeadlineAt =
-      localStorage.getItem(STORAGE.DEADLINE_AT);
-
-    const startedAt =
-      currentStartedAt ||
+    const serverStartedAt =
       payload.started_at ||
       payload.criado_em ||
       null;
 
-    const deadlineAt =
-      currentDeadlineAt ||
-      payload.deadline_at ||
+    const serverDeadlineAt =
       payload.expires_at ||
+      payload.deadline_at ||
       null;
 
-    if (startedAt) {
-      localStorage.setItem(
-        STORAGE.STARTED_AT,
-        String(startedAt)
-      );
+    if (
+      !persistOfficialStartedAt(
+        serverStartedAt,
+        'ativacao.server'
+      )
+    ) {
+      const currentStartedAt =
+        localStorage.getItem(
+          STORAGE.STARTED_AT
+        );
+
+      if (currentStartedAt) {
+        persistOfficialStartedAt(
+          currentStartedAt,
+          'ativacao.local-fallback'
+        );
+      }
     }
 
-    if (deadlineAt) {
-      localStorage.setItem(
-        STORAGE.DEADLINE_AT,
-        String(deadlineAt)
-      );
+    if (
+      !persistOfficialDeadline(
+        serverDeadlineAt,
+        'ativacao.server'
+      )
+    ) {
+      const currentDeadlineAt =
+        localStorage.getItem(
+          STORAGE.DEADLINE_AT
+        );
+
+      if (currentDeadlineAt) {
+        persistOfficialDeadline(
+          currentDeadlineAt,
+          'ativacao.local-fallback'
+        );
+      }
     }
 
     const section =
