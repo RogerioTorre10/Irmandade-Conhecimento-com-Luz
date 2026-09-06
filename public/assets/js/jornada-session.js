@@ -247,6 +247,100 @@
   }
 
   // =====================================================
+  // PRAZO OFICIAL — SERVIDOR É A AUTORIDADE
+  // =====================================================
+
+  function parseDeadlineMs(value) {
+    if (value == null || value === '') {
+      return null;
+    }
+
+    const numeric = Number(value);
+
+    if (
+      Number.isFinite(numeric) &&
+      numeric > 0
+    ) {
+      return numeric;
+    }
+
+    const parsed =
+      Date.parse(String(value));
+
+    return Number.isFinite(parsed)
+      ? parsed
+      : null;
+  }
+
+
+  function persistOfficialDeadline(
+    value,
+    source = 'server'
+  ) {
+    const incomingMs =
+      parseDeadlineMs(value);
+
+    if (incomingMs == null) {
+      return false;
+    }
+
+    localStorage.setItem(
+      STORAGE.DEADLINE_AT,
+      String(incomingMs)
+    );
+
+    console.log(
+      '[GUARDIÃO][PRAZO] deadline oficial aplicado:',
+      new Date(incomingMs).toISOString(),
+      'fonte=',
+      source
+    );
+
+    emit(
+      'jornada:deadline-updated',
+      {
+        deadline_at: incomingMs,
+        source
+      }
+    );
+
+    return true;
+  }
+
+  function persistOfficialStartedAt(
+    value,
+    source = 'server'
+  ) {
+    if (
+      value == null ||
+      value === ''
+    ) {
+      return false;
+    }
+
+    const parsed =
+      Date.parse(String(value));
+
+    if (!Number.isFinite(parsed)) {
+      return false;
+    }
+
+    localStorage.setItem(
+      STORAGE.STARTED_AT,
+      new Date(parsed).toISOString()
+    );
+
+    console.log(
+      '[GUARDIÃO][PRAZO] início oficial aplicado:',
+      new Date(parsed).toISOString(),
+      'fonte=',
+      source
+    );
+
+    return true;
+  }
+
+  // =====================================================
   // DEVICE HASH
   // =====================================================
 
