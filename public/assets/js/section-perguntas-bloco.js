@@ -1332,41 +1332,62 @@
   }
 
   // ─── Identidade operacional da Jornada ───────────────────────────────────────
-function getJornadaOperationalIdentity() {
-  try {
-    const progress = safeJson(
-      sessionStorage.getItem('JORNADA_PROGRESS'),
-      {}
-    ) || {};
-
-    const email = String(
-      progress.email ||
-      progress?.progresso_json_temp?.email ||
-      ''
-    ).trim().toLowerCase();
-
-    const codigo_jornada = String(
-      progress.codigo_jornada ||
-      progress.codigoJornada ||
-      ''
-    ).trim();
-
-    return {
-      email,
-      codigo_jornada,
-    };
-  } catch (e) {
-    console.warn(
-      '[JORNADA][IDENTIDADE] falha ao recuperar identidade operacional:',
-      e
-    );
-
-    return {
-      email: '',
-      codigo_jornada: '',
-    };
+  function getJornadaOperationalIdentity() {
+    try {
+      const progress = safeJson(
+        sessionStorage.getItem('JORNADA_PROGRESS'),
+        {}
+      ) || {};
+  
+      // =====================================================
+      // IDENTIDADE OPERACIONAL
+      // O Guardião/localStorage é a fonte principal.
+      // JORNADA_PROGRESS permanece como fallback.
+      // =====================================================
+  
+      const email = String(
+        localStorage.getItem('jornada_email') ||
+        sessionStorage.getItem('jornada.email') ||
+        progress.email ||
+        progress?.progresso_json_temp?.email ||
+        ''
+      ).trim().toLowerCase();
+  
+      const codigo_jornada = String(
+        localStorage.getItem('jornada_codigo') ||
+        progress.codigo_jornada ||
+        progress.codigoJornada ||
+        ''
+      ).trim();
+  
+      if (!email || !codigo_jornada) {
+        console.warn(
+          '[JORNADA][IDENTIDADE] identidade operacional incompleta:',
+          {
+            email_presente: Boolean(email),
+            codigo_jornada:
+              codigo_jornada || '(ausente)'
+          }
+        );
+      }
+  
+      return {
+        email,
+        codigo_jornada,
+      };
+  
+    } catch (e) {
+      console.warn(
+        '[JORNADA][IDENTIDADE] falha ao recuperar identidade operacional:',
+        e
+      );
+  
+      return {
+        email: '',
+        codigo_jornada: '',
+      };
+    }
   }
-}
 
   // ─── API / Devolutiva ────────────────────────────────────────────────────────
   async function requestGuideFeedbackWithFallback(params) {
