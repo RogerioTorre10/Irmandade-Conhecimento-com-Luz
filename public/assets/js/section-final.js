@@ -2072,7 +2072,7 @@ function removerFinalDuplicado(texto) {
     if (!btnBaixarSelfie.dataset.boundFinalSelfie) {
       btnBaixarSelfie.dataset.boundFinalSelfie = '1';
 
-      btnBaixarSelfie.addEventListener('click', (ev) => {
+      btnBaixarSelfie.addEventListener('click', async (ev) => {
         ev.preventDefault();
         ev.stopPropagation();
 
