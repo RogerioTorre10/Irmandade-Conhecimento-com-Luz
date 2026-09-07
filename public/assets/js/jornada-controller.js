@@ -29,7 +29,8 @@
     'section-intro',
     'section-termos1',
     'section-termos2',
-    'section-senha'
+    'section-senha',
+    'section-final'
   ];
 
   let lastShownSection = null;
