@@ -47,7 +47,29 @@
              data-i18n="senha.p3"
              data-i18n-text="senha.p3"
              data-text="A senha e o e-mail serão validados juntos para liberar sua Jornada.">
-          </p>
+          </p>          
+
+          <div class="senha-input-wrap senha-email-row on-pergaminho">
+            <input id="senha-email"
+                   class="input-espinhos input-email"
+                   type="email"
+                   placeholder="Digite seu e-mail..."
+                   autocomplete="email"
+                   data-i18n-placeholder="senha.emailPurchasePlaceholder"
+                   aria-label="Digite seu e-mail" />
+          </div>
+
+          <div class="senha-send-wrap">
+            <button id="btn-enviar-2fa"
+                   class="btn btn-stone senha-btn-wide"
+                   type="button"
+                   data-i18n="senha.sendPassword"
+                   data-i18n-text="senha.sendPassword"
+                   data-text="Enviar senha por e-mail"
+                   aria-label="Enviar senha para o e-mail da compra">
+                   ✉️ Enviar senha por e-mail
+            </button>
+          </div>
 
           <div class="senha-input-wrap senha-code-row on-pergaminho">
             <input id="senha-input"
@@ -70,28 +92,6 @@
                     type="button"
                     aria-label="Mostrar ou ocultar a senha">
               👁️
-            </button>
-          </div>
-
-          <div class="senha-input-wrap senha-email-row on-pergaminho">
-            <input id="senha-email"
-                   class="input-espinhos input-email"
-                   type="email"
-                   placeholder="Digite seu e-mail..."
-                   autocomplete="email"
-                   data-i18n-placeholder="senha.emailPurchasePlaceholder"
-                   aria-label="Digite seu e-mail" />
-          </div>
-
-          <div class="senha-send-wrap">
-            <button id="btn-enviar-2fa"
-                   class="btn btn-stone senha-btn-wide"
-                   type="button"
-                   data-i18n="senha.sendPassword"
-                   data-i18n-text="senha.sendPassword"
-                   data-text="Enviar senha por e-mail"
-                   aria-label="Enviar senha para o e-mail da compra">
-                   ✉️ Enviar senha por e-mail
             </button>
           </div>
 
