@@ -1473,25 +1473,44 @@ function removerFinalDuplicado(texto) {
         source: result?.raw?.source || result?.provider || 'api'
       });
 
-      box.textContent = '';
-
-      const textoParaVoz = normalizarReferenciasBiblicasParaVoz(texto);
-
-      // inicia a datilografia
-      const typingPromise = typeText(box, texto, 22, false);
-
-      // pequena vantagem visual para a aura aparecer
-      await sleep(350);
- 
-      // inicia a leitura enquanto digita
-      const speechPromise = queueSpeak(textoParaVoz);
-
-      // espera ambos terminarem
-      await Promise.all([
-      typingPromise,
-      speechPromise
-      ]);
+      const textoParaVoz =
+        normalizarReferenciasBiblicasParaVoz(texto);
       
+      // =====================================================
+      // EXIBIÇÃO BLINDADA DA DEVOLUTIVA FINAL
+      // =====================================================
+      // O texto aparece imediatamente.
+      // A animação/voz nunca pode apagar uma devolutiva válida.
+      box.textContent = texto;
+      
+      box.style.display = 'block';
+      box.style.visibility = 'visible';
+      box.style.opacity = '1';
+      
+      box.classList.remove('typing-active');
+      box.classList.add('typing-done');
+      
+      console.log(
+        '[FINAL][DEVOLUTIVA][VISIVEL]',
+        {
+          chars: texto.length,
+          preview: texto.slice(0, 80)
+        }
+      );
+      
+      // Voz é complementar. Não controla mais a exibição do texto.
+      try {
+        await Promise.race([
+          queueSpeak(textoParaVoz),
+          sleep(30000)
+        ]);
+      } catch (err) {
+        console.warn(
+          '[FINAL][TTS][NAO_BLOQUEANTE]',
+          err
+        );
+      }
+            
       setFinalReplayState(section, "ready");
 
       window.__GUIA_FINAL_EFETIVO__ =
