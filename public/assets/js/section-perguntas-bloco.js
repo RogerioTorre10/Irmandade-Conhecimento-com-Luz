@@ -2653,6 +2653,22 @@ function bindButtons(section, bloco, perguntaText, qIndex = 0) {
     setTimeout(() => renderBloco(section), 80);
   });
 
+  document.addEventListener('section:shown', function (ev) {
+      const section = getSectionFromEvent(ev.detail);
+      const id = getSectionId(section);
+  
+      if (!id || !id.startsWith('section-perguntas-')) return;
+  
+      console.log(
+          '[PERGUNTAS_BLOCO][SECTION_SHOWN] Reativando bloco:',
+          id
+      );
+  
+      setTimeout(() => {
+          renderBloco(section);
+      }, 80);
+  });
+
   document.addEventListener('DOMContentLoaded', function () {
     const section = getCurrentSection();
     const id = getSectionId(section);
