@@ -872,6 +872,65 @@
       );
     }
 
+    // =====================================================
+    // MARCADORES REMOTOS DE RETOMADA
+    // =====================================================
+    // Informa às sections que o estado foi reconstruído
+    // a partir do checkpoint oficial do servidor.
+    try {
+      sessionStorage.setItem(
+        'JORNADA_RESTORE_MODE',
+        '1'
+      );
+    
+      if (data.last_section) {
+        sessionStorage.setItem(
+          'JORNADA_REMOTE_LAST_SECTION',
+          normalizeSection(data.last_section)
+        );
+      }
+    
+      if (
+        data.last_block != null &&
+        data.last_block !== ''
+      ) {
+        const blocoRemoto = String(data.last_block);
+    
+        sessionStorage.setItem(
+          'JORNADA_REMOTE_LAST_BLOCK',
+          blocoRemoto
+        );
+    
+        // O checkpoint oficial do servidor também vence
+        // uma eventual posição antiga da pergunta no navegador.
+        if (data.last_question != null) {
+          const perguntaRemota =
+            toIntSafe(data.last_question);
+    
+          sessionStorage.setItem(
+            'JORNADA_REMOTE_LAST_QUESTION',
+            String(perguntaRemota)
+          );
+    
+          sessionStorage.setItem(
+            `jp:${blocoRemoto}:idx`,
+            String(perguntaRemota)
+          );
+    
+          localStorage.setItem(
+            `jp:${blocoRemoto}:idx`,
+            String(perguntaRemota)
+          );
+        }
+      }
+    
+    } catch (err) {
+      console.warn(
+        '[GUARDIÃO][RESTORE][MARCADORES]',
+        err
+      );
+    }
+
     const snapshot =
       data.progresso_json_temp || {};
 
