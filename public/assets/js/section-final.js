@@ -2087,28 +2087,92 @@ function removerFinalDuplicado(texto) {
         }
 
         try {
-          const dataUrl = String(img).trim().startsWith('data:image')
-            ? String(img).trim()
-            : ('data:image/jpeg;base64,' + String(img).trim().replace(/^base64,/, ''));
-
-          const a = document.createElement('a');
-          a.href = dataUrl;
-          a.download = (payload.nome ? payload.nome : 'selfiecard') + '-selfiecard.jpg';
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-
+          const raw = String(img).trim();
+        
+          const dataUrl = raw.startsWith('data:image')
+            ? raw
+            : ('data:image/png;base64,' + raw.replace(/^base64,/, ''));
+        
+          // Descobre o tipo real da imagem.
+          const mimeMatch = dataUrl.match(/^data:(image\/[^;]+);base64,/i);
+          const mimeType = mimeMatch?.[1] || 'image/png';
+        
+          const extensao =
+            mimeType.includes('jpeg') || mimeType.includes('jpg')
+              ? 'jpg'
+              : 'png';
+        
+          const nomeArquivo =
+            `${payload.nome || 'selfiecard'}-selfiecard.${extensao}`;
+        
+          // Converte DATA URL em Blob real.
+          const resposta = await fetch(dataUrl);
+          const blob = await resposta.blob();
+        
+          const arquivo = new File(
+            [blob],
+            nomeArquivo,
+            { type: mimeType }
+          );
+        
           const isIOS =
             /iPad|iPhone|iPod/.test(navigator.userAgent) ||
             (
               navigator.platform === 'MacIntel' &&
               navigator.maxTouchPoints > 1
             );
-          
+        
+          // ==========================================
+          // iPHONE / iPAD
+          // ==========================================
+          if (
+            isIOS &&
+            navigator.share &&
+            navigator.canShare?.({
+              files: [arquivo]
+            })
+          ) {
+            await navigator.share({
+              files: [arquivo],
+              title: 'SelfieCard — Jornada Essencial'
+            });
+        
+            setPdfStatus(
+              root,
+              '✅ SelfieCard preparada. Escolha “Salvar em Arquivos” para guardá-la.',
+              'ok'
+            );
+        
+            return;
+          }
+        
+          // ==========================================
+          // DOWNLOAD NORMAL — DESKTOP / ANDROID /
+          // FALLBACK PARA iOS
+          // ==========================================
+          const blobUrl =
+            URL.createObjectURL(blob);
+        
+          const a =
+            document.createElement('a');
+        
+          a.href = blobUrl;
+          a.download = nomeArquivo;
+        
+          document.body.appendChild(a);
+        
+          a.click();
+        
+          document.body.removeChild(a);
+        
+          setTimeout(() => {
+            URL.revokeObjectURL(blobUrl);
+          }, 15000);
+        
           if (isIOS) {
             setPdfStatus(
               root,
-              '📥 SelfieCard preparada. Toque em “Baixar” no aviso do Safari. Depois procure no app Arquivos > Downloads.',
+              '📥 Confirme o download no Safari.',
               'ok'
             );
           } else {
@@ -2121,12 +2185,35 @@ function removerFinalDuplicado(texto) {
               'ok'
             );
           }
+        
         } catch (e) {
-          console.error('[FINAL][SELFIE] erro:', e);
-          setPdfStatus(root, t('final.selfieDownloadError', '❌ Não consegui baixar a SelfieCard. Veja o console.'), 'err');
+        
+          // Cancelar a folha de compartilhamento do iPhone
+          // não deve ser tratado como erro da Jornada.
+          if (e?.name === 'AbortError') {
+            setPdfStatus(
+              root,
+              'SelfieCard pronta. Toque novamente para salvar.',
+              null
+            );
+        
+            return;
+          }
+        
+          console.error(
+            '[FINAL][SELFIE] erro:',
+            e
+          );
+        
+          setPdfStatus(
+            root,
+            t(
+              'final.selfieDownloadError',
+              '❌ Não consegui preparar a SelfieCard.'
+            ),
+            'err'
+          );
         }
-      });
-    }
 
     if (!btnPortal.dataset.boundFinalPortal) {
       btnPortal.dataset.boundFinalPortal = '1';
