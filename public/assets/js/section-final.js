@@ -1416,14 +1416,36 @@ function removerFinalDuplicado(texto) {
   if (!section) return null;
 
     let box = section.querySelector('#finalGuideFeedback');
+
     if (!box) {
       box = document.createElement('div');
       box.id = 'finalGuideFeedback';
       box.className = 'final-guide-feedback';
-
-      const status = section.querySelector('#finalPdfStatus');
-      if (status && status.parentNode) {
-        status.parentNode.insertBefore(box, status.nextSibling);
+    
+      const replayBtn =
+        section.querySelector('#btnOuvirFinal');
+    
+      const status =
+        section.querySelector('#finalPdfStatus');
+    
+      if (
+        replayBtn &&
+        replayBtn.parentNode
+      ) {
+        replayBtn.parentNode.insertBefore(
+          box,
+          replayBtn.nextSibling
+        );
+    
+      } else if (
+        status &&
+        status.parentNode
+      ) {
+        status.parentNode.insertBefore(
+          box,
+          status.nextSibling
+        );
+    
       } else {
         section.appendChild(box);
       }
