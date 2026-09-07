@@ -2352,29 +2352,38 @@ function removerFinalDuplicado(texto) {
   document.addEventListener('section:shown', (e) => {
     const id = e.detail?.sectionId || e.detail;
     if (id !== SECTION_ID) return;
-
-    console.log('[FINAL] section:shown recebido para section-final, iniciando sequência...');
-
+  
+    console.log(
+      '[FINAL] section:shown recebido para section-final, iniciando sequência...'
+    );
+  
     const sec = document.getElementById(SECTION_ID);
+  
     if (sec) {
       applyFinalGuideTheme(sec);
       sec.style.display = 'block';
       mountFinalPdfUI(sec);
-    
+  
       // Não libera botões antes da sequência final começar.
       lockFinalButtons(sec);
     }
-    
+  
     startFinalSequence();
-
+  }); // ← ESTE FECHAMENTO ESTÁ FALTANDO
+  
+  
   document.addEventListener('click', (e) => {
     const target = e.target;
     if (!target) return;
   
-    if (target.matches?.('[data-action="finalizar"], [data-action="voltar-portal"], #btnFinalizar, #btnVoltarPortal')) {
+    if (
+      target.matches?.(
+        '[data-action="finalizar"], [data-action="voltar-portal"], #btnFinalizar, #btnVoltarPortal'
+      )
+    ) {
       e.preventDefault();
       handleVoltarInicio();
     }
- });
-}   
-})();
+  });
+
+
