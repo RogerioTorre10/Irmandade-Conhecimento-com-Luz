@@ -1451,6 +1451,10 @@ function removerFinalDuplicado(texto) {
       }
     }
 
+    box.style.display = 'block';
+    box.style.visibility = 'visible';
+    box.style.opacity = '1';    
+
     lockFinalButtons(section);
 
     try {
