@@ -2151,38 +2151,35 @@ function removerFinalDuplicado(texto) {
   }
 
     if (botoes) {
-      // Mantém a área de ações visualmente estável durante
-      // a geração da devolutiva final.
+      // Área de ações permanece visualmente estável.
       botoes.classList.add('show');
-    
       botoes.style.opacity = '1';
       botoes.style.transform = 'scale(1)';
       botoes.style.transition = 'none';
-    
-      // Os botões continuam visíveis, mas o bloqueio funcional
-      // é controlado por lockFinalButtons().
       botoes.style.pointerEvents = 'auto';
     }
 
     mountFinalPdfUI(section);
     mountFinalReplayButton(section);
-    unlockPortalButton(section);
+    
+    // Mantém todos os controles bloqueados enquanto
+    // a devolutiva final ainda está sendo produzida.
     lockFinalButtons(section);
-
+    
     function mountFinalReplayButton(section) {
 
-  const btn = getFinalReplayButton(section);
-
-  if (!btn) return;
-
-  setFinalReplayState(section,"hidden");
-
-  if (btn.dataset.boundReplay === "1")
-      return;
-
-  btn.dataset.boundReplay = "1";
-
-  btn.onclick = async () => {
+    const btn = getFinalReplayButton(section);
+  
+    if (!btn) return;
+  
+    setFinalReplayState(section,"hidden");
+  
+    if (btn.dataset.boundReplay === "1")
+        return;
+  
+    btn.dataset.boundReplay = "1";
+  
+    btn.onclick = async () => {
 
       if (btn.dataset.busy === "1")
           return;
