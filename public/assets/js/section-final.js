@@ -1432,47 +1432,215 @@ function removerFinalDuplicado(texto) {
   }
 
   // ================================
+  // LIMPEZA DA JORNADA CONCLUÍDA
+  // ================================
+  function limparEstadoLocalJornadaConcluida() {
+    console.log('[FINAL][CLEANUP] Iniciando limpeza local da Jornada...');
+  
+    try {
+      // Chaves específicas conhecidas da Jornada.
+      const chavesExatas = [
+        'jornada_auth_ok',
+        'jornada_codigo',
+        'jornada_email',
+        'jornada_started_at',
+        'jornada_deadline_at',
+        'jornada_last_section',
+        'jornada_last_block',
+        'jornada_last_question',
+        'jornada_last_at',
+  
+        'JORNADA_PROGRESS',
+        'JORNADA_RESPOSTAS',
+        'JORNADA_STATE',
+        'JORNADA_STATE_CACHE',
+  
+        'JORNADA_DEVOLUTIVAS_BLOCO',
+        'jornada.blockFeedbacks',
+  
+        'JORNADA_DEVOLUTIVA_FINAL',
+  
+        'JORNADA_GUIA',
+        'JORNADA_GUIA_ID',
+        'JORNADA_GUIA_NOME',
+        'JORNADA_GUIA_ATIVO',
+        'JORNADA_GUIA_COLOR',
+  
+        'JORNADA_SELFIECARD',
+        'JORNADA_SELFIE_CARD',
+        'JORNADA_SELFIECARD_B64',
+        'SELFIE_CARD',
+  
+        '__SELFIECARD_DONE__',
+  
+        'JORNADA_RUN_ID',
+  
+        'jornada.codigo_jornada',
+        'jornada.email',
+        'jornada.guia',
+        'jornada.guiaSelecionado',
+        'jornada.estadoTela'
+      ];
+  
+      chavesExatas.forEach((key) => {
+        try {
+          localStorage.removeItem(key);
+        } catch {}
+  
+        try {
+          sessionStorage.removeItem(key);
+        } catch {}
+      });
+  
+      // Remove respostas individuais das perguntas.
+      for (let i = localStorage.length - 1; i >= 0; i--) {
+        const key = localStorage.key(i);
+  
+        if (
+          key &&
+          (
+            key.startsWith('jornada_resp_') ||
+            key.startsWith('jornada.pergunta.') ||
+            key.startsWith('JORNADA_REMOTE_')
+          )
+        ) {
+          localStorage.removeItem(key);
+        }
+      }
+  
+      for (let i = sessionStorage.length - 1; i >= 0; i--) {
+        const key = sessionStorage.key(i);
+  
+        if (
+          key &&
+          (
+            key.startsWith('jornada_resp_') ||
+            key.startsWith('jornada.pergunta.') ||
+            key.startsWith('JORNADA_REMOTE_')
+          )
+        ) {
+          sessionStorage.removeItem(key);
+        }
+      }
+  
+      // Limpa estados globais apenas desta execução.
+      try {
+        delete window.__JORNADA_DEVOLUTIVA_FINAL__;
+        delete window.__JORNADA_DEVOLUTIVAS__;
+        delete window.__FINAL_DEVOLUTIVA_RUNNING__;
+        delete window.__FINAL_DEVOLUTIVA_DONE__;
+        delete window.__GUIA_FINAL_EFETIVO__;
+        delete window.JORNADA_STATE;
+      } catch {}
+  
+      console.log(
+        '[FINAL][CLEANUP] Estado local da Jornada removido com sucesso.'
+      );
+  
+    } catch (err) {
+      console.warn(
+        '[FINAL][CLEANUP][WARN]',
+        err
+      );
+    }
+  }
+  
+  
+  // ================================
   // VOLTAR AO PORTAL
   // ================================
   function handleVoltarInicio() {
-  if (finalReturning) return;
-  finalReturning = true;
-
-  const src = FINAL_MOVIE;
-
-  const goPortal = () => {
-    window.location.href = HOME_URL;
-  };
-
-  if (typeof window.playBlockTransition === 'function') {
-    window.playBlockTransition(src, 'portal', {
-      useGoldBorder: true,
-      pulse: true,
-      ambientBlur: true,
-      onEnd: goPortal,
-      onEnded: goPortal,
-      nextSectionId: 'portal'
-    });
-
-    setTimeout(goPortal, 16000);
-    return;
+    if (finalReturning) return;
+  
+    finalReturning = true;
+  
+    const src = FINAL_MOVIE;
+  
+    let portalExecutado = false;
+  
+    const goPortal = async () => {
+      if (portalExecutado) return;
+      portalExecutado = true;
+  
+      console.log(
+        '[FINAL][PORTAL] Encerrando Jornada antes de sair...'
+      );
+  
+      // 1. Confirma conclusão no backend.
+      try {
+        if (
+          window.JORNADA_SESSION &&
+          typeof window.JORNADA_SESSION.finalizar === 'function'
+        ) {
+          await window.JORNADA_SESSION.finalizar({
+            jornada_concluida: true,
+            origem: 'voltar_portal'
+          });
+  
+          console.log(
+            '[FINAL][PORTAL] Jornada finalizada no backend.'
+          );
+        }
+      } catch (err) {
+        // A navegação não deve ficar presa caso a confirmação já tenha
+        // ocorrido anteriormente ou haja oscilação de conexão.
+        console.warn(
+          '[FINAL][PORTAL][FINALIZAR][WARN]',
+          err
+        );
+      }
+  
+      // 2. Somente depois da tentativa de finalização,
+      // limpa o estado local desta Jornada.
+      limparEstadoLocalJornadaConcluida();
+  
+      // 3. Sai definitivamente da Jornada.
+      window.location.replace(HOME_URL);
+    };
+  
+  
+    if (typeof window.playBlockTransition === 'function') {
+      window.playBlockTransition(
+        src,
+        'portal',
+        {
+          useGoldBorder: true,
+          pulse: true,
+          ambientBlur: true,
+  
+          onEnd: goPortal,
+          onEnded: goPortal,
+  
+          nextSectionId: 'portal'
+        }
+      );
+  
+      setTimeout(goPortal, 16000);
+      return;
+    }
+  
+  
+    if (typeof window.playVideo === 'function') {
+      window.playVideo(
+        src,
+        {
+          useGoldBorder: true,
+          pulse: true,
+          ambientBlur: true,
+  
+          onEnded: goPortal,
+          onEnd: goPortal
+        }
+      );
+  
+      setTimeout(goPortal, 16000);
+      return;
+    }
+  
+  
+    goPortal();
   }
-
-  if (typeof window.playVideo === 'function') {
-    window.playVideo(src, {
-      useGoldBorder: true,
-      pulse: true,
-      ambientBlur: true,
-      onEnded: goPortal,
-      onEnd: goPortal
-    });
-
-    setTimeout(goPortal, 16000);
-    return;
-  }
-
-  goPortal();
-}
+  
   // ================================
   // UI DE BOTÕES FINAL
   // ================================
