@@ -2214,6 +2214,10 @@ function removerFinalDuplicado(texto) {
             'err'
           );
         }
+      }); // ← FECHA O addEventListener DA SELFIECARD
+
+    } 
+        
 
     if (!btnPortal.dataset.boundFinalPortal) {
       btnPortal.dataset.boundFinalPortal = '1';
