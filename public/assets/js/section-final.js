@@ -2370,11 +2370,10 @@ function removerFinalDuplicado(texto) {
   document.addEventListener('click', (e) => {
     const target = e.target;
     if (!target) return;
-
+  }
     if (target.matches?.('[data-action="finalizar"], [data-action="voltar-portal"], #btnFinalizar, #btnVoltarPortal')) {
       e.preventDefault();
       handleVoltarInicio();
     }
-  }
  });
 })();
