@@ -2375,5 +2375,6 @@ function removerFinalDuplicado(texto) {
       e.preventDefault();
       handleVoltarInicio();
     }
-  });
+  }
+ });
 })();
