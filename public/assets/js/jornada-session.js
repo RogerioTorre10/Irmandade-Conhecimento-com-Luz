@@ -934,6 +934,56 @@
     const snapshot =
       data.progresso_json_temp || {};
 
+    // =====================================================
+    // SUBESTADO REMOTO DA TELA
+    // =====================================================
+    try {
+      const estadoTelaRemoto =
+        snapshot.estado_tela ??
+        '';
+    
+      if (estadoTelaRemoto) {
+        sessionStorage.setItem(
+          'JORNADA_REMOTE_ESTADO_TELA',
+          String(estadoTelaRemoto)
+        );
+    
+        sessionStorage.setItem(
+          'jornada.estadoTela',
+          String(estadoTelaRemoto)
+        );
+      }
+    
+      if (snapshot.devolutiva_concluida === true) {
+        sessionStorage.setItem(
+          'JORNADA_REMOTE_DEVOLUTIVA_CONCLUIDA',
+          '1'
+        );
+      } else {
+        sessionStorage.removeItem(
+          'JORNADA_REMOTE_DEVOLUTIVA_CONCLUIDA'
+        );
+      }
+    
+      console.log(
+        '[GUARDIÃO][RESTORE][CHECKPOINT]',
+        {
+          section: data.last_section,
+          bloco: data.last_block,
+          pergunta: data.last_question,
+          estado_tela: estadoTelaRemoto,
+          devolutiva_concluida:
+            snapshot.devolutiva_concluida === true
+        }
+      );
+    
+    } catch (err) {
+      console.warn(
+        '[GUARDIÃO][RESTORE][CHECKPOINT][WARN]',
+        err
+      );
+    }
+
     if (snapshot.respostas) {
       sessionStorage.setItem(
         'JORNADA_RESPOSTAS',
