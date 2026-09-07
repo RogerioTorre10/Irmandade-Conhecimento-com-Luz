@@ -986,14 +986,48 @@ function buildFinalSynthesisPayload() {
         utter.lang = picked.lang || utter.lang;
       }
 
-      utter.onend = () => resolve();
-      utter.onerror = () => resolve();
+      let finalizado = false;
 
-      try { window.speechSynthesis.cancel(); } catch {}
+      const finalizarTTS = () => {
+        if (finalizado) return;
+        finalizado = true;
+      
+        clearTimeout(ttsSafetyTimer);
+        resolve();
+      };
+      
+      utter.onend = finalizarTTS;
+      utter.onerror = finalizarTTS;
+      
+      // TRAVA DE SEGURANÇA:
+      // Safari/iOS às vezes não dispara onend nem onerror.
+      // A voz nunca poderá bloquear a Jornada.
+      const duracaoEstimada = Math.max(
+        6000,
+        Math.min(30000, clean.length * 75)
+      );
+      
+      const ttsSafetyTimer = setTimeout(() => {
+        console.warn(
+          '[FINAL][TTS][SAFETY] TTS não respondeu; liberando sequência.'
+        );
+      
+        try {
+          window.speechSynthesis.cancel();
+        } catch {}
+      
+        finalizarTTS();
+      }, duracaoEstimada);
+      
+      try {
+        window.speechSynthesis.cancel();
+      } catch {}
+      
       try {
         window.speechSynthesis.speak(utter);
-      } catch {
-        resolve();
+      } catch (err) {
+        console.warn('[FINAL][TTS] Falha ao iniciar voz:', err);
+        finalizarTTS();
       }
     }));
 
