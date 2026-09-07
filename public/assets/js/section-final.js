@@ -2385,5 +2385,4 @@ function removerFinalDuplicado(texto) {
       handleVoltarInicio();
     }
   });
-
-
+})(); 
