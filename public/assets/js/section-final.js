@@ -1108,59 +1108,147 @@ function buildGuideFallbackText(guiaRaw, nomeRaw) {
   // DEVOLUTIVA FINAL
   // ================================
   async function postFinalFeedback(body) {
-  const apiBase =
-    window.API?.PRIMARY ||
-    window.API_BASE ||
-    window.APP_CONFIG?.API_BASE ||
-    '/api';
-
-  const base = String(apiBase).replace(/\/$/, '');
-  const url = base.endsWith('/api')
-    ? `${base}/jornada/devolutiva-final`
-    : `${base}/api/jornada/devolutiva-final`;
-
-  const resp = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  });
-
-  const data = await resp.json().catch(() => ({}));
-
-  if (!resp.ok || data?.ok === false) {
-    throw new Error(data?.detail || data?.message || data?.error || `HTTP ${resp.status}`);
-  }
-
-  const texto = String(
-    data?.devolutivaFinal ||
-    data?.devolutiva_final ||
-    data?.devolutiva ||
-    data?.textoFinal ||
-    data?.texto_final ||
-    data?.texto ||
-    data?.text ||
-    data?.message ||
-    ''
-  ).trim();
-
-  console.log('[FINAL][API][PARSE]', {
-    keys: Object.keys(data || {}),
-    chars: texto.length,
-    provider: data?.provider || data?.source || data?.guia || null
-  });
+    const apiBase =
+      window.API?.PRIMARY ||
+      window.API_BASE ||
+      window.APP_CONFIG?.API_BASE ||
+      '/api';
   
-  if (!texto) {
-    throw new Error('Resposta vazia da devolutiva final');
+    const base = String(apiBase).replace(/\/$/, '');
+  
+    const url = base.endsWith('/api')
+      ? `${base}/jornada/devolutiva-final`
+      : `${base}/api/jornada/devolutiva-final`;
+  
+    // =====================================================
+    // TIMEOUT CIRÚRGICO DA DEVOLUTIVA FINAL
+    // =====================================================
+    const controller = new AbortController();
+  
+    const TIMEOUT_MS = 55000;
+  
+    const timeoutId = setTimeout(() => {
+      try {
+        controller.abort();
+      } catch (_) {}
+    }, TIMEOUT_MS);
+  
+    console.log(
+      '[FINAL][API][REQUEST]',
+      {
+        guia: body?.guia || null,
+        respostas: Array.isArray(body?.respostas)
+          ? body.respostas.length
+          : 0,
+        blocos: Array.isArray(body?.blocos)
+          ? body.blocos.length
+          : 0,
+        retry: !!body?.retry,
+        timeout_ms: TIMEOUT_MS
+      }
+    );
+  
+    try {
+      const resp = await fetch(url, {
+        method: 'POST',
+  
+        headers: {
+          'Content-Type': 'application/json'
+        },
+  
+        body: JSON.stringify(body),
+  
+        signal: controller.signal
+      });
+  
+      const data =
+        await resp.json().catch(() => ({}));
+  
+      if (!resp.ok || data?.ok === false) {
+        throw new Error(
+          data?.detail ||
+          data?.message ||
+          data?.error ||
+          `HTTP ${resp.status}`
+        );
+      }
+  
+      const texto = String(
+        data?.devolutivaFinal ||
+        data?.devolutiva_final ||
+        data?.devolutiva ||
+        data?.textoFinal ||
+        data?.texto_final ||
+        data?.texto ||
+        data?.text ||
+        data?.message ||
+        ''
+      ).trim();
+  
+      console.log(
+        '[FINAL][API][PARSE]',
+        {
+          keys: Object.keys(data || {}),
+          chars: texto.length,
+          provider:
+            data?.provider ||
+            data?.source ||
+            data?.guia ||
+            null
+        }
+      );
+  
+      if (!texto) {
+        throw new Error(
+          'Resposta vazia da devolutiva final'
+        );
+      }
+  
+      return {
+        texto,
+  
+        provider: String(
+          data?.provider ||
+          data?.source ||
+          data?.guia ||
+          ''
+        ).trim().toLowerCase(),
+  
+        guia: String(
+          data?.guia || ''
+        ).trim().toLowerCase(),
+  
+        fallbackUsed: Boolean(
+          data?.fallback ||
+          data?.fallbackUsed
+        ),
+  
+        raw: data
+      };
+  
+    } catch (err) {
+  
+      if (
+        err?.name === 'AbortError'
+      ) {
+        console.warn(
+          '[FINAL][API][TIMEOUT]',
+          `Provider ${body?.guia || 'desconhecido'} ultrapassou ${TIMEOUT_MS}ms`
+        );
+  
+        throw new Error(
+          `Timeout na devolutiva final do guia ${body?.guia || ''}`
+        );
+      }
+  
+      throw err;
+  
+    } finally {
+  
+      clearTimeout(timeoutId);
+  
+    }
   }
-
-  return {
-    texto,
-    provider: String(data?.provider || data?.source || data?.guia || '').trim().toLowerCase(),
-    guia: String(data?.guia || '').trim().toLowerCase(),
-    fallbackUsed: Boolean(data?.fallback || data?.fallbackUsed),
-    raw: data
-  };
-}
 
   function getGuiaFinal() {
     try {
