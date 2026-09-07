@@ -2098,7 +2098,29 @@ function removerFinalDuplicado(texto) {
           a.click();
           document.body.removeChild(a);
 
-          setPdfStatus(root, t('final.selfieDownloaded', '✅ SelfieCard baixado com sucesso!'), 'ok');
+          const isIOS =
+            /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+            (
+              navigator.platform === 'MacIntel' &&
+              navigator.maxTouchPoints > 1
+            );
+          
+          if (isIOS) {
+            setPdfStatus(
+              root,
+              '📥 SelfieCard preparada. Toque em “Baixar” no aviso do Safari. Depois procure no app Arquivos > Downloads.',
+              'ok'
+            );
+          } else {
+            setPdfStatus(
+              root,
+              t(
+                'final.selfieDownloaded',
+                '✅ SelfieCard baixada com sucesso!'
+              ),
+              'ok'
+            );
+          }
         } catch (e) {
           console.error('[FINAL][SELFIE] erro:', e);
           setPdfStatus(root, t('final.selfieDownloadError', '❌ Não consegui baixar a SelfieCard. Veja o console.'), 'err');
