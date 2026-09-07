@@ -2067,14 +2067,14 @@ function removerFinalDuplicado(texto) {
     'Fim da Jornada'
   ).trim();
 
-titleEl.dataset.original = tituloOriginal;
-titleEl.dataset.text = tituloOriginal;
-titleEl.textContent = tituloOriginal;
-titleEl.style.opacity = 1;
-titleEl.style.transform = 'translateY(0)';
-titleEl.setAttribute('data-typing', 'true');
-titleEl.setAttribute('data-no-i18n', 'true');
-titleEl.removeAttribute('data-i18n');
+  titleEl.dataset.original = tituloOriginal;
+  titleEl.dataset.text = tituloOriginal;
+  titleEl.textContent = tituloOriginal;
+  titleEl.style.opacity = 1;
+  titleEl.style.transform = 'translateY(0)';
+  titleEl.setAttribute('data-typing', 'true');
+  titleEl.setAttribute('data-no-i18n', 'true');
+  titleEl.removeAttribute('data-i18n');
 
   const ps = msgEl.querySelectorAll('p');
   ps.forEach((p) => {
@@ -2110,23 +2110,23 @@ titleEl.removeAttribute('data-i18n');
     await sleep(300);
   }
 
-  setFinalButtonsBusy(section, false);
-} catch (err) {
-  console.error('[FINAL] Erro na sequência inicial:', err);
-  setFinalButtonsBusy(section, false);
-}
+    setFinalButtonsBusy(section, false);
+  } catch (err) {
+    console.error('[FINAL] Erro na sequência inicial:', err);
+    setFinalButtonsBusy(section, false);
+  }
 
     if (botoes) {
-      botoes.style.opacity = '0';
-      botoes.style.transform = 'scale(0.9)';
-      botoes.style.transition = 'all 0.8s ease';
-      botoes.style.pointerEvents = 'none';
-
-      await sleep(400);
-
+      // Mantém a área de ações visualmente estável durante
+      // a geração da devolutiva final.
       botoes.classList.add('show');
+    
       botoes.style.opacity = '1';
       botoes.style.transform = 'scale(1)';
+      botoes.style.transition = 'none';
+    
+      // Os botões continuam visíveis, mas o bloqueio funcional
+      // é controlado por lockFinalButtons().
       botoes.style.pointerEvents = 'auto';
     }
 
