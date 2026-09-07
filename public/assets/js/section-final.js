@@ -2091,64 +2091,70 @@ function removerFinalDuplicado(texto) {
     });
 
    try {
-  section.style.display = 'block';
+    section.style.display = 'block';
+  
+    const tituloOriginal = t(
+      'final.title',
+      titleEl?.dataset?.text ||
+      titleEl?.dataset?.original ||
+      titleEl?.textContent?.trim() ||
+      'Fim da Jornada'
+    ).trim();
+  
+      titleEl.dataset.original = tituloOriginal;
+      titleEl.dataset.text = tituloOriginal;
+      titleEl.textContent = tituloOriginal;
+      titleEl.style.opacity = 1;
+      titleEl.style.transform = 'translateY(0)';
+      titleEl.setAttribute('data-typing', 'true');
+      titleEl.setAttribute('data-no-i18n', 'true');
+      titleEl.removeAttribute('data-i18n');
+  
+    const ps = msgEl.querySelectorAll('p');
+    ps.forEach((p) => {
+      const txt = resolveTextFromEl(p, '');
+      p.dataset.original = txt;
+      p.textContent = '';
+      p.style.opacity = 0;
+      p.style.transform = 'translateY(10px)';
+      p.classList.remove('revealed');
+    });
+  
+    section.classList.add('show');
+    await sleep(200);
+  
+      titleEl.style.transition = 'all 0.9s ease';
+      titleEl.style.opacity = 1;
+      titleEl.style.transform = 'translateY(0)';
+      titleEl.textContent = '';
+      await typeText(titleEl, tituloOriginal, 65, true);
+      await sleep(600);
 
-  const tituloOriginal = t(
-    'final.title',
-    titleEl?.dataset?.text ||
-    titleEl?.dataset?.original ||
-    titleEl?.textContent?.trim() ||
-    'Fim da Jornada'
-  ).trim();
-
-  titleEl.dataset.original = tituloOriginal;
-  titleEl.dataset.text = tituloOriginal;
-  titleEl.textContent = tituloOriginal;
-  titleEl.style.opacity = 1;
-  titleEl.style.transform = 'translateY(0)';
-  titleEl.setAttribute('data-typing', 'true');
-  titleEl.setAttribute('data-no-i18n', 'true');
-  titleEl.removeAttribute('data-i18n');
-
-  const ps = msgEl.querySelectorAll('p');
-  ps.forEach((p) => {
-    const txt = resolveTextFromEl(p, '');
-    p.dataset.original = txt;
-    p.textContent = '';
-    p.style.opacity = 0;
-    p.style.transform = 'translateY(10px)';
-    p.classList.remove('revealed');
-  });
-
-  section.classList.add('show');
-  await sleep(200);
-
-  titleEl.style.transition = 'all 0.9s ease';
-  titleEl.style.opacity = 1;
-  titleEl.style.transform = 'translateY(0)';
-  titleEl.textContent = '';
-  await typeText(titleEl, tituloOriginal, 65, true);
-  await sleep(600);
-
-  for (let i = 0; i < ps.length; i++) {
-    const p = ps[i];
-    const txt = p.dataset.original || '';
-    if (!txt) continue;
-
-    p.style.transition = 'all 0.8s ease';
-    p.style.opacity = 1;
-    p.style.transform = 'translateY(0)';
-
-    await typeText(p, txt, 55, true);
-    p.classList.add('revealed');
-    await sleep(300);
-  }
-
-    setFinalButtonsBusy(section, false);
-  } catch (err) {
-    console.error('[FINAL] Erro na sequência inicial:', err);
-    setFinalButtonsBusy(section, false);
-  }
+    for (let i = 0; i < ps.length; i++) {
+      const p = ps[i];
+      const txt = p.dataset.original || '';
+    
+      if (!txt) continue;
+    
+      p.style.transition = 'all 0.8s ease';
+      p.style.opacity = 1;
+      p.style.transform = 'translateY(0)';
+    
+      await typeText(p, txt, 55, true);
+    
+      p.classList.add('revealed');
+    
+      await sleep(300);
+    }
+    
+    } catch (err) {
+      console.error(
+        '[FINAL] Erro na sequência inicial:',
+        err
+      );
+    
+      setFinalButtonsBusy(section, false);
+    }
 
     if (botoes) {
       // Área de ações permanece visualmente estável.
@@ -2309,11 +2315,12 @@ function removerFinalDuplicado(texto) {
       applyFinalGuideTheme(sec);
       sec.style.display = 'block';
       mountFinalPdfUI(sec);
-      unlockPortalButton(sec);
+    
+      // Não libera botões antes da sequência final começar.
+      lockFinalButtons(sec);
     }
-
+    
     startFinalSequence();
-  });
 
   document.addEventListener('click', (e) => {
     const target = e.target;
