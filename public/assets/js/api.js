@@ -61,6 +61,135 @@
     setTimeout(() => URL.revokeObjectURL(url), 2000);
   }
 
+  // =====================================================
+  // CACHE LOCAL DO PDF FINAL — INDEXEDDB
+  // 1 geração por Jornada / redownload sem backend
+  // =====================================================
+  
+  const PDF_CACHE_DB = 'JORNADA_PDF_CACHE';
+  const PDF_CACHE_STORE = 'pdfs';
+  const PDF_CACHE_VERSION = 1;
+  
+  function openPdfCacheDB() {
+    return new Promise((resolve, reject) => {
+      if (!('indexedDB' in window)) {
+        reject(new Error('IndexedDB indisponível'));
+        return;
+      }
+  
+      const request = indexedDB.open(
+        PDF_CACHE_DB,
+        PDF_CACHE_VERSION
+      );
+  
+      request.onupgradeneeded = () => {
+        const db = request.result;
+  
+        if (!db.objectStoreNames.contains(PDF_CACHE_STORE)) {
+          db.createObjectStore(PDF_CACHE_STORE);
+        }
+      };
+  
+      request.onsuccess = () => resolve(request.result);
+  
+      request.onerror = () =>
+        reject(request.error || new Error('Falha ao abrir cache PDF'));
+    });
+  }
+  
+  
+  async function getCachedPdf(cacheKey) {
+    if (!cacheKey) return null;
+  
+    try {
+      const db = await openPdfCacheDB();
+  
+      return await new Promise((resolve, reject) => {
+        const tx = db.transaction(
+          PDF_CACHE_STORE,
+          'readonly'
+        );
+  
+        const store = tx.objectStore(PDF_CACHE_STORE);
+        const req = store.get(cacheKey);
+  
+        req.onsuccess = () => resolve(req.result || null);
+        req.onerror = () => reject(req.error);
+  
+        tx.oncomplete = () => db.close();
+      });
+  
+    } catch (err) {
+      console.warn('[PDF][CACHE][READ][WARN]', err);
+      return null;
+    }
+  }
+  
+  
+  async function saveCachedPdf(cacheKey, blob, filename) {
+    if (!cacheKey || !(blob instanceof Blob)) return false;
+  
+    try {
+      const db = await openPdfCacheDB();
+  
+      await new Promise((resolve, reject) => {
+        const tx = db.transaction(
+          PDF_CACHE_STORE,
+          'readwrite'
+        );
+  
+        const store = tx.objectStore(PDF_CACHE_STORE);
+  
+        store.put(
+          {
+            blob,
+            filename,
+            createdAt: Date.now()
+          },
+          cacheKey
+        );
+  
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+        tx.onabort = () => reject(tx.error);
+      });
+  
+      db.close();
+  
+      console.log(
+        '[PDF][CACHE][SAVE]',
+        cacheKey,
+        blob.size
+      );
+  
+      return true;
+  
+    } catch (err) {
+      console.warn('[PDF][CACHE][SAVE][WARN]', err);
+      return false;
+    }
+  }
+  
+  
+  async function clearPdfCache() {
+    try {
+      if (!('indexedDB' in window)) return;
+  
+      await new Promise((resolve) => {
+        const request = indexedDB.deleteDatabase(PDF_CACHE_DB);
+  
+        request.onsuccess = () => resolve();
+        request.onerror = () => resolve();
+        request.onblocked = () => resolve();
+      });
+  
+      console.log('[PDF][CACHE] removido.');
+  
+    } catch (err) {
+      console.warn('[PDF][CACHE][CLEAR][WARN]', err);
+    }
+  }
+
   function isPdf(res) {
     const ct = (res.headers.get('content-type') || '').toLowerCase();
     return ct.includes('application/pdf');
