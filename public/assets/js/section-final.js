@@ -1713,16 +1713,12 @@ function removerFinalDuplicado(texto) {
   }
   
   
-  // ================================
-  // VOLTAR AO PORTAL
-  // ================================
   function handleVoltarInicio() {
     if (finalReturning) return;
   
     finalReturning = true;
   
     const src = FINAL_MOVIE;
-  
     let portalExecutado = false;
   
     const goPortal = async () => {
@@ -1733,78 +1729,114 @@ function removerFinalDuplicado(texto) {
         '[FINAL][PORTAL] Encerrando Jornada antes de sair...'
       );
   
-      // 1. Confirma conclusão no backend.
+      // =====================================================
+      // FINALIZAÇÃO BLINDADA
+      // O backend nunca poderá prender o participante
+      // na section-final.
+      // =====================================================
       try {
         if (
           window.JORNADA_SESSION &&
           typeof window.JORNADA_SESSION.finalizar === 'function'
         ) {
-          await window.JORNADA_SESSION.finalizar({
-            jornada_concluida: true,
-            origem: 'voltar_portal'
-          });
+          await Promise.race([
+            window.JORNADA_SESSION.finalizar({
+              jornada_concluida: true,
+              origem: 'voltar_portal'
+            }),
+  
+            new Promise((resolve) =>
+              setTimeout(resolve, 5000)
+            )
+          ]);
   
           console.log(
-            '[FINAL][PORTAL] Jornada finalizada no backend.'
+            '[FINAL][PORTAL] Finalização concluída ou timeout liberado.'
           );
         }
       } catch (err) {
-        // A navegação não deve ficar presa caso a confirmação já tenha
-        // ocorrido anteriormente ou haja oscilação de conexão.
         console.warn(
           '[FINAL][PORTAL][FINALIZAR][WARN]',
           err
         );
       }
   
-      // 2. Somente depois da tentativa de finalização,
-      // limpa o estado local desta Jornada.
-      limparEstadoLocalJornadaConcluida();
+      // Limpa somente o estado da Jornada concluída.
+      try {
+        limparEstadoLocalJornadaConcluida();
+      } catch (err) {
+        console.warn(
+          '[FINAL][PORTAL][LIMPEZA][WARN]',
+          err
+        );
+      }
   
-      // 3. Sai definitivamente da Jornada.
+      // Sai definitivamente da Jornada.
       window.location.replace(HOME_URL);
     };
   
-  
+    // =====================================================
+    // TRANSIÇÃO FINAL
+    // =====================================================
     if (typeof window.playBlockTransition === 'function') {
-      window.playBlockTransition(
-        src,
-        'portal',
-        {
-          useGoldBorder: true,
-          pulse: true,
-          ambientBlur: true,
+      try {
+        window.playBlockTransition(
+          src,
+          null,
+          {
+            useGoldBorder: true,
+            pulse: true,
+            ambientBlur: true,
   
-          onEnd: goPortal,
-          onEnded: goPortal,
+            onEnd: goPortal,
+            onEnded: goPortal
   
-          nextSectionId: 'portal'
-        }
-      );
+            // IMPORTANTE:
+            // não existe nextSectionId aqui.
+            // Portal é página externa, não section da Jornada.
+          }
+        );
   
-      setTimeout(goPortal, 16000);
-      return;
+        // Segurança absoluta:
+        // mesmo que o evento do vídeo falhe, sai para o portal.
+        setTimeout(goPortal, 16000);
+  
+        return;
+      } catch (err) {
+        console.warn(
+          '[FINAL][PORTAL][VIDEO][WARN]',
+          err
+        );
+      }
     }
-  
   
     if (typeof window.playVideo === 'function') {
-      window.playVideo(
-        src,
-        {
-          useGoldBorder: true,
-          pulse: true,
-          ambientBlur: true,
+      try {
+        window.playVideo(
+          src,
+          {
+            useGoldBorder: true,
+            pulse: true,
+            ambientBlur: true,
   
-          onEnded: goPortal,
-          onEnd: goPortal
-        }
-      );
+            onEnded: goPortal,
+            onEnd: goPortal
+          }
+        );
   
-      setTimeout(goPortal, 16000);
-      return;
+        setTimeout(goPortal, 16000);
+  
+        return;
+      } catch (err) {
+        console.warn(
+          '[FINAL][PORTAL][VIDEO_FALLBACK][WARN]',
+          err
+        );
+      }
     }
   
-  
+    // Se nenhum player estiver disponível,
+    // vai diretamente ao Portal.
     goPortal();
   }
   
