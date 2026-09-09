@@ -817,8 +817,6 @@ if (resendInfoEl) {
   );
 }  
 
-// O botão central executa a mesma validação
-// do botão Confirmar/Entrar.
 if (
   btnEnviar2FA &&
   btnEnviar2FA.dataset.boundSend !== '1'
@@ -849,22 +847,60 @@ if (
         return;
       }
 
-      btnEnviar2FA.setAttribute(
-        'disabled',
-        'true'
-      );
+      // Impede clique duplo.
+      if (btnEnviar2FA.dataset.sending === '1') {
+        return;
+      }
+
+      btnEnviar2FA.dataset.sending = '1';
+      btnEnviar2FA.disabled = true;
+
+      const textoOriginalEnviar =
+        btnEnviar2FA.textContent;
+
+      btnEnviar2FA.textContent =
+        '⏳ Enviando...';
+
+      const controller =
+        new AbortController();
+
+      const timeoutId = setTimeout(() => {
+        try {
+          controller.abort();
+        } catch (_) {}
+      }, 20000);
 
       try {
+        console.log(
+          '[JCSenha][REENVIO][REQUEST]',
+          {
+            email,
+            url: `${API_BASE}/hotmart/reenviar-codigo`
+          }
+        );
+
         const resp = await fetch(
           `${API_BASE}/hotmart/reenviar-codigo`,
           {
             method: 'POST',
+
             headers: {
               'Content-Type': 'application/json'
             },
+
             body: JSON.stringify({
               email
-            })
+            }),
+
+            signal: controller.signal
+          }
+        );
+
+        console.log(
+          '[JCSenha][REENVIO][RESPONSE]',
+          {
+            status: resp.status,
+            ok: resp.ok
           }
         );
 
@@ -872,39 +908,68 @@ if (
 
         try {
           data = await resp.json();
-        } catch {
+        } catch (_) {
           data = {};
+        }
+
+        if (!resp.ok) {
+          throw new Error(
+            data?.detail ||
+            data?.message ||
+            `HTTP ${resp.status}`
+          );
         }
 
         window.toast?.(
           data?.message ||
           tSenha(
-            'sendNeutralMessage',
-            'Se houver uma compra aprovada para este e-mail, enviaremos a senha.'
+            'resendNeutralMessage',
+            'Solicitação recebida. Se esta compra estiver elegível, a senha será enviada ao e-mail informado.'
           ),
-          resp.ok ? 'success' : 'info'
+          'success'
+        );
+
+        setPdfStatus?.(
+          root,
+          '',
+          null
         );
 
       } catch (err) {
-        console.error(
-          '[JCSenha] falha ao enviar senha:',
-          err
-        );
 
-        window.toast?.(
-          tSenha(
-            'sendError',
-            'Não foi possível solicitar o envio neste momento.'
-          ),
-          'error'
-        );
+        if (err?.name === 'AbortError') {
+          console.warn(
+            '[JCSenha][REENVIO][TIMEOUT]'
+          );
+
+          window.toast?.(
+            'A solicitação demorou além do esperado. Aguarde alguns instantes antes de tentar novamente.',
+            'warning'
+          );
+
+        } else {
+          console.error(
+            '[JCSenha] falha ao enviar senha:',
+            err
+          );
+
+          window.toast?.(
+            tSenha(
+              'resendError',
+              'Não foi possível solicitar o envio neste momento.'
+            ),
+            'error'
+          );
+        }
 
       } finally {
-        setTimeout(() => {
-          btnEnviar2FA.removeAttribute(
-            'disabled'
-          );
-        }, 60000);
+        clearTimeout(timeoutId);
+
+        btnEnviar2FA.dataset.sending = '0';
+        btnEnviar2FA.disabled = false;
+
+        btnEnviar2FA.textContent =
+          textoOriginalEnviar;
       }
     }
   );
