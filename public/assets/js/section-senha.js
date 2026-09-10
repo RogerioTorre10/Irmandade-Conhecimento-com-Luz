@@ -940,7 +940,7 @@
           );
         
           // Segurança: se por qualquer motivo o vídeo não concluir
-          // a navegação, libera o Guia automaticamente.
+          // a navegação, libera o destino automaticamente.
           const fallbackGuia = setTimeout(() => {
         
             const senhaAtual =
@@ -954,7 +954,7 @@
         
               console.warn(
                 '[JCSenha] transição não concluiu; ' +
-                'abrindo section-guia por fallback.'
+                'abrindo destino por fallback.'
               );
         
               irParaDestino();
