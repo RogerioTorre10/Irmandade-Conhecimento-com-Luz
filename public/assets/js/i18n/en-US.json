@@ -98,6 +98,8 @@
   "resendError": "We couldn't request the code again at this time.",
   "validationError": "We couldn't validate your access.",
   "accessConfirmed": "Access confirmed.",
+  "journeyCompleted": "This Journey has already been completed and cannot be started again.",
+  "journeyExpired": "The access period for this Journey has expired.",
   "accessResumed": "Access confirmed. Resuming your Journey.",
   "sectionLoadError": "Error: the Access Section elements could not be loaded."
 },
