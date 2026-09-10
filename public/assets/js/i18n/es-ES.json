@@ -89,6 +89,8 @@
   "resendError": "No fue posible solicitar el reenvío en este momento.",
   "validationError": "No fue posible validar el acceso.",
   "accessConfirmed": "Acceso confirmado.",
+  "journeyCompleted": "Esta Jornada ya ha sido concluida y no puede iniciarse nuevamente.",
+  "journeyExpired": "El período de acceso a esta Jornada ha expirado.",
   "accessResumed": "Acceso confirmado. Reanudando su Jornada.",
   "sectionLoadError": "Error: no se pudieron cargar los elementos de la Sección de Acceso."
 },
