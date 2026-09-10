@@ -978,12 +978,12 @@
               videoErr
             );
         
-            irParaGuia();
+            irParaDestino();
           }
         
         } else {
         
-          irParaGuia();
+          irParaDestino();
         }
       } catch (videoErr) {
         console.warn(
@@ -991,7 +991,7 @@
           videoErr
         );
 
-        irParaGuia();
+        irParaDestino();
       }
 
     } catch (err) {
