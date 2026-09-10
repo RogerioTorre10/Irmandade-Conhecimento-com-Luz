@@ -89,6 +89,8 @@
   "resendError": "目前无法请求重新发送代码。",
   "validationError": "无法验证访问权限。",
   "accessConfirmed": "访问已确认。",
+  "journeyCompleted": "此旅程已完成，无法再次开始。",
+  "journeyExpired": "此旅程的访问期限已过期。",
   "accessResumed": "访问已确认。正在继续您的旅程。",
   "sectionLoadError": "错误：无法加载访问部分的元素。"
 },
