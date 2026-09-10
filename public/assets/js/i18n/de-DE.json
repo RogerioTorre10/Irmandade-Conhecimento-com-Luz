@@ -89,6 +89,8 @@
   "resendError": "Der erneute Versand des Codes konnte derzeit nicht angefordert werden.",
   "validationError": "Der Zugang konnte nicht bestätigt werden.",
   "accessConfirmed": "Zugang bestätigt.",
+  "journeyCompleted": "Diese Reise wurde bereits abgeschlossen und kann nicht erneut gestartet werden.",
+  "journeyExpired": "Der Zugangszeitraum für diese Reise ist abgelaufen.",
   "accessResumed": "Zugang bestätigt. Ihre Reise wird fortgesetzt.",
   "sectionLoadError": "Fehler: Die Elemente des Zugangsbereichs konnten nicht geladen werden."
 },
