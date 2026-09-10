@@ -89,6 +89,8 @@
   "resendError": "現在、コードの再送信をリクエストできませんでした。",
   "validationError": "アクセスを確認できませんでした。",
   "accessConfirmed": "アクセスが確認されました。",
+  "journeyCompleted": "このジャーニーはすでに完了しているため、再度開始することはできません。",
+  "journeyExpired": "このジャーニーのアクセス期間は終了しました。",
   "accessResumed": "アクセスが確認されました。ジャーニーを再開します。",
   "sectionLoadError": "エラー：アクセスセクションの要素を読み込めませんでした。"
 },
