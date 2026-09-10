@@ -1640,12 +1640,8 @@ function getNomeParticipanteAtual() {
   }
 
   async function gerarDevolutivaDoBloco(bloco) {
-  const nome =
-    sessionStorage.getItem('jornada.nome') ||
-    localStorage.getItem('JORNADA_NOME') ||
-    localStorage.getItem('jc.nome') ||
-    'Participante';
-
+  const nome = getNomeParticipanteAtual();
+    
   const guia =
     sessionStorage.getItem('jornada.guia') ||
     localStorage.getItem('JORNADA_GUIA') ||
@@ -2261,19 +2257,7 @@ function bindButtons(section, bloco, perguntaText, qIndex = 0) {
       document.body.dataset.guia ||
       'lumen';
 
-
-    const nome =
-      sessionStorage.getItem(
-        'jornada.nome'
-      ) ||
-      localStorage.getItem(
-        'JORNADA_NOME'
-      ) ||
-      localStorage.getItem(
-        'jc.nome'
-      ) ||
-      'Participante';
-
+    const nome = getNomeParticipanteAtual();
 
     // =================================================
     // RETOMADA CIRÚRGICA
