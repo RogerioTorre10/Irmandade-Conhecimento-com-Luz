@@ -638,6 +638,66 @@
         data = {};
       }
 
+      // =====================================================
+      // BLINDAGEM COMERCIAL DA SECTION SENHA
+      // =====================================================
+      
+      if (resp.status === 409) {
+      
+        console.warn(
+          '[JCSenha][AUTH][BLOQUEADO] Jornada já concluída.',
+          {
+            email,
+            codigo_jornada: senhaDigitada
+          }
+        );
+      
+        // Remove qualquer identidade temporária da tentativa bloqueada.
+        sessionStorage.removeItem('jornada.email');
+        sessionStorage.removeItem('jornada.senha');
+        sessionStorage.removeItem('jornada.codigo_jornada');
+      
+        // Não deixa código concluído permanecer como autenticação válida.
+        localStorage.removeItem('jornada_auth_ok');
+      
+        throw new Error(
+          data?.detail ||
+          data?.message ||
+          tSenha(
+            'journeyCompleted',
+            'Esta Jornada já foi concluída e não pode ser iniciada novamente.'
+          )
+        );
+      }
+      
+      
+      if (resp.status === 410) {
+      
+        console.warn(
+          '[JCSenha][AUTH][BLOQUEADO] Jornada expirada.',
+          {
+            email,
+            codigo_jornada: senhaDigitada
+          }
+        );
+      
+        sessionStorage.removeItem('jornada.email');
+        sessionStorage.removeItem('jornada.senha');
+        sessionStorage.removeItem('jornada.codigo_jornada');
+      
+        localStorage.removeItem('jornada_auth_ok');
+      
+        throw new Error(
+          data?.detail ||
+          data?.message ||
+          tSenha(
+            'journeyExpired',
+            'O prazo desta Jornada expirou.'
+          )
+        );
+      }
+      
+      
       if (
         !resp.ok ||
         !data?.ok ||
@@ -657,6 +717,28 @@
         data.codigo_jornada ||
         data.senha ||
         senhaDigitada;
+
+      // =====================================================
+      // IDENTIDADE DA JORNADA
+      // Somente após autenticação confirmada pelo backend.
+      // =====================================================
+      
+      saveSenha(codigoJornada);
+      
+      sessionStorage.setItem(
+        'jornada.email',
+        email
+      );
+      
+      sessionStorage.setItem(
+        'jornada.senha',
+        codigoJornada
+      );
+      
+      sessionStorage.setItem(
+        'jornada.codigo_jornada',
+        codigoJornada
+      );
 
       const startedAt =
         data.started_at ||
