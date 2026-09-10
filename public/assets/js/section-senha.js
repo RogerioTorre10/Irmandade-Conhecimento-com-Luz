@@ -782,42 +782,124 @@
         );
       }
 
+            // =====================================================
+      // REGRA DE OURO — NOVA JORNADA x RETOMADA CROSS-DEVICE
+      // =====================================================
+
+      let retomadaRemota = null;
+      let destinoAposSenha = 'section-guia';
+
       try {
+
+        // ---------------------------------------------------
+        // JORNADA EM ANDAMENTO
+        // Não cria nova ativação e não sobrescreve checkpoint.
+        // O servidor é a autoridade sobre onde o participante parou.
+        // ---------------------------------------------------
         if (
+          data.resume === true &&
           window.JORNADA_SESSION &&
-          typeof window.JORNADA_SESSION
-            .registrarAtivacao === 'function'
+          typeof window.JORNADA_SESSION.retomar === 'function'
         ) {
-          await window.JORNADA_SESSION
-            .registrarAtivacao({
-              email,
-              codigo_jornada: codigoJornada,
-              started_at: startedAt,
-              deadline_at: deadlineAt,
-              last_section: 'section-guia'
-            });
+
+          console.log(
+            '[JCSenha][RETOMADA] Jornada em andamento detectada. ' +
+            'Buscando checkpoint oficial do servidor...'
+          );
+
+          retomadaRemota =
+            await window.JORNADA_SESSION.retomar();
+
+          console.log(
+            '[JCSenha][RETOMADA] resposta do Guardião:',
+            retomadaRemota
+          );
+
+          if (
+            retomadaRemota?.retomar === true &&
+            retomadaRemota?.last_section
+          ) {
+
+            destinoAposSenha =
+              String(retomadaRemota.last_section).trim();
+
+            console.log(
+              '[JCSenha][RETOMADA] checkpoint restaurado:',
+              {
+                section: destinoAposSenha,
+                bloco: retomadaRemota.last_block,
+                pergunta: retomadaRemota.last_question
+              }
+            );
+
+          } else {
+
+            console.warn(
+              '[JCSenha][RETOMADA] servidor informou retomada, ' +
+              'mas não devolveu checkpoint navegável.',
+              retomadaRemota
+            );
+
+            throw new Error(
+              tSenha(
+                'resumeError',
+                'Não foi possível restaurar o ponto da sua Jornada. Tente novamente.'
+              )
+            );
+          }
+
+        } else {
+
+          // -------------------------------------------------
+          // JORNADA NOVA
+          // Somente aqui fazemos a primeira ativação.
+          // -------------------------------------------------
+
+          console.log(
+            '[JCSenha][NOVA] primeira ativação da Jornada.'
+          );
+
+          if (
+            window.JORNADA_SESSION &&
+            typeof window.JORNADA_SESSION
+              .registrarAtivacao === 'function'
+          ) {
+
+            await window.JORNADA_SESSION
+              .registrarAtivacao({
+                email,
+                codigo_jornada: codigoJornada,
+                started_at: startedAt,
+                deadline_at: deadlineAt,
+                last_section: 'section-guia'
+              });
+          }
+
+          if (
+            window.JORNADA_SESSION &&
+            typeof window.JORNADA_SESSION
+              .atualizarEstado === 'function'
+          ) {
+
+            await window.JORNADA_SESSION
+              .atualizarEstado({
+                last_section: 'section-guia',
+                estado_tela: 'senha_validada'
+              });
+          }
+
+          destinoAposSenha = 'section-guia';
         }
 
-        if (
-          window.JORNADA_SESSION &&
-          typeof window.JORNADA_SESSION
-            .atualizarEstado === 'function'
-        ) {
-          await window.JORNADA_SESSION
-            .atualizarEstado({
-              last_section: 'section-guia',
-              estado_tela: data.resume
-                ? 'senha_validada_retomada'
-                : 'senha_validada'
-            });
-        }
       } catch (sessionErr) {
-        console.warn(
-          '[JCSenha] acesso validado, mas a sincronização auxiliar falhou:',
+
+        console.error(
+          '[JCSenha] falha ao preparar acesso/retomada:',
           sessionErr
         );
-      }
 
+        throw sessionErr;
+      }
       window.toast?.(
         data.resume
           ? tSenha(
