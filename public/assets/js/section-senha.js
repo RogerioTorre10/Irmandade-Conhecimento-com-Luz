@@ -782,136 +782,152 @@
         );
       }
 
-      // =====================================================
-      // REGRA DE OURO — NOVA JORNADA x RETOMADA CROSS-DEVICE
-      // =====================================================
-
-      let retomadaRemota = null;
-      let destinoAposSenha = 'section-guia';
-
       try {
-
-        // ---------------------------------------------------
-        // JORNADA EM ANDAMENTO
-        // Não cria nova ativação e não sobrescreve checkpoint.
-        // O servidor é a autoridade sobre onde o participante parou.
-        // ---------------------------------------------------
         if (
-          data.resume === true &&
           window.JORNADA_SESSION &&
-          typeof window.JORNADA_SESSION.retomar === 'function'
+          typeof window.JORNADA_SESSION
+            .registrarAtivacao === 'function'
         ) {
-
-          console.log(
-            '[JCSenha][RETOMADA] Jornada em andamento detectada. ' +
-            'Buscando checkpoint oficial do servidor...'
-          );
-
-          retomadaRemota =
-            await window.JORNADA_SESSION.retomar();
-
-          console.log(
-            '[JCSenha][RETOMADA] resposta do Guardião:',
-            retomadaRemota
-          );
-
-          if (
-            retomadaRemota?.retomar === true &&
-            retomadaRemota?.last_section
-          ) {
-
-            destinoAposSenha =
-              String(retomadaRemota.last_section).trim();
-
-            console.log(
-              '[JCSenha][RETOMADA] checkpoint restaurado:',
-              {
-                section: destinoAposSenha,
-                bloco: retomadaRemota.last_block,
-                pergunta: retomadaRemota.last_question
-              }
-            );
-
-          } else {
-
-            console.warn(
-              '[JCSenha][RETOMADA] servidor informou retomada, ' +
-              'mas não devolveu checkpoint navegável.',
-              retomadaRemota
-            );
-
-            throw new Error(
-              tSenha(
-                'resumeError',
-                'Não foi possível restaurar o ponto da sua Jornada. Tente novamente.'
-              )
-            );
-          }
-
-        } else {
-
-          // -------------------------------------------------
-          // JORNADA NOVA
-          // Somente aqui fazemos a primeira ativação.
-          // -------------------------------------------------
-
-          console.log(
-            '[JCSenha][NOVA] primeira ativação da Jornada.'
-          );
-
-          if (
-            window.JORNADA_SESSION &&
-            typeof window.JORNADA_SESSION
-              .registrarAtivacao === 'function'
-          ) {
-
-            await window.JORNADA_SESSION
-              .registrarAtivacao({
-                email,
-                codigo_jornada: codigoJornada,
-                started_at: startedAt,
-                deadline_at: deadlineAt,
-                last_section: 'section-guia'
-              });
-          }
-
-          if (
-            window.JORNADA_SESSION &&
-            typeof window.JORNADA_SESSION
-              .atualizarEstado === 'function'
-          ) {
-
-            await window.JORNADA_SESSION
-              .atualizarEstado({
-                last_section: 'section-guia',
-                estado_tela: 'senha_validada'
-              });
-          }
-
-          destinoAposSenha = 'section-guia';
+          await window.JORNADA_SESSION
+            .registrarAtivacao({
+              email,
+              codigo_jornada: codigoJornada,
+              started_at: startedAt,
+              deadline_at: deadlineAt,
+              last_section: 'section-guia'
+            });
         }
 
+        if (
+          window.JORNADA_SESSION &&
+          typeof window.JORNADA_SESSION
+            .atualizarEstado === 'function'
+        ) {
+          await window.JORNADA_SESSION
+            .atualizarEstado({
+              last_section: 'section-guia',
+              estado_tela: data.resume
+                ? 'senha_validada_retomada'
+                : 'senha_validada'
+            });
+        }
       } catch (sessionErr) {
-
-        console.error(
-          '[JCSenha] falha ao preparar acesso/retomada:',
+        console.warn(
+          '[JCSenha] acesso validado, mas a sincronização auxiliar falhou:',
           sessionErr
         );
-
-        throw sessionErr;
       }
 
-        window.toast?.(
-          err.message ||
-          tSenha(
-            'validationError',
-            'Não foi possível validar o acesso.'
+      window.toast?.(
+        data.resume
+          ? tSenha(
+            'accessResumed',
+            'Acesso confirmado. Retomando sua Jornada.'
+          )
+          : tSenha(
+            'accessConfirmed',
+            'Acesso confirmado.'
           ),
-          'error'
+        'success'
+      );
+
+      const irParaGuia = () => {
+
+        console.log('[JCSenha] liberando acesso ao Guia.');
+        
+        window.JC?.show?.(NEXT_SECTION_ID);
+      };
+
+      try {
+        const src = getTransitionSrc(
+          root,
+          btnNext
         );
+
+        if (
+          typeof window.playTransitionVideo === 'function' &&
+          src
+        ) {
+        
+          console.log(
+            '[JCSenha] iniciando transição para:',
+            NEXT_SECTION_ID
+          );
+        
+          // Segurança: se por qualquer motivo o vídeo não concluir
+          // a navegação, libera o Guia automaticamente.
+          const fallbackGuia = setTimeout(() => {
+        
+            const senhaAtual =
+              document.getElementById('section-senha');
+        
+            const aindaNaSenha =
+              senhaAtual &&
+              !senhaAtual.classList.contains('hidden');
+        
+            if (aindaNaSenha) {
+        
+              console.warn(
+                '[JCSenha] transição não concluiu; ' +
+                'abrindo section-guia por fallback.'
+              );
+        
+              irParaGuia();
+            }
+        
+          }, 12000);
+        
+          try {
+        
+            window.playTransitionVideo(
+              src,
+              NEXT_SECTION_ID
+            );
+        
+          } catch (videoErr) {
+        
+            clearTimeout(fallbackGuia);
+        
+            console.warn(
+              '[JCSenha] falha ao iniciar filme:',
+              videoErr
+            );
+        
+            irParaGuia();
+          }
+        
+        } else {
+        
+          irParaGuia();
+        }
+      } catch (videoErr) {
+        console.warn(
+          '[JCSenha] falha no filme de transição:',
+          videoErr
+        );
+
+        irParaGuia();
       }
-    });
-  }
+
+    } catch (err) {
+      console.error(
+        '[JCSenha] erro ao validar e-mail e senha JCL:',
+        err
+      );
+
+      btnNext.removeAttribute('disabled');
+
+      window.toast?.(
+        err.message ||
+        tSenha(
+          'validationError',
+          'Não foi possível validar o acesso.'
+        ),
+        'error'
+      );
+    }
+  });
+}
 
   // ===== BOTÕES DE ACESSO E REENVIO =====
 
