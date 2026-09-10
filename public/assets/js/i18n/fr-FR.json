@@ -89,6 +89,8 @@
   "resendError": "Impossible de demander un nouvel envoi du code pour le moment.",
   "validationError": "Impossible de valider l'accès.",
   "accessConfirmed": "Accès confirmé.",
+  "journeyCompleted": "Ce Parcours a déjà été terminé et ne peut pas être recommencé.",
+  "journeyExpired": "La période d’accès à ce Parcours a expiré.",
   "accessResumed": "Accès confirmé. Reprise de votre Parcours.",
   "sectionLoadError": "Erreur : les éléments de la Section d'Accès n'ont pas pu être chargés."
 },
