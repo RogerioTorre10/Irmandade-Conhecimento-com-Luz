@@ -589,24 +589,7 @@
       );
       senhaInput?.focus();
       return;
-    }
-
-    saveSenha(senhaDigitada);
-
-    sessionStorage.setItem(
-      'jornada.email',
-      email
-    );
-
-    sessionStorage.setItem(
-      'jornada.senha',
-      senhaDigitada
-    );
-
-    sessionStorage.setItem(
-      'jornada.codigo_jornada',
-      senhaDigitada
-    );
+    }   
 
     btnNext.setAttribute('disabled', 'true');
 
