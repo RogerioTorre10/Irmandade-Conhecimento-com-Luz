@@ -831,11 +831,14 @@
         'success'
       );
 
-      const irParaGuia = () => {
+     const irParaDestino = () => {
 
-        console.log('[JCSenha] liberando acesso ao Guia.');
-        
-        window.JC?.show?.(NEXT_SECTION_ID);
+        console.log(
+          '[JCSenha] liberando acesso para:',
+          destinoAposSenha
+        );
+
+        window.JC?.show?.(destinoAposSenha);
       };
 
       try {
@@ -872,7 +875,7 @@
                 'abrindo section-guia por fallback.'
               );
         
-              irParaGuia();
+              irParaDestino();
             }
         
           }, 12000);
@@ -881,7 +884,7 @@
         
             window.playTransitionVideo(
               src,
-              NEXT_SECTION_ID
+              destinoAposSenha
             );
         
           } catch (videoErr) {
