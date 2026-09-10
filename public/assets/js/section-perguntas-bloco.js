@@ -1306,6 +1306,20 @@
     };
   }
 
+// ─── Nome oficial do participante ────────────────────────────────────────────
+// A IA deve usar o nome pertencente aos Dados Pessoais da Jornada atual.
+// Nunca usar chaves legacy soltas do navegador como fonte primária,
+// pois o mesmo dispositivo pode ser utilizado por participantes diferentes.
+function getNomeParticipanteAtual() {
+  const dados = buildDadosPessoaisPayload();
+
+  const nome = String(
+    dados?.nomeCompleto || ''
+  ).trim();
+
+  return nome || 'Participante';
+}
+
   // ─── Memória da jornada (histórico cumulativo enviado à IA) ──────────────────
   function buildHistoricoJornada(limite = 12) {
     try {
