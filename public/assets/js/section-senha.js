@@ -854,7 +854,7 @@
         
           console.log(
             '[JCSenha] iniciando transição para:',
-            NEXT_SECTION_ID
+            destinoAposSenha
           );
         
           // Segurança: se por qualquer motivo o vídeo não concluir
