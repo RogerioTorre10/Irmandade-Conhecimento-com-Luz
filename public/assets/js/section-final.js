@@ -582,6 +582,74 @@ function buildFinalSynthesisPayload() {
     return merged;
   }
 
+  // A identidade pode vir do login atual, do snapshot restaurado pelo backend
+  // ou das chaves legadas. Isto e indispensavel quando a Jornada e retomada
+  // em outro dispositivo: respostas e posicao podem existir sem que o objeto
+  // global original ainda esteja em memoria.
+  function readFinalIdentity(stateObj = {}) {
+    const progress = getProgressSnapshotFinal();
+    const nested =
+      (progress?.progresso_json_temp && typeof progress.progresso_json_temp === 'object')
+        ? progress.progresso_json_temp
+        : {};
+
+    function firstValue(values) {
+      for (const value of values) {
+        const clean = String(value ?? '').trim();
+        if (clean) return clean;
+      }
+      return '';
+    }
+
+    function readKey(key) {
+      try {
+        return sessionStorage.getItem(key) || localStorage.getItem(key) || '';
+      } catch (_) {
+        return '';
+      }
+    }
+
+    const codigo_jornada = firstValue([
+      stateObj.codigo_jornada,
+      stateObj.codigoJornada,
+      stateObj.codigo,
+      progress.codigo_jornada,
+      progress.codigoJornada,
+      nested.codigo_jornada,
+      nested.codigoJornada,
+      readKey('jornada_codigo'),
+      readKey('jornada.codigo_jornada'),
+      readKey('JORNADA_CODIGO'),
+      readKey('codigo_jornada')
+    ]);
+
+    const email = firstValue([
+      stateObj.email,
+      stateObj.jornada_email,
+      stateObj.participantEmail,
+      progress.email,
+      progress.jornada_email,
+      nested.email,
+      nested.jornada_email,
+      readKey('jornada_email'),
+      readKey('jornada.email'),
+      readKey('JORNADA_EMAIL'),
+      readKey('email_jornada')
+    ]).toLowerCase();
+
+    // Consolida as chaves canonicas para as etapas seguintes da mesma sessao.
+    if (codigo_jornada) {
+      try { sessionStorage.setItem('jornada_codigo', codigo_jornada); } catch (_) {}
+      try { sessionStorage.setItem('jornada.codigo_jornada', codigo_jornada); } catch (_) {}
+    }
+    if (email) {
+      try { sessionStorage.setItem('jornada_email', email); } catch (_) {}
+      try { sessionStorage.setItem('jornada.email', email); } catch (_) {}
+    }
+
+    return { codigo_jornada, email };
+  }
+
   function normalizeGuide(raw) {
     const s = String(raw || '').trim();
     const x = s.toLowerCase();
@@ -795,6 +863,7 @@ function buildFinalSynthesisPayload() {
   // ================================
   function buildFinalPayloadDiamante() {
   const s = getJornadaState();
+  const identidade = readFinalIdentity(s);
   const nome = String(
     s.nome ?? s.name ?? s.participantName ?? s.participante ?? localStorage.getItem('JORNADANOME') ?? sessionStorage.getItem('JORNADANOME') ?? 'Caminhante'
   ).trim();
@@ -814,6 +883,8 @@ function buildFinalSynthesisPayload() {
   const devolutivaFinal = getStoredFinalFeedback();
 
   const payload = {
+    codigo_jornada: identidade.codigo_jornada,
+    email: identidade.email,
     nome,
     guia,
     idioma: getActiveLang(),
@@ -1298,7 +1369,9 @@ function buildGuideFallbackText(guiaRaw, nomeRaw) {
     // IMPORTANTE: só reaproveita se existe DEVOLUTIVA FINAL de fato já salva.
     // NÃO concatenar devolutivas de bloco aqui — isso faria o backend curto-circuitar
     // (>=2000 chars) mesmo na primeira geração da final, entregando texto antigo.
-    return String(getStoredFinalFeedback() || '').trim();
+    const parcial = String(getStoredFinalFeedback() || '').trim();
+    // Textos curtos são fallback de emergência, não uma final válida para continuação.
+    return isWeakFeedback(parcial, { minChars: 520, minSentences: 5 }) ? '' : parcial;
   }
 
   async function fetchFinalGuideFeedback() {
@@ -1321,6 +1394,17 @@ function buildGuideFallbackText(guiaRaw, nomeRaw) {
   const nome = String(payload?.nome || 'Caminhante').trim();
   const dadosPessoais = buildDadosPessoaisFinalSilencioso(payload?.dadosPessoais);
 
+  if (!payload?.codigo_jornada || !payload?.email) {
+    console.error('[FINAL][IDENTIDADE][AUSENTE]', {
+      codigo: Boolean(payload?.codigo_jornada),
+      email: Boolean(payload?.email)
+    });
+    return {
+      ok: false,
+      error: 'Identidade da Jornada não restaurada. Retome o acesso com o mesmo e-mail antes de gerar a devolutiva final.'
+    };
+  }
+
   if (!respostas.length && !blocos.length && !sinteseBlocos) {
     return { ok: true, text: buildGuideFallbackText({ id: guiaOriginal }, nome), guiaUsado: guiaOriginal, fallbackUsed: true };
   }
@@ -1335,6 +1419,8 @@ function buildGuideFallbackText(guiaRaw, nomeRaw) {
     try {
       // === RETOMADA CIRÚRGICA: envia devolutiva final já salva como parcial ===
       const body = {
+        codigo_jornada: String(payload?.codigo_jornada || '').trim(),
+        email: String(payload?.email || '').trim().toLowerCase(),
         nome,
         guia: guiaId,
         idioma: getActiveLang(),
