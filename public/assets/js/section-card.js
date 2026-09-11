@@ -450,6 +450,24 @@
       window.JORNADA_STATE = window.JORNADA_STATE || {};
       window.JORNADA_STATE.selfieCard = dataUrl;
 
+      // Persiste o cartão no checkpoint remoto assim que ele fica pronto.
+      // O Guardião envia novamente apenas se a imagem mudar.
+      try {
+        const salvarCheckpoint = window.JORNADA_SESSION?.salvar;
+        if (typeof salvarCheckpoint === 'function') {
+          Promise.resolve(
+            salvarCheckpoint({
+              last_section: 'section-card',
+              motivo: 'selfiecard_pronta'
+            })
+          ).catch((err) => {
+            console.warn('[CARD][SELFIECARD][SYNC]', err);
+          });
+        }
+      } catch (err) {
+        console.warn('[CARD][SELFIECARD][SYNC]', err);
+      }
+
       console.log('[CARD][SELFIECARD] ✅ salva!');
     };
 
