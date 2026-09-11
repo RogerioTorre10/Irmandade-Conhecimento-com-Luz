@@ -25,19 +25,45 @@
   }
 
   function loadData() {
-    try {
-      return JSON.parse(sessionStorage.getItem(STORAGE_KEY) || '{}');
-    } catch {
-      return {};
+    const candidatos = [
+      sessionStorage.getItem(STORAGE_KEY),
+      localStorage.getItem(STORAGE_KEY),
+      sessionStorage.getItem('JORNADA_DADOS'),
+      localStorage.getItem('JORNADA_DADOS')
+    ];
+
+    for (const raw of candidatos) {
+      try {
+        const data = JSON.parse(raw || 'null');
+        if (data && typeof data === 'object') return data;
+      } catch {}
     }
+
+    return {};
   } 
   
   function saveData(data) {
     try {
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data || {}));
-      window.__JORNADA_DADOS_PESSOAIS__ = data || {};
+      const dados = data || {};
+      const raw = JSON.stringify(dados);
+      const nome = String(
+        dados.nomeCompleto || dados.nome_completo || dados.nome || ''
+      ).trim();
+
+      sessionStorage.setItem(STORAGE_KEY, raw);
+      localStorage.setItem(STORAGE_KEY, raw);
+      sessionStorage.setItem('JORNADA_DADOS', raw);
+      localStorage.setItem('JORNADA_DADOS', raw);
+
+      if (nome) {
+        sessionStorage.setItem('jornada.nome', nome);
+        localStorage.setItem('JORNADA_NOME', nome);
+      }
+
+      window.__JORNADA_DADOS_PESSOAIS__ = dados;
       window.JORNADA_STATE = window.JORNADA_STATE || {};
-      window.JORNADA_STATE.dadosPessoais = data || {};
+      window.JORNADA_STATE.dadosPessoais = dados;
+      if (nome) window.JORNADA_STATE.nome = nome;
     } catch (e) {
       console.warn(`[${MOD}] falha ao salvar`, e);
     }
