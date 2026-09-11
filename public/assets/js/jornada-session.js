@@ -71,6 +71,7 @@
     retryCount: 0,
     saveChain: Promise.resolve(),
     lastRemoteSnapshot: null,
+    selfieSyncSignature: '',
     lastError: null
   };
 
@@ -413,6 +414,40 @@
   // SNAPSHOT / PAYLOAD
   // =====================================================
 
+  function getDadosPessoaisSnapshot() {
+    const candidatos = [
+      sessionStorage.getItem('JORNADA_DADOS_PESSOAIS'),
+      localStorage.getItem('JORNADA_DADOS_PESSOAIS'),
+      sessionStorage.getItem('JORNADA_DADOS'),
+      localStorage.getItem('JORNADA_DADOS')
+    ];
+
+    for (const raw of candidatos) {
+      const dados = safeJsonParse(raw, null);
+      if (dados && typeof dados === 'object' && !Array.isArray(dados)) {
+        return dados;
+      }
+    }
+
+    return {};
+  }
+
+  function getSelfieCardSnapshot() {
+    return String(
+      sessionStorage.getItem('JORNADA_SELFIECARD') ||
+      sessionStorage.getItem('SELFIE_CARD') ||
+      localStorage.getItem('JORNADA_SELFIECARD') ||
+      localStorage.getItem('SELFIE_CARD') ||
+      window.JORNADA_STATE?.selfieCard ||
+      ''
+    ).trim();
+  }
+
+  function getSelfieSignature(value) {
+    const raw = String(value || '');
+    return raw ? `${raw.length}:${raw.slice(-48)}` : '';
+  }
+
   function buildSnapshot(extra = {}) {
 
     const progressObj = safeJsonParse(
@@ -441,6 +476,21 @@
     if (progressObj.pergunta) {
       progressObj.pergunta = toIntSafe(progressObj.pergunta);
     }
+
+    const dadosPessoais = getDadosPessoaisSnapshot();
+    const nome = String(
+      dadosPessoais.nomeCompleto ||
+      dadosPessoais.nome_completo ||
+      dadosPessoais.nome ||
+      sessionStorage.getItem('jornada.nome') ||
+      localStorage.getItem('JORNADA_NOME') ||
+      ''
+    ).trim();
+
+    const selfieCard = getSelfieCardSnapshot();
+    const deveSincronizarSelfie =
+      selfieCard &&
+      getSelfieSignature(selfieCard) !== state.selfieSyncSignature;
 
     return {
 
@@ -489,11 +539,15 @@
             : progressObj.devolutivas?.final
       },
 
-      dados:
-        safeJsonParse(
-          sessionStorage.getItem('JORNADA_DADOS'),
-          {}
-        ),
+      nome,
+
+      dados: dadosPessoais,
+
+      dadosPessoais,
+
+      ...(deveSincronizarSelfie
+        ? { selfieCard }
+        : {}),
 
       estado_tela:
         extra.estado_tela ??
@@ -752,6 +806,12 @@
 
           }
 
+          if (payload.progresso_json_temp?.selfieCard) {
+            state.selfieSyncSignature = getSelfieSignature(
+              payload.progresso_json_temp.selfieCard
+            );
+          }
+
           state.lastRemoteSnapshot =
             data;
 
@@ -849,6 +909,15 @@
         STORAGE.CODIGO,
         String(data.codigo_jornada)
       );
+      sessionStorage.setItem(
+        STORAGE.CODIGO,
+        String(data.codigo_jornada)
+      );
+    }
+
+    if (data.email) {
+      localStorage.setItem(STORAGE.EMAIL, String(data.email));
+      sessionStorage.setItem(STORAGE.EMAIL, String(data.email));
     }
 
     if (data.last_section) {
@@ -1052,11 +1121,60 @@
       window.__JORNADA_DEVOLUTIVA_FINAL__ = devolutivaFinal;
     }
 
-    if (snapshot.dados) {
-      sessionStorage.setItem(
-        'JORNADA_DADOS',
-        JSON.stringify(snapshot.dados)
-      );
+    const dadosPessoais =
+      snapshot.dadosPessoais ||
+      snapshot.dados_pessoais ||
+      snapshot.dados ||
+      {};
+
+    if (
+      dadosPessoais &&
+      typeof dadosPessoais === 'object' &&
+      !Array.isArray(dadosPessoais) &&
+      Object.keys(dadosPessoais).length
+    ) {
+      const rawDados = JSON.stringify(dadosPessoais);
+      sessionStorage.setItem('JORNADA_DADOS', rawDados);
+      sessionStorage.setItem('JORNADA_DADOS_PESSOAIS', rawDados);
+      localStorage.setItem('JORNADA_DADOS', rawDados);
+      localStorage.setItem('JORNADA_DADOS_PESSOAIS', rawDados);
+
+      window.__JORNADA_DADOS_PESSOAIS__ = dadosPessoais;
+      window.JORNADA_STATE = window.JORNADA_STATE || {};
+      window.JORNADA_STATE.dadosPessoais = dadosPessoais;
+    }
+
+    const nomeRestaurado = String(
+      snapshot.nome ||
+      dadosPessoais.nomeCompleto ||
+      dadosPessoais.nome_completo ||
+      dadosPessoais.nome ||
+      ''
+    ).trim();
+
+    if (nomeRestaurado) {
+      sessionStorage.setItem('jornada.nome', nomeRestaurado);
+      localStorage.setItem('JORNADA_NOME', nomeRestaurado);
+      window.JORNADA_STATE = window.JORNADA_STATE || {};
+      window.JORNADA_STATE.nome = nomeRestaurado;
+    }
+
+    const selfieCard = String(
+      snapshot.selfieCard ||
+      snapshot.selfie_card ||
+      snapshot.selfiecard ||
+      ''
+    ).trim();
+
+    if (selfieCard.startsWith('data:image/')) {
+      sessionStorage.setItem('JORNADA_SELFIECARD', selfieCard);
+      sessionStorage.setItem('SELFIE_CARD', selfieCard);
+      localStorage.setItem('JORNADA_SELFIECARD', selfieCard);
+      localStorage.setItem('SELFIE_CARD', selfieCard);
+
+      window.JORNADA_STATE = window.JORNADA_STATE || {};
+      window.JORNADA_STATE.selfieCard = selfieCard;
+      state.selfieSyncSignature = getSelfieSignature(selfieCard);
     }
 
     if (snapshot.guia) {
