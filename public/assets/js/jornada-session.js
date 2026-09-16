@@ -448,6 +448,22 @@
     return raw ? `${raw.length}:${raw.slice(-48)}` : '';
   }
 
+  function getOfficialJourneyLanguage() {
+    return String(
+      sessionStorage.getItem('jornada.idioma_oficial') ||
+      localStorage.getItem('jornada.idioma_oficial') ||
+      ''
+    ).trim();
+  }
+
+  function persistOfficialJourneyLanguage(value) {
+    const idioma = String(value || '').trim();
+    if (!idioma) return '';
+    sessionStorage.setItem('jornada.idioma_oficial', idioma);
+    localStorage.setItem('jornada.idioma_oficial', idioma);
+    return idioma;
+  }
+
   function buildSnapshot(extra = {}) {
 
     const progressObj = safeJsonParse(
@@ -498,6 +514,7 @@
         sessionStorage.getItem('jornada.guia'),
 
       idioma:
+        getOfficialJourneyLanguage() ||
         localStorage.getItem('i18n_lang') ||
         window.i18n?.lang ||
         'pt-BR',
@@ -690,6 +707,17 @@
 
   async function salvar(extra = {}) {
 
+    if (
+      state.restoring ||
+      sessionStorage.getItem('JORNADA_RESTORE_PENDING') === '1'
+    ) {
+      console.log(
+        '[GUARDIÃO] save suspenso até concluir a restauração oficial'
+      );
+      state.dirty = true;
+      return null;
+    }
+
     if (!isAuthenticated()) {
 
       console.log(
@@ -774,6 +802,19 @@
 
           const data =
             await response.json();
+
+          if (
+            data?.save_ignored === true &&
+            data?.reason === 'dispositivo_substituido'
+          ) {
+            state.authenticated = false;
+            state.dirty = false;
+            localStorage.setItem(STORAGE.AUTH_OK, '0');
+            localStorage.removeItem(STORAGE.PENDING_SAVE);
+            setReauthRequired(true, data);
+            emit('jornada:device-superseded', data);
+            return data;
+          }
 
           if (!response.ok) {
 
@@ -901,7 +942,7 @@
   // RESTAURAÇÃO DO SNAPSHOT
   // =====================================================
 
-  function restoreStorageFromSnapshot(data = {}) {
+  async function restoreStorageFromSnapshot(data = {}) {
     if (!data || typeof data !== 'object') return;
 
     if (data.codigo_jornada) {
@@ -1191,15 +1232,25 @@
 
     if (snapshot.idioma) {
       try {
+        const idiomaOficial = persistOfficialJourneyLanguage(
+          String(snapshot.idioma)
+        );
+
         localStorage.setItem(
           'i18n_lang',
-          String(snapshot.idioma)
+          idiomaOficial
         );
 
         sessionStorage.setItem(
           'i18n_lang',
-          String(snapshot.idioma)
+          idiomaOficial
         );
+
+        if (typeof window.i18n?.restoreJourneyLang === 'function') {
+          await window.i18n.restoreJourneyLang(idiomaOficial);
+        } else if (typeof window.JORNADA_setLang === 'function') {
+          await window.JORNADA_setLang(idiomaOficial, true);
+        }
       } catch (_) {}
     }
 
@@ -1438,7 +1489,9 @@
         response.ok &&
         data?.retomar === true
       ) {
-        restoreStorageFromSnapshot(data);
+        await restoreStorageFromSnapshot(data);
+
+        sessionStorage.removeItem('JORNADA_RESTORE_PENDING');
 
         localStorage.setItem(
           STORAGE.AUTH_OK,
@@ -1632,6 +1685,13 @@
     state.reauthRequired = false;
 
     setReauthRequired(false);
+
+    persistOfficialJourneyLanguage(
+      window.i18n?.lang ||
+      localStorage.getItem('i18n_lang') ||
+      sessionStorage.getItem('i18n_lang') ||
+      'pt-BR'
+    );
 
     persistStateCache({
       activatedAt: Date.now()
@@ -1883,6 +1943,9 @@
       sessionStorage.removeItem(
         'JORNADA_DADOS'
       );
+
+      sessionStorage.removeItem('jornada.idioma_oficial');
+      localStorage.removeItem('jornada.idioma_oficial');
 
       emit(
         'jornada:finished',
