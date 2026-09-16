@@ -759,6 +759,14 @@
         'jornada_email',
         email
       );
+
+      if (data.resume === true) {
+        // Fecha a pequena janela entre autenticar e restaurar: nenhum autosave
+        // deste aparelho pode publicar seu idioma/cache local antes do servidor.
+        sessionStorage.setItem('JORNADA_RESTORE_PENDING', '1');
+      } else {
+        sessionStorage.removeItem('JORNADA_RESTORE_PENDING');
+      }
       
       localStorage.setItem(
         'jornada_auth_ok',
