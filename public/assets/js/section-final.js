@@ -1371,12 +1371,12 @@ function buildGuideFallbackText(guiaRaw, nomeRaw) {
     // (>=2000 chars) mesmo na primeira geração da final, entregando texto antigo.
     const parcial = String(getStoredFinalFeedback() || '').trim();
     // Textos curtos são fallback de emergência, não uma final válida para continuação.
-    return isWeakFeedback(parcial, { minChars: 520, minSentences: 5 }) ? '' : parcial;
+    return isWeakFeedback(parcial, { minChars: 2200, minSentences: 12 }) ? '' : parcial;
   }
 
   async function fetchFinalGuideFeedback() {
   const cachedFinal = getStoredFinalFeedback();
-  if (cachedFinal.length >= 2000) {
+  if (!isWeakFeedback(cachedFinal, { minChars: 2400, minSentences: 12 })) {
     return {
       ok: true,
       text: cachedFinal,
@@ -1436,7 +1436,7 @@ function buildGuideFallbackText(guiaRaw, nomeRaw) {
       const result = await postFinalFeedback(body);
       const texto = String(result?.texto || '').trim();
 
-      if (isWeakFeedback(texto, { minChars: 520, minSentences: 5 })) {
+      if (isWeakFeedback(texto, { minChars: 2200, minSentences: 12 })) {
         ultimoErro = new Error('Devolutiva final fraca');
         continue;
       }
