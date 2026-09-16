@@ -9,6 +9,7 @@
 
   const STORAGE_KEY = 'i18n_lang';
   const LOCK_KEY = 'i18n_locked';
+  const OFFICIAL_KEY = 'jornada.idioma_oficial';
   const DEFAULT = 'pt-BR';
   const SUPPORTED = ['pt-BR', 'en-US', 'es-ES', 'fr-FR', 'ja-JP', 'zh-CN', 'de-DE'];
 
@@ -416,6 +417,22 @@
     return setLang(lang, !!persist);
   }
 
+  // Usado somente na retomada autenticada. O idioma salvo no checkpoint
+  // pertence à Jornada e deve vencer o idioma/lock local do novo aparelho.
+  async function restoreJourneyLang(lang) {
+    const official = normalizeLang(lang);
+    if (!official || !SUPPORTED.includes(official)) return state.lang;
+
+    setLocked(false);
+    setStoredLang(official);
+    try { sessionStorage.setItem(OFFICIAL_KEY, official); } catch (_) {}
+    try { localStorage.setItem(OFFICIAL_KEY, official); } catch (_) {}
+
+    const applied = await setLang(official, true);
+    log('Idioma oficial restaurado do checkpoint:', applied);
+    return applied;
+  }
+
   async function waitForReady(timeoutMs = 10000) {
     if (state.ready) return true;
 
@@ -513,6 +530,7 @@
     apply,
     setLang,
     forceLang,
+    restoreJourneyLang,
     waitForReady,
     normalizeLang,
     unlockLang
