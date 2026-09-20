@@ -28,43 +28,17 @@
   }
 
   function pickApiBase() {
-  const hostname =
-    window.location.hostname
-      .toLowerCase()
-      .trim();
+    const cfg = (window.APP_CONFIG && window.APP_CONFIG.API_BASE)
+      ? window.APP_CONFIG.API_BASE
+      : '';
 
-  const isHomolog =
-    hostname.includes('homolog') ||
-    hostname ===
-      'irmandade-conhecimento-com-luz-1.onrender.com';
+    if (cfg) return normalizeBase(cfg);
+    if (window.API_BASE) return normalizeBase(window.API_BASE);
 
-  /*
-   * No ambiente homolog, a URL do backend homolog
-   * tem prioridade absoluta, mesmo que APP_CONFIG
-   * ainda esteja configurado como produção.
-   */
-  if (isHomolog) {
-    return normalizeBase(
-      'https://lumen-backend-homolog.onrender.com/api'
-    );
+    return normalizeBase('https://lumen-backend-api.onrender.com/api');
   }
-
-  const configuredBase =
-    window.APP_CONFIG?.API_BASE ||
-    window.API_BASE ||
-    'https://lumen-backend-api.onrender.com/api';
-
-  return normalizeBase(configuredBase);
-}
 
   const API_PRIMARY = pickApiBase();
-  console.log(
-  '[API][AMBIENTE]',
-  {
-    hostname: window.location.hostname,
-    API_PRIMARY
-  }
-);
   const PDF_PATHS = [
   '/jornada/essencial/pdf',
   '/jornada-essencial/pdf',
@@ -85,6 +59,135 @@
     a.click();
     document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(url), 2000);
+  }
+
+  // =====================================================
+  // CACHE LOCAL DO PDF FINAL — INDEXEDDB
+  // 1 geração por Jornada / redownload sem backend
+  // =====================================================
+  
+  const PDF_CACHE_DB = 'JORNADA_PDF_CACHE';
+  const PDF_CACHE_STORE = 'pdfs';
+  const PDF_CACHE_VERSION = 1;
+  
+  function openPdfCacheDB() {
+    return new Promise((resolve, reject) => {
+      if (!('indexedDB' in window)) {
+        reject(new Error('IndexedDB indisponível'));
+        return;
+      }
+  
+      const request = indexedDB.open(
+        PDF_CACHE_DB,
+        PDF_CACHE_VERSION
+      );
+  
+      request.onupgradeneeded = () => {
+        const db = request.result;
+  
+        if (!db.objectStoreNames.contains(PDF_CACHE_STORE)) {
+          db.createObjectStore(PDF_CACHE_STORE);
+        }
+      };
+  
+      request.onsuccess = () => resolve(request.result);
+  
+      request.onerror = () =>
+        reject(request.error || new Error('Falha ao abrir cache PDF'));
+    });
+  }
+  
+  
+  async function getCachedPdf(cacheKey) {
+    if (!cacheKey) return null;
+  
+    try {
+      const db = await openPdfCacheDB();
+  
+      return await new Promise((resolve, reject) => {
+        const tx = db.transaction(
+          PDF_CACHE_STORE,
+          'readonly'
+        );
+  
+        const store = tx.objectStore(PDF_CACHE_STORE);
+        const req = store.get(cacheKey);
+  
+        req.onsuccess = () => resolve(req.result || null);
+        req.onerror = () => reject(req.error);
+  
+        tx.oncomplete = () => db.close();
+      });
+  
+    } catch (err) {
+      console.warn('[PDF][CACHE][READ][WARN]', err);
+      return null;
+    }
+  }
+  
+  
+  async function saveCachedPdf(cacheKey, blob, filename) {
+    if (!cacheKey || !(blob instanceof Blob)) return false;
+  
+    try {
+      const db = await openPdfCacheDB();
+  
+      await new Promise((resolve, reject) => {
+        const tx = db.transaction(
+          PDF_CACHE_STORE,
+          'readwrite'
+        );
+  
+        const store = tx.objectStore(PDF_CACHE_STORE);
+  
+        store.put(
+          {
+            blob,
+            filename,
+            createdAt: Date.now()
+          },
+          cacheKey
+        );
+  
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+        tx.onabort = () => reject(tx.error);
+      });
+  
+      db.close();
+  
+      console.log(
+        '[PDF][CACHE][SAVE]',
+        cacheKey,
+        blob.size
+      );
+  
+      return true;
+  
+    } catch (err) {
+      console.warn('[PDF][CACHE][SAVE][WARN]', err);
+      return false;
+    }
+  }
+  
+  
+  async function clearPdfCache() {
+    try {
+      if (!('indexedDB' in window)) return;
+  
+      await new Promise((resolve) => {
+        const request = indexedDB.deleteDatabase(PDF_CACHE_DB);
+  
+        request.onsuccess = () => resolve();
+        request.onerror = () => resolve();
+        request.onblocked = () => resolve();
+      });
+  
+      console.log('[PDF][CACHE] removido.');
+  
+    } catch (err) {
+      console.warn('[PDF][CACHE][CLEAR][WARN]', err);
+    }
   }
 
   function isPdf(res) {
@@ -295,89 +398,238 @@
   }
 
   async function gerarPDFEHQ(payload) {
-  const safePayload = sanitizePdfPayload(payload || {});
-
-  const fileName =
-    (safePayload.nome || 'jornada')
-      .toString()
-      .replace(/[^\p{L}\p{N}_-]+/gu, '_')
-      .slice(0, 40);
-
-  const fname = `${fileName}-${new Date().toISOString().slice(0, 10)}.pdf`;
-
-  const PDF_PATHS = [
-    '/jornada/essencial/pdf',
-    '/jornada/pdf',
-    '/jornada-essencial/pdf',
-    '/pdf',
-    '/gerar-pdf'
-  ];
-
-  let lastError = null;
-
-  for (const path of PDF_PATHS) {
-    try {
-      console.log('[PDF] tentando:', `${API_PRIMARY}${path}`);
-      
-      await sleep(400);
-
-      const { data, response } = await postJSON(API_PRIMARY, path, safePayload, 60000);
-
-  if (data instanceof Blob) {
-    const size = data.size || 0;
-    const type = String(data.type || '').toLowerCase();
-
-    console.log('[PDF] blob recebido:', {
-      path,
-      status: response?.status,
-      type,
-      size
-  });
-
-  if (!size || size < 50000 || !type.includes('pdf')) {
-    console.error('[PDF] bloqueado: blob inválido ou incompleto', { size, type, path });
-    lastError = new Error(`PDF incompleto em ${path}. Size=${size}`);
-    await sleep(1500);
-    continue;
-  }
-
-  triggerDownload(data, fname);
-
-  return {
-    ok: true,
-    path,
-    blob: data,
-    size
-  };
-}
-
-      if (data && typeof data === 'object' && data.url) {
-        console.log('[PDF] sucesso via url:', path, data.url);
-        window.open(data.url, '_blank');
-        return { ok: true, path };
+    const safePayload = sanitizePdfPayload(payload || {});
+  
+    const fileName =
+      (safePayload.nome || 'jornada')
+        .toString()
+        .replace(/[^\p{L}\p{N}_-]+/gu, '_')
+        .slice(0, 40);
+  
+    const fname =
+      `${fileName}-${new Date().toISOString().slice(0, 10)}.pdf`;
+  
+    // =====================================================
+    // IDENTIDADE DO PDF
+    // =====================================================
+  
+    const codigoJornada =
+      safePayload.codigo_jornada ||
+      safePayload.codigoJornada ||
+      sessionStorage.getItem('codigo_jornada') ||
+      localStorage.getItem('codigo_jornada') ||
+      sessionStorage.getItem('JORNADA_CODIGO') ||
+      localStorage.getItem('JORNADA_CODIGO') ||
+      '';
+  
+    const email =
+      safePayload.email ||
+      sessionStorage.getItem('jornada_email') ||
+      localStorage.getItem('jornada_email') ||
+      '';
+  
+    const cacheKey =
+      String(codigoJornada || email || fileName)
+        .trim()
+        .toLowerCase();
+  
+    // =====================================================
+    // 1) PRIMEIRO PROCURA PDF JÁ GERADO
+    // =====================================================
+  
+    if (cacheKey) {
+      const cached = await getCachedPdf(cacheKey);
+  
+      if (
+        cached &&
+        cached.blob instanceof Blob &&
+        cached.blob.size >= 50000
+      ) {
+        console.log(
+          '[PDF][CACHE][HIT] Redownload local. Backend NÃO chamado.',
+          {
+            cacheKey,
+            size: cached.blob.size
+          }
+        );
+  
+        triggerDownload(
+          cached.blob,
+          cached.filename || fname
+        );
+  
+        return {
+          ok: true,
+          cached: true,
+          blob: cached.blob,
+          size: cached.blob.size,
+          path: 'indexeddb-cache'
+        };
       }
-
-      if (data && typeof data === 'object' && data.ok && data.pdf_url) {
-        console.log('[PDF] sucesso via pdf_url:', path, data.pdf_url);
-        window.open(data.pdf_url, '_blank');
-        return { ok: true, path };
-      }
-
-      console.warn('[PDF] resposta sem blob/url:', path, data);
-      lastError = new Error(`Resposta inesperada em ${path}`);
-    } catch (e) {
-      lastError = e;
-      console.warn('[PDF] tentativa falhou:', path, e?.message || e);
-      await sleep(300);
     }
+  
+    // =====================================================
+    // 2) NÃO EXISTE CACHE → GERA UMA ÚNICA VEZ
+    // =====================================================
+  
+    const paths = [
+      '/jornada/essencial/pdf',
+      '/jornada/pdf',
+      '/jornada-essencial/pdf',
+      '/pdf',
+      '/gerar-pdf'
+    ];
+  
+    let lastError = null;
+  
+    for (const path of paths) {
+      try {
+        console.log(
+          '[PDF][GERACAO] tentando:',
+          `${API_PRIMARY}${path}`
+        );
+  
+        await sleep(400);
+  
+        const { data, response } =
+          await postJSON(
+            API_PRIMARY,
+            path,
+            safePayload,
+            60000
+          );
+  
+        if (data instanceof Blob) {
+          const size = data.size || 0;
+          const type =
+            String(data.type || '').toLowerCase();
+  
+          console.log('[PDF] blob recebido:', {
+            path,
+            status: response?.status,
+            type,
+            size
+          });
+  
+          if (
+            !size ||
+            size < 50000 ||
+            !type.includes('pdf')
+          ) {
+            console.error(
+              '[PDF] bloqueado: blob inválido ou incompleto',
+              { size, type, path }
+            );
+  
+            lastError =
+              new Error(
+                `PDF incompleto em ${path}. Size=${size}`
+              );
+  
+            await sleep(1500);
+            continue;
+          }
+  
+          // ===============================================
+          // SALVA ANTES DO DOWNLOAD
+          // ===============================================
+  
+          if (cacheKey) {
+            await saveCachedPdf(
+              cacheKey,
+              data,
+              fname
+            );
+          }
+  
+          triggerDownload(data, fname);
+  
+          return {
+            ok: true,
+            cached: false,
+            path,
+            blob: data,
+            size
+          };
+        }
+  
+        // Compatibilidade com eventual backend por URL.
+        if (
+          data &&
+          typeof data === 'object' &&
+          data.url
+        ) {
+          console.log(
+            '[PDF] sucesso via url:',
+            path,
+            data.url
+          );
+  
+          window.open(data.url, '_blank');
+  
+          return {
+            ok: true,
+            cached: false,
+            path
+          };
+        }
+  
+        if (
+          data &&
+          typeof data === 'object' &&
+          data.ok &&
+          data.pdf_url
+        ) {
+          console.log(
+            '[PDF] sucesso via pdf_url:',
+            path,
+            data.pdf_url
+          );
+  
+          window.open(data.pdf_url, '_blank');
+  
+          return {
+            ok: true,
+            cached: false,
+            path
+          };
+        }
+  
+        console.warn(
+          '[PDF] resposta sem blob/url:',
+          path,
+          data
+        );
+  
+        lastError =
+          new Error(`Resposta inesperada em ${path}`);
+  
+      } catch (e) {
+        lastError = e;
+  
+        console.warn(
+          '[PDF] tentativa falhou:',
+          path,
+          e?.message || e
+        );
+  
+        await sleep(300);
+      }
+    }
+  
+    console.error(
+      '[PDF] nenhuma rota respondeu corretamente.',
+      lastError
+    );
+  
+    return {
+      ok: false,
+      error: String(
+        lastError?.message ||
+        'Nenhuma rota de PDF respondeu corretamente.'
+      )
+    };
   }
-
-  console.error('[PDF] nenhuma rota respondeu corretamente.', lastError);
-  return {
-    ok: false,
-    error: String(lastError?.message || 'Nenhuma rota de PDF respondeu corretamente.')
-  };
-}
   
   async function gerarDevolutivaBase(payload, path) {
     try {
