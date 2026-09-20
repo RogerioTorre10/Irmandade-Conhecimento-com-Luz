@@ -71,6 +71,7 @@
     retryCount: 0,
     saveChain: Promise.resolve(),
     lastRemoteSnapshot: null,
+    selfieSyncSignature: '',
     lastError: null
   };
 
@@ -247,6 +248,100 @@
   }
 
   // =====================================================
+  // PRAZO OFICIAL — SERVIDOR É A AUTORIDADE
+  // =====================================================
+
+  function parseDeadlineMs(value) {
+    if (value == null || value === '') {
+      return null;
+    }
+
+    const numeric = Number(value);
+
+    if (
+      Number.isFinite(numeric) &&
+      numeric > 0
+    ) {
+      return numeric;
+    }
+
+    const parsed =
+      Date.parse(String(value));
+
+    return Number.isFinite(parsed)
+      ? parsed
+      : null;
+  }
+
+
+  function persistOfficialDeadline(
+    value,
+    source = 'server'
+  ) {
+    const incomingMs =
+      parseDeadlineMs(value);
+
+    if (incomingMs == null) {
+      return false;
+    }
+
+    localStorage.setItem(
+      STORAGE.DEADLINE_AT,
+      String(incomingMs)
+    );
+
+    console.log(
+      '[GUARDIÃO][PRAZO] deadline oficial aplicado:',
+      new Date(incomingMs).toISOString(),
+      'fonte=',
+      source
+    );
+
+    emit(
+      'jornada:deadline-updated',
+      {
+        deadline_at: incomingMs,
+        source
+      }
+    );
+
+    return true;
+  }
+
+  function persistOfficialStartedAt(
+    value,
+    source = 'server'
+  ) {
+    if (
+      value == null ||
+      value === ''
+    ) {
+      return false;
+    }
+
+    const parsed =
+      Date.parse(String(value));
+
+    if (!Number.isFinite(parsed)) {
+      return false;
+    }
+
+    localStorage.setItem(
+      STORAGE.STARTED_AT,
+      new Date(parsed).toISOString()
+    );
+
+    console.log(
+      '[GUARDIÃO][PRAZO] início oficial aplicado:',
+      new Date(parsed).toISOString(),
+      'fonte=',
+      source
+    );
+
+    return true;
+  }
+
+  // =====================================================
   // DEVICE HASH
   // =====================================================
 
@@ -319,6 +414,56 @@
   // SNAPSHOT / PAYLOAD
   // =====================================================
 
+  function getDadosPessoaisSnapshot() {
+    const candidatos = [
+      sessionStorage.getItem('JORNADA_DADOS_PESSOAIS'),
+      localStorage.getItem('JORNADA_DADOS_PESSOAIS'),
+      sessionStorage.getItem('JORNADA_DADOS'),
+      localStorage.getItem('JORNADA_DADOS')
+    ];
+
+    for (const raw of candidatos) {
+      const dados = safeJsonParse(raw, null);
+      if (dados && typeof dados === 'object' && !Array.isArray(dados)) {
+        return dados;
+      }
+    }
+
+    return {};
+  }
+
+  function getSelfieCardSnapshot() {
+    return String(
+      sessionStorage.getItem('JORNADA_SELFIECARD') ||
+      sessionStorage.getItem('SELFIE_CARD') ||
+      localStorage.getItem('JORNADA_SELFIECARD') ||
+      localStorage.getItem('SELFIE_CARD') ||
+      window.JORNADA_STATE?.selfieCard ||
+      ''
+    ).trim();
+  }
+
+  function getSelfieSignature(value) {
+    const raw = String(value || '');
+    return raw ? `${raw.length}:${raw.slice(-48)}` : '';
+  }
+
+  function getOfficialJourneyLanguage() {
+    return String(
+      sessionStorage.getItem('jornada.idioma_oficial') ||
+      localStorage.getItem('jornada.idioma_oficial') ||
+      ''
+    ).trim();
+  }
+
+  function persistOfficialJourneyLanguage(value) {
+    const idioma = String(value || '').trim();
+    if (!idioma) return '';
+    sessionStorage.setItem('jornada.idioma_oficial', idioma);
+    localStorage.setItem('jornada.idioma_oficial', idioma);
+    return idioma;
+  }
+
   function buildSnapshot(extra = {}) {
 
     const progressObj = safeJsonParse(
@@ -348,12 +493,28 @@
       progressObj.pergunta = toIntSafe(progressObj.pergunta);
     }
 
+    const dadosPessoais = getDadosPessoaisSnapshot();
+    const nome = String(
+      dadosPessoais.nomeCompleto ||
+      dadosPessoais.nome_completo ||
+      dadosPessoais.nome ||
+      sessionStorage.getItem('jornada.nome') ||
+      localStorage.getItem('JORNADA_NOME') ||
+      ''
+    ).trim();
+
+    const selfieCard = getSelfieCardSnapshot();
+    const deveSincronizarSelfie =
+      selfieCard &&
+      getSelfieSignature(selfieCard) !== state.selfieSyncSignature;
+
     return {
 
       guia:
         sessionStorage.getItem('jornada.guia'),
 
       idioma:
+        getOfficialJourneyLanguage() ||
         localStorage.getItem('i18n_lang') ||
         window.i18n?.lang ||
         'pt-BR',
@@ -395,11 +556,15 @@
             : progressObj.devolutivas?.final
       },
 
-      dados:
-        safeJsonParse(
-          sessionStorage.getItem('JORNADA_DADOS'),
-          {}
-        ),
+      nome,
+
+      dados: dadosPessoais,
+
+      dadosPessoais,
+
+      ...(deveSincronizarSelfie
+        ? { selfieCard }
+        : {}),
 
       estado_tela:
         extra.estado_tela ??
@@ -494,6 +659,23 @@
 
     state.retryCount++;
 
+    if (state.retryCount > 5) {
+
+      console.warn(
+        '[GUARDIÃO] salvamento remoto indisponível. ' +
+        'Snapshot preservado localmente para nova tentativa posterior.'
+      );
+    
+      state.retryCount = 5;
+    
+      localStorage.setItem(
+        STORAGE.PENDING_SAVE,
+        '1'
+      );
+    
+      return;
+    }
+
     const delay =
       Math.min(
         30000,
@@ -524,6 +706,17 @@
   // =====================================================
 
   async function salvar(extra = {}) {
+
+    if (
+      state.restoring ||
+      sessionStorage.getItem('JORNADA_RESTORE_PENDING') === '1'
+    ) {
+      console.log(
+        '[GUARDIÃO] save suspenso até concluir a restauração oficial'
+      );
+      state.dirty = true;
+      return null;
+    }
 
     if (!isAuthenticated()) {
 
@@ -610,6 +803,19 @@
           const data =
             await response.json();
 
+          if (
+            data?.save_ignored === true &&
+            data?.reason === 'dispositivo_substituido'
+          ) {
+            state.authenticated = false;
+            state.dirty = false;
+            localStorage.setItem(STORAGE.AUTH_OK, '0');
+            localStorage.removeItem(STORAGE.PENDING_SAVE);
+            setReauthRequired(true, data);
+            emit('jornada:device-superseded', data);
+            return data;
+          }
+
           if (!response.ok) {
 
             throw new Error(
@@ -639,6 +845,12 @@
               data.codigo_jornada
             );
 
+          }
+
+          if (payload.progresso_json_temp?.selfieCard) {
+            state.selfieSyncSignature = getSelfieSignature(
+              payload.progresso_json_temp.selfieCard
+            );
           }
 
           state.lastRemoteSnapshot =
@@ -730,7 +942,7 @@
   // RESTAURAÇÃO DO SNAPSHOT
   // =====================================================
 
-  function restoreStorageFromSnapshot(data = {}) {
+  async function restoreStorageFromSnapshot(data = {}) {
     if (!data || typeof data !== 'object') return;
 
     if (data.codigo_jornada) {
@@ -738,6 +950,15 @@
         STORAGE.CODIGO,
         String(data.codigo_jornada)
       );
+      sessionStorage.setItem(
+        STORAGE.CODIGO,
+        String(data.codigo_jornada)
+      );
+    }
+
+    if (data.email) {
+      localStorage.setItem(STORAGE.EMAIL, String(data.email));
+      sessionStorage.setItem(STORAGE.EMAIL, String(data.email));
     }
 
     if (data.last_section) {
@@ -761,8 +982,117 @@
       );
     }
 
+    // =====================================================
+    // MARCADORES REMOTOS DE RETOMADA
+    // =====================================================
+    // Informa às sections que o estado foi reconstruído
+    // a partir do checkpoint oficial do servidor.
+    try {
+      sessionStorage.setItem(
+        'JORNADA_RESTORE_MODE',
+        '1'
+      );
+    
+      if (data.last_section) {
+        sessionStorage.setItem(
+          'JORNADA_REMOTE_LAST_SECTION',
+          normalizeSection(data.last_section)
+        );
+      }
+    
+      if (
+        data.last_block != null &&
+        data.last_block !== ''
+      ) {
+        const blocoRemoto = String(data.last_block);
+    
+        sessionStorage.setItem(
+          'JORNADA_REMOTE_LAST_BLOCK',
+          blocoRemoto
+        );
+    
+        // O checkpoint oficial do servidor também vence
+        // uma eventual posição antiga da pergunta no navegador.
+        if (data.last_question != null) {
+          const perguntaRemota =
+            toIntSafe(data.last_question);
+    
+          sessionStorage.setItem(
+            'JORNADA_REMOTE_LAST_QUESTION',
+            String(perguntaRemota)
+          );
+    
+          sessionStorage.setItem(
+            `jp:${blocoRemoto}:idx`,
+            String(perguntaRemota)
+          );
+    
+          localStorage.setItem(
+            `jp:${blocoRemoto}:idx`,
+            String(perguntaRemota)
+          );
+        }
+      }
+    
+    } catch (err) {
+      console.warn(
+        '[GUARDIÃO][RESTORE][MARCADORES]',
+        err
+      );
+    }
+
     const snapshot =
       data.progresso_json_temp || {};
+
+    // =====================================================
+    // SUBESTADO REMOTO DA TELA
+    // =====================================================
+    try {
+      const estadoTelaRemoto =
+        snapshot.estado_tela ??
+        '';
+    
+      if (estadoTelaRemoto) {
+        sessionStorage.setItem(
+          'JORNADA_REMOTE_ESTADO_TELA',
+          String(estadoTelaRemoto)
+        );
+    
+        sessionStorage.setItem(
+          'jornada.estadoTela',
+          String(estadoTelaRemoto)
+        );
+      }
+    
+      if (snapshot.devolutiva_concluida === true) {
+        sessionStorage.setItem(
+          'JORNADA_REMOTE_DEVOLUTIVA_CONCLUIDA',
+          '1'
+        );
+      } else {
+        sessionStorage.removeItem(
+          'JORNADA_REMOTE_DEVOLUTIVA_CONCLUIDA'
+        );
+      }
+    
+      console.log(
+        '[GUARDIÃO][RESTORE][CHECKPOINT]',
+        {
+          section: data.last_section,
+          bloco: data.last_block,
+          pergunta: data.last_question,
+          estado_tela: estadoTelaRemoto,
+          devolutiva_concluida:
+            snapshot.devolutiva_concluida === true
+        }
+      );
+    
+    } catch (err) {
+      console.warn(
+        '[GUARDIÃO][RESTORE][CHECKPOINT][WARN]',
+        err
+      );
+    }
 
     if (snapshot.respostas) {
       sessionStorage.setItem(
@@ -832,11 +1162,60 @@
       window.__JORNADA_DEVOLUTIVA_FINAL__ = devolutivaFinal;
     }
 
-    if (snapshot.dados) {
-      sessionStorage.setItem(
-        'JORNADA_DADOS',
-        JSON.stringify(snapshot.dados)
-      );
+    const dadosPessoais =
+      snapshot.dadosPessoais ||
+      snapshot.dados_pessoais ||
+      snapshot.dados ||
+      {};
+
+    if (
+      dadosPessoais &&
+      typeof dadosPessoais === 'object' &&
+      !Array.isArray(dadosPessoais) &&
+      Object.keys(dadosPessoais).length
+    ) {
+      const rawDados = JSON.stringify(dadosPessoais);
+      sessionStorage.setItem('JORNADA_DADOS', rawDados);
+      sessionStorage.setItem('JORNADA_DADOS_PESSOAIS', rawDados);
+      localStorage.setItem('JORNADA_DADOS', rawDados);
+      localStorage.setItem('JORNADA_DADOS_PESSOAIS', rawDados);
+
+      window.__JORNADA_DADOS_PESSOAIS__ = dadosPessoais;
+      window.JORNADA_STATE = window.JORNADA_STATE || {};
+      window.JORNADA_STATE.dadosPessoais = dadosPessoais;
+    }
+
+    const nomeRestaurado = String(
+      snapshot.nome ||
+      dadosPessoais.nomeCompleto ||
+      dadosPessoais.nome_completo ||
+      dadosPessoais.nome ||
+      ''
+    ).trim();
+
+    if (nomeRestaurado) {
+      sessionStorage.setItem('jornada.nome', nomeRestaurado);
+      localStorage.setItem('JORNADA_NOME', nomeRestaurado);
+      window.JORNADA_STATE = window.JORNADA_STATE || {};
+      window.JORNADA_STATE.nome = nomeRestaurado;
+    }
+
+    const selfieCard = String(
+      snapshot.selfieCard ||
+      snapshot.selfie_card ||
+      snapshot.selfiecard ||
+      ''
+    ).trim();
+
+    if (selfieCard.startsWith('data:image/')) {
+      sessionStorage.setItem('JORNADA_SELFIECARD', selfieCard);
+      sessionStorage.setItem('SELFIE_CARD', selfieCard);
+      localStorage.setItem('JORNADA_SELFIECARD', selfieCard);
+      localStorage.setItem('SELFIE_CARD', selfieCard);
+
+      window.JORNADA_STATE = window.JORNADA_STATE || {};
+      window.JORNADA_STATE.selfieCard = selfieCard;
+      state.selfieSyncSignature = getSelfieSignature(selfieCard);
     }
 
     if (snapshot.guia) {
@@ -853,15 +1232,25 @@
 
     if (snapshot.idioma) {
       try {
+        const idiomaOficial = persistOfficialJourneyLanguage(
+          String(snapshot.idioma)
+        );
+
         localStorage.setItem(
           'i18n_lang',
-          String(snapshot.idioma)
+          idiomaOficial
         );
 
         sessionStorage.setItem(
           'i18n_lang',
-          String(snapshot.idioma)
+          idiomaOficial
         );
+
+        if (typeof window.i18n?.restoreJourneyLang === 'function') {
+          await window.i18n.restoreJourneyLang(idiomaOficial);
+        } else if (typeof window.JORNADA_setLang === 'function') {
+          await window.JORNADA_setLang(idiomaOficial, true);
+        }
       } catch (_) {}
     }
 
@@ -872,40 +1261,31 @@
       );
     }
 
-    if (snapshot.started_at) {
-      localStorage.setItem(
-        STORAGE.STARTED_AT,
-        String(snapshot.started_at)
-      );
-    }
+    // =====================================================
+    // PRAZO NA RETOMADA
+    // dados oficiais do servidor vencem o snapshot local.
+    // =====================================================
 
-    if (snapshot.deadline_at) {
-      localStorage.setItem(
-        STORAGE.DEADLINE_AT,
-        String(snapshot.deadline_at)
-      );
-    }
+    const officialStartedAt =
+      data.started_at ||
+      snapshot.started_at ||
+      null;
 
-    if (data.started_at) {
-      localStorage.setItem(
-        STORAGE.STARTED_AT,
-        String(data.started_at)
-      );
-    }
+    const officialDeadlineAt =
+      data.expires_at ||
+      data.deadline_at ||
+      snapshot.deadline_at ||
+      null;
 
-    if (data.deadline_at) {
-      localStorage.setItem(
-        STORAGE.DEADLINE_AT,
-        String(data.deadline_at)
-      );
-    }
+    persistOfficialStartedAt(
+      officialStartedAt,
+      'retomada.server'
+    );
 
-    if (data.expires_at) {
-      localStorage.setItem(
-        STORAGE.DEADLINE_AT,
-        String(data.expires_at)
-      );
-    }
+    persistOfficialDeadline(
+      officialDeadlineAt,
+      'retomada.server'
+    );
 
     state.lastRemoteSnapshot = data;
     state.restored = true;
@@ -1109,7 +1489,9 @@
         response.ok &&
         data?.retomar === true
       ) {
-        restoreStorageFromSnapshot(data);
+        await restoreStorageFromSnapshot(data);
+
+        sessionStorage.removeItem('JORNADA_RESTORE_PENDING');
 
         localStorage.setItem(
           STORAGE.AUTH_OK,
@@ -1234,36 +1616,57 @@
       );
     }
 
-    const currentStartedAt =
-      localStorage.getItem(STORAGE.STARTED_AT);
+    // =====================================================
+    // PRAZO OFICIAL DA LICENÇA
+    // O servidor sempre vence o relógio local.
+    // =====================================================
 
-    const currentDeadlineAt =
-      localStorage.getItem(STORAGE.DEADLINE_AT);
-
-    const startedAt =
-      currentStartedAt ||
+    const serverStartedAt =
       payload.started_at ||
       payload.criado_em ||
       null;
 
-    const deadlineAt =
-      currentDeadlineAt ||
-      payload.deadline_at ||
+    const serverDeadlineAt =
       payload.expires_at ||
+      payload.deadline_at ||
       null;
 
-    if (startedAt) {
-      localStorage.setItem(
-        STORAGE.STARTED_AT,
-        String(startedAt)
-      );
+    if (
+      !persistOfficialStartedAt(
+        serverStartedAt,
+        'ativacao.server'
+      )
+    ) {
+      const currentStartedAt =
+        localStorage.getItem(
+          STORAGE.STARTED_AT
+        );
+
+      if (currentStartedAt) {
+        persistOfficialStartedAt(
+          currentStartedAt,
+          'ativacao.local-fallback'
+        );
+      }
     }
 
-    if (deadlineAt) {
-      localStorage.setItem(
-        STORAGE.DEADLINE_AT,
-        String(deadlineAt)
-      );
+    if (
+      !persistOfficialDeadline(
+        serverDeadlineAt,
+        'ativacao.server'
+      )
+    ) {
+      const currentDeadlineAt =
+        localStorage.getItem(
+          STORAGE.DEADLINE_AT
+        );
+
+      if (currentDeadlineAt) {
+        persistOfficialDeadline(
+          currentDeadlineAt,
+          'ativacao.local-fallback'
+        );
+      }
     }
 
     const section =
@@ -1282,6 +1685,13 @@
     state.reauthRequired = false;
 
     setReauthRequired(false);
+
+    persistOfficialJourneyLanguage(
+      window.i18n?.lang ||
+      localStorage.getItem('i18n_lang') ||
+      sessionStorage.getItem('i18n_lang') ||
+      'pt-BR'
+    );
 
     persistStateCache({
       activatedAt: Date.now()
@@ -1533,6 +1943,9 @@
       sessionStorage.removeItem(
         'JORNADA_DADOS'
       );
+
+      sessionStorage.removeItem('jornada.idioma_oficial');
+      localStorage.removeItem('jornada.idioma_oficial');
 
       emit(
         'jornada:finished',
