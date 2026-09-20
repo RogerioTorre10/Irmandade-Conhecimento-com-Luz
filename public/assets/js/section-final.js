@@ -582,6 +582,74 @@ function buildFinalSynthesisPayload() {
     return merged;
   }
 
+  // A identidade pode vir do login atual, do snapshot restaurado pelo backend
+  // ou das chaves legadas. Isto e indispensavel quando a Jornada e retomada
+  // em outro dispositivo: respostas e posicao podem existir sem que o objeto
+  // global original ainda esteja em memoria.
+  function readFinalIdentity(stateObj = {}) {
+    const progress = getProgressSnapshotFinal();
+    const nested =
+      (progress?.progresso_json_temp && typeof progress.progresso_json_temp === 'object')
+        ? progress.progresso_json_temp
+        : {};
+
+    function firstValue(values) {
+      for (const value of values) {
+        const clean = String(value ?? '').trim();
+        if (clean) return clean;
+      }
+      return '';
+    }
+
+    function readKey(key) {
+      try {
+        return sessionStorage.getItem(key) || localStorage.getItem(key) || '';
+      } catch (_) {
+        return '';
+      }
+    }
+
+    const codigo_jornada = firstValue([
+      stateObj.codigo_jornada,
+      stateObj.codigoJornada,
+      stateObj.codigo,
+      progress.codigo_jornada,
+      progress.codigoJornada,
+      nested.codigo_jornada,
+      nested.codigoJornada,
+      readKey('jornada_codigo'),
+      readKey('jornada.codigo_jornada'),
+      readKey('JORNADA_CODIGO'),
+      readKey('codigo_jornada')
+    ]);
+
+    const email = firstValue([
+      stateObj.email,
+      stateObj.jornada_email,
+      stateObj.participantEmail,
+      progress.email,
+      progress.jornada_email,
+      nested.email,
+      nested.jornada_email,
+      readKey('jornada_email'),
+      readKey('jornada.email'),
+      readKey('JORNADA_EMAIL'),
+      readKey('email_jornada')
+    ]).toLowerCase();
+
+    // Consolida as chaves canonicas para as etapas seguintes da mesma sessao.
+    if (codigo_jornada) {
+      try { sessionStorage.setItem('jornada_codigo', codigo_jornada); } catch (_) {}
+      try { sessionStorage.setItem('jornada.codigo_jornada', codigo_jornada); } catch (_) {}
+    }
+    if (email) {
+      try { sessionStorage.setItem('jornada_email', email); } catch (_) {}
+      try { sessionStorage.setItem('jornada.email', email); } catch (_) {}
+    }
+
+    return { codigo_jornada, email };
+  }
+
   function normalizeGuide(raw) {
     const s = String(raw || '').trim();
     const x = s.toLowerCase();
@@ -795,6 +863,7 @@ function buildFinalSynthesisPayload() {
   // ================================
   function buildFinalPayloadDiamante() {
   const s = getJornadaState();
+  const identidade = readFinalIdentity(s);
   const nome = String(
     s.nome ?? s.name ?? s.participantName ?? s.participante ?? localStorage.getItem('JORNADANOME') ?? sessionStorage.getItem('JORNADANOME') ?? 'Caminhante'
   ).trim();
@@ -814,6 +883,8 @@ function buildFinalSynthesisPayload() {
   const devolutivaFinal = getStoredFinalFeedback();
 
   const payload = {
+    codigo_jornada: identidade.codigo_jornada,
+    email: identidade.email,
     nome,
     guia,
     idioma: getActiveLang(),
@@ -986,14 +1057,48 @@ function buildFinalSynthesisPayload() {
         utter.lang = picked.lang || utter.lang;
       }
 
-      utter.onend = () => resolve();
-      utter.onerror = () => resolve();
+      let finalizado = false;
 
-      try { window.speechSynthesis.cancel(); } catch {}
+      const finalizarTTS = () => {
+        if (finalizado) return;
+        finalizado = true;
+      
+        clearTimeout(ttsSafetyTimer);
+        resolve();
+      };
+      
+      utter.onend = finalizarTTS;
+      utter.onerror = finalizarTTS;
+      
+      // TRAVA DE SEGURANÇA:
+      // Safari/iOS às vezes não dispara onend nem onerror.
+      // A voz nunca poderá bloquear a Jornada.
+      const duracaoEstimada = Math.max(
+        6000,
+        Math.min(30000, clean.length * 75)
+      );
+      
+      const ttsSafetyTimer = setTimeout(() => {
+        console.warn(
+          '[FINAL][TTS][SAFETY] TTS não respondeu; liberando sequência.'
+        );
+      
+        try {
+          window.speechSynthesis.cancel();
+        } catch {}
+      
+        finalizarTTS();
+      }, duracaoEstimada);
+      
+      try {
+        window.speechSynthesis.cancel();
+      } catch {}
+      
       try {
         window.speechSynthesis.speak(utter);
-      } catch {
-        resolve();
+      } catch (err) {
+        console.warn('[FINAL][TTS] Falha ao iniciar voz:', err);
+        finalizarTTS();
       }
     }));
 
@@ -1108,59 +1213,147 @@ function buildGuideFallbackText(guiaRaw, nomeRaw) {
   // DEVOLUTIVA FINAL
   // ================================
   async function postFinalFeedback(body) {
-  const apiBase =
-    window.API?.PRIMARY ||
-    window.API_BASE ||
-    window.APP_CONFIG?.API_BASE ||
-    '/api';
-
-  const base = String(apiBase).replace(/\/$/, '');
-  const url = base.endsWith('/api')
-    ? `${base}/jornada/devolutiva-final`
-    : `${base}/api/jornada/devolutiva-final`;
-
-  const resp = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  });
-
-  const data = await resp.json().catch(() => ({}));
-
-  if (!resp.ok || data?.ok === false) {
-    throw new Error(data?.detail || data?.message || data?.error || `HTTP ${resp.status}`);
-  }
-
-  const texto = String(
-    data?.devolutivaFinal ||
-    data?.devolutiva_final ||
-    data?.devolutiva ||
-    data?.textoFinal ||
-    data?.texto_final ||
-    data?.texto ||
-    data?.text ||
-    data?.message ||
-    ''
-  ).trim();
-
-  console.log('[FINAL][API][PARSE]', {
-    keys: Object.keys(data || {}),
-    chars: texto.length,
-    provider: data?.provider || data?.source || data?.guia || null
-  });
+    const apiBase =
+      window.API?.PRIMARY ||
+      window.API_BASE ||
+      window.APP_CONFIG?.API_BASE ||
+      '/api';
   
-  if (!texto) {
-    throw new Error('Resposta vazia da devolutiva final');
+    const base = String(apiBase).replace(/\/$/, '');
+  
+    const url = base.endsWith('/api')
+      ? `${base}/jornada/devolutiva-final`
+      : `${base}/api/jornada/devolutiva-final`;
+  
+    // =====================================================
+    // TIMEOUT CIRÚRGICO DA DEVOLUTIVA FINAL
+    // =====================================================
+    const controller = new AbortController();
+  
+    const TIMEOUT_MS = 55000;
+  
+    const timeoutId = setTimeout(() => {
+      try {
+        controller.abort();
+      } catch (_) {}
+    }, TIMEOUT_MS);
+  
+    console.log(
+      '[FINAL][API][REQUEST]',
+      {
+        guia: body?.guia || null,
+        respostas: Array.isArray(body?.respostas)
+          ? body.respostas.length
+          : 0,
+        blocos: Array.isArray(body?.blocos)
+          ? body.blocos.length
+          : 0,
+        retry: !!body?.retry,
+        timeout_ms: TIMEOUT_MS
+      }
+    );
+  
+    try {
+      const resp = await fetch(url, {
+        method: 'POST',
+  
+        headers: {
+          'Content-Type': 'application/json'
+        },
+  
+        body: JSON.stringify(body),
+  
+        signal: controller.signal
+      });
+  
+      const data =
+        await resp.json().catch(() => ({}));
+  
+      if (!resp.ok || data?.ok === false) {
+        throw new Error(
+          data?.detail ||
+          data?.message ||
+          data?.error ||
+          `HTTP ${resp.status}`
+        );
+      }
+  
+      const texto = String(
+        data?.devolutivaFinal ||
+        data?.devolutiva_final ||
+        data?.devolutiva ||
+        data?.textoFinal ||
+        data?.texto_final ||
+        data?.texto ||
+        data?.text ||
+        data?.message ||
+        ''
+      ).trim();
+  
+      console.log(
+        '[FINAL][API][PARSE]',
+        {
+          keys: Object.keys(data || {}),
+          chars: texto.length,
+          provider:
+            data?.provider ||
+            data?.source ||
+            data?.guia ||
+            null
+        }
+      );
+  
+      if (!texto) {
+        throw new Error(
+          'Resposta vazia da devolutiva final'
+        );
+      }
+  
+      return {
+        texto,
+  
+        provider: String(
+          data?.provider ||
+          data?.source ||
+          data?.guia ||
+          ''
+        ).trim().toLowerCase(),
+  
+        guia: String(
+          data?.guia || ''
+        ).trim().toLowerCase(),
+  
+        fallbackUsed: Boolean(
+          data?.fallback ||
+          data?.fallbackUsed
+        ),
+  
+        raw: data
+      };
+  
+    } catch (err) {
+  
+      if (
+        err?.name === 'AbortError'
+      ) {
+        console.warn(
+          '[FINAL][API][TIMEOUT]',
+          `Provider ${body?.guia || 'desconhecido'} ultrapassou ${TIMEOUT_MS}ms`
+        );
+  
+        throw new Error(
+          `Timeout na devolutiva final do guia ${body?.guia || ''}`
+        );
+      }
+  
+      throw err;
+  
+    } finally {
+  
+      clearTimeout(timeoutId);
+  
+    }
   }
-
-  return {
-    texto,
-    provider: String(data?.provider || data?.source || data?.guia || '').trim().toLowerCase(),
-    guia: String(data?.guia || '').trim().toLowerCase(),
-    fallbackUsed: Boolean(data?.fallback || data?.fallbackUsed),
-    raw: data
-  };
-}
 
   function getGuiaFinal() {
     try {
@@ -1176,12 +1369,14 @@ function buildGuideFallbackText(guiaRaw, nomeRaw) {
     // IMPORTANTE: só reaproveita se existe DEVOLUTIVA FINAL de fato já salva.
     // NÃO concatenar devolutivas de bloco aqui — isso faria o backend curto-circuitar
     // (>=2000 chars) mesmo na primeira geração da final, entregando texto antigo.
-    return String(getStoredFinalFeedback() || '').trim();
+    const parcial = String(getStoredFinalFeedback() || '').trim();
+    // Textos curtos são fallback de emergência, não uma final válida para continuação.
+    return isWeakFeedback(parcial, { minChars: 2200, minSentences: 12 }) ? '' : parcial;
   }
 
   async function fetchFinalGuideFeedback() {
   const cachedFinal = getStoredFinalFeedback();
-  if (cachedFinal.length >= 2000) {
+  if (!isWeakFeedback(cachedFinal, { minChars: 2400, minSentences: 12 })) {
     return {
       ok: true,
       text: cachedFinal,
@@ -1199,6 +1394,17 @@ function buildGuideFallbackText(guiaRaw, nomeRaw) {
   const nome = String(payload?.nome || 'Caminhante').trim();
   const dadosPessoais = buildDadosPessoaisFinalSilencioso(payload?.dadosPessoais);
 
+  if (!payload?.codigo_jornada || !payload?.email) {
+    console.error('[FINAL][IDENTIDADE][AUSENTE]', {
+      codigo: Boolean(payload?.codigo_jornada),
+      email: Boolean(payload?.email)
+    });
+    return {
+      ok: false,
+      error: 'Identidade da Jornada não restaurada. Retome o acesso com o mesmo e-mail antes de gerar a devolutiva final.'
+    };
+  }
+
   if (!respostas.length && !blocos.length && !sinteseBlocos) {
     return { ok: true, text: buildGuideFallbackText({ id: guiaOriginal }, nome), guiaUsado: guiaOriginal, fallbackUsed: true };
   }
@@ -1213,6 +1419,8 @@ function buildGuideFallbackText(guiaRaw, nomeRaw) {
     try {
       // === RETOMADA CIRÚRGICA: envia devolutiva final já salva como parcial ===
       const body = {
+        codigo_jornada: String(payload?.codigo_jornada || '').trim(),
+        email: String(payload?.email || '').trim().toLowerCase(),
         nome,
         guia: guiaId,
         idioma: getActiveLang(),
@@ -1228,7 +1436,7 @@ function buildGuideFallbackText(guiaRaw, nomeRaw) {
       const result = await postFinalFeedback(body);
       const texto = String(result?.texto || '').trim();
 
-      if (isWeakFeedback(texto, { minChars: 520, minSentences: 5 })) {
+      if (isWeakFeedback(texto, { minChars: 2200, minSentences: 12 })) {
         ultimoErro = new Error('Devolutiva final fraca');
         continue;
       }
@@ -1294,18 +1502,44 @@ function removerFinalDuplicado(texto) {
   if (!section) return null;
 
     let box = section.querySelector('#finalGuideFeedback');
+
     if (!box) {
       box = document.createElement('div');
       box.id = 'finalGuideFeedback';
       box.className = 'final-guide-feedback';
-
-      const status = section.querySelector('#finalPdfStatus');
-      if (status && status.parentNode) {
-        status.parentNode.insertBefore(box, status.nextSibling);
+    
+      const replayBtn =
+        section.querySelector('#btnOuvirFinal');
+    
+      const status =
+        section.querySelector('#finalPdfStatus');
+    
+      if (
+        replayBtn &&
+        replayBtn.parentNode
+      ) {
+        replayBtn.parentNode.insertBefore(
+          box,
+          replayBtn.nextSibling
+        );
+    
+      } else if (
+        status &&
+        status.parentNode
+      ) {
+        status.parentNode.insertBefore(
+          box,
+          status.nextSibling
+        );
+    
       } else {
         section.appendChild(box);
       }
     }
+
+    box.style.display = 'block';
+    box.style.visibility = 'visible';
+    box.style.opacity = '1';    
 
     lockFinalButtons(section);
 
@@ -1325,25 +1559,44 @@ function removerFinalDuplicado(texto) {
         source: result?.raw?.source || result?.provider || 'api'
       });
 
-      box.textContent = '';
-
-      const textoParaVoz = normalizarReferenciasBiblicasParaVoz(texto);
-
-      // inicia a datilografia
-      const typingPromise = typeText(box, texto, 22, false);
-
-      // pequena vantagem visual para a aura aparecer
-      await sleep(350);
- 
-      // inicia a leitura enquanto digita
-      const speechPromise = queueSpeak(textoParaVoz);
-
-      // espera ambos terminarem
-      await Promise.all([
-      typingPromise,
-      speechPromise
-      ]);
+      const textoParaVoz =
+        normalizarReferenciasBiblicasParaVoz(texto);
       
+      // =====================================================
+      // EXIBIÇÃO BLINDADA DA DEVOLUTIVA FINAL
+      // =====================================================
+      // O texto aparece imediatamente.
+      // A animação/voz nunca pode apagar uma devolutiva válida.
+      box.textContent = texto;
+      
+      box.style.display = 'block';
+      box.style.visibility = 'visible';
+      box.style.opacity = '1';
+      
+      box.classList.remove('typing-active');
+      box.classList.add('typing-done');
+      
+      console.log(
+        '[FINAL][DEVOLUTIVA][VISIVEL]',
+        {
+          chars: texto.length,
+          preview: texto.slice(0, 80)
+        }
+      );
+      
+      // Voz é complementar. Não controla mais a exibição do texto.
+      try {
+        await Promise.race([
+          queueSpeak(textoParaVoz),
+          sleep(30000)
+        ]);
+      } catch (err) {
+        console.warn(
+          '[FINAL][TTS][NAO_BLOQUEANTE]',
+          err
+        );
+      }
+            
       setFinalReplayState(section, "ready");
 
       window.__GUIA_FINAL_EFETIVO__ =
@@ -1432,47 +1685,247 @@ function removerFinalDuplicado(texto) {
   }
 
   // ================================
-  // VOLTAR AO PORTAL
+  // LIMPEZA DA JORNADA CONCLUÍDA
   // ================================
+  function limparEstadoLocalJornadaConcluida() {
+    console.log('[FINAL][CLEANUP] Iniciando limpeza local da Jornada...');
+  
+    try {
+      // Chaves específicas conhecidas da Jornada.
+      const chavesExatas = [
+        'jornada_auth_ok',
+        'jornada_codigo',
+        'jornada_email',
+        'jornada_started_at',
+        'jornada_deadline_at',
+        'jornada_last_section',
+        'jornada_last_block',
+        'jornada_last_question',
+        'jornada_last_at',
+  
+        'JORNADA_PROGRESS',
+        'JORNADA_RESPOSTAS',
+        'JORNADA_STATE',
+        'JORNADA_STATE_CACHE',
+  
+        'JORNADA_DEVOLUTIVAS_BLOCO',
+        'jornada.blockFeedbacks',
+  
+        'JORNADA_DEVOLUTIVA_FINAL',
+  
+        'JORNADA_GUIA',
+        'JORNADA_GUIA_ID',
+        'JORNADA_GUIA_NOME',
+        'JORNADA_GUIA_ATIVO',
+        'JORNADA_GUIA_COLOR',
+  
+        'JORNADA_SELFIECARD',
+        'JORNADA_SELFIE_CARD',
+        'JORNADA_SELFIECARD_B64',
+        'SELFIE_CARD',
+  
+        '__SELFIECARD_DONE__',
+  
+        'JORNADA_RUN_ID',
+  
+        'jornada.codigo_jornada',
+        'jornada.email',
+        'jornada.guia',
+        'jornada.guiaSelecionado',
+        'jornada.estadoTela'
+      ];
+  
+      chavesExatas.forEach((key) => {
+        try {
+          localStorage.removeItem(key);
+        } catch {}
+  
+        try {
+          sessionStorage.removeItem(key);
+        } catch {}
+      });
+  
+      // Remove respostas individuais das perguntas.
+      for (let i = localStorage.length - 1; i >= 0; i--) {
+        const key = localStorage.key(i);
+  
+        if (
+          key &&
+          (
+            key.startsWith('jornada_resp_') ||
+            key.startsWith('jornada.pergunta.') ||
+            key.startsWith('JORNADA_REMOTE_')
+          )
+        ) {
+          localStorage.removeItem(key);
+        }
+      }
+  
+      for (let i = sessionStorage.length - 1; i >= 0; i--) {
+        const key = sessionStorage.key(i);
+  
+        if (
+          key &&
+          (
+            key.startsWith('jornada_resp_') ||
+            key.startsWith('jornada.pergunta.') ||
+            key.startsWith('JORNADA_REMOTE_')
+          )
+        ) {
+          sessionStorage.removeItem(key);
+        }
+      }
+  
+      // Limpa estados globais apenas desta execução.
+      try {
+        delete window.__JORNADA_DEVOLUTIVA_FINAL__;
+        delete window.__JORNADA_DEVOLUTIVAS__;
+        delete window.__FINAL_DEVOLUTIVA_RUNNING__;
+        delete window.__FINAL_DEVOLUTIVA_DONE__;
+        delete window.__GUIA_FINAL_EFETIVO__;
+        delete window.JORNADA_STATE;
+      } catch {}
+  
+      console.log(
+        '[FINAL][CLEANUP] Estado local da Jornada removido com sucesso.'
+      );
+  
+    } catch (err) {
+      console.warn(
+        '[FINAL][CLEANUP][WARN]',
+        err
+      );
+    }
+  }
+  
+  
   function handleVoltarInicio() {
-  if (finalReturning) return;
-  finalReturning = true;
-
-  const src = FINAL_MOVIE;
-
-  const goPortal = () => {
-    window.location.href = HOME_URL;
-  };
-
-  if (typeof window.playBlockTransition === 'function') {
-    window.playBlockTransition(src, 'portal', {
-      useGoldBorder: true,
-      pulse: true,
-      ambientBlur: true,
-      onEnd: goPortal,
-      onEnded: goPortal,
-      nextSectionId: 'portal'
-    });
-
-    setTimeout(goPortal, 16000);
-    return;
+    if (finalReturning) return;
+  
+    finalReturning = true;
+  
+    const src = FINAL_MOVIE;
+    let portalExecutado = false;
+  
+    const goPortal = async () => {
+      if (portalExecutado) return;
+      portalExecutado = true;
+  
+      console.log(
+        '[FINAL][PORTAL] Encerrando Jornada antes de sair...'
+      );
+  
+      // =====================================================
+      // FINALIZAÇÃO BLINDADA
+      // O backend nunca poderá prender o participante
+      // na section-final.
+      // =====================================================
+      try {
+        if (
+          window.JORNADA_SESSION &&
+          typeof window.JORNADA_SESSION.finalizar === 'function'
+        ) {
+          await Promise.race([
+            window.JORNADA_SESSION.finalizar({
+              jornada_concluida: true,
+              origem: 'voltar_portal'
+            }),
+  
+            new Promise((resolve) =>
+              setTimeout(resolve, 5000)
+            )
+          ]);
+  
+          console.log(
+            '[FINAL][PORTAL] Finalização concluída ou timeout liberado.'
+          );
+        }
+      } catch (err) {
+        console.warn(
+          '[FINAL][PORTAL][FINALIZAR][WARN]',
+          err
+        );
+      }
+  
+      // Limpa somente o estado da Jornada concluída.
+      try {
+        limparEstadoLocalJornadaConcluida();
+      } catch (err) {
+        console.warn(
+          '[FINAL][PORTAL][LIMPEZA][WARN]',
+          err
+        );
+      }
+  
+      // Sai definitivamente da Jornada.
+      window.location.replace(HOME_URL);
+    };
+  
+    // =====================================================
+    // TRANSIÇÃO FINAL
+    // =====================================================
+    if (typeof window.playBlockTransition === 'function') {
+      try {
+        window.playBlockTransition(
+          src,
+          null,
+          {
+            useGoldBorder: true,
+            pulse: true,
+            ambientBlur: true,
+  
+            onEnd: goPortal,
+            onEnded: goPortal
+  
+            // IMPORTANTE:
+            // não existe nextSectionId aqui.
+            // Portal é página externa, não section da Jornada.
+          }
+        );
+  
+        // Segurança absoluta:
+        // mesmo que o evento do vídeo falhe, sai para o portal.
+        setTimeout(goPortal, 16000);
+  
+        return;
+      } catch (err) {
+        console.warn(
+          '[FINAL][PORTAL][VIDEO][WARN]',
+          err
+        );
+      }
+    }
+  
+    if (typeof window.playVideo === 'function') {
+      try {
+        window.playVideo(
+          src,
+          {
+            useGoldBorder: true,
+            pulse: true,
+            ambientBlur: true,
+  
+            onEnded: goPortal,
+            onEnd: goPortal
+          }
+        );
+  
+        setTimeout(goPortal, 16000);
+  
+        return;
+      } catch (err) {
+        console.warn(
+          '[FINAL][PORTAL][VIDEO_FALLBACK][WARN]',
+          err
+        );
+      }
+    }
+  
+    // Se nenhum player estiver disponível,
+    // vai diretamente ao Portal.
+    goPortal();
   }
-
-  if (typeof window.playVideo === 'function') {
-    window.playVideo(src, {
-      useGoldBorder: true,
-      pulse: true,
-      ambientBlur: true,
-      onEnded: goPortal,
-      onEnd: goPortal
-    });
-
-    setTimeout(goPortal, 16000);
-    return;
-  }
-
-  goPortal();
-}
+  
   // ================================
   // UI DE BOTÕES FINAL
   // ================================
@@ -1737,7 +2190,7 @@ function removerFinalDuplicado(texto) {
     if (!btnBaixarSelfie.dataset.boundFinalSelfie) {
       btnBaixarSelfie.dataset.boundFinalSelfie = '1';
 
-      btnBaixarSelfie.addEventListener('click', (ev) => {
+      btnBaixarSelfie.addEventListener('click', async (ev) => {
         ev.preventDefault();
         ev.stopPropagation();
 
@@ -1752,24 +2205,137 @@ function removerFinalDuplicado(texto) {
         }
 
         try {
-          const dataUrl = String(img).trim().startsWith('data:image')
-            ? String(img).trim()
-            : ('data:image/jpeg;base64,' + String(img).trim().replace(/^base64,/, ''));
-
-          const a = document.createElement('a');
-          a.href = dataUrl;
-          a.download = (payload.nome ? payload.nome : 'selfiecard') + '-selfiecard.jpg';
+          const raw = String(img).trim();
+        
+          const dataUrl = raw.startsWith('data:image')
+            ? raw
+            : ('data:image/png;base64,' + raw.replace(/^base64,/, ''));
+        
+          // Descobre o tipo real da imagem.
+          const mimeMatch = dataUrl.match(/^data:(image\/[^;]+);base64,/i);
+          const mimeType = mimeMatch?.[1] || 'image/png';
+        
+          const extensao =
+            mimeType.includes('jpeg') || mimeType.includes('jpg')
+              ? 'jpg'
+              : 'png';
+        
+          const nomeArquivo =
+            `${payload.nome || 'selfiecard'}-selfiecard.${extensao}`;
+        
+          // Converte DATA URL em Blob real.
+          const resposta = await fetch(dataUrl);
+          const blob = await resposta.blob();
+        
+          const arquivo = new File(
+            [blob],
+            nomeArquivo,
+            { type: mimeType }
+          );
+        
+          const isIOS =
+            /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+            (
+              navigator.platform === 'MacIntel' &&
+              navigator.maxTouchPoints > 1
+            );
+        
+          // ==========================================
+          // iPHONE / iPAD
+          // ==========================================
+          if (
+            isIOS &&
+            navigator.share &&
+            navigator.canShare?.({
+              files: [arquivo]
+            })
+          ) {
+            await navigator.share({
+              files: [arquivo],
+              title: 'SelfieCard — Jornada Essencial'
+            });
+        
+            setPdfStatus(
+              root,
+              '✅ SelfieCard preparada. Escolha “Salvar em Arquivos” para guardá-la.',
+              'ok'
+            );
+        
+            return;
+          }
+        
+          // ==========================================
+          // DOWNLOAD NORMAL — DESKTOP / ANDROID /
+          // FALLBACK PARA iOS
+          // ==========================================
+          const blobUrl =
+            URL.createObjectURL(blob);
+        
+          const a =
+            document.createElement('a');
+        
+          a.href = blobUrl;
+          a.download = nomeArquivo;
+        
           document.body.appendChild(a);
+        
           a.click();
+        
           document.body.removeChild(a);
-
-          setPdfStatus(root, t('final.selfieDownloaded', '✅ SelfieCard baixado com sucesso!'), 'ok');
+        
+          setTimeout(() => {
+            URL.revokeObjectURL(blobUrl);
+          }, 15000);
+        
+          if (isIOS) {
+            setPdfStatus(
+              root,
+              '📥 Confirme o download no Safari.',
+              'ok'
+            );
+          } else {
+            setPdfStatus(
+              root,
+              t(
+                'final.selfieDownloaded',
+                '✅ SelfieCard baixada com sucesso!'
+              ),
+              'ok'
+            );
+          }
+        
         } catch (e) {
-          console.error('[FINAL][SELFIE] erro:', e);
-          setPdfStatus(root, t('final.selfieDownloadError', '❌ Não consegui baixar a SelfieCard. Veja o console.'), 'err');
+        
+          // Cancelar a folha de compartilhamento do iPhone
+          // não deve ser tratado como erro da Jornada.
+          if (e?.name === 'AbortError') {
+            setPdfStatus(
+              root,
+              'SelfieCard pronta. Toque novamente para salvar.',
+              null
+            );
+        
+            return;
+          }
+        
+          console.error(
+            '[FINAL][SELFIE] erro:',
+            e
+          );
+        
+          setPdfStatus(
+            root,
+            t(
+              'final.selfieDownloadError',
+              '❌ Não consegui preparar a SelfieCard.'
+            ),
+            'err'
+          );
         }
-      });
-    }
+      }); // ← FECHA O addEventListener DA SELFIECARD
+
+    } 
+        
 
     if (!btnPortal.dataset.boundFinalPortal) {
       btnPortal.dataset.boundFinalPortal = '1';
@@ -1801,98 +2367,101 @@ function removerFinalDuplicado(texto) {
     });
 
    try {
-  section.style.display = 'block';
+    section.style.display = 'block';
+  
+    const tituloOriginal = t(
+      'final.title',
+      titleEl?.dataset?.text ||
+      titleEl?.dataset?.original ||
+      titleEl?.textContent?.trim() ||
+      'Fim da Jornada'
+    ).trim();
+  
+      titleEl.dataset.original = tituloOriginal;
+      titleEl.dataset.text = tituloOriginal;
+      titleEl.textContent = tituloOriginal;
+      titleEl.style.opacity = 1;
+      titleEl.style.transform = 'translateY(0)';
+      titleEl.setAttribute('data-typing', 'true');
+      titleEl.setAttribute('data-no-i18n', 'true');
+      titleEl.removeAttribute('data-i18n');
+  
+    const ps = msgEl.querySelectorAll('p');
+    ps.forEach((p) => {
+      const txt = resolveTextFromEl(p, '');
+      p.dataset.original = txt;
+      p.textContent = '';
+      p.style.opacity = 0;
+      p.style.transform = 'translateY(10px)';
+      p.classList.remove('revealed');
+    });
+  
+    section.classList.add('show');
+    await sleep(200);
+  
+      titleEl.style.transition = 'all 0.9s ease';
+      titleEl.style.opacity = 1;
+      titleEl.style.transform = 'translateY(0)';
+      titleEl.textContent = '';
+      await typeText(titleEl, tituloOriginal, 65, true);
+      await sleep(600);
 
-  const tituloOriginal = t(
-    'final.title',
-    titleEl?.dataset?.text ||
-    titleEl?.dataset?.original ||
-    titleEl?.textContent?.trim() ||
-    'Fim da Jornada'
-  ).trim();
-
-titleEl.dataset.original = tituloOriginal;
-titleEl.dataset.text = tituloOriginal;
-titleEl.textContent = tituloOriginal;
-titleEl.style.opacity = 1;
-titleEl.style.transform = 'translateY(0)';
-titleEl.setAttribute('data-typing', 'true');
-titleEl.setAttribute('data-no-i18n', 'true');
-titleEl.removeAttribute('data-i18n');
-
-  const ps = msgEl.querySelectorAll('p');
-  ps.forEach((p) => {
-    const txt = resolveTextFromEl(p, '');
-    p.dataset.original = txt;
-    p.textContent = '';
-    p.style.opacity = 0;
-    p.style.transform = 'translateY(10px)';
-    p.classList.remove('revealed');
-  });
-
-  section.classList.add('show');
-  await sleep(200);
-
-  titleEl.style.transition = 'all 0.9s ease';
-  titleEl.style.opacity = 1;
-  titleEl.style.transform = 'translateY(0)';
-  titleEl.textContent = '';
-  await typeText(titleEl, tituloOriginal, 65, true);
-  await sleep(600);
-
-  for (let i = 0; i < ps.length; i++) {
-    const p = ps[i];
-    const txt = p.dataset.original || '';
-    if (!txt) continue;
-
-    p.style.transition = 'all 0.8s ease';
-    p.style.opacity = 1;
-    p.style.transform = 'translateY(0)';
-
-    await typeText(p, txt, 55, true);
-    p.classList.add('revealed');
-    await sleep(300);
-  }
-
-  setFinalButtonsBusy(section, false);
-} catch (err) {
-  console.error('[FINAL] Erro na sequência inicial:', err);
-  setFinalButtonsBusy(section, false);
-}
+    for (let i = 0; i < ps.length; i++) {
+      const p = ps[i];
+      const txt = p.dataset.original || '';
+    
+      if (!txt) continue;
+    
+      p.style.transition = 'all 0.8s ease';
+      p.style.opacity = 1;
+      p.style.transform = 'translateY(0)';
+    
+      await typeText(p, txt, 55, true);
+    
+      p.classList.add('revealed');
+    
+      await sleep(300);
+    }
+    
+    } catch (err) {
+      console.error(
+        '[FINAL] Erro na sequência inicial:',
+        err
+      );
+    
+      setFinalButtonsBusy(section, false);
+    }
 
     if (botoes) {
-      botoes.style.opacity = '0';
-      botoes.style.transform = 'scale(0.9)';
-      botoes.style.transition = 'all 0.8s ease';
-      botoes.style.pointerEvents = 'none';
-
-      await sleep(400);
-
+      // Área de ações permanece visualmente estável.
       botoes.classList.add('show');
       botoes.style.opacity = '1';
       botoes.style.transform = 'scale(1)';
+      botoes.style.transition = 'none';
       botoes.style.pointerEvents = 'auto';
     }
 
     mountFinalPdfUI(section);
     mountFinalReplayButton(section);
-    unlockPortalButton(section);
+    
+    // Mantém todos os controles bloqueados enquanto
+    // a devolutiva final ainda está sendo produzida.
     lockFinalButtons(section);
-
+    
     function mountFinalReplayButton(section) {
 
-  const btn = getFinalReplayButton(section);
-
-  if (!btn) return;
-
-  setFinalReplayState(section,"hidden");
-
-  if (btn.dataset.boundReplay === "1")
-      return;
-
-  btn.dataset.boundReplay = "1";
-
-  btn.onclick = async () => {
+    const btn = getFinalReplayButton(section);
+  
+    if (!btn) return;
+  
+    setFinalReplayState(section,"hidden");
+  
+    if (btn.dataset.boundReplay === "1")
+        return;
+  
+    btn.dataset.boundReplay = "1";
+  
+    btn.onclick = async () => {
 
       if (btn.dataset.busy === "1")
           return;
@@ -2014,27 +2583,37 @@ titleEl.removeAttribute('data-i18n');
   document.addEventListener('section:shown', (e) => {
     const id = e.detail?.sectionId || e.detail;
     if (id !== SECTION_ID) return;
-
-    console.log('[FINAL] section:shown recebido para section-final, iniciando sequência...');
-
+  
+    console.log(
+      '[FINAL] section:shown recebido para section-final, iniciando sequência...'
+    );
+  
     const sec = document.getElementById(SECTION_ID);
+  
     if (sec) {
       applyFinalGuideTheme(sec);
       sec.style.display = 'block';
       mountFinalPdfUI(sec);
-      unlockPortalButton(sec);
+  
+      // Não libera botões antes da sequência final começar.
+      lockFinalButtons(sec);
     }
-
+  
     startFinalSequence();
-  });
-
+  }); // ← ESTE FECHAMENTO ESTÁ FALTANDO
+  
+  
   document.addEventListener('click', (e) => {
     const target = e.target;
     if (!target) return;
-
-    if (target.matches?.('[data-action="finalizar"], [data-action="voltar-portal"], #btnFinalizar, #btnVoltarPortal')) {
+  
+    if (
+      target.matches?.(
+        '[data-action="finalizar"], [data-action="voltar-portal"], #btnFinalizar, #btnVoltarPortal'
+      )
+    ) {
       e.preventDefault();
       handleVoltarInicio();
     }
   });
-})();
+})(); 
