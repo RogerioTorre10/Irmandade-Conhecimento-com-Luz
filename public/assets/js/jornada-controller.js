@@ -29,7 +29,8 @@
     'section-intro',
     'section-termos1',
     'section-termos2',
-    'section-senha'
+    'section-senha',
+    'section-final'
   ];
 
   let lastShownSection = null;
@@ -315,97 +316,58 @@
   function jornadaTemAcessoValidado() {
     const authOk =
       localStorage.getItem('jornada_auth_ok') === '1';
-
+  
     const codigo =
       localStorage.getItem('jornada_codigo') ||
       sessionStorage.getItem('jornada.codigo_jornada') ||
       '';
-
+  
     const email =
       localStorage.getItem('jornada_email') ||
       sessionStorage.getItem('jornada.email') ||
       '';
-
+  
     const deadlineRaw =
       localStorage.getItem('jornada_deadline_at') ||
       '';
-
+  
     if (!authOk || !codigo || !email || !deadlineRaw) {
       return false;
     }
-
-    const deadline = Number(deadlineRaw);
-
+  
+    const deadlineNumerico = Number(deadlineRaw);
+  
+    const deadline =
+      Number.isFinite(deadlineNumerico) && deadlineNumerico > 0
+        ? deadlineNumerico
+        : Date.parse(deadlineRaw);
+  
     if (!Number.isFinite(deadline) || deadline <= 0) {
       return false;
     }
-
+  
     return Date.now() < deadline;
   }
-
+  
   async function show(sectionId, opts) {
     const force = !!(opts && opts.force);
-  
-    // ======================================================
-// HOMOLOG / DEVELOP
-// Libera navegação manual para testes.
-// PRINCIPAL continua protegido.
-// ======================================================
-
-const HOSTNAME = window.location.hostname.toLowerCase();
-
-const IS_HOMOLOG =
-  HOSTNAME === 'irmandade-conhecimento-com-luz-1.onrender.com' ||
-  HOSTNAME.includes('homolog');
-
-console.warn('[JC][AMBIENTE]', {
-  hostname: HOSTNAME,
-  IS_HOMOLOG
-});
-
-const secaoPrivada =
-  !SECOES_PUBLICAS_JORNADA.has(sectionId);
-
-const acessoValidado =
-  jornadaTemAcessoValidado();
-
-if (
-  secaoPrivada &&
-  !acessoValidado
-) {
-
-  if (IS_HOMOLOG) {
-
-    console.warn(
-      '[JC][HOMOLOG] Acesso direto de teste liberado:',
-      sectionId
-    );
-
-  } else {
-
-    console.warn(
-      '[JC][SECURITY] Acesso bloqueado à seção privada:',
-      sectionId
-    );
-
-    window.toast?.(
-      'Valide seu acesso para continuar a jornada.',
-      'warning'
-    );
-
-    sectionId = 'section-senha';
-  }
-}
-  
+    // Segurança: nenhuma seção privada pode ser aberta
+    // manualmente pelo console sem uma Jornada autenticada e válida.
     if (
-      IS_HOMOLOG &&
       !SECOES_PUBLICAS_JORNADA.has(sectionId) &&
       !jornadaTemAcessoValidado()
     ) {
       console.warn(
-        '[JC][HOMOLOG] Acesso direto de teste liberado:',
+        '[JC][SECURITY] Acesso bloqueado à seção privada:',
         sectionId
       );
+
+      window.toast?.(
+        'Valide seu acesso para continuar a Jornada.',
+        'warning'
+      );
+
+      sectionId = 'section-senha';
     }
     if (window.JORNADA_SESSION?.reauthRequired && sectionId !== 'section-senha' && !force) {
       console.warn('[JC] Redirecionando para reautenticação.');
@@ -585,9 +547,35 @@ const dentro72h =
         console.log('[JC][AUTO_RESTORE] Tentando retomar. Local:', secaoLocal);
 
         let secaoRemota = null;
+
         try {
-          const retomada = await window.JORNADA_SESSION?.retomar?.();
-          console.log('[JC][RETOMADA]', retomada);
+        
+          console.log(
+            '[JC][AUTO_RESTORE] Consultando checkpoint remoto...'
+          );
+        
+          const promiseRetomar =
+            window.JORNADA_SESSION?.retomar?.();
+        
+          const timeoutRetomar =
+            new Promise((_, reject) => {
+              setTimeout(() => {
+                reject(
+                  new Error('timeout_retomada_remota')
+                );
+              }, 5000);
+            });
+        
+          const retomada =
+            await Promise.race([
+              promiseRetomar,
+              timeoutRetomar
+            ]);
+        
+          console.log(
+            '[JC][RETOMADA]',
+            retomada
+          );
           if (retomada?.reason === 'reautenticacao_necessaria' || retomada?.reautenticacao_necessaria) {
             // Jornada em andamento porém sem dados novos salvos (página vazia
             // após a senha): NÃO devolver para a section-senha, pois ela recusa
@@ -611,11 +599,59 @@ const dentro72h =
             secaoRemota = retomada.last_section;
           }
         } catch (e) {
-          console.warn('[JC][AUTO_RESTORE][BACKEND_ERR]', e);
-          const fallback = window.JORNADA_SESSION?.getInitialSection?.();
-          if (fallback && fallback !== 'section-intro') {
-            console.log('[JC] Usando snapshot local:', fallback);
-            await show(fallback, { force: true });
+
+          console.warn(
+            '[JC][AUTO_RESTORE][BACKEND_ERR]',
+            e
+          );
+        
+          const localOk =
+            secaoLocal &&
+            !SECOES_IGNORADAS_RESTORE.includes(
+              secaoLocal
+            );
+        
+          if (localOk) {
+        
+            console.log(
+              '[JC][AUTO_RESTORE] ' +
+              'Backend não concluiu a retomada; ' +
+              'usando checkpoint local:',
+              secaoLocal
+            );
+        
+            window.toast?.(
+              '✅ Sua jornada foi restaurada. Bem-vindo(a) de volta! 🙏',
+              'success'
+            );
+        
+            await show(
+              secaoLocal,
+              { force: true }
+            );
+        
+            isInitializing = false;
+            return;
+          }
+        
+          const fallback =
+            window.JORNADA_SESSION?.getInitialSection?.();
+        
+          if (
+            fallback &&
+            fallback !== 'section-intro'
+          ) {
+        
+            console.log(
+              '[JC] Usando snapshot local:',
+              fallback
+            );
+        
+            await show(
+              fallback,
+              { force: true }
+            );
+        
             isInitializing = false;
             return;
           }
@@ -707,6 +743,34 @@ const dentro72h =
     }
   });
 
+  // ============================================================
+  // RETOMADA APÓS REAUTENTICAÇÃO — Safari/iOS
+  // ============================================================
+  document.addEventListener('jornada:reauth-success', (e) => {
+    const resume =
+      e?.detail?.resume_section ||
+      e?.detail?.last_section ||
+      localStorage.getItem('jornada_last_section');
+
+    if (!resume || SECOES_IGNORADAS_RESTORE.includes(resume)) return;
+
+    try {
+      sessionStorage.setItem('JORNADA_RESTORE_MODE', '1');
+    } catch (_) {}
+
+    // A section-senha pode terminar seu próprio fluxo no mesmo tick.
+    // Um pequeno defer garante que o checkpoint remoto seja a última navegação.
+    setTimeout(async () => {
+      try {
+        console.log('[JC][REAUTH_RESUME] Retomando checkpoint remoto:', resume);
+        await show(resume, { force: true });
+        window.toast?.('✅ Jornada restaurada no ponto em que você parou.', 'success');
+      } catch (err) {
+        console.warn('[JC][REAUTH_RESUME] falha ao abrir checkpoint:', err);
+      }
+    }, 120);
+  });
+
   window.JC = {
     ...existingJC,
     init,
@@ -715,12 +779,5 @@ const dentro72h =
     setOrder,
     attachButtonEvents,
     handleSectionLogic
-  };
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init, { once: true });
-  } else {
-    init();
-  }
-
+  };  
 })();
