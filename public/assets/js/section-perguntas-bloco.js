@@ -463,6 +463,32 @@
     return true;
   }
 
+  // Exibe uma devolutiva já consumida/restaurada SEM TTS e SEM datilografia.
+  // Usada somente no caminho de retomada para não obrigar o participante
+  // a ouvir novamente conteúdo que já foi entregue.
+  function setGuideResponseInstant(text, kind = 'success') {
+    const wrap = document.getElementById('jp-ai-response-wrap');
+    const box = document.getElementById('jp-ai-response');
+    const label = document.querySelector('.jp-ai-response-label');
+    if (label) label.textContent = uiText('guide_feedback_label', 'Devolutiva do Guia');
+    if (!wrap || !box) return false;
+
+    const content = String(text || '').trim();
+    if (!content) return false;
+
+    stopSpeaking();
+    wrap.dataset.kind = kind;
+    wrap.dataset.responseText = content;
+    box.hidden = false;
+    box.textContent = content;
+    box.classList.remove('is-revealing');
+    box.classList.add('is-visible', 'oracle-ready');
+    box.style.textShadow =
+      '0 0 8px var(--guia-soft), 0 0 18px rgba(255,255,255,0.08)';
+    box.style.borderColor = 'var(--guia-main)';
+    return true;
+  }
+
   function getCurrentGuideResponseText() {
     const wrap = document.getElementById('jp-ai-response-wrap');
     const txt = wrap?.dataset?.responseText || '';
@@ -1005,16 +1031,25 @@
 
   function requestCriticalSave(extra = {}) {
     try {
-      window.JORNADA_SESSION?.atualizarEstado?.({
-        last_section: State.sectionId || document.querySelector('section[id^="section-perguntas-"]')?.id || localStorage.getItem('jornada_last_section') || '',
-        last_block: State.bloco?.id || localStorage.getItem('jornada_last_block') || '',
-        last_question: State.questionIndex || 0,
-        devolutiva_concluida: true,
-        critical: true,
-        ...extra,
-      }, { immediate: true, reason: extra.reason || 'devolutiva_salva' });
+      const atualizar = window.JORNADA_SESSION?.atualizarEstado;
+      if (typeof atualizar !== 'function') return Promise.resolve(null);
+
+      return Promise.resolve(
+        atualizar({
+          last_section: State.sectionId || document.querySelector('section[id^="section-perguntas-"]')?.id || localStorage.getItem('jornada_last_section') || '',
+          last_block: State.bloco?.id || localStorage.getItem('jornada_last_block') || '',
+          last_question: State.questionIndex || 0,
+          devolutiva_concluida: true,
+          critical: true,
+          ...extra,
+        }, { immediate: true, reason: extra.reason || 'devolutiva_salva' })
+      ).catch((err) => {
+        console.warn('[DEVOLUTIVA][SAVE][WARN]', err);
+        return null;
+      });
     } catch (err) {
       console.warn('[DEVOLUTIVA][SAVE][WARN]', err);
+      return Promise.resolve(null);
     }
   }
 
@@ -1056,10 +1091,34 @@
   function getCurrentQuestionIndex(bloco) {
     if (!bloco) return 0;
     const total = getBlockQuestionsCount(bloco) || 1;
-    const raw =
+    const perBlockRaw =
       sessionStorage.getItem(questionIndexKey(bloco)) ??
       localStorage.getItem(questionIndexKey(bloco));
-    let idx = Number(raw);
+
+    let idx =
+      perBlockRaw == null || perBlockRaw === ''
+        ? Number.NaN
+        : Number(perBlockRaw);
+
+    // Safari/iOS pode perder a chave específica jp:<bloco>:idx.
+    // Nesse caso, usa o checkpoint remoto genérico restaurado pelo Guardião.
+    if (!Number.isFinite(idx) || idx < 0) {
+      const lastBlock = String(
+        sessionStorage.getItem('JORNADA_REMOTE_LAST_BLOCK') ||
+        localStorage.getItem('jornada_last_block') ||
+        ''
+      ).trim();
+
+      const remoteQuestion = Number(
+        sessionStorage.getItem('JORNADA_REMOTE_LAST_QUESTION') ??
+        localStorage.getItem('jornada_last_question')
+      );
+
+      if (lastBlock && lastBlock === String(bloco.id || '') && Number.isFinite(remoteQuestion)) {
+        idx = remoteQuestion;
+      }
+    }
+
     if (!Number.isFinite(idx) || idx < 0) idx = 0;
     if (idx > total - 1) idx = total - 1;
     return idx;
@@ -1247,6 +1306,20 @@
     };
   }
 
+// ─── Nome oficial do participante ────────────────────────────────────────────
+// A IA deve usar o nome pertencente aos Dados Pessoais da Jornada atual.
+// Nunca usar chaves legacy soltas do navegador como fonte primária,
+// pois o mesmo dispositivo pode ser utilizado por participantes diferentes.
+function getNomeParticipanteAtual() {
+  const dados = buildDadosPessoaisPayload();
+
+  const nome = String(
+    dados?.nomeCompleto || ''
+  ).trim();
+
+  return nome || 'Participante';
+}
+
   // ─── Memória da jornada (histórico cumulativo enviado à IA) ──────────────────
   function buildHistoricoJornada(limite = 12) {
     try {
@@ -1273,41 +1346,62 @@
   }
 
   // ─── Identidade operacional da Jornada ───────────────────────────────────────
-function getJornadaOperationalIdentity() {
-  try {
-    const progress = safeJson(
-      sessionStorage.getItem('JORNADA_PROGRESS'),
-      {}
-    ) || {};
-
-    const email = String(
-      progress.email ||
-      progress?.progresso_json_temp?.email ||
-      ''
-    ).trim().toLowerCase();
-
-    const codigo_jornada = String(
-      progress.codigo_jornada ||
-      progress.codigoJornada ||
-      ''
-    ).trim();
-
-    return {
-      email,
-      codigo_jornada,
-    };
-  } catch (e) {
-    console.warn(
-      '[JORNADA][IDENTIDADE] falha ao recuperar identidade operacional:',
-      e
-    );
-
-    return {
-      email: '',
-      codigo_jornada: '',
-    };
+  function getJornadaOperationalIdentity() {
+    try {
+      const progress = safeJson(
+        sessionStorage.getItem('JORNADA_PROGRESS'),
+        {}
+      ) || {};
+  
+      // =====================================================
+      // IDENTIDADE OPERACIONAL
+      // O Guardião/localStorage é a fonte principal.
+      // JORNADA_PROGRESS permanece como fallback.
+      // =====================================================
+  
+      const email = String(
+        localStorage.getItem('jornada_email') ||
+        sessionStorage.getItem('jornada.email') ||
+        progress.email ||
+        progress?.progresso_json_temp?.email ||
+        ''
+      ).trim().toLowerCase();
+  
+      const codigo_jornada = String(
+        localStorage.getItem('jornada_codigo') ||
+        progress.codigo_jornada ||
+        progress.codigoJornada ||
+        ''
+      ).trim();
+  
+      if (!email || !codigo_jornada) {
+        console.warn(
+          '[JORNADA][IDENTIDADE] identidade operacional incompleta:',
+          {
+            email_presente: Boolean(email),
+            codigo_jornada:
+              codigo_jornada || '(ausente)'
+          }
+        );
+      }
+  
+      return {
+        email,
+        codigo_jornada,
+      };
+  
+    } catch (e) {
+      console.warn(
+        '[JORNADA][IDENTIDADE] falha ao recuperar identidade operacional:',
+        e
+      );
+  
+      return {
+        email: '',
+        codigo_jornada: '',
+      };
+    }
   }
-}
 
   // ─── API / Devolutiva ────────────────────────────────────────────────────────
   async function requestGuideFeedbackWithFallback(params) {
@@ -1546,12 +1640,8 @@ function getJornadaOperationalIdentity() {
   }
 
   async function gerarDevolutivaDoBloco(bloco) {
-  const nome =
-    sessionStorage.getItem('jornada.nome') ||
-    localStorage.getItem('JORNADA_NOME') ||
-    localStorage.getItem('jc.nome') ||
-    'Participante';
-
+  const nome = getNomeParticipanteAtual();
+    
   const guia =
     sessionStorage.getItem('jornada.guia') ||
     localStorage.getItem('JORNADA_GUIA') ||
@@ -1711,6 +1801,25 @@ function getJornadaOperationalIdentity() {
     if (old) old.remove();
   }
 
+  function markBlockConsumed(bloco) {
+    if (!bloco) return;
+    try {
+      const blocoId = String(bloco.id || '');
+      const todos = getStoredBlockFeedbacks();
+      const atual = todos.find((item) => item?.blocoId === blocoId);
+      if (!atual) return;
+      const outros = todos.filter((item) => item?.blocoId !== blocoId);
+      outros.push({
+        ...atual,
+        blockConsumed: true,
+        blockConsumedAt: new Date().toISOString(),
+      });
+      setStoredBlockFeedbacks(outros, { silent: true });
+    } catch (err) {
+      console.warn('[BLOCO][CONSUMED] falha ao marcar bloco:', err);
+    }
+  }
+
   function showBlockNextBtn(section, bloco) {
     if (!section) return;
     removeBlockNextBtn(section);
@@ -1724,8 +1833,34 @@ function getJornadaOperationalIdentity() {
     btn.textContent = uiText('continue', 'Continuar');
     btn.addEventListener(
       'click',
-      () => {
+      async () => {
         btn.disabled = true;
+
+        // Marca que a síntese foi efetivamente consumida e grava o PRÓXIMO
+        // checkpoint antes de navegar. Assim, se o Safari fechar logo após o
+        // clique, a retomada não volta ao bloco já encerrado.
+        markBlockConsumed(bloco);
+
+        const nextSection = bloco?.nextSection || FINAL_SECTION_ID;
+        const nextBloco =
+          nextSection.startsWith('section-perguntas-')
+            ? getBlocoAtual(nextSection)
+            : null;
+
+        try {
+          await window.JORNADA_SESSION?.atualizarEstado?.({
+            last_section: nextSection,
+            last_block: nextBloco?.id || bloco?.id || '',
+            last_question: 0,
+            estado_tela: 'bloco_concluido',
+            devolutiva_concluida: true,
+            critical: true,
+            reason: 'bloco_consumido',
+          }, { immediate: true, reason: 'bloco_consumido' });
+        } catch (err) {
+          console.warn('[BLOCO][CONSUMED] checkpoint remoto falhou; seguindo navegação.', err);
+        }
+
         exitBlockFeedbackMode(section);
         goNext(bloco);
       },
@@ -1761,6 +1896,16 @@ function getJornadaOperationalIdentity() {
       // ====================================================
       enterBlockFeedbackMode(section);
 
+      // Checkpoint explícito do subestado: se houver F5 enquanto a síntese
+      // ainda está sendo gerada, a retomada volta ao modo de devolutiva do bloco
+      // e reinicia somente esta síntese — nunca retorna à pergunta já consumida.
+      await requestCriticalSave({
+        last_question: getCurrentQuestionIndex(bloco),
+        estado_tela: 'devolutiva_bloco_gerando',
+        devolutiva_concluida: false,
+        reason: 'devolutiva_bloco_iniciada',
+      });
+
       const lead = getBlockClosingLead(bloco);
       if (lead) {
         await setGuideResponse(lead, 'info');
@@ -1792,6 +1937,7 @@ function getJornadaOperationalIdentity() {
         // por saves posteriores por pergunta.
         devolutivaFinal: textoFinal,
         blockFinal: true,
+        blockConsumed: Boolean(atual?.blockConsumed),
         perguntas: Array.isArray(atual?.perguntas) ? atual.perguntas : [],
         guiaUsado:
           result?.guiaUsado ||
@@ -1799,7 +1945,18 @@ function getJornadaOperationalIdentity() {
         source: result?.source || 'desconhecida',
       });
 
-      setStoredBlockFeedbacks(outros);
+      // Primeiro grava localmente sem disparar um save paralelo.
+      setStoredBlockFeedbacks(outros, { silent: true });
+
+      // Depois aguarda o checkpoint remoto conter a devolutiva FINAL do bloco.
+      // Só então começamos TTS/datilografia. Assim, um F5 durante ou logo após
+      // a devolutiva não perde blockFinal/devolutivaFinal.
+      await requestCriticalSave({
+        last_question: getCurrentQuestionIndex(bloco),
+        estado_tela: 'devolutiva_bloco',
+        devolutiva_concluida: true,
+        reason: 'devolutiva_bloco_concluida',
+      });
 
       await setGuideResponse(
         textoFinal,
@@ -2024,95 +2181,6 @@ function bindButtons(section, bloco, perguntaText, qIndex = 0) {
 
     if (state === 'ready') {
 
-    // =====================================================
-    // RETRATAÇÃO
-    // Não avança.
-    // Retorna exatamente à pergunta que ficou pendente.
-    // =====================================================
-  
-    const reanswerKey =
-      `jornada:reanswer:${bloco?.id || 'bloco'}`;
-  
-    const pendingReanswerRaw =
-      sessionStorage.getItem(reanswerKey);
-  
-    const pendingReanswer =
-      pendingReanswerRaw !== null
-        ? Number(pendingReanswerRaw)
-        : null;
-  
-    const temRetratacaoPendente =
-      section.dataset.awaitingReanswer === '1' ||
-      Number.isInteger(pendingReanswer);
-  
-    if (temRetratacaoPendente) {
-  
-      const idxRetorno =
-        Number.isInteger(pendingReanswer)
-          ? pendingReanswer
-          : getCurrentQuestionIndex(bloco);
-  
-      // Fixa a pergunta aguardada ANTES de qualquer limpeza.
-      setCurrentQuestionIndex(
-        bloco,
-        idxRetorno
-      );
-  
-      // Limpa os marcadores da retratação.
-      delete section.dataset.awaitingReanswer;
-  
-      sessionStorage.removeItem(
-        reanswerKey
-      );
-  
-      forceStopMic();
-      stopSpeaking();
-  
-      // Limpa resposta e devolutiva,
-      // sem avançar para outra pergunta.
-      clearAnswerUI();
-  
-      setContinueState(
-        section,
-        'idle'
-      );
-  
-      const btn =
-        section.querySelector('#jp-btn-confirmar');
-  
-      if (btn) {
-        btn.textContent = uiText(
-          'confirm',
-          'Confirmar'
-        );
-      }
-  
-      const ta =
-        section.querySelector('#jp-answer-input');
-  
-      if (ta) {
-        ta.value = '';
-        ta.focus();
-      }
-  
-      console.log(
-        '[PERGUNTA][RETRATACAO] pergunta restaurada',
-        {
-          bloco: bloco?.id,
-          pergunta: idxRetorno + 1
-        }
-      );
-  
-      // CRÍTICO:
-      // não deixa cair em maybeHandleBlockClosure()
-      return;
-    }
-  
-    // =====================================================
-    // SEM RETRATAÇÃO:
-    // comportamento normal
-    // =====================================================
-  
     await maybeHandleBlockClosure(
       section,
       bloco
@@ -2153,8 +2221,7 @@ function bindButtons(section, bloco, perguntaText, qIndex = 0) {
       getCurrentQuestionIndex(bloco);
 
 
-    // Salva provisoriamente.
-    // Se for retratação, será removida depois.
+    // Salva a resposta atual.
     saveAnswer(
       bloco,
       idxAtual,
@@ -2190,19 +2257,7 @@ function bindButtons(section, bloco, perguntaText, qIndex = 0) {
       document.body.dataset.guia ||
       'lumen';
 
-
-    const nome =
-      sessionStorage.getItem(
-        'jornada.nome'
-      ) ||
-      localStorage.getItem(
-        'JORNADA_NOME'
-      ) ||
-      localStorage.getItem(
-        'jc.nome'
-      ) ||
-      'Participante';
-
+    const nome = getNomeParticipanteAtual();
 
     // =================================================
     // RETOMADA CIRÚRGICA
@@ -2303,117 +2358,7 @@ function bindButtons(section, bloco, perguntaText, qIndex = 0) {
 
 
     // =================================================
-    // CLASSIFICAÇÃO DA RESPOSTA
-    // =================================================
-
-    const tipoResposta = String(
-      result?.tipoResposta ||
-      (
-        result?.provider === 'intervencao_retratacao' ||
-        result?.source === 'intervencao_retratacao'
-          ? 'retratacao'
-          : ''
-      )
-    )
-      .trim()
-      .toLowerCase();
-
-
-    // =================================================
-    // RETRATAÇÃO
-    //
-    // NÃO é resposta da pergunta.
-    // Mantém índice atual até nova resposta real.
-    // =================================================
-
-    if (
-      tipoResposta === 'retratacao'
-    ) {
-
-      console.log(
-        '[PERGUNTA][RETRATACAO]',
-        {
-          bloco:
-            bloco?.id,
-
-          pergunta:
-            idxAtual + 1,
-
-          texto:
-            val
-        }
-      );
-
-
-      // Remove o pedido de desculpas da
-      // resposta oficial da pergunta.
-      removeAnswer(
-        bloco,
-        idxAtual
-      );
-
-
-      // Garante que a pergunta atual
-      // continue sendo a mesma.
-      setCurrentQuestionIndex(
-        bloco,
-        idxAtual
-      );
-
-
-      // Persiste qual pergunta aguarda resposta.
-      const reanswerKey =
-        `jornada:reanswer:${bloco?.id || 'bloco'}`;
-
-
-      sessionStorage.setItem(
-        reanswerKey,
-        String(idxAtual)
-      );
-
-
-      section.dataset.awaitingReanswer =
-        '1';
-
-
-      // Mostra a resposta do Guia.
-      await setGuideResponse(
-        texto,
-        result?.fallbackUsed
-          ? 'warning'
-          : 'success'
-      );
-
-
-      // Ready apenas para permitir
-      // o clique em "Responder pergunta".
-      setContinueState(
-        section,
-        'ready'
-      );
-
-
-      const btn =
-        section.querySelector(
-          '#jp-btn-confirmar'
-        );
-
-
-      if (btn) {
-        btn.textContent = uiText(
-          'answer_question_again',
-          'Responder pergunta'
-        );
-      }
-
-
-      // Não registra como resposta/reflexão.
-      return;
-    }
-
-
-    // =================================================
-    // RESPOSTA NORMAL / INTERVENÇÃO DISCIPLINAR
+    // RESPOSTA NORMAL
     // =================================================
 
     upsertPerguntaFeedback(
@@ -2494,7 +2439,7 @@ function bindButtons(section, bloco, perguntaText, qIndex = 0) {
     btnConfirm.dataset.busy = '0';
 
     // Só libera fisicamente o botão.
-    // A disciplina é verificada no próximo clique.
+    // Mantém o botão disponível para o próximo clique.
      btnConfirm.disabled = false;
     }
   };
@@ -2564,31 +2509,124 @@ function bindButtons(section, bloco, perguntaText, qIndex = 0) {
     }
 
     setGuideResponse('');
-    // === RETOMADA CIRÚRGICA: restaura devolutiva já gerada para este bloco ===
-    // Prioridade: devolutiva final do bloco (se já foi entregue) > por pergunta.
+
+    // === RETOMADA SERVER-FIRST / iOS =========================================
+    // Durante uma restauração, conteúdo já consumido nunca volta a tocar TTS
+    // nem refazer datilografia. O checkpoint remoto decide o próximo passo.
+    const remoteLastSection = String(
+      sessionStorage.getItem('JORNADA_REMOTE_LAST_SECTION') || ''
+    ).trim();
+    const remoteLastBlock = String(
+      sessionStorage.getItem('JORNADA_REMOTE_LAST_BLOCK') || ''
+    ).trim();
+    const remoteEstadoTela = String(
+      sessionStorage.getItem('JORNADA_REMOTE_ESTADO_TELA') ||
+      sessionStorage.getItem('jornada.estadoTela') ||
+      ''
+    ).trim();
+
+    const explicitRestore = sessionStorage.getItem('JORNADA_RESTORE_MODE') === '1';
+    const remoteCheckpointMatches =
+      remoteLastSection === sectionId &&
+      (!remoteLastBlock || remoteLastBlock === String(bloco?.id || ''));
+
+    // Fallback importante contra corrida de inicialização: mesmo que outro render
+    // tenha consumido JORNADA_RESTORE_MODE, os marcadores remotos ainda provam
+    // que esta tela nasceu de uma retomada.
+    const restoreMode = explicitRestore || remoteCheckpointMatches;
+    let skipQuestionTyping = false;
+    let restartBlockFeedback = false;
+
     try {
       const _prev =
         getStoredBlockFeedbacks().find((it) => it?.blocoId === bloco?.id) || null;
       const _isUltima = qIndex >= totalPerguntas - 1;
-      const _prevTxt = String(
-        (_isUltima && _prev?.blockFinal && _prev?.devolutivaFinal) ||
-          _prev?.perguntas?.[qIndex]?.devolutiva ||
-          getPerguntaFeedback(bloco, qIndex) ||
-          ''
+      const _questionFeedback = String(
+        _prev?.perguntas?.[qIndex]?.devolutiva ||
+        getPerguntaFeedback(bloco, qIndex) ||
+        ''
       ).trim();
-      if (_prevTxt) {
-        setGuideResponse(_prevTxt, 'success');
+      const _blockFinalTxt = String(_prev?.devolutivaFinal || '').trim();
+      const _remoteFeedbackDone =
+        sessionStorage.getItem('JORNADA_REMOTE_DEVOLUTIVA_CONCLUIDA') === '1';
+
+      if (restoreMode && _prev?.blockFinal && _prev?.blockConsumed) {
+        console.log('[RETOMADA][BLOCO] bloco já consumido; pulando:', bloco?.id);
+        skipQuestionTyping = true;
+        setTimeout(() => goNext(bloco), 60);
+        return;
+      }
+
+      if (
+        restoreMode &&
+        _isUltima &&
+        remoteEstadoTela === 'devolutiva_bloco_gerando' &&
+        !_prev?.blockFinal
+      ) {
+        // F5 ocorreu enquanto a síntese estava em processamento.
+        // Mantém a UI no modo de devolutiva e refaz somente a síntese do bloco.
+        console.log('[RETOMADA][BLOCO] retomando síntese em processamento:', bloco?.id);
+        enterBlockFeedbackMode(section);
+        setContinueState(section, 'loading');
+        skipQuestionTyping = true;
+        restartBlockFeedback = true;
+      } else if (restoreMode && _prev?.blockFinal && _blockFinalTxt && _isUltima) {
+        // Síntese já gerada, mas sem prova de que o clique final foi persistido.
+        // Mostra instantaneamente (sem voz) e pede apenas um clique para seguir.
+        enterBlockFeedbackMode(section);
+        setGuideResponseInstant(_blockFinalTxt, 'success');
+        setContinueState(section, 'ready');
+        showBlockNextBtn(section, bloco);
+        skipQuestionTyping = true;
+      } else if (restoreMode && _questionFeedback && _remoteFeedbackDone && !_isUltima) {
+        // O backend aponta para a pergunta cuja devolutiva já terminou.
+        // Avança silenciosamente para a próxima pergunta realmente pendente.
+        const nextIdx = Math.min(qIndex + 1, totalPerguntas - 1);
+        console.log('[RETOMADA][PERGUNTA] devolutiva já consumida; avançando', qIndex, '→', nextIdx);
+        setCurrentQuestionIndex(bloco, nextIdx);
+        localStorage.setItem('jornada_last_question', String(nextIdx));
+        sessionStorage.removeItem('JORNADA_REMOTE_DEVOLUTIVA_CONCLUIDA');
+        await renderBloco(section);
+        return;
+      } else if (_questionFeedback) {
+        // Há devolutiva prévia, mas não devemos repeti-la em áudio durante restore.
+        if (restoreMode) setGuideResponseInstant(_questionFeedback, 'success');
+        else await setGuideResponse(_questionFeedback, 'success');
         setContinueState(section, 'ready');
       } else {
         setContinueState(section, 'idle');
+        if (restoreMode) {
+          // Chegamos ao primeiro conteúdo realmente pendente: volta ao fluxo normal.
+          sessionStorage.removeItem('JORNADA_RESTORE_MODE');
+          sessionStorage.removeItem('JORNADA_REMOTE_DEVOLUTIVA_CONCLUIDA');
+          sessionStorage.removeItem('JORNADA_REMOTE_LAST_SECTION');
+          sessionStorage.removeItem('JORNADA_REMOTE_LAST_BLOCK');
+          sessionStorage.removeItem('JORNADA_REMOTE_LAST_QUESTION');
+          sessionStorage.removeItem('JORNADA_REMOTE_ESTADO_TELA');
+        }
       }
-    } catch {
+    } catch (err) {
+      console.warn('[RETOMADA][BLOCO] fallback para fluxo normal:', err);
       setContinueState(section, 'idle');
     }
     updateProgress(bloco);
     bindButtons(section, bloco, perguntaText, qIndex);
 
-    if (questionEl) {
+    if (restartBlockFeedback) {
+      if (section.dataset.blockRestoreRunning !== '1') {
+        section.dataset.blockRestoreRunning = '1';
+        setTimeout(async () => {
+          try {
+            await maybeHandleBlockClosure(section, bloco);
+          } finally {
+            delete section.dataset.blockRestoreRunning;
+          }
+        }, 80);
+      }
+      return;
+    }
+
+    if (questionEl && !skipQuestionTyping) {
       questionEl.textContent = '';
       questionEl.style.display = 'block';
       questionEl.style.visibility = 'visible';
@@ -2611,6 +2649,22 @@ function bindButtons(section, bloco, perguntaText, qIndex = 0) {
     const id = getSectionId(section);
     if (!id || !id.startsWith('section-perguntas-')) return;
     setTimeout(() => renderBloco(section), 80);
+  });
+
+  document.addEventListener('section:shown', function (ev) {
+      const section = getSectionFromEvent(ev.detail);
+      const id = getSectionId(section);
+  
+      if (!id || !id.startsWith('section-perguntas-')) return;
+  
+      console.log(
+          '[PERGUNTAS_BLOCO][SECTION_SHOWN] Reativando bloco:',
+          id
+      );
+  
+      setTimeout(() => {
+          renderBloco(section);
+      }, 80);
   });
 
   document.addEventListener('DOMContentLoaded', function () {
