@@ -427,6 +427,61 @@
     } catch {}
   }
 
+  // Garante que /auth/start e o Guardiao usem exatamente a mesma
+  // identidade do aparelho. Em navegadores novos (especialmente Safari/iOS),
+  // enviar o valor generico "browser" antes de o Guardiao gerar o hash fazia
+  // o primeiro salvamento parecer uma troca de dispositivo.
+  async function getStableDeviceHash() {
+    const storageKey = 'jornada_device_hash';
+
+    try {
+      const existing = localStorage.getItem(storageKey);
+
+      if (existing && existing !== 'browser') {
+        return existing;
+      }
+
+      if (existing === 'browser') {
+        localStorage.removeItem(storageKey);
+      }
+    } catch (_) {}
+
+    try {
+      if (
+        window.JORNADA_SESSION &&
+        typeof window.JORNADA_SESSION.generateDeviceHash === 'function'
+      ) {
+        const generated =
+          await window.JORNADA_SESSION.generateDeviceHash();
+
+        if (generated && generated !== 'browser') {
+          localStorage.setItem(storageKey, generated);
+          return generated;
+        }
+      }
+    } catch (err) {
+      console.warn(
+        '[JCSenha][DEVICE] Guardiao nao conseguiu gerar o hash; usando fallback estavel.',
+        err
+      );
+    }
+
+    // Fallback persistente: o Guardiao reutilizara este mesmo valor depois,
+    // evitando que a identidade mude entre autenticar e salvar o checkpoint.
+    let fallback;
+
+    try {
+      fallback = `device-${crypto.randomUUID()}`;
+    } catch (_) {
+      fallback =
+        `device-${Date.now().toString(36)}-` +
+        Math.random().toString(36).slice(2);
+    }
+
+    localStorage.setItem(storageKey, fallback);
+    return fallback;
+  }
+
   const API_BASE =
   window.APP_CONFIG?.API_BASE ||
   'https://lumen-backend-api.onrender.com/api';
@@ -594,12 +649,17 @@
     btnNext.setAttribute('disabled', 'true');
 
     try {
+
+      // Deve existir antes do POST. O mesmo valor sera reaproveitado por
+      // registrarAtivacao(), salvar() e retomar().
+      const deviceHash = await getStableDeviceHash();
     
       console.log(
         '[JCSenha][AUTH] iniciando POST /auth/start',
         {
           email,
           senha: senhaDigitada,
+          device_hash_pronto: !!deviceHash,
           api: `${API_BASE}/auth/start`
         }
       );
@@ -614,10 +674,7 @@
           body: JSON.stringify({
             email,
             senha: senhaDigitada,
-            device_hash:
-              localStorage.getItem(
-                'jornada_device_hash'
-              ) || 'browser'
+            device_hash: deviceHash
           })
         }
       );
@@ -921,14 +978,51 @@
         'success'
       );
 
-     const irParaDestino = () => {
+      const HANDOFF_KEY =
+        'JORNADA_AUTH_DESTINO_PENDING';
+
+      sessionStorage.setItem(
+        HANDOFF_KEY,
+        destinoAposSenha
+      );
+
+      let navegacaoSolicitada = false;
+      let fallbackNavegacao = null;
+
+      const irParaDestino = () => {
+
+        if (navegacaoSolicitada) return;
+        navegacaoSolicitada = true;
+
+        if (fallbackNavegacao) {
+          clearTimeout(fallbackNavegacao);
+          fallbackNavegacao = null;
+        }
 
         console.log(
           '[JCSenha] liberando acesso para:',
           destinoAposSenha
         );
 
-        window.JC?.show?.(destinoAposSenha);
+        try {
+          if (window.JC?.show) {
+            window.JC.show(destinoAposSenha);
+          } else if (typeof window.showSection === 'function') {
+            window.showSection(destinoAposSenha);
+          } else {
+            window.location.hash = `#${destinoAposSenha}`;
+          }
+
+          sessionStorage.removeItem(HANDOFF_KEY);
+        } catch (navigationErr) {
+          navegacaoSolicitada = false;
+          btnNext.removeAttribute('disabled');
+
+          console.error(
+            '[JCSenha] falha ao abrir destino autenticado:',
+            navigationErr
+          );
+        }
       };
 
       try {
@@ -947,16 +1041,28 @@
             destinoAposSenha
           );
         
-          // Segurança: se por qualquer motivo o vídeo não concluir
-          // a navegação, libera o destino automaticamente.
-          const fallbackGuia = setTimeout(() => {
+          // O player emite este evento depois de limpar o overlay. A chamada
+          // explicita evita depender somente do evento "ended" do Safari.
+          const onTransitionEnded = () => {
+            setTimeout(irParaDestino, 260);
+          };
+
+          document.addEventListener(
+            'transition:ended',
+            onTransitionEnded,
+            { once: true }
+          );
+
+          // Ultima seguranca para falha de midia/rede. O proprio player possui
+          // seus timeouts; este apenas impede a tela Senha de ficar bloqueada.
+          fallbackNavegacao = setTimeout(() => {
         
             const senhaAtual =
               document.getElementById('section-senha');
         
             const aindaNaSenha =
               senhaAtual &&
-              !senhaAtual.classList.contains('hidden');
+              isElementActuallyVisible(senhaAtual);
         
             if (aindaNaSenha) {
         
@@ -968,7 +1074,7 @@
               irParaDestino();
             }
         
-          }, 12000);
+          }, 26000);
         
           try {
         
@@ -979,7 +1085,15 @@
         
           } catch (videoErr) {
         
-            clearTimeout(fallbackGuia);
+            document.removeEventListener(
+              'transition:ended',
+              onTransitionEnded
+            );
+
+            if (fallbackNavegacao) {
+              clearTimeout(fallbackNavegacao);
+              fallbackNavegacao = null;
+            }
         
             console.warn(
               '[JCSenha] falha ao iniciar filme:',
@@ -1242,6 +1356,44 @@ if (
 
     const root = node || document.getElementById(SECTION_ID);
     if (!root) return;
+
+    // Se a autenticacao ja terminou e algum comportamento do Safari voltar
+    // momentaneamente para a Senha, conclui a passagem sem pedir novo clique.
+    const pendingDestination =
+      sessionStorage.getItem(
+        'JORNADA_AUTH_DESTINO_PENDING'
+      );
+
+    if (
+      pendingDestination &&
+      localStorage.getItem('jornada_auth_ok') === '1'
+    ) {
+      console.warn(
+        '[JCSenha][HANDOFF] retorno indevido a Senha; retomando destino autenticado:',
+        pendingDestination
+      );
+
+      setTimeout(() => {
+        try {
+          if (window.JC?.show) {
+            window.JC.show(pendingDestination);
+          } else if (typeof window.showSection === 'function') {
+            window.showSection(pendingDestination);
+          }
+
+          sessionStorage.removeItem(
+            'JORNADA_AUTH_DESTINO_PENDING'
+          );
+        } catch (err) {
+          console.error(
+            '[JCSenha][HANDOFF] falha ao recuperar navegacao:',
+            err
+          );
+        }
+      }, 0);
+
+      return;
+    }
 
     cancelAllSpeech();
     window.JCSenha.state.initToken += 1;
