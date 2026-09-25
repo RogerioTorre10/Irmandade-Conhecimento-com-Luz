@@ -467,79 +467,76 @@
       || '/assets/videos/filme-senha-confirmada.mp4';
   }
 
-  function getSenhaEmailInputs(root) {
-    if (!root) return [];
-
-    const selectors = [
-      '#senha-email',
-      '#email-compra',
-      '#email-acesso',
-      '#email-input',
-      'input[type="email"]',
-      'input[name*="email" i]',
-      'input[id*="email" i]'
-    ].join(',');
-
-    return Array.from(root.querySelectorAll(selectors))
-      .filter((el, index, all) =>
-        el instanceof HTMLInputElement &&
-        all.indexOf(el) === index
-      );
+  function getIdentificationEmailInput(root) {
+    return root?.querySelector('#senha-email') || null;
   }
 
-  function getPrimarySenhaEmailInput(root) {
-    const inputs = getSenhaEmailInputs(root);
-    return inputs.find((el) => el.value.trim()) || inputs[0] || null;
+  function getResendEmailInput(root) {
+    return root?.querySelector('#senha-email-reenvio') || null;
   }
 
   function setupSenhaEmailSync(root) {
-    const inputs = getSenhaEmailInputs(root);
-    if (!inputs.length) return;
-
-    let syncing = false;
+    const identificationInput = getIdentificationEmailInput(root);
+    const resendInput = getResendEmailInput(root);
+    if (!identificationInput) return;
 
     const remembered = (
-      inputs.find((el) => el.value.trim())?.value ||
+      identificationInput.value ||
       sessionStorage.getItem('jornada.email') ||
       localStorage.getItem('jornada_email') ||
       ''
     ).trim().toLowerCase();
 
-    const syncFrom = (source) => {
-      if (syncing) return;
-      syncing = true;
+    if (!identificationInput.value.trim() && remembered) {
+      identificationInput.value = remembered;
+    }
 
-      const value = String(source?.value || '')
-        .trim()
-        .toLowerCase();
+    // Fluxo propositalmente unidirecional:
+    // identificacao/vinculo -> reenvio. O segundo campo pode ser corrigido
+    // sem alterar o e-mail usado para autenticar a Jornada.
+    let lastAutoFilled = '';
+    let resendEditedManually = false;
 
-      inputs.forEach((target) => {
-        if (target !== source && target.value !== value) {
-          target.value = value;
-        }
-      });
+    const copyIdentificationToResend = () => {
+      const value = String(identificationInput.value || '').trim().toLowerCase();
 
       if (value) {
         sessionStorage.setItem('jornada.email', value);
         localStorage.setItem('jornada_email', value);
       }
 
-      syncing = false;
+      if (!resendInput) return;
+
+      const resendValue = String(resendInput.value || '').trim().toLowerCase();
+      const mayAutoFill = !resendEditedManually || !resendValue || resendValue === lastAutoFilled;
+
+      if (mayAutoFill) {
+        resendInput.value = value;
+        lastAutoFilled = value;
+      }
     };
 
-    if (remembered) {
-      inputs.forEach((el) => {
-        el.value = remembered;
+    if (resendInput && !resendInput.value.trim()) {
+      resendInput.value = String(identificationInput.value || remembered).trim().toLowerCase();
+      lastAutoFilled = resendInput.value;
+    }
+
+    if (identificationInput.dataset.senhaEmailSync !== '1') {
+      identificationInput.dataset.senhaEmailSync = '1';
+      identificationInput.addEventListener('input', copyIdentificationToResend);
+      identificationInput.addEventListener('change', copyIdentificationToResend);
+      identificationInput.addEventListener('blur', copyIdentificationToResend);
+    }
+
+    if (resendInput && resendInput.dataset.senhaResendEmailSync !== '1') {
+      resendInput.dataset.senhaResendEmailSync = '1';
+      resendInput.addEventListener('input', () => {
+        resendEditedManually =
+          String(resendInput.value || '').trim().toLowerCase() !== lastAutoFilled;
       });
     }
 
-    inputs.forEach((el) => {
-      if (el.dataset.senhaEmailSync === '1') return;
-      el.dataset.senhaEmailSync = '1';
-      el.addEventListener('input', () => syncFrom(el));
-      el.addEventListener('change', () => syncFrom(el));
-      el.addEventListener('blur', () => syncFrom(el));
-    });
+    copyIdentificationToResend();
   }
 
   function saveSenha(value) {
@@ -725,7 +722,7 @@
 
   btnNext.addEventListener('click', async () => {
     const senhaInput = root.querySelector('#senha-input');
-    const emailInput = getPrimarySenhaEmailInput(root);
+    const emailInput = getIdentificationEmailInput(root);
 
     const senhaDigitada = (senhaInput?.value || '')
       .trim()
@@ -1266,118 +1263,18 @@
 
   // ===== BOTÕES DE ACESSO E REENVIO =====
 
-const btnEnviar2FA =
-  root.querySelector('#btn-enviar-2fa');
-
 const btnReenviar2FA =
   root.querySelector('#btn-reenviar-2fa');
 
 const resendInfoEl =
-  root.querySelector('.senha-copy-mini');
+  root.querySelector('#senha-reenvio-ajuda');
 
 if (resendInfoEl) {
   resendInfoEl.textContent = tSenha(
-    'resendInfo',
-    'Dificuldade em solicitar o código? Clique no botão abaixo.'
+    'resendEmailHelp',
+    'Use este segundo e-mail somente para receber novamente o código válido. Ele é preenchido automaticamente, mas você pode corrigi-lo antes de reenviar.'
   );
 }  
-
-// O botão central executa a mesma validação
-// do botão Confirmar/Entrar.
-if (
-  btnEnviar2FA &&
-  btnEnviar2FA.dataset.boundSend !== '1'
-) {
-  btnEnviar2FA.dataset.boundSend = '1';
-
-  btnEnviar2FA.addEventListener(
-    'click',
-    async () => {
-      const emailInput =
-        getPrimarySenhaEmailInput(root);
-
-      const email =
-        (emailInput?.value || '')
-          .trim()
-          .toLowerCase();
-
-      if (!email) {
-        showSenhaNotice(
-          tSenha(
-            'emailRequired',
-            'Digite primeiro o e-mail utilizado na compra.'
-          ),
-          'warning'
-        );
-
-        emailInput?.focus();
-        return;
-      }
-
-      btnEnviar2FA.setAttribute(
-        'disabled',
-        'true'
-      );
-      
-      const textoOriginalEnviar =
-        btnEnviar2FA.textContent;
-      
-      btnEnviar2FA.textContent =
-        '⏳ Enviando...';
-      
-      try {
-      
-        const resp = await fetch(
-          `${API_BASE}/hotmart/reenviar-codigo`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              email
-            })
-          }
-        );
-      
-        let data = {};
-      
-        try {
-          data = await resp.json();
-        } catch {
-          data = {};
-        }
-      
-        showSenhaNotice(
-          data?.message ||
-          'Se houver uma compra aprovada para este e-mail, enviaremos a senha.',
-          resp.ok ? 'success' : 'info'
-        );
-      
-      } catch (err) {
-      
-        console.error(
-          '[JCSenha] falha ao enviar senha:',
-          err
-        );
-      
-        showSenhaNotice(
-          'Não foi possível solicitar o envio neste momento.',
-          'error'
-        );
-      
-      } finally {
-      
-        btnEnviar2FA.removeAttribute(
-          'disabled'
-        );
-      
-        btnEnviar2FA.textContent =
-          textoOriginalEnviar;
-      }
-    }
-  );
-}
 
 
 // Reenvia apenas uma cópia da mesma senha JCL.
@@ -1391,7 +1288,7 @@ if (
     'click',
     async () => {
       const emailInput =
-        getPrimarySenhaEmailInput(root);
+        getResendEmailInput(root);
 
       const email =
         (emailInput?.value || '')
@@ -1402,7 +1299,7 @@ if (
         showSenhaNotice(
           tSenha(
             'emailRequired',
-            'Digite primeiro o e-mail utilizado na compra.'
+            'Informe o e-mail que deve receber novamente o código.'
           ),
           'warning'
         );
