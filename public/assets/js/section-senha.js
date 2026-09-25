@@ -50,6 +50,57 @@
   return fallback;
 } 
 
+  // Avisos exclusivos da section Senha. Como o elemento e anexado ao body e
+  // usa position:fixed, permanece visivel na tela mesmo com o pergaminho rolado.
+  function showSenhaNotice(message, type = 'info') {
+    const text = String(message || '').trim();
+    if (!text) return;
+
+    document.getElementById('jc-senha-viewport-notice')?.remove();
+
+    const colors = {
+      success: { background: 'rgba(18, 76, 52, 0.97)', border: '#73d6a2' },
+      warning: { background: 'rgba(92, 61, 12, 0.97)', border: '#f0c96d' },
+      error: { background: 'rgba(105, 26, 31, 0.97)', border: '#ff8e96' },
+      info: { background: 'rgba(20, 35, 67, 0.97)', border: '#79b8ff' }
+    };
+
+    const palette = colors[type] || colors.info;
+    const notice = document.createElement('div');
+
+    notice.id = 'jc-senha-viewport-notice';
+    notice.className = `jc-senha-notice jc-senha-notice--${type}`;
+    notice.setAttribute('role', type === 'error' ? 'alert' : 'status');
+    notice.setAttribute('aria-live', type === 'error' ? 'assertive' : 'polite');
+    notice.textContent = text;
+
+    Object.assign(notice.style, {
+      position: 'fixed',
+      top: 'max(18px, env(safe-area-inset-top))',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      width: 'min(92vw, 560px)',
+      boxSizing: 'border-box',
+      padding: '14px 18px',
+      border: `1px solid ${palette.border}`,
+      borderRadius: '12px',
+      background: palette.background,
+      color: '#ffffff',
+      fontSize: 'clamp(14px, 2.8vw, 17px)',
+      lineHeight: '1.45',
+      textAlign: 'center',
+      boxShadow: '0 10px 32px rgba(0, 0, 0, 0.48)',
+      zIndex: '2147483646',
+      pointerEvents: 'none'
+    });
+
+    document.body.appendChild(notice);
+
+    setTimeout(() => {
+      if (notice.isConnected) notice.remove();
+    }, type === 'error' ? 8000 : 5500);
+  }
+
   async function waitForElement(selector, { within = document, timeout = 8000, step = 100 } = {}) {
     const t0 = performance.now();
     return new Promise((resolve, reject) => {
@@ -416,6 +467,81 @@
       || '/assets/videos/filme-senha-confirmada.mp4';
   }
 
+  function getSenhaEmailInputs(root) {
+    if (!root) return [];
+
+    const selectors = [
+      '#senha-email',
+      '#email-compra',
+      '#email-acesso',
+      '#email-input',
+      'input[type="email"]',
+      'input[name*="email" i]',
+      'input[id*="email" i]'
+    ].join(',');
+
+    return Array.from(root.querySelectorAll(selectors))
+      .filter((el, index, all) =>
+        el instanceof HTMLInputElement &&
+        all.indexOf(el) === index
+      );
+  }
+
+  function getPrimarySenhaEmailInput(root) {
+    const inputs = getSenhaEmailInputs(root);
+    return inputs.find((el) => el.value.trim()) || inputs[0] || null;
+  }
+
+  function setupSenhaEmailSync(root) {
+    const inputs = getSenhaEmailInputs(root);
+    if (!inputs.length) return;
+
+    let syncing = false;
+
+    const remembered = (
+      inputs.find((el) => el.value.trim())?.value ||
+      sessionStorage.getItem('jornada.email') ||
+      localStorage.getItem('jornada_email') ||
+      ''
+    ).trim().toLowerCase();
+
+    const syncFrom = (source) => {
+      if (syncing) return;
+      syncing = true;
+
+      const value = String(source?.value || '')
+        .trim()
+        .toLowerCase();
+
+      inputs.forEach((target) => {
+        if (target !== source && target.value !== value) {
+          target.value = value;
+        }
+      });
+
+      if (value) {
+        sessionStorage.setItem('jornada.email', value);
+        localStorage.setItem('jornada_email', value);
+      }
+
+      syncing = false;
+    };
+
+    if (remembered) {
+      inputs.forEach((el) => {
+        el.value = remembered;
+      });
+    }
+
+    inputs.forEach((el) => {
+      if (el.dataset.senhaEmailSync === '1') return;
+      el.dataset.senhaEmailSync = '1';
+      el.addEventListener('input', () => syncFrom(el));
+      el.addEventListener('change', () => syncFrom(el));
+      el.addEventListener('blur', () => syncFrom(el));
+    });
+  }
+
   function saveSenha(value) {
     try {
       if (window.JC?.data) {
@@ -522,9 +648,11 @@
       btnPrev = await waitForElement('#btn-senha-prev', { within: root });
     } catch (e) {
       console.error('[JCSenha] elementos não encontrados:', e);
-      window.toast?.(tSenha('sectionLoadError', 'Erro: os elementos da seção Senha não foram carregados.'),'error');
+      showSenhaNotice(tSenha('sectionLoadError', 'Erro: os elementos da seção Senha não foram carregados.'),'error');
       return;
     }
+
+    setupSenhaEmailSync(root);
 
     await applySectionI18n(root);
     await flushFrames(2);
@@ -597,7 +725,7 @@
 
   btnNext.addEventListener('click', async () => {
     const senhaInput = root.querySelector('#senha-input');
-    const emailInput = root.querySelector('#senha-email');
+    const emailInput = getPrimarySenhaEmailInput(root);
 
     const senhaDigitada = (senhaInput?.value || '')
       .trim()
@@ -608,7 +736,7 @@
       .toLowerCase();
 
     if (!email) {
-     window.toast?.(
+     showSenhaNotice(
        tSenha(
         'purchaseEmailRequired',
         'Digite o mesmo e-mail utilizado na compra.'
@@ -620,7 +748,7 @@
     }
 
     if (!senhaDigitada) {
-     window.toast?.(
+     showSenhaNotice(
        tSenha(
          'passwordRequired',
          'Digite a senha recebida após a compra.'
@@ -635,7 +763,7 @@
       /^JCL-[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}$/;
 
     if (!formatoJCL.test(senhaDigitada)) {
-      window.toast?.(
+      showSenhaNotice(
         tSenha(
           'invalidPasswordFormat',
           'Confira a senha. Use o formato JCL-XXXX-XXXX-XXXX.'
@@ -965,7 +1093,7 @@
 
         throw sessionErr;
       }
-      window.toast?.(
+      showSenhaNotice(
         data.resume
           ? tSenha(
             'accessResumed',
@@ -1124,7 +1252,7 @@
 
       btnNext.removeAttribute('disabled');
 
-      window.toast?.(
+      showSenhaNotice(
         err.message ||
         tSenha(
           'validationError',
@@ -1166,7 +1294,7 @@ if (
     'click',
     async () => {
       const emailInput =
-        root.querySelector('#senha-email');
+        getPrimarySenhaEmailInput(root);
 
       const email =
         (emailInput?.value || '')
@@ -1174,7 +1302,7 @@ if (
           .toLowerCase();
 
       if (!email) {
-        window.toast?.(
+        showSenhaNotice(
           tSenha(
             'emailRequired',
             'Digite primeiro o e-mail utilizado na compra.'
@@ -1220,7 +1348,7 @@ if (
           data = {};
         }
       
-        window.toast?.(
+        showSenhaNotice(
           data?.message ||
           'Se houver uma compra aprovada para este e-mail, enviaremos a senha.',
           resp.ok ? 'success' : 'info'
@@ -1233,7 +1361,7 @@ if (
           err
         );
       
-        window.toast?.(
+        showSenhaNotice(
           'Não foi possível solicitar o envio neste momento.',
           'error'
         );
@@ -1263,7 +1391,7 @@ if (
     'click',
     async () => {
       const emailInput =
-        root.querySelector('#senha-email');
+        getPrimarySenhaEmailInput(root);
 
       const email =
         (emailInput?.value || '')
@@ -1271,7 +1399,7 @@ if (
           .toLowerCase();
 
       if (!email) {
-        window.toast?.(
+        showSenhaNotice(
           tSenha(
             'emailRequired',
             'Digite primeiro o e-mail utilizado na compra.'
@@ -1310,7 +1438,7 @@ if (
           data = {};
         }
 
-        window.toast?.(
+        showSenhaNotice(
           data?.message ||
             tSenha(
               'resendNeutralMessage',
@@ -1325,7 +1453,7 @@ if (
           err
         );
 
-        window.toast?.(
+        showSenhaNotice(
           tSenha(
             'resendError',
             'Não foi possível solicitar o reenvio neste momento.'
