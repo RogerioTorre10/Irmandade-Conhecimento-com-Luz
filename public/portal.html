@@ -153,10 +153,10 @@
     <div class="group">
       <div class="gtitle">Conteúdos do Portal</div>
       <nav class="nav">
-        <a class="btn" href="/mensagens.html">🕯️ Mensagens</a>
-        <a class="btn" href="/figuras.html">🖼️ Figuras</a>
-        <a class="btn" href="/videos.html">📽️ Vídeos</a>
-        <a class="btn" href="/sobre.html">ℹ️ Sobre</a>
+        <a class="btn" href="#" data-coming-soon="Mensagens" aria-describedby="portal-coming-soon">🕯️ Mensagens</a>
+        <a class="btn" href="#" data-coming-soon="Figuras" aria-describedby="portal-coming-soon">🖼️ Figuras</a>
+        <a class="btn" href="#" data-coming-soon="Vídeos" aria-describedby="portal-coming-soon">📽️ Vídeos</a>
+        <a class="btn" href="#" data-coming-soon="Sobre" aria-describedby="portal-coming-soon">ℹ️ Sobre</a>
       </nav>
     </div>
   </aside>
@@ -170,10 +170,10 @@
      <!-- VÍDEO (primeiro) -->
 <div class="media media--hero video-block">
   <div class="box">
-    <video id="heroVideo" playsinline autoplay muted loop preload="auto"
+    <video id="heroVideo" playsinline autoplay muted preload="auto"
            controlslist="nodownload noplaybackrate nofullscreen noremoteplayback"
            disablepictureinpicture>
-      <source src="/assets/img/irmandade-no-jardim.mp4" type="video/mp4" />
+      <source src="/assets/img/irmandade-no-jardim.mp4?v=20260927-2" type="video/mp4" />
       Seu navegador não suporta o elemento de vídeo.
     </video>
   </div>
@@ -260,19 +260,16 @@
       tryPlay(v);
     };
 
-    try {
-      v.currentTime = 0;
+    // Recarregar o recurso reinicia também os decodificadores e os segmentos
+    // internos do MP4. Isso evita que o navegador repita apenas a parte final.
+    v.addEventListener('loadedmetadata', finish, { once:true });
+    v.load();
 
-      if (Math.abs(v.currentTime) <= 0.05) {
-        requestAnimationFrame(finish);
-      } else {
-        v.addEventListener('seeked', finish, { once:true });
-        setTimeout(finish, 500);
-      }
-    } catch (_) {
-      v.addEventListener('loadedmetadata', finish, { once:true });
-      v.load();
-    }
+    // Proteção para navegadores que restauram o vídeo do cache sem emitir
+    // loadedmetadata novamente.
+    setTimeout(() => {
+      if (v.readyState >= 1) finish();
+    }, 700);
   }
 
   if (v) {
@@ -318,8 +315,8 @@
 
       if (!notice) return;
 
-      const journeyName = link.dataset.comingSoon || 'Jornada';
-      notice.textContent = `${journeyName} em construção. Em breve, abriremos este novo caminho.`;
+      const itemName = link.dataset.comingSoon || 'Este conteúdo';
+      notice.textContent = `${itemName} em construção. Em breve, abriremos este novo caminho.`;
       notice.classList.add('is-visible');
 
       clearTimeout(noticeTimer);
