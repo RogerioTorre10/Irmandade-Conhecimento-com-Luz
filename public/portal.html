@@ -28,6 +28,30 @@
   .nav{display:flex;flex-direction:column;gap:10px}
   .btn{padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.06);color:var(--ink);text-decoration:none;border:1px solid rgba(255,255,255,.12);transition:.18s}
   .btn:hover{transform:translateY(-1px);border-color:var(--ring)}
+  .btn[data-coming-soon]{cursor:pointer}
+
+  /* Aviso das Jornadas que ainda não foram lançadas */
+  .portal-notice{
+    position:fixed;
+    top:max(18px,env(safe-area-inset-top));
+    left:50%;
+    z-index:2147483646;
+    width:min(92vw,560px);
+    padding:16px 20px;
+    border:1px solid rgba(247,213,139,.8);
+    border-radius:12px;
+    background:rgba(11,15,26,.97);
+    color:#fff4cf;
+    box-shadow:0 12px 34px rgba(0,0,0,.55);
+    text-align:center;
+    font-size:clamp(15px,2.8vw,18px);
+    line-height:1.45;
+    opacity:0;
+    transform:translate(-50%,-14px);
+    transition:opacity .2s ease,transform .2s ease;
+    pointer-events:none;
+  }
+  .portal-notice.is-visible{opacity:1;transform:translate(-50%,0)}
   section.content{flex:3 1 520px;display:flex;flex-direction:column;gap:20px}
   .hero h2{font-family:BerkshireSwash,ManufacturingConsent,Cardo,serif;color:var(--gold)}
   .hero p{color:#b7bdd1;margin-top:6px}
@@ -121,9 +145,9 @@
       <div class="gtitle">Jornadas</div>
       <nav class="nav">
         <a class="btn" href="/jornada-conhecimento-com-luz.html">🔥 Jornada Essencial</a>
-        <a class="btn" href="#vocacional">🎯 Jornada Vocacional</a>
-        <a class="btn" href="#amorosa">💞 Jornada Amorosa</a>
-        <a class="btn" href="#todas">📚 Outras Jornadas</a>
+        <a class="btn" href="#" data-coming-soon="Jornada Vocacional" aria-describedby="portal-coming-soon">🎯 Jornada Vocacional</a>
+        <a class="btn" href="#" data-coming-soon="Jornada Amorosa" aria-describedby="portal-coming-soon">💞 Jornada Amorosa</a>
+        <a class="btn" href="#" data-coming-soon="Outras Jornadas" aria-describedby="portal-coming-soon">📚 Outras Jornadas</a>
       </nav>
     </div>
     <div class="group">
@@ -197,42 +221,113 @@
 
 <footer>Para além. E sempre!! • © Irmandade Conhecimento com Luz</footer>
 
-<!-- Reforço de autoplay contínuo do vídeo -->
+<div id="portal-coming-soon"
+     class="portal-notice"
+     role="status"
+     aria-live="polite"
+     aria-atomic="true"></div>
+
+<!-- Reinício real do vídeo + bloqueio das Jornadas ainda não lançadas -->
 <script>
 (function () {
   const v = document.getElementById('heroVideo');
-  if (!v) return;
+  let restartToken = 0;
+  let restarting = false;
 
-  function tryPlay() {
-    const p = v.play();
+  function tryPlay(video) {
+    if (!video) return;
+    const p = video.play();
     if (p && typeof p.then === 'function') {
       p.catch(() => {
-        // alguns navegadores precisam de um "nudge" após eventos
-        setTimeout(() => v.play().catch(()=>{}), 300);
+        setTimeout(() => video.play().catch(() => {}), 300);
       });
     }
   }
 
-  // garantir flags corretas
-  v.muted = true;
-  v.loop = true;
-  v.playsInline = true;
+  function restartFromZero() {
+    if (!v) return;
 
-  // quando estiver pronto para tocar
-  v.addEventListener('canplay', tryPlay, { once: true });
+    const token = ++restartToken;
+    let finished = false;
+    restarting = true;
+    v.pause();
 
-  // se o navegador pausar sozinho (economia de energia/visibilidade)
-  v.addEventListener('pause', () => {
-    if (!v.ended) tryPlay();
+    const finish = () => {
+      if (finished || token !== restartToken) return;
+      finished = true;
+      try { v.currentTime = 0; } catch (_) {}
+      restarting = false;
+      tryPlay(v);
+    };
+
+    try {
+      v.currentTime = 0;
+
+      if (Math.abs(v.currentTime) <= 0.05) {
+        requestAnimationFrame(finish);
+      } else {
+        v.addEventListener('seeked', finish, { once:true });
+        setTimeout(finish, 500);
+      }
+    } catch (_) {
+      v.addEventListener('loadedmetadata', finish, { once:true });
+      v.load();
+    }
+  }
+
+  if (v) {
+    v.muted = true;
+    v.playsInline = true;
+
+    // O loop nativo foi removido porque alguns navegadores retomavam o MP4
+    // em um ponto intermediário. O evento ended força o retorno ao segundo 0.
+    v.loop = false;
+    v.removeAttribute('loop');
+
+    v.addEventListener('loadedmetadata', () => {
+      try { v.currentTime = 0; } catch (_) {}
+    }, { once:true });
+
+    v.addEventListener('canplay', () => tryPlay(v), { once:true });
+    v.addEventListener('ended', restartFromZero);
+
+    v.addEventListener('pause', () => {
+      if (!restarting && !v.ended && !document.hidden) tryPlay(v);
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        if (v.ended) restartFromZero();
+        else tryPlay(v);
+      }
+    });
+
+    window.addEventListener('load', () => tryPlay(v));
+    window.addEventListener('pageshow', (event) => {
+      if (event.persisted) restartFromZero();
+    });
+  }
+
+  const notice = document.getElementById('portal-coming-soon');
+  let noticeTimer = 0;
+
+  document.querySelectorAll('[data-coming-soon]').forEach((link) => {
+    link.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (!notice) return;
+
+      const journeyName = link.dataset.comingSoon || 'Jornada';
+      notice.textContent = `${journeyName} em construção. Em breve, abriremos este novo caminho.`;
+      notice.classList.add('is-visible');
+
+      clearTimeout(noticeTimer);
+      noticeTimer = setTimeout(() => {
+        notice.classList.remove('is-visible');
+      }, 5200);
+    });
   });
-
-  // ao voltar para a aba/visibilidade
-  document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) tryPlay();
-  });
-
-  // fallback no load
-  window.addEventListener('load', tryPlay);
 })();
 </script>
 </body>
