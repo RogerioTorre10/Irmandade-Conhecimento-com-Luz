@@ -818,6 +818,42 @@
 
           if (!response.ok) {
 
+            if (response.status === 410) {
+              const officialDeadline =
+                data?.expires_at ||
+                data?.deadline_at ||
+                data?.detail?.expires_at ||
+                null;
+
+              if (officialDeadline) {
+                persistOfficialDeadline(
+                  officialDeadline,
+                  'save.expirada.server'
+                );
+              } else {
+                localStorage.removeItem(STORAGE.DEADLINE_AT);
+              }
+
+              localStorage.setItem(STORAGE.AUTH_OK, '0');
+              localStorage.removeItem(STORAGE.PENDING_SAVE);
+
+              state.authenticated = false;
+              state.activated = false;
+              state.dirty = false;
+              state.retryCount = 0;
+
+              emit('jornada:expired', {
+                ...data,
+                reason: 'jornada_expirada'
+              });
+
+              return {
+                ...data,
+                reason: 'jornada_expirada',
+                expirada: true
+              };
+            }
+
             throw new Error(
               data?.detail ||
               data?.message ||
@@ -845,6 +881,15 @@
               data.codigo_jornada
             );
 
+          }
+
+          // Todo SAVE devolve o prazo canônico do backend.
+          // Isso corrige imediatamente qualquer contador local antigo.
+          if (data.expires_at || data.deadline_at) {
+            persistOfficialDeadline(
+              data.expires_at || data.deadline_at,
+              'save.server'
+            );
           }
 
           if (payload.progresso_json_temp?.selfieCard) {
@@ -1458,6 +1503,18 @@
       }
 
       if (reason === 'jornada_expirada') {
+        // Mesmo em uma resposta de expiração, grave a data oficial
+        // antes de avisar a interface. Assim o contador não continua
+        // exibindo horas locais enquanto o servidor já bloqueou o uso.
+        if (data.expires_at || data.deadline_at) {
+          persistOfficialDeadline(
+            data.expires_at || data.deadline_at,
+            'retomada.expirada.server'
+          );
+        } else {
+          localStorage.removeItem(STORAGE.DEADLINE_AT);
+        }
+
         localStorage.setItem(
           STORAGE.AUTH_OK,
           '0'
