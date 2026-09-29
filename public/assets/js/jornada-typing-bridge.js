@@ -83,10 +83,63 @@
   const __voiceCache = new Map();
 
   const GUIDE_VOICE_PROFILE = {
-   zion:  { gender: 'male',   style: 'imperial' },
-   lumen: { gender: 'female', style: 'bright' },
-   arian: { gender: 'female', style: 'counselor' }   
+   cerimonial: { gender: 'male',   style: 'baritone' },
+   zion:       { gender: 'male',   style: 'imperial' },
+   lumen:      { gender: 'female', style: 'bright' },
+   arian:      { gender: 'female', style: 'counselor' }
  };
+
+  const CEREMONIAL_SECTION_IDS = new Set([
+    'section-intro',
+    'section-termos1',
+    'section-termos2',
+    'section-senha'
+  ]);
+
+  function __isVisibleSection(section) {
+    if (!section || !CEREMONIAL_SECTION_IDS.has(section.id)) return false;
+    if (section.hidden || section.getAttribute('aria-hidden') === 'true') return false;
+
+    try {
+      const style = window.getComputedStyle(section);
+      if (style.display === 'none' || style.visibility === 'hidden') return false;
+      return section.getClientRects().length > 0;
+    } catch {
+      return false;
+    }
+  }
+
+  function __isCeremonialContext(element) {
+    const ownSection = element?.closest?.(
+      '#section-intro, #section-termos1, #section-termos2, #section-senha'
+    );
+    if (ownSection) return true;
+
+    const activeSelectors = [
+      '.jornada-section.active',
+      '.jornada-section.is-active',
+      'section.active',
+      'section.is-active',
+      '[data-section].active',
+      '[data-section].is-active'
+    ];
+
+    for (const selector of activeSelectors) {
+      const active = document.querySelector(selector);
+      if (active && CEREMONIAL_SECTION_IDS.has(active.id)) return true;
+    }
+
+    for (const id of CEREMONIAL_SECTION_IDS) {
+      if (__isVisibleSection(document.getElementById(id))) return true;
+    }
+
+    return false;
+  }
+
+  function __resolveSpeechGuide(requestedGuide, element) {
+    if (__isCeremonialContext(element)) return 'cerimonial';
+    return String(requestedGuide || getGuideNow() || 'lumen').toLowerCase();
+  }
 
   function __loadVoicesNow() {
   try {
@@ -245,6 +298,12 @@
       if (/neural|natural|microsoft|google/i.test(n)) score += 8;
     }
 
+    if (profile.style === 'baritone') {
+      if (/daniel|david|alex|jorge|paul|paulo|carlos|felipe|ricardo|antonio|antônio|bruno|thomas|thiago|diego|fernando|eddy|enrique|luca|marco|mateo|matheus|rafael|roberto|samuel|ichiro|kenji|hiro|otoya/.test(n)) score += 24;
+      if (/male|man|homem|masculin|masculine/.test(n)) score += 18;
+      if (/neural|natural|microsoft|google/i.test(n)) score += 10;
+    }
+
     if (profile.style === 'bright') {
       if (/samantha|sofia|victoria|luciana|maria|ana|zira|paulina|sayaka/.test(n)) score += 18;
       if (/female|woman|feminine|feminin/.test(n)) score += 14;
@@ -314,7 +373,7 @@
 
     let candidates = exact.length ? exact : family;
 
-    if (guide === 'zion' && candidates.length) {
+    if (profile.gender === 'male' && candidates.length) {
   // Nomes explicitamente masculinos conhecidos em desktop e mobile.
   const maleHints =
     /\b(male|man|homem|masculin[oa]?|masculine|daniel|david|alex|jorge|paul|paulo|carlos|felipe|ricardo|antonio|antônio|bruno|thomas|thiago|diego|fernando|eddy|enrique|luca|marco|mateo|matheus|junior|joão|joao|guilherme|rafael|roberto|samuel|xander|hattori|otoya|ichiro|kenji|hiro)\b/i;
@@ -343,7 +402,7 @@
     if (nonFemaleInLang.length) {
       candidates = nonFemaleInLang;
       // Sem voz masculina no idioma: mantém o ranking normal no idioma correto.
-      // Nunca troca de idioma para o Zion — o pitch reduzido garante o timbre masculino.
+      // Nunca troca de idioma: preserva a pronúncia e usa a afinação do perfil.
     }
   }
 }
@@ -375,14 +434,14 @@
     return best;
   }
 
-  async function __applyVoice(utt, lang) {
+  async function __applyVoice(utt, lang, guide) {
     if (!utt || !('speechSynthesis' in window)) return;
 
     const normalizedLang = __normalizeLang(lang || getLangNow());
 
     await __ensureVoicesReady();
 
-    const guide = getGuideNow();
+    guide = String(guide || getGuideNow() || 'lumen').toLowerCase();
     const voice = __pickBestVoice(normalizedLang, guide);
 
     if (voice) {
@@ -669,6 +728,14 @@ if (showCursor) element.appendChild(caret);
   else if (L.startsWith('en')) baseRate = 1.0;
   else if (L.startsWith('de')) baseRate = 0.96;
 
+  if (g === 'cerimonial') {
+    return {
+      rate: Math.max(0.82, baseRate - 0.10),
+      pitch: 0.86,
+      volume: 1.0
+    };
+  }
+
   if (g === 'zion') {
     return {
       rate: Math.max(0.86, baseRate - 0.07),
@@ -699,7 +766,7 @@ if (showCursor) element.appendChild(caret);
     if (!text || !('speechSynthesis' in window)) return;
 
     const lang = getLangNow();
-    const guide = String(options.guide || getGuideNow() || 'lumen').toLowerCase();
+    const guide = __resolveSpeechGuide(options.guide, options.element);
     const tuning = getGuideSpeechTuning(guide, lang);
 
     const clean = String(text).replace(/\s+/g, ' ').trim();
@@ -748,7 +815,7 @@ if (showCursor) element.appendChild(caret);
       try { window.Luz?.stopPulse(); } catch {}
     };
 
-    Promise.resolve(__applyVoice(utt, lang))
+    Promise.resolve(__applyVoice(utt, lang, guide))
       .then(() => {
         try { speechSynthesis.speak(utt); } catch {}
       })
@@ -784,7 +851,7 @@ if (showCursor) element.appendChild(caret);
     } catch {}
 
     const lang = getLangNow();
-    const guide = String(options.guide || getGuideNow() || 'lumen').toLowerCase();
+    const guide = __resolveSpeechGuide(options.guide, element);
     const tuning = getGuideSpeechTuning(guide, lang);
 
     let speechDone = !('speechSynthesis' in window);
@@ -819,7 +886,7 @@ if (showCursor) element.appendChild(caret);
       utt.onend = () => { speechDone = true; };
       utt.onerror = () => { speechDone = true; };
 
-      try { await __applyVoice(utt, lang); } catch {}
+      try { await __applyVoice(utt, lang, guide); } catch {}
     }
 
     if (utt) {
@@ -880,7 +947,7 @@ if (showCursor) element.appendChild(caret);
 
   window.__TEST_TTS_JORNADA = async function (sampleText) {
     const lang = getLangNow();
-    const guide = getGuideNow();
+    const guide = __resolveSpeechGuide(null, null);
 
     await __ensureVoicesReady();
 
@@ -908,6 +975,10 @@ if (showCursor) element.appendChild(caret);
     const utt = new SpeechSynthesisUtterance(text);
     utt.lang = lang;
     if (voice) utt.voice = voice;
+    const tuning = getGuideSpeechTuning(guide, lang);
+    utt.rate = tuning.rate;
+    utt.pitch = tuning.pitch;
+    utt.volume = tuning.volume;
     speechSynthesis.cancel();
     speechSynthesis.speak(utt);
   };
