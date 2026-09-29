@@ -713,6 +713,122 @@ if (showCursor) element.appendChild(caret);
     });
   };
 
+  // =========================================================
+  // VOZ NEURAL (servidor /api/tts) — voz épica e encorpada.
+  // Se o servidor não tiver a voz configurada ou falhar,
+  // tudo continua com a voz do navegador, sem mudar o fluxo.
+  // =========================================================
+  const __neural = {
+    statusPromise: null,
+    urlCache: new Map(),
+    current: null,
+    gen: 0
+  };
+
+  function __neuralEnabled() {
+    if (window.JORNADA_NEURAL_VOICE === false) return Promise.resolve(false);
+    if (!__neural.statusPromise) {
+      __neural.statusPromise = fetch('/api/tts/status', { cache: 'no-store' })
+        .then(r => (r.ok ? r.json() : { enabled: false }))
+        .then(j => !!j?.enabled)
+        .catch(() => false);
+    }
+    return __neural.statusPromise;
+  }
+
+  function __stopNeural() {
+    const a = __neural.current;
+    __neural.current = null;
+    if (!a) return;
+    try { a.pause(); } catch {}
+    try { a.onended?.(); } catch {}
+  }
+
+  // Qualquer speechSynthesis.cancel() já existente na jornada
+  // também interrompe a voz neural.
+  try {
+    if ('speechSynthesis' in window && !speechSynthesis.__neuralPatched) {
+      const _cancel = speechSynthesis.cancel.bind(speechSynthesis);
+      speechSynthesis.cancel = function () {
+        __neural.gen++;
+        __stopNeural();
+        return _cancel();
+      };
+      speechSynthesis.__neuralPatched = true;
+    }
+  } catch {}
+
+  // Prepara o áudio (baixa + metadados). Retorna Audio ou null.
+  async function __prepareNeural(text, lang, guide, timeoutMs = 9000) {
+    if (!(await __neuralEnabled())) return null;
+
+    const key = `${guide}::${text}`;
+    try {
+      let url = __neural.urlCache.get(key);
+      if (!url) {
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+        const r = await fetch('/api/tts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, lang, guide }),
+          signal: ctrl.signal
+        }).finally(() => clearTimeout(timer));
+        if (!r.ok) return null;
+        url = URL.createObjectURL(await r.blob());
+        __neural.urlCache.set(key, url);
+      }
+
+      const audio = new Audio(url);
+      audio.preload = 'auto';
+      await new Promise((resolve, reject) => {
+        if (audio.readyState >= 1) return resolve();
+        audio.addEventListener('loadedmetadata', resolve, { once: true });
+        audio.addEventListener('error', reject, { once: true });
+        setTimeout(resolve, 2500);
+      });
+      return audio;
+    } catch (e) {
+      typingLog('Voz neural indisponível, usando voz do navegador', e?.message || e);
+      return null;
+    }
+  }
+
+  // Toca o áudio preparado. Retorna Promise<boolean> (true se tocou).
+  function __playNeural(audio, onDone) {
+    let finished = false;
+    const done = () => {
+      if (finished) return;
+      finished = true;
+      if (__neural.current === audio) __neural.current = null;
+      try { window.Luz?.stopPulse(); } catch {}
+      try { onDone?.(); } catch {}
+    };
+
+    try { speechSynthesis.cancel(); } catch { __stopNeural(); }
+
+    audio.onended = done;
+    audio.onerror = done;
+    __neural.current = audio;
+
+    try { window.Luz?.startPulse({ min: 1, max: 1.45, speed: 120 }); } catch {}
+
+    return Promise.resolve(audio.play())
+      .then(() => true)
+      .catch(() => {
+        audio.onended = null;
+        audio.onerror = null;
+        if (__neural.current === audio) __neural.current = null;
+        try { window.Luz?.stopPulse(); } catch {}
+        return false;
+      });
+  }
+
+  window.JORNADA_NEURAL = {
+    enabled: __neuralEnabled,
+    stop: __stopNeural
+  };
+
   window.EffectCoordinator = window.EffectCoordinator || {};
 
   function getGuideSpeechTuning(guide, lang) {
@@ -781,6 +897,17 @@ if (showCursor) element.appendChild(caret);
 
     try { speechSynthesis.cancel(); } catch {}
 
+    const speakGen = __neural.gen;
+    __prepareNeural(clean, lang, guide)
+      .then(audio => {
+        // outra fala começou (ou foi cancelada) enquanto o áudio carregava
+        if (speakGen !== __neural.gen) return true;
+        return audio ? __playNeural(audio) : false;
+      })
+      .then(ok => { if (!ok) __speakBrowser(); })
+      .catch(() => __speakBrowser());
+
+    function __speakBrowser() {
     const utt = new SpeechSynthesisUtterance(clean);
     utt.lang = lang;
     utt.rate = options.rate ?? tuning.rate;
@@ -822,6 +949,7 @@ if (showCursor) element.appendChild(caret);
       .catch(() => {
         try { speechSynthesis.speak(utt); } catch {}
       });
+    }
   };
 
   window.typeAndSpeak = async function (element, text, speed = 42, options = {}) {
@@ -863,11 +991,24 @@ if (showCursor) element.appendChild(caret);
       Math.min(9000, (chars / 14) * 1000 / Math.max(0.72, tuning.rate))
     );
 
-    const typingSpeed = options.speed
+    let typingSpeed = options.speed
       ? options.speed
       : Math.max(20, Math.min(46, Math.round(estimatedSpeechMs / Math.max(chars, 1))));
 
-    if ('speechSynthesis' in window) {
+    // Voz neural: digitação acompanha a duração real do áudio.
+    let neuralPlaying = false;
+    const neuralAudio = await __prepareNeural(clean, lang, guide);
+    if (neuralAudio) {
+      const durMs = (neuralAudio.duration || 0) * 1000;
+      if (!options.speed && isFinite(durMs) && durMs > 0) {
+        typingSpeed = Math.max(18, Math.min(70, Math.round((durMs * 0.92) / Math.max(chars, 1))));
+      }
+      speechDone = false;
+      neuralPlaying = await __playNeural(neuralAudio, () => { speechDone = true; });
+      if (!neuralPlaying) speechDone = !('speechSynthesis' in window);
+    }
+
+    if (!neuralPlaying && 'speechSynthesis' in window) {
       utt = new SpeechSynthesisUtterance(clean);
       utt.lang = lang;
       utt.rate = options.rate ?? tuning.rate;

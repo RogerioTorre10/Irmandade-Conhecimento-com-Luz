@@ -10,4 +10,9 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      # Voz neural da narração (ElevenLabs). Preencher no painel do Render.
+      - key: ELEVENLABS_API_KEY
+        sync: false
+      - key: ELEVENLABS_VOICE_ID
+        sync: false
     staticPublishPath: public
