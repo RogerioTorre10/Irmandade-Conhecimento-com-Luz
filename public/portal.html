@@ -9,93 +9,296 @@
 <style>
   @font-face{font-family:'ManufacturingConsent';src:url('/assets/fonts/ManufacturingConsent-Regular.ttf') format('truetype');font-display:swap}
   @font-face{font-family:'Cardo';src:url('/assets/fonts/Cardo-Regular.ttf') format('truetype');font-display:swap}
+  @font-face{font-family:'Cardo';font-weight:700;src:url('/assets/fonts/Cardo-Bold.ttf') format('truetype');font-display:swap}
   @font-face{font-family:'BerkshireSwash';src:url('/assets/fonts/BerkshireSwash-Regular.ttf') format('truetype');font-display:swap}
-  :root{--bg:#0b0f1a;--ink:#e6e7ee;--gold:#f7d58b;--ring:rgba(122,162,255,.35)}
+
+  /* =========================================================
+     MEDIEVAL × TECNOLÓGICO
+     Ouro, pergaminho e chama (medieval) + vidro, grade e
+     luz azul-ciano (tecnologia). O ouro conduz; o azul acende.
+     ========================================================= */
+  :root{
+    --bg:#070a14;
+    --bg-2:#0d1324;
+    --ink:#ece6d6;           /* pergaminho claro */
+    --muted:#a9b0c6;
+    --gold:#f7d58b;
+    --gold-2:#c9993f;
+    --gold-line:rgba(247,213,139,.38);
+    --tech:#6fd3ff;          /* luz tecnológica */
+    --tech-soft:rgba(111,211,255,.18);
+    --ring:rgba(122,162,255,.35);
+    --glass:rgba(16,22,40,.62);
+    --glass-2:rgba(22,30,54,.55);
+    --radius:16px;
+    --hero-media-h:360px;    /* ajuste aqui (ex.: 300–420px) */
+    --hero-media-w:860px;    /* largura máxima do bloco no desktop */
+  }
   *{box-sizing:border-box;margin:0;padding:0}
-  html,body{height:100%;font-family:Cardo,serif;background:var(--bg);color:var(--ink);display:flex;flex-direction:column}
+  html{background:var(--bg)}
+  html,body{min-height:100%}
+  body{
+    font-family:Cardo,serif;
+    color:var(--ink);
+    display:flex;flex-direction:column;min-height:100vh;
+    background-color:var(--bg);
+    background:
+      radial-gradient(1100px 600px at 50% -10%,rgba(247,213,139,.12),transparent 60%),
+      radial-gradient(900px 700px at 100% 100%,rgba(111,211,255,.08),transparent 60%),
+      radial-gradient(700px 600px at 0% 70%,rgba(201,153,63,.07),transparent 60%),
+      linear-gradient(180deg,var(--bg-2),var(--bg));
+    position:relative;
+    overflow-x:hidden;
+  }
+  /* grade digital sutil ao fundo */
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background-image:
+      linear-gradient(rgba(111,211,255,.05) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(111,211,255,.05) 1px,transparent 1px);
+    background-size:44px 44px;
+    -webkit-mask-image:radial-gradient(ellipse at 50% 30%,#000 20%,transparent 75%);
+            mask-image:radial-gradient(ellipse at 50% 30%,#000 20%,transparent 75%);
+  }
+  /* poeira de luz (brasas) */
+  body::after{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.55;
+    background-image:
+      radial-gradient(1.5px 1.5px at 12% 22%,rgba(247,213,139,.8),transparent),
+      radial-gradient(1px 1px at 78% 14%,rgba(111,211,255,.8),transparent),
+      radial-gradient(1.5px 1.5px at 64% 72%,rgba(247,213,139,.6),transparent),
+      radial-gradient(1px 1px at 28% 84%,rgba(111,211,255,.6),transparent),
+      radial-gradient(1px 1px at 90% 58%,rgba(247,213,139,.7),transparent),
+      radial-gradient(1.5px 1.5px at 42% 40%,rgba(255,255,255,.4),transparent);
+    animation:embers 14s ease-in-out infinite alternate;
+  }
+  @keyframes embers{from{transform:translateY(0)}to{transform:translateY(-18px)}}
+  header,main,footer{position:relative;z-index:1}
 
-  /* Header centralizado com chama */
-  header{display:flex;flex-direction:column;align-items:center;padding:20px;background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.08)}
-  .brand{display:flex;align-items:center;gap:14px;font-family:ManufacturingConsent,BerkshireSwash,Cardo,serif;font-size:clamp(28px,3vw,46px);color:var(--gold)}
-  .back{margin-top:8px;color:var(--ink);text-decoration:none;font-size:18px}
-  .back:hover{text-decoration:underline}
+  /* ---------- Cabeçalho ---------- */
+  header{
+    display:flex;flex-direction:column;align-items:center;gap:6px;
+    padding:22px 16px 18px;
+    background:linear-gradient(180deg,rgba(10,14,28,.85),rgba(10,14,28,.55));
+    -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+    border-bottom:1px solid transparent;
+    border-image:linear-gradient(90deg,transparent,var(--gold-2) 20%,var(--tech) 50%,var(--gold-2) 80%,transparent) 1;
+    position:sticky;top:0;z-index:20;
+  }
+  /* linha de varredura que percorre o cabeçalho */
+  header::after{
+    content:"";position:absolute;left:0;bottom:-1px;height:2px;width:140px;
+    background:linear-gradient(90deg,transparent,var(--tech),transparent);
+    filter:drop-shadow(0 0 6px var(--tech));
+    animation:scan 6s linear infinite;
+  }
+  @keyframes scan{from{left:-140px}to{left:100%}}
+  .brand{
+    display:flex;align-items:center;gap:14px;
+    font-family:ManufacturingConsent,BerkshireSwash,Cardo,serif;
+    font-size:clamp(28px,4vw,48px);line-height:1.1;text-align:center;
+    background:linear-gradient(180deg,#fff3cf 0%,var(--gold) 45%,var(--gold-2) 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    text-shadow:0 0 22px rgba(247,213,139,.18);
+  }
+  .brand .chama{flex:none}
+  .back{
+    display:inline-flex;align-items:center;gap:6px;
+    color:var(--muted);text-decoration:none;font-size:15px;letter-spacing:.06em;
+    padding:6px 14px;border-radius:999px;
+    border:1px solid rgba(247,213,139,.18);background:rgba(255,255,255,.03);
+    transition:color .2s,border-color .2s,box-shadow .2s;
+  }
+  .back:hover,.back:focus-visible{color:var(--gold);border-color:var(--gold-line);box-shadow:0 0 0 3px var(--tech-soft);outline:none}
 
-  /* Layout geral */
-  main.wrap{flex:1;display:flex;flex-wrap:wrap;gap:20px;padding:20px}
-  .panel{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:20px}
-  aside.sidebar{flex:1 1 220px;max-width:280px;display:flex;flex-direction:column;gap:20px}
-  .gtitle{font-family:BerkshireSwash,ManufacturingConsent,Cardo,serif;color:var(--gold);font-size:20px;margin-bottom:8px}
-  .nav{display:flex;flex-direction:column;gap:10px}
-  .btn{padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.06);color:var(--ink);text-decoration:none;border:1px solid rgba(255,255,255,.12);transition:.18s}
-  .btn:hover{transform:translateY(-1px);border-color:var(--ring)}
-  section.content{flex:3 1 520px;display:flex;flex-direction:column;gap:20px}
-  .hero h2{font-family:BerkshireSwash,ManufacturingConsent,Cardo,serif;color:var(--gold)}
-  .hero p{color:#b7bdd1;margin-top:6px}
-
-  /* Media blocks */
-  .media{display:flex;flex-wrap:wrap;gap:24px;margin-top:12px;justify-content:center}
-  .box{flex:1 1 320px;max-width:420px;text-align:center}
-  .box img,.box video{
-    width:100%;
-    border-radius:14px;border:1px solid rgba(255,255,255,.1);
-    box-shadow:0 4px 12px rgba(0,0,0,.35)
+  /* ---------- Layout ---------- */
+  main.wrap{
+    flex:1;display:flex;flex-wrap:wrap;gap:22px;
+    padding:24px 16px;width:100%;max-width:1280px;margin:0 auto;
   }
 
- /* Altura / largura dos blocos do herói */
-:root{
-  --hero-media-h: 360px;      /* ajuste aqui (ex.: 300–420px) */
-  --hero-media-w: 860px;      /* largura máxima do bloco no desktop */
-}
+  /* Painel: vidro moderno com moldura dourada e cantos de relicário */
+  .panel{
+    position:relative;
+    background:linear-gradient(160deg,var(--glass),var(--glass-2));
+    -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+    border:1px solid var(--gold-line);
+    border-radius:var(--radius);
+    padding:24px;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.06),
+      inset 0 0 0 4px rgba(7,10,20,.55),
+      inset 0 0 0 5px rgba(247,213,139,.10),
+      0 18px 40px rgba(0,0,0,.45);
+  }
+  /* cantos ornamentais (medieval) desenhados como mira/HUD (tech) */
+  .panel::before,.panel::after{
+    content:"";position:absolute;width:22px;height:22px;pointer-events:none;
+    border:2px solid var(--gold);opacity:.85;
+    filter:drop-shadow(0 0 4px rgba(247,213,139,.45));
+  }
+  .panel::before{top:-1px;left:-1px;border-right:0;border-bottom:0;border-top-left-radius:var(--radius)}
+  .panel::after{bottom:-1px;right:-1px;border-left:0;border-top:0;border-bottom-right-radius:var(--radius)}
 
-/* Cada bloco (vídeo e imagem) vira uma faixa separada */
-.media--hero{ justify-content:center; }
-.media--hero.video-block,
-.media--hero.image-block{
-  gap: 0;
-  margin-top: 18px;
-}
-.media--hero.video-block{ margin-bottom: 24px; }
+  aside.sidebar{flex:1 1 240px;max-width:290px;display:flex;flex-direction:column;gap:26px;align-self:flex-start;position:sticky;top:130px}
+  .gtitle{
+    font-family:BerkshireSwash,ManufacturingConsent,Cardo,serif;
+    color:var(--gold);font-size:21px;margin-bottom:12px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .gtitle::after{
+    content:"";flex:1;height:1px;
+    background:linear-gradient(90deg,var(--gold-line),rgba(111,211,255,.35),transparent);
+  }
 
-/* O conteúdo centraliza e respeita a largura/altura configuradas */
-.media--hero.video-block .box,
-.media--hero.image-block .box{
-  flex: 0 1 var(--hero-media-w);
-  max-width: var(--hero-media-w);
-  width: 100%;
-}
+  .nav{display:flex;flex-direction:column;gap:10px}
+  .btn{
+    position:relative;overflow:hidden;
+    display:flex;align-items:center;gap:8px;
+    padding:11px 14px 11px 18px;border-radius:12px;
+    background:linear-gradient(90deg,rgba(247,213,139,.07),rgba(255,255,255,.02));
+    color:var(--ink);text-decoration:none;font-size:16px;letter-spacing:.02em;
+    border:1px solid rgba(247,213,139,.16);
+    transition:transform .18s,border-color .18s,box-shadow .18s,color .18s;
+  }
+  /* selo dourado à esquerda */
+  .btn::before{
+    content:"";position:absolute;left:0;top:18%;bottom:18%;width:3px;border-radius:3px;
+    background:linear-gradient(180deg,var(--gold),var(--gold-2));
+    box-shadow:0 0 8px rgba(247,213,139,.5);
+    transition:background .18s,box-shadow .18s;
+  }
+  /* brilho que atravessa o botão */
+  .btn::after{
+    content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;
+    background:linear-gradient(100deg,transparent,rgba(111,211,255,.18),transparent);
+    transform:skewX(-18deg);transition:left .5s ease;
+  }
+  .btn:hover,.btn:focus-visible{
+    transform:translateX(3px);color:#fff;outline:none;
+    border-color:rgba(111,211,255,.45);
+    box-shadow:0 0 0 3px var(--tech-soft),0 8px 20px rgba(0,0,0,.35);
+  }
+  .btn:hover::before,.btn:focus-visible::before{background:linear-gradient(180deg,var(--tech),var(--gold));box-shadow:0 0 10px var(--tech)}
+  .btn:hover::after,.btn:focus-visible::after{left:120%}
+  .btn[data-coming-soon]{cursor:pointer;color:var(--muted)}
+  .btn[data-coming-soon]:hover{color:var(--ink)}
+  /* a jornada ativa ganha destaque de chama */
+  .nav .btn:not([data-coming-soon]){
+    background:linear-gradient(90deg,rgba(247,213,139,.18),rgba(111,211,255,.06));
+    border-color:var(--gold-line);font-weight:700;
+  }
 
-/* Vídeo com impacto */
-.media--hero.video-block .box video{
-  height: var(--hero-media-h);
-  width: 100%;
-  object-fit: cover;
-  border-radius: 14px;
-  border: 1px solid rgba(255,255,255,.1);
-  box-shadow: 0 4px 12px rgba(0,0,0,.35);
-  pointer-events: none;
-}
+  /* Aviso das Jornadas que ainda não foram lançadas */
+  .portal-notice{
+    position:fixed;
+    top:max(18px,env(safe-area-inset-top));
+    left:50%;
+    z-index:2147483646;
+    width:min(92vw,560px);
+    padding:16px 20px;
+    border:1px solid rgba(247,213,139,.8);
+    border-radius:14px;
+    background:linear-gradient(160deg,rgba(11,15,26,.97),rgba(18,26,48,.97));
+    color:#fff4cf;
+    box-shadow:0 0 0 4px var(--tech-soft),0 12px 34px rgba(0,0,0,.55);
+    text-align:center;
+    font-size:clamp(15px,2.8vw,18px);
+    line-height:1.45;
+    opacity:0;
+    transform:translate(-50%,-14px);
+    transition:opacity .2s ease,transform .2s ease;
+    pointer-events:none;
+  }
+  .portal-notice.is-visible{opacity:1;transform:translate(-50%,0)}
 
-/* Imagem inteira (sem cortes) */
-.media--hero.image-block .box img{
-  height: var(--hero-media-h);
-  width: 100%;
-  object-fit: contain;               /* evita cortar o texto da arte */
-  background: rgba(0,0,0,.12);       /* “letterbox” suave nas bordas */
-  border-radius: 14px;
-  border: 1px solid rgba(255,255,255,.1);
-  box-shadow: 0 4px 12px rgba(0,0,0,.35);
-}
+  section.content{flex:3 1 520px;min-width:0;display:flex;flex-direction:column;gap:22px}
+  .hero{text-align:center}
+  .hero h2,.section-title{
+    font-family:BerkshireSwash,ManufacturingConsent,Cardo,serif;
+    font-size:clamp(26px,3.2vw,38px);font-weight:400;
+    background:linear-gradient(180deg,#fff3cf,var(--gold) 50%,var(--gold-2));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .section-title{font-size:clamp(22px,2.6vw,30px);text-align:center}
+  .hero p{color:var(--muted);margin:10px auto 0;max-width:680px;font-size:17px;line-height:1.6}
 
+  /* divisor: runa dourada com circuito */
+  .divider{
+    display:flex;align-items:center;justify-content:center;gap:12px;
+    margin:14px auto 4px;max-width:420px;color:var(--gold);font-size:14px;
+  }
+  .divider::before,.divider::after{
+    content:"";flex:1;height:1px;
+    background:linear-gradient(90deg,transparent,var(--gold-line),rgba(111,211,255,.5));
+  }
+  .divider::after{transform:scaleX(-1)}
+  .divider span{filter:drop-shadow(0 0 6px rgba(247,213,139,.6))}
+
+  /* ---------- Mídias ---------- */
+  .media{display:flex;flex-wrap:wrap;gap:24px;margin-top:14px;justify-content:center}
+  .box{flex:1 1 320px;max-width:420px;text-align:center}
+  .box img,.box video{
+    display:block;width:100%;
+    border-radius:12px;
+    border:1px solid var(--gold-line);
+    box-shadow:0 0 0 4px rgba(7,10,20,.7),0 0 0 5px rgba(247,213,139,.18),0 12px 28px rgba(0,0,0,.5);
+  }
+
+  .media--hero{justify-content:center}
+  .media--hero.video-block,
+  .media--hero.image-block{gap:0;margin-top:20px}
+  .media--hero.video-block{margin-bottom:24px}
+  .media--hero.video-block .box,
+  .media--hero.image-block .box{
+    flex:0 1 var(--hero-media-w);
+    max-width:var(--hero-media-w);
+    width:100%;
+    position:relative;
+  }
+  /* cantos de mira na moldura das mídias do herói */
+  .media--hero .box::before,.media--hero .box::after{
+    content:"";position:absolute;width:26px;height:26px;z-index:2;pointer-events:none;
+    border:2px solid var(--tech);opacity:.75;filter:drop-shadow(0 0 5px var(--tech));
+  }
+  .media--hero .box::before{top:-8px;left:-8px;border-right:0;border-bottom:0}
+  .media--hero .box::after{bottom:-8px;right:-8px;border-left:0;border-top:0}
+
+  /* Vídeo com impacto */
+  .media--hero.video-block .box video{
+    height:var(--hero-media-h);
+    object-fit:cover;
+    pointer-events:none;
+  }
+  /* Imagem inteira (sem cortes) */
+  .media--hero.image-block .box img{
+    height:var(--hero-media-h);
+    object-fit:contain;               /* evita cortar o texto da arte */
+    background:rgba(0,0,0,.25);       /* “letterbox” suave nas bordas */
+  }
 
   /* CONVITES: mostrar artes INTEIRAS, sem cortes */
   .media--convites .box{max-width:360px}
+  .media--convites a{display:block;border-radius:12px;transition:transform .25s ease,filter .25s ease}
+  .media--convites a:hover,.media--convites a:focus-visible{transform:translateY(-4px);filter:drop-shadow(0 0 14px rgba(247,213,139,.35));outline:none}
   .media--convites img{
     height:300px;
     object-fit:contain;    /* sem corte */
-    background:rgba(0,0,0,.12);
+    background:rgba(0,0,0,.25);
   }
+  .media--convites figcaption{
+    margin-top:12px;color:var(--gold);letter-spacing:.08em;font-size:15px;
+    text-transform:uppercase;
+  }
+  .media--convites figcaption::before,.media--convites figcaption::after{content:" ✦ ";color:var(--tech);opacity:.8}
 
-  footer{color:#b7bdd1;text-align:center;padding:18px 10px;border-top:1px solid rgba(255,255,255,.08)}
+  /* ---------- Rodapé ---------- */
+  footer{
+    color:var(--muted);text-align:center;padding:22px 16px;letter-spacing:.06em;
+    border-top:1px solid transparent;
+    border-image:linear-gradient(90deg,transparent,var(--gold-line),rgba(111,211,255,.4),var(--gold-line),transparent) 1;
+    background:rgba(7,10,20,.6);
+  }
 
   /* chama do header */
   .chama{position:relative;width:36px;height:52px;filter:drop-shadow(0 6px 14px rgba(255,140,0,.35))}
@@ -103,6 +306,20 @@
   .chama span:nth-child(2){width:24px;height:36px;bottom:5px;opacity:.8;animation-duration:1.2s}
   .chama span:nth-child(3){width:16px;height:24px;bottom:10px;opacity:.6;animation-duration:1s}
   @keyframes flame{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+
+  /* ---------- Celular ---------- */
+  @media (max-width:760px){
+    :root{--hero-media-h:220px}
+    header{position:relative}
+    aside.sidebar{max-width:none;flex-basis:100%;position:static}
+    .panel{padding:18px}
+    .media--convites img{height:260px}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    header::after,body::after,.chama span{animation:none}
+    .btn,.btn::after,.media--convites a{transition:none}
+  }
 </style>
 </head>
 <body>
@@ -121,18 +338,18 @@
       <div class="gtitle">Jornadas</div>
       <nav class="nav">
         <a class="btn" href="/jornada-conhecimento-com-luz.html">🔥 Jornada Essencial</a>
-        <a class="btn" href="#vocacional">🎯 Jornada Vocacional</a>
-        <a class="btn" href="#amorosa">💞 Jornada Amorosa</a>
-        <a class="btn" href="#todas">📚 Outras Jornadas</a>
+        <a class="btn" href="#" data-coming-soon="Jornada Vocacional" aria-describedby="portal-coming-soon">🎯 Jornada Vocacional</a>
+        <a class="btn" href="#" data-coming-soon="Jornada Amorosa" aria-describedby="portal-coming-soon">💞 Jornada Amorosa</a>
+        <a class="btn" href="#" data-coming-soon="Outras Jornadas" aria-describedby="portal-coming-soon">📚 Outras Jornadas</a>
       </nav>
     </div>
     <div class="group">
       <div class="gtitle">Conteúdos do Portal</div>
       <nav class="nav">
-        <a class="btn" href="/mensagens.html">🕯️ Mensagens</a>
-        <a class="btn" href="/figuras.html">🖼️ Figuras</a>
-        <a class="btn" href="/videos.html">📽️ Vídeos</a>
-        <a class="btn" href="/sobre.html">ℹ️ Sobre</a>
+        <a class="btn" href="#" data-coming-soon="Mensagens" aria-describedby="portal-coming-soon">🕯️ Mensagens</a>
+        <a class="btn" href="#" data-coming-soon="Figuras" aria-describedby="portal-coming-soon">🖼️ Figuras</a>
+        <a class="btn" href="#" data-coming-soon="Vídeos" aria-describedby="portal-coming-soon">📽️ Vídeos</a>
+        <a class="btn" href="#" data-coming-soon="Sobre" aria-describedby="portal-coming-soon">ℹ️ Sobre</a>
       </nav>
     </div>
   </aside>
@@ -141,15 +358,16 @@
   <section class="content">
     <div class="hero panel">
       <h2>Bem-vindo ao Portal</h2>
+      <div class="divider" aria-hidden="true"><span>✦</span></div>
       <p>Aqui você encontra mensagens da Irmandade, figuras simbólicas, vídeos de apresentação e os atalhos para todas as jornadas. Este espaço vai crescer conforme abrirmos novos caminhos.</p>
 
      <!-- VÍDEO (primeiro) -->
 <div class="media media--hero video-block">
   <div class="box">
-    <video id="heroVideo" playsinline autoplay muted loop preload="auto"
+    <video id="heroVideo" playsinline autoplay muted preload="auto"
            controlslist="nodownload noplaybackrate nofullscreen noremoteplayback"
            disablepictureinpicture>
-      <source src="/assets/img/irmandade-no-jardim.mp4" type="video/mp4" />
+      <source src="/assets/videos/irmandade-no-jardim.mp4" />
       Seu navegador não suporta o elemento de vídeo.
     </video>
   </div>
@@ -164,31 +382,32 @@
 
     <!-- Convites -->
     <div class="panel">
-      <h3 style="font-family:BerkshireSwash,ManufacturingConsent,Cardo,serif;color:var(--gold);text-align:center">Convites da Irmandade</h3>
+      <h3 class="section-title">Convites da Irmandade</h3>
+      <div class="divider" aria-hidden="true"><span>✦</span></div>
       <div class="media media--convites">
         <div class="box">
           <a href="/assets/img/chamado-do-Arion.png" target="_blank" rel="noopener">
             <img src="/assets/img/chamado-do-Arion.png" alt="Chamado do Arion" loading="lazy" />
           </a>
-          <figcaption style="margin-top:8px;color:#b7bdd1">Chamado do Arion</figcaption>
+          <figcaption>Chamado do Arion</figcaption>
         </div>
         <div class="box">
           <a href="/assets/img/chamado-do-Lumen.png" target="_blank" rel="noopener">
             <img src="/assets/img/chamado-do-Lumen.png" alt="Chamado do Lumen" loading="lazy" />
           </a>
-          <figcaption style="margin-top:8px;color:#b7bdd1">Chamado do Lumen</figcaption>
+          <figcaption>Chamado do Lumen</figcaption>
         </div>
         <div class="box">
           <a href="/assets/img/chamado-do-Rogério.png" target="_blank" rel="noopener">
             <img src="/assets/img/chamado-do-Rogério.png" alt="Chamado do Rogério" loading="lazy" />
           </a>
-          <figcaption style="margin-top:8px;color:#b7bdd1">Chamado do Rogério</figcaption>
+          <figcaption>Chamado do Rogério</figcaption>
         </div>
         <div class="box">
           <a href="/assets/img/chamado-do-Zion.png" target="_blank" rel="noopener">
             <img src="/assets/img/chamado-do-Zion.png" alt="Chamado do Zion" loading="lazy" />
           </a>
-          <figcaption style="margin-top:8px;color:#b7bdd1">Chamado do Zion</figcaption>
+          <figcaption>Chamado do Zion</figcaption>
         </div>
       </div>
     </div>
@@ -197,42 +416,110 @@
 
 <footer>Para além. E sempre!! • © Irmandade Conhecimento com Luz</footer>
 
-<!-- Reforço de autoplay contínuo do vídeo -->
+<div id="portal-coming-soon"
+     class="portal-notice"
+     role="status"
+     aria-live="polite"
+     aria-atomic="true"></div>
+
+<!-- Reinício real do vídeo + bloqueio das Jornadas ainda não lançadas -->
 <script>
 (function () {
   const v = document.getElementById('heroVideo');
-  if (!v) return;
+  let restartToken = 0;
+  let restarting = false;
 
-  function tryPlay() {
-    const p = v.play();
+  function tryPlay(video) {
+    if (!video) return;
+    const p = video.play();
     if (p && typeof p.then === 'function') {
       p.catch(() => {
-        // alguns navegadores precisam de um "nudge" após eventos
-        setTimeout(() => v.play().catch(()=>{}), 300);
+        setTimeout(() => video.play().catch(() => {}), 300);
       });
     }
   }
 
-  // garantir flags corretas
-  v.muted = true;
-  v.loop = true;
-  v.playsInline = true;
+  function restartFromZero() {
+    if (!v) return;
 
-  // quando estiver pronto para tocar
-  v.addEventListener('canplay', tryPlay, { once: true });
+    const token = ++restartToken;
+    let finished = false;
+    restarting = true;
+    v.pause();
 
-  // se o navegador pausar sozinho (economia de energia/visibilidade)
-  v.addEventListener('pause', () => {
-    if (!v.ended) tryPlay();
+    const finish = () => {
+      if (finished || token !== restartToken) return;
+      finished = true;
+      try { v.currentTime = 0; } catch (_) {}
+      restarting = false;
+      tryPlay(v);
+    };
+
+    // Recarregar o recurso reinicia também os decodificadores e os segmentos
+    // internos do MP4. Isso evita que o navegador repita apenas a parte final.
+    v.addEventListener('loadedmetadata', finish, { once:true });
+    v.load();
+
+    // Proteção para navegadores que restauram o vídeo do cache sem emitir
+    // loadedmetadata novamente.
+    setTimeout(() => {
+      if (v.readyState >= 1) finish();
+    }, 700);
+  }
+
+  if (v) {
+    v.muted = true;
+    v.playsInline = true;
+
+    // O loop nativo foi removido porque alguns navegadores retomavam o MP4
+    // em um ponto intermediário. O evento ended força o retorno ao segundo 0.
+    v.loop = false;
+    v.removeAttribute('loop');
+
+    v.addEventListener('loadedmetadata', () => {
+      try { v.currentTime = 0; } catch (_) {}
+    }, { once:true });
+
+    v.addEventListener('canplay', () => tryPlay(v), { once:true });
+    v.addEventListener('ended', restartFromZero);
+
+    v.addEventListener('pause', () => {
+      if (!restarting && !v.ended && !document.hidden) tryPlay(v);
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        if (v.ended) restartFromZero();
+        else tryPlay(v);
+      }
+    });
+
+    window.addEventListener('load', () => tryPlay(v));
+    window.addEventListener('pageshow', (event) => {
+      if (event.persisted) restartFromZero();
+    });
+  }
+
+  const notice = document.getElementById('portal-coming-soon');
+  let noticeTimer = 0;
+
+  document.querySelectorAll('[data-coming-soon]').forEach((link) => {
+    link.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (!notice) return;
+
+      const itemName = link.dataset.comingSoon || 'Este conteúdo';
+      notice.textContent = `${itemName} em construção. Em breve, abriremos este novo caminho.`;
+      notice.classList.add('is-visible');
+
+      clearTimeout(noticeTimer);
+      noticeTimer = setTimeout(() => {
+        notice.classList.remove('is-visible');
+      }, 5200);
+    });
   });
-
-  // ao voltar para a aba/visibilidade
-  document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) tryPlay();
-  });
-
-  // fallback no load
-  window.addEventListener('load', tryPlay);
 })();
 </script>
 </body>
