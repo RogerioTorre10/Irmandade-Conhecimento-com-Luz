@@ -365,15 +365,42 @@
 
   /* Radar */
   .radar{
-    --s:170px;
+    --s:min(210px,70vw);
     position:relative;width:var(--s);height:var(--s);margin:4px auto 10px;border-radius:50%;overflow:hidden;
-    background:
-      repeating-radial-gradient(circle,transparent 0 calc(var(--s)/8 - 1px),hsl(var(--tech-h) 100% 72% / .22) calc(var(--s)/8 - 1px) calc(var(--s)/8)),
-      linear-gradient(transparent calc(50% - .5px),hsl(var(--tech-h) 100% 72% / .25) 0 calc(50% + .5px),transparent 0),
-      linear-gradient(90deg,transparent calc(50% - .5px),hsl(var(--tech-h) 100% 72% / .25) 0 calc(50% + .5px),transparent 0),
-      radial-gradient(circle,hsl(var(--tech-h) 70% 12%),var(--screen) 72%);
+    background:radial-gradient(circle,hsl(var(--tech-h) 60% 10%),#020409 75%);
     box-shadow:0 0 0 2px var(--brass-dk),0 0 0 4px var(--brass),0 0 0 6px #0b0d14,inset 0 0 22px rgba(0,0,0,.85),0 0 18px var(--tech-soft);
+    isolation:isolate;
   }
+  /* anéis e mira do radar, por cima do céu */
+  .radar .grid{
+    position:absolute;inset:0;border-radius:50%;pointer-events:none;
+    background:
+      repeating-radial-gradient(circle,transparent 0 calc(var(--s)/8 - 1px),hsl(var(--tech-h) 100% 72% / .2) calc(var(--s)/8 - 1px) calc(var(--s)/8)),
+      linear-gradient(transparent calc(50% - .5px),hsl(var(--tech-h) 100% 72% / .22) 0 calc(50% + .5px),transparent 0),
+      linear-gradient(90deg,transparent calc(50% - .5px),hsl(var(--tech-h) 100% 72% / .22) 0 calc(50% + .5px),transparent 0);
+    box-shadow:inset 0 0 26px rgba(0,0,0,.9);
+  }
+  /* Mapa das constelações: o céu gira devagar (rotação celeste) */
+  .radar .sky{position:absolute;inset:0;animation:skyTurn 160s linear infinite}
+  .radar .sky svg{width:100%;height:100%;display:block}
+  @keyframes skyTurn{to{transform:rotate(-360deg)}}
+  .radar .sky-field{fill:#cfe3ff;opacity:.45}
+  .radar .sky-field .tw{animation:twinkle 3.2s ease-in-out infinite}
+  @keyframes twinkle{50%{opacity:.15}}
+  .radar .sky-lines{stroke:hsl(var(--tech-h) 100% 72% / .16);stroke-width:.7;stroke-dasharray:2 2}
+  .radar .sky-stars{fill:#e9f1ff;opacity:.55}
+  /* A varredura "revela" o universo: cópia brilhante do céu dentro do cone */
+  .radar .reveal{
+    position:absolute;inset:0;border-radius:50%;
+    -webkit-mask-image:conic-gradient(from 0deg,transparent 0 250deg,rgba(0,0,0,.35) 320deg,#000 360deg);
+            mask-image:conic-gradient(from 0deg,transparent 0 250deg,rgba(0,0,0,.35) 320deg,#000 360deg);
+    animation:spin 4s linear infinite;
+  }
+  .radar .reveal .counter{position:absolute;inset:0;animation:spin 4s linear infinite reverse}
+  .radar .reveal .sky-field{fill:#fff;opacity:1}
+  .radar .reveal .sky-lines{stroke:var(--gold);stroke-width:1;stroke-dasharray:none;filter:drop-shadow(0 0 2px var(--gold))}
+  .radar .reveal .sky-stars{fill:#fff7d6;opacity:1;filter:drop-shadow(0 0 3px var(--gold)) drop-shadow(0 0 6px var(--gold))}
+  .radar-readout{margin:0 0 4px;font-size:11px}
   .radar .sweep{
     position:absolute;inset:0;border-radius:50%;
     background:conic-gradient(from 0deg,transparent 0 280deg,hsl(var(--tech-h) 100% 72% / .06) 290deg,hsl(var(--tech-h) 100% 72% / .5) 358deg,var(--tech) 360deg);
@@ -388,9 +415,10 @@
   @keyframes blip{0%{opacity:0}1%{opacity:1;transform:scale(1.4)}35%{opacity:.25;transform:scale(1)}100%{opacity:0}}
   .radar .core{position:absolute;inset:0;display:grid;place-items:center;color:var(--gold);font-size:14px;text-shadow:0 0 8px rgba(247,213,139,.8)}
   .radar .rn{position:absolute;left:50%;top:4px;transform:translateX(-50%);font-family:BerkshireSwash,Cardo,serif;font-size:12px;color:var(--gold);opacity:.85}
-  .radar.mini{--s:36px;margin:0;box-shadow:0 0 0 1px var(--brass-dk),0 0 0 2px var(--brass),inset 0 0 8px rgba(0,0,0,.8)}
+  .radar.mini{--s:36px;margin:0;background:
+      repeating-radial-gradient(circle,transparent 0 5px,hsl(var(--tech-h) 100% 72% / .25) 5px 6px),radial-gradient(circle,hsl(var(--tech-h) 60% 10%),#020409 75%);box-shadow:0 0 0 1px var(--brass-dk),0 0 0 2px var(--brass),inset 0 0 8px rgba(0,0,0,.8)}
   .radar.mini .sweep{animation-duration:2.6s}
-  body.no-radar .radar .sweep,body.no-radar .radar .blip{animation-play-state:paused}
+  body.no-radar .radar .sweep,body.no-radar .radar .blip,body.no-radar .radar .sky,body.no-radar .radar .reveal,body.no-radar .radar .reveal .counter{animation-play-state:paused}
 
   /* Visor de leitura do painel */
   .ctl-screen{
@@ -504,7 +532,7 @@
   }
 
   @media (prefers-reduced-motion:reduce){
-    body::before,.chama span,.led.warn,.dial::after,.bars i,.monitor .screen::before,.portal-notice::before,.radar .sweep,.radar .blip{animation:none}
+    body::before,.chama span,.led.warn,.dial::after,.bars i,.monitor .screen::before,.portal-notice::before,.radar .sweep,.radar .blip,.radar .sky,.radar .reveal,.radar .reveal .counter,.radar .sky-field .tw{animation:none}
     .btn,.media--convites a,.back{transition:none}
   }
 </style>
@@ -518,6 +546,12 @@
 </script>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <radialGradient id="milky" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#9fb8ff" stop-opacity=".28"/><stop offset="1" stop-color="#9fb8ff" stop-opacity="0"/></radialGradient>
+    <radialGradient id="nebula" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#c77dff" stop-opacity=".30"/><stop offset="1" stop-color="#c77dff" stop-opacity="0"/></radialGradient>
+  </defs>
+</svg>
 <header class="plate">
   <div class="telemetry" aria-hidden="true">
     <div class="readout"><span class="led"></span>SISTEMAS <b>OK</b></div>
@@ -567,16 +601,25 @@
     <!-- Radar -->
     <div class="group" aria-hidden="true">
       <div class="gtitle">Radar de Luz</div>
-      <div class="radar">
+      <div class="radar" id="radarMain">
+        <div class="sky"><svg viewBox="0 0 200 200"><ellipse cx="100" cy="100" rx="120" ry="26" transform="rotate(-35 100 100)" fill="url(#milky)"/>
+    <ellipse cx="146" cy="150" rx="26" ry="18" fill="url(#nebula)"/>
+    <g class="sky-field"><circle cx="135.3" cy="35.0" r="0.7"/><circle cx="146.5" cy="93.4" r="0.6" class="tw" style="animation-delay:-2.4s"/><circle cx="75.1" cy="98.2" r="0.5"/><circle cx="157.7" cy="135.0" r="0.9"/><circle cx="78.1" cy="154.6" r="0.6"/><circle cx="151.5" cy="109.1" r="0.5"/><circle cx="77.8" cy="75.8" r="0.9"/><circle cx="45.2" cy="54.9" r="0.4"/><circle cx="86.0" cy="107.1" r="0.4"/><circle cx="87.7" cy="125.7" r="0.6"/><circle cx="161.3" cy="152.0" r="0.9"/><circle cx="168.4" cy="89.3" r="0.6"/><circle cx="112.6" cy="195.2" r="0.5"/><circle cx="89.3" cy="71.8" r="0.9"/><circle cx="146.5" cy="143.6" r="0.9"/><circle cx="45.9" cy="115.5" r="0.9" class="tw" style="animation-delay:-0.4s"/><circle cx="66.6" cy="107.6" r="0.4"/><circle cx="126.1" cy="61.6" r="0.6"/><circle cx="82.1" cy="129.8" r="0.5" class="tw" style="animation-delay:-2.1s"/><circle cx="115.5" cy="181.4" r="0.7"/><circle cx="157.3" cy="174.6" r="0.6"/><circle cx="27.2" cy="119.1" r="0.9"/><circle cx="83.1" cy="170.8" r="0.6"/><circle cx="104.9" cy="44.0" r="0.5"/><circle cx="119.2" cy="39.3" r="0.4"/><circle cx="130.7" cy="79.7" r="0.5"/><circle cx="42.5" cy="84.8" r="0.6"/><circle cx="94.2" cy="194.2" r="0.6" class="tw" style="animation-delay:-0.3s"/><circle cx="111.5" cy="45.9" r="0.5"/><circle cx="64.4" cy="34.0" r="0.9"/><circle cx="126.9" cy="118.3" r="0.4"/><circle cx="101.4" cy="26.4" r="0.6" class="tw" style="animation-delay:-2.4s"/><circle cx="93.6" cy="190.4" r="0.6"/><circle cx="66.3" cy="136.6" r="0.4"/><circle cx="110.2" cy="114.3" r="0.4" class="tw" style="animation-delay:-0.7s"/><circle cx="172.3" cy="143.7" r="0.7"/><circle cx="45.0" cy="75.2" r="0.9"/><circle cx="152.2" cy="163.5" r="0.9"/><circle cx="170.7" cy="110.2" r="0.9"/><circle cx="44.2" cy="104.9" r="0.6"/><circle cx="36.2" cy="115.9" r="0.5"/><circle cx="153.2" cy="91.2" r="0.7"/><circle cx="97.1" cy="161.8" r="0.4"/><circle cx="74.5" cy="44.8" r="0.4" class="tw" style="animation-delay:-2.4s"/><circle cx="163.2" cy="45.4" r="0.5" class="tw" style="animation-delay:-3.9s"/><circle cx="163.3" cy="80.3" r="0.4"/><circle cx="51.4" cy="78.4" r="0.9"/><circle cx="28.0" cy="141.3" r="0.9"/><circle cx="89.4" cy="163.7" r="0.9" class="tw" style="animation-delay:-2.4s"/><circle cx="72.6" cy="110.2" r="0.5"/><circle cx="85.9" cy="64.4" r="0.6"/><circle cx="152.3" cy="170.1" r="0.4"/><circle cx="134.7" cy="43.1" r="0.9" class="tw" style="animation-delay:-1.4s"/><circle cx="178.9" cy="125.0" r="0.7"/><circle cx="53.0" cy="181.8" r="0.5"/><circle cx="30.4" cy="130.0" r="0.6"/><circle cx="90.1" cy="185.2" r="0.7" class="tw" style="animation-delay:-2.2s"/><circle cx="107.9" cy="53.7" r="0.9"/><circle cx="154.8" cy="141.2" r="0.4"/><circle cx="46.3" cy="166.1" r="0.7"/><circle cx="176.3" cy="60.3" r="0.9"/><circle cx="190.6" cy="123.4" r="0.6"/><circle cx="159.2" cy="52.6" r="0.6"/><circle cx="109.6" cy="52.4" r="0.4"/><circle cx="171.5" cy="104.6" r="0.5"/><circle cx="26.6" cy="65.0" r="0.4"/><circle cx="162.5" cy="136.5" r="0.9" class="tw" style="animation-delay:-3.8s"/><circle cx="162.4" cy="78.8" r="0.7"/><circle cx="45.3" cy="104.0" r="0.5"/><circle cx="132.5" cy="33.1" r="0.5" class="tw" style="animation-delay:-3.7s"/><circle cx="91.2" cy="43.2" r="0.9"/><circle cx="154.8" cy="131.8" r="0.4"/><circle cx="140.7" cy="154.9" r="0.4" class="tw" style="animation-delay:-3.4s"/><circle cx="143.8" cy="25.2" r="0.9"/><circle cx="144.9" cy="157.8" r="0.7"/></g>
+    <g class="sky-lines"><line x1="62" y1="128" x2="62" y2="160"/><line x1="48" y1="145" x2="76" y2="142"/><line x1="118" y1="30" x2="146" y2="36"/><line x1="118" y1="30" x2="126" y2="58"/><line x1="146" y1="36" x2="140" y2="64"/><line x1="126" y1="58" x2="133" y2="61"/><line x1="133" y1="61" x2="140" y2="64"/><line x1="126" y1="58" x2="120" y2="90"/><line x1="140" y1="64" x2="152" y2="86"/><line x1="118" y1="30" x2="132" y2="24"/><line x1="132" y1="24" x2="146" y2="36"/><line x1="126" y1="110" x2="128" y2="118"/><line x1="122" y1="114" x2="128" y2="118"/><line x1="128" y1="118" x2="136" y2="124"/><line x1="136" y1="124" x2="144" y2="132"/><line x1="144" y1="132" x2="150" y2="142"/><line x1="150" y1="142" x2="154" y2="154"/><line x1="154" y1="154" x2="152" y2="166"/><line x1="152" y1="166" x2="144" y2="174"/><line x1="144" y1="174" x2="134" y2="176"/><line x1="134" y1="176" x2="128" y2="170"/><line x1="52" y1="44" x2="62" y2="56"/><line x1="62" y1="56" x2="72" y2="46"/><line x1="72" y1="46" x2="82" y2="58"/><line x1="82" y1="58" x2="92" y2="48"/><line x1="22" y1="82" x2="32" y2="76"/><line x1="32" y1="76" x2="42" y2="78"/><line x1="42" y1="78" x2="52" y2="86"/><line x1="52" y1="86" x2="54" y2="100"/><line x1="54" y1="100" x2="68" y2="104"/><line x1="68" y1="104" x2="70" y2="90"/><line x1="70" y1="90" x2="52" y2="86"/></g>
+    <g class="sky-stars"><circle cx="62" cy="128" r="2.6"/><circle cx="62" cy="160" r="2.4"/><circle cx="48" cy="145" r="2.0"/><circle cx="76" cy="142" r="2.2"/><circle cx="69" cy="151" r="1.2"/><circle cx="118" cy="30" r="2.6"/><circle cx="146" cy="36" r="2.0"/><circle cx="126" cy="58" r="1.7"/><circle cx="133" cy="61" r="1.7"/><circle cx="140" cy="64" r="1.7"/><circle cx="120" cy="90" r="1.8"/><circle cx="152" cy="86" r="2.6"/><circle cx="132" cy="24" r="1.1"/><circle cx="128" cy="118" r="1.6"/><circle cx="136" cy="124" r="1.6"/><circle cx="144" cy="132" r="2.8"/><circle cx="150" cy="142" r="1.6"/><circle cx="154" cy="154" r="1.6"/><circle cx="152" cy="166" r="1.6"/><circle cx="144" cy="174" r="1.6"/><circle cx="134" cy="176" r="1.6"/><circle cx="128" cy="170" r="1.9"/><circle cx="122" cy="114" r="1.3"/><circle cx="126" cy="110" r="1.3"/><circle cx="52" cy="44" r="1.8"/><circle cx="62" cy="56" r="1.8"/><circle cx="72" cy="46" r="2.0"/><circle cx="82" cy="58" r="1.8"/><circle cx="92" cy="48" r="1.8"/><circle cx="22" cy="82" r="1.8"/><circle cx="32" cy="76" r="1.8"/><circle cx="42" cy="78" r="1.8"/><circle cx="52" cy="86" r="1.8"/><circle cx="54" cy="100" r="1.8"/><circle cx="68" cy="104" r="1.8"/><circle cx="70" cy="90" r="1.8"/></g></svg></div>
+        <div class="reveal"><div class="counter"><div class="sky"><svg viewBox="0 0 200 200"><ellipse cx="100" cy="100" rx="120" ry="26" transform="rotate(-35 100 100)" fill="url(#milky)"/>
+    <ellipse cx="146" cy="150" rx="26" ry="18" fill="url(#nebula)"/>
+    <g class="sky-field"><circle cx="135.3" cy="35.0" r="0.7"/><circle cx="146.5" cy="93.4" r="0.6" class="tw" style="animation-delay:-2.4s"/><circle cx="75.1" cy="98.2" r="0.5"/><circle cx="157.7" cy="135.0" r="0.9"/><circle cx="78.1" cy="154.6" r="0.6"/><circle cx="151.5" cy="109.1" r="0.5"/><circle cx="77.8" cy="75.8" r="0.9"/><circle cx="45.2" cy="54.9" r="0.4"/><circle cx="86.0" cy="107.1" r="0.4"/><circle cx="87.7" cy="125.7" r="0.6"/><circle cx="161.3" cy="152.0" r="0.9"/><circle cx="168.4" cy="89.3" r="0.6"/><circle cx="112.6" cy="195.2" r="0.5"/><circle cx="89.3" cy="71.8" r="0.9"/><circle cx="146.5" cy="143.6" r="0.9"/><circle cx="45.9" cy="115.5" r="0.9" class="tw" style="animation-delay:-0.4s"/><circle cx="66.6" cy="107.6" r="0.4"/><circle cx="126.1" cy="61.6" r="0.6"/><circle cx="82.1" cy="129.8" r="0.5" class="tw" style="animation-delay:-2.1s"/><circle cx="115.5" cy="181.4" r="0.7"/><circle cx="157.3" cy="174.6" r="0.6"/><circle cx="27.2" cy="119.1" r="0.9"/><circle cx="83.1" cy="170.8" r="0.6"/><circle cx="104.9" cy="44.0" r="0.5"/><circle cx="119.2" cy="39.3" r="0.4"/><circle cx="130.7" cy="79.7" r="0.5"/><circle cx="42.5" cy="84.8" r="0.6"/><circle cx="94.2" cy="194.2" r="0.6" class="tw" style="animation-delay:-0.3s"/><circle cx="111.5" cy="45.9" r="0.5"/><circle cx="64.4" cy="34.0" r="0.9"/><circle cx="126.9" cy="118.3" r="0.4"/><circle cx="101.4" cy="26.4" r="0.6" class="tw" style="animation-delay:-2.4s"/><circle cx="93.6" cy="190.4" r="0.6"/><circle cx="66.3" cy="136.6" r="0.4"/><circle cx="110.2" cy="114.3" r="0.4" class="tw" style="animation-delay:-0.7s"/><circle cx="172.3" cy="143.7" r="0.7"/><circle cx="45.0" cy="75.2" r="0.9"/><circle cx="152.2" cy="163.5" r="0.9"/><circle cx="170.7" cy="110.2" r="0.9"/><circle cx="44.2" cy="104.9" r="0.6"/><circle cx="36.2" cy="115.9" r="0.5"/><circle cx="153.2" cy="91.2" r="0.7"/><circle cx="97.1" cy="161.8" r="0.4"/><circle cx="74.5" cy="44.8" r="0.4" class="tw" style="animation-delay:-2.4s"/><circle cx="163.2" cy="45.4" r="0.5" class="tw" style="animation-delay:-3.9s"/><circle cx="163.3" cy="80.3" r="0.4"/><circle cx="51.4" cy="78.4" r="0.9"/><circle cx="28.0" cy="141.3" r="0.9"/><circle cx="89.4" cy="163.7" r="0.9" class="tw" style="animation-delay:-2.4s"/><circle cx="72.6" cy="110.2" r="0.5"/><circle cx="85.9" cy="64.4" r="0.6"/><circle cx="152.3" cy="170.1" r="0.4"/><circle cx="134.7" cy="43.1" r="0.9" class="tw" style="animation-delay:-1.4s"/><circle cx="178.9" cy="125.0" r="0.7"/><circle cx="53.0" cy="181.8" r="0.5"/><circle cx="30.4" cy="130.0" r="0.6"/><circle cx="90.1" cy="185.2" r="0.7" class="tw" style="animation-delay:-2.2s"/><circle cx="107.9" cy="53.7" r="0.9"/><circle cx="154.8" cy="141.2" r="0.4"/><circle cx="46.3" cy="166.1" r="0.7"/><circle cx="176.3" cy="60.3" r="0.9"/><circle cx="190.6" cy="123.4" r="0.6"/><circle cx="159.2" cy="52.6" r="0.6"/><circle cx="109.6" cy="52.4" r="0.4"/><circle cx="171.5" cy="104.6" r="0.5"/><circle cx="26.6" cy="65.0" r="0.4"/><circle cx="162.5" cy="136.5" r="0.9" class="tw" style="animation-delay:-3.8s"/><circle cx="162.4" cy="78.8" r="0.7"/><circle cx="45.3" cy="104.0" r="0.5"/><circle cx="132.5" cy="33.1" r="0.5" class="tw" style="animation-delay:-3.7s"/><circle cx="91.2" cy="43.2" r="0.9"/><circle cx="154.8" cy="131.8" r="0.4"/><circle cx="140.7" cy="154.9" r="0.4" class="tw" style="animation-delay:-3.4s"/><circle cx="143.8" cy="25.2" r="0.9"/><circle cx="144.9" cy="157.8" r="0.7"/></g>
+    <g class="sky-lines"><line x1="62" y1="128" x2="62" y2="160"/><line x1="48" y1="145" x2="76" y2="142"/><line x1="118" y1="30" x2="146" y2="36"/><line x1="118" y1="30" x2="126" y2="58"/><line x1="146" y1="36" x2="140" y2="64"/><line x1="126" y1="58" x2="133" y2="61"/><line x1="133" y1="61" x2="140" y2="64"/><line x1="126" y1="58" x2="120" y2="90"/><line x1="140" y1="64" x2="152" y2="86"/><line x1="118" y1="30" x2="132" y2="24"/><line x1="132" y1="24" x2="146" y2="36"/><line x1="126" y1="110" x2="128" y2="118"/><line x1="122" y1="114" x2="128" y2="118"/><line x1="128" y1="118" x2="136" y2="124"/><line x1="136" y1="124" x2="144" y2="132"/><line x1="144" y1="132" x2="150" y2="142"/><line x1="150" y1="142" x2="154" y2="154"/><line x1="154" y1="154" x2="152" y2="166"/><line x1="152" y1="166" x2="144" y2="174"/><line x1="144" y1="174" x2="134" y2="176"/><line x1="134" y1="176" x2="128" y2="170"/><line x1="52" y1="44" x2="62" y2="56"/><line x1="62" y1="56" x2="72" y2="46"/><line x1="72" y1="46" x2="82" y2="58"/><line x1="82" y1="58" x2="92" y2="48"/><line x1="22" y1="82" x2="32" y2="76"/><line x1="32" y1="76" x2="42" y2="78"/><line x1="42" y1="78" x2="52" y2="86"/><line x1="52" y1="86" x2="54" y2="100"/><line x1="54" y1="100" x2="68" y2="104"/><line x1="68" y1="104" x2="70" y2="90"/><line x1="70" y1="90" x2="52" y2="86"/></g>
+    <g class="sky-stars"><circle cx="62" cy="128" r="2.6"/><circle cx="62" cy="160" r="2.4"/><circle cx="48" cy="145" r="2.0"/><circle cx="76" cy="142" r="2.2"/><circle cx="69" cy="151" r="1.2"/><circle cx="118" cy="30" r="2.6"/><circle cx="146" cy="36" r="2.0"/><circle cx="126" cy="58" r="1.7"/><circle cx="133" cy="61" r="1.7"/><circle cx="140" cy="64" r="1.7"/><circle cx="120" cy="90" r="1.8"/><circle cx="152" cy="86" r="2.6"/><circle cx="132" cy="24" r="1.1"/><circle cx="128" cy="118" r="1.6"/><circle cx="136" cy="124" r="1.6"/><circle cx="144" cy="132" r="2.8"/><circle cx="150" cy="142" r="1.6"/><circle cx="154" cy="154" r="1.6"/><circle cx="152" cy="166" r="1.6"/><circle cx="144" cy="174" r="1.6"/><circle cx="134" cy="176" r="1.6"/><circle cx="128" cy="170" r="1.9"/><circle cx="122" cy="114" r="1.3"/><circle cx="126" cy="110" r="1.3"/><circle cx="52" cy="44" r="1.8"/><circle cx="62" cy="56" r="1.8"/><circle cx="72" cy="46" r="2.0"/><circle cx="82" cy="58" r="1.8"/><circle cx="92" cy="48" r="1.8"/><circle cx="22" cy="82" r="1.8"/><circle cx="32" cy="76" r="1.8"/><circle cx="42" cy="78" r="1.8"/><circle cx="52" cy="86" r="1.8"/><circle cx="54" cy="100" r="1.8"/><circle cx="68" cy="104" r="1.8"/><circle cx="70" cy="90" r="1.8"/></g></svg></div></div></div>
+        <span class="grid"></span>
         <span class="sweep"></span>
         <i class="blip" style="--x:66.9%;--y:28.3%;--d:0.42s"></i>
-        <i class="blip" style="--x:87.1%;--y:65.0%;--d:1.24s"></i>
-        <i class="blip" style="--x:42.6%;--y:65.9%;--d:2.28s"></i>
         <i class="blip" style="--x:19.5%;--y:38.9%;--d:3.22s"></i>
-        <i class="blip" style="--x:43.7%;--y:39.2%;--d:3.67s"></i>
         <span class="rn">N</span>
         <span class="core">✦</span>
       </div>
+      <div class="ctl-screen radar-readout" id="radarReadout" aria-live="off">VARRENDO O UNIVERSO…</div>
     </div>
 
     <!-- Painel de controle (funcional) -->
@@ -1008,6 +1051,42 @@
     const el = e.target.closest('.btn, .back, .reboot');
     if (el && !el.contains(e.relatedTarget)) Sfx.hover();
   });
+
+  // ---------- Radar: constelação sob a varredura ----------
+  const CONST = [
+    ['Cruzeiro do Sul', 219],
+    ['Órion', 37],
+    ['Escorpião', 139],
+    ['Cassiopeia', 331],
+    ['Ursa Maior', 283]
+  ];
+  const radarEl = document.getElementById('radarMain');
+  const readout = document.getElementById('radarReadout');
+  let lastName = '';
+  function radarTick() {
+    if (radarEl && readout && radarEl.getAnimations) {
+      const sweepA = radarEl.querySelector('.sweep').getAnimations()[0];
+      const skyA = radarEl.querySelector('.sky').getAnimations()[0];
+      if (sweepA && skyA) {
+        const sweep = ((sweepA.currentTime || 0) % 4000) / 4000 * 360;
+        const sky = -((skyA.currentTime || 0) % 160000) / 160000 * 360;
+        let hit = '';
+        for (const [name, ang] of CONST) {
+          const cur = ((ang + sky) % 360 + 360) % 360;
+          const diff = ((sweep - cur) % 360 + 360) % 360;
+          if (diff < 40) { hit = name; break; }
+        }
+        const txt = hit ? 'ALVO: ' + hit.toUpperCase() : 'VARRENDO O UNIVERSO…';
+        if (txt !== lastName) {
+          readout.textContent = txt;
+          if (hit) flash(signal);
+          lastName = txt;
+        }
+      }
+    }
+    requestAnimationFrame(radarTick);
+  }
+  requestAnimationFrame(radarTick);
 
   // ---------- Sequência de ignição ----------
   const boot = document.getElementById('boot');
