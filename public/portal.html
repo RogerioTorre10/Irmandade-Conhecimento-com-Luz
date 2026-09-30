@@ -27,8 +27,10 @@
     --brass:#c9993f;         /* bronze/latão */
     --brass-dk:#6e4f1c;
     --gold-line:rgba(247,213,139,.38);
-    --tech:#6fd3ff;          /* luz das telas */
-    --tech-soft:rgba(111,211,255,.18);
+    --tech-h:197;            /* matiz da luz das telas (ajustável no painel) */
+    --tech:hsl(var(--tech-h) 100% 72%);
+    --tech-soft:hsl(var(--tech-h) 100% 72% / .18);
+    --bright:1;              /* brilho geral (ajustável no painel) */
     --ok:#6dffb0;            /* LED verde */
     --warn:#ffb84d;          /* LED âmbar */
     --screen:#04121a;        /* vidro da tela */
@@ -44,7 +46,7 @@
     display:flex;flex-direction:column;min-height:100vh;
     background-color:var(--bg);
     background:
-      radial-gradient(1200px 520px at 50% -8%,rgba(111,211,255,.10),transparent 60%),
+      radial-gradient(1200px 520px at 50% -8%,hsl(var(--tech-h) 100% 72% / .10),transparent 60%),
       radial-gradient(900px 600px at 50% 110%,rgba(247,213,139,.08),transparent 60%),
       linear-gradient(180deg,#0a0e19,var(--bg));
     position:relative;overflow-x:hidden;
@@ -57,10 +59,10 @@
       radial-gradient(1px 1px at 22% 68%,rgba(255,255,255,.7),transparent),
       radial-gradient(1.5px 1.5px at 38% 28%,rgba(247,213,139,.9),transparent),
       radial-gradient(1px 1px at 55% 82%,#fff,transparent),
-      radial-gradient(1px 1px at 71% 18%,rgba(111,211,255,.9),transparent),
+      radial-gradient(1px 1px at 71% 18%,hsl(var(--tech-h) 100% 72% / .9),transparent),
       radial-gradient(1.5px 1.5px at 86% 52%,#fff,transparent),
       radial-gradient(1px 1px at 93% 88%,rgba(247,213,139,.8),transparent),
-      radial-gradient(1px 1px at 4% 92%,rgba(111,211,255,.8),transparent);
+      radial-gradient(1px 1px at 4% 92%,hsl(var(--tech-h) 100% 72% / .8),transparent);
     background-size:600px 600px;
     animation:drift 90s linear infinite;
   }
@@ -122,11 +124,11 @@
   .readout{
     display:flex;align-items:center;gap:8px;
     font-family:ui-monospace,'SFMono-Regular',Menlo,Consolas,monospace;font-size:12px;letter-spacing:.08em;
-    color:var(--tech);text-shadow:0 0 6px rgba(111,211,255,.6);
+    color:var(--tech);text-shadow:0 0 6px hsl(var(--tech-h) 100% 72% / .6);
     padding:6px 10px;border-radius:6px;
     background:var(--screen);
-    border:1px solid rgba(111,211,255,.25);
-    box-shadow:inset 0 0 12px rgba(111,211,255,.12);
+    border:1px solid hsl(var(--tech-h) 100% 72% / .25);
+    box-shadow:inset 0 0 12px hsl(var(--tech-h) 100% 72% / .12);
   }
   .readout b{color:var(--gold);font-weight:400;text-shadow:0 0 6px rgba(247,213,139,.5)}
   .brand{
@@ -166,7 +168,7 @@
     color:var(--gold);font-size:20px;margin-bottom:12px;
     display:flex;align-items:center;gap:10px;
   }
-  .gtitle::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--gold-line),rgba(111,211,255,.35),transparent)}
+  .gtitle::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--gold-line),hsl(var(--tech-h) 100% 72% / .35),transparent)}
 
   .nav{display:flex;flex-direction:column;gap:10px}
   /* teclas físicas retroiluminadas */
@@ -182,7 +184,7 @@
   .btn .led{margin-left:auto}
   .btn:hover,.btn:focus-visible{
     color:#fff;outline:none;
-    box-shadow:0 0 0 1px var(--tech),0 0 14px rgba(111,211,255,.35),inset 0 1px 0 rgba(255,255,255,.12),inset 0 -2px 0 rgba(0,0,0,.4),0 4px 0 #06080d;
+    box-shadow:0 0 0 1px var(--tech),0 0 14px hsl(var(--tech-h) 100% 72% / .35),inset 0 1px 0 rgba(255,255,255,.12),inset 0 -2px 0 rgba(0,0,0,.4),0 4px 0 #06080d;
   }
   .btn:active{transform:translateY(3px);box-shadow:0 0 0 1px var(--tech),inset 0 1px 0 rgba(255,255,255,.1),0 1px 0 #06080d}
   .btn[data-coming-soon]{cursor:pointer;color:var(--muted)}
@@ -203,7 +205,7 @@
     background:
       radial-gradient(circle,var(--screen) 55%,transparent 56%),
       conic-gradient(from 225deg,var(--tech) calc(var(--v)*270deg),rgba(255,255,255,.08) 0 270deg,transparent 0);
-    box-shadow:0 0 0 2px var(--brass-dk),0 0 0 3px var(--brass),inset 0 0 10px rgba(0,0,0,.8),0 0 12px rgba(111,211,255,.15);
+    box-shadow:0 0 0 2px var(--brass-dk),0 0 0 3px var(--brass),inset 0 0 10px rgba(0,0,0,.8),0 0 12px hsl(var(--tech-h) 100% 72% / .15);
   }
   /* rosa-dos-ventos / runa no centro */
   .dial::before{
@@ -226,7 +228,7 @@
 
   .switches{display:flex;justify-content:space-between;gap:8px;margin-top:16px}
   .toggle{
-    position:relative;width:26px;height:44px;border-radius:6px;
+    position:relative;border:0;padding:0;cursor:pointer;flex:none;width:26px;height:44px;border-radius:6px;
     background:linear-gradient(180deg,#0a0d15,#1a2030);
     box-shadow:0 0 0 1px var(--brass-dk),inset 0 2px 6px rgba(0,0,0,.8);
   }
@@ -235,12 +237,12 @@
     background:linear-gradient(90deg,#8a8f9c,#f2f3f6 45%,#6d727e);
     box-shadow:0 3px 4px rgba(0,0,0,.6);
   }
-  .toggle.down::before{top:18px}
+  .toggle[aria-checked="false"]::before{top:18px}
   .toggle::after{content:"";position:absolute;left:50%;bottom:-12px;margin-left:-3px;width:6px;height:6px;border-radius:50%;background:var(--ok);box-shadow:0 0 6px var(--ok)}
-  .toggle.down::after{background:#2a3040;box-shadow:none}
+  .toggle[aria-checked="false"]::after{background:#2a3040;box-shadow:none}
 
-  .bars{display:flex;align-items:flex-end;gap:4px;height:38px;margin-top:22px;padding:6px 8px;border-radius:6px;background:var(--screen);border:1px solid rgba(111,211,255,.25)}
-  .bars i{flex:1;background:linear-gradient(180deg,var(--tech),rgba(111,211,255,.25));border-radius:2px 2px 0 0;animation:eq 2.4s ease-in-out infinite alternate}
+  .bars{display:flex;align-items:flex-end;gap:4px;height:38px;margin-top:22px;padding:6px 8px;border-radius:6px;background:var(--screen);border:1px solid hsl(var(--tech-h) 100% 72% / .25)}
+  .bars i{flex:1;background:linear-gradient(180deg,var(--tech),hsl(var(--tech-h) 100% 72% / .25));border-radius:2px 2px 0 0;animation:eq 2.4s ease-in-out infinite alternate}
   .bars i:nth-child(1){height:40%;animation-delay:-.2s}.bars i:nth-child(2){height:75%;animation-delay:-.9s}
   .bars i:nth-child(3){height:55%;animation-delay:-1.4s}.bars i:nth-child(4){height:90%;animation-delay:-.4s}
   .bars i:nth-child(5){height:35%;animation-delay:-1.1s}.bars i:nth-child(6){height:65%;animation-delay:-.7s}
@@ -289,7 +291,7 @@
   .hero p{color:var(--muted);margin:10px auto 0;max-width:680px;font-size:17px;line-height:1.6}
 
   .divider{display:flex;align-items:center;justify-content:center;gap:12px;margin:12px auto 4px;max-width:420px;color:var(--gold);font-size:14px}
-  .divider::before,.divider::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold-line),rgba(111,211,255,.5))}
+  .divider::before,.divider::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold-line),hsl(var(--tech-h) 100% 72% / .5))}
   .divider::after{transform:scaleX(-1)}
   .divider span{filter:drop-shadow(0 0 6px rgba(247,213,139,.6))}
 
@@ -301,7 +303,7 @@
     background:linear-gradient(180deg,#2a2f3d,#141823);
     box-shadow:0 0 0 1px #000,0 0 0 2px var(--brass-dk),0 0 0 3px var(--brass),inset 0 1px 0 rgba(255,255,255,.12),0 14px 30px rgba(0,0,0,.55);
   }
-  .monitor .screen{position:relative;border-radius:8px;overflow:hidden;background:var(--screen);box-shadow:inset 0 0 0 1px rgba(111,211,255,.25)}
+  .monitor .screen{position:relative;border-radius:8px;overflow:hidden;background:var(--screen);box-shadow:inset 0 0 0 1px hsl(var(--tech-h) 100% 72% / .25)}
   .monitor .screen img,.monitor .screen video{display:block;width:100%}
   /* varredura CRT + reflexo do vidro */
   .monitor .screen::after{
@@ -313,7 +315,7 @@
   }
   .monitor .screen::before{
     content:"";position:absolute;left:0;right:0;top:-30%;height:30%;z-index:1;pointer-events:none;
-    background:linear-gradient(180deg,transparent,rgba(111,211,255,.08),transparent);
+    background:linear-gradient(180deg,transparent,hsl(var(--tech-h) 100% 72% / .08),transparent);
     animation:sweep 7s linear infinite;
   }
   @keyframes sweep{to{top:110%}}
@@ -335,7 +337,7 @@
   /* CONVITES: canais de transmissão, artes inteiras */
   .media--convites .box{max-width:360px}
   .media--convites a{display:block;transition:transform .25s ease,filter .25s ease}
-  .media--convites a:hover,.media--convites a:focus-visible{transform:translateY(-4px);filter:drop-shadow(0 0 14px rgba(111,211,255,.3));outline:none}
+  .media--convites a:hover,.media--convites a:focus-visible{transform:translateY(-4px);filter:drop-shadow(0 0 14px hsl(var(--tech-h) 100% 72% / .3));outline:none}
   .media--convites img{height:300px;object-fit:contain}
   .media--convites figcaption{margin-top:12px;color:var(--gold);letter-spacing:.08em;font-size:15px;text-transform:uppercase}
 
@@ -354,6 +356,134 @@
   .chama span:nth-child(2){width:24px;height:36px;bottom:5px;opacity:.8;animation-duration:1.2s}
   .chama span:nth-child(3){width:16px;height:24px;bottom:10px;opacity:.6;animation-duration:1s}
   @keyframes flame{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+
+
+  /* =========================================================
+     PAINEL DE CONTROLE INTERATIVO
+     ========================================================= */
+  .plate{filter:brightness(var(--bright))}
+
+  /* Radar */
+  .radar{
+    --s:170px;
+    position:relative;width:var(--s);height:var(--s);margin:4px auto 10px;border-radius:50%;overflow:hidden;
+    background:
+      repeating-radial-gradient(circle,transparent 0 calc(var(--s)/8 - 1px),hsl(var(--tech-h) 100% 72% / .22) calc(var(--s)/8 - 1px) calc(var(--s)/8)),
+      linear-gradient(transparent calc(50% - .5px),hsl(var(--tech-h) 100% 72% / .25) 0 calc(50% + .5px),transparent 0),
+      linear-gradient(90deg,transparent calc(50% - .5px),hsl(var(--tech-h) 100% 72% / .25) 0 calc(50% + .5px),transparent 0),
+      radial-gradient(circle,hsl(var(--tech-h) 70% 12%),var(--screen) 72%);
+    box-shadow:0 0 0 2px var(--brass-dk),0 0 0 4px var(--brass),0 0 0 6px #0b0d14,inset 0 0 22px rgba(0,0,0,.85),0 0 18px var(--tech-soft);
+  }
+  .radar .sweep{
+    position:absolute;inset:0;border-radius:50%;
+    background:conic-gradient(from 0deg,transparent 0 280deg,hsl(var(--tech-h) 100% 72% / .06) 290deg,hsl(var(--tech-h) 100% 72% / .5) 358deg,var(--tech) 360deg);
+    animation:spin 4s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .radar .blip{
+    position:absolute;left:var(--x);top:var(--y);width:7px;height:7px;margin:-3.5px;border-radius:50%;
+    background:var(--gold);box-shadow:0 0 8px var(--gold),0 0 14px rgba(247,213,139,.6);
+    opacity:0;animation:blip 4s linear infinite;animation-delay:var(--d);
+  }
+  @keyframes blip{0%{opacity:0}1%{opacity:1;transform:scale(1.4)}35%{opacity:.25;transform:scale(1)}100%{opacity:0}}
+  .radar .core{position:absolute;inset:0;display:grid;place-items:center;color:var(--gold);font-size:14px;text-shadow:0 0 8px rgba(247,213,139,.8)}
+  .radar .rn{position:absolute;left:50%;top:4px;transform:translateX(-50%);font-family:BerkshireSwash,Cardo,serif;font-size:12px;color:var(--gold);opacity:.85}
+  .radar.mini{--s:36px;margin:0;box-shadow:0 0 0 1px var(--brass-dk),0 0 0 2px var(--brass),inset 0 0 8px rgba(0,0,0,.8)}
+  .radar.mini .sweep{animation-duration:2.6s}
+  body.no-radar .radar .sweep,body.no-radar .radar .blip{animation-play-state:paused}
+
+  /* Visor de leitura do painel */
+  .ctl-screen{
+    margin-top:14px;padding:8px 10px;border-radius:6px;text-align:center;
+    font-family:ui-monospace,'SFMono-Regular',Menlo,Consolas,monospace;font-size:12px;letter-spacing:.1em;
+    color:var(--tech);text-shadow:0 0 6px hsl(var(--tech-h) 100% 72% / .6);
+    background:var(--screen);border:1px solid hsl(var(--tech-h) 100% 72% / .25);box-shadow:inset 0 0 12px hsl(var(--tech-h) 100% 72% / .12);
+  }
+
+  /* Deslizantes (faders) de latão */
+  .fader{display:grid;grid-template-columns:78px 1fr;align-items:center;gap:6px 10px;margin-top:14px}
+  .fader label{display:flex;align-items:center;gap:7px;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);cursor:pointer}
+  .fader input[type=range]{
+    -webkit-appearance:none;appearance:none;width:100%;height:8px;border-radius:4px;cursor:pointer;
+    background:linear-gradient(90deg,var(--tech) var(--p,50%),#0a0d15 0);
+    box-shadow:inset 0 1px 3px rgba(0,0,0,.8),0 0 0 1px var(--brass-dk);
+  }
+  .fader.hue input[type=range]{
+    background:linear-gradient(90deg,hsl(0 100% 70%),hsl(60 100% 70%),hsl(120 100% 70%),hsl(180 100% 70%),hsl(240 100% 70%),hsl(300 100% 70%),hsl(360 100% 70%));
+  }
+  .fader input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:16px;height:26px;border-radius:4px;border:1px solid #000;
+    background:linear-gradient(90deg,#8a6420,#ffe7ad 50%,#8a6420);
+    box-shadow:0 2px 5px rgba(0,0,0,.7),inset 0 0 0 1px rgba(255,255,255,.25);
+  }
+  .fader input[type=range]::-moz-range-thumb{
+    width:16px;height:26px;border-radius:4px;border:1px solid #000;
+    background:linear-gradient(90deg,#8a6420,#ffe7ad 50%,#8a6420);
+    box-shadow:0 2px 5px rgba(0,0,0,.7);
+  }
+  .fader input[type=range]:focus-visible{outline:none;box-shadow:inset 0 1px 3px rgba(0,0,0,.8),0 0 0 1px var(--brass),0 0 0 4px var(--tech-soft)}
+  /* barra de LEDs que mostra o nível */
+  .meter{grid-column:2;display:flex;gap:3px}
+  .meter i{flex:1;height:5px;border-radius:2px;background:#1c2230;box-shadow:inset 0 1px 1px rgba(0,0,0,.6);transition:background .12s,box-shadow .12s}
+  .meter i.on{background:var(--ok);box-shadow:0 0 5px var(--ok)}
+  .meter i.on.hi{background:var(--warn);box-shadow:0 0 5px var(--warn)}
+  .meter i.on.max{background:#ff5f5f;box-shadow:0 0 5px #ff5f5f}
+  .meter.tech i.on{background:var(--tech);box-shadow:0 0 5px var(--tech)}
+  /* LED que pisca quando algo é ajustado */
+  .led.flash{animation:ledFlash .35s ease-out !important}
+  @keyframes ledFlash{0%{filter:brightness(2.6);transform:scale(1.6)}100%{filter:none;transform:none}}
+
+  /* Chaves com legenda */
+  .switches .sw{display:flex;flex-direction:column;align-items:center;gap:16px}
+  .switches .sw span{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .toggle:focus-visible{outline:none;box-shadow:0 0 0 1px var(--brass),0 0 0 4px var(--tech-soft),inset 0 2px 6px rgba(0,0,0,.8)}
+  body.no-scan .monitor .screen::before,body.no-scan .monitor .screen::after{display:none}
+  body.no-stars::before{display:none}
+
+  .reboot{
+    width:100%;margin-top:18px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    font-family:Cardo,serif;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:#fff4cf;
+    padding:10px 14px;border-radius:9px;border:1px solid #000;
+    background:linear-gradient(180deg,#4a1a14,#2a0d09);
+    box-shadow:0 0 0 1px #a2432f,inset 0 1px 0 rgba(255,220,200,.2),0 4px 0 #06080d;
+    transition:transform .1s,box-shadow .15s;
+  }
+  .reboot:hover,.reboot:focus-visible{outline:none;box-shadow:0 0 0 1px #ff7a5c,0 0 14px rgba(255,122,92,.35),inset 0 1px 0 rgba(255,220,200,.2),0 4px 0 #06080d}
+  .reboot:active{transform:translateY(3px);box-shadow:0 0 0 1px #ff7a5c,0 1px 0 #06080d}
+
+  /* =========================================================
+     SEQUÊNCIA DE IGNIÇÃO (ligar os sistemas)
+     ========================================================= */
+  .boot{
+    position:fixed;inset:0;z-index:2147483645;display:none;align-items:center;justify-content:center;
+    background:radial-gradient(circle at 50% 40%,#0b1424,#020308 70%);
+    transition:opacity .6s ease;cursor:pointer;
+  }
+  html.boot-pending .boot,.boot.show{display:flex}
+  .boot.out{opacity:0;pointer-events:none}
+  .boot-box{width:min(90vw,470px);display:flex;flex-direction:column;align-items:center;gap:14px;padding:26px 22px}
+  .boot-title{font-family:BerkshireSwash,ManufacturingConsent,Cardo,serif;font-size:clamp(22px,5vw,30px);color:var(--gold);text-align:center;text-shadow:0 0 18px rgba(247,213,139,.35)}
+  .boot-log{list-style:none;width:100%;min-height:150px;font-family:ui-monospace,'SFMono-Regular',Menlo,Consolas,monospace;font-size:13px;letter-spacing:.06em;color:var(--tech);text-shadow:0 0 6px hsl(var(--tech-h) 100% 72% / .5)}
+  .boot-log li{display:flex;justify-content:space-between;gap:10px;padding:3px 0;animation:bootLine .25s ease-out}
+  .boot-log li b{font-weight:400;color:var(--ok);text-shadow:0 0 6px var(--ok)}
+  @keyframes bootLine{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:none}}
+  .boot-bar{width:100%;height:8px;border-radius:4px;overflow:hidden;background:#0a0d15;box-shadow:0 0 0 1px var(--brass-dk),inset 0 1px 3px rgba(0,0,0,.8)}
+  .boot-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--brass),var(--gold),var(--tech));box-shadow:0 0 10px var(--tech);transition:width .35s ease}
+  .boot-skip{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);opacity:.7}
+
+  html.boot-pending .plate{opacity:0}
+  html.leds-off .led:not(.lit){background:#2a3040 !important;box-shadow:inset 0 1px 2px rgba(0,0,0,.6) !important;animation:none !important}
+  .power-on{animation:powerOn .9s ease-out both}
+  @keyframes powerOn{
+    0%{opacity:0;filter:brightness(2.2)}
+    8%{opacity:.9}
+    13%{opacity:.12}
+    22%{opacity:1;filter:brightness(1.8)}
+    30%{opacity:.45}
+    42%{opacity:1}
+    100%{opacity:1;filter:brightness(var(--bright))}
+  }
 
   /* ---------- Telas menores ---------- */
   @media (max-width:980px){
@@ -374,10 +504,18 @@
   }
 
   @media (prefers-reduced-motion:reduce){
-    body::before,.chama span,.led.warn,.dial::after,.bars i,.monitor .screen::before,.portal-notice::before{animation:none}
+    body::before,.chama span,.led.warn,.dial::after,.bars i,.monitor .screen::before,.portal-notice::before,.radar .sweep,.radar .blip{animation:none}
     .btn,.media--convites a,.back{transition:none}
   }
 </style>
+<script>
+  try {
+    if (!sessionStorage.getItem('portal.boot') &&
+        !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.documentElement.classList.add('boot-pending', 'leds-off');
+    }
+  } catch (_) {}
+</script>
 </head>
 <body>
 <header class="plate">
@@ -396,7 +534,8 @@
   <div class="telemetry right" aria-hidden="true">
     <div class="readout">HORA ESTELAR <b id="starClock">--:--:--</b></div>
     <div class="readout">ESCUDO <b>100%</b></div>
-    <div class="readout"><span class="led tech"></span>SINAL</div>
+    <div class="readout"><span class="led tech" id="ledSignal"></span>SINAL</div>
+    <div class="radar mini"><span class="sweep"></span></div>
   </div>
 </header>
 
@@ -425,18 +564,56 @@
         <a class="btn" href="#" data-coming-soon="Sobre" aria-describedby="portal-coming-soon">ℹ️ Sobre<span class="led off" aria-hidden="true"></span></a>
       </nav>
     </div>
-    <!-- Instrumentos (decorativos) -->
+    <!-- Radar -->
     <div class="group" aria-hidden="true">
-      <div class="gtitle">Instrumentos</div>
-      <div class="instruments">
-        <div class="gauge"><div class="dial" style="--v:.82"></div><span>Fé</span></div>
-        <div class="gauge"><div class="dial" style="--v:.64"></div><span>Luz</span></div>
-        <div class="gauge"><div class="dial" style="--v:.45"></div><span>Rumo</span></div>
+      <div class="gtitle">Radar de Luz</div>
+      <div class="radar">
+        <span class="sweep"></span>
+        <i class="blip" style="--x:66.9%;--y:28.3%;--d:0.42s"></i>
+        <i class="blip" style="--x:87.1%;--y:65.0%;--d:1.24s"></i>
+        <i class="blip" style="--x:42.6%;--y:65.9%;--d:2.28s"></i>
+        <i class="blip" style="--x:19.5%;--y:38.9%;--d:3.22s"></i>
+        <i class="blip" style="--x:43.7%;--y:39.2%;--d:3.67s"></i>
+        <span class="rn">N</span>
+        <span class="core">✦</span>
       </div>
-      <div class="bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    </div>
+
+    <!-- Painel de controle (funcional) -->
+    <div class="group">
+      <div class="gtitle">Painel de Controle</div>
+      <div class="instruments" aria-hidden="true">
+        <div class="gauge"><div class="dial" id="dialBright" style="--v:.62"></div><span>Luz</span></div>
+        <div class="gauge"><div class="dial" id="dialHue" style="--v:.55"></div><span>Cor</span></div>
+        <div class="gauge"><div class="dial" id="dialVol" style="--v:.6"></div><span>Som</span></div>
+      </div>
+
+      <div class="fader">
+        <label for="ctlBright"><span class="led" id="ledBright"></span>Luz</label>
+        <input type="range" id="ctlBright" min="50" max="130" step="1" value="100" aria-label="Brilho da tela" />
+        <div class="meter" data-meter="ctlBright" aria-hidden="true"></div>
+      </div>
+      <div class="fader hue">
+        <label for="ctlHue"><span class="led tech" id="ledHue"></span>Cor</label>
+        <input type="range" id="ctlHue" min="0" max="360" step="1" value="197" aria-label="Cor das luzes e telas" />
+        <div class="meter tech" data-meter="ctlHue" aria-hidden="true"></div>
+      </div>
+      <div class="fader">
+        <label for="ctlVol"><span class="led" id="ledVol"></span>Som</label>
+        <input type="range" id="ctlVol" min="0" max="100" step="1" value="60" aria-label="Volume dos sons do painel" />
+        <div class="meter" data-meter="ctlVol" aria-hidden="true"></div>
+      </div>
+
+      <div class="ctl-screen" id="ctlScreen" aria-live="polite">LUZ 100% · COR 197° · SOM 60%</div>
+
       <div class="switches">
-        <div class="toggle"></div><div class="toggle"></div><div class="toggle down"></div><div class="toggle"></div><div class="toggle down"></div><div class="toggle"></div>
+        <div class="sw"><button type="button" class="toggle" role="switch" aria-checked="true" data-key="som" aria-label="Som"></button><span>Som</span></div>
+        <div class="sw"><button type="button" class="toggle" role="switch" aria-checked="true" data-key="scan" aria-label="Varredura das telas"></button><span>Scan</span></div>
+        <div class="sw"><button type="button" class="toggle" role="switch" aria-checked="true" data-key="stars" aria-label="Estrelas ao fundo"></button><span>Astros</span></div>
+        <div class="sw"><button type="button" class="toggle" role="switch" aria-checked="true" data-key="radar" aria-label="Radar girando"></button><span>Radar</span></div>
       </div>
+
+      <button type="button" class="reboot" id="rebootBtn">⏻ Reiniciar sistemas</button>
     </div>
   </aside>
 
@@ -523,6 +700,16 @@
   <span class="status" aria-hidden="true"><span class="led"></span>Todos os sistemas ativos</span>
   <span class="motto">Para além. E sempre!! • © Irmandade Conhecimento com Luz</span>
 </footer>
+
+<div class="boot" id="boot" aria-hidden="true">
+  <div class="boot-box">
+    <div class="chama"><span></span><span></span><span></span></div>
+    <div class="boot-title">Sequência de Ignição</div>
+    <ol class="boot-log" id="bootLog"></ol>
+    <div class="boot-bar"><i id="bootBar"></i></div>
+    <div class="boot-skip">toque para pular</div>
+  </div>
+</div>
 
 <div id="portal-coming-soon"
      class="portal-notice"
@@ -630,18 +817,281 @@
   });
 })();
 </script>
-<!-- Hora estelar do painel (decorativa) -->
+<!-- Cockpit: relógio, sons, controles, LEDs e sequência de ignição -->
 <script>
 (function () {
-  const el = document.getElementById('starClock');
-  if (!el) return;
+  const root = document.documentElement;
+  const $ = (sel) => document.querySelector(sel);
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---------- Hora estelar ----------
+  const clock = document.getElementById('starClock');
   const pad = (n) => String(n).padStart(2, '0');
   const tick = () => {
     const d = new Date();
-    el.textContent = pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+    if (clock) clock.textContent = pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
   };
   tick();
   setInterval(tick, 1000);
+
+  // ---------- Preferências salvas ----------
+  const KEY = 'portal.cockpit.v1';
+  const DEFAULTS = { bright: 100, hue: 197, vol: 60, som: true, scan: true, stars: true, radar: true };
+  let cfg = Object.assign({}, DEFAULTS);
+  try { Object.assign(cfg, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (_) {}
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(cfg)); } catch (_) {} };
+
+  // ---------- Sons sintetizados (sem arquivos) ----------
+  const Sfx = {
+    ctx: null, master: null,
+    unlock() {
+      try {
+        if (!this.ctx) {
+          const AC = window.AudioContext || window.webkitAudioContext;
+          if (!AC) return;
+          this.ctx = new AC();
+          this.master = this.ctx.createGain();
+          this.master.connect(this.ctx.destination);
+          this.setVolume();
+        }
+        if (this.ctx.state === 'suspended') this.ctx.resume();
+      } catch (_) {}
+    },
+    ready() { return this.ctx && this.ctx.state === 'running' && cfg.som && cfg.vol > 0; },
+    setVolume() {
+      if (!this.master) return;
+      const v = cfg.som ? Math.pow(cfg.vol / 100, 1.6) : 0;
+      this.master.gain.setTargetAtTime(v, this.ctx.currentTime, 0.02);
+    },
+    tone(freq, dur, opt = {}) {
+      if (!this.ready()) return;
+      const c = this.ctx, t = c.currentTime + (opt.delay || 0);
+      const o = c.createOscillator(), g = c.createGain();
+      o.type = opt.type || 'sine';
+      o.frequency.setValueAtTime(freq, t);
+      if (opt.to) o.frequency.exponentialRampToValueAtTime(opt.to, t + dur);
+      const peak = opt.gain ?? 0.25;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(peak, t + Math.min(0.01, dur / 4));
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g); g.connect(this.master);
+      o.start(t); o.stop(t + dur + 0.02);
+    },
+    noise(dur, opt = {}) {
+      if (!this.ready()) return;
+      const c = this.ctx, t = c.currentTime + (opt.delay || 0);
+      const buf = c.createBuffer(1, Math.ceil(c.sampleRate * dur), c.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
+      const src = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+      src.buffer = buf; f.type = 'bandpass'; f.frequency.value = opt.freq || 2500; f.Q.value = 1.2;
+      g.gain.value = opt.gain ?? 0.3;
+      src.connect(f); f.connect(g); g.connect(this.master);
+      src.start(t);
+    },
+    click()  { this.noise(0.03, { freq: 3200, gain: 0.35 }); this.tone(1400, 0.05, { type: 'triangle', to: 700, gain: 0.18 }); },
+    hover()  { this.tone(2200, 0.03, { type: 'sine', gain: 0.04 }); },
+    toggle(on) { this.noise(0.025, { freq: 1800, gain: 0.45 }); this.tone(on ? 520 : 340, 0.08, { type: 'square', gain: 0.07, delay: 0.02 }); },
+    step()   { this.tone(1900, 0.025, { type: 'sine', gain: 0.07 }); },
+    alert()  { this.tone(880, 0.12, { type: 'triangle', gain: 0.16, delay: 0.05 }); this.tone(660, 0.16, { type: 'triangle', gain: 0.16, delay: 0.2 }); },
+    beep(i)  { this.tone(600 + i * 90, 0.07, { type: 'sine', gain: 0.12 }); },
+    ignite() { this.tone(70, 1.6, { type: 'sawtooth', to: 220, gain: 0.08 }); this.tone(140, 1.6, { type: 'sine', to: 440, gain: 0.1 }); },
+    online() { [523, 659, 784, 1047].forEach((f, i) => this.tone(f, 0.22, { type: 'sine', gain: 0.12, delay: i * 0.09 })); }
+  };
+  // O navegador só libera áudio depois de um toque/clique.
+  ['pointerdown', 'keydown', 'touchstart'].forEach((ev) =>
+    document.addEventListener(ev, () => Sfx.unlock(), { capture: true, passive: true })
+  );
+
+  // ---------- LEDs ----------
+  function flash(el) {
+    if (!el) return;
+    el.classList.remove('flash');
+    void el.offsetWidth;
+    el.classList.add('flash');
+  }
+  const signal = document.getElementById('ledSignal');
+
+  // ---------- Deslizantes ----------
+  const sliders = {
+    bright: { input: $('#ctlBright'), led: $('#ledBright'), dial: $('#dialBright'), min: 50, max: 130 },
+    hue:    { input: $('#ctlHue'),    led: $('#ledHue'),    dial: $('#dialHue'),    min: 0,  max: 360 },
+    vol:    { input: $('#ctlVol'),    led: $('#ledVol'),    dial: $('#dialVol'),    min: 0,  max: 100 }
+  };
+  document.querySelectorAll('.meter').forEach((m) => { m.innerHTML = '<i></i>'.repeat(10); });
+
+  function renderScreen() {
+    const scr = $('#ctlScreen');
+    if (scr) scr.textContent = 'LUZ ' + cfg.bright + '% · COR ' + cfg.hue + '° · SOM ' + (cfg.som ? cfg.vol + '%' : 'MUDO');
+  }
+
+  function applySlider(key) {
+    const sl = sliders[key];
+    if (!sl.input) return;
+    const v = cfg[key];
+    const frac = (v - sl.min) / (sl.max - sl.min);
+    sl.input.value = v;
+    sl.input.style.setProperty('--p', (frac * 100) + '%');
+    if (sl.dial) sl.dial.style.setProperty('--v', frac.toFixed(3));
+
+    if (key === 'bright') root.style.setProperty('--bright', (v / 100).toFixed(2));
+    if (key === 'hue') root.style.setProperty('--tech-h', v);
+    if (key === 'vol') Sfx.setVolume();
+
+    const meter = document.querySelector('.meter[data-meter="' + sl.input.id + '"]');
+    if (meter) {
+      const lit = Math.round(frac * 10);
+      meter.querySelectorAll('i').forEach((i, idx) => {
+        i.className = idx < lit ? ('on' + (idx >= 9 ? ' max' : idx >= 7 ? ' hi' : '')) : '';
+      });
+    }
+    // LED do deslizante: mais forte quanto maior o valor (o de Luz/Som apaga no mínimo)
+    if (sl.led && key !== 'hue') {
+      sl.led.style.opacity = (0.25 + frac * 0.75).toFixed(2);
+      sl.led.classList.toggle('off', key === 'vol' && (v === 0 || !cfg.som));
+    }
+    renderScreen();
+  }
+
+  let lastStep = 0;
+  Object.keys(sliders).forEach((key) => {
+    const sl = sliders[key];
+    if (!sl.input) return;
+    sl.input.addEventListener('input', () => {
+      cfg[key] = Number(sl.input.value);
+      applySlider(key);
+      flash(sl.led);
+      flash(signal);
+      const now = performance.now();
+      if (now - lastStep > 45) { Sfx.step(); lastStep = now; }
+    });
+    sl.input.addEventListener('change', save);
+  });
+
+  // ---------- Chaves ----------
+  const toggles = document.querySelectorAll('.toggle[data-key]');
+  function applyToggle(key) {
+    const on = !!cfg[key];
+    toggles.forEach((t) => { if (t.dataset.key === key) t.setAttribute('aria-checked', on ? 'true' : 'false'); });
+    if (key === 'scan') document.body.classList.toggle('no-scan', !on);
+    if (key === 'stars') document.body.classList.toggle('no-stars', !on);
+    if (key === 'radar') document.body.classList.toggle('no-radar', !on);
+    if (key === 'som') { Sfx.setVolume(); applySlider('vol'); }
+    renderScreen();
+  }
+  toggles.forEach((t) => {
+    t.addEventListener('click', () => {
+      const key = t.dataset.key;
+      cfg[key] = !cfg[key];
+      if (key === 'som' && cfg.som) Sfx.unlock();
+      applyToggle(key);
+      Sfx.toggle(cfg[key]);
+      flash(signal);
+      save();
+    });
+  });
+
+  Object.keys(sliders).forEach(applySlider);
+  ['som', 'scan', 'stars', 'radar'].forEach(applyToggle);
+
+  // ---------- Sons nos botões ----------
+  document.addEventListener('click', (e) => {
+    const el = e.target.closest('.btn, .back, .monitor, .reboot');
+    if (!el) return;
+    Sfx.click();
+    flash(el.querySelector('.led'));
+    flash(signal);
+    if (el.matches('[data-coming-soon]')) Sfx.alert();
+  }, true);
+  document.addEventListener('pointerover', (e) => {
+    if (e.pointerType !== 'mouse') return;
+    const el = e.target.closest('.btn, .back, .reboot');
+    if (el && !el.contains(e.relatedTarget)) Sfx.hover();
+  });
+
+  // ---------- Sequência de ignição ----------
+  const boot = document.getElementById('boot');
+  const log = document.getElementById('bootLog');
+  const bar = document.getElementById('bootBar');
+  const LINES = [
+    ['Acendendo a chama', 'OK'],
+    ['Calibrando instrumentos', 'OK'],
+    ['Radar de luz', 'ATIVO'],
+    ['Escudos da fé', '100%'],
+    ['Canais de transmissão', '04/04'],
+    ['Todos os sistemas', 'ATIVOS']
+  ];
+  let running = false, timers = [];
+  const later = (fn, ms) => timers.push(setTimeout(fn, ms));
+
+  function powerUp() {
+    const plates = Array.from(document.querySelectorAll('.plate'));
+    plates.forEach((pl, i) => { pl.style.animationDelay = (i * 0.15) + 's'; pl.classList.add('power-on'); });
+    root.classList.remove('boot-pending');
+    root.classList.add('leds-off');
+
+    const leds = Array.from(document.querySelectorAll('.led'));
+    const step = Math.max(12, Math.round(900 / Math.max(leds.length, 1)));
+    leds.forEach((led, i) => later(() => {
+      led.classList.add('lit');
+      if (i % 4 === 0) Sfx.step();
+    }, 250 + i * step));
+
+    later(() => {
+      root.classList.remove('leds-off');
+      leds.forEach((led) => led.classList.remove('lit'));
+      Sfx.online();
+    }, 300 + leds.length * step);
+
+    later(() => {
+      plates.forEach((pl) => { pl.classList.remove('power-on'); pl.style.animationDelay = ''; });
+      running = false;
+    }, 1200 + plates.length * 150);
+  }
+
+  function finishBoot() {
+    if (!boot) return;
+    timers.forEach(clearTimeout); timers = [];
+    boot.classList.add('out');
+    try { sessionStorage.setItem('portal.boot', '1'); } catch (_) {}
+    setTimeout(() => { boot.classList.remove('show', 'out'); }, 650);
+    powerUp();
+  }
+
+  function runBoot() {
+    if (!boot || running) return;
+    running = true;
+    timers.forEach(clearTimeout); timers = [];
+    log.innerHTML = '';
+    bar.style.width = '0';
+    boot.classList.remove('out');
+    boot.classList.add('show');
+    root.classList.add('boot-pending', 'leds-off');
+    Sfx.ignite();
+
+    LINES.forEach(([label, status], i) => {
+      later(() => {
+        const li = document.createElement('li');
+        li.innerHTML = '<span></span><b></b>';
+        li.firstChild.textContent = label + '…';
+        log.appendChild(li);
+        later(() => { li.lastChild.textContent = status; Sfx.beep(i); }, 220);
+        bar.style.width = (((i + 1) / LINES.length) * 100) + '%';
+      }, 250 + i * 380);
+    });
+    later(finishBoot, 250 + LINES.length * 380 + 500);
+  }
+
+  if (boot) boot.addEventListener('click', () => { if (running) finishBoot(); });
+  const reboot = document.getElementById('rebootBtn');
+  if (reboot) reboot.addEventListener('click', () => { if (!running) runBoot(); });
+
+  if (root.classList.contains('boot-pending')) {
+    if (reduceMotion) { root.classList.remove('boot-pending', 'leds-off'); }
+    else runBoot();
+  } else {
+    root.classList.remove('leds-off');
+  }
 })();
 </script>
 </body>
