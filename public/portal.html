@@ -532,7 +532,10 @@
   }
 
   @media (prefers-reduced-motion:reduce){
-    body::before,.chama span,.led.warn,.dial::after,.bars i,.monitor .screen::before,.portal-notice::before,.radar .sweep,.radar .blip,.radar .sky,.radar .reveal,.radar .reveal .counter,.radar .sky-field .tw{animation:none}
+    body::before,.chama span,.led.warn,.dial::after,.bars i,.monitor .screen::before,.portal-notice::before,.radar .blip,.radar .sky-field .tw{animation:none}
+    /* o radar continua varrendo, só que mais devagar (a chave Radar pode parar) */
+    .radar .sweep,.radar .reveal,.radar .reveal .counter{animation-duration:10s}
+    .radar .sky{animation-duration:300s}
     .btn,.media--convites a,.back{transition:none}
   }
 </style>
@@ -1068,8 +1071,10 @@
       const sweepA = radarEl.querySelector('.sweep').getAnimations()[0];
       const skyA = radarEl.querySelector('.sky').getAnimations()[0];
       if (sweepA && skyA) {
-        const sweep = ((sweepA.currentTime || 0) % 4000) / 4000 * 360;
-        const sky = -((skyA.currentTime || 0) % 160000) / 160000 * 360;
+        const sweepDur = Number(sweepA.effect.getTiming().duration) || 4000;
+        const skyDur = Number(skyA.effect.getTiming().duration) || 160000;
+        const sweep = ((sweepA.currentTime || 0) % sweepDur) / sweepDur * 360;
+        const sky = -((skyA.currentTime || 0) % skyDur) / skyDur * 360;
         let hit = '';
         for (const [name, ang] of CONST) {
           const cur = ((ang + sky) % 360 + 360) % 360;
