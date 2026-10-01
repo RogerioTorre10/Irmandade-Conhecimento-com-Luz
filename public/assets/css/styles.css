@@ -424,9 +424,17 @@ section:has(.typing-active) .j-panel-glow {
   overflow: hidden !important;
   border-radius: 18px !important;
   background: rgba(0, 0, 0, 0.12) !important;
+  /* aro externo: dourado antes da escolha do guia, na cor do guia depois.
+     A 1ª regra vale para navegadores antigos (sempre dourado). */
   box-shadow:
-    0 0 0 2px rgba(212,175,55,.82),
-    0 0 32px rgba(212,175,55,.35) !important;
+    0 0 0 3px rgba(212,175,55,.9),
+    0 0 36px rgba(212,175,55,.45) !important;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.65),
+    0 0 0 4px var(--vt-ring, #d4af37),
+    0 0 0 5px rgba(0,0,0,.45),
+    0 0 26px color-mix(in srgb, var(--vt-ring, #d4af37) 70%, transparent),
+    0 0 70px color-mix(in srgb, var(--vt-ring, #d4af37) 35%, transparent) !important;
 }
 
 #vt-video,

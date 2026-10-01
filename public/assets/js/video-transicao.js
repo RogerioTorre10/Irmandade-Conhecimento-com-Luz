@@ -240,6 +240,37 @@
   return { overlay, frame, video, ambient, skip };
 }
 
+  const RING_GOLD = '#d4af37';
+  const RING_GUIDE_COLORS = { lumen: '#00ff9d', zion: '#00aaff', arian: '#ff00ff' };
+  // vídeos que levam a estas sections acontecem antes da escolha do guia
+  const RING_GOLD_NEXT = new Set([
+    'section-intro', 'section-termos1', 'section-termos2', 'section-senha', 'section-guia'
+  ]);
+
+  function currentGuideKey() {
+    const raw = String(
+      document.body?.dataset?.guia ||
+      window.JORNADA_STATE?.guiaSelecionado ||
+      window.JORNADA_STATE?.guia ||
+      sessionStorage.getItem('JORNADA_GUIA') ||
+      sessionStorage.getItem('jornada.guia') ||
+      ''
+    ).toLowerCase();
+    if (raw.includes('lumen')) return 'lumen';
+    if (raw.includes('zion')) return 'zion';
+    if (raw.includes('arian') || raw.includes('arion')) return 'arian';
+    return '';
+  }
+
+  function applyRingColor(frame, nextSectionId) {
+    if (!frame) return;
+    const next = String(nextSectionId || '');
+    const guide = RING_GOLD_NEXT.has(next) ? '' : currentGuideKey();
+    const color = RING_GUIDE_COLORS[guide] || RING_GOLD;
+    frame.style.setProperty('--vt-ring', color);
+    frame.dataset.ring = guide || 'gold';
+  }
+
   function playTransitionVideo(src, nextSectionId) {
     log('Recebido src:', src, 'nextSectionId:', nextSectionId);
 
@@ -270,6 +301,10 @@
     log('Vídeo resolvido para:', href);
 
     const { overlay, frame, video, ambient, skip } = buildPortal();
+
+    // Aro do vídeo: dourado até a escolha do guia; depois, na cor do guia.
+    // Só aparência — qualquer falha mantém o dourado e o vídeo segue normal.
+    try { applyRingColor(frame, nextSectionId); } catch (_) {}
 
     overlay.style.opacity = '1';
     overlay.style.visibility = 'visible';
