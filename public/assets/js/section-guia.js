@@ -534,6 +534,34 @@
     el.classList.add('typing-active');
     el.classList.remove('typing-done');
 
+    // Fala e digitação juntas (sincronizadas) quando a voz está ligada.
+    // Antes a fala era cortada após 6,5 s, mesmo em textos longos.
+    if (speak && !el.dataset.spoken && typeof window.typeAndSpeak === 'function') {
+      try {
+        safeSpeechCancel();
+        const guide = getGuideForVoice();
+        const tone = {
+          zion:  { rate: 1.0,  pitch: 0.9 },
+          lumen: { rate: 1.02, pitch: 1.1 },
+          arian: { rate: 1.05, pitch: 1.2 }
+        }[guide] || { rate: 1.02, pitch: 1 };
+        await window.typeAndSpeak(el, msg, speed, {
+          cursor: true,
+          forceReplay: true,
+          rate: tone.rate,
+          pitch: tone.pitch,
+          guide
+        });
+        el.classList.remove('typing-active');
+        el.classList.add('typing-done');
+        el.dataset.spoken = 'true';
+        await sleep(60);
+        return;
+      } catch (err) {
+        console.warn('[GUIA] typeAndSpeak falhou, usando caminho antigo:', err);
+      }
+    }
+
     let usedFallback = false;
 
     if (typeof window.runTyping === 'function') {
@@ -624,7 +652,7 @@
             console.warn('[GUIA][TTS] timeout de segurança; liberando fluxo.');
             try { window.speechSynthesis?.cancel?.(); } catch {}
             done();
-          }, 6500);
+          }, Math.max(6500, msg.length * 90 + 3000));
 
           try {
             window.speechSynthesis.speak(utter);

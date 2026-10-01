@@ -908,23 +908,125 @@ if (showCursor) element.appendChild(caret);
   };
 }
 
+  // =========================================================
+  // FALA EM PEDAÇOS (voz do navegador)
+  // O Chrome corta falas longas (~15 s). Dividimos o texto em frases
+  // curtas, enfileiradas, e só consideramos a fala "terminada" quando o
+  // último pedaço acaba. Cancelamentos e travas (iOS sem onend) liberam
+  // a jornada com segurança.
+  // =========================================================
+  function __splitSpeechChunks(text, lang) {
+    const clean = String(text || '').replace(/\s+/g, ' ').trim();
+    if (!clean) return [];
+    const cjk = /^(ja|zh)/i.test(String(lang || ''));
+    const MAX = cjk ? 70 : 180;
+    const sentences = clean.match(cjk
+      ? /[^。！？!?]+[。！？!?]*/g
+      : /[^.!?…;:]+[.!?…;:]*["'”»)]*\s*/g) || [clean];
+    const out = [];
+    let buf = '';
+    const push = (t) => { t = t.trim(); if (t) out.push(t); };
+    for (const sent of sentences) {
+      if ((buf + sent).length <= MAX) { buf += sent; continue; }
+      if (buf) { push(buf); buf = ''; }
+      if (sent.length <= MAX) { buf = sent; continue; }
+      // frase muito longa: quebra por vírgulas e depois por espaços
+      let rest = sent;
+      while (rest.length > MAX) {
+        let cut = rest.lastIndexOf(cjk ? '、' : ',', MAX);
+        if (cut < MAX * 0.4) cut = rest.lastIndexOf(' ', MAX);
+        if (cut < MAX * 0.4) cut = MAX;
+        push(rest.slice(0, cut + 1));
+        rest = rest.slice(cut + 1);
+      }
+      buf = rest;
+    }
+    push(buf);
+    return out;
+  }
+
+  function __estimateSpeechMs(text, rate, lang) {
+    const chars = String(text || '').length;
+    const cjk = /^(ja|zh)/i.test(String(lang || ''));
+    const cps = cjk ? 6 : 14; // caracteres por segundo, aproximado
+    return Math.max(1500, (chars / cps) * 1000 / Math.max(0.6, Number(rate) || 1));
+  }
+
+  // Fala `text` em pedaços. Retorna Promise que resolve quando termina,
+  // quando outra fala/cancelamento acontece, ou por segurança.
+  function __speakBrowserChunked(text, cfg = {}) {
+    return new Promise(async (resolve) => {
+      if (!('speechSynthesis' in window)) return resolve();
+      const chunks = __splitSpeechChunks(text, cfg.lang);
+      if (!chunks.length) return resolve();
+
+      let finished = false;
+      let watch = null;
+      let safety = null;
+      const myGen = __neural.gen;
+      const finish = () => {
+        if (finished) return;
+        finished = true;
+        clearInterval(watch);
+        clearTimeout(safety);
+        try { cfg.onEnd?.(); } catch {}
+        resolve();
+      };
+
+      // voz escolhida uma vez e reaproveitada nos pedaços
+      const probe = new SpeechSynthesisUtterance(chunks[0]);
+      probe.lang = cfg.lang || 'pt-BR';
+      try { await __applyVoice(probe, cfg.lang, cfg.guide); } catch {}
+      if (myGen !== __neural.gen) return finish(); // cancelado enquanto preparava
+
+      chunks.forEach((chunk, i) => {
+        const u = i === 0 ? probe : new SpeechSynthesisUtterance(chunk);
+        if (i > 0) { u.voice = probe.voice; u.lang = probe.lang; }
+        u.rate = cfg.rate ?? 1;
+        u.pitch = cfg.pitch ?? 1;
+        u.volume = cfg.volume ?? 1;
+        if (i === 0) u.onstart = () => { try { cfg.onStart?.(); } catch {} };
+        u.onboundary = () => { try { window.Luz?.startPulse({ min: 1, max: 1.45, speed: 120 }); } catch {} };
+        u.onerror = (ev) => {
+          const err = ev?.error || '';
+          // interrompido/cancelado = outra fala começou: libera já
+          if (err === 'interrupted' || err === 'canceled' || i === chunks.length - 1) finish();
+        };
+        if (i === chunks.length - 1) u.onend = finish;
+        try { speechSynthesis.speak(u); } catch { if (i === chunks.length - 1) finish(); }
+      });
+      try { speechSynthesis.resume(); } catch {}
+
+      // cancelamento vindo de qualquer parte da jornada
+      watch = setInterval(() => { if (myGen !== __neural.gen) finish(); }, 250);
+      // segurança: iOS às vezes não dispara onend
+      safety = setTimeout(finish, __estimateSpeechMs(text, cfg.rate, cfg.lang) * 1.35 + 2000);
+    });
+  }
+
+  window.JORNADA_TTS = window.JORNADA_TTS || {};
+  window.JORNADA_TTS.speakChunked = __speakBrowserChunked;
+  window.JORNADA_TTS.splitChunks = __splitSpeechChunks;
+
   let __lastSpeakSig = '';
   let __lastSpeakAt = 0;
 
-  window.EffectCoordinator.speak = (text, options = {}) => {
-    if (!text || !('speechSynthesis' in window)) return;
+  // Retorna uma Promise que só resolve quando a fala termina
+  // (ou é cancelada), para quem usa `await` não cortar a fala seguinte.
+  window.EffectCoordinator.speak = (text, options = {}) => new Promise((resolveSpeak) => {
+    if (!text || !('speechSynthesis' in window)) return resolveSpeak();
 
     const lang = getLangNow();
     const guide = __resolveSpeechGuide(options.guide, options.element);
     const tuning = getGuideSpeechTuning(guide, lang);
 
     const clean = String(text).replace(/\s+/g, ' ').trim();
-    if (!clean) return;
+    if (!clean) return resolveSpeak();
 
     const sig = `${lang}::${guide}::${clean}`;
     const now = Date.now();
 
-    if (sig === __lastSpeakSig && (now - __lastSpeakAt) < 1600) return;
+    if (sig === __lastSpeakSig && (now - __lastSpeakAt) < 1600) return resolveSpeak();
     __lastSpeakSig = sig;
     __lastSpeakAt = now;
 
@@ -935,12 +1037,32 @@ if (showCursor) element.appendChild(caret);
       .then(audio => {
         // outra fala começou (ou foi cancelada) enquanto o áudio carregava
         if (speakGen !== __neural.gen) return true;
-        return audio ? __playNeural(audio) : false;
+        if (!audio) return false;
+        const durMs = isFinite(audio.duration) && audio.duration > 0
+          ? audio.duration * 1000
+          : __estimateSpeechMs(clean, options.rate ?? tuning.rate, lang);
+        const neuralSafety = setTimeout(resolveSpeak, durMs * 1.3 + 3000);
+        return __playNeural(audio, () => { clearTimeout(neuralSafety); resolveSpeak(); })
+          .then(ok => { if (!ok) clearTimeout(neuralSafety); return ok; });
       })
       .then(ok => { if (!ok) __speakBrowser(); })
       .catch(() => __speakBrowser());
 
     function __speakBrowser() {
+      if (speakGen !== __neural.gen) return resolveSpeak();
+      __speakBrowserChunked(clean, {
+        lang,
+        guide,
+        rate: options.rate ?? tuning.rate,
+        pitch: options.pitch ?? tuning.pitch,
+        volume: options.volume ?? tuning.volume,
+        onStart: () => typingLog('TTS iniciou', { lang, guide }),
+        onEnd: () => { try { window.Luz?.stopPulse(); } catch {} }
+      }).then(resolveSpeak);
+    }
+
+    // código antigo de fala única (mantido desligado como referência)
+    function __speakBrowserLegacy() {
     const utt = new SpeechSynthesisUtterance(clean);
     utt.lang = lang;
     utt.rate = options.rate ?? tuning.rate;
@@ -983,7 +1105,7 @@ if (showCursor) element.appendChild(caret);
         try { speechSynthesis.speak(utt); } catch {}
       });
     }
-  };
+  });
 
   window.typeAndSpeak = async function (element, text, speed = 42, options = {}) {
     if (!text || !element) return;
@@ -1015,98 +1137,53 @@ if (showCursor) element.appendChild(caret);
     const guide = __resolveSpeechGuide(options.guide, element);
     const tuning = getGuideSpeechTuning(guide, lang);
 
-    let speechDone = !('speechSynthesis' in window);
+    let speechDone = !window.speechSynthesis;
     let utt = null;
 
     const chars = clean.length;
-    const estimatedSpeechMs = Math.max(
-      1800,
-      Math.min(9000, (chars / 14) * 1000 / Math.max(0.72, tuning.rate))
-    );
+    const speechRate = options.rate ?? tuning.rate;
+    const estimatedSpeechMs = __estimateSpeechMs(clean, speechRate, lang);
 
+    // digitação no ritmo estimado da fala (antes havia teto de 9 s,
+    // e em textos longos a digitação terminava muito antes da voz)
     let typingSpeed = options.speed
       ? options.speed
-      : Math.max(20, Math.min(46, Math.round(estimatedSpeechMs / Math.max(chars, 1))));
+      : Math.max(20, Math.min(80, Math.round((estimatedSpeechMs * 0.95) / Math.max(chars, 1))));
 
     // Voz neural: digitação acompanha a duração real do áudio.
     let neuralPlaying = false;
+    let waitBaseMs = estimatedSpeechMs;
     const neuralAudio = await __prepareNeural(clean, lang, guide);
     if (neuralAudio) {
       const durMs = (neuralAudio.duration || 0) * 1000;
+      if (isFinite(durMs) && durMs > 0) waitBaseMs = durMs;
       if (!options.speed && isFinite(durMs) && durMs > 0) {
         typingSpeed = Math.max(18, Math.min(70, Math.round((durMs * 0.92) / Math.max(chars, 1))));
       }
       speechDone = false;
       neuralPlaying = await __playNeural(neuralAudio, () => { speechDone = true; });
-      if (!neuralPlaying) speechDone = !('speechSynthesis' in window);
+      if (!neuralPlaying) speechDone = !window.speechSynthesis;
     }
 
-    if (!neuralPlaying && 'speechSynthesis' in window) {
-      utt = new SpeechSynthesisUtterance(clean);
-      utt.lang = lang;
-      utt.rate = options.rate ?? tuning.rate;
-      utt.pitch = options.pitch ?? tuning.pitch;
-      utt.volume = options.volume ?? tuning.volume;
-
-      utt.onstart = () => {
-        typingLog('typeAndSpeak iniciou', {
-          lang: utt.lang,
-          guide,
-          voice: utt.voice?.name || '(default)',
-          typingSpeed
-        });
-      };
-
-      utt.onend = () => { speechDone = true; };
-      utt.onerror = () => { speechDone = true; };
-
-      try { await __applyVoice(utt, lang, guide); } catch {}
+    // sem nenhuma voz disponível: digita na velocidade normal da section
+    if (!neuralPlaying && !window.speechSynthesis && !options.speed) {
+      typingSpeed = Number(speed) || 42;
     }
 
-    if (utt) {
-      const langLower =
-        String(lang || '')
-          .toLowerCase();
-    
-      const isCJK =
-        langLower.startsWith('ja') ||
-        langLower.startsWith('zh');
-    
-      const isMobile =
-        /android|iphone|ipad|ipod|mobile/i.test(
-          navigator.userAgent || ''
-        );
-    
-      try {
-        speechSynthesis.cancel();
-      } catch {}
-    
-      // Mobile + Japonês/Chinês:
-      // dá tempo real para o cancel anterior terminar
-      // antes de iniciar o novo utterance.
-      if (isMobile && isCJK) {
-        await new Promise(
-          resolve => setTimeout(resolve, 220)
-        );
-    
-        try {
-          speechSynthesis.resume();
-        } catch {}
-      }
-    
-      try {
-        speechSynthesis.speak(utt);
-      } catch {
-        speechDone = true;
-      }
-    
-      await new Promise(
-        resolve =>
-          setTimeout(
-            resolve,
-            isMobile && isCJK ? 180 : 90
-          )
-      );
+    let browserSpeech = null;
+    if (!neuralPlaying && window.speechSynthesis) {
+      try { speechSynthesis.cancel(); } catch {}
+      speechDone = false;
+      browserSpeech = __speakBrowserChunked(clean, {
+        lang,
+        guide,
+        rate: speechRate,
+        pitch: options.pitch ?? tuning.pitch,
+        volume: options.volume ?? tuning.volume,
+        onStart: () => typingLog('typeAndSpeak iniciou', { lang, guide, typingSpeed })
+      }).then(() => { speechDone = true; });
+      // pequena folga para a voz começar junto com a digitação
+      await new Promise(r => setTimeout(r, /^(ja|zh)/i.test(String(lang)) ? 180 : 90));
     }
     await window.runTyping(element, clean, null, {
       speed: typingSpeed,
@@ -1114,7 +1191,9 @@ if (showCursor) element.appendChild(caret);
       forceReplay: options.forceReplay ?? false
     });
 
-    while (!speechDone) {
+    // espera a fala terminar, mas nunca prende a jornada para sempre
+    const waitLimit = Date.now() + waitBaseMs * 1.4 + 2500;
+    while (!speechDone && Date.now() < waitLimit) {
       await new Promise(r => setTimeout(r, 60));
     }
   };

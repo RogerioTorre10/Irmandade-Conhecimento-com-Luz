@@ -1094,6 +1094,20 @@ function buildFinalSynthesisPayload() {
         window.speechSynthesis.cancel();
       } catch {}
       
+      // Fala em pedaços (evita o corte do Chrome em textos longos e o
+      // limite de 30 s da trava acima, que cancelava a voz no meio).
+      if (window.JORNADA_TTS?.speakChunked) {
+        clearTimeout(ttsSafetyTimer);
+        window.JORNADA_TTS.speakChunked(clean, {
+          lang: utter.lang,
+          rate: utter.rate,
+          pitch: utter.pitch,
+          volume: utter.volume,
+          guide
+        }).then(finalizarTTS, finalizarTTS);
+        return;
+      }
+
       try {
         window.speechSynthesis.speak(utter);
       } catch (err) {
@@ -1113,7 +1127,12 @@ function buildFinalSynthesisPayload() {
     el.classList.add('typing-active');
 
     let speechPromise = Promise.resolve();
-    if (withVoice) speechPromise = queueSpeak(text);
+    if (withVoice) {
+      speechPromise = queueSpeak(text);
+      // digitação no ritmo aproximado da voz (antes terminava bem antes dela)
+      const estMs = (text.length / 14) * 1000 / 0.93;
+      delay = Math.max(delay, Math.min(170, Math.round(estMs / Math.max(1, text.length / 2) * 0.95)));
+    }
 
     for (let i = 0; i < text.length; i++) {
       el.textContent += text[i];
