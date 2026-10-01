@@ -603,6 +603,17 @@
 
     if (!('speechSynthesis' in window)) return Promise.resolve();
 
+    // Fala em pedaços (evita o corte do Chrome em respostas longas).
+    if (window.JORNADA_TTS?.speakChunked) {
+      try { speechSynthesis.cancel(); } catch {}
+      return window.JORNADA_TTS.speakChunked(clean, {
+        lang,
+        guide,
+        rate: guide === 'zion' ? 0.92 : 0.98,
+        pitch: guide === 'zion' ? 0.82 : 1.12
+      }).catch(() => {});
+    }
+
     try {
       speechSynthesis.cancel();
       const utt = new SpeechSynthesisUtterance(clean);

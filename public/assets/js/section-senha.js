@@ -401,6 +401,30 @@
   el.removeAttribute('data-spoken');
   el.setAttribute('aria-busy', 'true');
 
+  // Fala e digitação juntas (sincronizadas) quando a voz está ligada.
+  if (speak && typeof window.typeAndSpeak === 'function') {
+    try {
+      cancelAllSpeech();
+      await window.typeAndSpeak(el, text, speed, {
+        cursor: true,
+        forceReplay: true,
+        rate: voiceCtx?.rate ?? 1.0,
+        pitch: voiceCtx?.pitch ?? 1.0,
+        guide: voiceCtx?.guide ?? 'lumen'
+      });
+      el.classList.remove('typing-active');
+      el.classList.add('typing-done');
+      el.removeAttribute('aria-busy');
+      el.setAttribute('data-typed', 'true');
+      window.G.__typingLock = prevLock;
+      if (runToken === window.JCSenha.state.activeRunToken) el.dataset.spoken = 'true';
+      await sleep(80);
+      return;
+    } catch (err) {
+      console.warn('[JCSenha] typeAndSpeak falhou, usando caminho antigo:', err);
+    }
+  }
+
   let usedFallback = false;
 
   if (typeof window.runTyping === 'function') {
