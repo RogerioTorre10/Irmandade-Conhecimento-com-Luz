@@ -606,6 +606,21 @@
     }
   }
 
+  function __splitTypingUnits(text, lang = getLangNow()) {
+    const value = String(text || '');
+
+    try {
+      if (typeof Intl?.Segmenter === 'function') {
+        const segmenter = new Intl.Segmenter(lang, { granularity: 'grapheme' });
+        return Array.from(segmenter.segment(value), item => item.segment);
+      }
+    } catch {}
+
+    // Array.from preserva pares substitutos (emoji e vários ideogramas)
+    // mesmo nos navegadores que ainda não oferecem Intl.Segmenter.
+    return Array.from(value);
+  }
+
   async function typeText(element, text, speed = 40, showCursor = true) {
     return new Promise((resolve) => {
       if (!element || !text) return resolve();
@@ -630,7 +645,9 @@ element.classList.add('typing-active');
 
 if (showCursor) element.appendChild(caret);
 
+      const typingUnits = __splitTypingUnits(text);
       let i = 0;
+      let renderedText = '';
       const interval = setInterval(() => {
         if (abort) {
           clearInterval(interval);
@@ -639,8 +656,8 @@ if (showCursor) element.appendChild(caret);
           return resolve();
         }
 
-  const partial = text.slice(0, i + 1);
-     element.textContent = partial;
+  renderedText += typingUnits[i] || '';
+     element.textContent = renderedText;
 
   if (showCursor) {
     element.appendChild(caret);
@@ -649,7 +666,7 @@ if (showCursor) element.appendChild(caret);
         try { window.Luz?.bump({ peak: 1.18, ms: 120 }); } catch {}
 
         i++;
-        if (i >= text.length) {
+        if (i >= typingUnits.length) {
           clearInterval(interval);
           if (showCursor) caret.remove();
           element.classList.remove('typing-active');
@@ -1018,23 +1035,32 @@ if (showCursor) element.appendChild(caret);
     let speechDone = !('speechSynthesis' in window);
     let utt = null;
 
-    const chars = clean.length;
+    const typingUnits = __splitTypingUnits(clean, lang);
+    const unitCount = Math.max(typingUnits.length, 1);
     const estimatedSpeechMs = Math.max(
       1800,
-      Math.min(9000, (chars / 14) * 1000 / Math.max(0.72, tuning.rate))
+      Math.min(30000, (unitCount / 14) * 1000 / Math.max(0.72, tuning.rate))
     );
 
     let typingSpeed = options.speed
       ? options.speed
-      : Math.max(20, Math.min(46, Math.round(estimatedSpeechMs / Math.max(chars, 1))));
+      : Math.max(16, Math.min(90, Math.round(estimatedSpeechMs / unitCount)));
 
     // Voz neural: digitação acompanha a duração real do áudio.
     let neuralPlaying = false;
     const neuralAudio = await __prepareNeural(clean, lang, guide);
     if (neuralAudio) {
       const durMs = (neuralAudio.duration || 0) * 1000;
-      if (!options.speed && isFinite(durMs) && durMs > 0) {
-        typingSpeed = Math.max(18, Math.min(70, Math.round((durMs * 0.92) / Math.max(chars, 1))));
+      if (options.syncToSpeech !== false && isFinite(durMs) && durMs > 0) {
+        // Usa a duração real do áudio. A pequena margem evita que atrasos do
+        // temporizador façam a última letra aparecer depois do fim da voz.
+        const finishRatio = Number.isFinite(Number(options.typingFinishRatio))
+          ? Math.max(0.96, Math.min(1, Number(options.typingFinishRatio)))
+          : 0.985;
+        typingSpeed = Math.max(
+          10,
+          Math.min(160, Math.round((durMs * finishRatio) / unitCount))
+        );
       }
       speechDone = false;
       neuralPlaying = await __playNeural(neuralAudio, () => { speechDone = true; });
