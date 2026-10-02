@@ -838,3 +838,10 @@
     max-width: 240px !important;
   }
 }
+
+
+/* texto ainda não digitado fica invisível (evita o título "piscar" antes da datilografia) */
+#section-senha [data-typing="true"]:not(.typing-active):not(.typing-done):not(.type-done) {
+  color: transparent !important;
+  text-shadow: none !important;
+}
