@@ -83,10 +83,63 @@
   const __voiceCache = new Map();
 
   const GUIDE_VOICE_PROFILE = {
-   zion:  { gender: 'male',   style: 'imperial' },
-   lumen: { gender: 'female', style: 'bright' },
-   arian: { gender: 'female', style: 'counselor' }   
+   cerimonial: { gender: 'male',   style: 'baritone' },
+   zion:       { gender: 'male',   style: 'imperial' },
+   lumen:      { gender: 'female', style: 'bright' },
+   arian:      { gender: 'female', style: 'counselor' }
  };
+
+  const CEREMONIAL_SECTION_IDS = new Set([
+    'section-intro',
+    'section-termos1',
+    'section-termos2',
+    'section-senha'
+  ]);
+
+  function __isVisibleSection(section) {
+    if (!section || !CEREMONIAL_SECTION_IDS.has(section.id)) return false;
+    if (section.hidden || section.getAttribute('aria-hidden') === 'true') return false;
+
+    try {
+      const style = window.getComputedStyle(section);
+      if (style.display === 'none' || style.visibility === 'hidden') return false;
+      return section.getClientRects().length > 0;
+    } catch {
+      return false;
+    }
+  }
+
+  function __isCeremonialContext(element) {
+    const ownSection = element?.closest?.(
+      '#section-intro, #section-termos1, #section-termos2, #section-senha'
+    );
+    if (ownSection) return true;
+
+    const activeSelectors = [
+      '.jornada-section.active',
+      '.jornada-section.is-active',
+      'section.active',
+      'section.is-active',
+      '[data-section].active',
+      '[data-section].is-active'
+    ];
+
+    for (const selector of activeSelectors) {
+      const active = document.querySelector(selector);
+      if (active && CEREMONIAL_SECTION_IDS.has(active.id)) return true;
+    }
+
+    for (const id of CEREMONIAL_SECTION_IDS) {
+      if (__isVisibleSection(document.getElementById(id))) return true;
+    }
+
+    return false;
+  }
+
+  function __resolveSpeechGuide(requestedGuide, element) {
+    if (__isCeremonialContext(element)) return 'cerimonial';
+    return String(requestedGuide || getGuideNow() || 'lumen').toLowerCase();
+  }
 
   function __loadVoicesNow() {
   try {
@@ -245,6 +298,12 @@
       if (/neural|natural|microsoft|google/i.test(n)) score += 8;
     }
 
+    if (profile.style === 'baritone') {
+      if (/daniel|david|alex|jorge|paul|paulo|carlos|felipe|ricardo|antonio|antônio|bruno|thomas|thiago|diego|fernando|eddy|enrique|luca|marco|mateo|matheus|rafael|roberto|samuel|ichiro|kenji|hiro|otoya/.test(n)) score += 24;
+      if (/male|man|homem|masculin|masculine/.test(n)) score += 18;
+      if (/neural|natural|microsoft|google/i.test(n)) score += 10;
+    }
+
     if (profile.style === 'bright') {
       if (/samantha|sofia|victoria|luciana|maria|ana|zira|paulina|sayaka/.test(n)) score += 18;
       if (/female|woman|feminine|feminin/.test(n)) score += 14;
@@ -314,7 +373,7 @@
 
     let candidates = exact.length ? exact : family;
 
-    if (guide === 'zion' && candidates.length) {
+    if (profile.gender === 'male' && candidates.length) {
   // Nomes explicitamente masculinos conhecidos em desktop e mobile.
   const maleHints =
     /\b(male|man|homem|masculin[oa]?|masculine|daniel|david|alex|jorge|paul|paulo|carlos|felipe|ricardo|antonio|antônio|bruno|thomas|thiago|diego|fernando|eddy|enrique|luca|marco|mateo|matheus|junior|joão|joao|guilherme|rafael|roberto|samuel|xander|hattori|otoya|ichiro|kenji|hiro)\b/i;
@@ -343,7 +402,7 @@
     if (nonFemaleInLang.length) {
       candidates = nonFemaleInLang;
       // Sem voz masculina no idioma: mantém o ranking normal no idioma correto.
-      // Nunca troca de idioma para o Zion — o pitch reduzido garante o timbre masculino.
+      // Nunca troca de idioma: preserva a pronúncia e usa a afinação do perfil.
     }
   }
 }
@@ -375,14 +434,14 @@
     return best;
   }
 
-  async function __applyVoice(utt, lang) {
+  async function __applyVoice(utt, lang, guide) {
     if (!utt || !('speechSynthesis' in window)) return;
 
     const normalizedLang = __normalizeLang(lang || getLangNow());
 
     await __ensureVoicesReady();
 
-    const guide = getGuideNow();
+    guide = String(guide || getGuideNow() || 'lumen').toLowerCase();
     const voice = __pickBestVoice(normalizedLang, guide);
 
     if (voice) {
@@ -654,6 +713,160 @@ if (showCursor) element.appendChild(caret);
     });
   };
 
+  // =========================================================
+  // VOZ NEURAL (servidor /api/tts) — voz épica e encorpada.
+  // Se o servidor não tiver a voz configurada ou falhar,
+  // tudo continua com a voz do navegador, sem mudar o fluxo.
+  // =========================================================
+  const __neural = {
+    statusPromise: null,
+    urlCache: new Map(),
+    current: null,
+    gen: 0
+  };
+
+  function __neuralApiUrl(path = '') {
+    const configured =
+      window.JORNADA_API_BASE ||
+      window.APP_CONFIG?.API_BASE ||
+      window.JORNADA_CFG?.API_BASE ||
+      '/api';
+    const base = String(configured).replace(/\/+$/, '');
+    return `${base}/tts${path}`;
+  }
+
+  function __ensureAIVoiceDisclosure() {
+    if (document.getElementById('jornada-ai-voice-disclosure')) return;
+    const labels = {
+      'pt-BR': 'Narração gerada por inteligência artificial.',
+      'en-US': 'Narration generated by artificial intelligence.',
+      'es-ES': 'Narración generada por inteligencia artificial.',
+      'fr-FR': 'Narration générée par intelligence artificielle.',
+      'de-DE': 'Sprachausgabe durch künstliche Intelligenz erzeugt.',
+      'ja-JP': 'このナレーションは人工知能によって生成されています。',
+      'zh-CN': '本旁白由人工智能生成。'
+    };
+    const note = document.createElement('small');
+    note.id = 'jornada-ai-voice-disclosure';
+    note.textContent = labels[getLangNow()] || labels['pt-BR'];
+    note.style.cssText =
+      'display:block;margin-top:4px;opacity:.68;font-size:11px;text-align:center';
+    (document.querySelector('.site-footer') || document.body).appendChild(note);
+  }
+
+  function __neuralEnabled() {
+    if (window.JORNADA_NEURAL_VOICE === false) return Promise.resolve(false);
+    if (!__neural.statusPromise) {
+      __neural.statusPromise = fetch(__neuralApiUrl('/status'), { cache: 'no-store' })
+        .then(r => (r.ok ? r.json() : { enabled: false }))
+        .then(j => {
+          const enabled = !!j?.enabled;
+          if (enabled) __ensureAIVoiceDisclosure();
+          return enabled;
+        })
+        .catch(() => false);
+    }
+    return __neural.statusPromise;
+  }
+
+  function __stopNeural() {
+    const a = __neural.current;
+    __neural.current = null;
+    if (!a) return;
+    try { a.pause(); } catch {}
+    try { a.onended?.(); } catch {}
+  }
+
+  // Qualquer speechSynthesis.cancel() já existente na jornada
+  // também interrompe a voz neural.
+  try {
+    if ('speechSynthesis' in window && !speechSynthesis.__neuralPatched) {
+      const _cancel = speechSynthesis.cancel.bind(speechSynthesis);
+      speechSynthesis.cancel = function () {
+        __neural.gen++;
+        __stopNeural();
+        return _cancel();
+      };
+      speechSynthesis.__neuralPatched = true;
+    }
+  } catch {}
+
+  // Prepara o áudio (baixa + metadados). Retorna Audio ou null.
+  async function __prepareNeural(text, lang, guide, timeoutMs = 9000) {
+    if (!(await __neuralEnabled())) return null;
+
+    const key = `${lang}::${guide}::${text}`;
+    try {
+      let url = __neural.urlCache.get(key);
+      if (!url) {
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+        const r = await fetch(__neuralApiUrl(), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, lang, guide }),
+          signal: ctrl.signal
+        }).finally(() => clearTimeout(timer));
+        if (!r.ok) return null;
+        url = URL.createObjectURL(await r.blob());
+        __neural.urlCache.set(key, url);
+      }
+
+      const audio = new Audio(url);
+      audio.preload = 'auto';
+      await new Promise((resolve, reject) => {
+        if (audio.readyState >= 1) return resolve();
+        audio.addEventListener('loadedmetadata', resolve, { once: true });
+        audio.addEventListener('error', reject, { once: true });
+        setTimeout(resolve, 2500);
+      });
+      return audio;
+    } catch (e) {
+      typingLog('Voz neural indisponível, usando voz do navegador', e?.message || e);
+      return null;
+    }
+  }
+
+  // Toca o áudio preparado. Retorna Promise<boolean> (true se tocou).
+  function __playNeural(audio, onDone) {
+    let finished = false;
+    const done = () => {
+      if (finished) return;
+      finished = true;
+      if (__neural.current === audio) __neural.current = null;
+      try { window.Luz?.stopPulse(); } catch {}
+      try { onDone?.(); } catch {}
+    };
+
+    try { speechSynthesis.cancel(); } catch { __stopNeural(); }
+
+    audio.onended = done;
+    audio.onerror = done;
+    __neural.current = audio;
+    // avisa a luz do guia no instante em que o som começa
+    audio.addEventListener('playing', () => {
+      try { document.dispatchEvent(new CustomEvent('jornada:voz-inicio')); } catch {}
+    });
+
+    try { window.Luz?.startPulse({ min: 1, max: 1.45, speed: 120 }); } catch {}
+
+    return Promise.resolve(audio.play())
+      .then(() => true)
+      .catch(() => {
+        audio.onended = null;
+        audio.onerror = null;
+        if (__neural.current === audio) __neural.current = null;
+        try { window.Luz?.stopPulse(); } catch {}
+        return false;
+      });
+  }
+
+  window.JORNADA_NEURAL = {
+    enabled: __neuralEnabled,
+    stop: __stopNeural,
+    isPlaying: () => !!(__neural.current && !__neural.current.paused && !__neural.current.ended)
+  };
+
   window.EffectCoordinator = window.EffectCoordinator || {};
 
   function getGuideSpeechTuning(guide, lang) {
@@ -668,6 +881,14 @@ if (showCursor) element.appendChild(caret);
   else if (L.startsWith('es')) baseRate = 0.99;
   else if (L.startsWith('en')) baseRate = 1.0;
   else if (L.startsWith('de')) baseRate = 0.96;
+
+  if (g === 'cerimonial') {
+    return {
+      rate: Math.max(0.82, baseRate - 0.10),
+      pitch: 0.86,
+      volume: 1.0
+    };
+  }
 
   if (g === 'zion') {
     return {
@@ -692,28 +913,161 @@ if (showCursor) element.appendChild(caret);
   };
 }
 
+  // =========================================================
+  // FALA EM PEDAÇOS (voz do navegador)
+  // O Chrome corta falas longas (~15 s). Dividimos o texto em frases
+  // curtas, enfileiradas, e só consideramos a fala "terminada" quando o
+  // último pedaço acaba. Cancelamentos e travas (iOS sem onend) liberam
+  // a jornada com segurança.
+  // =========================================================
+  function __splitSpeechChunks(text, lang) {
+    const clean = String(text || '').replace(/\s+/g, ' ').trim();
+    if (!clean) return [];
+    const cjk = /^(ja|zh)/i.test(String(lang || ''));
+    const MAX = cjk ? 70 : 180;
+    const sentences = clean.match(cjk
+      ? /[^。！？!?]+[。！？!?]*/g
+      : /[^.!?…;:]+[.!?…;:]*["'”»)]*\s*/g) || [clean];
+    const out = [];
+    let buf = '';
+    const push = (t) => { t = t.trim(); if (t) out.push(t); };
+    for (const sent of sentences) {
+      if ((buf + sent).length <= MAX) { buf += sent; continue; }
+      if (buf) { push(buf); buf = ''; }
+      if (sent.length <= MAX) { buf = sent; continue; }
+      // frase muito longa: quebra por vírgulas e depois por espaços
+      let rest = sent;
+      while (rest.length > MAX) {
+        let cut = rest.lastIndexOf(cjk ? '、' : ',', MAX);
+        if (cut < MAX * 0.4) cut = rest.lastIndexOf(' ', MAX);
+        if (cut < MAX * 0.4) cut = MAX;
+        push(rest.slice(0, cut + 1));
+        rest = rest.slice(cut + 1);
+      }
+      buf = rest;
+    }
+    push(buf);
+    return out;
+  }
+
+  function __estimateSpeechMs(text, rate, lang) {
+    const chars = String(text || '').length;
+    const cjk = /^(ja|zh)/i.test(String(lang || ''));
+    const cps = cjk ? 6 : 14; // caracteres por segundo, aproximado
+    return Math.max(1500, (chars / cps) * 1000 / Math.max(0.6, Number(rate) || 1));
+  }
+
+  // Fala `text` em pedaços. Retorna Promise que resolve quando termina,
+  // quando outra fala/cancelamento acontece, ou por segurança.
+  function __speakBrowserChunked(text, cfg = {}) {
+    return new Promise(async (resolve) => {
+      if (!('speechSynthesis' in window)) return resolve();
+      const chunks = __splitSpeechChunks(text, cfg.lang);
+      if (!chunks.length) return resolve();
+
+      let finished = false;
+      let watch = null;
+      let safety = null;
+      const myGen = __neural.gen;
+      const finish = () => {
+        if (finished) return;
+        finished = true;
+        clearInterval(watch);
+        clearTimeout(safety);
+        try { cfg.onEnd?.(); } catch {}
+        resolve();
+      };
+
+      // voz escolhida uma vez e reaproveitada nos pedaços
+      const probe = new SpeechSynthesisUtterance(chunks[0]);
+      probe.lang = cfg.lang || 'pt-BR';
+      try { await __applyVoice(probe, cfg.lang, cfg.guide); } catch {}
+      if (myGen !== __neural.gen) return finish(); // cancelado enquanto preparava
+
+      chunks.forEach((chunk, i) => {
+        const u = i === 0 ? probe : new SpeechSynthesisUtterance(chunk);
+        if (i > 0) { u.voice = probe.voice; u.lang = probe.lang; }
+        u.rate = cfg.rate ?? 1;
+        u.pitch = cfg.pitch ?? 1;
+        u.volume = cfg.volume ?? 1;
+        if (i === 0) u.onstart = () => { try { cfg.onStart?.(); } catch {} };
+        u.onboundary = () => { try { window.Luz?.startPulse({ min: 1, max: 1.45, speed: 120 }); } catch {} };
+        u.onerror = (ev) => {
+          const err = ev?.error || '';
+          // interrompido/cancelado = outra fala começou: libera já
+          if (err === 'interrupted' || err === 'canceled' || i === chunks.length - 1) finish();
+        };
+        if (i === chunks.length - 1) u.onend = finish;
+        try { speechSynthesis.speak(u); } catch { if (i === chunks.length - 1) finish(); }
+      });
+      try { speechSynthesis.resume(); } catch {}
+
+      // cancelamento vindo de qualquer parte da jornada
+      watch = setInterval(() => { if (myGen !== __neural.gen) finish(); }, 250);
+      // segurança: iOS às vezes não dispara onend
+      safety = setTimeout(finish, __estimateSpeechMs(text, cfg.rate, cfg.lang) * 1.35 + 2000);
+    });
+  }
+
+  window.JORNADA_TTS = window.JORNADA_TTS || {};
+  window.JORNADA_TTS.speakChunked = __speakBrowserChunked;
+  window.JORNADA_TTS.splitChunks = __splitSpeechChunks;
+
   let __lastSpeakSig = '';
   let __lastSpeakAt = 0;
 
-  window.EffectCoordinator.speak = (text, options = {}) => {
-    if (!text || !('speechSynthesis' in window)) return;
+  // Retorna uma Promise que só resolve quando a fala termina
+  // (ou é cancelada), para quem usa `await` não cortar a fala seguinte.
+  window.EffectCoordinator.speak = (text, options = {}) => new Promise((resolveSpeak) => {
+    if (!text || !('speechSynthesis' in window)) return resolveSpeak();
 
     const lang = getLangNow();
-    const guide = String(options.guide || getGuideNow() || 'lumen').toLowerCase();
+    const guide = __resolveSpeechGuide(options.guide, options.element);
     const tuning = getGuideSpeechTuning(guide, lang);
 
     const clean = String(text).replace(/\s+/g, ' ').trim();
-    if (!clean) return;
+    if (!clean) return resolveSpeak();
 
     const sig = `${lang}::${guide}::${clean}`;
     const now = Date.now();
 
-    if (sig === __lastSpeakSig && (now - __lastSpeakAt) < 1600) return;
+    if (sig === __lastSpeakSig && (now - __lastSpeakAt) < 1600) return resolveSpeak();
     __lastSpeakSig = sig;
     __lastSpeakAt = now;
 
     try { speechSynthesis.cancel(); } catch {}
 
+    const speakGen = __neural.gen;
+    __prepareNeural(clean, lang, guide)
+      .then(audio => {
+        // outra fala começou (ou foi cancelada) enquanto o áudio carregava
+        if (speakGen !== __neural.gen) return true;
+        if (!audio) return false;
+        const durMs = isFinite(audio.duration) && audio.duration > 0
+          ? audio.duration * 1000
+          : __estimateSpeechMs(clean, options.rate ?? tuning.rate, lang);
+        const neuralSafety = setTimeout(resolveSpeak, durMs * 1.3 + 3000);
+        return __playNeural(audio, () => { clearTimeout(neuralSafety); resolveSpeak(); })
+          .then(ok => { if (!ok) clearTimeout(neuralSafety); return ok; });
+      })
+      .then(ok => { if (!ok) __speakBrowser(); })
+      .catch(() => __speakBrowser());
+
+    function __speakBrowser() {
+      if (speakGen !== __neural.gen) return resolveSpeak();
+      __speakBrowserChunked(clean, {
+        lang,
+        guide,
+        rate: options.rate ?? tuning.rate,
+        pitch: options.pitch ?? tuning.pitch,
+        volume: options.volume ?? tuning.volume,
+        onStart: () => typingLog('TTS iniciou', { lang, guide }),
+        onEnd: () => { try { window.Luz?.stopPulse(); } catch {} }
+      }).then(resolveSpeak);
+    }
+
+    // código antigo de fala única (mantido desligado como referência)
+    function __speakBrowserLegacy() {
     const utt = new SpeechSynthesisUtterance(clean);
     utt.lang = lang;
     utt.rate = options.rate ?? tuning.rate;
@@ -748,14 +1102,15 @@ if (showCursor) element.appendChild(caret);
       try { window.Luz?.stopPulse(); } catch {}
     };
 
-    Promise.resolve(__applyVoice(utt, lang))
+    Promise.resolve(__applyVoice(utt, lang, guide))
       .then(() => {
         try { speechSynthesis.speak(utt); } catch {}
       })
       .catch(() => {
         try { speechSynthesis.speak(utt); } catch {}
       });
-  };
+    }
+  });
 
   window.typeAndSpeak = async function (element, text, speed = 42, options = {}) {
     if (!text || !element) return;
@@ -784,88 +1139,63 @@ if (showCursor) element.appendChild(caret);
     } catch {}
 
     const lang = getLangNow();
-    const guide = String(options.guide || getGuideNow() || 'lumen').toLowerCase();
+    const guide = __resolveSpeechGuide(options.guide, element);
     const tuning = getGuideSpeechTuning(guide, lang);
 
-    let speechDone = !('speechSynthesis' in window);
+    let speechDone = !window.speechSynthesis;
     let utt = null;
 
     const chars = clean.length;
-    const estimatedSpeechMs = Math.max(
-      1800,
-      Math.min(9000, (chars / 14) * 1000 / Math.max(0.72, tuning.rate))
-    );
+    const speechRate = options.rate ?? tuning.rate;
+    const estimatedSpeechMs = __estimateSpeechMs(clean, speechRate, lang);
 
-    const typingSpeed = options.speed
+    // digitação no ritmo estimado da fala (antes havia teto de 9 s,
+    // e em textos longos a digitação terminava muito antes da voz)
+    let typingSpeed = options.speed
       ? options.speed
-      : Math.max(20, Math.min(46, Math.round(estimatedSpeechMs / Math.max(chars, 1))));
+      : Math.max(20, Math.min(80, Math.round((estimatedSpeechMs * 0.95) / Math.max(chars, 1))));
 
-    if ('speechSynthesis' in window) {
-      utt = new SpeechSynthesisUtterance(clean);
-      utt.lang = lang;
-      utt.rate = options.rate ?? tuning.rate;
-      utt.pitch = options.pitch ?? tuning.pitch;
-      utt.volume = options.volume ?? tuning.volume;
-
-      utt.onstart = () => {
-        typingLog('typeAndSpeak iniciou', {
-          lang: utt.lang,
-          guide,
-          voice: utt.voice?.name || '(default)',
-          typingSpeed
-        });
-      };
-
-      utt.onend = () => { speechDone = true; };
-      utt.onerror = () => { speechDone = true; };
-
-      try { await __applyVoice(utt, lang); } catch {}
+    // Voz neural: digitação acompanha a duração real do áudio.
+    let neuralPlaying = false;
+    let waitBaseMs = estimatedSpeechMs;
+    const stillHere = () => {
+      try { return typeof options.shouldContinue !== 'function' || options.shouldContinue() !== false; }
+      catch { return true; }
+    };
+    const neuralAudio = await __prepareNeural(clean, lang, guide);
+    if (neuralAudio && stillHere()) {
+      const durMs = (neuralAudio.duration || 0) * 1000;
+      if (isFinite(durMs) && durMs > 0) waitBaseMs = durMs;
+      if (!options.speed && isFinite(durMs) && durMs > 0) {
+        typingSpeed = Math.max(18, Math.min(70, Math.round((durMs * 0.92) / Math.max(chars, 1))));
+      }
+      speechDone = false;
+      neuralPlaying = await __playNeural(neuralAudio, () => { speechDone = true; });
+      if (!neuralPlaying) speechDone = !window.speechSynthesis;
     }
 
-    if (utt) {
-      const langLower =
-        String(lang || '')
-          .toLowerCase();
-    
-      const isCJK =
-        langLower.startsWith('ja') ||
-        langLower.startsWith('zh');
-    
-      const isMobile =
-        /android|iphone|ipad|ipod|mobile/i.test(
-          navigator.userAgent || ''
-        );
-    
-      try {
-        speechSynthesis.cancel();
-      } catch {}
-    
-      // Mobile + Japonês/Chinês:
-      // dá tempo real para o cancel anterior terminar
-      // antes de iniciar o novo utterance.
-      if (isMobile && isCJK) {
-        await new Promise(
-          resolve => setTimeout(resolve, 220)
-        );
-    
-        try {
-          speechSynthesis.resume();
-        } catch {}
-      }
-    
-      try {
-        speechSynthesis.speak(utt);
-      } catch {
-        speechDone = true;
-      }
-    
-      await new Promise(
-        resolve =>
-          setTimeout(
-            resolve,
-            isMobile && isCJK ? 180 : 90
-          )
-      );
+    // sem nenhuma voz disponível: digita na velocidade normal da section
+    if (!neuralPlaying && !window.speechSynthesis && !options.speed) {
+      typingSpeed = Number(speed) || 42;
+    }
+
+    let browserSpeech = null;
+    if (!stillHere()) {
+      // a pessoa já saiu desta section: não fala (não corta a voz da seguinte)
+      speechDone = true;
+    } else if (!neuralPlaying && window.speechSynthesis) {
+      try { speechSynthesis.cancel(); } catch {}
+      speechDone = false;
+      browserSpeech = __speakBrowserChunked(clean, {
+        lang,
+        guide,
+        rate: speechRate,
+        pitch: options.pitch ?? tuning.pitch,
+        volume: options.volume ?? tuning.volume,
+        onStart: () => typingLog('typeAndSpeak iniciou', { lang, guide, typingSpeed })
+      }).then(() => { speechDone = true; });
+      // pequena folga para a voz começar junto com a digitação
+      await new Promise(r => setTimeout(r, /^(ja|zh)/i.test(String(lang)) ? 180 : 90));
     }
     await window.runTyping(element, clean, null, {
       speed: typingSpeed,
@@ -873,14 +1203,16 @@ if (showCursor) element.appendChild(caret);
       forceReplay: options.forceReplay ?? false
     });
 
-    while (!speechDone) {
+    // espera a fala terminar, mas nunca prende a jornada para sempre
+    const waitLimit = Date.now() + waitBaseMs * 1.4 + 2500;
+    while (!speechDone && Date.now() < waitLimit) {
       await new Promise(r => setTimeout(r, 60));
     }
   };
 
   window.__TEST_TTS_JORNADA = async function (sampleText) {
     const lang = getLangNow();
-    const guide = getGuideNow();
+    const guide = __resolveSpeechGuide(null, null);
 
     await __ensureVoicesReady();
 
@@ -908,6 +1240,10 @@ if (showCursor) element.appendChild(caret);
     const utt = new SpeechSynthesisUtterance(text);
     utt.lang = lang;
     if (voice) utt.voice = voice;
+    const tuning = getGuideSpeechTuning(guide, lang);
+    utt.rate = tuning.rate;
+    utt.pitch = tuning.pitch;
+    utt.volume = tuning.volume;
     speechSynthesis.cancel();
     speechSynthesis.speak(utt);
   };
