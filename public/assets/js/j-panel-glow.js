@@ -223,7 +223,7 @@
 
     // alvo: acende ao começar e cresce conforme o texto avança
     let target = 0;
-    if (reading) target = prog !== null ? 0.45 + 0.55 * prog : 0.85;
+    if (reading) target = prog !== null ? 0.62 + 0.38 * prog : 0.9;
     value += (target - value) * (target > value ? 0.06 : 0.035);
 
     updateFlash(t, reading && talking);
@@ -253,12 +253,12 @@
 
       // pulsa com a voz (respiração) + clarões de relâmpago
       const pulse = talking && !reduceMotion ? 0.82 + 0.18 * Math.sin(t / 210) : 1;
-      L.style.opacity = Math.min(1, value * pulse + flash * 0.5).toFixed(3);
+      L.style.opacity = Math.min(1, value * pulse + flash * 0.6).toFixed(3);
       if (raio) raio.style.opacity = (flash * Math.min(1, value + 0.3)).toFixed(3);
       if (ceu) {
         ceu.style.setProperty('--cx', `${Math.round(r.left + r.width / 2)}px`);
         ceu.style.setProperty('--cy', `${Math.round(r.top + r.height / 2)}px`);
-        ceu.style.opacity = (flash * 0.55).toFixed(3);
+        ceu.style.opacity = (flash * 0.8).toFixed(3);
       }
     }
     requestAnimationFrame(frame);
@@ -281,4 +281,112 @@
     setInterval(() => { if (!running && speaking()) wake(); }, 400);
   }
   if (document.body) start(); else document.addEventListener('DOMContentLoaded', start);
+})();
+
+
+// =====================================================
+// BOTÕES PRONTOS — o botão de avançar se ilumina quando a
+// leitura da section terminou e ele já está liberado.
+// Padrão em toda a jornada: botão luminoso = pode seguir.
+// =====================================================
+(function () {
+  'use strict';
+  if (window.__BOTOES_PRONTOS__) return;
+  window.__BOTOES_PRONTOS__ = true;
+
+  const GOLD = '#d4af37';
+  const GUIDE_COLORS = { lumen: '#00ff9d', zion: '#00aaff', arian: '#ff00ff' };
+  const PRE_GUIDE = new Set(['section-intro', 'section-termos1', 'section-termos2', 'section-senha', 'section-guia']);
+  const ADVANCE = [
+    '#btn-intro',
+    '#section-termos1 .nextBtn', '#section-termos1 [data-action="avancar"]',
+    '#section-termos2 .avancarBtn', '#section-termos2 [data-action="avancar"]',
+    '#btn-senha-avancar',
+    '#btn-confirmar-nome',
+    '#btn-selfie-confirm',
+    '#section-card #btnNext',
+    '#btn-dp-continuar',
+    '[data-jornada-avancar]'
+  ].join(',');
+
+  const quiet = new WeakMap(); // há quantos ciclos a section está sem leitura
+
+  // condições extras de "página concluída" (mesma regra da validação da section)
+  const EXTRA_READY = {
+    // dados pessoais: o nome completo é o único campo obrigatório
+    'btn-dp-continuar': () => (document.getElementById('dp-nome')?.value || '').trim().length >= 2
+  };
+
+  function formComplete(btn, sec) {
+    const extra = EXTRA_READY[btn.id];
+    if (extra) { try { if (!extra()) return false; } catch {} }
+    if (!sec) return true;
+    // campos marcados como obrigatórios precisam estar preenchidos
+    return ![...sec.querySelectorAll('input[required], select[required], textarea[required]')]
+      .some((f) => f.offsetParent !== null && !String(f.value || '').trim());
+  }
+
+  function guideColor(sectionId) {
+    if (!sectionId || PRE_GUIDE.has(sectionId)) return GOLD;
+    const raw = String(
+      document.body?.dataset?.guia ||
+      window.JORNADA_STATE?.guiaSelecionado ||
+      sessionStorage.getItem('JORNADA_GUIA') ||
+      sessionStorage.getItem('jornada.guia') || ''
+    ).toLowerCase();
+    if (raw.includes('lumen')) return GUIDE_COLORS.lumen;
+    if (raw.includes('zion')) return GUIDE_COLORS.zion;
+    if (raw.includes('arian') || raw.includes('arion')) return GUIDE_COLORS.arian;
+    return GOLD;
+  }
+
+  function speaking() {
+    try { if (window.JORNADA_NEURAL?.isPlaying?.()) return true; } catch {}
+    try { return !!window.speechSynthesis?.speaking; } catch { return false; }
+  }
+
+  function usable(btn) {
+    if (!btn || btn.disabled) return false;
+    if (btn.getAttribute('aria-disabled') === 'true') return false;
+    if (btn.classList.contains('is-hidden') || btn.classList.contains('disabled')) return false;
+    const r = btn.getBoundingClientRect();
+    if (r.width < 8 || r.height < 8) return false;
+    const cs = getComputedStyle(btn);
+    return cs.display !== 'none' && cs.visibility !== 'hidden' && Number(cs.opacity) > 0.2;
+  }
+
+  function tick() {
+    const videoOn = !!document.getElementById('vt-overlay');
+    document.querySelectorAll(ADVANCE).forEach((btn) => {
+      const sec = btn.closest('section');
+      // ainda há texto visível esperando para ser digitado?
+      const pendingText = !!sec && [...sec.querySelectorAll('[data-typing="true"]')].some((el) =>
+        el.offsetParent !== null &&
+        !el.classList.contains('typing-done') && !el.classList.contains('type-done') &&
+        String(el.dataset?.text || el.getAttribute('data-text') || '').trim() !== ''
+      );
+      const reading = pendingText || !!sec?.querySelector('.typing-active') || speaking();
+      const n = reading || videoOn ? 0 : (quiet.get(btn) || 0) + 1;
+      quiet.set(btn, n);
+      // ~0,6 s de silêncio + botão liberado = pronto
+      const ready = n >= 2 && usable(btn) && formComplete(btn, sec) && !btn.dataset.prontoClicado;
+      if (ready) {
+        btn.style.setProperty('--pronto-cor', guideColor(sec?.id));
+        btn.classList.add('jornada-btn-pronto');
+      } else {
+        btn.classList.remove('jornada-btn-pronto');
+      }
+    });
+  }
+
+  // ao clicar, apaga (a section seguinte vai acender o próprio botão)
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest?.('.jornada-btn-pronto');
+    if (!btn) return;
+    btn.classList.remove('jornada-btn-pronto');
+    btn.dataset.prontoClicado = '1';
+    setTimeout(() => { delete btn.dataset.prontoClicado; }, 2500);
+  }, true);
+
+  setInterval(tick, 300);
 })();
