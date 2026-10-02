@@ -649,10 +649,21 @@ body[data-guia="lumen"] #section-perguntas-reflexoes,
 body[data-guia="lumen"] #section-perguntas-crescimento,
 body[data-guia="lumen"] #section-perguntas-integracao,
 body[data-guia="lumen"] #section-perguntas-sintese {
-  --guia-main: #9cff57;
-  --guia-soft: rgba(156, 255, 87, 0.30);
-  --guia-strong: rgba(156, 255, 87, 0.64);
-  --guia-text: #efffde;
+  --guia-main: #00ff9d;
+  --guia-soft: rgba(0, 255, 157, 0.30);
+  --guia-strong: rgba(0, 255, 157, 0.64);
+  --guia-text: #e8fff7;
+}
+
+body[data-guia="zion"] #section-perguntas-raizes,
+body[data-guia="zion"] #section-perguntas-reflexoes,
+body[data-guia="zion"] #section-perguntas-crescimento,
+body[data-guia="zion"] #section-perguntas-integracao,
+body[data-guia="zion"] #section-perguntas-sintese {
+  --guia-main: #00aaff;
+  --guia-soft: rgba(0, 170, 255, 0.30);
+  --guia-strong: rgba(0, 170, 255, 0.66);
+  --guia-text: #e3f7ff;
 }
 
 body[data-guia="arian"] #section-perguntas-raizes,
@@ -660,10 +671,10 @@ body[data-guia="arian"] #section-perguntas-reflexoes,
 body[data-guia="arian"] #section-perguntas-crescimento,
 body[data-guia="arian"] #section-perguntas-integracao,
 body[data-guia="arian"] #section-perguntas-sintese {
-  --guia-main: #6dc8ff;
-  --guia-soft: rgba(109, 200, 255, 0.30);
-  --guia-strong: rgba(109, 200, 255, 0.66);
-  --guia-text: #e3f7ff;
+  --guia-main: #ff00ff;
+  --guia-soft: rgba(255, 0, 255, 0.30);
+  --guia-strong: rgba(255, 0, 255, 0.66);
+  --guia-text: #ffe8ff;
 }
 
 .jp-block-title,
@@ -694,7 +705,8 @@ body[data-guia="arian"] #section-perguntas-sintese {
 }
 
 .jp-progress-fill,
-#progress-question-fill {
+#progress-question-fill,
+#jp-blocos-fill {
   background: linear-gradient(
     90deg,
     var(--guia-main),
@@ -1145,3 +1157,22 @@ section[id^="section-perguntas-"].is-block-feedback-mode .j-panel-glow {
 
 
 
+
+/* ===========================================================
+   BARRA DE BLOCOS (ampulheta) — acima do título do bloco
+   =========================================================== */
+.jp-progress-blocos {
+  margin: 0 auto 8px !important;
+  gap: 10px !important;
+}
+.jp-progress-blocos .jp-total-icon {
+  font-size: 1.25rem;
+  line-height: 1;
+  flex: 0 0 auto;
+}
+.jp-progress-blocos .jp-progress-fill,
+#jp-blocos-fill {
+  width: 20%;
+  transition: width .8s ease;
+}
+#progress-question-fill { transition: width .6s ease; }

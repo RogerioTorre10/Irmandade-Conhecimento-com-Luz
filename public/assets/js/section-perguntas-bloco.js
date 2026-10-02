@@ -282,21 +282,21 @@
 
     const themeMap = {
       lumen: {
-        main: '#00c781',
-        soft: 'rgba(0,199,129,0.28)',
-        strong: 'rgba(0,199,129,0.62)',
+        main: '#00ff9d',
+        soft: 'rgba(0,255,157,0.28)',
+        strong: 'rgba(0,255,157,0.62)',
         text: '#e8fff7',
       },
       zion: {
-        main: '#59c8ff',
-        soft: 'rgba(89,200,255,0.28)',
-        strong: 'rgba(89,200,255,0.62)',
+        main: '#00aaff',
+        soft: 'rgba(0,170,255,0.28)',
+        strong: 'rgba(0,170,255,0.62)',
         text: '#eefaff',
       },
       arian: {
-        main: '#ff4fd8',
-        soft: 'rgba(255,79,216,0.28)',
-        strong: 'rgba(255,79,216,0.62)',
+        main: '#ff00ff',
+        soft: 'rgba(255,0,255,0.28)',
+        strong: 'rgba(255,0,255,0.62)',
         text: '#fff0fb',
       },
     };
@@ -339,13 +339,10 @@
       textarea.style.boxShadow = `0 0 12px ${theme.soft}, inset 0 0 10px rgba(255,255,255,0.04)`;
     }
 
-    const bar = section?.querySelector(
-      '#progress-question-fill, .jp-progress-fill'
-    );
-    if (bar) {
+    section?.querySelectorAll('#progress-question-fill, .jp-progress-fill').forEach((bar) => {
       bar.style.background = `linear-gradient(90deg, ${theme.main}, ${theme.main})`;
       bar.style.boxShadow = `0 0 12px ${theme.soft}, 0 0 20px ${theme.strong}`;
-    }
+    });
 
     log('Tema do guia aplicado:', guia, theme.main);
   }
@@ -518,6 +515,13 @@
       questionValue.textContent = `${currentQuestion} / ${totalQuestions}`;
     if (questionFill)
       questionFill.style.width = `${(currentQuestion / totalQuestions) * 100}%`;
+
+    // barra de blocos (ampulheta): preenche com a cor do guia
+    const blocosValue = document.getElementById('jp-blocos-value');
+    const blocosFill = document.getElementById('jp-blocos-fill');
+    if (blocosValue) blocosValue.textContent = `${currentBlock} / ${totalBlocks}`;
+    if (blocosFill)
+      blocosFill.style.width = `${Math.min(100, (currentBlock / totalBlocks) * 100)}%`;
 
     const blockValue = document.getElementById('progress-block-value');
     const blockFill = document.getElementById('progress-block-fill');

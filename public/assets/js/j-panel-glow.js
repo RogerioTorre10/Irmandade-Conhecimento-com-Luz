@@ -124,6 +124,60 @@
   let pendingFlicker = 0; // segundo pulso da "piscada dupla"
   let running = false;
   let lastColor = '';
+  let lastFlashAt = 0;
+  let wordPulse = 0;      // pulso de cada palavra falada (0..1)
+
+  // Estado real da voz, vindo dos eventos da fala (start/boundary/end):
+  // a luz acompanha o som de verdade, sem esperar a checagem periódica.
+  const voz = { on: false, eventos: false, offAt: 0, lastWordAt: 0 };
+
+  function canFlash(t) { return t - lastFlashAt >= 500; } // máx. 2 clarões/s
+
+  function voiceStarted() {
+    const t = performance.now();
+    const pausaLonga = t - voz.offAt > 400; // nova fala, não só o próximo trecho
+    voz.on = true;
+    voz.eventos = true;
+    if (pausaLonga) {
+      value = Math.max(value, 0.78);         // acende já no início da voz
+      if (!reduceMotion && canFlash(t)) {
+        flash = 1; lastFlashAt = t;
+        nextFlashAt = t + 1800 + Math.random() * 1800;
+      }
+    }
+    wake();
+  }
+  function voiceWord(e) {
+    const t = performance.now();
+    voz.lastWordAt = t;
+    wordPulse = 1;
+    // começo de frase: clarão (respeitando o limite de 2 por segundo)
+    if (e && e.name === 'sentence' && !reduceMotion && canFlash(t) && Math.random() < 0.6) {
+      flash = Math.max(flash, 0.85); lastFlashAt = t;
+    }
+  }
+  function voiceEnded() { voz.on = false; voz.offAt = performance.now(); }
+
+  function hookVoice() {
+    const ss = window.speechSynthesis;
+    if (!ss || ss.__presencaHooked || typeof ss.speak !== 'function') return;
+    const prevSpeak = ss.speak;
+    ss.speak = function (u) {
+      try {
+        if (u && typeof u.addEventListener === 'function') {
+          u.addEventListener('start', voiceStarted);
+          u.addEventListener('boundary', voiceWord);
+          u.addEventListener('end', voiceEnded);
+          u.addEventListener('error', voiceEnded);
+        }
+      } catch {}
+      return prevSpeak.apply(this, arguments);
+    };
+    ss.__presencaHooked = true;
+  }
+  hookVoice();
+  // voz neural (arquivo de áudio): o bridge avisa quando começa a tocar
+  document.addEventListener('jornada:voz-inicio', voiceStarted);
 
   function ensureLayer() {
     if (layer && document.body.contains(layer)) return layer;
@@ -146,11 +200,12 @@
     if (reduceMotion) { flash = 0; return; }
     if (active) {
       if (!nextFlashAt) nextFlashAt = t + 700 + Math.random() * 900;
-      if (t >= nextFlashAt) {
+      if (t >= nextFlashAt && canFlash(t)) {
         flash = 1;
+        lastFlashAt = t;
         pendingFlicker = Math.random() < 0.45 ? t + 140 + Math.random() * 90 : 0;
         nextFlashAt = t + 2000 + Math.random() * 2400;
-      } else if (pendingFlicker && t >= pendingFlicker) {
+      } else if (pendingFlicker && t >= pendingFlicker && t - lastFlashAt >= 120) {
         flash = Math.max(flash, 0.75);
         pendingFlicker = 0;
       }
@@ -203,7 +258,12 @@
 
   function speaking() {
     try { if (window.JORNADA_NEURAL?.isPlaying?.()) return true; } catch {}
-    try { return !!window.speechSynthesis?.speaking; } catch { return false; }
+    try {
+      const ss = window.speechSynthesis;
+      if (!ss?.speaking) return false;
+      // com eventos disponíveis, só conta quando o som começou de fato
+      return voz.eventos ? voz.on : true;
+    } catch { return false; }
   }
 
   // progresso da digitação do texto atual (0..1)
@@ -224,9 +284,12 @@
     // alvo: acende ao começar e cresce conforme o texto avança
     let target = 0;
     if (reading) target = prog !== null ? 0.62 + 0.38 * prog : 0.9;
-    value += (target - value) * (target > value ? 0.06 : 0.035);
+    const subida = talking ? 0.2 : 0.06;
+    value += (target - value) * (target > value ? subida : 0.035);
 
+    if (reading && talking && !nextFlashAt) nextFlashAt = t + 1800 + Math.random() * 1800;
     updateFlash(t, reading && talking);
+    wordPulse *= 0.86;
 
     const panel = value > 0.01 ? targetPanel() : null;
     const L = ensureLayer();
@@ -251,8 +314,13 @@
         lastColor = color;
       }
 
-      // pulsa com a voz (respiração) + clarões de relâmpago
-      const pulse = talking && !reduceMotion ? 0.82 + 0.18 * Math.sin(t / 210) : 1;
+      // pulsa com cada palavra falada (sem eventos de palavra: respiração) + relâmpagos
+      let pulse = 1;
+      if (talking && !reduceMotion) {
+        pulse = t - voz.lastWordAt < 900
+          ? 0.8 + 0.2 * wordPulse
+          : 0.82 + 0.18 * Math.sin(t / 210);
+      }
       L.style.opacity = Math.min(1, value * pulse + flash * 0.6).toFixed(3);
       if (raio) raio.style.opacity = (flash * Math.min(1, value + 0.3)).toFixed(3);
       if (ceu) {
@@ -278,7 +346,8 @@
   });
   function start() {
     obs.observe(document.body, { subtree: true, attributes: true, attributeFilter: ['class'] });
-    setInterval(() => { if (!running && speaking()) wake(); }, 400);
+    hookVoice(); // caso a voz tenha sido trocada depois do carregamento
+    setInterval(() => { if (!running && speaking()) wake(); }, 150);
   }
   if (document.body) start(); else document.addEventListener('DOMContentLoaded', start);
 })();
