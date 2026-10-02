@@ -6,406 +6,204 @@
 <title>Irmandade • Portal</title>
 <meta name="description" content="Portal oficial da Irmandade Conhecimento com Luz — mensagens, convites e acesso às jornadas" />
 <meta name="theme-color" content="#0b0f1a" />
-<style>
-  @font-face{font-family:'ManufacturingConsent';src:url('/assets/fonts/ManufacturingConsent-Regular.ttf') format('truetype');font-display:swap}
-  @font-face{font-family:'Cardo';src:url('/assets/fonts/Cardo-Regular.ttf') format('truetype');font-display:swap}
-  @font-face{font-family:'Cardo';font-weight:700;src:url('/assets/fonts/Cardo-Bold.ttf') format('truetype');font-display:swap}
-  @font-face{font-family:'BerkshireSwash';src:url('/assets/fonts/BerkshireSwash-Regular.ttf') format('truetype');font-display:swap}
-
-  /* =========================================================
-     MEDIEVAL × TECNOLÓGICO
-     Ouro, pergaminho e chama (medieval) + vidro, grade e
-     luz azul-ciano (tecnologia). O ouro conduz; o azul acende.
-     ========================================================= */
-  :root{
-    --bg:#070a14;
-    --bg-2:#0d1324;
-    --ink:#ece6d6;           /* pergaminho claro */
-    --muted:#a9b0c6;
-    --gold:#f7d58b;
-    --gold-2:#c9993f;
-    --gold-line:rgba(247,213,139,.38);
-    --tech:#6fd3ff;          /* luz tecnológica */
-    --tech-soft:rgba(111,211,255,.18);
-    --ring:rgba(122,162,255,.35);
-    --glass:rgba(16,22,40,.62);
-    --glass-2:rgba(22,30,54,.55);
-    --radius:16px;
-    --hero-media-h:360px;    /* ajuste aqui (ex.: 300–420px) */
-    --hero-media-w:860px;    /* largura máxima do bloco no desktop */
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html{background:var(--bg)}
-  html,body{min-height:100%}
-  body{
-    font-family:Cardo,serif;
-    color:var(--ink);
-    display:flex;flex-direction:column;min-height:100vh;
-    background-color:var(--bg);
-    background:
-      radial-gradient(1100px 600px at 50% -10%,rgba(247,213,139,.12),transparent 60%),
-      radial-gradient(900px 700px at 100% 100%,rgba(111,211,255,.08),transparent 60%),
-      radial-gradient(700px 600px at 0% 70%,rgba(201,153,63,.07),transparent 60%),
-      linear-gradient(180deg,var(--bg-2),var(--bg));
-    position:relative;
-    overflow-x:hidden;
-  }
-  /* grade digital sutil ao fundo */
-  body::before{
-    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
-    background-image:
-      linear-gradient(rgba(111,211,255,.05) 1px,transparent 1px),
-      linear-gradient(90deg,rgba(111,211,255,.05) 1px,transparent 1px);
-    background-size:44px 44px;
-    -webkit-mask-image:radial-gradient(ellipse at 50% 30%,#000 20%,transparent 75%);
-            mask-image:radial-gradient(ellipse at 50% 30%,#000 20%,transparent 75%);
-  }
-  /* poeira de luz (brasas) */
-  body::after{
-    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.55;
-    background-image:
-      radial-gradient(1.5px 1.5px at 12% 22%,rgba(247,213,139,.8),transparent),
-      radial-gradient(1px 1px at 78% 14%,rgba(111,211,255,.8),transparent),
-      radial-gradient(1.5px 1.5px at 64% 72%,rgba(247,213,139,.6),transparent),
-      radial-gradient(1px 1px at 28% 84%,rgba(111,211,255,.6),transparent),
-      radial-gradient(1px 1px at 90% 58%,rgba(247,213,139,.7),transparent),
-      radial-gradient(1.5px 1.5px at 42% 40%,rgba(255,255,255,.4),transparent);
-    animation:embers 14s ease-in-out infinite alternate;
-  }
-  @keyframes embers{from{transform:translateY(0)}to{transform:translateY(-18px)}}
-  header,main,footer{position:relative;z-index:1}
-
-  /* ---------- Cabeçalho ---------- */
-  header{
-    display:flex;flex-direction:column;align-items:center;gap:6px;
-    padding:22px 16px 18px;
-    background:linear-gradient(180deg,rgba(10,14,28,.85),rgba(10,14,28,.55));
-    -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
-    border-bottom:1px solid transparent;
-    border-image:linear-gradient(90deg,transparent,var(--gold-2) 20%,var(--tech) 50%,var(--gold-2) 80%,transparent) 1;
-    position:sticky;top:0;z-index:20;
-  }
-  /* linha de varredura que percorre o cabeçalho */
-  header::after{
-    content:"";position:absolute;left:0;bottom:-1px;height:2px;width:140px;
-    background:linear-gradient(90deg,transparent,var(--tech),transparent);
-    filter:drop-shadow(0 0 6px var(--tech));
-    animation:scan 6s linear infinite;
-  }
-  @keyframes scan{from{left:-140px}to{left:100%}}
-  .brand{
-    display:flex;align-items:center;gap:14px;
-    font-family:ManufacturingConsent,BerkshireSwash,Cardo,serif;
-    font-size:clamp(28px,4vw,48px);line-height:1.1;text-align:center;
-    background:linear-gradient(180deg,#fff3cf 0%,var(--gold) 45%,var(--gold-2) 100%);
-    -webkit-background-clip:text;background-clip:text;color:transparent;
-    text-shadow:0 0 22px rgba(247,213,139,.18);
-  }
-  .brand .chama{flex:none}
-  .back{
-    display:inline-flex;align-items:center;gap:6px;
-    color:var(--muted);text-decoration:none;font-size:15px;letter-spacing:.06em;
-    padding:6px 14px;border-radius:999px;
-    border:1px solid rgba(247,213,139,.18);background:rgba(255,255,255,.03);
-    transition:color .2s,border-color .2s,box-shadow .2s;
-  }
-  .back:hover,.back:focus-visible{color:var(--gold);border-color:var(--gold-line);box-shadow:0 0 0 3px var(--tech-soft);outline:none}
-
-  /* ---------- Layout ---------- */
-  main.wrap{
-    flex:1;display:flex;flex-wrap:wrap;gap:22px;
-    padding:24px 16px;width:100%;max-width:1280px;margin:0 auto;
-  }
-
-  /* Painel: vidro moderno com moldura dourada e cantos de relicário */
-  .panel{
-    position:relative;
-    background:linear-gradient(160deg,var(--glass),var(--glass-2));
-    -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
-    border:1px solid var(--gold-line);
-    border-radius:var(--radius);
-    padding:24px;
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,.06),
-      inset 0 0 0 4px rgba(7,10,20,.55),
-      inset 0 0 0 5px rgba(247,213,139,.10),
-      0 18px 40px rgba(0,0,0,.45);
-  }
-  /* cantos ornamentais (medieval) desenhados como mira/HUD (tech) */
-  .panel::before,.panel::after{
-    content:"";position:absolute;width:22px;height:22px;pointer-events:none;
-    border:2px solid var(--gold);opacity:.85;
-    filter:drop-shadow(0 0 4px rgba(247,213,139,.45));
-  }
-  .panel::before{top:-1px;left:-1px;border-right:0;border-bottom:0;border-top-left-radius:var(--radius)}
-  .panel::after{bottom:-1px;right:-1px;border-left:0;border-top:0;border-bottom-right-radius:var(--radius)}
-
-  aside.sidebar{flex:1 1 240px;max-width:290px;display:flex;flex-direction:column;gap:26px;align-self:flex-start;position:sticky;top:130px}
-  .gtitle{
-    font-family:BerkshireSwash,ManufacturingConsent,Cardo,serif;
-    color:var(--gold);font-size:21px;margin-bottom:12px;
-    display:flex;align-items:center;gap:10px;
-  }
-  .gtitle::after{
-    content:"";flex:1;height:1px;
-    background:linear-gradient(90deg,var(--gold-line),rgba(111,211,255,.35),transparent);
-  }
-
-  .nav{display:flex;flex-direction:column;gap:10px}
-  .btn{
-    position:relative;overflow:hidden;
-    display:flex;align-items:center;gap:8px;
-    padding:11px 14px 11px 18px;border-radius:12px;
-    background:linear-gradient(90deg,rgba(247,213,139,.07),rgba(255,255,255,.02));
-    color:var(--ink);text-decoration:none;font-size:16px;letter-spacing:.02em;
-    border:1px solid rgba(247,213,139,.16);
-    transition:transform .18s,border-color .18s,box-shadow .18s,color .18s;
-  }
-  /* selo dourado à esquerda */
-  .btn::before{
-    content:"";position:absolute;left:0;top:18%;bottom:18%;width:3px;border-radius:3px;
-    background:linear-gradient(180deg,var(--gold),var(--gold-2));
-    box-shadow:0 0 8px rgba(247,213,139,.5);
-    transition:background .18s,box-shadow .18s;
-  }
-  /* brilho que atravessa o botão */
-  .btn::after{
-    content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;
-    background:linear-gradient(100deg,transparent,rgba(111,211,255,.18),transparent);
-    transform:skewX(-18deg);transition:left .5s ease;
-  }
-  .btn:hover,.btn:focus-visible{
-    transform:translateX(3px);color:#fff;outline:none;
-    border-color:rgba(111,211,255,.45);
-    box-shadow:0 0 0 3px var(--tech-soft),0 8px 20px rgba(0,0,0,.35);
-  }
-  .btn:hover::before,.btn:focus-visible::before{background:linear-gradient(180deg,var(--tech),var(--gold));box-shadow:0 0 10px var(--tech)}
-  .btn:hover::after,.btn:focus-visible::after{left:120%}
-  .btn[data-coming-soon]{cursor:pointer;color:var(--muted)}
-  .btn[data-coming-soon]:hover{color:var(--ink)}
-  /* a jornada ativa ganha destaque de chama */
-  .nav .btn:not([data-coming-soon]){
-    background:linear-gradient(90deg,rgba(247,213,139,.18),rgba(111,211,255,.06));
-    border-color:var(--gold-line);font-weight:700;
-  }
-
-  /* Aviso das Jornadas que ainda não foram lançadas */
-  .portal-notice{
-    position:fixed;
-    top:max(18px,env(safe-area-inset-top));
-    left:50%;
-    z-index:2147483646;
-    width:min(92vw,560px);
-    padding:16px 20px;
-    border:1px solid rgba(247,213,139,.8);
-    border-radius:14px;
-    background:linear-gradient(160deg,rgba(11,15,26,.97),rgba(18,26,48,.97));
-    color:#fff4cf;
-    box-shadow:0 0 0 4px var(--tech-soft),0 12px 34px rgba(0,0,0,.55);
-    text-align:center;
-    font-size:clamp(15px,2.8vw,18px);
-    line-height:1.45;
-    opacity:0;
-    transform:translate(-50%,-14px);
-    transition:opacity .2s ease,transform .2s ease;
-    pointer-events:none;
-  }
-  .portal-notice.is-visible{opacity:1;transform:translate(-50%,0)}
-
-  section.content{flex:3 1 520px;min-width:0;display:flex;flex-direction:column;gap:22px}
-  .hero{text-align:center}
-  .hero h2,.section-title{
-    font-family:BerkshireSwash,ManufacturingConsent,Cardo,serif;
-    font-size:clamp(26px,3.2vw,38px);font-weight:400;
-    background:linear-gradient(180deg,#fff3cf,var(--gold) 50%,var(--gold-2));
-    -webkit-background-clip:text;background-clip:text;color:transparent;
-  }
-  .section-title{font-size:clamp(22px,2.6vw,30px);text-align:center}
-  .hero p{color:var(--muted);margin:10px auto 0;max-width:680px;font-size:17px;line-height:1.6}
-
-  /* divisor: runa dourada com circuito */
-  .divider{
-    display:flex;align-items:center;justify-content:center;gap:12px;
-    margin:14px auto 4px;max-width:420px;color:var(--gold);font-size:14px;
-  }
-  .divider::before,.divider::after{
-    content:"";flex:1;height:1px;
-    background:linear-gradient(90deg,transparent,var(--gold-line),rgba(111,211,255,.5));
-  }
-  .divider::after{transform:scaleX(-1)}
-  .divider span{filter:drop-shadow(0 0 6px rgba(247,213,139,.6))}
-
-  /* ---------- Mídias ---------- */
-  .media{display:flex;flex-wrap:wrap;gap:24px;margin-top:14px;justify-content:center}
-  .box{flex:1 1 320px;max-width:420px;text-align:center}
-  .box img,.box video{
-    display:block;width:100%;
-    border-radius:12px;
-    border:1px solid var(--gold-line);
-    box-shadow:0 0 0 4px rgba(7,10,20,.7),0 0 0 5px rgba(247,213,139,.18),0 12px 28px rgba(0,0,0,.5);
-  }
-
-  .media--hero{justify-content:center}
-  .media--hero.video-block,
-  .media--hero.image-block{gap:0;margin-top:20px}
-  .media--hero.video-block{margin-bottom:24px}
-  .media--hero.video-block .box,
-  .media--hero.image-block .box{
-    flex:0 1 var(--hero-media-w);
-    max-width:var(--hero-media-w);
-    width:100%;
-    position:relative;
-  }
-  /* cantos de mira na moldura das mídias do herói */
-  .media--hero .box::before,.media--hero .box::after{
-    content:"";position:absolute;width:26px;height:26px;z-index:2;pointer-events:none;
-    border:2px solid var(--tech);opacity:.75;filter:drop-shadow(0 0 5px var(--tech));
-  }
-  .media--hero .box::before{top:-8px;left:-8px;border-right:0;border-bottom:0}
-  .media--hero .box::after{bottom:-8px;right:-8px;border-left:0;border-top:0}
-
-  /* Vídeo com impacto */
-  .media--hero.video-block .box video{
-    height:var(--hero-media-h);
-    object-fit:cover;
-    pointer-events:none;
-  }
-  /* Imagem inteira (sem cortes) */
-  .media--hero.image-block .box img{
-    height:var(--hero-media-h);
-    object-fit:contain;               /* evita cortar o texto da arte */
-    background:rgba(0,0,0,.25);       /* “letterbox” suave nas bordas */
-  }
-
-  /* CONVITES: mostrar artes INTEIRAS, sem cortes */
-  .media--convites .box{max-width:360px}
-  .media--convites a{display:block;border-radius:12px;transition:transform .25s ease,filter .25s ease}
-  .media--convites a:hover,.media--convites a:focus-visible{transform:translateY(-4px);filter:drop-shadow(0 0 14px rgba(247,213,139,.35));outline:none}
-  .media--convites img{
-    height:300px;
-    object-fit:contain;    /* sem corte */
-    background:rgba(0,0,0,.25);
-  }
-  .media--convites figcaption{
-    margin-top:12px;color:var(--gold);letter-spacing:.08em;font-size:15px;
-    text-transform:uppercase;
-  }
-  .media--convites figcaption::before,.media--convites figcaption::after{content:" ✦ ";color:var(--tech);opacity:.8}
-
-  /* ---------- Rodapé ---------- */
-  footer{
-    color:var(--muted);text-align:center;padding:22px 16px;letter-spacing:.06em;
-    border-top:1px solid transparent;
-    border-image:linear-gradient(90deg,transparent,var(--gold-line),rgba(111,211,255,.4),var(--gold-line),transparent) 1;
-    background:rgba(7,10,20,.6);
-  }
-
-  /* chama do header */
-  .chama{position:relative;width:36px;height:52px;filter:drop-shadow(0 6px 14px rgba(255,140,0,.35))}
-  .chama span{position:absolute;inset:auto 0 0 0;margin:auto;width:36px;height:52px;border-radius:24px;background:radial-gradient(50% 60% at 50% 30%,#fff7cc 0%,#ffd166 35%,#ff8c00 70%,transparent 100%);animation:flame 1.6s infinite ease-in-out}
-  .chama span:nth-child(2){width:24px;height:36px;bottom:5px;opacity:.8;animation-duration:1.2s}
-  .chama span:nth-child(3){width:16px;height:24px;bottom:10px;opacity:.6;animation-duration:1s}
-  @keyframes flame{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
-
-  /* ---------- Celular ---------- */
-  @media (max-width:760px){
-    :root{--hero-media-h:220px}
-    header{position:relative}
-    aside.sidebar{max-width:none;flex-basis:100%;position:static}
-    .panel{padding:18px}
-    .media--convites img{height:260px}
-  }
-
-  @media (prefers-reduced-motion:reduce){
-    header::after,body::after,.chama span{animation:none}
-    .btn,.btn::after,.media--convites a{transition:none}
-  }
-</style>
+<link rel="stylesheet" href="/assets/css/cockpit.css" />
+<link rel="stylesheet" href="/assets/css/chama-vela.css" />
+<style>.brand .chama-vela{--largura:24px;--altura:50px;flex:none;margin-right:2px}.boot-box .chama-vela{--largura:28px;--altura:58px}</style>
+<script>
+  try {
+    if (!sessionStorage.getItem('portal.boot') &&
+        !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.documentElement.classList.add('boot-pending', 'leds-off');
+    }
+  } catch (_) {}
+</script>
 </head>
 <body>
-<header>
-  <div class="brand">
-    <div class="chama"><span></span><span></span><span></span></div>
-    Irmandade • Portal
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <radialGradient id="milky" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#9fb8ff" stop-opacity=".28"/><stop offset="1" stop-color="#9fb8ff" stop-opacity="0"/></radialGradient>
+    <radialGradient id="nebula" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#c77dff" stop-opacity=".30"/><stop offset="1" stop-color="#c77dff" stop-opacity="0"/></radialGradient>
+  </defs>
+</svg>
+<header class="plate">
+  <div class="telemetry" aria-hidden="true">
+    <div class="readout"><span class="led"></span>SISTEMAS <b>OK</b></div>
+    <div class="readout">RUMO <b>LUZ</b></div>
+    <div class="readout">ALT <b>∞</b></div>
   </div>
-  <a class="back" href="/index.html">⬅️ Voltar ao cartão</a>
+  <div class="brand-wrap">
+    <div class="brand">
+      <div class="chama-vela"><div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div></div>
+      Irmandade • Portal
+    </div>
+    <a class="back" href="/index.html">⬅️ Voltar ao cartão</a>
+  </div>
+  <div class="telemetry right" aria-hidden="true">
+    <div class="readout">HORA ESTELAR <b id="starClock">--:--:--</b></div>
+    <div class="readout">ESCUDO <b>100%</b></div>
+    <div class="readout"><span class="led tech" id="ledSignal"></span>SINAL</div>
+    <div class="radar mini"><span class="sweep"></span></div>
+  </div>
 </header>
 
 <main class="wrap">
-  <!-- Navegação lateral -->
-  <aside class="sidebar panel">
+  <!-- Console de navegação -->
+  <aside class="sidebar plate panel">
+    <div class="panel-head">
+      <span class="tag">Console de Navegação</span>
+      <span class="leds" aria-hidden="true"><span class="led"></span><span class="led tech"></span></span>
+    </div>
     <div class="group">
       <div class="gtitle">Jornadas</div>
       <nav class="nav">
-        <a class="btn" href="/jornada-conhecimento-com-luz.html">🔥 Jornada Essencial</a>
-        <a class="btn" href="#" data-coming-soon="Jornada Vocacional" aria-describedby="portal-coming-soon">🎯 Jornada Vocacional</a>
-        <a class="btn" href="#" data-coming-soon="Jornada Amorosa" aria-describedby="portal-coming-soon">💞 Jornada Amorosa</a>
-        <a class="btn" href="#" data-coming-soon="Outras Jornadas" aria-describedby="portal-coming-soon">📚 Outras Jornadas</a>
+        <a class="btn" href="/jornada-conhecimento-com-luz.html">🔥 Jornada Essencial<span class="led" aria-hidden="true"></span></a>
+        <a class="btn" href="#" data-coming-soon="Jornada Vocacional" aria-describedby="portal-coming-soon">🎯 Jornada Vocacional<span class="led warn" aria-hidden="true"></span></a>
+        <a class="btn" href="#" data-coming-soon="Jornada Amorosa" aria-describedby="portal-coming-soon">💞 Jornada Amorosa<span class="led warn" aria-hidden="true"></span></a>
+        <a class="btn" href="#" data-coming-soon="Outras Jornadas" aria-describedby="portal-coming-soon">📚 Outras Jornadas<span class="led warn" aria-hidden="true"></span></a>
       </nav>
     </div>
     <div class="group">
       <div class="gtitle">Conteúdos do Portal</div>
       <nav class="nav">
-        <a class="btn" href="#" data-coming-soon="Mensagens" aria-describedby="portal-coming-soon">🕯️ Mensagens</a>
-        <a class="btn" href="#" data-coming-soon="Figuras" aria-describedby="portal-coming-soon">🖼️ Figuras</a>
-        <a class="btn" href="#" data-coming-soon="Vídeos" aria-describedby="portal-coming-soon">📽️ Vídeos</a>
-        <a class="btn" href="#" data-coming-soon="Sobre" aria-describedby="portal-coming-soon">ℹ️ Sobre</a>
+        <a class="btn" href="#" data-coming-soon="Mensagens" aria-describedby="portal-coming-soon">🕯️ Mensagens<span class="led off" aria-hidden="true"></span></a>
+        <a class="btn" href="#" data-coming-soon="Figuras" aria-describedby="portal-coming-soon">🖼️ Figuras<span class="led off" aria-hidden="true"></span></a>
+        <a class="btn" href="#" data-coming-soon="Vídeos" aria-describedby="portal-coming-soon">📽️ Vídeos<span class="led off" aria-hidden="true"></span></a>
+        <a class="btn" href="#" data-coming-soon="Sobre" aria-describedby="portal-coming-soon">ℹ️ Sobre<span class="led off" aria-hidden="true"></span></a>
       </nav>
+    </div>
+    <!-- Radar -->
+    <div class="group" aria-hidden="true">
+      <div class="gtitle">Radar de Luz</div>
+      <div class="radar" id="radarMain">
+        <div class="sky"><svg viewBox="0 0 200 200"><ellipse cx="100" cy="100" rx="120" ry="26" transform="rotate(-35 100 100)" fill="url(#milky)"/>
+    <ellipse cx="146" cy="150" rx="26" ry="18" fill="url(#nebula)"/>
+    <g class="sky-field"><circle cx="135.3" cy="35.0" r="0.7"/><circle cx="146.5" cy="93.4" r="0.6" class="tw" style="animation-delay:-2.4s"/><circle cx="75.1" cy="98.2" r="0.5"/><circle cx="157.7" cy="135.0" r="0.9"/><circle cx="78.1" cy="154.6" r="0.6"/><circle cx="151.5" cy="109.1" r="0.5"/><circle cx="77.8" cy="75.8" r="0.9"/><circle cx="45.2" cy="54.9" r="0.4"/><circle cx="86.0" cy="107.1" r="0.4"/><circle cx="87.7" cy="125.7" r="0.6"/><circle cx="161.3" cy="152.0" r="0.9"/><circle cx="168.4" cy="89.3" r="0.6"/><circle cx="112.6" cy="195.2" r="0.5"/><circle cx="89.3" cy="71.8" r="0.9"/><circle cx="146.5" cy="143.6" r="0.9"/><circle cx="45.9" cy="115.5" r="0.9" class="tw" style="animation-delay:-0.4s"/><circle cx="66.6" cy="107.6" r="0.4"/><circle cx="126.1" cy="61.6" r="0.6"/><circle cx="82.1" cy="129.8" r="0.5" class="tw" style="animation-delay:-2.1s"/><circle cx="115.5" cy="181.4" r="0.7"/><circle cx="157.3" cy="174.6" r="0.6"/><circle cx="27.2" cy="119.1" r="0.9"/><circle cx="83.1" cy="170.8" r="0.6"/><circle cx="104.9" cy="44.0" r="0.5"/><circle cx="119.2" cy="39.3" r="0.4"/><circle cx="130.7" cy="79.7" r="0.5"/><circle cx="42.5" cy="84.8" r="0.6"/><circle cx="94.2" cy="194.2" r="0.6" class="tw" style="animation-delay:-0.3s"/><circle cx="111.5" cy="45.9" r="0.5"/><circle cx="64.4" cy="34.0" r="0.9"/><circle cx="126.9" cy="118.3" r="0.4"/><circle cx="101.4" cy="26.4" r="0.6" class="tw" style="animation-delay:-2.4s"/><circle cx="93.6" cy="190.4" r="0.6"/><circle cx="66.3" cy="136.6" r="0.4"/><circle cx="110.2" cy="114.3" r="0.4" class="tw" style="animation-delay:-0.7s"/><circle cx="172.3" cy="143.7" r="0.7"/><circle cx="45.0" cy="75.2" r="0.9"/><circle cx="152.2" cy="163.5" r="0.9"/><circle cx="170.7" cy="110.2" r="0.9"/><circle cx="44.2" cy="104.9" r="0.6"/><circle cx="36.2" cy="115.9" r="0.5"/><circle cx="153.2" cy="91.2" r="0.7"/><circle cx="97.1" cy="161.8" r="0.4"/><circle cx="74.5" cy="44.8" r="0.4" class="tw" style="animation-delay:-2.4s"/><circle cx="163.2" cy="45.4" r="0.5" class="tw" style="animation-delay:-3.9s"/><circle cx="163.3" cy="80.3" r="0.4"/><circle cx="51.4" cy="78.4" r="0.9"/><circle cx="28.0" cy="141.3" r="0.9"/><circle cx="89.4" cy="163.7" r="0.9" class="tw" style="animation-delay:-2.4s"/><circle cx="72.6" cy="110.2" r="0.5"/><circle cx="85.9" cy="64.4" r="0.6"/><circle cx="152.3" cy="170.1" r="0.4"/><circle cx="134.7" cy="43.1" r="0.9" class="tw" style="animation-delay:-1.4s"/><circle cx="178.9" cy="125.0" r="0.7"/><circle cx="53.0" cy="181.8" r="0.5"/><circle cx="30.4" cy="130.0" r="0.6"/><circle cx="90.1" cy="185.2" r="0.7" class="tw" style="animation-delay:-2.2s"/><circle cx="107.9" cy="53.7" r="0.9"/><circle cx="154.8" cy="141.2" r="0.4"/><circle cx="46.3" cy="166.1" r="0.7"/><circle cx="176.3" cy="60.3" r="0.9"/><circle cx="190.6" cy="123.4" r="0.6"/><circle cx="159.2" cy="52.6" r="0.6"/><circle cx="109.6" cy="52.4" r="0.4"/><circle cx="171.5" cy="104.6" r="0.5"/><circle cx="26.6" cy="65.0" r="0.4"/><circle cx="162.5" cy="136.5" r="0.9" class="tw" style="animation-delay:-3.8s"/><circle cx="162.4" cy="78.8" r="0.7"/><circle cx="45.3" cy="104.0" r="0.5"/><circle cx="132.5" cy="33.1" r="0.5" class="tw" style="animation-delay:-3.7s"/><circle cx="91.2" cy="43.2" r="0.9"/><circle cx="154.8" cy="131.8" r="0.4"/><circle cx="140.7" cy="154.9" r="0.4" class="tw" style="animation-delay:-3.4s"/><circle cx="143.8" cy="25.2" r="0.9"/><circle cx="144.9" cy="157.8" r="0.7"/></g>
+    <g class="sky-lines"><line x1="62" y1="128" x2="62" y2="160"/><line x1="48" y1="145" x2="76" y2="142"/><line x1="118" y1="30" x2="146" y2="36"/><line x1="118" y1="30" x2="126" y2="58"/><line x1="146" y1="36" x2="140" y2="64"/><line x1="126" y1="58" x2="133" y2="61"/><line x1="133" y1="61" x2="140" y2="64"/><line x1="126" y1="58" x2="120" y2="90"/><line x1="140" y1="64" x2="152" y2="86"/><line x1="118" y1="30" x2="132" y2="24"/><line x1="132" y1="24" x2="146" y2="36"/><line x1="126" y1="110" x2="128" y2="118"/><line x1="122" y1="114" x2="128" y2="118"/><line x1="128" y1="118" x2="136" y2="124"/><line x1="136" y1="124" x2="144" y2="132"/><line x1="144" y1="132" x2="150" y2="142"/><line x1="150" y1="142" x2="154" y2="154"/><line x1="154" y1="154" x2="152" y2="166"/><line x1="152" y1="166" x2="144" y2="174"/><line x1="144" y1="174" x2="134" y2="176"/><line x1="134" y1="176" x2="128" y2="170"/><line x1="52" y1="44" x2="62" y2="56"/><line x1="62" y1="56" x2="72" y2="46"/><line x1="72" y1="46" x2="82" y2="58"/><line x1="82" y1="58" x2="92" y2="48"/><line x1="22" y1="82" x2="32" y2="76"/><line x1="32" y1="76" x2="42" y2="78"/><line x1="42" y1="78" x2="52" y2="86"/><line x1="52" y1="86" x2="54" y2="100"/><line x1="54" y1="100" x2="68" y2="104"/><line x1="68" y1="104" x2="70" y2="90"/><line x1="70" y1="90" x2="52" y2="86"/></g>
+    <g class="sky-stars"><circle cx="62" cy="128" r="2.6"/><circle cx="62" cy="160" r="2.4"/><circle cx="48" cy="145" r="2.0"/><circle cx="76" cy="142" r="2.2"/><circle cx="69" cy="151" r="1.2"/><circle cx="118" cy="30" r="2.6"/><circle cx="146" cy="36" r="2.0"/><circle cx="126" cy="58" r="1.7"/><circle cx="133" cy="61" r="1.7"/><circle cx="140" cy="64" r="1.7"/><circle cx="120" cy="90" r="1.8"/><circle cx="152" cy="86" r="2.6"/><circle cx="132" cy="24" r="1.1"/><circle cx="128" cy="118" r="1.6"/><circle cx="136" cy="124" r="1.6"/><circle cx="144" cy="132" r="2.8"/><circle cx="150" cy="142" r="1.6"/><circle cx="154" cy="154" r="1.6"/><circle cx="152" cy="166" r="1.6"/><circle cx="144" cy="174" r="1.6"/><circle cx="134" cy="176" r="1.6"/><circle cx="128" cy="170" r="1.9"/><circle cx="122" cy="114" r="1.3"/><circle cx="126" cy="110" r="1.3"/><circle cx="52" cy="44" r="1.8"/><circle cx="62" cy="56" r="1.8"/><circle cx="72" cy="46" r="2.0"/><circle cx="82" cy="58" r="1.8"/><circle cx="92" cy="48" r="1.8"/><circle cx="22" cy="82" r="1.8"/><circle cx="32" cy="76" r="1.8"/><circle cx="42" cy="78" r="1.8"/><circle cx="52" cy="86" r="1.8"/><circle cx="54" cy="100" r="1.8"/><circle cx="68" cy="104" r="1.8"/><circle cx="70" cy="90" r="1.8"/></g></svg></div>
+        <div class="reveal"><div class="counter"><div class="sky"><svg viewBox="0 0 200 200"><ellipse cx="100" cy="100" rx="120" ry="26" transform="rotate(-35 100 100)" fill="url(#milky)"/>
+    <ellipse cx="146" cy="150" rx="26" ry="18" fill="url(#nebula)"/>
+    <g class="sky-field"><circle cx="135.3" cy="35.0" r="0.7"/><circle cx="146.5" cy="93.4" r="0.6" class="tw" style="animation-delay:-2.4s"/><circle cx="75.1" cy="98.2" r="0.5"/><circle cx="157.7" cy="135.0" r="0.9"/><circle cx="78.1" cy="154.6" r="0.6"/><circle cx="151.5" cy="109.1" r="0.5"/><circle cx="77.8" cy="75.8" r="0.9"/><circle cx="45.2" cy="54.9" r="0.4"/><circle cx="86.0" cy="107.1" r="0.4"/><circle cx="87.7" cy="125.7" r="0.6"/><circle cx="161.3" cy="152.0" r="0.9"/><circle cx="168.4" cy="89.3" r="0.6"/><circle cx="112.6" cy="195.2" r="0.5"/><circle cx="89.3" cy="71.8" r="0.9"/><circle cx="146.5" cy="143.6" r="0.9"/><circle cx="45.9" cy="115.5" r="0.9" class="tw" style="animation-delay:-0.4s"/><circle cx="66.6" cy="107.6" r="0.4"/><circle cx="126.1" cy="61.6" r="0.6"/><circle cx="82.1" cy="129.8" r="0.5" class="tw" style="animation-delay:-2.1s"/><circle cx="115.5" cy="181.4" r="0.7"/><circle cx="157.3" cy="174.6" r="0.6"/><circle cx="27.2" cy="119.1" r="0.9"/><circle cx="83.1" cy="170.8" r="0.6"/><circle cx="104.9" cy="44.0" r="0.5"/><circle cx="119.2" cy="39.3" r="0.4"/><circle cx="130.7" cy="79.7" r="0.5"/><circle cx="42.5" cy="84.8" r="0.6"/><circle cx="94.2" cy="194.2" r="0.6" class="tw" style="animation-delay:-0.3s"/><circle cx="111.5" cy="45.9" r="0.5"/><circle cx="64.4" cy="34.0" r="0.9"/><circle cx="126.9" cy="118.3" r="0.4"/><circle cx="101.4" cy="26.4" r="0.6" class="tw" style="animation-delay:-2.4s"/><circle cx="93.6" cy="190.4" r="0.6"/><circle cx="66.3" cy="136.6" r="0.4"/><circle cx="110.2" cy="114.3" r="0.4" class="tw" style="animation-delay:-0.7s"/><circle cx="172.3" cy="143.7" r="0.7"/><circle cx="45.0" cy="75.2" r="0.9"/><circle cx="152.2" cy="163.5" r="0.9"/><circle cx="170.7" cy="110.2" r="0.9"/><circle cx="44.2" cy="104.9" r="0.6"/><circle cx="36.2" cy="115.9" r="0.5"/><circle cx="153.2" cy="91.2" r="0.7"/><circle cx="97.1" cy="161.8" r="0.4"/><circle cx="74.5" cy="44.8" r="0.4" class="tw" style="animation-delay:-2.4s"/><circle cx="163.2" cy="45.4" r="0.5" class="tw" style="animation-delay:-3.9s"/><circle cx="163.3" cy="80.3" r="0.4"/><circle cx="51.4" cy="78.4" r="0.9"/><circle cx="28.0" cy="141.3" r="0.9"/><circle cx="89.4" cy="163.7" r="0.9" class="tw" style="animation-delay:-2.4s"/><circle cx="72.6" cy="110.2" r="0.5"/><circle cx="85.9" cy="64.4" r="0.6"/><circle cx="152.3" cy="170.1" r="0.4"/><circle cx="134.7" cy="43.1" r="0.9" class="tw" style="animation-delay:-1.4s"/><circle cx="178.9" cy="125.0" r="0.7"/><circle cx="53.0" cy="181.8" r="0.5"/><circle cx="30.4" cy="130.0" r="0.6"/><circle cx="90.1" cy="185.2" r="0.7" class="tw" style="animation-delay:-2.2s"/><circle cx="107.9" cy="53.7" r="0.9"/><circle cx="154.8" cy="141.2" r="0.4"/><circle cx="46.3" cy="166.1" r="0.7"/><circle cx="176.3" cy="60.3" r="0.9"/><circle cx="190.6" cy="123.4" r="0.6"/><circle cx="159.2" cy="52.6" r="0.6"/><circle cx="109.6" cy="52.4" r="0.4"/><circle cx="171.5" cy="104.6" r="0.5"/><circle cx="26.6" cy="65.0" r="0.4"/><circle cx="162.5" cy="136.5" r="0.9" class="tw" style="animation-delay:-3.8s"/><circle cx="162.4" cy="78.8" r="0.7"/><circle cx="45.3" cy="104.0" r="0.5"/><circle cx="132.5" cy="33.1" r="0.5" class="tw" style="animation-delay:-3.7s"/><circle cx="91.2" cy="43.2" r="0.9"/><circle cx="154.8" cy="131.8" r="0.4"/><circle cx="140.7" cy="154.9" r="0.4" class="tw" style="animation-delay:-3.4s"/><circle cx="143.8" cy="25.2" r="0.9"/><circle cx="144.9" cy="157.8" r="0.7"/></g>
+    <g class="sky-lines"><line x1="62" y1="128" x2="62" y2="160"/><line x1="48" y1="145" x2="76" y2="142"/><line x1="118" y1="30" x2="146" y2="36"/><line x1="118" y1="30" x2="126" y2="58"/><line x1="146" y1="36" x2="140" y2="64"/><line x1="126" y1="58" x2="133" y2="61"/><line x1="133" y1="61" x2="140" y2="64"/><line x1="126" y1="58" x2="120" y2="90"/><line x1="140" y1="64" x2="152" y2="86"/><line x1="118" y1="30" x2="132" y2="24"/><line x1="132" y1="24" x2="146" y2="36"/><line x1="126" y1="110" x2="128" y2="118"/><line x1="122" y1="114" x2="128" y2="118"/><line x1="128" y1="118" x2="136" y2="124"/><line x1="136" y1="124" x2="144" y2="132"/><line x1="144" y1="132" x2="150" y2="142"/><line x1="150" y1="142" x2="154" y2="154"/><line x1="154" y1="154" x2="152" y2="166"/><line x1="152" y1="166" x2="144" y2="174"/><line x1="144" y1="174" x2="134" y2="176"/><line x1="134" y1="176" x2="128" y2="170"/><line x1="52" y1="44" x2="62" y2="56"/><line x1="62" y1="56" x2="72" y2="46"/><line x1="72" y1="46" x2="82" y2="58"/><line x1="82" y1="58" x2="92" y2="48"/><line x1="22" y1="82" x2="32" y2="76"/><line x1="32" y1="76" x2="42" y2="78"/><line x1="42" y1="78" x2="52" y2="86"/><line x1="52" y1="86" x2="54" y2="100"/><line x1="54" y1="100" x2="68" y2="104"/><line x1="68" y1="104" x2="70" y2="90"/><line x1="70" y1="90" x2="52" y2="86"/></g>
+    <g class="sky-stars"><circle cx="62" cy="128" r="2.6"/><circle cx="62" cy="160" r="2.4"/><circle cx="48" cy="145" r="2.0"/><circle cx="76" cy="142" r="2.2"/><circle cx="69" cy="151" r="1.2"/><circle cx="118" cy="30" r="2.6"/><circle cx="146" cy="36" r="2.0"/><circle cx="126" cy="58" r="1.7"/><circle cx="133" cy="61" r="1.7"/><circle cx="140" cy="64" r="1.7"/><circle cx="120" cy="90" r="1.8"/><circle cx="152" cy="86" r="2.6"/><circle cx="132" cy="24" r="1.1"/><circle cx="128" cy="118" r="1.6"/><circle cx="136" cy="124" r="1.6"/><circle cx="144" cy="132" r="2.8"/><circle cx="150" cy="142" r="1.6"/><circle cx="154" cy="154" r="1.6"/><circle cx="152" cy="166" r="1.6"/><circle cx="144" cy="174" r="1.6"/><circle cx="134" cy="176" r="1.6"/><circle cx="128" cy="170" r="1.9"/><circle cx="122" cy="114" r="1.3"/><circle cx="126" cy="110" r="1.3"/><circle cx="52" cy="44" r="1.8"/><circle cx="62" cy="56" r="1.8"/><circle cx="72" cy="46" r="2.0"/><circle cx="82" cy="58" r="1.8"/><circle cx="92" cy="48" r="1.8"/><circle cx="22" cy="82" r="1.8"/><circle cx="32" cy="76" r="1.8"/><circle cx="42" cy="78" r="1.8"/><circle cx="52" cy="86" r="1.8"/><circle cx="54" cy="100" r="1.8"/><circle cx="68" cy="104" r="1.8"/><circle cx="70" cy="90" r="1.8"/></g></svg></div></div></div>
+        <span class="grid"></span>
+        <span class="sweep"></span>
+        <i class="blip" style="--x:66.9%;--y:28.3%;--d:0.42s"></i>
+        <i class="blip" style="--x:19.5%;--y:38.9%;--d:3.22s"></i>
+        <span class="rn">N</span>
+        <span class="core">✦</span>
+      </div>
+      <div class="ctl-screen radar-readout" id="radarReadout" aria-live="off">VARRENDO O UNIVERSO…</div>
+    </div>
+
+    <!-- Painel de controle (funcional) -->
+    <div class="group">
+      <div class="gtitle">Painel de Controle</div>
+      <div class="instruments" aria-hidden="true">
+        <div class="gauge"><div class="dial" id="dialBright" style="--v:.62"></div><span>Luz</span></div>
+        <div class="gauge"><div class="dial" id="dialHue" style="--v:.55"></div><span>Cor</span></div>
+        <div class="gauge"><div class="dial" id="dialVol" style="--v:.6"></div><span>Som</span></div>
+      </div>
+
+      <div class="fader">
+        <label for="ctlBright"><span class="led" id="ledBright"></span>Luz</label>
+        <input type="range" id="ctlBright" min="50" max="130" step="1" value="100" aria-label="Brilho da tela" />
+        <div class="meter" data-meter="ctlBright" aria-hidden="true"></div>
+      </div>
+      <div class="fader hue">
+        <label for="ctlHue"><span class="led tech" id="ledHue"></span>Cor</label>
+        <input type="range" id="ctlHue" min="0" max="360" step="1" value="197" aria-label="Cor das luzes e telas" />
+        <div class="meter tech" data-meter="ctlHue" aria-hidden="true"></div>
+      </div>
+      <div class="fader">
+        <label for="ctlVol"><span class="led" id="ledVol"></span>Som</label>
+        <input type="range" id="ctlVol" min="0" max="100" step="1" value="60" aria-label="Volume dos sons do painel" />
+        <div class="meter" data-meter="ctlVol" aria-hidden="true"></div>
+      </div>
+
+      <div class="ctl-screen" id="ctlScreen" aria-live="polite">LUZ 100% · COR 197° · SOM 60%</div>
+
+      <div class="switches">
+        <div class="sw"><button type="button" class="toggle" role="switch" aria-checked="true" data-key="som" aria-label="Som"></button><span>Som</span></div>
+        <div class="sw"><button type="button" class="toggle" role="switch" aria-checked="true" data-key="scan" aria-label="Varredura das telas"></button><span>Scan</span></div>
+        <div class="sw"><button type="button" class="toggle" role="switch" aria-checked="true" data-key="stars" aria-label="Estrelas ao fundo"></button><span>Astros</span></div>
+        <div class="sw"><button type="button" class="toggle" role="switch" aria-checked="true" data-key="radar" aria-label="Radar girando"></button><span>Radar</span></div>
+      </div>
+
+      <button type="button" class="reboot" id="rebootBtn">⏻ Reiniciar sistemas</button>
     </div>
   </aside>
 
-  <!-- Conteúdo principal -->
+  <!-- Tela principal -->
   <section class="content">
-    <div class="hero panel">
+    <div class="hero plate panel">
+      <div class="panel-head">
+        <span class="tag">Tela Principal</span>
+        <span class="leds" aria-hidden="true"><span class="led"></span><span class="led"></span><span class="led tech"></span></span>
+      </div>
       <h2>Bem-vindo ao Portal</h2>
       <div class="divider" aria-hidden="true"><span>✦</span></div>
       <p>Aqui você encontra mensagens da Irmandade, figuras simbólicas, vídeos de apresentação e os atalhos para todas as jornadas. Este espaço vai crescer conforme abrirmos novos caminhos.</p>
 
-     <!-- VÍDEO (primeiro) -->
-<div class="media media--hero video-block">
-  <div class="box">
-    <video id="heroVideo" playsinline autoplay muted preload="auto"
-           controlslist="nodownload noplaybackrate nofullscreen noremoteplayback"
-           disablepictureinpicture>
-      <source src="/assets/videos/irmandade-no-jardim.mp4" />
-      Seu navegador não suporta o elemento de vídeo.
-    </video>
-  </div>
-</div>
+      <!-- VÍDEO (primeiro) -->
+      <div class="media media--hero video-block">
+        <div class="box monitor">
+          <div class="screen">
+            <video id="heroVideo" playsinline autoplay muted preload="auto"
+                   controlslist="nodownload noplaybackrate nofullscreen noremoteplayback"
+                   disablepictureinpicture>
+              <source src="/assets/videos/irmandade-no-jardim.mp4" />
+              Seu navegador não suporta o elemento de vídeo.
+            </video>
+          </div>
+          <div class="monitor-bar" aria-hidden="true"><span>● Transmissão ao vivo</span><span class="leds"><span class="led"></span><span class="led tech"></span></span></div>
+        </div>
+      </div>
 
-<!-- IMAGEM (depois) -->
-<div class="media media--hero image-block">
-  <div class="box">
-    <img src="/assets/img/sou-grato.png" alt="Figura simbólica" />
-  </div>
-</div>
+      <!-- IMAGEM (depois) -->
+      <div class="media media--hero image-block">
+        <div class="box monitor">
+          <div class="screen">
+            <img src="/assets/img/sou-grato.png" alt="Figura simbólica" />
+          </div>
+          <div class="monitor-bar" aria-hidden="true"><span>Arquivo da Irmandade</span><span class="leds"><span class="led tech"></span></span></div>
+        </div>
+      </div>
+    </div>
 
     <!-- Convites -->
-    <div class="panel">
+    <div class="plate panel hero">
+      <div class="panel-head">
+        <span class="tag">Canais de Transmissão</span>
+        <span class="leds" aria-hidden="true"><span class="led"></span><span class="led"></span><span class="led"></span><span class="led"></span></span>
+      </div>
       <h3 class="section-title">Convites da Irmandade</h3>
       <div class="divider" aria-hidden="true"><span>✦</span></div>
       <div class="media media--convites">
         <div class="box">
-          <a href="/assets/img/chamado-do-Arion.png" target="_blank" rel="noopener">
-            <img src="/assets/img/chamado-do-Arion.png" alt="Chamado do Arion" loading="lazy" />
+          <a class="monitor" href="/assets/img/chamado-do-Arion.png" target="_blank" rel="noopener">
+            <div class="screen"><img src="/assets/img/chamado-do-Arion.png" alt="Chamado do Arion" loading="lazy" /></div>
+            <div class="monitor-bar" aria-hidden="true"><span>Canal 01</span><span class="led"></span></div>
           </a>
           <figcaption>Chamado do Arion</figcaption>
         </div>
         <div class="box">
-          <a href="/assets/img/chamado-do-Lumen.png" target="_blank" rel="noopener">
-            <img src="/assets/img/chamado-do-Lumen.png" alt="Chamado do Lumen" loading="lazy" />
+          <a class="monitor" href="/assets/img/chamado-do-Lumen.png" target="_blank" rel="noopener">
+            <div class="screen"><img src="/assets/img/chamado-do-Lumen.png" alt="Chamado do Lumen" loading="lazy" /></div>
+            <div class="monitor-bar" aria-hidden="true"><span>Canal 02</span><span class="led"></span></div>
           </a>
           <figcaption>Chamado do Lumen</figcaption>
         </div>
         <div class="box">
-          <a href="/assets/img/chamado-do-Rogério.png" target="_blank" rel="noopener">
-            <img src="/assets/img/chamado-do-Rogério.png" alt="Chamado do Rogério" loading="lazy" />
+          <a class="monitor" href="/assets/img/chamado-do-Rogério.png" target="_blank" rel="noopener">
+            <div class="screen"><img src="/assets/img/chamado-do-Rogério.png" alt="Chamado do Rogério" loading="lazy" /></div>
+            <div class="monitor-bar" aria-hidden="true"><span>Canal 03</span><span class="led"></span></div>
           </a>
           <figcaption>Chamado do Rogério</figcaption>
         </div>
         <div class="box">
-          <a href="/assets/img/chamado-do-Zion.png" target="_blank" rel="noopener">
-            <img src="/assets/img/chamado-do-Zion.png" alt="Chamado do Zion" loading="lazy" />
+          <a class="monitor" href="/assets/img/chamado-do-Zion.png" target="_blank" rel="noopener">
+            <div class="screen"><img src="/assets/img/chamado-do-Zion.png" alt="Chamado do Zion" loading="lazy" /></div>
+            <div class="monitor-bar" aria-hidden="true"><span>Canal 04</span><span class="led"></span></div>
           </a>
           <figcaption>Chamado do Zion</figcaption>
         </div>
@@ -414,7 +212,20 @@
   </section>
 </main>
 
-<footer>Para além. E sempre!! • © Irmandade Conhecimento com Luz</footer>
+<footer class="plate">
+  <span class="status" aria-hidden="true"><span class="led"></span>Todos os sistemas ativos</span>
+  <span class="motto">Para além. E sempre!! • © Irmandade Conhecimento com Luz</span>
+</footer>
+
+<div class="boot" id="boot" aria-hidden="true">
+  <div class="boot-box">
+    <div class="chama-vela"><div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div></div>
+    <div class="boot-title">Sequência de Ignição</div>
+    <ol class="boot-log" id="bootLog"></ol>
+    <div class="boot-bar"><i id="bootBar"></i></div>
+    <div class="boot-skip">toque para pular</div>
+  </div>
+</div>
 
 <div id="portal-coming-soon"
      class="portal-notice"
@@ -522,5 +333,8 @@
   });
 })();
 </script>
+<!-- Cockpit: relógio, sons, controles, LEDs e sequência de ignição -->
+<script src="/assets/js/cockpit.js"></script>
+<script src="/assets/js/som-universo.js" defer></script>
 </body>
 </html>
