@@ -478,11 +478,11 @@ body.vt-fade-in #jornada-content-wrapper{
     0 0 200px rgba(212,175,55,.30),
     inset 0 0 50px rgba(212,175,55,.35);
   box-shadow:
-    0 0 0 2px color-mix(in srgb, var(--presenca-cor) 55%, #fff 45%),
-    0 0 40px color-mix(in srgb, var(--presenca-cor) 85%, transparent),
-    0 0 110px color-mix(in srgb, var(--presenca-cor) 55%, transparent),
-    0 0 200px color-mix(in srgb, var(--presenca-cor) 30%, transparent),
-    inset 0 0 50px color-mix(in srgb, var(--presenca-cor) 35%, transparent);
+    0 0 0 3px color-mix(in srgb, var(--presenca-cor) 50%, #fff 50%),
+    0 0 46px var(--presenca-cor),
+    0 0 130px color-mix(in srgb, var(--presenca-cor) 70%, transparent),
+    0 0 240px color-mix(in srgb, var(--presenca-cor) 42%, transparent),
+    inset 0 0 60px color-mix(in srgb, var(--presenca-cor) 45%, transparent);
 }
 
 /* aura larga em volta do painel */
@@ -492,7 +492,7 @@ body.vt-fade-in #jornada-content-wrapper{
   border-radius: 40%;
   pointer-events: none;
   background: radial-gradient(ellipse at center, rgba(212,175,55,.32) 30%, transparent 70%);
-  background: radial-gradient(ellipse at center, color-mix(in srgb, var(--presenca-cor) 32%, transparent) 30%, transparent 70%);
+  background: radial-gradient(ellipse at center, color-mix(in srgb, var(--presenca-cor) 48%, transparent) 30%, transparent 72%);
 }
 
 /* clarão do relâmpago: borda branca-quente e luz por dentro do painel */
@@ -528,4 +528,30 @@ body.vt-fade-in #jornada-content-wrapper{
   background: radial-gradient(circle at var(--cx) var(--cy), rgba(255,240,200,.35), rgba(212,175,55,.18) 35%, transparent 70%);
   background: radial-gradient(circle at var(--cx) var(--cy), color-mix(in srgb, var(--presenca-cor) 40%, #fff 25%), color-mix(in srgb, var(--presenca-cor) 20%, transparent) 35%, transparent 70%);
   mix-blend-mode: screen;
+}
+
+
+/* ======================================================
+   BOTÃO PRONTO — avançar liberado depois da leitura
+   (classe aplicada por j-panel-glow.js em toda a jornada)
+   ====================================================== */
+@keyframes jornadaBtnPronto {
+  0%, 100% { filter: brightness(1.05) drop-shadow(0 0 6px var(--pronto-cor, #d4af37)) drop-shadow(0 0 14px var(--pronto-cor, #d4af37)); }
+  50%      { filter: brightness(1.22) drop-shadow(0 0 12px var(--pronto-cor, #d4af37)) drop-shadow(0 0 30px var(--pronto-cor, #d4af37)); }
+}
+:is(#section-intro, #section-termos1, #section-termos2, #section-senha, #section-guia,
+    #section-selfie, #section-card, #section-dados-pessoais, #section-final,
+    [id^="section-perguntas"]) .jornada-btn-pronto.jornada-btn-pronto,
+.jornada-btn-pronto.jornada-btn-pronto {
+  --pronto-cor: #d4af37;
+  animation: jornadaBtnPronto 1.8s ease-in-out infinite !important;
+  outline: 2px solid var(--pronto-cor) !important;
+  outline-offset: 3px !important;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.55),
+    0 0 18px var(--pronto-cor),
+    0 0 42px var(--pronto-cor) !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .jornada-btn-pronto.jornada-btn-pronto { animation: none !important; filter: brightness(1.12) drop-shadow(0 0 10px var(--pronto-cor, #d4af37)); }
 }

@@ -473,6 +473,9 @@
 
     ensureVisible(root);
 
+    // espera o dicionário de tradução (no celular ele pode chegar depois);
+    // sem isso o título saía só com o texto reserva ("Jornada")
+    try { await window.i18n?.waitForReady?.(4000); } catch {}
     await applySectionI18n(root);
     await flushFrames(2);
 
