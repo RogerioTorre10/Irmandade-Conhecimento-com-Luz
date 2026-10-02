@@ -843,6 +843,10 @@ if (showCursor) element.appendChild(caret);
     audio.onended = done;
     audio.onerror = done;
     __neural.current = audio;
+    // avisa a luz do guia no instante em que o som começa
+    audio.addEventListener('playing', () => {
+      try { document.dispatchEvent(new CustomEvent('jornada:voz-inicio')); } catch {}
+    });
 
     try { window.Luz?.startPulse({ min: 1, max: 1.45, speed: 120 }); } catch {}
 
