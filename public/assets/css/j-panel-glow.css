@@ -455,7 +455,7 @@ body.vt-fade-in #jornada-content-wrapper{
 
 
 /* ======================================================
-   PRESENÇA DO GUIA — camada de luz sobre o painel da section
+   PRESENÇA DO GUIA — luz de relâmpago sobre o painel da section
    (posicionada por j-panel-glow.js; não interfere no layout)
    ====================================================== */
 #guia-presenca{
@@ -472,13 +472,60 @@ body.vt-fade-in #jornada-content-wrapper{
   --presenca-cor: #d4af37;
   /* navegadores antigos: sempre dourado */
   box-shadow:
-    0 0 0 1px rgba(255,230,160,.55),
-    0 0 26px rgba(212,175,55,.55),
-    0 0 70px rgba(212,175,55,.30),
-    inset 0 0 26px rgba(212,175,55,.22);
+    0 0 0 2px rgba(255,236,170,.85),
+    0 0 40px rgba(212,175,55,.85),
+    0 0 110px rgba(212,175,55,.55),
+    0 0 200px rgba(212,175,55,.30),
+    inset 0 0 50px rgba(212,175,55,.35);
   box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--presenca-cor) 60%, #fff 40%),
-    0 0 26px color-mix(in srgb, var(--presenca-cor) 70%, transparent),
-    0 0 70px color-mix(in srgb, var(--presenca-cor) 38%, transparent),
-    inset 0 0 26px color-mix(in srgb, var(--presenca-cor) 26%, transparent);
+    0 0 0 2px color-mix(in srgb, var(--presenca-cor) 55%, #fff 45%),
+    0 0 40px color-mix(in srgb, var(--presenca-cor) 85%, transparent),
+    0 0 110px color-mix(in srgb, var(--presenca-cor) 55%, transparent),
+    0 0 200px color-mix(in srgb, var(--presenca-cor) 30%, transparent),
+    inset 0 0 50px color-mix(in srgb, var(--presenca-cor) 35%, transparent);
+}
+
+/* aura larga em volta do painel */
+#guia-presenca .gp-halo{
+  position: absolute;
+  inset: -70px;
+  border-radius: 40%;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(212,175,55,.32) 30%, transparent 70%);
+  background: radial-gradient(ellipse at center, color-mix(in srgb, var(--presenca-cor) 32%, transparent) 30%, transparent 70%);
+}
+
+/* clarão do relâmpago: borda branca-quente e luz por dentro do painel */
+#guia-presenca .gp-raio{
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  pointer-events: none;
+  box-shadow:
+    0 0 0 2px #fff,
+    0 0 26px rgba(255,255,255,.95),
+    0 0 90px rgba(255,236,170,.85),
+    0 0 180px rgba(212,175,55,.6);
+  box-shadow:
+    0 0 0 2px #fff,
+    0 0 26px rgba(255,255,255,.95),
+    0 0 90px color-mix(in srgb, var(--presenca-cor) 70%, #fff 30%),
+    0 0 180px color-mix(in srgb, var(--presenca-cor) 60%, transparent);
+  background: radial-gradient(ellipse at 50% 35%, rgba(255,255,255,.22), transparent 70%);
+}
+
+/* reflexo do relâmpago na tela inteira */
+#guia-relampago{
+  position: fixed;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 49;
+  --presenca-cor: #d4af37;
+  --cx: 50%;
+  --cy: 50%;
+  background: radial-gradient(circle at var(--cx) var(--cy), rgba(255,240,200,.35), rgba(212,175,55,.18) 35%, transparent 70%);
+  background: radial-gradient(circle at var(--cx) var(--cy), color-mix(in srgb, var(--presenca-cor) 40%, #fff 25%), color-mix(in srgb, var(--presenca-cor) 20%, transparent) 35%, transparent 70%);
+  mix-blend-mode: screen;
 }

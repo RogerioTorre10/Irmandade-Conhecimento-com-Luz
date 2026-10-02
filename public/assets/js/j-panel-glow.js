@@ -116,7 +116,12 @@
   const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
   let layer = null;
+  let raio = null;        // clarão branco-quente do relâmpago
+  let ceu = null;         // reflexo do relâmpago na tela
   let value = 0;          // intensidade atual (0..1)
+  let flash = 0;          // intensidade do clarão (0..1)
+  let nextFlashAt = 0;
+  let pendingFlicker = 0; // segundo pulso da "piscada dupla"
   let running = false;
   let lastColor = '';
 
@@ -125,8 +130,36 @@
     layer = document.createElement('div');
     layer.id = 'guia-presenca';
     layer.setAttribute('aria-hidden', 'true');
+    layer.innerHTML = '<span class="gp-halo"></span><span class="gp-raio"></span>';
+    raio = layer.querySelector('.gp-raio');
+    ceu = document.createElement('div');
+    ceu.id = 'guia-relampago';
+    ceu.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(ceu);
     document.body.appendChild(layer);
     return layer;
+  }
+
+  // Relâmpago: clarões irregulares enquanto o guia fala.
+  // No máximo 2 clarões por segundo (limite seguro para fotossensibilidade).
+  function updateFlash(t, active) {
+    if (reduceMotion) { flash = 0; return; }
+    if (active) {
+      if (!nextFlashAt) nextFlashAt = t + 700 + Math.random() * 900;
+      if (t >= nextFlashAt) {
+        flash = 1;
+        pendingFlicker = Math.random() < 0.45 ? t + 140 + Math.random() * 90 : 0;
+        nextFlashAt = t + 2000 + Math.random() * 2400;
+      } else if (pendingFlicker && t >= pendingFlicker) {
+        flash = Math.max(flash, 0.75);
+        pendingFlicker = 0;
+      }
+    } else {
+      nextFlashAt = 0;
+      pendingFlicker = 0;
+    }
+    flash *= 0.88; // decai rápido, como um relâmpago
+    if (flash < 0.01) flash = 0;
   }
 
   function currentSectionEl() {
@@ -193,12 +226,16 @@
     if (reading) target = prog !== null ? 0.45 + 0.55 * prog : 0.85;
     value += (target - value) * (target > value ? 0.06 : 0.035);
 
+    updateFlash(t, reading && talking);
+
     const panel = value > 0.01 ? targetPanel() : null;
     const L = ensureLayer();
 
     if (!panel || value <= 0.01) {
       L.style.opacity = '0';
-      if (!reading && value <= 0.01) { running = false; value = 0; return; }
+      if (raio) raio.style.opacity = '0';
+      if (ceu) ceu.style.opacity = '0';
+      if (!reading && value <= 0.01) { running = false; value = 0; flash = 0; return; }
     } else {
       const r = panel.getBoundingClientRect();
       const cs = getComputedStyle(panel);
@@ -208,11 +245,21 @@
       L.style.borderRadius = cs.borderRadius || '24px';
 
       const color = guideColor(window.JC?.currentSection || panel.closest('section')?.id);
-      if (color !== lastColor) { L.style.setProperty('--presenca-cor', color); lastColor = color; }
+      if (color !== lastColor) {
+        L.style.setProperty('--presenca-cor', color);
+        ceu.style.setProperty('--presenca-cor', color);
+        lastColor = color;
+      }
 
-      // pulsa com a voz (respiração suave)
-      const pulse = talking && !reduceMotion ? 0.86 + 0.14 * Math.sin(t / 230) : 1;
-      L.style.opacity = (value * pulse).toFixed(3);
+      // pulsa com a voz (respiração) + clarões de relâmpago
+      const pulse = talking && !reduceMotion ? 0.82 + 0.18 * Math.sin(t / 210) : 1;
+      L.style.opacity = Math.min(1, value * pulse + flash * 0.5).toFixed(3);
+      if (raio) raio.style.opacity = (flash * Math.min(1, value + 0.3)).toFixed(3);
+      if (ceu) {
+        ceu.style.setProperty('--cx', `${Math.round(r.left + r.width / 2)}px`);
+        ceu.style.setProperty('--cy', `${Math.round(r.top + r.height / 2)}px`);
+        ceu.style.opacity = (flash * 0.55).toFixed(3);
+      }
     }
     requestAnimationFrame(frame);
   }
