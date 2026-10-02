@@ -376,6 +376,27 @@
 
     activateTypingAura(el);
 
+    // Fala e digitação juntas (sincronizadas) quando a voz está ligada.
+    if (speak && !el.dataset.spoken && typeof window.typeAndSpeak === 'function') {
+      try {
+        cancelAllSpeech();
+        await window.typeAndSpeak(el, normalizedText, speed, {
+          cursor: true,
+          forceReplay: true,
+          rate: voiceCtx?.rate ?? 1.05,
+          pitch: voiceCtx?.pitch ?? 1.0,
+          guide: voiceCtx?.guide ?? getActiveGuide()
+        });
+        if (runToken !== window.JCTermos1.state.activeRunToken) return;
+        el.dataset.spoken = 'true';
+        finishTypingAura(el);
+        await sleep(80);
+        return;
+      } catch (err) {
+        console.warn('[JCTermos1] typeAndSpeak falhou, usando caminho antigo:', err);
+      }
+    }
+
     let usedFallback = false;
 
     if (typeof window.runTyping === 'function') {
@@ -452,6 +473,9 @@
 
     ensureVisible(root);
 
+    // espera o dicionário de tradução (no celular ele pode chegar depois);
+    // sem isso o título saía só com o texto reserva ("Jornada")
+    try { await window.i18n?.waitForReady?.(4000); } catch {}
     await applySectionI18n(root);
     await flushFrames(2);
 
@@ -534,16 +558,36 @@
     const root = node || document.getElementById(SECTION_ID);
     if (!root) return;
 
+    // Abertura repetida da mesma section (ex.: fim do vídeo + botão da
+    // section anterior): se já está lendo ou já leu, e a pessoa não saiu
+    // dela, não recomeça — evita título digitado e falado duas vezes.
+    const st = window.JCTermos1.state;
+    if (!st.__left && (st.__running || st.ready)) {
+      console.log('[JCTermos1] abertura repetida ignorada (leitura já em andamento/concluída)');
+      return;
+    }
+    st.__left = false;
+
     cancelAllSpeech();
     window.JCTermos1.state.initToken += 1;
     const myToken = window.JCTermos1.state.initToken;
 
-    initOnce(root, myToken);
+    st.__running = true;
+    Promise.resolve(initOnce(root, myToken)).finally(() => {
+      if (myToken === window.JCTermos1.state.initToken) st.__running = false;
+    });
   }
 
   function bind() {
     if (!window.JCTermos1.state.listenerOn) {
       document.addEventListener('section:shown', onSectionShown, { passive: true });
+      document.addEventListener('section:shown', (e) => {
+        const id = e?.detail?.sectionId;
+        if (id && id !== SECTION_ID) {
+          window.JCTermos1.state.__left = true;
+          window.JCTermos1.state.ready = false;
+        }
+      }, { passive: true });
       window.JCTermos1.state.listenerOn = true;
     }
   }
