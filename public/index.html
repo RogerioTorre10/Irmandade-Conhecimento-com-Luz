@@ -286,6 +286,10 @@
     .chama{position:absolute;left:50%;bottom:48%;width:70%;aspect-ratio:3/4.4;transform:translateX(-50%);filter:drop-shadow(0 4px 12px rgba(255,140,0,.6))}
     .chama{transform-origin:50% 100%;animation:sway 2.3s ease-in-out infinite}
     .torch.right .chama{animation-duration:2.7s;animation-delay:-.9s}
+    /* chama da jornada (chama-vela.css) sobre o suporte da tocha */
+    .torch .chama-vela{position:absolute;left:50%;bottom:44%;transform:translateX(-50%);--largura:clamp(16px,3.6vw,30px);--altura:calc(var(--largura) * 2.1);--glow:12px}
+    .torch.right .chama-vela .lingua{animation-duration:1.4s}
+    .torch.right .chama-vela .lingua:nth-child(3){animation-duration:2s}
     @keyframes sway{0%,100%{transform:translateX(-50%) skewX(0deg)}25%{transform:translateX(-50%) skewX(-5deg)}75%{transform:translateX(-50%) skewX(5deg)}}
     .chama span{position:absolute;inset:auto 0 0 0;margin:auto;width:100%;height:100%;border-radius:50% 50% 45% 45%;transform-origin:50% 100%;background:radial-gradient(50% 60% at 50% 30%,#fff7cc 0%,#ffd166 35%,#ff8c00 70%,transparent 100%);animation:flame .9s infinite ease-in-out}
     .chama span:nth-child(2){width:66%;height:70%;opacity:.85;animation-duration:.7s;animation-delay:-.2s}
@@ -412,7 +416,9 @@
       .js .reveal{transition:none}
     }
   </style>
+  <link rel="stylesheet" href="/assets/css/chama-vela.css" />
   <script>document.documentElement.classList.add('js');</script>
+  <script src="/assets/js/som-universo.js" defer></script>
 </head>
 <body>
 <div class="frame" aria-hidden="true"></div>
@@ -437,7 +443,7 @@
       <p class="words">Fé<b>•</b>Sabedoria<b>•</b>Irmandade<b>•</b>Luz</p>
 
       <div class="actions">
-        <button type="button" class="sound" id="soundBtn" aria-pressed="false"><span class="dot"></span>Som ambiente</button>
+        <button type="button" class="sound" id="soundBtn" data-som-universo aria-pressed="true"><span class="dot"></span><span data-som-label>Som do Universo: ON</span></button>
       </div>
     </section>
 
@@ -459,8 +465,8 @@
       </div>
       <div class="layer keystone" aria-hidden="true">✦</div>
 
-      <div class="layer torch left" aria-hidden="true"><span class="halo"></span><i class="spark"></i><i class="spark"></i><i class="spark"></i><span class="bracket"></span><div class="chama"><span></span><span></span><span></span></div></div>
-      <div class="layer torch right" aria-hidden="true"><span class="halo"></span><i class="spark"></i><i class="spark"></i><i class="spark"></i><span class="bracket"></span><div class="chama"><span></span><span></span><span></span></div></div>
+      <div class="layer torch left" aria-hidden="true"><span class="halo"></span><i class="spark"></i><i class="spark"></i><i class="spark"></i><span class="bracket"></span><div class="chama-vela"><div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div></div></div>
+      <div class="layer torch right" aria-hidden="true"><span class="halo"></span><i class="spark"></i><i class="spark"></i><i class="spark"></i><span class="bracket"></span><div class="chama-vela"><div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div></div></div>
 
       <div class="layer steps" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
       <div class="layer spill" aria-hidden="true"></div>
@@ -549,105 +555,21 @@
       card.style.setProperty('--ty', (-((e.clientY - r.top) / r.height - 0.5) * 12).toFixed(2));
     });
     card.addEventListener('pointerleave', () => { card.style.setProperty('--tx', 0); card.style.setProperty('--ty', 0); });
-    card.addEventListener('pointerenter', () => Audio.chime(1));
+    card.addEventListener('pointerenter', () => Som.chime(1));
   });
 
-  // ---------- Som ambiente (sintetizado, sem arquivos) ----------
-  const Audio = {
-    ctx: null, master: null, pad: null, on: false, chimeTimer: 0,
-    init() {
-      if (this.ctx) return true;
-      const AC = window.AudioContext || window.webkitAudioContext;
-      if (!AC) return false;
-      this.ctx = new AC();
-      this.master = this.ctx.createGain();
-      this.master.gain.value = 0;
-      this.master.connect(this.ctx.destination);
-      return true;
-    },
-    startPad() {
-      const c = this.ctx;
-      const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 900;
-      const g = c.createGain(); g.gain.value = 0.12;
-      lp.connect(g); g.connect(this.master);
-      // acorde místico (Lá menor com nona), levemente desafinado
-      [110, 164.81, 220, 246.94, 329.63].forEach((f, i) => {
-        [-3, 3].forEach((det) => {
-          const o = c.createOscillator();
-          o.type = i < 2 ? 'sine' : 'triangle';
-          o.frequency.value = f; o.detune.value = det;
-          const og = c.createGain(); og.gain.value = i < 2 ? 0.22 : 0.08;
-          o.connect(og); og.connect(lp); o.start();
-        });
-      });
-      // respiração lenta do som
-      const lfo = c.createOscillator(); const lg = c.createGain();
-      lfo.frequency.value = 0.08; lg.gain.value = 0.05;
-      lfo.connect(lg); lg.connect(g.gain); lfo.start();
-      this.pad = true;
-    },
-    toggle() {
-      if (!this.init()) return false;
-      if (this.ctx.state === 'suspended') this.ctx.resume();
-      if (!this.pad) this.startPad();
-      this.on = !this.on;
-      this.master.gain.setTargetAtTime(this.on ? 0.55 : 0, this.ctx.currentTime, 0.6);
-      clearInterval(this.chimeTimer);
-      if (this.on) this.chimeTimer = setInterval(() => this.chime(Math.random() * 0.6 + 0.4), 5200);
-      return this.on;
-    },
-    chime(level = 1) {
-      if (!this.on || !this.ctx) return;
-      const c = this.ctx, t = c.currentTime;
-      const notes = [880, 987.77, 1318.51, 1760, 1174.66];
-      const f = notes[Math.floor(Math.random() * notes.length)];
-      [1, 2.76].forEach((mult, k) => {
-        const o = c.createOscillator(), g = c.createGain();
-        o.type = 'sine'; o.frequency.value = f * mult;
-        g.gain.setValueAtTime(0.0001, t);
-        g.gain.exponentialRampToValueAtTime((k ? 0.02 : 0.07) * level, t + 0.02);
-        g.gain.exponentialRampToValueAtTime(0.0001, t + 2.8);
-        o.connect(g); g.connect(this.master); o.start(t); o.stop(t + 3);
-      });
-    },
-    whoosh() {
-      if (!this.ctx || this.ctx.state !== 'running') return;
-      const c = this.ctx, t = c.currentTime;
-      if (!this.on) this.master.gain.setTargetAtTime(0.55, t, 0.05);
-      const len = 2.2, buf = c.createBuffer(1, Math.ceil(c.sampleRate * len), c.sampleRate);
-      const d = buf.getChannelData(0);
-      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-      const src = c.createBufferSource(), bp = c.createBiquadFilter(), g = c.createGain();
-      src.buffer = buf; bp.type = 'bandpass'; bp.Q.value = 0.8;
-      bp.frequency.setValueAtTime(200, t); bp.frequency.exponentialRampToValueAtTime(3200, t + 1.8);
-      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.35, t + 1.2); g.gain.exponentialRampToValueAtTime(0.0001, t + 2.1);
-      src.connect(bp); bp.connect(g); g.connect(this.master); src.start(t);
-      [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => {
-        const o = c.createOscillator(), og = c.createGain();
-        o.type = 'sine'; o.frequency.value = f;
-        og.gain.setValueAtTime(0.0001, t + i * 0.18);
-        og.gain.exponentialRampToValueAtTime(0.09, t + i * 0.18 + 0.05);
-        og.gain.exponentialRampToValueAtTime(0.0001, t + i * 0.18 + 1.6);
-        o.connect(og); og.connect(this.master); o.start(t + i * 0.18); o.stop(t + i * 0.18 + 1.7);
-      });
-    }
+  // ---------- Som do Universo (assets/js/som-universo.js) ----------
+  const Som = {
+    chime: (l) => { try { window.SomUniverso?.chime(l); } catch (_) {} },
+    whoosh: () => { try { window.SomUniverso?.whoosh(); } catch (_) {} }
   };
-  const soundBtn = document.getElementById('soundBtn');
-  if (soundBtn) {
-    soundBtn.addEventListener('click', () => {
-      const on = Audio.toggle();
-      soundBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
-      if (on) setTimeout(() => Audio.chime(1), 300);
-    });
-  }
 
   // ---------- Travessia do portal ----------
   let entering = false;
   function enterPortal(href) {
     if (entering) return;
     entering = true;
-    try { Audio.init(); if (Audio.ctx.state === 'suspended') Audio.ctx.resume(); } catch (_) {}
-    Audio.whoosh();
+    Som.whoosh();
     document.body.classList.add('entering');
     if (scene) scene.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
     setTimeout(() => { window.location.href = href || PORTAL; }, reduce ? 150 : 2000);

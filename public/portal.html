@@ -7,6 +7,8 @@
 <meta name="description" content="Portal oficial da Irmandade Conhecimento com Luz — mensagens, convites e acesso às jornadas" />
 <meta name="theme-color" content="#0b0f1a" />
 <link rel="stylesheet" href="/assets/css/cockpit.css" />
+<link rel="stylesheet" href="/assets/css/chama-vela.css" />
+<style>.brand .chama-vela{--largura:24px;--altura:50px;flex:none;margin-right:2px}.boot-box .chama-vela{--largura:28px;--altura:58px}</style>
 <script>
   try {
     if (!sessionStorage.getItem('portal.boot') &&
@@ -31,7 +33,7 @@
   </div>
   <div class="brand-wrap">
     <div class="brand">
-      <div class="chama"><span></span><span></span><span></span></div>
+      <div class="chama-vela"><div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div></div>
       Irmandade • Portal
     </div>
     <a class="back" href="/index.html">⬅️ Voltar ao cartão</a>
@@ -217,7 +219,7 @@
 
 <div class="boot" id="boot" aria-hidden="true">
   <div class="boot-box">
-    <div class="chama"><span></span><span></span><span></span></div>
+    <div class="chama-vela"><div class="brasa"></div><div class="lingua"></div><div class="lingua"></div><div class="lingua"></div><div class="brilho"></div></div>
     <div class="boot-title">Sequência de Ignição</div>
     <ol class="boot-log" id="bootLog"></ol>
     <div class="boot-bar"><i id="bootBar"></i></div>
@@ -333,5 +335,6 @@
 </script>
 <!-- Cockpit: relógio, sons, controles, LEDs e sequência de ignição -->
 <script src="/assets/js/cockpit.js"></script>
+<script src="/assets/js/som-universo.js" defer></script>
 </body>
 </html>
