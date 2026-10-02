@@ -5,6 +5,10 @@
 // - Se existir /assets/audio/musica-jornada.mp3, toca a música (suave, em
 //   loop, continuando do ponto em que parou na página anterior).
 //   Sem o arquivo, usa o som sintetizado (acorde místico + sinos).
+// - A música passa por um GainNode (WebAudio): assim o volume funciona também
+//   no iPhone, que ignora audio.volume.
+// - Durante o efeito leitura (digitação ou voz) a música abaixa sozinha e
+//   volta suavemente quando a leitura termina.
 // - Os navegadores só liberam som depois de um toque/clique: se o início
 //   automático for bloqueado, o som começa no primeiro toque na página.
 // - Botão: qualquer elemento com [data-som-universo]; se a página não tiver
@@ -18,7 +22,10 @@
   const TIME_KEY = 'irmandade.somUniverso.t';   // posição da música
   const MUSIC_SRC = '/assets/audio/musica-jornada.mp3';
   const MUSIC_VOLUME = 0.22;
+  const MUSIC_DUCK = 0.06;     // volume enquanto há leitura
   const PAD_VOLUME = 0.55;
+  const PAD_DUCK = 0.18;
+  const DUCK_RELEASE_MS = 900; // espera antes de voltar ao volume normal
 
   const listeners = new Set();
   let on = readPref();
@@ -27,6 +34,8 @@
   let music = null;
   let ctx = null, master = null, padStarted = false, chimeTimer = 0;
   let fadeTimer = 0;
+  let musicGain = null, pauseTimer = 0;
+  let ducked = false, lastReadingAt = 0;
 
   function readPref() {
     try { return localStorage.getItem(PREF_KEY) !== 'off'; } catch { return true; }
@@ -125,6 +134,13 @@
   function fadeMusic(target, ms = 1800) {
     if (!music) return;
     clearInterval(fadeTimer);
+    clearTimeout(pauseTimer);
+    if (musicGain) {
+      musicGain.gain.cancelScheduledValues(ctx.currentTime);
+      musicGain.gain.setTargetAtTime(target, ctx.currentTime, ms / 3000);
+      if (target === 0) pauseTimer = setTimeout(() => { try { music.pause(); } catch {} }, ms + 200);
+      return;
+    }
     const start = music.volume, t0 = performance.now();
     fadeTimer = setInterval(() => {
       const k = Math.min(1, (performance.now() - t0) / ms);
@@ -152,11 +168,25 @@
             try { music.currentTime = t % (music.duration || Infinity); } catch {}
           }, { once: true });
         } catch {}
-        music.addEventListener('error', () => { mode = 'pad'; music = null; startSound(); }, { once: true });
+        music.addEventListener('error', () => { mode = 'pad'; music = null; musicGain = null; startSound(); }, { once: true });
+        if (ensureCtx()) {
+          try {
+            musicGain = ctx.createGain();
+            musicGain.gain.value = 0;
+            ctx.createMediaElementSource(music).connect(musicGain);
+            musicGain.connect(ctx.destination);
+            music.volume = 1;
+          } catch { musicGain = null; }
+        }
+      }
+      if (musicGain) {
+        // sem o contexto de áudio rodando a música sairia muda: espera o toque
+        try { if (ctx.state !== 'running') await ctx.resume(); } catch {}
+        if (ctx.state !== 'running') return false;
       }
       try {
         await music.play();
-        fadeMusic(MUSIC_VOLUME);
+        fadeMusic(targetVolume());
         started = true;
         return true;
       } catch {
@@ -169,7 +199,7 @@
     try { if (ctx.state === 'suspended') await ctx.resume(); } catch {}
     if (ctx.state !== 'running') return false;
     startPad();
-    master.gain.setTargetAtTime(PAD_VOLUME, ctx.currentTime, 0.8);
+    master.gain.setTargetAtTime(targetVolume(), ctx.currentTime, 0.8);
     clearInterval(chimeTimer);
     chimeTimer = setInterval(() => chime(Math.random() * 0.6 + 0.4), 5200);
     started = true;
@@ -185,17 +215,58 @@
   function setOn(v) {
     on = !!v;
     savePref();
-    if (on) startSound(); else stopSound();
+    if (on) { unlockInGesture(); startSound(); } else stopSound();
     emit();
     return on;
   }
 
+  // ---------- abaixa a música durante o efeito leitura ----------
+  function isReading() {
+    try {
+      if (window.speechSynthesis && window.speechSynthesis.speaking) return true;
+      if (window.JORNADA_NEURAL && typeof window.JORNADA_NEURAL.isPlaying === 'function' &&
+          window.JORNADA_NEURAL.isPlaying()) return true;
+      const typing = document.querySelectorAll('.typing-active');
+      for (const el of typing) if (el.getClientRects().length) return true;
+      for (const v of document.querySelectorAll('video')) {
+        if (!v.paused && !v.muted && !v.ended && v.volume > 0) return true;
+      }
+    } catch {}
+    return false;
+  }
+
+  function targetVolume() {
+    if (mode === 'music') return ducked ? MUSIC_DUCK : MUSIC_VOLUME;
+    return ducked ? PAD_DUCK : PAD_VOLUME;
+  }
+
+  function applyVolume(ms) {
+    if (!on || !started) return;
+    if (mode === 'music') { if (music && !music.paused) fadeMusic(targetVolume(), ms); }
+    else if (ctx && master) master.gain.setTargetAtTime(targetVolume(), ctx.currentTime, ms / 3000);
+  }
+
+  setInterval(() => {
+    const now = performance.now();
+    if (isReading()) lastReadingAt = now;
+    const want = now - lastReadingAt < DUCK_RELEASE_MS;
+    if (want !== ducked) {
+      ducked = want;
+      applyVolume(ducked ? 450 : 2200); // abaixa rápido, volta devagar
+    }
+  }, 200);
+
   // ---------- início automático / no primeiro toque ----------
+  // iPhone: o áudio só destrava se resume()/play() forem chamados ainda dentro do toque
+  function unlockInGesture() {
+    try { if (ensureCtx() && ctx.state !== 'running') ctx.resume(); } catch {}
+    try { if (mode === 'music' && music && music.paused) music.play().catch(() => {}); } catch {}
+  }
   function onFirstGesture() {
-    if (on && !isAudible()) startSound();
+    if (on && !isAudible()) { unlockInGesture(); startSound(); }
   }
   function isAudible() {
-    if (mode === 'music') return !!music && !music.paused;
+    if (mode === 'music') return !!music && !music.paused && (!musicGain || ctx.state === 'running');
     return !!ctx && ctx.state === 'running' && padStarted && on;
   }
   ['pointerdown', 'keydown', 'touchend'].forEach((ev) =>
@@ -212,7 +283,12 @@
     document.querySelectorAll('[data-som-universo]').forEach((b) => {
       b.setAttribute('aria-pressed', on ? 'true' : 'false');
       const label = b.querySelector('[data-som-label]');
-      if (label) label.textContent = on ? 'Som do Universo: ON' : 'Som do Universo: OFF';
+      if (label) {
+        label.textContent = mode === 'music'
+          ? (on ? 'Música: ON' : 'Sem música')
+          : (on ? 'Som do Universo: ON' : 'Som do Universo: OFF');
+      }
+      b.setAttribute('title', on ? 'Silenciar a música' : 'Ligar a música');
     });
   }
 
@@ -223,7 +299,7 @@
       b.type = 'button';
       b.className = 'som-universo-flutuante';
       b.setAttribute('data-som-universo', '');
-      b.setAttribute('aria-label', 'Ligar ou desligar o Som do Universo');
+      b.setAttribute('aria-label', 'Ligar ou silenciar a música');
       b.innerHTML = '<span class="dot" aria-hidden="true"></span><span data-som-label>Som do Universo: ON</span>';
       document.body.appendChild(b);
       injectFloatingStyle();
@@ -259,6 +335,9 @@
       .som-universo-flutuante .dot{width:8px;height:8px;border-radius:50%;background:#3a3a44}
       .som-universo-flutuante[aria-pressed="true"] .dot{background:#6dffb0;box-shadow:0 0 8px #6dffb0}
       @media (max-width:520px){ .som-universo-flutuante{right:10px;bottom:10px;padding:7px 10px;font-size:10px} }
+      /* na jornada o canto inferior direito é da chama: o botão vai para a esquerda */
+      body:has(#flame-bottom-right) .som-universo-flutuante{right:auto;left:14px}
+      @media (max-width:520px){ body:has(#flame-bottom-right) .som-universo-flutuante{left:10px} }
     `;
     document.head.appendChild(st);
   }
@@ -276,12 +355,14 @@
       modo: mode,
       tocando: isAudible(),
       posicaoMusica: music ? Number((music.currentTime || 0).toFixed(1)) : null,
-      volumeMusica: music ? Number(music.volume.toFixed(2)) : null
+      volumeMusica: music ? Number((musicGain ? musicGain.gain.value : music.volume).toFixed(2)) : null,
+      abaixadaPorLeitura: ducked
     })
   };
 
   function boot() {
     bindButtons();
+    musicAvailable().then((ok) => { if (mode === null) mode = ok ? 'music' : 'pad'; renderButtons(); });
     if (on) startSound(); // pode ser bloqueado: aí começa no primeiro toque
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
