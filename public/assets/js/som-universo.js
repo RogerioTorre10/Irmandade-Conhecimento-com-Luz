@@ -21,10 +21,13 @@
   const PREF_KEY = 'irmandade.somUniverso';     // 'on' | 'off'
   const TIME_KEY = 'irmandade.somUniverso.t';   // posição da música
   const MUSIC_SRC = '/assets/audio/musica-jornada.mp3';
-  const MUSIC_VOLUME = 0.22;
-  const MUSIC_DUCK = 0.06;     // volume enquanto há leitura
+  const MUSIC_VOLUME = 0.22;       // site e portal
+  const MUSIC_VOLUME_JORNADA = 0.15; // dentro das sections: mais suave
+  const MUSIC_DUCK_TYPING = 0.06;  // só a digitação (sem voz)
+  const MUSIC_DUCK_VOICE = 0.012;  // enquanto o guia fala: quase inaudível
   const PAD_VOLUME = 0.55;
-  const PAD_DUCK = 0.18;
+  const PAD_DUCK_TYPING = 0.18;
+  const PAD_DUCK_VOICE = 0.04;
   const DUCK_RELEASE_MS = 900; // espera antes de voltar ao volume normal
 
   const listeners = new Set();
@@ -35,7 +38,9 @@
   let ctx = null, master = null, padStarted = false, chimeTimer = 0;
   let fadeTimer = 0;
   let musicGain = null, pauseTimer = 0;
-  let ducked = false, lastReadingAt = 0;
+  let ducked = false;             // false | 'typing' | 'voice'
+  let lastTypingAt = 0, lastVoiceAt = 0;
+  const NA_JORNADA = /jornada/i.test(location.pathname);
 
   function readPref() {
     try { return localStorage.getItem(PREF_KEY) !== 'off'; } catch { return true; }
@@ -221,23 +226,39 @@
   }
 
   // ---------- abaixa a música durante o efeito leitura ----------
-  function isReading() {
+  // voz do guia (navegador ou neural) ou vídeo com som
+  function isVoice() {
     try {
       if (window.speechSynthesis && window.speechSynthesis.speaking) return true;
       if (window.JORNADA_NEURAL && typeof window.JORNADA_NEURAL.isPlaying === 'function' &&
           window.JORNADA_NEURAL.isPlaying()) return true;
-      const typing = document.querySelectorAll('.typing-active');
-      for (const el of typing) if (el.getClientRects().length) return true;
       for (const v of document.querySelectorAll('video')) {
         if (!v.paused && !v.muted && !v.ended && v.volume > 0) return true;
       }
     } catch {}
     return false;
   }
+  function isTyping() {
+    try {
+      for (const el of document.querySelectorAll('.typing-active')) if (el.getClientRects().length) return true;
+    } catch {}
+    return false;
+  }
 
   function targetVolume() {
-    if (mode === 'music') return ducked ? MUSIC_DUCK : MUSIC_VOLUME;
-    return ducked ? PAD_DUCK : PAD_VOLUME;
+    if (mode === 'music') {
+      if (ducked === 'voice') return MUSIC_DUCK_VOICE;
+      if (ducked === 'typing') return MUSIC_DUCK_TYPING;
+      return NA_JORNADA ? MUSIC_VOLUME_JORNADA : MUSIC_VOLUME;
+    }
+    if (ducked === 'voice') return PAD_DUCK_VOICE;
+    if (ducked === 'typing') return PAD_DUCK_TYPING;
+    return PAD_VOLUME;
+  }
+
+  function targetVolumeFor(state) {
+    const prev = ducked; ducked = state;
+    const v = targetVolume(); ducked = prev; return v;
   }
 
   function applyVolume(ms) {
@@ -248,11 +269,15 @@
 
   setInterval(() => {
     const now = performance.now();
-    if (isReading()) lastReadingAt = now;
-    const want = now - lastReadingAt < DUCK_RELEASE_MS;
+    if (isVoice()) lastVoiceAt = now;
+    if (isTyping()) lastTypingAt = now;
+    // a voz segura um pouco mais, para não "respirar" entre uma frase e outra
+    const want = now - lastVoiceAt < DUCK_RELEASE_MS + 600 ? 'voice'
+      : now - lastTypingAt < DUCK_RELEASE_MS ? 'typing' : false;
     if (want !== ducked) {
+      const descendo = targetVolumeFor(want) < targetVolume();
       ducked = want;
-      applyVolume(ducked ? 450 : 2200); // abaixa rápido, volta devagar
+      applyVolume(descendo ? 350 : 2600); // abaixa rápido, volta devagar
     }
   }, 200);
 
