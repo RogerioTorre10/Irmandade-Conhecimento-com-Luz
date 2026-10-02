@@ -359,6 +359,30 @@ footer,
   }
 }
 
+/* =====================================================
+   AURA DO PAINEL DURANTE A LEITURA / DATILOGRAFIA
+   Apenas visual — não interfere no fluxo da Jornada
+   ===================================================== */
+
+@keyframes auraPainelLeitura {
+  0%, 100% {
+    box-shadow:
+      0 0 18px rgba(212, 175, 55, 0.18),
+      0 0 36px rgba(255, 190, 60, 0.10);
+  }
+
+  50% {
+    box-shadow:
+      0 0 28px rgba(255, 220, 120, 0.42),
+      0 0 55px rgba(212, 175, 55, 0.25);
+  }
+}
+
+/* Acende o painel somente enquanto houver texto sendo datilografado */
+section:has(.typing-active) .j-panel-glow {
+  animation: auraPainelLeitura 2.4s ease-in-out infinite;
+}
+
 /* VIDEO TRANSIÇÃO — AMBIENT BLUR BLINDADO */
 #vt-overlay,
 .vt-video-overlay {
@@ -369,9 +393,37 @@ footer,
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  background: transparent !important;
+  /* fundo opaco: enquanto o vídeo carrega, nada da página aparece por baixo */
+  background: #05060c !important;
   overflow: hidden !important;
   z-index: 2147483647 !important;
+}
+
+/* Moldura "ambilight": contorna a tela inteira, em volta do vídeo desfocado.
+   Dourada antes da escolha do guia; depois, na cor do guia (--vt-ring). */
+#vt-overlay::after,
+.vt-video-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  border: 12px solid #d4af37;
+  border-image: linear-gradient(180deg, #f3d77a 0%, var(--vt-ring, #d4af37) 45%, var(--vt-ring, #d4af37) 100%) 1;
+  box-shadow:
+    inset 0 0 0 1px rgba(0,0,0,.55),
+    inset 0 0 40px rgba(212,175,55,.45);
+  box-shadow:
+    inset 0 0 0 1px rgba(0,0,0,.55),
+    inset 0 0 40px color-mix(in srgb, var(--vt-ring, #d4af37) 60%, transparent),
+    inset 0 0 120px color-mix(in srgb, var(--vt-ring, #d4af37) 30%, transparent);
+}
+
+@media (max-width: 767px) {
+  #vt-overlay::after,
+  .vt-video-overlay::after {
+    border-width: 7px;
+  }
 }
 
 #vt-ambient,
@@ -400,9 +452,17 @@ footer,
   overflow: hidden !important;
   border-radius: 18px !important;
   background: rgba(0, 0, 0, 0.12) !important;
+  /* aro externo: dourado antes da escolha do guia, na cor do guia depois.
+     A 1ª regra vale para navegadores antigos (sempre dourado). */
   box-shadow:
-    0 0 0 2px rgba(212,175,55,.82),
-    0 0 32px rgba(212,175,55,.35) !important;
+    0 0 0 3px rgba(212,175,55,.9),
+    0 0 36px rgba(212,175,55,.45) !important;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.65),
+    0 0 0 4px var(--vt-ring, #d4af37),
+    0 0 0 5px rgba(0,0,0,.45),
+    0 0 26px color-mix(in srgb, var(--vt-ring, #d4af37) 70%, transparent),
+    0 0 70px color-mix(in srgb, var(--vt-ring, #d4af37) 35%, transparent) !important;
 }
 
 #vt-video,
@@ -430,8 +490,8 @@ footer,
 @media (max-width: 767px) {
   #vt-frame,
   .vt-video-frame {
-    width: 98vw !important;
-    max-width: 98vw !important;
+    width: calc(100vw - 30px) !important;
+    max-width: calc(100vw - 30px) !important;
     min-height: 180px !important;
     aspect-ratio: 16 / 9 !important;
     border-radius: 16px !important;
