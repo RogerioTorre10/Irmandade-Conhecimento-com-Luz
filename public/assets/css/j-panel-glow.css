@@ -399,8 +399,10 @@
   will-change: opacity, filter, transform;
 }
 
+/* !important: o controlador grava opacity:1 direto no elemento ao fim de
+   cada navegação; durante o vídeo o conteúdo precisa continuar oculto */
 body.vt-fade-out #jornada-content-wrapper{
-  opacity: 0;
+  opacity: 0 !important;
   filter: blur(2px) brightness(.75);
   transform: translateY(6px) scale(0.995);
 }

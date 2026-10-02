@@ -58,6 +58,11 @@
     return ['section-intro', 'section-termos1', 'section-termos2'].includes(sectionId);
   }
 
+  // Sections que têm a própria datilografia + voz (section-termos1.js,
+  // section-termos2.js). O controlador NÃO deve digitar nelas também: as duas
+  // rotinas disputavam o mesmo título (ele parava em "Jor") e cortavam a voz.
+  const SECTIONS_COM_DATILOGRAFIA_PROPRIA = new Set(['section-termos1', 'section-termos2']);
+
   function getTypingNodes(root) {
     if (!root) return [];
     return Array.from(
@@ -152,6 +157,10 @@
   })();
 
   async function applyTypingAndTTS(sectionId, root, options = {}) {
+    if (SECTIONS_COM_DATILOGRAFIA_PROPRIA.has(sectionId)) {
+      console.log('[JC.applyTypingAndTTS] Section com datilografia própria, ignorando:', sectionId);
+      return;
+    }
     if (!root) return;
     if (window.__LANG_MODAL_OPEN__ || !window.__INTRO_LANG_CONFIRMED__) {
       console.log('[JC.applyTypingAndTTS] Aguardando confirmação do idioma.');
@@ -184,6 +193,12 @@
       }
       await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
       for (const el of typingElements) {
+        // A pessoa já foi para outra section: para de digitar/falar esta,
+        // senão ela continua em segundo plano e corta a voz da seguinte.
+        if (window.JC?.currentSection && window.JC.currentSection !== sectionId) {
+          console.log('[JC.applyTypingAndTTS] Section trocada; interrompendo:', sectionId);
+          break;
+        }
         const text = getText(el);
         if (!text) continue;
         el.dataset.text = text;
@@ -205,7 +220,9 @@
             {
               cursor: elementCursor,
               forceReplay: true,
-              kind: voiceKind
+              kind: voiceKind,
+              // só fala enquanto a pessoa ainda estiver nesta section
+              shouldContinue: () => !window.JC?.currentSection || window.JC.currentSection === sectionId
             }
           );
         } else if (typeof window.runTyping === 'function') {
