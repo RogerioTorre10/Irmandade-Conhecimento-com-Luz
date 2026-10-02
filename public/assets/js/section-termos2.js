@@ -275,6 +275,26 @@
 
     activateTypingAura(el);
 
+    // Fala e digitação juntas (sincronizadas) quando a voz está ligada.
+    if (speak && !el.dataset.spoken && typeof window.typeAndSpeak === 'function') {
+      try {
+        speechSynthesis.cancel?.();
+        await window.typeAndSpeak(el, normalizedText, speed, {
+          cursor: true,
+          forceReplay: true,
+          rate: voiceCtx?.rate ?? 1.05,
+          pitch: voiceCtx?.pitch ?? 1.0,
+          guide: voiceCtx?.guide ?? getActiveGuide()
+        });
+        el.dataset.spoken = 'true';
+        finishTypingAura(el);
+        await sleep(80);
+        return;
+      } catch (err) {
+        console.warn('[JCTermos2] typeAndSpeak falhou, usando caminho antigo:', err);
+      }
+    }
+
     let usedFallback = false;
 
     if (typeof window.runTyping === 'function') {
@@ -357,6 +377,9 @@
     await waitForTransitionUnlock();
     ensureVisible(root);
 
+    // espera o dicionário de tradução (no celular ele pode chegar depois);
+    // sem isso o título saía só com o texto reserva ("Jornada")
+    try { await window.i18n?.waitForReady?.(4000); } catch {}
     await applySectionI18n(root);
     await flushFrames(2);
 
