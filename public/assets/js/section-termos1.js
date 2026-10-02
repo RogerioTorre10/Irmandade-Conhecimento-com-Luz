@@ -555,16 +555,36 @@
     const root = node || document.getElementById(SECTION_ID);
     if (!root) return;
 
+    // Abertura repetida da mesma section (ex.: fim do vídeo + botão da
+    // section anterior): se já está lendo ou já leu, e a pessoa não saiu
+    // dela, não recomeça — evita título digitado e falado duas vezes.
+    const st = window.JCTermos1.state;
+    if (!st.__left && (st.__running || st.ready)) {
+      console.log('[JCTermos1] abertura repetida ignorada (leitura já em andamento/concluída)');
+      return;
+    }
+    st.__left = false;
+
     cancelAllSpeech();
     window.JCTermos1.state.initToken += 1;
     const myToken = window.JCTermos1.state.initToken;
 
-    initOnce(root, myToken);
+    st.__running = true;
+    Promise.resolve(initOnce(root, myToken)).finally(() => {
+      if (myToken === window.JCTermos1.state.initToken) st.__running = false;
+    });
   }
 
   function bind() {
     if (!window.JCTermos1.state.listenerOn) {
       document.addEventListener('section:shown', onSectionShown, { passive: true });
+      document.addEventListener('section:shown', (e) => {
+        const id = e?.detail?.sectionId;
+        if (id && id !== SECTION_ID) {
+          window.JCTermos1.state.__left = true;
+          window.JCTermos1.state.ready = false;
+        }
+      }, { passive: true });
       window.JCTermos1.state.listenerOn = true;
     }
   }
