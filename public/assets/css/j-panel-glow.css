@@ -399,8 +399,10 @@
   will-change: opacity, filter, transform;
 }
 
+/* !important: o controlador grava opacity:1 direto no elemento ao fim de
+   cada navegação; durante o vídeo o conteúdo precisa continuar oculto */
 body.vt-fade-out #jornada-content-wrapper{
-  opacity: 0;
+  opacity: 0 !important;
   filter: blur(2px) brightness(.75);
   transform: translateY(6px) scale(0.995);
 }
@@ -451,4 +453,107 @@ body.vt-fade-in #jornada-content-wrapper{
   html, body{
     overflow-x: hidden;
   }
+}
+
+
+/* ======================================================
+   PRESENÇA DO GUIA — luz de relâmpago sobre o painel da section
+   (posicionada por j-panel-glow.js; não interfere no layout)
+   ====================================================== */
+#guia-presenca{
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 50;
+  border-radius: 24px;
+  will-change: opacity, transform;
+  --presenca-cor: #d4af37;
+  /* navegadores antigos: sempre dourado */
+  box-shadow:
+    0 0 0 2px rgba(255,236,170,.85),
+    0 0 40px rgba(212,175,55,.85),
+    0 0 110px rgba(212,175,55,.55),
+    0 0 200px rgba(212,175,55,.30),
+    inset 0 0 50px rgba(212,175,55,.35);
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--presenca-cor) 50%, #fff 50%),
+    0 0 46px var(--presenca-cor),
+    0 0 130px color-mix(in srgb, var(--presenca-cor) 70%, transparent),
+    0 0 240px color-mix(in srgb, var(--presenca-cor) 42%, transparent),
+    inset 0 0 60px color-mix(in srgb, var(--presenca-cor) 45%, transparent);
+}
+
+/* aura larga em volta do painel */
+#guia-presenca .gp-halo{
+  position: absolute;
+  inset: -70px;
+  border-radius: 40%;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(212,175,55,.32) 30%, transparent 70%);
+  background: radial-gradient(ellipse at center, color-mix(in srgb, var(--presenca-cor) 48%, transparent) 30%, transparent 72%);
+}
+
+/* clarão do relâmpago: borda branca-quente e luz por dentro do painel */
+#guia-presenca .gp-raio{
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  pointer-events: none;
+  box-shadow:
+    0 0 0 2px #fff,
+    0 0 26px rgba(255,255,255,.95),
+    0 0 90px rgba(255,236,170,.85),
+    0 0 180px rgba(212,175,55,.6);
+  box-shadow:
+    0 0 0 2px #fff,
+    0 0 26px rgba(255,255,255,.95),
+    0 0 90px color-mix(in srgb, var(--presenca-cor) 70%, #fff 30%),
+    0 0 180px color-mix(in srgb, var(--presenca-cor) 60%, transparent);
+  background: radial-gradient(ellipse at 50% 35%, rgba(255,255,255,.22), transparent 70%);
+}
+
+/* reflexo do relâmpago na tela inteira */
+#guia-relampago{
+  position: fixed;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 49;
+  --presenca-cor: #d4af37;
+  --cx: 50%;
+  --cy: 50%;
+  background: radial-gradient(circle at var(--cx) var(--cy), rgba(255,240,200,.35), rgba(212,175,55,.18) 35%, transparent 70%);
+  background: radial-gradient(circle at var(--cx) var(--cy), color-mix(in srgb, var(--presenca-cor) 40%, #fff 25%), color-mix(in srgb, var(--presenca-cor) 20%, transparent) 35%, transparent 70%);
+  mix-blend-mode: screen;
+}
+
+
+/* ======================================================
+   BOTÃO PRONTO — avançar liberado depois da leitura
+   (classe aplicada por j-panel-glow.js em toda a jornada)
+   ====================================================== */
+@keyframes jornadaBtnPronto {
+  0%, 100% { filter: brightness(1.05) drop-shadow(0 0 6px var(--pronto-cor, #d4af37)) drop-shadow(0 0 14px var(--pronto-cor, #d4af37)); }
+  50%      { filter: brightness(1.22) drop-shadow(0 0 12px var(--pronto-cor, #d4af37)) drop-shadow(0 0 30px var(--pronto-cor, #d4af37)); }
+}
+:is(#section-intro, #section-termos1, #section-termos2, #section-senha, #section-guia,
+    #section-selfie, #section-card, #section-dados-pessoais, #section-final,
+    [id^="section-perguntas"]) .jornada-btn-pronto.jornada-btn-pronto,
+.jornada-btn-pronto.jornada-btn-pronto {
+  --pronto-cor: #d4af37;
+  animation: jornadaBtnPronto 1.8s ease-in-out infinite !important;
+  outline: 2px solid var(--pronto-cor) !important;
+  outline-offset: 3px !important;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.55),
+    0 0 18px var(--pronto-cor),
+    0 0 42px var(--pronto-cor) !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .jornada-btn-pronto.jornada-btn-pronto { animation: none !important; filter: brightness(1.12) drop-shadow(0 0 10px var(--pronto-cor, #d4af37)); }
 }
