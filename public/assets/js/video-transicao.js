@@ -115,6 +115,13 @@
       document.dispatchEvent(new CustomEvent('transition:ended'));
       window.dispatchEvent(new CustomEvent('jornada:transicao:end'));
 
+      // rede de segurança: a página nunca fica oculta depois do vídeo
+      setTimeout(() => {
+        if (!isPlaying && document.body.classList.contains('vt-fade-out')) {
+          document.body.classList.remove('vt-fade-out');
+        }
+      }, 1500);
+
       log('Overlay removido e estado resetado');
     } catch (e) {
       warn('Erro no cleanup:', e);
@@ -240,6 +247,55 @@
   return { overlay, frame, video, ambient, skip };
 }
 
+  const RING_GOLD = '#d4af37';
+  const RING_GUIDE_COLORS = { lumen: '#00ff9d', zion: '#00aaff', arian: '#ff00ff' };
+  // sections em que o guia ainda não foi escolhido nesta jornada
+  const RING_PRE_GUIDE = new Set([
+    'section-intro', 'section-termos1', 'section-termos2', 'section-senha'
+  ]);
+  // vídeos que levam a estas sections também acontecem antes da escolha
+  const RING_GOLD_NEXT = new Set([
+    'section-intro', 'section-termos1', 'section-termos2', 'section-senha', 'section-guia'
+  ]);
+  const RING_POST_GUIDE_PREFIXES = [
+    'section-guia', 'section-selfie', 'section-card', 'section-dados-pessoais',
+    'section-perguntas', 'section-final'
+  ];
+
+  function currentGuideKey() {
+    const raw = String(
+      document.body?.dataset?.guia ||
+      window.JORNADA_STATE?.guiaSelecionado ||
+      window.JORNADA_STATE?.guia ||
+      sessionStorage.getItem('JORNADA_GUIA') ||
+      sessionStorage.getItem('jornada.guia') ||
+      ''
+    ).toLowerCase();
+    if (raw.includes('lumen')) return 'lumen';
+    if (raw.includes('zion')) return 'zion';
+    if (raw.includes('arian') || raw.includes('arion')) return 'arian';
+    return '';
+  }
+
+  // Só usa a cor do guia quando temos certeza de que a jornada já passou
+  // da escolha do guia. Em qualquer dúvida, fica dourado.
+  function isAfterGuideChoice(nextSectionId) {
+    const current = String(window.JC?.currentSection || '');
+    const next = String(nextSectionId || '');
+    if (RING_PRE_GUIDE.has(current)) return false;
+    if (RING_GOLD_NEXT.has(next)) return false;
+    return RING_POST_GUIDE_PREFIXES.some((p) => current.startsWith(p)) ||
+           RING_POST_GUIDE_PREFIXES.some((p) => p !== 'section-guia' && next.startsWith(p));
+  }
+
+  function applyRingColor(target, nextSectionId) {
+    if (!target) return;
+    const guide = isAfterGuideChoice(nextSectionId) ? currentGuideKey() : '';
+    const color = RING_GUIDE_COLORS[guide] || RING_GOLD;
+    target.style.setProperty('--vt-ring', color);
+    target.dataset.ring = guide || 'gold';
+  }
+
   function playTransitionVideo(src, nextSectionId) {
     log('Recebido src:', src, 'nextSectionId:', nextSectionId);
 
@@ -271,6 +327,10 @@
 
     const { overlay, frame, video, ambient, skip } = buildPortal();
 
+    // Aro do vídeo: dourado até a escolha do guia; depois, na cor do guia.
+    // Só aparência — qualquer falha mantém o dourado e o vídeo segue normal.
+    try { applyRingColor(overlay, nextSectionId); } catch (_) {}
+
     overlay.style.opacity = '1';
     overlay.style.visibility = 'visible';
     overlay.style.pointerEvents = 'auto';
@@ -280,10 +340,18 @@
     const onResize = () => fitFrameToVideo(frame, video);
     window.addEventListener('resize', onResize);
 
+    // Ordem do encerramento (sem "vazar" section anterior nem a seguinte):
+    // 1) troca a section POR BAIXO do vídeo, com o conteúdo ainda oculto;
+    // 2) o vídeo esmaece até o escuro;
+    // 3) libera o fim da transição (as sections começam a leitura como antes);
+    // 4) só então a nova section aparece com o fade de entrada.
     const finishAndGo = safeOnce(() => {
       window.removeEventListener('resize', onResize);
 
+      try { video.pause(); } catch (_) {}
       try { ambient.pause(); } catch (_) {}
+
+      try { navigateTo(nextSectionId); } catch (e) { warn('Falha ao navegar sob o vídeo:', e); }
 
       overlay.classList.remove('show');
       overlay.classList.add('hide');
@@ -292,17 +360,17 @@
       setTimeout(() => {
         cleanup();
 
-        document.body.classList.remove('vt-fade-out');
-        document.body.classList.add('vt-fade-in');
-
-        setTimeout(() => {
-          navigateTo(nextSectionId);
-        }, 180);
-
-        setTimeout(() => {
-          document.body.classList.remove('vt-fade-in');
-        }, 650);
-      }, 900);
+        // dá tempo de a nova section (ou o novo bloco) desenhar antes de revelar
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          setTimeout(() => {
+            document.body.classList.remove('vt-fade-out');
+            document.body.classList.add('vt-fade-in');
+            setTimeout(() => {
+              document.body.classList.remove('vt-fade-in');
+            }, 650);
+          }, 160);
+        }));
+      }, 650);
     });
                                  
     skip.addEventListener('click', () => finishAndGo());
