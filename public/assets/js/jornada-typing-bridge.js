@@ -1154,8 +1154,12 @@ if (showCursor) element.appendChild(caret);
     // Voz neural: digitação acompanha a duração real do áudio.
     let neuralPlaying = false;
     let waitBaseMs = estimatedSpeechMs;
+    const stillHere = () => {
+      try { return typeof options.shouldContinue !== 'function' || options.shouldContinue() !== false; }
+      catch { return true; }
+    };
     const neuralAudio = await __prepareNeural(clean, lang, guide);
-    if (neuralAudio) {
+    if (neuralAudio && stillHere()) {
       const durMs = (neuralAudio.duration || 0) * 1000;
       if (isFinite(durMs) && durMs > 0) waitBaseMs = durMs;
       if (!options.speed && isFinite(durMs) && durMs > 0) {
@@ -1172,7 +1176,10 @@ if (showCursor) element.appendChild(caret);
     }
 
     let browserSpeech = null;
-    if (!neuralPlaying && window.speechSynthesis) {
+    if (!stillHere()) {
+      // a pessoa já saiu desta section: não fala (não corta a voz da seguinte)
+      speechDone = true;
+    } else if (!neuralPlaying && window.speechSynthesis) {
       try { speechSynthesis.cancel(); } catch {}
       speechDone = false;
       browserSpeech = __speakBrowserChunked(clean, {

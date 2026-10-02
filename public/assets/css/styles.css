@@ -393,7 +393,8 @@ section:has(.typing-active) .j-panel-glow {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  background: transparent !important;
+  /* fundo opaco: enquanto o vídeo carrega, nada da página aparece por baixo */
+  background: #05060c !important;
   overflow: hidden !important;
   z-index: 2147483647 !important;
 }

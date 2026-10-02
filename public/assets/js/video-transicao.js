@@ -115,6 +115,13 @@
       document.dispatchEvent(new CustomEvent('transition:ended'));
       window.dispatchEvent(new CustomEvent('jornada:transicao:end'));
 
+      // rede de segurança: a página nunca fica oculta depois do vídeo
+      setTimeout(() => {
+        if (!isPlaying && document.body.classList.contains('vt-fade-out')) {
+          document.body.classList.remove('vt-fade-out');
+        }
+      }, 1500);
+
       log('Overlay removido e estado resetado');
     } catch (e) {
       warn('Erro no cleanup:', e);
@@ -333,10 +340,18 @@
     const onResize = () => fitFrameToVideo(frame, video);
     window.addEventListener('resize', onResize);
 
+    // Ordem do encerramento (sem "vazar" section anterior nem a seguinte):
+    // 1) troca a section POR BAIXO do vídeo, com o conteúdo ainda oculto;
+    // 2) o vídeo esmaece até o escuro;
+    // 3) libera o fim da transição (as sections começam a leitura como antes);
+    // 4) só então a nova section aparece com o fade de entrada.
     const finishAndGo = safeOnce(() => {
       window.removeEventListener('resize', onResize);
 
+      try { video.pause(); } catch (_) {}
       try { ambient.pause(); } catch (_) {}
+
+      try { navigateTo(nextSectionId); } catch (e) { warn('Falha ao navegar sob o vídeo:', e); }
 
       overlay.classList.remove('show');
       overlay.classList.add('hide');
@@ -345,17 +360,17 @@
       setTimeout(() => {
         cleanup();
 
-        document.body.classList.remove('vt-fade-out');
-        document.body.classList.add('vt-fade-in');
-
-        setTimeout(() => {
-          navigateTo(nextSectionId);
-        }, 180);
-
-        setTimeout(() => {
-          document.body.classList.remove('vt-fade-in');
-        }, 650);
-      }, 900);
+        // dá tempo de a nova section (ou o novo bloco) desenhar antes de revelar
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          setTimeout(() => {
+            document.body.classList.remove('vt-fade-out');
+            document.body.classList.add('vt-fade-in');
+            setTimeout(() => {
+              document.body.classList.remove('vt-fade-in');
+            }, 650);
+          }, 160);
+        }));
+      }, 650);
     });
                                  
     skip.addEventListener('click', () => finishAndGo());
