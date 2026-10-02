@@ -29,8 +29,7 @@
     'section-intro',
     'section-termos1',
     'section-termos2',
-    'section-senha',
-    'section-final'
+    'section-senha'
   ];
 
   let lastShownSection = null;
@@ -57,11 +56,6 @@
   function isIntroLike(sectionId) {
     return ['section-intro', 'section-termos1', 'section-termos2'].includes(sectionId);
   }
-
-  // Sections que têm a própria datilografia + voz (section-termos1.js,
-  // section-termos2.js). O controlador NÃO deve digitar nelas também: as duas
-  // rotinas disputavam o mesmo título (ele parava em "Jor") e cortavam a voz.
-  const SECTIONS_COM_DATILOGRAFIA_PROPRIA = new Set(['section-termos1', 'section-termos2']);
 
   function getTypingNodes(root) {
     if (!root) return [];
@@ -157,10 +151,6 @@
   })();
 
   async function applyTypingAndTTS(sectionId, root, options = {}) {
-    if (SECTIONS_COM_DATILOGRAFIA_PROPRIA.has(sectionId)) {
-      console.log('[JC.applyTypingAndTTS] Section com datilografia própria, ignorando:', sectionId);
-      return;
-    }
     if (!root) return;
     if (window.__LANG_MODAL_OPEN__ || !window.__INTRO_LANG_CONFIRMED__) {
       console.log('[JC.applyTypingAndTTS] Aguardando confirmação do idioma.');
@@ -193,12 +183,6 @@
       }
       await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
       for (const el of typingElements) {
-        // A pessoa já foi para outra section: para de digitar/falar esta,
-        // senão ela continua em segundo plano e corta a voz da seguinte.
-        if (window.JC?.currentSection && window.JC.currentSection !== sectionId) {
-          console.log('[JC.applyTypingAndTTS] Section trocada; interrompendo:', sectionId);
-          break;
-        }
         const text = getText(el);
         if (!text) continue;
         el.dataset.text = text;
@@ -220,9 +204,7 @@
             {
               cursor: elementCursor,
               forceReplay: true,
-              kind: voiceKind,
-              // só fala enquanto a pessoa ainda estiver nesta section
-              shouldContinue: () => !window.JC?.currentSection || window.JC.currentSection === sectionId
+              kind: voiceKind
             }
           );
         } else if (typeof window.runTyping === 'function') {
@@ -333,39 +315,34 @@
   function jornadaTemAcessoValidado() {
     const authOk =
       localStorage.getItem('jornada_auth_ok') === '1';
-  
+
     const codigo =
       localStorage.getItem('jornada_codigo') ||
       sessionStorage.getItem('jornada.codigo_jornada') ||
       '';
-  
+
     const email =
       localStorage.getItem('jornada_email') ||
       sessionStorage.getItem('jornada.email') ||
       '';
-  
+
     const deadlineRaw =
       localStorage.getItem('jornada_deadline_at') ||
       '';
-  
+
     if (!authOk || !codigo || !email || !deadlineRaw) {
       return false;
     }
-  
-    const deadlineNumerico = Number(deadlineRaw);
-  
-    const deadline =
-      Number.isFinite(deadlineNumerico) && deadlineNumerico > 0
-        ? deadlineNumerico
-        : Date.parse(deadlineRaw);
-  
+
+    const deadline = Number(deadlineRaw);
+
     if (!Number.isFinite(deadline) || deadline <= 0) {
       return false;
     }
-  
+
     return Date.now() < deadline;
   }
-  
+
   async function show(sectionId, opts) {
     const force = !!(opts && opts.force);
     // Segurança: nenhuma seção privada pode ser aberta
@@ -564,35 +541,9 @@ const dentro72h =
         console.log('[JC][AUTO_RESTORE] Tentando retomar. Local:', secaoLocal);
 
         let secaoRemota = null;
-
         try {
-        
-          console.log(
-            '[JC][AUTO_RESTORE] Consultando checkpoint remoto...'
-          );
-        
-          const promiseRetomar =
-            window.JORNADA_SESSION?.retomar?.();
-        
-          const timeoutRetomar =
-            new Promise((_, reject) => {
-              setTimeout(() => {
-                reject(
-                  new Error('timeout_retomada_remota')
-                );
-              }, 5000);
-            });
-        
-          const retomada =
-            await Promise.race([
-              promiseRetomar,
-              timeoutRetomar
-            ]);
-        
-          console.log(
-            '[JC][RETOMADA]',
-            retomada
-          );
+          const retomada = await window.JORNADA_SESSION?.retomar?.();
+          console.log('[JC][RETOMADA]', retomada);
           if (retomada?.reason === 'reautenticacao_necessaria' || retomada?.reautenticacao_necessaria) {
             // Jornada em andamento porém sem dados novos salvos (página vazia
             // após a senha): NÃO devolver para a section-senha, pois ela recusa
@@ -616,59 +567,11 @@ const dentro72h =
             secaoRemota = retomada.last_section;
           }
         } catch (e) {
-
-          console.warn(
-            '[JC][AUTO_RESTORE][BACKEND_ERR]',
-            e
-          );
-        
-          const localOk =
-            secaoLocal &&
-            !SECOES_IGNORADAS_RESTORE.includes(
-              secaoLocal
-            );
-        
-          if (localOk) {
-        
-            console.log(
-              '[JC][AUTO_RESTORE] ' +
-              'Backend não concluiu a retomada; ' +
-              'usando checkpoint local:',
-              secaoLocal
-            );
-        
-            window.toast?.(
-              '✅ Sua jornada foi restaurada. Bem-vindo(a) de volta! 🙏',
-              'success'
-            );
-        
-            await show(
-              secaoLocal,
-              { force: true }
-            );
-        
-            isInitializing = false;
-            return;
-          }
-        
-          const fallback =
-            window.JORNADA_SESSION?.getInitialSection?.();
-        
-          if (
-            fallback &&
-            fallback !== 'section-intro'
-          ) {
-        
-            console.log(
-              '[JC] Usando snapshot local:',
-              fallback
-            );
-        
-            await show(
-              fallback,
-              { force: true }
-            );
-        
+          console.warn('[JC][AUTO_RESTORE][BACKEND_ERR]', e);
+          const fallback = window.JORNADA_SESSION?.getInitialSection?.();
+          if (fallback && fallback !== 'section-intro') {
+            console.log('[JC] Usando snapshot local:', fallback);
+            await show(fallback, { force: true });
             isInitializing = false;
             return;
           }
@@ -760,34 +663,6 @@ const dentro72h =
     }
   });
 
-  // ============================================================
-  // RETOMADA APÓS REAUTENTICAÇÃO — Safari/iOS
-  // ============================================================
-  document.addEventListener('jornada:reauth-success', (e) => {
-    const resume =
-      e?.detail?.resume_section ||
-      e?.detail?.last_section ||
-      localStorage.getItem('jornada_last_section');
-
-    if (!resume || SECOES_IGNORADAS_RESTORE.includes(resume)) return;
-
-    try {
-      sessionStorage.setItem('JORNADA_RESTORE_MODE', '1');
-    } catch (_) {}
-
-    // A section-senha pode terminar seu próprio fluxo no mesmo tick.
-    // Um pequeno defer garante que o checkpoint remoto seja a última navegação.
-    setTimeout(async () => {
-      try {
-        console.log('[JC][REAUTH_RESUME] Retomando checkpoint remoto:', resume);
-        await show(resume, { force: true });
-        window.toast?.('✅ Jornada restaurada no ponto em que você parou.', 'success');
-      } catch (err) {
-        console.warn('[JC][REAUTH_RESUME] falha ao abrir checkpoint:', err);
-      }
-    }, 120);
-  });
-
   window.JC = {
     ...existingJC,
     init,
@@ -796,5 +671,12 @@ const dentro72h =
     setOrder,
     attachButtonEvents,
     handleSectionLogic
-  };  
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init, { once: true });
+  } else {
+    init();
+  }
+
 })();
