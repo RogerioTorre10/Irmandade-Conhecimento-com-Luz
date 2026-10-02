@@ -452,3 +452,33 @@ body.vt-fade-in #jornada-content-wrapper{
     overflow-x: hidden;
   }
 }
+
+
+/* ======================================================
+   PRESENÇA DO GUIA — camada de luz sobre o painel da section
+   (posicionada por j-panel-glow.js; não interfere no layout)
+   ====================================================== */
+#guia-presenca{
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 50;
+  border-radius: 24px;
+  will-change: opacity, transform;
+  --presenca-cor: #d4af37;
+  /* navegadores antigos: sempre dourado */
+  box-shadow:
+    0 0 0 1px rgba(255,230,160,.55),
+    0 0 26px rgba(212,175,55,.55),
+    0 0 70px rgba(212,175,55,.30),
+    inset 0 0 26px rgba(212,175,55,.22);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--presenca-cor) 60%, #fff 40%),
+    0 0 26px color-mix(in srgb, var(--presenca-cor) 70%, transparent),
+    0 0 70px color-mix(in srgb, var(--presenca-cor) 38%, transparent),
+    inset 0 0 26px color-mix(in srgb, var(--presenca-cor) 26%, transparent);
+}

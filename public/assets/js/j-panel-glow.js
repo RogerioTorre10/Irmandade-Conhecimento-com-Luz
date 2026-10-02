@@ -96,3 +96,142 @@
   }
 
 })();
+
+
+// =====================================================
+// PRESENÇA DO GUIA — luz sobre o painel da section atual
+// Acende quando a leitura começa, cresce conforme o texto avança,
+// pulsa enquanto a voz fala e se apaga suavemente ao terminar.
+// Só visual: não altera o HTML das sections nem o fluxo da jornada.
+// =====================================================
+(function () {
+  'use strict';
+  if (window.__GUIA_PRESENCA__) return;
+  window.__GUIA_PRESENCA__ = true;
+
+  const GOLD = '#d4af37';
+  const GUIDE_COLORS = { lumen: '#00ff9d', zion: '#00aaff', arian: '#ff00ff' };
+  // até a escolha do guia (inclusive na própria section do guia) a luz é dourada
+  const PRE_GUIDE = new Set(['section-intro', 'section-termos1', 'section-termos2', 'section-senha', 'section-guia']);
+  const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+  let layer = null;
+  let value = 0;          // intensidade atual (0..1)
+  let running = false;
+  let lastColor = '';
+
+  function ensureLayer() {
+    if (layer && document.body.contains(layer)) return layer;
+    layer = document.createElement('div');
+    layer.id = 'guia-presenca';
+    layer.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(layer);
+    return layer;
+  }
+
+  function currentSectionEl() {
+    const id = window.JC?.currentSection;
+    const el = id ? document.getElementById(id) : null;
+    if (el) return el;
+    return document.querySelector('.typing-active')?.closest('section') || null;
+  }
+
+  function guideColor(sectionId) {
+    if (!sectionId || PRE_GUIDE.has(sectionId)) return GOLD;
+    const raw = String(
+      document.body?.dataset?.guia ||
+      window.JORNADA_STATE?.guiaSelecionado ||
+      sessionStorage.getItem('JORNADA_GUIA') ||
+      sessionStorage.getItem('jornada.guia') || ''
+    ).toLowerCase();
+    if (raw.includes('lumen')) return GUIDE_COLORS.lumen;
+    if (raw.includes('zion')) return GUIDE_COLORS.zion;
+    if (raw.includes('arian') || raw.includes('arion')) return GUIDE_COLORS.arian;
+    return GOLD;
+  }
+
+  function isVisible(el) {
+    if (!el) return false;
+    const r = el.getBoundingClientRect();
+    if (r.width < 40 || r.height < 40) return false;
+    const cs = getComputedStyle(el);
+    return cs.display !== 'none' && cs.visibility !== 'hidden' && Number(cs.opacity) > 0.05;
+  }
+
+  function targetPanel() {
+    const typing = document.querySelector('.typing-active');
+    const fromTyping = typing?.closest('.j-panel-glow');
+    if (isVisible(fromTyping)) return fromTyping;
+    const sec = currentSectionEl();
+    const panels = sec ? sec.querySelectorAll('.j-panel-glow') : [];
+    for (const p of panels) if (isVisible(p)) return p;
+    return null;
+  }
+
+  function speaking() {
+    try { if (window.JORNADA_NEURAL?.isPlaying?.()) return true; } catch {}
+    try { return !!window.speechSynthesis?.speaking; } catch { return false; }
+  }
+
+  // progresso da digitação do texto atual (0..1)
+  function typingProgress() {
+    const el = document.querySelector('.typing-active');
+    if (!el) return null;
+    const total = String(el.dataset?.text || el.getAttribute('data-text') || '').length;
+    if (!total) return 0.6;
+    return Math.min(1, (el.textContent || '').length / total);
+  }
+
+  function frame(t) {
+    const videoOn = !!document.getElementById('vt-overlay');
+    const prog = typingProgress();
+    const talking = speaking();
+    const reading = !videoOn && (prog !== null || talking);
+
+    // alvo: acende ao começar e cresce conforme o texto avança
+    let target = 0;
+    if (reading) target = prog !== null ? 0.45 + 0.55 * prog : 0.85;
+    value += (target - value) * (target > value ? 0.06 : 0.035);
+
+    const panel = value > 0.01 ? targetPanel() : null;
+    const L = ensureLayer();
+
+    if (!panel || value <= 0.01) {
+      L.style.opacity = '0';
+      if (!reading && value <= 0.01) { running = false; value = 0; return; }
+    } else {
+      const r = panel.getBoundingClientRect();
+      const cs = getComputedStyle(panel);
+      L.style.transform = `translate(${Math.round(r.left)}px, ${Math.round(r.top)}px)`;
+      L.style.width = `${Math.round(r.width)}px`;
+      L.style.height = `${Math.round(r.height)}px`;
+      L.style.borderRadius = cs.borderRadius || '24px';
+
+      const color = guideColor(window.JC?.currentSection || panel.closest('section')?.id);
+      if (color !== lastColor) { L.style.setProperty('--presenca-cor', color); lastColor = color; }
+
+      // pulsa com a voz (respiração suave)
+      const pulse = talking && !reduceMotion ? 0.86 + 0.14 * Math.sin(t / 230) : 1;
+      L.style.opacity = (value * pulse).toFixed(3);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function wake() {
+    if (running) return;
+    running = true;
+    requestAnimationFrame(frame);
+  }
+
+  // acorda quando algo começa a ser digitado ou falado
+  const obs = new MutationObserver((muts) => {
+    for (const m of muts) {
+      if (m.target?.classList?.contains('typing-active')) { wake(); return; }
+    }
+  });
+  function start() {
+    obs.observe(document.body, { subtree: true, attributes: true, attributeFilter: ['class'] });
+    setInterval(() => { if (!running && speaking()) wake(); }, 400);
+  }
+  if (document.body) start(); else document.addEventListener('DOMContentLoaded', start);
+})();
