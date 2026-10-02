@@ -859,7 +859,8 @@ if (showCursor) element.appendChild(caret);
 
   window.JORNADA_NEURAL = {
     enabled: __neuralEnabled,
-    stop: __stopNeural
+    stop: __stopNeural,
+    isPlaying: () => !!(__neural.current && !__neural.current.paused && !__neural.current.ended)
   };
 
   window.EffectCoordinator = window.EffectCoordinator || {};
