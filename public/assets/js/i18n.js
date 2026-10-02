@@ -26,6 +26,47 @@
     _langPromise: null
   };
 
+  // Textos locais adicionados para diferenciar claramente o e-mail que
+  // identifica/vincula a Jornada do e-mail usado apenas para reenvio.
+  // Os JSON externos continuam tendo prioridade quando possuírem essas chaves.
+  const LOCAL_OVERRIDES = {
+    'pt-BR': {
+      'senha.purchaseEmailHelp': 'Este e-mail identifica sua compra e vincula esta Jornada ao seu acesso.',
+      'senha.resendEmailHelp': 'Use este segundo e-mail somente para receber novamente o código válido. Ele é preenchido automaticamente, mas você pode corrigi-lo antes de reenviar.',
+      'senha.resendEmailPlaceholder': 'E-mail que receberá novamente o código...'
+    },
+    'en-US': {
+      'senha.purchaseEmailHelp': 'This email identifies your purchase and links this Journey to your access.',
+      'senha.resendEmailHelp': 'Use this second email only to receive the valid code again. It is filled automatically, but you can correct it before resending.',
+      'senha.resendEmailPlaceholder': 'Email that will receive the code again...'
+    },
+    'es-ES': {
+      'senha.purchaseEmailHelp': 'Este correo identifica tu compra y vincula esta Jornada con tu acceso.',
+      'senha.resendEmailHelp': 'Usa este segundo correo solo para recibir nuevamente el código válido. Se completa automáticamente, pero puedes corregirlo antes de reenviar.',
+      'senha.resendEmailPlaceholder': 'Correo que recibirá nuevamente el código...'
+    },
+    'fr-FR': {
+      'senha.purchaseEmailHelp': 'Cet e-mail identifie votre achat et associe ce Parcours à votre accès.',
+      'senha.resendEmailHelp': 'Utilisez ce deuxième e-mail uniquement pour recevoir à nouveau le code valide. Il est rempli automatiquement, mais vous pouvez le corriger avant le renvoi.',
+      'senha.resendEmailPlaceholder': 'E-mail qui recevra à nouveau le code...'
+    },
+    'ja-JP': {
+      'senha.purchaseEmailHelp': 'このメールアドレスで購入を確認し、この旅をあなたのアクセスに紐づけます。',
+      'senha.resendEmailHelp': '2つ目のメール欄は、有効なコードを再送する場合にのみ使用します。自動入力されますが、再送前に修正できます。',
+      'senha.resendEmailPlaceholder': 'コードを再受信するメールアドレス...'
+    },
+    'zh-CN': {
+      'senha.purchaseEmailHelp': '此电子邮箱用于识别您的购买记录，并将本次旅程与您的访问权限关联。',
+      'senha.resendEmailHelp': '第二个邮箱仅用于重新接收有效代码。系统会自动填写，您也可以在重发前修改。',
+      'senha.resendEmailPlaceholder': '重新接收代码的电子邮箱...'
+    },
+    'de-DE': {
+      'senha.purchaseEmailHelp': 'Diese E-Mail identifiziert Ihren Kauf und verknüpft diese Reise mit Ihrem Zugang.',
+      'senha.resendEmailHelp': 'Verwenden Sie diese zweite E-Mail nur, um den gültigen Code erneut zu erhalten. Sie wird automatisch ausgefüllt, kann aber vor dem erneuten Senden geändert werden.',
+      'senha.resendEmailPlaceholder': 'E-Mail für den erneuten Code-Empfang...'
+    }
+  };
+
   window.__I18N_DICT_CACHE__ = window.__I18N_DICT_CACHE__ || {};
   const DICT_CACHE = window.__I18N_DICT_CACHE__;
 
@@ -242,6 +283,10 @@
     }
     if (val == null && state.dict && typeof state.dict === 'object') {
       val = getByPath(state.dict.messages, key);
+    }
+
+    if (val == null) {
+      val = LOCAL_OVERRIDES[state.lang]?.[key];
     }
 
     if (typeof val === 'string' || typeof val === 'number') {
