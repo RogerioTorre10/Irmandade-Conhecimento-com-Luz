@@ -33,8 +33,10 @@
   try { track = Math.abs(Number(sessionStorage.getItem(TRACK_KEY)) || 0) % PLAYLIST.length; } catch {}
   let trackErrors = 0;
   // Níveis com o controle deslizante em 100%; o controle multiplica todos eles.
-  const MUSIC_VOLUME = 0.2;          // site e portal
-  const MUSIC_VOLUME_JORNADA = 0.13; // dentro das sections: mais suave
+  // Sem fala há folga para aumentar: no padrão (70%) fica um pouco acima do
+  // que era antes, e o participante pode subir até 100% para curtir a música.
+  const MUSIC_VOLUME = 0.4;          // site e portal (padrão 70% → 0,28)
+  const MUSIC_VOLUME_JORNADA = 0.3;  // sections sem fala (padrão 70% → 0,21)
   const MUSIC_DUCK_TYPING = 0.04;    // só a digitação (sem voz)
   const MUSIC_DUCK_VOICE = 0.005;    // enquanto o guia fala: praticamente inaudível
   const VOL_KEY = 'irmandade.somUniverso.vol'; // posição do controle (0..1)
