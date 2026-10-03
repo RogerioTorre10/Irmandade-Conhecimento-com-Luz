@@ -478,13 +478,13 @@ body.vt-fade-in #jornada-content-wrapper{
     0 0 40px rgba(212,175,55,.85),
     0 0 110px rgba(212,175,55,.55),
     0 0 200px rgba(212,175,55,.30),
-    inset 0 0 50px rgba(212,175,55,.35);
+    inset 0 0 40px rgba(212,175,55,.2);
   box-shadow:
     0 0 0 3px color-mix(in srgb, var(--presenca-cor) 50%, #fff 50%),
     0 0 46px var(--presenca-cor),
     0 0 130px color-mix(in srgb, var(--presenca-cor) 70%, transparent),
     0 0 240px color-mix(in srgb, var(--presenca-cor) 42%, transparent),
-    inset 0 0 60px color-mix(in srgb, var(--presenca-cor) 45%, transparent);
+    inset 0 0 40px color-mix(in srgb, var(--presenca-cor) 20%, transparent);
 }
 
 /* aura larga em volta do painel */
@@ -493,8 +493,9 @@ body.vt-fade-in #jornada-content-wrapper{
   inset: -70px;
   border-radius: 40%;
   pointer-events: none;
-  background: radial-gradient(ellipse at center, rgba(212,175,55,.32) 30%, transparent 70%);
-  background: radial-gradient(ellipse at center, color-mix(in srgb, var(--presenca-cor) 48%, transparent) 30%, transparent 72%);
+  /* centro transparente: a aura fica em volta do painel, sem véu sobre o texto */
+  background: radial-gradient(ellipse at center, transparent 42%, rgba(212,175,55,.28) 56%, transparent 72%);
+  background: radial-gradient(ellipse at center, transparent 42%, color-mix(in srgb, var(--presenca-cor) 42%, transparent) 56%, transparent 72%);
 }
 
 /* clarão do relâmpago: borda branca-quente e luz por dentro do painel */
@@ -510,11 +511,11 @@ body.vt-fade-in #jornada-content-wrapper{
     0 0 90px rgba(255,236,170,.85),
     0 0 180px rgba(212,175,55,.6);
   box-shadow:
-    0 0 0 2px #fff,
-    0 0 26px rgba(255,255,255,.95),
+    0 0 0 2px rgba(255,255,255,.85),
+    0 0 22px rgba(255,255,255,.55),
     0 0 90px color-mix(in srgb, var(--presenca-cor) 70%, #fff 30%),
     0 0 180px color-mix(in srgb, var(--presenca-cor) 60%, transparent);
-  background: radial-gradient(ellipse at 50% 35%, rgba(255,255,255,.22), transparent 70%);
+  background: radial-gradient(ellipse at 50% 35%, rgba(255,255,255,.07), transparent 70%);
 }
 
 /* reflexo do relâmpago na tela inteira */

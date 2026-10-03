@@ -113,6 +113,10 @@
   const GUIDE_COLORS = { lumen: '#00ff9d', zion: '#00aaff', arian: '#ff00ff' };
   // até a escolha do guia (inclusive na própria section do guia) a luz é dourada
   const PRE_GUIDE = new Set(['section-intro', 'section-termos1', 'section-termos2', 'section-senha', 'section-guia']);
+  // intensidade do clarão do "trovão" (antes: 0.6 / 1 / 0.8)
+  const FLASH_PAINEL = 0.28;
+  const FLASH_RAIO = 0.45;
+  const FLASH_CEU = 0.3;
   const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
   let layer = null;
@@ -321,12 +325,13 @@
           ? 0.8 + 0.2 * wordPulse
           : 0.82 + 0.18 * Math.sin(t / 210);
       }
-      L.style.opacity = Math.min(1, value * pulse + flash * 0.6).toFixed(3);
-      if (raio) raio.style.opacity = (flash * Math.min(1, value + 0.3)).toFixed(3);
+      // trovão suave: o clarão acompanha a voz sem ofuscar o texto
+      L.style.opacity = Math.min(1, value * pulse + flash * FLASH_PAINEL).toFixed(3);
+      if (raio) raio.style.opacity = (flash * FLASH_RAIO * Math.min(1, value + 0.3)).toFixed(3);
       if (ceu) {
         ceu.style.setProperty('--cx', `${Math.round(r.left + r.width / 2)}px`);
         ceu.style.setProperty('--cy', `${Math.round(r.top + r.height / 2)}px`);
-        ceu.style.opacity = (flash * 0.8).toFixed(3);
+        ceu.style.opacity = (flash * FLASH_CEU).toFixed(3);
       }
     }
     requestAnimationFrame(frame);
