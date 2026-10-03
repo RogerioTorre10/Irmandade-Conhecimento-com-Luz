@@ -2,8 +2,9 @@
 // SOM DO UNIVERSO — trilha ambiente do site e do portal
 //
 // - Ligado por padrão ("ON"); a escolha da pessoa fica guardada.
-// - Se existir /assets/audio/musica-jornada.mp3, toca a música (suave, em
-//   loop, continuando do ponto em que parou na página anterior).
+// - Toca as músicas da trilha (suaves) uma depois da outra, sem parar:
+//   quando uma termina, começa a outra. Ao trocar de página continua na
+//   mesma música e no mesmo ponto.
 //   Sem o arquivo, usa o som sintetizado (acorde místico + sinos).
 // - A música passa por um GainNode (WebAudio): assim o volume funciona também
 //   no iPhone, que ignora audio.volume.
@@ -20,7 +21,16 @@
 
   const PREF_KEY = 'irmandade.somUniverso';     // 'on' | 'off'
   const TIME_KEY = 'irmandade.somUniverso.t';   // posição da música
-  const MUSIC_SRC = '/assets/audio/musica-jornada.mp3';
+  const TRACK_KEY = 'irmandade.somUniverso.faixa'; // qual música está tocando
+  // "O Pleno Existencial" — versões autorais (Suno), tocadas em sequência
+  const PLAYLIST = [
+    '/assets/audio/musica-jornada-1.mp3', // Soleil de fin de journée
+    '/assets/audio/musica-jornada-2.mp3'  // Violino e Saxofone
+  ];
+  const MUSIC_SRC = PLAYLIST[0];
+  let track = 0;
+  try { track = Math.abs(Number(sessionStorage.getItem(TRACK_KEY)) || 0) % PLAYLIST.length; } catch {}
+  let trackErrors = 0;
   const MUSIC_VOLUME = 0.22;       // site e portal
   const MUSIC_VOLUME_JORNADA = 0.15; // dentro das sections: mais suave
   const MUSIC_DUCK_TYPING = 0.06;  // só a digitação (sem voz)
@@ -163,9 +173,12 @@
 
     if (mode === 'music') {
       if (!music) {
-        music = new Audio(MUSIC_SRC);
-        music.loop = true;
+        music = new Audio(PLAYLIST[track]);
+        music.loop = PLAYLIST.length === 1;
         music.preload = 'auto';
+        // terminou uma música: começa a próxima (volta à primeira no fim)
+        music.addEventListener('ended', () => nextTrack());
+        music.addEventListener('playing', () => { trackErrors = 0; });
         music.volume = 0;
         try {
           const t = Number(sessionStorage.getItem(TIME_KEY) || 0);
@@ -173,7 +186,13 @@
             try { music.currentTime = t % (music.duration || Infinity); } catch {}
           }, { once: true });
         } catch {}
-        music.addEventListener('error', () => { mode = 'pad'; music = null; musicGain = null; startSound(); }, { once: true });
+        // uma faixa com problema: tenta a próxima; se nenhuma tocar, usa o som sintetizado
+        music.addEventListener('error', () => {
+          trackErrors++;
+          if (trackErrors < PLAYLIST.length) { nextTrack(); return; }
+          try { music.pause(); } catch {}
+          mode = 'pad'; music = null; musicGain = null; startSound();
+        });
         if (ensureCtx()) {
           try {
             musicGain = ctx.createGain();
@@ -209,6 +228,21 @@
     chimeTimer = setInterval(() => chime(Math.random() * 0.6 + 0.4), 5200);
     started = true;
     return true;
+  }
+
+  function nextTrack() {
+    if (!music) return;
+    track = (track + 1) % PLAYLIST.length;
+    try {
+      sessionStorage.setItem(TRACK_KEY, String(track));
+      sessionStorage.setItem(TIME_KEY, '0');
+    } catch {}
+    music.src = PLAYLIST[track];
+    try { music.load(); } catch {}
+    if (on) {
+      const p = music.play();
+      if (p && p.catch) p.catch(() => {});
+    }
   }
 
   function stopSound() {
@@ -300,7 +334,12 @@
 
   // guarda a posição da música para continuar na próxima página
   window.addEventListener('pagehide', () => {
-    try { if (music && !music.paused) sessionStorage.setItem(TIME_KEY, String(music.currentTime || 0)); } catch {}
+    try {
+      if (music && !music.paused) {
+        sessionStorage.setItem(TIME_KEY, String(music.currentTime || 0));
+        sessionStorage.setItem(TRACK_KEY, String(track));
+      }
+    } catch {}
   });
 
   // ---------- botões ----------
@@ -379,6 +418,7 @@
       ligado: on,
       modo: mode,
       tocando: isAudible(),
+      faixa: mode === 'music' ? track + 1 : null,
       posicaoMusica: music ? Number((music.currentTime || 0).toFixed(1)) : null,
       volumeMusica: music ? Number((musicGain ? musicGain.gain.value : music.volume).toFixed(2)) : null,
       abaixadaPorLeitura: ducked
