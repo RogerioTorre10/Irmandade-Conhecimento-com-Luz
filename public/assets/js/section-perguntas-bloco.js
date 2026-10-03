@@ -2675,7 +2675,15 @@ function bindButtons(section, bloco, perguntaText, qIndex = 0) {
       questionEl.style.display = 'block';
       questionEl.style.visibility = 'visible';
       questionEl.style.opacity = '1';
+      // Reserva já a altura da pergunta inteira (com o cursor): a caixa não
+      // cresce linha a linha durante a datilografia e o conteúdo não "dança".
       questionEl.style.minHeight = '42px';
+      try {
+        questionEl.textContent = `${perguntaText} |`;
+        const h = questionEl.getBoundingClientRect().height;
+        if (h > 42) questionEl.style.minHeight = `${Math.ceil(h)}px`;
+      } catch {}
+      questionEl.textContent = '';
       questionEl.setAttribute('data-typing', 'true');
       await typeQuestion(questionEl, perguntaText, 28, true);
     }
