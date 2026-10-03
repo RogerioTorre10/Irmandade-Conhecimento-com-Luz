@@ -1176,3 +1176,34 @@ section[id^="section-perguntas-"].is-block-feedback-mode .j-panel-glow {
   transition: width .8s ease;
 }
 #progress-question-fill { transition: width .6s ease; }
+
+/* ===========================================================
+   CELULAR — painel das perguntas mais largo
+   (menos moldura em volta: o texto ganha largura e o painel
+   fica menos comprido; só espaçamentos, nada de fluxo)
+   =========================================================== */
+@media (max-width: 600px) {
+  section[id^="section-perguntas-"] .j-panel-glow.perguntas-panel {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+  }
+  section[id^="section-perguntas-"] .j-perg-v-inner {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+  }
+  section[id^="section-perguntas-"] .j-arcane-card.perguntas-wrap {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+  /* moldura externa mais fina só enquanto as perguntas estão na tela */
+  #jornada-canvas:has(section[id^="section-perguntas-"]:not([hidden]):not(.hidden)) {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+  /* título do bloco: cabe numa linha nos nomes curtos, quebra nos longos */
+  section[id^="section-perguntas-"] .perguntas-title {
+    font-size: clamp(1.3rem, 7vw, 1.8rem) !important;
+    letter-spacing: 0.02em !important;
+    line-height: 1.15 !important;
+  }
+}
