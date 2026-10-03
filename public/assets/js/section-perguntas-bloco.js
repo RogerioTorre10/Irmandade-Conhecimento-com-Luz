@@ -403,6 +403,7 @@
 
     if (!content) {
       box.hidden = true;
+      box.style.minHeight = '';
       box.textContent = '';
       box.innerHTML = '';
       box.classList.remove('is-visible', 'is-revealing', 'oracle-ready');
@@ -429,6 +430,10 @@
 
     const lines = content.split('\n').filter(Boolean);
     if (!lines.length) lines.push(content);
+
+    // Reserva já a altura final da caixa: assim ela não cresce linha a linha
+    // durante a datilografia e o painel inteiro não fica "balançando".
+    reserveResponseHeight(box, lines);
 
     for (let i = 0; i < lines.length; i++) {
       const lineEl = document.createElement('div');
@@ -460,6 +465,29 @@
     return true;
   }
 
+  function reserveResponseHeight(box, lines) {
+    try {
+      box.style.minHeight = '';
+      const ghost = document.createDocumentFragment();
+      lines.forEach((line) => {
+        const el = document.createElement('div');
+        el.className = 'ai-line oracle-line';
+        el.style.visibility = 'hidden';
+        el.textContent = line;
+        ghost.appendChild(el);
+      });
+      box.appendChild(ghost);
+      const cs = getComputedStyle(box);
+      const maxH = parseFloat(cs.maxHeight);
+      const needed = box.scrollHeight + (parseFloat(cs.borderTopWidth) || 0) + (parseFloat(cs.borderBottomWidth) || 0);
+      const alvo = Number.isFinite(maxH) ? Math.min(needed, maxH) : needed;
+      box.innerHTML = '';
+      if (alvo > 0) box.style.minHeight = `${Math.ceil(alvo)}px`;
+    } catch {
+      box.innerHTML = '';
+    }
+  }
+
   // Exibe uma devolutiva já consumida/restaurada SEM TTS e SEM datilografia.
   // Usada somente no caminho de retomada para não obrigar o participante
   // a ouvir novamente conteúdo que já foi entregue.
@@ -477,6 +505,7 @@
     wrap.dataset.kind = kind;
     wrap.dataset.responseText = content;
     box.hidden = false;
+    box.style.minHeight = '';
     box.textContent = content;
     box.classList.remove('is-revealing');
     box.classList.add('is-visible', 'oracle-ready');
