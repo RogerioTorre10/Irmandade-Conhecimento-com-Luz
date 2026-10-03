@@ -22,10 +22,11 @@
   const PREF_KEY = 'irmandade.somUniverso';     // 'on' | 'off'
   const TIME_KEY = 'irmandade.somUniverso.t';   // posição da música
   const TRACK_KEY = 'irmandade.somUniverso.faixa'; // qual música está tocando
-  // "O Pleno Existencial" — versões autorais (Suno), tocadas em sequência
+  // "O Pleno Existencial" — versões autorais criadas no Suno Pro
+  // (uso comercial), tocadas em sequência
   const PLAYLIST = [
-    '/assets/audio/musica-jornada-1.mp3', // Soleil de fin de journée
-    '/assets/audio/musica-jornada-2.mp3'  // Violino e Saxofone
+    '/assets/audio/musica-jornada-1.mp3', // versão piano
+    '/assets/audio/musica-jornada-2.mp3'  // versão violino
   ];
   const MUSIC_SRC = PLAYLIST[0];
   let track = 0;
