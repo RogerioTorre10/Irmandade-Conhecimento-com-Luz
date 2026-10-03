@@ -82,11 +82,16 @@
   let __voicesPromise = null;
   const __voiceCache = new Map();
 
+  // Personalidade de cada voz:
+  // - cerimonial (narrador até a escolha do guia): grave, suave e acolhedor
+  // - zion: jovem adulto, firme, consistente e impactante
+  // - lumen: madura, acolhedora e firme (diretora de escola/universidade)
+  // - arian: jovem, firme e impositiva (apresentadora de jornal do horário nobre)
   const GUIDE_VOICE_PROFILE = {
    cerimonial: { gender: 'male',   style: 'baritone' },
    zion:       { gender: 'male',   style: 'imperial' },
-   lumen:      { gender: 'female', style: 'bright' },
-   arian:      { gender: 'female', style: 'counselor' }
+   lumen:      { gender: 'female', style: 'counselor' },
+   arian:      { gender: 'female', style: 'bright' }
  };
 
   const CEREMONIAL_SECTION_IDS = new Set([
@@ -882,36 +887,68 @@ if (showCursor) element.appendChild(caret);
   else if (L.startsWith('en')) baseRate = 1.0;
   else if (L.startsWith('de')) baseRate = 0.96;
 
+  // narrador: mais grave e mais calmo (suave, acolhedor)
   if (g === 'cerimonial') {
     return {
-      rate: Math.max(0.82, baseRate - 0.10),
-      pitch: 0.86,
+      rate: Math.max(0.80, baseRate - 0.13),
+      pitch: 0.76,
       volume: 1.0
     };
   }
 
+  // Zion escolhido: jovem adulto — menos grave que o narrador, ritmo firme
   if (g === 'zion') {
     return {
-      rate: Math.max(0.86, baseRate - 0.07),
-      pitch: 0.78,
+      rate: Math.max(0.90, baseRate - 0.03),
+      pitch: 0.9,
       volume: 1.0
     };
   }
 
+  // Arian: jovem, firme e impositiva — ritmo de telejornal, tom limpo
   if (g === 'arian') {
     return {
-      rate: Math.max(0.90, baseRate - 0.02),
-      pitch: 1.18,
+      rate: Math.min(1.06, baseRate + 0.02),
+      pitch: 1.06,
       volume: 1.0
     };
   }
 
+  // Lumen: madura, acolhedora e firme — tom mais baixo e pausado
   return {
-    rate: Math.min(1.08, baseRate + 0.03),
-    pitch: 1.14,
+    rate: Math.max(0.86, baseRate - 0.06),
+    pitch: 0.96,
     volume: 1.0
   };
 }
+
+  // =========================================================
+  // AFINAÇÃO ÚNICA DAS VOZES
+  // Algumas sections ainda definem pitch/rate próprios. Aqui toda fala
+  // da jornada passa a usar a personalidade do guia (getGuideSpeechTuning),
+  // para a voz ser a mesma do começo ao fim.
+  // =========================================================
+  try {
+    const ss = window.speechSynthesis;
+    if (ss && !ss.__afinacaoGuia && typeof ss.speak === 'function') {
+      const prevSpeak = ss.speak;
+      ss.speak = function (u) {
+        try {
+          if (u && !u.__semAfinacao) {
+            const guide = u.__guia || __resolveSpeechGuide(null, null);
+            const t = getGuideSpeechTuning(guide, u.lang || getLangNow());
+            u.rate = t.rate;
+            u.pitch = t.pitch;
+          }
+        } catch {}
+        return prevSpeak.apply(this, arguments);
+      };
+      ss.__afinacaoGuia = true;
+    }
+  } catch {}
+
+  window.JORNADA_TTS = window.JORNADA_TTS || {};
+  window.JORNADA_TTS.tuning = (guide) => getGuideSpeechTuning(__resolveSpeechGuide(guide, null), getLangNow());
 
   // =========================================================
   // FALA EM PEDAÇOS (voz do navegador)
@@ -989,6 +1026,7 @@ if (showCursor) element.appendChild(caret);
         if (i > 0) { u.voice = probe.voice; u.lang = probe.lang; }
         u.rate = cfg.rate ?? 1;
         u.pitch = cfg.pitch ?? 1;
+        u.__guia = __resolveSpeechGuide(cfg.guide, null);
         u.volume = cfg.volume ?? 1;
         if (i === 0) u.onstart = () => { try { cfg.onStart?.(); } catch {} };
         u.onboundary = () => { try { window.Luz?.startPulse({ min: 1, max: 1.45, speed: 120 }); } catch {} };
@@ -1045,7 +1083,7 @@ if (showCursor) element.appendChild(caret);
         if (!audio) return false;
         const durMs = isFinite(audio.duration) && audio.duration > 0
           ? audio.duration * 1000
-          : __estimateSpeechMs(clean, options.rate ?? tuning.rate, lang);
+          : __estimateSpeechMs(clean, tuning.rate, lang);
         const neuralSafety = setTimeout(resolveSpeak, durMs * 1.3 + 3000);
         return __playNeural(audio, () => { clearTimeout(neuralSafety); resolveSpeak(); })
           .then(ok => { if (!ok) clearTimeout(neuralSafety); return ok; });
@@ -1058,8 +1096,8 @@ if (showCursor) element.appendChild(caret);
       __speakBrowserChunked(clean, {
         lang,
         guide,
-        rate: options.rate ?? tuning.rate,
-        pitch: options.pitch ?? tuning.pitch,
+        rate: tuning.rate,
+        pitch: tuning.pitch,
         volume: options.volume ?? tuning.volume,
         onStart: () => typingLog('TTS iniciou', { lang, guide }),
         onEnd: () => { try { window.Luz?.stopPulse(); } catch {} }
@@ -1070,8 +1108,8 @@ if (showCursor) element.appendChild(caret);
     function __speakBrowserLegacy() {
     const utt = new SpeechSynthesisUtterance(clean);
     utt.lang = lang;
-    utt.rate = options.rate ?? tuning.rate;
-    utt.pitch = options.pitch ?? tuning.pitch;
+    utt.rate = tuning.rate;
+    utt.pitch = tuning.pitch;
     utt.volume = options.volume ?? tuning.volume;
 
     utt.onstart = () => {
@@ -1146,7 +1184,7 @@ if (showCursor) element.appendChild(caret);
     let utt = null;
 
     const chars = clean.length;
-    const speechRate = options.rate ?? tuning.rate;
+    const speechRate = tuning.rate;
     const estimatedSpeechMs = __estimateSpeechMs(clean, speechRate, lang);
 
     // digitação no ritmo estimado da fala (antes havia teto de 9 s,
@@ -1190,7 +1228,7 @@ if (showCursor) element.appendChild(caret);
         lang,
         guide,
         rate: speechRate,
-        pitch: options.pitch ?? tuning.pitch,
+        pitch: tuning.pitch,
         volume: options.volume ?? tuning.volume,
         onStart: () => typingLog('typeAndSpeak iniciou', { lang, guide, typingSpeed })
       }).then(() => { speechDone = true; });
