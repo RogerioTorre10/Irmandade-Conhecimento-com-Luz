@@ -32,10 +32,13 @@
   let track = 0;
   try { track = Math.abs(Number(sessionStorage.getItem(TRACK_KEY)) || 0) % PLAYLIST.length; } catch {}
   let trackErrors = 0;
-  const MUSIC_VOLUME = 0.22;       // site e portal
-  const MUSIC_VOLUME_JORNADA = 0.15; // dentro das sections: mais suave
-  const MUSIC_DUCK_TYPING = 0.06;  // só a digitação (sem voz)
-  const MUSIC_DUCK_VOICE = 0.012;  // enquanto o guia fala: quase inaudível
+  // Níveis com o controle deslizante em 100%; o controle multiplica todos eles.
+  const MUSIC_VOLUME = 0.2;          // site e portal
+  const MUSIC_VOLUME_JORNADA = 0.13; // dentro das sections: mais suave
+  const MUSIC_DUCK_TYPING = 0.04;    // só a digitação (sem voz)
+  const MUSIC_DUCK_VOICE = 0.005;    // enquanto o guia fala: praticamente inaudível
+  const VOL_KEY = 'irmandade.somUniverso.vol'; // posição do controle (0..1)
+  const VOL_PADRAO = 0.7;
   const PAD_VOLUME = 0.55;
   const PAD_DUCK_TYPING = 0.18;
   const PAD_DUCK_VOICE = 0.04;
@@ -43,6 +46,7 @@
 
   const listeners = new Set();
   let on = readPref();
+  let userVol = readVol();
   let started = false;
   let mode = null;            // 'music' | 'pad'
   let music = null;
@@ -55,6 +59,15 @@
 
   function readPref() {
     try { return localStorage.getItem(PREF_KEY) !== 'off'; } catch { return true; }
+  }
+  function readVol() {
+    try {
+      const v = parseFloat(localStorage.getItem(VOL_KEY));
+      return Number.isFinite(v) ? Math.min(1, Math.max(0, v)) : VOL_PADRAO;
+    } catch { return VOL_PADRAO; }
+  }
+  function saveVol() {
+    try { localStorage.setItem(VOL_KEY, String(userVol)); } catch {}
   }
   function savePref() {
     try { localStorage.setItem(PREF_KEY, on ? 'on' : 'off'); } catch {}
@@ -281,6 +294,9 @@
   }
 
   function targetVolume() {
+    return baseVolume() * userVol;
+  }
+  function baseVolume() {
     if (mode === 'music') {
       if (ducked === 'voice') return MUSIC_DUCK_VOICE;
       if (ducked === 'typing') return MUSIC_DUCK_TYPING;
@@ -343,66 +359,136 @@
     } catch {}
   });
 
-  // ---------- botões ----------
+  // ---------- controle de volume (deslizante) ----------
+  // Ícone (toque = silenciar/voltar) + controle deslizante. Arrastar até o
+  // fim à esquerda = sem música. Fica no rodapé de cada página.
+  const ICONE_SOM = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M4 9v6h4l5 4V5L8 9H4z"/><path class="onda1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M16 9.2a4 4 0 0 1 0 5.6"/><path class="onda2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M18.6 6.6a7.6 7.6 0 0 1 0 10.8"/><path class="mudo" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" d="M16.5 9.5l5 5m0-5l-5 5"/></svg>';
+
+  function volumeVisivel() { return on ? Math.round(userVol * 100) : 0; }
+
   function renderButtons() {
-    document.querySelectorAll('[data-som-universo]').forEach((b) => {
+    document.querySelectorAll('.som-controle').forEach((c) => {
+      const v = volumeVisivel();
+      c.classList.toggle('is-mudo', v === 0);
+      c.classList.toggle('is-baixo', v > 0 && v < 45);
+      const r = c.querySelector('input[type="range"]');
+      if (r && document.activeElement !== r) r.value = String(v);
+      if (r) {
+        r.style.setProperty('--nivel', v + '%');
+        r.setAttribute('aria-valuetext', v === 0 ? 'Sem música' : `Volume ${v}%`);
+      }
+      const b = c.querySelector('.som-controle__icone');
+      if (b) {
+        b.setAttribute('aria-pressed', v === 0 ? 'false' : 'true');
+        b.setAttribute('title', v === 0 ? 'Ligar a música' : 'Silenciar a música');
+      }
+    });
+    // botões antigos de liga/desliga, se alguma página ainda tiver
+    document.querySelectorAll('[data-som-universo]:not(.som-controle__icone)').forEach((b) => {
       b.setAttribute('aria-pressed', on ? 'true' : 'false');
       const label = b.querySelector('[data-som-label]');
-      if (label) {
-        label.textContent = mode === 'music'
-          ? (on ? 'Música: ON' : 'Sem música')
-          : (on ? 'Som do Universo: ON' : 'Som do Universo: OFF');
-      }
-      b.setAttribute('title', on ? 'Silenciar a música' : 'Ligar a música');
+      if (label) label.textContent = on ? 'Música: ON' : 'Sem música';
     });
   }
 
-  function bindButtons() {
-    let buttons = document.querySelectorAll('[data-som-universo]');
-    if (!buttons.length) {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'som-universo-flutuante';
-      b.setAttribute('data-som-universo', '');
-      b.setAttribute('aria-label', 'Ligar ou silenciar a música');
-      b.innerHTML = '<span class="dot" aria-hidden="true"></span><span data-som-label>Som do Universo: ON</span>';
-      document.body.appendChild(b);
-      injectFloatingStyle();
-      buttons = [b];
+  function setVolume(v, { fromSlider = false } = {}) {
+    v = Math.min(1, Math.max(0, Number(v) || 0));
+    if (v <= 0.001) {
+      if (on) setOn(false);
+      return;
     }
-    buttons.forEach((b) => {
-      if (b.dataset.somBound) return;
-      b.dataset.somBound = '1';
-      b.addEventListener('click', (e) => {
-        e.preventDefault();
-        setOn(!on);
-        if (on) setTimeout(() => chime(1), 400);
-      });
-    });
+    userVol = v;
+    saveVol();
+    if (!on) setOn(true);
+    else applyVolume(fromSlider ? 120 : 600);
     renderButtons();
   }
 
-  function injectFloatingStyle() {
+  function criarControle(flutuante) {
+    const c = document.createElement('div');
+    c.className = 'som-controle' + (flutuante ? ' som-controle--flutuante' : '');
+    c.setAttribute('role', 'group');
+    c.setAttribute('aria-label', 'Volume da música');
+    c.innerHTML =
+      '<button type="button" class="som-controle__icone" aria-label="Silenciar ou ligar a música">' + ICONE_SOM + '</button>' +
+      '<input type="range" class="som-controle__barra" min="0" max="100" step="1" aria-label="Volume da música">';
+    const icone = c.querySelector('.som-controle__icone');
+    const barra = c.querySelector('.som-controle__barra');
+    icone.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (on) setOn(false);
+      else { if (userVol < 0.05) userVol = VOL_PADRAO; saveVol(); setOn(true); setTimeout(() => chime(1), 400); }
+      renderButtons();
+    });
+    barra.addEventListener('input', () => setVolume(barra.value / 100, { fromSlider: true }));
+    barra.addEventListener('change', () => { barra.blur?.(); renderButtons(); });
+    return c;
+  }
+
+  function bindButtons() {
+    injectStyle();
+    const antigos = document.querySelectorAll('[data-som-universo]:not([data-som-bound])');
+    if (antigos.length) {
+      // a página tem o seu próprio lugar para o som: o controle entra ali
+      antigos.forEach((b) => {
+        b.dataset.somBound = '1';
+        b.replaceWith(criarControle(false));
+      });
+    } else if (!document.querySelector('.som-controle')) {
+      document.body.appendChild(criarControle(true));
+    }
+    renderButtons();
+  }
+
+  function injectStyle() {
     if (document.getElementById('som-universo-style')) return;
     const st = document.createElement('style');
     st.id = 'som-universo-style';
     st.textContent = `
-      .som-universo-flutuante{
-        position:fixed;right:14px;bottom:14px;z-index:60;
-        display:inline-flex;align-items:center;gap:8px;cursor:pointer;
-        padding:8px 12px;border-radius:999px;
-        background:rgba(8,8,14,.72);border:1px solid rgba(247,213,139,.45);color:#e8dcc0;
-        font:600 11px/1 ui-monospace,'SFMono-Regular',Menlo,Consolas,monospace;letter-spacing:.14em;text-transform:uppercase;
+      .som-controle{
+        display:inline-flex;align-items:center;gap:8px;
+        padding:6px 12px 6px 8px;border-radius:999px;
+        background:rgba(8,8,14,.72);border:1px solid rgba(247,213,139,.45);color:#f7d58b;
         -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
         box-shadow:0 4px 14px rgba(0,0,0,.5);
       }
-      .som-universo-flutuante:hover,.som-universo-flutuante:focus-visible{outline:none;border-color:#f7d58b;color:#f7d58b}
-      .som-universo-flutuante .dot{width:8px;height:8px;border-radius:50%;background:#3a3a44}
-      .som-universo-flutuante[aria-pressed="true"] .dot{background:#6dffb0;box-shadow:0 0 8px #6dffb0}
-      @media (max-width:520px){ .som-universo-flutuante{right:10px;bottom:10px;padding:7px 10px;font-size:10px} }
-      /* na jornada o canto inferior direito é da chama: o botão vai para a esquerda */
-      body:has(#flame-bottom-right) .som-universo-flutuante{right:auto;left:14px}
-      @media (max-width:520px){ body:has(#flame-bottom-right) .som-universo-flutuante{left:10px} }
+      .som-controle--flutuante{position:fixed;right:14px;bottom:14px;z-index:60}
+      .som-controle__icone{
+        display:inline-flex;align-items:center;justify-content:center;
+        width:30px;height:30px;padding:0;border:0;border-radius:50%;cursor:pointer;
+        background:transparent;color:inherit;
+      }
+      .som-controle__icone:focus-visible{outline:2px solid #f7d58b;outline-offset:2px}
+      .som-controle .mudo{display:none}
+      .som-controle.is-mudo{color:#8b8573}
+      .som-controle.is-mudo .mudo{display:inline}
+      .som-controle.is-mudo .onda1,.som-controle.is-mudo .onda2,.som-controle.is-baixo .onda2{display:none}
+      .som-controle__barra{
+        -webkit-appearance:none;appearance:none;width:110px;height:22px;margin:0;
+        background:transparent;cursor:pointer;--nivel:70%;
+      }
+      .som-controle__barra:focus-visible{outline:2px solid #f7d58b;outline-offset:3px;border-radius:999px}
+      .som-controle__barra::-webkit-slider-runnable-track{
+        height:4px;border-radius:999px;
+        background:linear-gradient(90deg,#f7d58b var(--nivel),rgba(255,255,255,.18) var(--nivel));
+      }
+      .som-controle__barra::-moz-range-track{height:4px;border-radius:999px;background:rgba(255,255,255,.18)}
+      .som-controle__barra::-moz-range-progress{height:4px;border-radius:999px;background:#f7d58b}
+      .som-controle__barra::-webkit-slider-thumb{
+        -webkit-appearance:none;width:16px;height:16px;margin-top:-6px;border-radius:50%;
+        background:#fff3d0;border:2px solid #d4af37;box-shadow:0 0 8px rgba(247,213,139,.8);
+      }
+      .som-controle__barra::-moz-range-thumb{
+        width:14px;height:14px;border-radius:50%;
+        background:#fff3d0;border:2px solid #d4af37;box-shadow:0 0 8px rgba(247,213,139,.8);
+      }
+      @media (max-width:520px){
+        .som-controle--flutuante{right:10px;bottom:10px;padding:4px 10px 4px 6px}
+        .som-controle__barra{width:88px}
+      }
+      /* na jornada o canto inferior direito é da chama: o controle vai para a esquerda */
+      body:has(#flame-bottom-right) .som-controle--flutuante{right:auto;left:14px}
+      @media (max-width:520px){ body:has(#flame-bottom-right) .som-controle--flutuante{left:10px} }
     `;
     document.head.appendChild(st);
   }
@@ -411,6 +497,8 @@
     isOn: () => on,
     setOn,
     toggle: () => setOn(!on),
+    volume: () => (on ? userVol : 0),
+    setVolume,
     chime,
     whoosh,
     onChange: (fn) => { listeners.add(fn); return () => listeners.delete(fn); },
@@ -422,7 +510,8 @@
       faixa: mode === 'music' ? track + 1 : null,
       posicaoMusica: music ? Number((music.currentTime || 0).toFixed(1)) : null,
       volumeMusica: music ? Number((musicGain ? musicGain.gain.value : music.volume).toFixed(2)) : null,
-      abaixadaPorLeitura: ducked
+      abaixadaPorLeitura: ducked,
+      controle: volumeVisivel()
     })
   };
 
