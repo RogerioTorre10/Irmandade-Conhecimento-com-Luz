@@ -1207,3 +1207,19 @@ section[id^="section-perguntas-"].is-block-feedback-mode .j-panel-glow {
     line-height: 1.15 !important;
   }
 }
+
+/* ===========================================================
+   BOTÃO CONTINUAR — mais espaço para o texto caber inteiro
+   ("Continuar" e também "Síntese do bloco..." enquanto o guia reflete)
+   =========================================================== */
+section[id^="section-perguntas-"] .perguntas-controls {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 1.9fr) !important;
+}
+section[id^="section-perguntas-"] #jp-btn-confirmar {
+  font-size: clamp(11.5px, 3.2vw, 16px) !important;
+  line-height: 1.08 !important;
+  white-space: normal !important;
+  text-align: center !important;
+  letter-spacing: 0 !important;
+  padding: 4px 10px !important;
+}

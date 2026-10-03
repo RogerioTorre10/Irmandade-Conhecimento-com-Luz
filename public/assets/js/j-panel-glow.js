@@ -300,10 +300,18 @@
   // Envelope da voz: palavras reais (quando o navegador informa) +
   // um ritmo de sílabas irregular, para a névoa "falar" também com a voz neural.
   function voiceAmp(t) {
-    const silabas = 0.5 + 0.5 * Math.sin(t / 85) * Math.sin(t / 410 + 1.3);
-    const palavra = t - voz.lastWordAt < 900 ? wordPulse : 0;
-    const alvo = Math.max(palavra, silabas * 0.85);
-    amp += (alvo - amp) * 0.3;
+    // sílabas: pulsos de ~2,4 por segundo (abaixo do limite seguro de 3/s),
+    // com frases que crescem e diminuem devagar
+    const silabas = Math.pow(Math.abs(Math.sin(t / 135)), 1.4) * (0.65 + 0.35 * Math.sin(t / 530 + 1.3));
+    // cada palavra acende e se apaga em ~0,3 s (por tempo, não por quadro:
+    // igual em celulares lentos e rápidos)
+    const desdePalavra = t - voz.lastWordAt;
+    const palavra = desdePalavra < 900 ? Math.exp(-desdePalavra / 120) : 0;
+    const alvo = desdePalavra < 900 ? 0.25 * silabas + 0.75 * palavra : silabas;
+    const dt = Math.min(100, Math.max(1, t - (voiceAmp.lastT || t - 16)));
+    voiceAmp.lastT = t;
+    const k = 1 - Math.exp(-dt / (alvo > amp ? 45 : 110));
+    amp += (alvo - amp) * k;
     return amp;
   }
 
@@ -353,7 +361,7 @@
       const a = falando ? voiceAmp(t) : (amp *= 0.9);
       if (halo) {
         halo.style.transform = `scale(${(1 + 0.08 * a).toFixed(3)})`;
-        halo.style.opacity = falando || a > 0.02 ? (0.62 + 0.38 * a).toFixed(3) : '';
+        halo.style.opacity = falando || a > 0.02 ? (0.15 + 0.85 * a).toFixed(3) : '';
       }
       if (falando && voz.lastWordAt < t - 900) {
         // voz sem eventos de palavra (neural, alguns celulares): ondas no ritmo da fala
@@ -363,7 +371,9 @@
         nextOndaAt = 0;
       }
       // trovão suave: o clarão acompanha a voz sem ofuscar o texto
-      L.style.opacity = Math.min(1, value + flash * FLASH_PAINEL).toFixed(3);
+      // falando: a névoa acende e apaga no ritmo da voz (nunca some de todo)
+      const brilhoVoz = falando ? 0.14 + 0.86 * a : 1;
+      L.style.opacity = Math.min(1, value * brilhoVoz + flash * FLASH_PAINEL).toFixed(3);
       if (raio) raio.style.opacity = (flash * FLASH_RAIO * Math.min(1, value + 0.3)).toFixed(3);
       if (ceu) {
         ceu.style.setProperty('--cx', `${Math.round(r.left + r.width / 2)}px`);
