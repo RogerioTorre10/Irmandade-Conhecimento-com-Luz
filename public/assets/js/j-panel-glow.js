@@ -121,6 +121,10 @@
 
   let layer = null;
   let raio = null;        // clarão branco-quente do relâmpago
+  let halo = null;        // névoa em volta do painel (vibra com a voz)
+  let amp = 0;            // "volume" aparente da voz (0..1)
+  let nextOndaAt = 0;     // próxima onda sonora na névoa
+  let lastOndaAt = 0;
   let ceu = null;         // reflexo do relâmpago na tela
   let value = 0;          // intensidade atual (0..1)
   let flash = 0;          // intensidade do clarão (0..1)
@@ -155,6 +159,7 @@
     const t = performance.now();
     voz.lastWordAt = t;
     wordPulse = 1;
+    emitOnda(t);
     // começo de frase: clarão (respeitando o limite de 2 por segundo)
     if (e && e.name === 'sentence' && !reduceMotion && canFlash(t) && Math.random() < 0.6) {
       flash = Math.max(flash, 0.85); lastFlashAt = t;
@@ -190,6 +195,7 @@
     layer.setAttribute('aria-hidden', 'true');
     layer.innerHTML = '<span class="gp-halo"></span><span class="gp-raio"></span>';
     raio = layer.querySelector('.gp-raio');
+    halo = layer.querySelector('.gp-halo');
     ceu = document.createElement('div');
     ceu.id = 'guia-relampago';
     ceu.setAttribute('aria-hidden', 'true');
@@ -279,6 +285,28 @@
     return Math.min(1, (el.textContent || '').length / total);
   }
 
+  // Onda que sai da névoa, como o som da voz se propagando.
+  function emitOnda(t) {
+    if (reduceMotion || !layer || t - lastOndaAt < 420) return;
+    if (layer.querySelectorAll('.gp-onda').length >= 3) return;
+    lastOndaAt = t;
+    const o = document.createElement('span');
+    o.className = 'gp-onda';
+    o.addEventListener('animationend', () => o.remove(), { once: true });
+    setTimeout(() => o.remove(), 2000);
+    layer.appendChild(o);
+  }
+
+  // Envelope da voz: palavras reais (quando o navegador informa) +
+  // um ritmo de sílabas irregular, para a névoa "falar" também com a voz neural.
+  function voiceAmp(t) {
+    const silabas = 0.5 + 0.5 * Math.sin(t / 85) * Math.sin(t / 410 + 1.3);
+    const palavra = t - voz.lastWordAt < 900 ? wordPulse : 0;
+    const alvo = Math.max(palavra, silabas * 0.85);
+    amp += (alvo - amp) * 0.3;
+    return amp;
+  }
+
   function frame(t) {
     const videoOn = !!document.getElementById('vt-overlay');
     const prog = typingProgress();
@@ -319,14 +347,23 @@
       }
 
       // pulsa com cada palavra falada (sem eventos de palavra: respiração) + relâmpagos
-      let pulse = 1;
-      if (talking && !reduceMotion) {
-        pulse = t - voz.lastWordAt < 900
-          ? 0.8 + 0.2 * wordPulse
-          : 0.82 + 0.18 * Math.sin(t / 210);
+      // Enquanto o guia fala a névoa fica acesa e vibra com a voz
+      // (cresce, respira e solta ondas); calada, volta ao normal.
+      const falando = talking && !reduceMotion;
+      const a = falando ? voiceAmp(t) : (amp *= 0.9);
+      if (halo) {
+        halo.style.transform = `scale(${(1 + 0.08 * a).toFixed(3)})`;
+        halo.style.opacity = falando || a > 0.02 ? (0.62 + 0.38 * a).toFixed(3) : '';
+      }
+      if (falando && voz.lastWordAt < t - 900) {
+        // voz sem eventos de palavra (neural, alguns celulares): ondas no ritmo da fala
+        if (!nextOndaAt) nextOndaAt = t + 300;
+        if (t >= nextOndaAt) { emitOnda(t); nextOndaAt = t + 650 + Math.random() * 500; }
+      } else if (!falando) {
+        nextOndaAt = 0;
       }
       // trovão suave: o clarão acompanha a voz sem ofuscar o texto
-      L.style.opacity = Math.min(1, value * pulse + flash * FLASH_PAINEL).toFixed(3);
+      L.style.opacity = Math.min(1, value + flash * FLASH_PAINEL).toFixed(3);
       if (raio) raio.style.opacity = (flash * FLASH_RAIO * Math.min(1, value + 0.3)).toFixed(3);
       if (ceu) {
         ceu.style.setProperty('--cx', `${Math.round(r.left + r.width / 2)}px`);
@@ -380,6 +417,7 @@
     '#btn-selfie-confirm',
     '#section-card #btnNext',
     '#btn-dp-continuar',
+    'section[id^="section-perguntas-"] #jp-btn-confirmar',
     '[data-jornada-avancar]'
   ].join(',');
 
@@ -388,12 +426,24 @@
   // condições extras de "página concluída" (mesma regra da validação da section)
   const EXTRA_READY = {
     // dados pessoais: o nome completo é o único campo obrigatório
-    'btn-dp-continuar': () => (document.getElementById('dp-nome')?.value || '').trim().length >= 2
+    'btn-dp-continuar': () => (document.getElementById('dp-nome')?.value || '').trim().length >= 2,
+    // perguntas: pronto para enviar a resposta digitada, ou para seguir
+    // depois que a devolutiva do guia foi exibida
+    'jp-btn-confirmar': (btn) => {
+      const sec = btn.closest('section');
+      const estado = sec?.dataset?.continueState || 'idle';
+      if (estado === 'loading' || btn.dataset.busy === '1') return false;
+      if (estado === 'ready') return true;
+      return (sec?.querySelector('#jp-answer-input')?.value || '').trim().length >= 2;
+    }
   };
+  // botões cuja regra acima já basta (não olham campos obrigatórios)
+  const SO_REGRA_PROPRIA = new Set(['jp-btn-confirmar']);
 
   function formComplete(btn, sec) {
     const extra = EXTRA_READY[btn.id];
-    if (extra) { try { if (!extra()) return false; } catch {} }
+    if (extra) { try { if (!extra(btn)) return false; } catch {} }
+    if (SO_REGRA_PROPRIA.has(btn.id)) return true;
     if (!sec) return true;
     // campos marcados como obrigatórios precisam estar preenchidos
     return ![...sec.querySelectorAll('input[required], select[required], textarea[required]')]
