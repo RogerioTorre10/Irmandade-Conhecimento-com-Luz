@@ -312,6 +312,18 @@
     'section-senha'
   ]);
 
+  // O bypass existe exclusivamente no ambiente de homologação/local.
+  // Mesmo que este arquivo seja copiado por engano para produção,
+  // o hostname comercial não satisfaz esta condição.
+  const IS_HOMOLOG_JORNADA = (() => {
+    const hostname = String(window.location?.hostname || '').toLowerCase();
+    return (
+      hostname.includes('homolog') ||
+      hostname === 'localhost' ||
+      hostname === '127.0.0.1'
+    );
+  })();
+
   function jornadaTemAcessoValidado() {
     const authOk =
       localStorage.getItem('jornada_auth_ok') === '1';
@@ -348,6 +360,7 @@
     // Segurança: nenhuma seção privada pode ser aberta
     // manualmente pelo console sem uma Jornada autenticada e válida.
     if (
+      !IS_HOMOLOG_JORNADA &&
       !SECOES_PUBLICAS_JORNADA.has(sectionId) &&
       !jornadaTemAcessoValidado()
     ) {
@@ -363,7 +376,7 @@
 
       sectionId = 'section-senha';
     }
-    if (window.JORNADA_SESSION?.reauthRequired && sectionId !== 'section-senha' && !force) {
+    if (!IS_HOMOLOG_JORNADA && window.JORNADA_SESSION?.reauthRequired && sectionId !== 'section-senha' && !force) {
       console.warn('[JC] Redirecionando para reautenticação.');
       sectionId = 'section-senha';
     }
