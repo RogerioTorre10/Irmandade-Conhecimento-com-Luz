@@ -558,3 +558,24 @@ body.vt-fade-in #jornada-content-wrapper{
 @media (prefers-reduced-motion: reduce) {
   .jornada-btn-pronto.jornada-btn-pronto { animation: none !important; filter: brightness(1.12) drop-shadow(0 0 10px var(--pronto-cor, #d4af37)); }
 }
+
+/* ondas da voz saindo da névoa do guia */
+#guia-presenca .gp-onda{
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow:
+    0 0 0 2px rgba(212,175,55,.6),
+    0 0 26px rgba(212,175,55,.45);
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--presenca-cor) 70%, transparent),
+    0 0 26px color-mix(in srgb, var(--presenca-cor) 55%, transparent);
+  animation: gpOnda 1.3s cubic-bezier(.2,.6,.3,1) forwards;
+}
+@keyframes gpOnda{
+  from{ transform: scale(1); opacity: .55; }
+  to  { transform: scale(1.07, 1.035); opacity: 0; }
+}
+#guia-presenca .gp-halo{ will-change: transform, opacity; }
+@media (prefers-reduced-motion: reduce){ #guia-presenca .gp-onda{ display:none; } }
