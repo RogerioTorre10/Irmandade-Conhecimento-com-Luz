@@ -53,6 +53,18 @@ const TTS_VOICES = {
   cerimonial: process.env.ELEVENLABS_VOICE_CERIMONIAL || TTS_DEFAULT_VOICE,
 };
 const TTS_ENABLED = Boolean(TTS_KEY && TTS_DEFAULT_VOICE);
+// Interpretação de cada voz (a voz em si vem do ELEVENLABS_VOICE_*):
+// estabilidade alta = mais serena/constante; style alto = mais expressiva/impositiva.
+const envNum = (name, fallback) => {
+  const v = Number(process.env[name]);
+  return Number.isFinite(v) && process.env[name] !== "" && process.env[name] != null ? v : fallback;
+};
+const TTS_SETTINGS = {
+  cerimonial: { stability: 0.62, style: 0.22, speed: 0.92 }, // grave, suave, acolhedor
+  zion: { stability: 0.5, style: 0.45, speed: 1.0 },         // jovem adulto, firme, impactante
+  lumen: { stability: 0.64, style: 0.3, speed: 0.95 },       // madura, acolhedora, firme
+  arian: { stability: 0.48, style: 0.55, speed: 1.04 },      // jovem, impositiva, telejornal
+};
 const TTS_CACHE_DIR = path.join(os.tmpdir(), "jornada-tts-cache");
 const TTS_MAX_CHARS = 1500;
 const ttsMemCache = new Map(); // hash -> Buffer (LRU simples)
@@ -88,7 +100,18 @@ app.post("/api/tts", express.json({ limit: "16kb" }), async (req, res) => {
   if (!ttsRateOk(req.ip)) return res.status(429).json({ error: "muitas requisições" });
 
   const voiceId = TTS_VOICES[guide];
-  const key = crypto.createHash("sha1").update(`${TTS_MODEL}|${voiceId}|${text}`).digest("hex");
+  const tune = TTS_SETTINGS[guide] || TTS_SETTINGS.lumen;
+  const voiceSettings = {
+    stability: envNum("ELEVENLABS_STABILITY", tune.stability),
+    similarity_boost: envNum("ELEVENLABS_SIMILARITY", 0.85),
+    style: envNum("ELEVENLABS_STYLE", tune.style),
+    speed: tune.speed,
+    use_speaker_boost: true,
+  };
+  const key = crypto
+    .createHash("sha1")
+    .update(`${TTS_MODEL}|${voiceId}|${JSON.stringify(voiceSettings)}|${text}`)
+    .digest("hex");
   const file = path.join(TTS_CACHE_DIR, `${key}.mp3`);
 
   const send = (buf) => {
@@ -114,12 +137,7 @@ app.post("/api/tts", express.json({ limit: "16kb" }), async (req, res) => {
         body: JSON.stringify({
           text,
           model_id: TTS_MODEL,
-          voice_settings: {
-            stability: Number(process.env.ELEVENLABS_STABILITY ?? 0.55),
-            similarity_boost: Number(process.env.ELEVENLABS_SIMILARITY ?? 0.85),
-            style: Number(process.env.ELEVENLABS_STYLE ?? 0.3),
-            use_speaker_boost: true,
-          },
+          voice_settings: voiceSettings,
         }),
       }
     );
