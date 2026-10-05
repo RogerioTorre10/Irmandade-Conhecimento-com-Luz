@@ -123,7 +123,7 @@ const page = {
 };
 
 const doc = new Document({
-  creator: META.autor, title: META.titulo, language: 'pt-BR',
+  creator: 'Rogério Aparecido da Silva Torres', title: META.titulo, language: 'pt-BR',
   styles: { default: { document: { run: { font: FONT, size: BODY } } } },
   sections: [
     { properties: { page }, children: [...front, ...tocLines] },
