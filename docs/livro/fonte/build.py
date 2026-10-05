@@ -30,7 +30,7 @@ def clean(t):
     return t
 
 blocks, used = [], {}
-for path in sorted(glob.glob('src/*.txt')):
+for path in sorted(glob.glob('src2/*.txt')):
     for raw in open(path, encoding='utf-8'):
         line = raw.strip()
         if not line or line.startswith('//'):
