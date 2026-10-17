@@ -845,3 +845,43 @@
   color: transparent !important;
   text-shadow: none !important;
 }
+
+/* ===== Aceite consciente antes de iniciar a Jornada ===== */
+#section-senha .senha-aceite {
+  margin: 14px 0 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(201, 162, 39, 0.45);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.18);
+  text-align: left;
+  font-size: 0.86rem;
+  line-height: 1.4;
+}
+#section-senha .senha-aceite-titulo {
+  margin: 0 0 6px;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 0.04em;
+}
+#section-senha .senha-aceite-lista {
+  margin: 0 0 8px;
+  padding-left: 18px;
+}
+#section-senha .senha-aceite-lista li {
+  margin-bottom: 4px;
+}
+#section-senha .senha-aceite-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  cursor: pointer;
+  font-weight: 700;
+}
+#section-senha .senha-aceite-check input {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  margin-top: 1px;
+  accent-color: #c9a227;
+  cursor: pointer;
+}

@@ -629,6 +629,9 @@
     return fallback;
   }
 
+  // Versao do texto de aceite (mudar quando o texto dos termos mudar).
+  const ACEITE_VERSAO = 'aceite-v1-2026-10-17';
+
   const API_BASE =
   window.APP_CONFIG?.API_BASE ||
   'https://lumen-backend-api.onrender.com/api';
@@ -798,6 +801,20 @@
       return;
     }   
 
+    // Aceite consciente: obrigatorio antes de entrar na Jornada.
+    const aceiteInput = root.querySelector('#senha-aceite') || document.getElementById('senha-aceite');
+    if (aceiteInput && !aceiteInput.checked) {
+      showSenhaNotice(
+        tSenha(
+          'consentRequired',
+          'Para entrar, confirme que leu e compreendeu os termos acima.'
+        ),
+        'warning'
+      );
+      aceiteInput.focus();
+      return;
+    }
+
     btnNext.setAttribute('disabled', 'true');
 
     try {
@@ -826,7 +843,10 @@
           body: JSON.stringify({
             email,
             senha: senhaDigitada,
-            device_hash: deviceHash
+            device_hash: deviceHash,
+            aceite_termos: !!aceiteInput?.checked,
+            aceite_versao: ACEITE_VERSAO,
+            idioma: (window.i18n?.lang || document.documentElement.lang || '')
           })
         }
       );
