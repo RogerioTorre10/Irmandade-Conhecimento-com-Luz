@@ -1,4 +1,7 @@
 {
+  "header": {
+    "flameLabel": "A chama permanecerá acesa por"
+  },
   "meta": {
      "lang": "pt-BR",
     "label": "Português (Brasil)"

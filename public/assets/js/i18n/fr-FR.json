@@ -1,4 +1,7 @@
 {
+  "header": {
+    "flameLabel": "La flamme restera allumée pendant"
+  },
   "meta": { "lang": "fr-FR", "label": "Français (France)" },
  "common": {
   "back": "Retour",

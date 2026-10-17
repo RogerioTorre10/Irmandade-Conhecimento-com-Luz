@@ -39,11 +39,11 @@
         <div class="brilho"></div>
       </div>
     </div>
-    <h1>Jornada Essencial</h1>
+    <h1 id="jornada-topo-titulo" data-i18n="intro.title">Jornada Essencial</h1>
     </header>
     <div class="jornada-timer">
-        <div class="timer-label">
-            🕯️ A chama permanecerá acesa por
+        <div class="timer-label" id="jornada-topo-chama">
+            🕯️ <span data-i18n="header.flameLabel">A chama permanecerá acesa por</span>
         </div>
         <span
         id="jornada-countdown"
@@ -197,6 +197,12 @@
       if (!window.i18n?.ready) return;
       const wrapper = document.getElementById('jornada-content-wrapper') || document.body;
       window.i18n.apply(wrapper);
+
+      // Topo fixo (titulo e frase da chama) fica fora do wrapper.
+      const topo = document.getElementById('jornada-topo-titulo');
+      const chama = document.getElementById('jornada-topo-chama');
+      if (topo) window.i18n.apply(topo.parentElement || topo);
+      if (chama) window.i18n.apply(chama);
 
       // Atualiza título da página
       const title = window.i18n.t('page.title') || 'Jornada Essencial';

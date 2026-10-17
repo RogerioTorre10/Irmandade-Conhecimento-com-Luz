@@ -1,4 +1,7 @@
 {
+  "header": {
+    "flameLabel": "Die Flamme bleibt entzündet für"
+  },
   "meta": { "lang": "de-DE", "label": "Deutsch (Deutschland)" },
  "common": {
   "back": "Zurück",
