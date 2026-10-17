@@ -92,6 +92,7 @@
   "consentItem4": "Si vous n'avez pas encore commencé, vous pouvez demander l'annulation et le remboursement dans les 7 jours suivant l'achat, avec l'annulation du code.",
   "consentLabel": "J'ai lu et compris, et je souhaite commencer le Parcours maintenant.",
   "consentRequired": "Pour entrer, confirmez que vous avez lu et compris les conditions ci-dessus.",
+  "consentListen": "🔊 Écouter à nouveau",
   "sendError": "Impossible de demander l'envoi du code pour le moment.",
   "resendError": "Impossible de demander un nouvel envoi du code pour le moment.",
   "validationError": "Impossible de valider l'accès.",

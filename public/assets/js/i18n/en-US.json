@@ -101,6 +101,7 @@
   "consentItem4": "If you have not started yet, you may request cancellation and a refund within 7 days of purchase, and your code will be cancelled.",
   "consentLabel": "I have read and understood this, and I wish to begin the Journey now.",
   "consentRequired": "To enter, please confirm that you have read and understood the terms above.",
+  "consentListen": "🔊 Listen again",
   "sendError": "We couldn't request the code at this time.",
   "resendError": "We couldn't request the code again at this time.",
   "validationError": "We couldn't validate your access.",

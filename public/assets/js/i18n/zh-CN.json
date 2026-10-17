@@ -92,6 +92,7 @@
   "consentItem4": "如果您尚未开始，可在购买后7天内申请取消并退款，届时访问码将被作废。",
   "consentLabel": "我已阅读并理解，现在希望开始旅程。",
   "consentRequired": "请确认您已阅读并理解上述条款后再进入。",
+  "consentListen": "🔊 再听一遍",
   "sendError": "目前无法请求发送代码。",
   "resendError": "目前无法请求重新发送代码。",
   "validationError": "无法验证访问权限。",

@@ -485,6 +485,82 @@
   await sleep(80);
 }
 
+  // =====================================================
+  // ACEITE CONSCIENTE NARRADO
+  // O bloco "Antes de iniciar" e lido em voz alta (sem datilografia), com
+  // destaque no item falado. A caixinha so libera ao fim da leitura.
+  // =====================================================
+  const ACEITE_MAX_FALA_MS = 45000;
+
+  function setAceiteBloqueado(root, bloqueado) {
+    const check = root?.querySelector('#senha-aceite');
+    const wrap = root?.querySelector('#senha-aceite-wrap');
+    if (!check) return;
+    check.disabled = !!bloqueado;
+    wrap?.classList.toggle('senha-aceite-lendo', !!bloqueado);
+  }
+
+  async function falarComLimite(texto, speakOptions) {
+    if (!texto) return;
+    const fala = window.EffectCoordinator?.speak
+      ? Promise.resolve(window.EffectCoordinator.speak(texto, speakOptions))
+      : Promise.resolve();
+    await Promise.race([fala.catch(() => {}), sleep(ACEITE_MAX_FALA_MS)]);
+  }
+
+  async function narrarAceite(root, voiceCtx, runToken) {
+    const wrap = root?.querySelector('#senha-aceite-wrap');
+    if (!wrap) return;
+
+    const partes = [
+      wrap.querySelector('.senha-aceite-titulo'),
+      ...wrap.querySelectorAll('.senha-aceite-lista li'),
+      wrap.querySelector('.senha-aceite-check span'),
+    ].filter(Boolean);
+
+    const speakOptions = {
+      rate: voiceCtx?.rate ?? 1.0,
+      pitch: voiceCtx?.pitch ?? 1.0,
+      lang: voiceCtx?.lang ?? document.documentElement.lang ?? 'pt-BR',
+      gender: voiceCtx?.voiceGender ?? 'female',
+      guide: voiceCtx?.guide ?? 'lumen',
+      style: voiceCtx?.style ?? 'acolhedora'
+    };
+
+    setAceiteBloqueado(root, true);
+    wrap.scrollIntoView?.({ behavior: 'smooth', block: 'center' });
+
+    try {
+      for (const el of partes) {
+        if (runToken && runToken !== window.JCSenha.state.activeRunToken) return;
+        el.classList.add('senha-aceite-falando');
+        await falarComLimite((el.textContent || '').trim(), speakOptions);
+        el.classList.remove('senha-aceite-falando');
+        await sleep(250);
+      }
+    } catch (err) {
+      console.error('[JCSenha] erro ao narrar o aceite:', err);
+    } finally {
+      partes.forEach((el) => el.classList.remove('senha-aceite-falando'));
+      setAceiteBloqueado(root, false);
+    }
+  }
+
+  function bindOuvirAceite(root, voiceCtx) {
+    const btn = root?.querySelector('#btn-aceite-ouvir');
+    if (!btn || btn.dataset.bound === '1') return;
+    btn.dataset.bound = '1';
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      try {
+        cancelAllSpeech();
+        await narrarAceite(root, syncGuideVoiceContext(root) || voiceCtx, 0);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  }
+
   function getTransitionSrc(root, btn) {
     return (btn?.dataset?.transitionSrc)
       || (root?.dataset?.transitionSrc)
@@ -716,6 +792,10 @@
 
     [btnPrev, btnNext, input, toggle].forEach((el) => el?.removeAttribute('disabled'));
     input.focus();
+
+    // Leitura em voz alta do aceite (a caixinha libera ao final).
+    bindOuvirAceite(root, voiceCtx);
+    narrarAceite(root, voiceCtx, triggerToken);
 
     if (toggle.dataset.boundToggle !== '1') {
       toggle.dataset.boundToggle = '1';

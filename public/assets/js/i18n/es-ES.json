@@ -92,6 +92,7 @@
   "consentItem4": "Si aún no has comenzado, puedes solicitar la cancelación y el reembolso dentro de los 7 días posteriores a la compra, con la cancelación del código.",
   "consentLabel": "He leído, comprendo y deseo comenzar la Jornada ahora.",
   "consentRequired": "Para entrar, confirma que has leído y comprendido los términos anteriores.",
+  "consentListen": "🔊 Escuchar de nuevo",
   "sendError": "No fue posible solicitar el envío en este momento.",
   "resendError": "No fue posible solicitar el reenvío en este momento.",
   "validationError": "No fue posible validar el acceso.",
