@@ -885,3 +885,29 @@
   accent-color: #c9a227;
   cursor: pointer;
 }
+
+/* Aceite narrado: destaque do item que esta sendo lido */
+#section-senha .senha-aceite-falando {
+  color: #f3d77a;
+  text-shadow: 0 0 8px rgba(243, 215, 122, 0.55);
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+#section-senha .senha-aceite-lendo .senha-aceite-check {
+  opacity: 0.55;
+  cursor: wait;
+}
+#section-senha .senha-aceite-ouvir {
+  display: block;
+  margin: 8px auto 0;
+  padding: 4px 12px;
+  border: 1px solid rgba(201, 162, 39, 0.55);
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+#section-senha .senha-aceite-ouvir:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
