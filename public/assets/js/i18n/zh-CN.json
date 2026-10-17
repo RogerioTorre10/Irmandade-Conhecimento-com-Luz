@@ -1,4 +1,7 @@
 {
+  "header": {
+    "flameLabel": "火焰将继续燃烧"
+  },
   "meta": { "lang": "zh-CN", "label": "中文（简体）" },
   "common": {
   "back": "返回",

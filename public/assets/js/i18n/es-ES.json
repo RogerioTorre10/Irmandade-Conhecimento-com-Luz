@@ -1,4 +1,7 @@
 {
+  "header": {
+    "flameLabel": "La llama permanecerá encendida durante"
+  },
   "meta": { "lang": "es-ES", "label": "Español (España)" },
   "common": {
   "back": "Volver",

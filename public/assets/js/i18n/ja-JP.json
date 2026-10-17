@@ -1,4 +1,7 @@
 {
+  "header": {
+    "flameLabel": "炎が灯り続ける残り時間"
+  },
   "meta": { "lang": "ja-JP", "label": "日本語 (日本)" },
  "common": {
   "back": "戻る",

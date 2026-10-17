@@ -1,4 +1,7 @@
 {
+  "header": {
+    "flameLabel": "The flame will stay lit for"
+  },
   "meta": { "lang": "en-US", "label": "English (US)" },
  "common": {
   "back": "Back",
