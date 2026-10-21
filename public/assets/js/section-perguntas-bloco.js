@@ -1483,7 +1483,8 @@ function getNomeParticipanteAtual() {
     });
 
     const IS_HOMOLOG =
-      window.location.hostname.includes('homolog');
+      window.location.hostname.includes('homolog') ||
+      window.location.hostname === 'irmandade-conhecimento-com-luz-1.onrender.com';
 
     const API_BASE = String(
       window.APP_CONFIG?.API_BASE ||
