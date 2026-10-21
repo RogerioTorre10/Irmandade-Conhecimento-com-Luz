@@ -1,0 +1,52 @@
+;(() => {
+'use strict';
+const API_BASE=(window.APP_CONFIG?.API_BASE||window.API_BASE||'https://lumen-backend-api.onrender.com/api').replace(/\/$/,'');
+const ENDPOINT='/jornada/progresso/admin/dashboard', REFRESH_MS=30000;
+const $=s=>document.querySelector(s), state={secret:'',data:null,tab:'jornadas',timer:null};
+const E={login:$('#login'),dash:$('#dash'),secret:$('#secret'),entrar:$('#entrar'),sair:$('#sair'),atualizar:$('#atualizar'),loginStatus:$('#loginStatus'),dot:$('#dot'),liveText:$('#liveText'),busca:$('#busca'),status:$('#status'),guia:$('#guia'),idioma:$('#idioma'),limpar:$('#limpar'),count:$('#count'),tableTitle:$('#tableTitle'),tableJornadas:$('#tableJornadas'),tableHotmart:$('#tableHotmart'),bodyJornadas:$('#bodyJornadas'),bodyHotmart:$('#bodyHotmart'),empty:$('#empty'),
+mCompras:$('#mCompras'),mAprovadas:$('#mAprovadas'),mAndamento:$('#mAndamento'),mConcluidas:$('#mConcluidas'),mExpiradas:$('#mExpiradas'),mTaxa:$('#mTaxa'),mGuia:$('#mGuia'),mIdioma:$('#mIdioma'),mTin:$('#mTin'),mTout:$('#mTout'),mCusto:$('#mCusto'),mCustoMedio:$('#mCustoMedio')};
+const esc=v=>String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;");
+const norm=v=>String(v||'').trim().toLowerCase();
+const num=v=>new Intl.NumberFormat('pt-BR').format(Number(v||0));
+function fmtDate(v){if(!v)return'—';const d=new Date(v);return Number.isNaN(d.getTime())?'—':new Intl.DateTimeFormat('pt-BR',{dateStyle:'short',timeStyle:'short'}).format(d)}
+function moneyBRL(v){const n=Number(v||0);return n>0?new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',minimumFractionDigits:4,maximumFractionDigits:4}).format(n):'—'}
+function moneyUSD(v){const n=Number(v||0);return n>0?new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:4,maximumFractionDigits:6}).format(n):'—'}
+function cost(x){return Number(x?.custo_ia_brl||0)>0?moneyBRL(x.custo_ia_brl):moneyUSD(x?.custo_ia_usd)}
+function fmtRestante(x){
+ const st=norm(x?.status_jornada);
+ if(st.includes('concl'))return'Concluída';
+ if(st.includes('expir'))return'Encerrado';
+ const v=x?.tempo_restante;
+ if(typeof v==='string'&&v.trim()&&v!=='[object Object]')return v.trim();
+ const sec=Number(x?.tempo_restante_segundos ?? (v&&typeof v==='object'?(v.segundos??v.seconds??v.total_segundos??v.total_seconds):NaN));
+ if(Number.isFinite(sec)){
+   const t=Math.max(0,Math.floor(sec)),h=Math.floor(t/3600),m=Math.floor((t%3600)/60);
+   return `${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}min`;
+ }
+ if(v&&typeof v==='object'){
+   const h=Number(v.horas??v.hours),m=Number(v.minutos??v.minutes);
+   if(Number.isFinite(h)||Number.isFinite(m))return `${String(Number.isFinite(h)?h:0).padStart(2,'0')}h ${String(Number.isFinite(m)?m:0).padStart(2,'0')}min`;
+ }
+ return'—';
+}
+function badge(v){const s=norm(v);let c='neutral';if(s.includes('concl')||s==='aprovado')c='ok';else if(s.includes('expir')||s.includes('revog'))c='bad';else if(s.includes('andamento')||s==='ativo')c='blue';else if(s.includes('pendent'))c='warn';return`<span class="badge ${c}">${esc(v||'—')}</span>`}
+async function api(){const r=await fetch(`${API_BASE}${ENDPOINT}?limite=1000&dias=30`,{cache:'no-store',headers:{Accept:'application/json','X-Admin-Secret':state.secret}});let d={};try{d=await r.json()}catch(_){ }if(!r.ok){const e=new Error(d?.detail||`HTTP ${r.status}`);e.status=r.status;throw e}return d}
+function setLive(ok,t){E.dot.classList.toggle('off',!ok);E.liveText.textContent=t||(ok?'Conectado':'Falha')}
+function renderMetrics(){const r=state.data?.resumo||{},h=state.data?.hotmart_resumo||{},ia=state.data?.ia_resumo||{},d=state.data?.distribuicao||{};E.mCompras.textContent=h.total??0;E.mAprovadas.textContent=h.aprovadas??r.compras_aprovadas??0;E.mAndamento.textContent=r.em_andamento??0;E.mConcluidas.textContent=r.concluidas??0;E.mExpiradas.textContent=r.expiradas??0;E.mTaxa.textContent=`${Number(r.taxa_conclusao_percentual||0).toFixed(1)}%`;E.mGuia.textContent=d.guia_mais_escolhido||'—';E.mIdioma.textContent=d.idioma_mais_usado||'—';E.mTin.textContent=num(ia.tokens_entrada);E.mTout.textContent=num(ia.tokens_saida);E.mCusto.textContent=Number(ia.custo_brl||0)>0?moneyBRL(ia.custo_brl):moneyUSD(ia.custo_usd);E.mCustoMedio.textContent=moneyBRL(ia.custo_medio_brl)}
+function journeys(){const q=norm(E.busca.value),st=norm(E.status.value),g=norm(E.guia.value),lang=norm(E.idioma.value);return(state.data?.jornadas_admin||[]).filter(x=>{const bag=norm([x.codigo_jornada,x.email,x.pedido_id,x.cidade,x.estado,x.pais,x.guia,x.idioma,x.provider,x.modelo].join(' '));if(q&&!bag.includes(q))return false;if(st&&!norm(x.status_jornada).includes(st)&&!norm(x.status_pagamento).includes(st))return false;if(g&&norm(x.guia)!==g)return false;if(lang&&norm(x.idioma)!==lang)return false;return true})}
+function hotmart(){const q=norm(E.busca.value),st=norm(E.status.value);return(state.data?.compras_hotmart||[]).filter(x=>{const bag=norm([x.transaction_id,x.email,x.nome,x.codigo_jornada,x.product_id].join(' '));if(q&&!bag.includes(q))return false;if(st&&!norm(x.status).includes(st))return false;return true})}
+function renderJ(){const rows=journeys();E.count.textContent=`${rows.length} registro${rows.length===1?'':'s'}`;E.empty.classList.toggle('hidden',rows.length>0);E.bodyJornadas.innerHTML=rows.map(x=>`<tr>
+<td class="mono">${esc(x.codigo_jornada||'—')}</td><td>${esc(x.email||'—')}</td><td>${badge(x.status_jornada)}</td><td><span class="badge gold">${esc(x.guia||'—')}</span></td><td>${esc(x.idioma||'—')}</td><td>${esc(x.pais||'—')}</td><td>${esc(x.estado||'—')}</td><td>${esc(x.cidade||'—')}</td><td>${esc(x.provider||'—')}</td><td class="mono">${esc(x.modelo||'—')}</td><td>${num(x.tokens_entrada)}</td><td>${num(x.tokens_saida)}</td><td>${num(x.tokens_total)}</td><td>${esc(cost(x))}</td><td>${esc(x.last_block??'—')}</td><td>${esc(x.last_question??'—')}</td><td>${esc(fmtRestante(x))}</td><td>${esc(fmtDate(x.atualizado_em||x.finished_at||x.started_at||x.created_at))}</td>
+</tr>`).join('')}
+function renderH(){const rows=hotmart();E.count.textContent=`${rows.length} compra${rows.length===1?'':'s'}`;E.empty.classList.toggle('hidden',rows.length>0);E.bodyHotmart.innerHTML=rows.map(x=>`<tr><td class="mono">${esc(x.transaction_id||'—')}</td><td>${esc(x.nome||'—')}</td><td>${esc(x.email||'—')}</td><td>${badge(x.status)}</td><td class="mono">${esc(x.codigo_jornada||'—')}</td><td class="mono">${esc(x.product_id||'—')}</td><td>${esc(fmtDate(x.aprovada_em||x.criada_em))}</td><td>${x.email_acesso_enviado?'<span class="badge ok">Enviado</span>':'<span class="badge warn">Pendente</span>'}</td><td>${esc(x.ultimo_evento||'—')}</td></tr>`).join('')}
+function render(){renderMetrics();const h=state.tab==='hotmart';E.tableJornadas.classList.toggle('hidden',h);E.tableHotmart.classList.toggle('hidden',!h);E.tableTitle.textContent=h?'Compras Hotmart':'Jornadas';h?renderH():renderJ()}
+async function refresh(silent=false){if(!state.secret)return;E.atualizar.disabled=true;if(!silent)setLive(true,'Atualizando...');try{state.data=await api();render();setLive(true,`Atualizado ${new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}`)}catch(e){setLive(false,e.status===403?'Acesso negado':'Falha');if(e.status===403)logout()}finally{E.atualizar.disabled=false}}
+async function login(){const s=String(E.secret.value||'').trim();if(!s){E.loginStatus.textContent='Informe a chave administrativa.';E.loginStatus.className='status error';return}state.secret=s;E.entrar.disabled=true;E.loginStatus.textContent='Validando...';try{state.data=await api();sessionStorage.setItem('ICL_ADMIN_SECRET_SESSION',s);E.login.classList.add('hidden');E.dash.classList.remove('hidden');render();start();setLive(true,'Conectado');E.loginStatus.textContent=''}catch(e){state.secret='';E.loginStatus.textContent=e.status===403?'Chave inválida.':`Erro: ${e.message}`;E.loginStatus.className='status error'}finally{E.entrar.disabled=false}}
+function logout(){clearInterval(state.timer);state.timer=null;state.secret='';state.data=null;sessionStorage.removeItem('ICL_ADMIN_SECRET_SESSION');E.dash.classList.add('hidden');E.login.classList.remove('hidden');E.secret.value=''}
+function start(){clearInterval(state.timer);state.timer=setInterval(()=>refresh(true),REFRESH_MS)}
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.tab=b.dataset.tab;render()}));
+[E.busca,E.status,E.guia,E.idioma].forEach(x=>x.addEventListener(x.tagName==='INPUT'?'input':'change',render));
+E.limpar.addEventListener('click',()=>{E.busca.value='';E.status.value='';E.guia.value='';E.idioma.value='';render()});E.entrar.addEventListener('click',login);E.secret.addEventListener('keydown',e=>{if(e.key==='Enter')login()});E.atualizar.addEventListener('click',()=>refresh(false));E.sair.addEventListener('click',logout);
+const saved=sessionStorage.getItem('ICL_ADMIN_SECRET_SESSION');if(saved){state.secret=saved;E.secret.value=saved;login()}
+console.log('[ICL ADMIN V3]',`${API_BASE}${ENDPOINT}`);
+})();

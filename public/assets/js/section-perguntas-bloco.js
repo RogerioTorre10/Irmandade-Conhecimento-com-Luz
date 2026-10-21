@@ -282,21 +282,21 @@
 
     const themeMap = {
       lumen: {
-        main: '#00c781',
-        soft: 'rgba(0,199,129,0.28)',
-        strong: 'rgba(0,199,129,0.62)',
+        main: '#00ff9d',
+        soft: 'rgba(0,255,157,0.28)',
+        strong: 'rgba(0,255,157,0.62)',
         text: '#e8fff7',
       },
       zion: {
-        main: '#59c8ff',
-        soft: 'rgba(89,200,255,0.28)',
-        strong: 'rgba(89,200,255,0.62)',
+        main: '#00aaff',
+        soft: 'rgba(0,170,255,0.28)',
+        strong: 'rgba(0,170,255,0.62)',
         text: '#eefaff',
       },
       arian: {
-        main: '#ff4fd8',
-        soft: 'rgba(255,79,216,0.28)',
-        strong: 'rgba(255,79,216,0.62)',
+        main: '#ff00ff',
+        soft: 'rgba(255,0,255,0.28)',
+        strong: 'rgba(255,0,255,0.62)',
         text: '#fff0fb',
       },
     };
@@ -339,13 +339,10 @@
       textarea.style.boxShadow = `0 0 12px ${theme.soft}, inset 0 0 10px rgba(255,255,255,0.04)`;
     }
 
-    const bar = section?.querySelector(
-      '#progress-question-fill, .jp-progress-fill'
-    );
-    if (bar) {
+    section?.querySelectorAll('#progress-question-fill, .jp-progress-fill').forEach((bar) => {
       bar.style.background = `linear-gradient(90deg, ${theme.main}, ${theme.main})`;
       bar.style.boxShadow = `0 0 12px ${theme.soft}, 0 0 20px ${theme.strong}`;
-    }
+    });
 
     log('Tema do guia aplicado:', guia, theme.main);
   }
@@ -406,6 +403,7 @@
 
     if (!content) {
       box.hidden = true;
+      box.style.minHeight = '';
       box.textContent = '';
       box.innerHTML = '';
       box.classList.remove('is-visible', 'is-revealing', 'oracle-ready');
@@ -432,6 +430,10 @@
 
     const lines = content.split('\n').filter(Boolean);
     if (!lines.length) lines.push(content);
+
+    // Reserva já a altura final da caixa: assim ela não cresce linha a linha
+    // durante a datilografia e o painel inteiro não fica "balançando".
+    reserveResponseHeight(box, lines);
 
     for (let i = 0; i < lines.length; i++) {
       const lineEl = document.createElement('div');
@@ -463,6 +465,29 @@
     return true;
   }
 
+  function reserveResponseHeight(box, lines) {
+    try {
+      box.style.minHeight = '';
+      const ghost = document.createDocumentFragment();
+      lines.forEach((line) => {
+        const el = document.createElement('div');
+        el.className = 'ai-line oracle-line';
+        el.style.visibility = 'hidden';
+        el.textContent = line;
+        ghost.appendChild(el);
+      });
+      box.appendChild(ghost);
+      const cs = getComputedStyle(box);
+      const maxH = parseFloat(cs.maxHeight);
+      const needed = box.scrollHeight + (parseFloat(cs.borderTopWidth) || 0) + (parseFloat(cs.borderBottomWidth) || 0);
+      const alvo = Number.isFinite(maxH) ? Math.min(needed, maxH) : needed;
+      box.innerHTML = '';
+      if (alvo > 0) box.style.minHeight = `${Math.ceil(alvo)}px`;
+    } catch {
+      box.innerHTML = '';
+    }
+  }
+
   // Exibe uma devolutiva já consumida/restaurada SEM TTS e SEM datilografia.
   // Usada somente no caminho de retomada para não obrigar o participante
   // a ouvir novamente conteúdo que já foi entregue.
@@ -480,6 +505,7 @@
     wrap.dataset.kind = kind;
     wrap.dataset.responseText = content;
     box.hidden = false;
+    box.style.minHeight = '';
     box.textContent = content;
     box.classList.remove('is-revealing');
     box.classList.add('is-visible', 'oracle-ready');
@@ -518,6 +544,13 @@
       questionValue.textContent = `${currentQuestion} / ${totalQuestions}`;
     if (questionFill)
       questionFill.style.width = `${(currentQuestion / totalQuestions) * 100}%`;
+
+    // barra de blocos (ampulheta): preenche com a cor do guia
+    const blocosValue = document.getElementById('jp-blocos-value');
+    const blocosFill = document.getElementById('jp-blocos-fill');
+    if (blocosValue) blocosValue.textContent = `${currentBlock} / ${totalBlocks}`;
+    if (blocosFill)
+      blocosFill.style.width = `${Math.min(100, (currentBlock / totalBlocks) * 100)}%`;
 
     const blockValue = document.getElementById('progress-block-value');
     const blockFill = document.getElementById('progress-block-fill');
@@ -602,6 +635,17 @@
     const lang = document.documentElement.lang || getLang() || 'pt-BR';
 
     if (!('speechSynthesis' in window)) return Promise.resolve();
+
+    // Fala em pedaços (evita o corte do Chrome em respostas longas).
+    if (window.JORNADA_TTS?.speakChunked) {
+      try { speechSynthesis.cancel(); } catch {}
+      return window.JORNADA_TTS.speakChunked(clean, {
+        lang,
+        guide,
+        rate: guide === 'zion' ? 0.92 : 0.98,
+        pitch: guide === 'zion' ? 0.82 : 1.12
+      }).catch(() => {});
+    }
 
     try {
       speechSynthesis.cancel();
@@ -2631,7 +2675,15 @@ function bindButtons(section, bloco, perguntaText, qIndex = 0) {
       questionEl.style.display = 'block';
       questionEl.style.visibility = 'visible';
       questionEl.style.opacity = '1';
+      // Reserva já a altura da pergunta inteira (com o cursor): a caixa não
+      // cresce linha a linha durante a datilografia e o conteúdo não "dança".
       questionEl.style.minHeight = '42px';
+      try {
+        questionEl.textContent = `${perguntaText} |`;
+        const h = questionEl.getBoundingClientRect().height;
+        if (h > 42) questionEl.style.minHeight = `${Math.ceil(h)}px`;
+      } catch {}
+      questionEl.textContent = '';
       questionEl.setAttribute('data-typing', 'true');
       await typeQuestion(questionEl, perguntaText, 28, true);
     }

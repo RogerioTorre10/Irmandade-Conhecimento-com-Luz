@@ -1,4 +1,7 @@
 {
+  "header": {
+    "flameLabel": "Die Flamme bleibt entzündet für"
+  },
   "meta": { "lang": "de-DE", "label": "Deutsch (Deutschland)" },
  "common": {
   "back": "Zurück",
@@ -85,6 +88,14 @@
   "invalidPasswordFormat": "Überprüfen Sie den Code. Verwenden Sie das Format JCL-XXXX-XXXX-XXXX.",
   "sendNeutralMessage": "Wenn für diese E-Mail-Adresse ein genehmigter Kauf vorliegt, senden wir den Zugangscode.",
   "resendNeutralMessage": "Wenn für diese E-Mail-Adresse ein berechtigter Kauf vorliegt, senden wir den Zugangscode.",
+  "consentTitle": "Bevor Sie beginnen",
+  "consentItem1": "Die Reise ist ein individuelles, personalisiertes Erlebnis, das in Echtzeit aus Ihren Antworten entsteht, und ihre Durchführung beginnt mit dem Zugang.",
+  "consentItem2": "Das in der Reise Erlebte kann weder zurückgegeben noch rückgängig gemacht werden.",
+  "consentItem3": "Sie beginnen aus eigener, freier und bewusster Entscheidung und verpflichten sich, die Reise innerhalb von 72 Stunden auf einem beliebigen Gerät abzuschließen.",
+  "consentItem4": "Wenn Sie noch nicht begonnen haben, können Sie innerhalb von 7 Tagen nach dem Kauf die Stornierung und Erstattung beantragen; der Code wird dann storniert.",
+  "consentLabel": "Ich habe dies gelesen und verstanden und möchte die Reise jetzt beginnen.",
+  "consentRequired": "Bitte bestätigen Sie zum Eintreten, dass Sie die obigen Bedingungen gelesen und verstanden haben.",
+  "consentListen": "🔊 Erneut anhören",
   "sendError": "Der Versand des Codes konnte derzeit nicht angefordert werden.",
   "resendError": "Der erneute Versand des Codes konnte derzeit nicht angefordert werden.",
   "validationError": "Der Zugang konnte nicht bestätigt werden.",

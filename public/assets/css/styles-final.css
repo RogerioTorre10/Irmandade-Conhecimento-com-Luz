@@ -1445,3 +1445,17 @@ min-width:220px;
   }
 
 }
+
+/* ============================================================
+   FIX v15 — DESKTOP: PERGAMINHO ACOMPANHA A ALTURA DO CONTEÚDO
+   Causa: .j-perg-v-inner tem aspect-ratio 3/5 (j-panel-glow.css).
+   Com min-height:0, o pergaminho ficava preso nessa proporção e a
+   caixa da devolutiva vazava pela borda de baixo.
+   Mobile (≤768px) permanece intocado.
+   ============================================================ */
+
+@media (min-width: 769px) {
+  #section-final .j-perg-v-inner {
+    aspect-ratio: auto !important;
+  }
+}
