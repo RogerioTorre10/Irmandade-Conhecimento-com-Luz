@@ -319,6 +319,7 @@
     const hostname = String(window.location?.hostname || '').toLowerCase();
     return (
       hostname.includes('homolog') ||
+      hostname === 'irmandade-conhecimento-com-luz-1.onrender.com' ||
       hostname === 'localhost' ||
       hostname === '127.0.0.1'
     );
