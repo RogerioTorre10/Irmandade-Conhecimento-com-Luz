@@ -4,7 +4,7 @@
 
 (function () {
   // >>> Ajuste AQUI se seu backend mudar <<<
-  const IS_HOMOLOG = /(^|\\.)irmandade-conhecimento-com-luz-1\\.onrender\\.com$/i.test(window.location.hostname);
+  const IS_HOMOLOG = /(^|\.)irmandade-conhecimento-com-luz-1\.onrender\.com$/i.test(window.location.hostname);
   const DEFAULT_API_BASE = IS_HOMOLOG
     ? "https://lumen-backend-homolog.onrender.com/api"
     : "https://lumen-backend-api.onrender.com/api";
