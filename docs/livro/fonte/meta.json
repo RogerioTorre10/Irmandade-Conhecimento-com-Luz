@@ -1,7 +1,7 @@
 {
   "titulo": "O PLENO EXISTENCIAL",
   "subtitulo": "A teoria entre o vazio e o cheio",
-  "autor": "ROGÉRIO APARECIDO DA SILVA TORRES",
+  "autor": "ROGÉRIO A S TORRES",
   "selo": "Irmandade Conhecimento com Luz",
   "creditos": [
     "O Pleno Existencial: a teoria entre o vazio e o cheio",
@@ -11,5 +11,11 @@
     "Irmandade Conhecimento com Luz"
   ],
   "epigrafe": "“Não importa o que fizeram de mim; o que importa é o que eu faço com o que fizeram de mim.”",
-  "epigrafeAutor": "— atribuída a Jean-Paul Sartre"
+  "epigrafeAutor": "— atribuída a Jean-Paul Sartre",
+  "dedicatoria": [
+    "À memória dos meus pais, Inácio e Creusa, e do meu irmão Rodolfo, que me deram as raízes.",
+    "Aos meus irmãos e cunhadas, Rinaldo e Sônia, Ricardo e Dulce, que seguem comigo na travessia.",
+    "Ao meu filho e nora, Lucas e Geovanna, à minha neta fofura Malu e à minha linda filha Júlia, a minha Lia: a luz que continua.",
+    "À Gisely, minha doce esposa, e às gêmeas Isabella e Fernanda, minhas filhas de coração, cujo apoio fez este momento chegar."
+  ]
 }
