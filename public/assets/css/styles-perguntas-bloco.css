@@ -1176,3 +1176,50 @@ section[id^="section-perguntas-"].is-block-feedback-mode .j-panel-glow {
   transition: width .8s ease;
 }
 #progress-question-fill { transition: width .6s ease; }
+
+/* ===========================================================
+   CELULAR — painel das perguntas mais largo
+   (menos moldura em volta: o texto ganha largura e o painel
+   fica menos comprido; só espaçamentos, nada de fluxo)
+   =========================================================== */
+@media (max-width: 600px) {
+  section[id^="section-perguntas-"] .j-panel-glow.perguntas-panel {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+  }
+  section[id^="section-perguntas-"] .j-perg-v-inner {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+  }
+  section[id^="section-perguntas-"] .j-arcane-card.perguntas-wrap {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+  /* moldura externa mais fina só enquanto as perguntas estão na tela */
+  #jornada-canvas:has(section[id^="section-perguntas-"]:not([hidden]):not(.hidden)) {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+  /* título do bloco: cabe numa linha nos nomes curtos, quebra nos longos */
+  section[id^="section-perguntas-"] .perguntas-title {
+    font-size: clamp(1.3rem, 7vw, 1.8rem) !important;
+    letter-spacing: 0.02em !important;
+    line-height: 1.15 !important;
+  }
+}
+
+/* ===========================================================
+   BOTÃO CONTINUAR — mais espaço para o texto caber inteiro
+   ("Continuar" e também "Síntese do bloco..." enquanto o guia reflete)
+   =========================================================== */
+section[id^="section-perguntas-"] .perguntas-controls {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 1.9fr) !important;
+}
+section[id^="section-perguntas-"] #jp-btn-confirmar {
+  font-size: clamp(11.5px, 3.2vw, 16px) !important;
+  line-height: 1.08 !important;
+  white-space: normal !important;
+  text-align: center !important;
+  letter-spacing: 0 !important;
+  padding: 4px 10px !important;
+}

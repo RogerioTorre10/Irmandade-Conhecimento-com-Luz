@@ -88,13 +88,7 @@
         }
       } catch (_) {}
 
-      try {
-        if (ambient) {
-          ambient.pause();
-          ambient.removeAttribute('src');
-          ambient.load();
-        }
-      } catch (_) {}
+      try { stopAmbientPaint(); } catch (_) {}
 
       try { video?.remove(); } catch (_) {}
       try { ambient?.remove(); } catch (_) {}
@@ -128,6 +122,29 @@
     }
   }
 
+  let ambientTimer = null;
+  function stopAmbientPaint() {
+    if (ambientTimer) { clearInterval(ambientTimer); ambientTimer = null; }
+  }
+  function startAmbientPaint(video, canvas) {
+    stopAmbientPaint();
+    let ctx2d = null;
+    try { ctx2d = canvas.getContext('2d', { alpha: false }); } catch (_) {}
+    if (!ctx2d) return;
+    const paint = () => {
+      if (!document.body.contains(canvas)) { stopAmbientPaint(); return; }
+      if (video.readyState < 2) return;
+      try {
+        ctx2d.drawImage(video, 0, 0, canvas.width, canvas.height);
+        canvas.style.opacity = '1';
+      } catch (_) {
+        stopAmbientPaint(); // fundo é só decorativo
+      }
+    };
+    paint();
+    ambientTimer = setInterval(paint, 120);
+  }
+
   function buildPortal() {
   document.getElementById('videoOverlay')?.remove();
   document.getElementById('global-video-overlay')?.remove();
@@ -153,25 +170,24 @@
     transition: 'opacity 600ms ease'
   });
 
-  const ambient = document.createElement('video');
+  // Fundo desfocado ("ambilight"): pintado a partir do PRÓPRIO vídeo num
+  // canvas pequeno. Antes era um segundo <video> com o mesmo arquivo, o que
+  // baixava o filme duas vezes e travava a reprodução em redes móveis.
+  const ambient = document.createElement('canvas');
   ambient.id = 'vt-ambient';
   ambient.className = 'vt-video-ambient';
-  ambient.playsInline = true;
-  ambient.autoplay = false;
-  ambient.controls = false;
-  ambient.muted = true;
-  ambient.loop = true;
-  ambient.preload = 'auto';
+  ambient.width = 64;
+  ambient.height = 36;
 
   Object.assign(ambient.style, {
     position: 'fixed',
     inset: '0',
     width: '100vw',
     height: '100vh',
-    objectFit: 'cover',
     filter: 'blur(30px) brightness(0.78) saturate(1.28)',
     transform: 'scale(1.22)',
-    opacity: '1',
+    opacity: '0',
+    transition: 'opacity 500ms ease',
     zIndex: '1',
     pointerEvents: 'none'
   });
@@ -349,7 +365,7 @@
       window.removeEventListener('resize', onResize);
 
       try { video.pause(); } catch (_) {}
-      try { ambient.pause(); } catch (_) {}
+      try { stopAmbientPaint(); } catch (_) {}
 
       try { navigateTo(nextSectionId); } catch (e) { warn('Falha ao navegar sob o vídeo:', e); }
 
@@ -386,7 +402,7 @@
 
     const clearTransitionTimers = () => {
       if (playbackSafetyTimer) {
-        clearTimeout(playbackSafetyTimer);
+        clearInterval(playbackSafetyTimer);
         playbackSafetyTimer = null;
       }
       if (loadSafetyTimer) {
@@ -403,18 +419,65 @@
     // O relógio de segurança da exibição só nasce DEPOIS que o vídeo
     // realmente entrou em reprodução. Assim, tempo de rede/buffer não
     // consome o tempo visual da transição.
+    // Vigia por PROGRESSO, não por relógio: enquanto o filme avança, ele é
+    // exibido até o fim, mesmo que a rede faça pausas para carregar.
+    // Antes havia um tempo fixo (duração + 5 s) a partir do play: com o
+    // vídeo parado carregando, esse tempo acabava e a jornada pulava o
+    // filme pela metade (ou parado no início).
     const armPlaybackSafety = () => {
-      if (playbackSafetyTimer) clearTimeout(playbackSafetyTimer);
+      if (playbackSafetyTimer) clearInterval(playbackSafetyTimer);
 
       const durationMs = Number.isFinite(video.duration) && video.duration > 0
         ? Math.ceil(video.duration * 1000)
-        : 10000;
+        : 30000;
+      const startedAt = performance.now();
+      let lastTime = video.currentTime || 0;
+      let lastMoveAt = startedAt;
+      let nudgedAt = 0;
 
-      playbackSafetyTimer = setTimeout(() => {
-        if (!isPlaying) return;
-        warn('Timeout de segurança APÓS início real da reprodução.');
-        finishSafely();
-      }, durationMs + 5000);
+      playbackSafetyTimer = setInterval(() => {
+        if (!isPlaying || !document.body.contains(video)) {
+          clearInterval(playbackSafetyTimer);
+          playbackSafetyTimer = null;
+          return;
+        }
+        const now = performance.now();
+        const t = video.currentTime || 0;
+        if (t > lastTime + 0.04) { lastTime = t; lastMoveAt = now; }
+
+        // chegou ao fim (alguns celulares não disparam 'ended')
+        if (video.ended || (Number.isFinite(video.duration) && t >= video.duration - 0.2)) {
+          finishSafely();
+          return;
+        }
+        // pausado sem motivo (economia de energia do celular): tenta seguir
+        if (video.paused && now - nudgedAt > 2000) {
+          nudgedAt = now;
+          try { const pr = video.play(); if (pr && pr.catch) pr.catch(() => {}); } catch (_) {}
+        }
+        // parado de verdade por muito tempo: libera a jornada
+        if (now - lastMoveAt > 15000) {
+          warn('Vídeo sem avançar há 15 s; liberando a jornada.');
+          finishSafely();
+          return;
+        }
+        // teto absoluto (rede muito lenta)
+        if (now - startedAt > durationMs * 3 + 30000) {
+          warn('Vídeo demorou demais; liberando a jornada.');
+          finishSafely();
+        }
+      }, 500);
+    };
+
+    // Começa com um pouco de vídeo já carregado (evita travar logo no início).
+    let bufferWait = null;
+    const startWhenBuffered = () => {
+      if (playStarted || playAttemptInFlight) return;
+      if (video.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) { tryPlayBoth(); return; }
+      if (bufferWait) return;
+      const go = () => { clearTimeout(bufferWait); tryPlayBoth(); };
+      video.addEventListener('canplaythrough', go, { once: true });
+      bufferWait = setTimeout(go, 2500);
     };
 
     const tryPlayBoth = async () => {
@@ -458,25 +521,8 @@
         clearTimeout(loadSafetyTimer);
         loadSafetyTimer = null;
 
-        // Ambient é apenas decorativo. Tenta acompanhar sem interferir no
-        // vídeo principal; qualquer falha dele é ignorada.
-        try {
-          // O ambient nunca pode aparecer antes de estar sincronizado
-          ambient.style.opacity = '0';
-        
-          if (ambient.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
-            ambient.currentTime = video.currentTime || 0;
-        
-            await ambient.play();
-        
-            // Só revela o blur depois que ambos já estão rodando juntos
-            ambient.currentTime = video.currentTime || 0;
-            ambient.style.opacity = '1';
-          }
-        } catch (_) {
-          // Se o ambient falhar, preserva o vídeo principal normalmente.
-          ambient.style.opacity = '0';
-        }
+        // Fundo desfocado: pintado do próprio vídeo (decorativo).
+        try { startAmbientPaint(video, ambient); } catch (_) {}
 
         log(
           'Vídeo principal iniciado REALMENTE.',
@@ -496,14 +542,14 @@
     // loadeddata garante que já existe um frame real disponível.
     const onLoadedData = () => {
       try { fitFrameToVideo(frame, video); } catch (_) {}
-      tryPlayBoth();
+      startWhenBuffered();
     };
 
     // canplay funciona como segunda porta de entrada, sem duplicar play().
     const onCanPlay = () => {
       log('Vídeo carregado e pronto:', href);
       try { fitFrameToVideo(frame, video); } catch (_) {}
-      tryPlayBoth();
+      startWhenBuffered();
     };
 
     const onPlaying = () => {
@@ -545,15 +591,10 @@
     video.addEventListener('ended', onEnded, { once: true });
     video.addEventListener('error', onError, { once: true });
 
-    // Cache-busting mantido, mas ambos recebem exatamente a mesma URL.
-    const finalSrc = href + (href.includes('?') ? '&' : '?') + 't=' + Date.now();
-
-    video.src = finalSrc;
-    ambient.src = finalSrc;
-
-    // Um único load por elemento.
+    // Sem "cache-busting": o navegador pode reaproveitar o que já baixou
+    // (os filmes não mudam durante a jornada) e o arquivo é baixado uma vez só.
+    video.src = href;
     video.load();
-    ambient.load();
 
     // Fallback de CARREGAMENTO, não de duração. Ele não encerra a
     // transição aos 18 s nem reinicia currentTime enquanto um play() existe.

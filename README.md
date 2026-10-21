@@ -44,3 +44,20 @@ root
 - Ícones via Lucide e estilos via Tailwind CDN (sem build).
 
 Qualquer ajuste me chama que eu edito e mando um novo pacote. PARA ALÉM. E SEMPRE!!
+
+## Voz da narração (voz neural)
+
+A narração usa uma voz neural (ElevenLabs) servida por `POST /api/tts` no `server.js`.
+Sem configuração, a jornada continua com a voz do navegador, sem mudar o fluxo.
+
+Variáveis de ambiente (painel do Render → Environment):
+
+| Variável | Obrigatória | Uso |
+| --- | --- | --- |
+| `ELEVENLABS_API_KEY` | sim | chave da conta ElevenLabs |
+| `ELEVENLABS_VOICE_ID` | sim | voz padrão (ex.: a voz clonada do áudio de referência) |
+| `ELEVENLABS_VOICE_LUMEN` / `_ZION` / `_ARIAN` / `_CERIMONIAL` | não | voz específica por guia |
+| `ELEVENLABS_MODEL` | não | padrão `eleven_multilingual_v2` (fala todos os idiomas da jornada) |
+| `ELEVENLABS_STABILITY` / `_SIMILARITY` / `_STYLE` | não | ajuste fino (padrões 0.55 / 0.85 / 0.3) |
+
+Os áudios gerados ficam em cache no servidor, então cada frase só é cobrada uma vez.
