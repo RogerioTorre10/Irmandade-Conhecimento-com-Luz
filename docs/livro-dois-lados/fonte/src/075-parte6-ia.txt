@@ -1,5 +1,5 @@
-PARTE|Parte VI|O ser humano diante da máquina
-CAP|Capítulo 22|A vibração que a máquina não tem
+PARTE|Parte VII|O ser humano diante da máquina
+CAP|Capítulo 23|A vibração que a máquina não tem
 Vivemos o tempo da inteligência artificial. Máquinas escrevem, conversam, traduzem, compõem músicas, desenham rostos que nunca existiram e resolvem problemas que antes só o ser humano resolvia. Os computadores quânticos prometem cálculos inimagináveis, e há quem sonhe com neurônios cultivados em laboratório ligados a circuitos eletrônicos. Diante disso, muita gente se pergunta, com medo ou com fascínio, se o ser humano será substituído.
 Este capítulo é a minha resposta. Ela começa com um pouco do que a máquina é, passa pelos dois lados do seu uso e chega àquilo que, na minha convicção, nenhuma máquina pode ter.
 SUB|O que a máquina faz
