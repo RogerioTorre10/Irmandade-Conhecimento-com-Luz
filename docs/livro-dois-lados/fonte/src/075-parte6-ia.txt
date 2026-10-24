@@ -1,5 +1,5 @@
-PARTE|Parte VI|O ser humano diante da máquina
-CAP|Capítulo 22|A vibração que a máquina não tem
+PARTE|Parte VII|O ser humano diante da máquina
+CAP|Capítulo 25|A vibração que a máquina não tem
 Vivemos o tempo da inteligência artificial. Máquinas escrevem, conversam, traduzem, compõem músicas, desenham rostos que nunca existiram e resolvem problemas que antes só o ser humano resolvia. Os computadores quânticos prometem cálculos inimagináveis, e há quem sonhe com neurônios cultivados em laboratório ligados a circuitos eletrônicos. Diante disso, muita gente se pergunta, com medo ou com fascínio, se o ser humano será substituído.
 Este capítulo é a minha resposta. Ela começa com um pouco do que a máquina é, passa pelos dois lados do seu uso e chega àquilo que, na minha convicção, nenhuma máquina pode ter.
 SUB|O que a máquina faz
@@ -26,4 +26,10 @@ Algumas atitudes ajudam a manter a inteligência artificial do lado que contagia
 SUB|A máquina calcula, o ser humano vibra
 A inteligência artificial não é uma inimiga. Ela é, talvez, a ferramenta mais poderosa que a humanidade já criou, e por isso mesmo tem os dois lados mais fortes. Pode curar ou enganar, aproximar ou isolar, ensinar ou viciar. Quem decide de que lado ela vibra somos nós.
 A máquina calcula. O ser humano vibra. E a responsabilidade pelo uso continua sendo de quem tem espírito.
-[SUA VOZ: como você usa a inteligência artificial na Irmandade, na Jornada e na escrita deste livro, e o que essa experiência ensinou a você sobre o que é ser humano.]
+SUB|A minha opinião
+Sei que muita gente teme o avanço da inteligência artificial e a independência que ela pode ganhar. Respeito esse medo. Mas a minha opinião é positiva. Hoje, a máquina não tem vontade própria. É uma entre as inúmeras ferramentas que o ser humano já criou, e, bem usada, pode mudar o mundo para melhor, fazendo avançar em poucos anos o que levaria décadas ou séculos.
+Como tudo neste livro, ela também tem os seus dois lados, e pode ser usada para o mal. A balança, mais uma vez, não está na máquina. Está na intenção de quem está por trás dela.
+SUB|A inteligência artificial neste livro
+Falo também por experiência própria. Graças à inteligência artificial, consegui colocar em prática várias coisas que, sem ela, levariam anos para sair do papel. Projetos que estavam na gaveta ganharam vida, inclusive na Irmandade e na Jornada.
+Este livro é um deles. A inteligência artificial me ajudou a pesquisar, a confirmar termos e dados, a conferir as citações e a decidir onde cada ideia que eu tinha estruturado ficaria melhor. Economizei tempo e ganhei segurança, sempre tomando o cuidado de não deixar passar uma informação falsa ou ultrapassada. As ideias, as convicções e as histórias são minhas. A máquina me ajudou a organizá-las e a apoiá-las em fontes.
+Por isso digo que ela é mais do que uma ferramenta de auxílio. Hoje ela pode ocupar um lugar importante na pesquisa, na orientação e na criação, desde que quem a usa continue conferindo, decidindo e respondendo pelo que escreve. Não usar a inteligência artificial como apoio, hoje, é como ir a pé para outro país quando existe o avião.
