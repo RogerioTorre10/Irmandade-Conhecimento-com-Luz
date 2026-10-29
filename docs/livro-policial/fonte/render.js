@@ -1,9 +1,9 @@
 // Gera o DOCX de "Todo crime tem um autor?" a partir dos capítulos em fonte/cap*.txt
-// Marcação: CAP|Capítulo N|Título  ·  SEP|  (quebra de cena)  ·  outra linha = parágrafo
+// Marcação: CAP|Capítulo N|Título  ·  SEP|  (quebra de cena)  ·  CEL|texto (chamada para o celular virtual)  ·  outra linha = parágrafo
 // uso: NODE_PATH=$(npm root -g) node render.js [saida.docx]
 const fs = require('fs');
 const path = require('path');
-const { Document, Packer, Paragraph, TextRun, AlignmentType } = require('docx');
+const { Document, Packer, Paragraph, TextRun, AlignmentType, BorderStyle, ShadingType } = require('docx');
 
 const cm = (v) => Math.round(v * 567);
 const FONT = 'Georgia';
@@ -23,6 +23,13 @@ for (const f of files) {
       children.push(new Paragraph({ spacing: { after: 720 }, alignment: AlignmentType.CENTER,
         children: [new TextRun({ text: title, font: FONT, size: 32, bold: true })] }));
       first = false;
+    } else if (line.startsWith('CEL|')) {
+      const box = { style: BorderStyle.SINGLE, size: 6, color: '555555', space: 6 };
+      const common = { border: { top: box, bottom: box, left: box, right: box }, shading: { type: ShadingType.CLEAR, color: 'auto', fill: 'EFEFEF' }, indent: { left: cm(0.4), right: cm(0.4) } };
+      children.push(new Paragraph({ ...common, alignment: AlignmentType.CENTER, spacing: { before: 240, after: 0 },
+        children: [new TextRun({ text: 'NO CELULAR DE HENRIQUE', font: FONT, size: 17, bold: true, characterSpacing: 30 })] }));
+      children.push(new Paragraph({ ...common, alignment: AlignmentType.CENTER, spacing: { before: 0, after: 240, line: 288 },
+        children: [new TextRun({ text: line.slice(4), font: FONT, size: 19, italics: true })] }));
     } else if (line.startsWith('SEP|')) {
       children.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 200, after: 200 },
         children: [new TextRun({ text: '*', font: FONT, size: 22 })] }));
