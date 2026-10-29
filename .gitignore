@@ -51,3 +51,6 @@ coverage/
 
 # Optional: ignore Copilot Pages (if used locally)
 copilot-pages/
+
+# Livro 2: arquivo intermediário do build
+docs/livro-dois-lados/fonte/blocks.json
