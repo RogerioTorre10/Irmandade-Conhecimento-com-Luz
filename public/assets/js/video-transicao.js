@@ -1,21 +1,20 @@
-// /assets/js/video-transicao.js — PORTAL DOURADO + AMBIENT BLUR FULLSCREEN BLINDADO
+// /assets/js/video-transicao.js — PORTAL DOURADO + GLAMOUR + LIMELIGHT (versão final cinematográfica)
 (function () {
   'use strict';
 
   const NS = '[VIDEO_TRANSICAO]';
-  const log = (...a) => console.log(NS, ...a);
+  const log  = (...a) => console.log(NS, ...a);
   const warn = (...a) => console.warn(NS, ...a);
 
   let isPlaying = false;
+  let cleaned   = false;
 
+  // ----------------------------- UTILIDADES -----------------------------
   const isMp4 = (src) => /\.mp4(\?|#|$)/i.test(src || '');
 
   const resolveHref = (src) => {
-    try {
-      return new URL(src, window.location.origin).href;
-    } catch {
-      return src;
-    }
+    try { return new URL(src, window.location.origin).href; }
+    catch { return src; }
   };
 
   function navigateTo(nextSectionId) {
@@ -36,123 +35,65 @@
     return (...args) => {
       if (done) return;
       done = true;
-      try {
-        fn(...args);
-      } catch (e) {
-        warn('Erro no safeOnce:', e);
-      }
+      try { fn(...args); } catch (e) { warn('Erro no safeOnce:', e); }
     };
   }
-  
-  function fitFrameToVideo(frame, video) {
-  if (!frame) return;
 
-  const isMobile = window.innerWidth < 768;
-  const maxVW = window.innerWidth * (isMobile ? 0.98 : 0.94);
-  const maxVH = window.innerHeight * (isMobile ? 0.58 : 0.72);
-
-  const w = (video && video.videoWidth) ? video.videoWidth : 16;
-  const h = (video && video.videoHeight) ? video.videoHeight : 9;
-  const ar = w / h;
-
-  let width = maxVW;
-  let height = width / ar;
-
-  if (height > maxVH) {
-    height = maxVH;
-    width = height * ar;
-  }
-
-  frame.style.width = `${Math.max(220, Math.round(width))}px`;
-  frame.style.height = `${Math.max(140, Math.round(height))}px`;
-  frame.style.maxWidth = isMobile ? '98vw' : '94vw';
-  frame.style.maxHeight = isMobile ? '58vh' : '72vh';
-  frame.style.display = 'block';
-  frame.style.visibility = 'visible';
-  frame.style.opacity = '1';
-}
-
-  function cleanup() {
-    try {
+  function onKeydown(e) {
+    if (e.key === 'Escape') {
+      log('Vídeo pulado pelo usuário (Esc)');
       const overlay = document.getElementById('vt-overlay');
-      const frame = document.getElementById('vt-frame');
-      const video = document.getElementById('vt-video');
-      const ambient = document.getElementById('vt-ambient');
-      const veil = document.getElementById('vt-veil');
-
-      try {
-        if (video) {
-          video.pause();
-          video.removeAttribute('src');
-          video.load();
-        }
-      } catch (_) {}
-
-      try { stopAmbientPaint(); } catch (_) {}
-
-      try { video?.remove(); } catch (_) {}
-      try { ambient?.remove(); } catch (_) {}
-      try { veil?.remove(); } catch (_) {}
-      try { frame?.remove(); } catch (_) {}
-      try { overlay?.remove(); } catch (_) {}
-
-      document.body.style.overflow = '';
-      document.documentElement.style.overflow = '';
-      
-      window.__TRANSITION_LOCK = false;
-      window.JORNADA_TRANSICAO_ATIVA = false;
-      document.body.classList.remove('is-transitioning');
-      document.body.classList.remove('transition-playing');
-      
-      isPlaying = false;
-
-      document.dispatchEvent(new CustomEvent('transition:ended'));
-      window.dispatchEvent(new CustomEvent('jornada:transicao:end'));
-
-      // rede de segurança: a página nunca fica oculta depois do vídeo
-      setTimeout(() => {
-        if (!isPlaying && document.body.classList.contains('vt-fade-out')) {
-          document.body.classList.remove('vt-fade-out');
-        }
-      }, 1500);
-
-      log('Overlay removido e estado resetado');
-    } catch (e) {
-      warn('Erro no cleanup:', e);
+      cleanup(overlay);
     }
   }
 
-  let ambientTimer = null;
-  function stopAmbientPaint() {
-    if (ambientTimer) { clearInterval(ambientTimer); ambientTimer = null; }
-  }
-  function startAmbientPaint(video, canvas) {
-    stopAmbientPaint();
-    let ctx2d = null;
-    try { ctx2d = canvas.getContext('2d', { alpha: false }); } catch (_) {}
-    if (!ctx2d) return;
-    const paint = () => {
-      if (!document.body.contains(canvas)) { stopAmbientPaint(); return; }
-      if (video.readyState < 2) return;
-      try {
-        ctx2d.drawImage(video, 0, 0, canvas.width, canvas.height);
-        canvas.style.opacity = '1';
-      } catch (_) {
-        stopAmbientPaint(); // fundo é só decorativo
-      }
-    };
-    paint();
-    ambientTimer = setInterval(paint, 120);
+  // Ajusta moldura à proporção real do vídeo (sem fullscreen nativo)
+  function fitFrameToVideo(frame, video) {
+    const vw = window.innerWidth  * 0.96;
+    const vh = window.innerHeight * 0.96;
+
+    // fallback inicial (16:9) se metadata ainda não carregou
+    const w = video.videoWidth  || 16;
+    const h = video.videoHeight ||  9;
+
+    const ar = w / h;
+
+    let width, height;
+    if (vw / ar <= vh) {
+      width  = vw;
+      height = vw / ar;
+    } else {
+      height = vh;
+      width  = vh * ar;
+    }
+
+    frame.style.width  = Math.round(width)  + 'px';
+    frame.style.height = Math.round(height) + 'px';
   }
 
-  function buildPortal() {
-  document.getElementById('videoOverlay')?.remove();
-  document.getElementById('global-video-overlay')?.remove();
-  document.getElementById('vt-overlay')?.remove();
+  // ---------------------------- LIMPEZA --------------------------------
+  function cleanup(overlay) {
+    if (cleaned) return;
+    cleaned = true;
 
+    try {
+      document.removeEventListener('keydown', onKeydown, true);
+      window.__TRANSITION_LOCK = false;
+      document.dispatchEvent(new CustomEvent('transition:ended'));
+      document.documentElement.style.overflow = '';
+      if (overlay?.parentNode) overlay.parentNode.removeChild(overlay);
+    } catch {}
+
+    isPlaying = false;
+    log('Overlay removido e estado resetado');
+  }
+
+  // -------------------------- PORTAL DOURADO ---------------------------
+function buildPortal() {
+  // Overlay escuro (FULLSCREEN de verdade, independente de CSS externo)
   const overlay = document.createElement('div');
   overlay.id = 'vt-overlay';
-  overlay.className = 'vt-video-overlay';
+  overlay.className = 'jp-video-overlay';
   overlay.setAttribute('role', 'dialog');
 
   Object.assign(overlay.style, {
@@ -163,57 +104,48 @@
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    background: 'rgba(0,0,0,0.35)',
-    zIndex: '2147483647',
-    overflow: 'hidden',
-    opacity: '1',
-    transition: 'opacity 600ms ease'
+    background: 'rgba(0,0,0,0.88)',
+    zIndex: '2147483647',        // acima de tudo
+    overflow: 'hidden'
   });
 
-  // Fundo desfocado ("ambilight"): pintado a partir do PRÓPRIO vídeo num
-  // canvas pequeno. Antes era um segundo <video> com o mesmo arquivo, o que
-  // baixava o filme duas vezes e travava a reprodução em redes móveis.
-  const ambient = document.createElement('canvas');
-  ambient.id = 'vt-ambient';
-  ambient.className = 'vt-video-ambient';
-  ambient.width = 64;
-  ambient.height = 36;
-
-  Object.assign(ambient.style, {
-    position: 'fixed',
-    inset: '0',
-    width: '100vw',
-    height: '100vh',
-    filter: 'blur(30px) brightness(0.78) saturate(1.28)',
-    transform: 'scale(1.22)',
-    opacity: '0',
-    transition: 'opacity 500ms ease',
-    zIndex: '1',
-    pointerEvents: 'none'
-  });
-
+  // Moldura dourada (container central)
   const frame = document.createElement('div');
-  frame.id = 'vt-frame';
-  frame.className = 'vt-video-frame';
+  frame.className = 'jp-video-frame';
 
   Object.assign(frame.style, {
     position: 'relative',
     display: 'block',
-    width: 'min(96vw, 1280px)',
-    height: 'min(82vh, 720px)',
     maxWidth: '96vw',
-    maxHeight: '82vh',
+    maxHeight: '96vh',
     borderRadius: '18px',
-    overflow: 'hidden',
-    background: 'rgba(0,0,0,0.45)',
-    boxShadow:
-      '0 0 0 2px rgba(212,175,55,.82), 0 0 42px rgba(212,175,55,.45)',
-    zIndex: '5'
+    overflow: 'hidden'
   });
 
+  // Vídeo ambiente (limelight)
+  const ambient = document.createElement('video');
+  ambient.className = 'jp-video-ambient';
+  ambient.playsInline = true;
+  ambient.autoplay = false;
+  ambient.controls = false;
+  ambient.muted = true;
+  ambient.loop = true;
+  ambient.preload = 'auto';
+
+  Object.assign(ambient.style, {
+    position: 'absolute',
+    inset: '0',
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    filter: 'blur(18px) brightness(0.7)',
+    transform: 'scale(1.08)',
+    opacity: '0.9'
+  });
+
+  // Vídeo principal
   const video = document.createElement('video');
   video.id = 'vt-video';
-  video.className = 'vt-video-main';
   video.playsInline = true;
   video.autoplay = false;
   video.controls = false;
@@ -225,96 +157,45 @@
     inset: '0',
     width: '100%',
     height: '100%',
-    objectFit: 'cover',
-    background: 'transparent',
-    zIndex: '6'
+    objectFit: 'cover'
   });
 
+  frame.appendChild(ambient);
+  frame.appendChild(video);
+
+  // Botão “Pular”
   const skip = document.createElement('button');
-  skip.id = 'vt-skip';
   skip.textContent = 'Pular';
   skip.setAttribute('aria-label', 'Pular vídeo');
-  skip.className = 'vt-video-skip';
+  skip.className = 'jp-video-skip';
 
   Object.assign(skip.style, {
     position: 'absolute',
     top: '14px',
     right: '14px',
-    zIndex: '10',
+    zIndex: '3',
     padding: '8px 14px',
     borderRadius: '999px',
-    border: '1px solid rgba(255,215,0,0.85)',
-    background: 'rgba(0,0,0,0.72)',
-    color: '#ffd700',
-    cursor: 'pointer',
-    boxShadow: '0 0 14px rgba(255,215,0,0.32)'
+    border: '0',
+    cursor: 'pointer'
   });
 
-  frame.appendChild(video);
   frame.appendChild(skip);
 
-  overlay.appendChild(ambient);
+  // Anexa no body por último (garante que fica acima)
   overlay.appendChild(frame);
-
-  document.body.appendChild(overlay);
-
+  document.documentElement.appendChild(overlay);
+  
+  // Glamour: portal aparece suave (mantém seu CSS se existir)
   requestAnimationFrame(() => overlay.classList.add('show'));
 
   return { overlay, frame, video, ambient, skip };
 }
-
-  const RING_GOLD = '#d4af37';
-  const RING_GUIDE_COLORS = { lumen: '#00ff9d', zion: '#00aaff', arian: '#ff00ff' };
-  // sections em que o guia ainda não foi escolhido nesta jornada
-  const RING_PRE_GUIDE = new Set([
-    'section-intro', 'section-termos1', 'section-termos2', 'section-senha'
-  ]);
-  // vídeos que levam a estas sections também acontecem antes da escolha
-  const RING_GOLD_NEXT = new Set([
-    'section-intro', 'section-termos1', 'section-termos2', 'section-senha', 'section-guia'
-  ]);
-  const RING_POST_GUIDE_PREFIXES = [
-    'section-guia', 'section-selfie', 'section-card', 'section-dados-pessoais',
-    'section-perguntas', 'section-final'
-  ];
-
-  function currentGuideKey() {
-    const raw = String(
-      document.body?.dataset?.guia ||
-      window.JORNADA_STATE?.guiaSelecionado ||
-      window.JORNADA_STATE?.guia ||
-      sessionStorage.getItem('JORNADA_GUIA') ||
-      sessionStorage.getItem('jornada.guia') ||
-      ''
-    ).toLowerCase();
-    if (raw.includes('lumen')) return 'lumen';
-    if (raw.includes('zion')) return 'zion';
-    if (raw.includes('arian') || raw.includes('arion')) return 'arian';
-    return '';
-  }
-
-  // Só usa a cor do guia quando temos certeza de que a jornada já passou
-  // da escolha do guia. Em qualquer dúvida, fica dourado.
-  function isAfterGuideChoice(nextSectionId) {
-    const current = String(window.JC?.currentSection || '');
-    const next = String(nextSectionId || '');
-    if (RING_PRE_GUIDE.has(current)) return false;
-    if (RING_GOLD_NEXT.has(next)) return false;
-    return RING_POST_GUIDE_PREFIXES.some((p) => current.startsWith(p)) ||
-           RING_POST_GUIDE_PREFIXES.some((p) => p !== 'section-guia' && next.startsWith(p));
-  }
-
-  function applyRingColor(target, nextSectionId) {
-    if (!target) return;
-    const guide = isAfterGuideChoice(nextSectionId) ? currentGuideKey() : '';
-    const color = RING_GUIDE_COLORS[guide] || RING_GOLD;
-    target.style.setProperty('--vt-ring', color);
-    target.dataset.ring = guide || 'gold';
-  }
-
+  // ------------------------- PLAYER PRINCIPAL ---------------------------
   function playTransitionVideo(src, nextSectionId) {
     log('Recebido src:', src, 'nextSectionId:', nextSectionId);
 
+    // Se não for MP4 → navega direto
     if (!src || !isMp4(src)) {
       warn('Fonte não é MP4 (ou ausente). Pulando player e navegando direto…');
       navigateTo(nextSectionId);
@@ -327,315 +208,126 @@
     }
 
     isPlaying = true;
+    cleaned = false;
 
-    window.__TRANSITION_LOCK = true;
-    window.JORNADA_TRANSICAO_ATIVA = true;
-
-    document.body.classList.add('is-transitioning');
-    document.body.classList.add('transition-playing');
+    // Glamour: some a página antes do filme
     document.body.classList.remove('vt-fade-in');
     document.body.classList.add('vt-fade-out');
 
+    // 🔒 trava transições e cancela TTS
+    window.__TRANSITION_LOCK = true;
+    document.dispatchEvent(new CustomEvent('transition:started'));
     try { window.speechSynthesis?.cancel(); } catch {}
+    document.documentElement.style.overflow = 'hidden';
 
     const href = resolveHref(src);
     log('Vídeo resolvido para:', href);
 
     const { overlay, frame, video, ambient, skip } = buildPortal();
 
-    // Aro do vídeo: dourado até a escolha do guia; depois, na cor do guia.
-    // Só aparência — qualquer falha mantém o dourado e o vídeo segue normal.
-    try { applyRingColor(overlay, nextSectionId); } catch (_) {}
-
-    overlay.style.opacity = '1';
-    overlay.style.visibility = 'visible';
-    overlay.style.pointerEvents = 'auto';
-    
+    // fallback imediato para evitar "barra dourada"
     fitFrameToVideo(frame, { videoWidth: 16, videoHeight: 9 });
 
+    // Ajuste responsivo do frame ao vídeo
     const onResize = () => fitFrameToVideo(frame, video);
     window.addEventListener('resize', onResize);
 
-    // Ordem do encerramento (sem "vazar" section anterior nem a seguinte):
-    // 1) troca a section POR BAIXO do vídeo, com o conteúdo ainda oculto;
-    // 2) o vídeo esmaece até o escuro;
-    // 3) libera o fim da transição (as sections começam a leitura como antes);
-    // 4) só então a nova section aparece com o fade de entrada.
     const finishAndGo = safeOnce(() => {
       window.removeEventListener('resize', onResize);
+      try { ambient.pause(); } catch {}
 
-      try { video.pause(); } catch (_) {}
-      try { stopAmbientPaint(); } catch (_) {}
-
-      try { navigateTo(nextSectionId); } catch (e) { warn('Falha ao navegar sob o vídeo:', e); }
-
+      // Glamour: portal sai suave
       overlay.classList.remove('show');
       overlay.classList.add('hide');
-      overlay.style.opacity = '0';
 
       setTimeout(() => {
-        cleanup();
+        cleanup(overlay);
+        navigateTo(nextSectionId);
 
-        // dá tempo de a nova section (ou o novo bloco) desenhar antes de revelar
-        requestAnimationFrame(() => requestAnimationFrame(() => {
-          setTimeout(() => {
-            document.body.classList.remove('vt-fade-out');
-            document.body.classList.add('vt-fade-in');
-            setTimeout(() => {
-              document.body.classList.remove('vt-fade-in');
-            }, 650);
-          }, 160);
-        }));
-      }, 650);
+        // Glamour: nova página entra suave
+        document.body.classList.remove('vt-fade-out');
+        document.body.classList.add('vt-fade-in');
+        setTimeout(() => document.body.classList.remove('vt-fade-in'), 650);
+      }, 360);
     });
-                                 
-    skip.addEventListener('click', () => finishAndGo());
 
+    skip.addEventListener('click', finishAndGo);
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) finishAndGo();
     });
-    
-    let playStarted = false;
-    let playAttemptInFlight = false;
-    let playbackSafetyTimer = null;
-    let loadSafetyTimer = null;
+    document.addEventListener('keydown', onKeydown, true);
 
-    const clearTransitionTimers = () => {
-      if (playbackSafetyTimer) {
-        clearInterval(playbackSafetyTimer);
-        playbackSafetyTimer = null;
-      }
-      if (loadSafetyTimer) {
-        clearTimeout(loadSafetyTimer);
-        loadSafetyTimer = null;
-      }
-    };
+    // EVENTOS
+    const onCanPlay = safeOnce(() => {
+      log('Vídeo carregado, iniciando reprodução:', href);
 
-    const finishSafely = () => {
-      clearTransitionTimers();
-      finishAndGo();
-    };
+      // moldura abraça proporção real
+      try { fitFrameToVideo(frame, video); } catch {}
 
-    // O relógio de segurança da exibição só nasce DEPOIS que o vídeo
-    // realmente entrou em reprodução. Assim, tempo de rede/buffer não
-    // consome o tempo visual da transição.
-    // Vigia por PROGRESSO, não por relógio: enquanto o filme avança, ele é
-    // exibido até o fim, mesmo que a rede faça pausas para carregar.
-    // Antes havia um tempo fixo (duração + 5 s) a partir do play: com o
-    // vídeo parado carregando, esse tempo acabava e a jornada pulava o
-    // filme pela metade (ou parado no início).
-    const armPlaybackSafety = () => {
-      if (playbackSafetyTimer) clearInterval(playbackSafetyTimer);
-
-      const durationMs = Number.isFinite(video.duration) && video.duration > 0
-        ? Math.ceil(video.duration * 1000)
-        : 30000;
-      const startedAt = performance.now();
-      let lastTime = video.currentTime || 0;
-      let lastMoveAt = startedAt;
-      let nudgedAt = 0;
-
-      playbackSafetyTimer = setInterval(() => {
-        if (!isPlaying || !document.body.contains(video)) {
-          clearInterval(playbackSafetyTimer);
-          playbackSafetyTimer = null;
-          return;
-        }
-        const now = performance.now();
-        const t = video.currentTime || 0;
-        if (t > lastTime + 0.04) { lastTime = t; lastMoveAt = now; }
-
-        // chegou ao fim (alguns celulares não disparam 'ended')
-        if (video.ended || (Number.isFinite(video.duration) && t >= video.duration - 0.2)) {
-          finishSafely();
-          return;
-        }
-        // pausado sem motivo (economia de energia do celular): tenta seguir
-        if (video.paused && now - nudgedAt > 2000) {
-          nudgedAt = now;
-          try { const pr = video.play(); if (pr && pr.catch) pr.catch(() => {}); } catch (_) {}
-        }
-        // parado de verdade por muito tempo: libera a jornada
-        if (now - lastMoveAt > 15000) {
-          warn('Vídeo sem avançar há 15 s; liberando a jornada.');
-          finishSafely();
-          return;
-        }
-        // teto absoluto (rede muito lenta)
-        if (now - startedAt > durationMs * 3 + 30000) {
-          warn('Vídeo demorou demais; liberando a jornada.');
-          finishSafely();
-        }
-      }, 500);
-    };
-
-    // Começa com um pouco de vídeo já carregado (evita travar logo no início).
-    let bufferWait = null;
-    const startWhenBuffered = () => {
-      if (playStarted || playAttemptInFlight) return;
-      if (video.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) { tryPlayBoth(); return; }
-      if (bufferWait) return;
-      const go = () => { clearTimeout(bufferWait); tryPlayBoth(); };
-      video.addEventListener('canplaythrough', go, { once: true });
-      bufferWait = setTimeout(go, 2500);
-    };
-
-    const tryPlayBoth = async () => {
-      if (playStarted || playAttemptInFlight) return;
-      if (!document.body.contains(video)) return;
-
-      playAttemptInFlight = true;
-
-      try {
-        // Não usamos pause() aqui: um pause durante uma Promise de play()
-        // pendente é justamente o que produz "play() interrupted by pause()".
-        if (video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
-          playAttemptInFlight = false;
-          return;
-        }
-
-        // Reinício absoluto antes do ÚNICO play válido.
-        if (Math.abs(video.currentTime) > 0.05) {
-          video.currentTime = 0;
-        }
-
-        overlay.classList.remove('hide');
-        overlay.classList.add('show');
-        overlay.style.opacity = '1';
-        overlay.style.visibility = 'visible';
-
-        await new Promise(resolve => {
-          requestAnimationFrame(() => requestAnimationFrame(resolve));
-        });
-
-        if (!document.body.contains(video)) {
-          playAttemptInFlight = false;
-          return;
-        }
-
-        await video.play();
-
-        // Só consideramos iniciado depois que play() realmente resolveu.
-        playStarted = true;
-        playAttemptInFlight = false;
-        clearTimeout(loadSafetyTimer);
-        loadSafetyTimer = null;
-
-        // Fundo desfocado: pintado do próprio vídeo (decorativo).
-        try { startAmbientPaint(video, ambient); } catch (_) {}
-
-        log(
-          'Vídeo principal iniciado REALMENTE.',
-          'currentTime=', video.currentTime,
-          'duration=', video.duration,
-          'readyState=', video.readyState
-        );
-
-        armPlaybackSafety();
-      } catch (err) {
-        playAttemptInFlight = false;
-        playStarted = false;
-        warn('Falha ao tocar vídeo principal:', err?.message || err);
-      }
-    };
-
-    // loadeddata garante que já existe um frame real disponível.
-    const onLoadedData = () => {
-      try { fitFrameToVideo(frame, video); } catch (_) {}
-      startWhenBuffered();
-    };
-
-    // canplay funciona como segunda porta de entrada, sem duplicar play().
-    const onCanPlay = () => {
-      log('Vídeo carregado e pronto:', href);
-      try { fitFrameToVideo(frame, video); } catch (_) {}
-      startWhenBuffered();
-    };
-
-    const onPlaying = () => {
-      // Defesa extra contra navegadores que resolvem play() antes de o
-      // primeiro frame avançar visualmente.
-      if (!playStarted) {
-        playStarted = true;
-        playAttemptInFlight = false;
-      }
-      if (!playbackSafetyTimer) armPlaybackSafety();
-      log('Evento playing confirmado em', video.currentTime);
-    };
-
-    const onWaiting = () => {
-      log('Buffering detectado em', video.currentTime);
-    };
+      // toca fundo + principal
+      ambient.play().catch(()=>{});
+      video.play().catch(err => {
+        warn('Falha ao dar play (autoplay?):', err);
+        video.muted = true;
+        ambient.muted = true;
+        ambient.play().catch(()=>{});
+        video.play().catch(() => warn('Play ainda bloqueado.'));
+      });
+    });
 
     const onEnded = safeOnce(() => {
       log('Vídeo finalizado:', href);
-      finishSafely();
+      finishAndGo();
     });
 
     const onError = safeOnce((ev) => {
       warn('Erro ao carregar vídeo:', href, ev);
-      finishSafely();
+      finishAndGo();
     });
 
-    video.addEventListener('loadedmetadata', () => {
-      try {
-        video.currentTime = 0;
-        fitFrameToVideo(frame, video);
-      } catch (_) {}
-    }, { once: true });
-
-    video.addEventListener('loadeddata', onLoadedData, { once: true });
-    video.addEventListener('canplay', onCanPlay, { once: true });
-    video.addEventListener('playing', onPlaying);
-    video.addEventListener('waiting', onWaiting);
+    video.addEventListener('loadedmetadata', () => fitFrameToVideo(frame, video), { once: true });
+    video.addEventListener('canplaythrough', onCanPlay, { once: true });
+    video.addEventListener('loadeddata', onCanPlay, { once: true });
     video.addEventListener('ended', onEnded, { once: true });
     video.addEventListener('error', onError, { once: true });
 
-    // Sem "cache-busting": o navegador pode reaproveitar o que já baixou
-    // (os filmes não mudam durante a jornada) e o arquivo é baixado uma vez só.
-    video.src = href;
+    // Cache-buster para evitar travas de Range/codec
+    const finalSrc = href + (href.includes('?') ? '&' : '?') + 't=' + Date.now();
+    video.src = finalSrc;
+    ambient.src = finalSrc;
+
     video.load();
-
-    // Fallback de CARREGAMENTO, não de duração. Ele não encerra a
-    // transição aos 18 s nem reinicia currentTime enquanto um play() existe.
-    // Apenas tenta iniciar novamente caso eventos de mídia tenham sido
-    // perdidos pelo navegador.
-    loadSafetyTimer = setTimeout(() => {
-      if (!isPlaying || playStarted || playAttemptInFlight) return;
-      if (!document.body.contains(video)) return;
-
-      warn('Fallback de carregamento acionado; tentando iniciar sem reset concorrente.');
-      tryPlayBoth();
-    }, 2500);
-
-    // Última proteção contra arquivo/rede realmente travados ANTES do play.
-    // Diferente do antigo timeout de 18 s, esta proteção só trata falha de
-    // carregamento e não simula que o filme terminou normalmente.
-    setTimeout(() => {
-      if (!isPlaying || playStarted) return;
-      warn('Vídeo não conseguiu iniciar após 20 s; liberando a jornada por segurança.');
-      finishSafely();
-    }, 20000);
+    ambient.load();
   }
 
+  // ----------------- API PÚBLICA -----------------
   window.playTransitionVideo = playTransitionVideo;
 
   window.playTransition = function (nextSectionId) {
     log('Transição simples (sem vídeo) para:', nextSectionId);
     navigateTo(nextSectionId);
   };
+  /* ======================================================================================
+ * BLOCO: Runner global para transição ENTRE BLOCOS (section-perguntas)
+ * - Garante window.playBlockTransition(videoSrc, done)
+ * - Reusa o motor do video-transicao.js (playTransitionVideo) sem navegar (nextSectionId = null)
+ * ====================================================================================== */
+(function ensurePlayBlockTransition() {
+  // se já existe e é função, não mexe
+  if (typeof window.playBlockTransition === 'function') return;
 
-  (function ensurePlayBlockTransition() {
-    if (typeof window.playBlockTransition === 'function') return;
+  // precisamos do motor do video-transicao.js
+  if (typeof window.playTransitionVideo !== 'function') {
+    console.warn('[VIDEO_TRANSICAO] playTransitionVideo não disponível; playBlockTransition não instalado.');
+    // fallback “no-op” para não quebrar fluxo
+    window.playBlockTransition = function (_videoSrc, done) {
+      if (typeof done === 'function') done();
+    };
+    return;
+  }
 
-    if (typeof window.playTransitionVideo !== 'function') {
-      warn('playTransitionVideo não disponível; playBlockTransition não instalado.');
-      window.playBlockTransition = function (_videoSrc, done) {
-        if (typeof done === 'function') done();
-      };
-      return;
-    }
-
+  // instala com blindagem (sem quebrar se alguém travou a prop)
+  const install = function () {
     window.playBlockTransition = function (videoSrc, done) {
       let called = false;
 
@@ -645,6 +337,7 @@
         if (typeof done === 'function') done();
       };
 
+      // garante que finaliza quando a transição realmente “encerra”
       const onEnded = () => {
         document.removeEventListener('transition:ended', onEnded, true);
         finish();
@@ -653,19 +346,44 @@
       document.addEventListener('transition:ended', onEnded, true);
 
       try {
+        // roda o vídeo SEM navegar (nextSectionId = null)
         window.playTransitionVideo(videoSrc, null);
       } catch (e) {
         document.removeEventListener('transition:ended', onEnded, true);
-        warn('Falha ao iniciar playTransitionVideo:', e);
+        console.warn('[VIDEO_TRANSICAO] Falha ao iniciar playTransitionVideo:', e);
         finish();
       }
 
+      // segurança: se por algum motivo o evento não vier, não trava
       setTimeout(() => {
         document.removeEventListener('transition:ended', onEnded, true);
         finish();
-      }, 40000);
+      }, 12000);
     };
 
-    log('playBlockTransition instalado (runner de blocos).');
-  })();
+    console.log('[VIDEO_TRANSICAO] playBlockTransition instalado (runner de blocos).');
+  };
+
+  try {
+    // tenta instalar com defineProperty (mais estável contra overwrite acidental)
+    Object.defineProperty(window, 'playBlockTransition', {
+      value: undefined,
+      writable: true,
+      configurable: true,
+      enumerable: true
+    });
+    install();
+  } catch (_) {
+    // se a propriedade estiver “travada”, faz atribuição simples (ou fallback no-op)
+    try {
+      install();
+    } catch (e2) {
+      console.warn('[VIDEO_TRANSICAO] Não foi possível instalar playBlockTransition:', e2);
+      window.playBlockTransition = function (_videoSrc, done) {
+        if (typeof done === 'function') done();
+      };
+    }
+  }
+})();
+
 })();
