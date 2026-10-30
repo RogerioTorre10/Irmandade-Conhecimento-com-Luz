@@ -1132,6 +1132,107 @@
     return `jp:${bloco?.id || 'bloco'}:idx`;
   }
 
+  const QUESTION_INDEX_OWNER_KEY = 'JORNADA_QUESTION_INDEX_OWNER';
+
+  function clearStoredQuestionIndexes() {
+    [sessionStorage, localStorage].forEach((storage) => {
+      const keys = [];
+      try {
+        for (let i = 0; i < storage.length; i += 1) {
+          const key = storage.key(i);
+          if (key && key.startsWith('jp:') && key.endsWith(':idx')) {
+            keys.push(key);
+          }
+        }
+        keys.forEach((key) => storage.removeItem(key));
+      } catch (err) {
+        console.warn('[PERGUNTAS][INDEX] falha ao limpar índices antigos:', err);
+      }
+    });
+  }
+
+  function ensureQuestionIndexOwner(bloco) {
+    const codigo = String(
+      localStorage.getItem('jornada_codigo') ||
+      sessionStorage.getItem('jornada.codigo_jornada') ||
+      ''
+    ).trim();
+
+    const email = String(
+      localStorage.getItem('jornada_email') ||
+      sessionStorage.getItem('jornada.email') ||
+      ''
+    ).trim().toLowerCase();
+
+    const runId = String(
+      sessionStorage.getItem('JORNADA_RUN_ID') || ''
+    ).trim();
+
+    const owner =
+      codigo || email
+        ? `journey:${codigo}|${email}`
+        : runId
+          ? `run:${runId}`
+          : '';
+
+    if (!owner) return;
+
+    const previousOwner = String(
+      localStorage.getItem(QUESTION_INDEX_OWNER_KEY) || ''
+    ).trim();
+
+    if (previousOwner === owner) return;
+
+    const remoteBlock = String(
+      sessionStorage.getItem('JORNADA_REMOTE_LAST_BLOCK') || ''
+    ).trim();
+    const localBlock = String(
+      localStorage.getItem('jornada_last_block') || ''
+    ).trim();
+    const checkpointBlock = remoteBlock || localBlock;
+
+    const remoteQuestionRaw =
+      sessionStorage.getItem('JORNADA_REMOTE_LAST_QUESTION');
+    const localQuestionRaw =
+      localStorage.getItem('jornada_last_question');
+    const checkpointQuestion = Number(
+      remoteQuestionRaw ?? localQuestionRaw
+    );
+
+    const explicitRestore =
+      sessionStorage.getItem('JORNADA_RESTORE_MODE') === '1';
+
+    clearStoredQuestionIndexes();
+
+    // Migração segura: ao instalar a correção no meio de uma Jornada,
+    // preserva somente o checkpoint comprovado do bloco atual. Índices
+    // antigos de blocos futuros deixam de contaminar a navegação.
+    if (
+      explicitRestore &&
+      checkpointBlock &&
+      checkpointBlock === String(bloco?.id || '') &&
+      Number.isFinite(checkpointQuestion) &&
+      checkpointQuestion >= 0
+    ) {
+      const total = getBlockQuestionsCount(bloco) || 1;
+      const safe = Math.max(
+        0,
+        Math.min(checkpointQuestion, total - 1)
+      );
+      sessionStorage.setItem(questionIndexKey(bloco), String(safe));
+      localStorage.setItem(questionIndexKey(bloco), String(safe));
+    }
+
+    localStorage.setItem(QUESTION_INDEX_OWNER_KEY, owner);
+
+    console.log('[PERGUNTAS][INDEX] proprietário atualizado:', {
+      owner,
+      restorePreservado:
+        explicitRestore &&
+        checkpointBlock === String(bloco?.id || '')
+    });
+  }
+
   function getCurrentQuestionIndex(bloco) {
     if (!bloco) return 0;
     const total = getBlockQuestionsCount(bloco) || 1;
@@ -1892,6 +1993,19 @@ function getNomeParticipanteAtual() {
             ? getBlocoAtual(nextSection)
             : null;
 
+        // Um bloco novo sempre começa em 1/10. O índice específico do bloco
+        // precisa ser zerado antes da navegação; caso contrário, um valor
+        // antigo (por exemplo 9 = 10/10) vence o checkpoint genérico 0.
+        if (nextBloco) {
+          setCurrentQuestionIndex(nextBloco, 0);
+          try {
+            localStorage.setItem('jornada_last_block', String(nextBloco.id || ''));
+            localStorage.setItem('jornada_last_question', '0');
+          } catch (err) {
+            console.warn('[BLOCO][NEXT] falha ao zerar checkpoint local:', err);
+          }
+        }
+
         try {
           await window.JORNADA_SESSION?.atualizarEstado?.({
             last_section: nextSection,
@@ -2505,6 +2619,10 @@ function bindButtons(section, bloco, perguntaText, qIndex = 0) {
       warn('Bloco não encontrado para', sectionId);
       return;
     }
+
+    // Se o código/e-mail da Jornada ou a sessão de homologação mudou,
+    // remove índices pertencentes ao percurso anterior antes de renderizar.
+    ensureQuestionIndexOwner(bloco);
 
     State.sectionId = sectionId;
     State.bloco = bloco;
