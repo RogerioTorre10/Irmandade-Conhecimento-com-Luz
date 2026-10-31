@@ -1,0 +1,38 @@
+{
+  "titulo": "TODO CRIME TEM UM AUTOR?",
+  "frase": "Todos o querem morto",
+  "genero": "romance",
+  "autor": "ROGÉRIO A S TORRES",
+  "selo": "Irmandade Conhecimento com Luz",
+  "creditos": [
+    "Todo crime tem um autor?",
+    "© 2026 Rogério Aparecido da Silva Torres. Todos os direitos reservados.",
+    "Nenhuma parte desta obra pode ser reproduzida sem autorização prévia do autor.",
+    "Esta é uma obra de ficção. Nomes, personagens, empresas, órgãos e acontecimentos são produto da imaginação do autor ou usados de forma fictícia. Lugares reais da cidade de São Paulo aparecem apenas como cenário. Qualquer semelhança com pessoas, vivas ou mortas, ou com fatos reais é mera coincidência.",
+    "As substâncias e os procedimentos médicos descritos neste livro são fictícios.",
+    "Irmandade Conhecimento com Luz"
+  ],
+  "dedicatoria": [
+    "À memória dos meus pais, Inácio e Creusa, e do meu irmão Rodolfo, que me deram as raízes.",
+    "Aos meus irmãos e cunhadas, Rinaldo e Sônia, Ricardo e Dulce, que seguem comigo na travessia.",
+    "Ao meu filho e nora, Lucas e Geovanna, à minha neta fofura Malu e à minha linda filha Júlia, a minha Lia: a luz que continua.",
+    "À Gisely, minha doce esposa, e às gêmeas Isabella e Fernanda, minhas filhas de coração, cujo apoio fez este momento chegar.",
+    "E ao Lucas e à Júlia, a minha Lia, que emprestaram os nomes a dois irmãos que aprenderam a confiar um no outro."
+  ],
+  "celular": {
+    "titulo": "O CELULAR DE HENRIQUE",
+    "texto": [
+      "Henrique Salvallus deixou o celular para trás. Agora ele está com você.",
+      "Ao longo do livro, você vai encontrar caixas como esta, com o título NO CELULAR DE HENRIQUE. Cada uma traz uma pista: uma senha, uma data, um número. Com ela, você abre, no celular virtual de Henrique, as mesmas mensagens, fotos, agendas e áudios que Lucas e Lia estão descobrindo naquele momento da história.",
+      "Para entrar, faça o seu cadastro gratuito no site da Irmandade Conhecimento com Luz. Você vai receber um código pessoal. Anote-o no espaço abaixo: em cada senha do livro, some o número indicado ao seu código.",
+      "Endereço: irmandade-conhecimento-com-luz.onrender.com/henrique",
+      "Meu código pessoal: ____________________",
+      "Uma regra só: não abra o que a história ainda não abriu."
+    ]
+  },
+  "sobre": [
+    "ROGÉRIO A S TORRES é psicólogo e fundador da Irmandade Conhecimento com Luz.",
+    "É autor de O Pleno Existencial: a teoria entre o vazio e o cheio. Todo crime tem um autor? é o seu primeiro romance.",
+    "Santista, pai do Lucas e da Júlia, escreve sobre aquilo que mais o intriga: o que as pessoas fazem com o que a vida faz delas."
+  ]
+}
