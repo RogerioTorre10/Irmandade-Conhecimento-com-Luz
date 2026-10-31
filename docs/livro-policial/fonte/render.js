@@ -47,8 +47,15 @@ function celularPage() {
     spacing: { after: 120, ...LINE }, children: [new TextRun({ text, font: FONT, size: BODY, italics })] });
   const strong = (text) => new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 240, after: 120 },
     children: [new TextRun({ text, font: FONT, size: 22, bold: true })] });
+  // "Endereço: site" → rótulo numa linha e o endereço inteiro na seguinte, sem quebrar no hífen
+  const address = (text) => {
+    const i = text.indexOf(': ');
+    if (i < 0) return [strong(text)];
+    return [strong(text.slice(0, i + 1)), new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 120 },
+      children: [new TextRun({ text: text.slice(i + 2), font: FONT, size: 20, bold: true })] })];
+  };
   return [para(T[0]), para(T[1]), ...celBox('Exemplo: digite 4821 somado ao seu código pessoal.'), para(T[2]),
-    strong(T[3]), strong(T[4]), new Paragraph({ spacing: { before: 240 }, alignment: AlignmentType.CENTER,
+    ...address(T[3]), strong(T[4]), new Paragraph({ spacing: { before: 240 }, alignment: AlignmentType.CENTER,
       children: [new TextRun({ text: T[5], font: FONT, size: BODY, italics: true })] })];
 }
 
