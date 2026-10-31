@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Livros • Irmandade</title>
+<meta name="description" content="Os livros de Rogério A S Torres, fundador da Irmandade Conhecimento com Luz." />
+<meta name="theme-color" content="#0b0f1a" />
+<link rel="icon" href="/favicon.svg" />
+<style>
+@font-face{font-family:'Cardo';src:url('/assets/fonts/Cardo-Regular.ttf') format('truetype');font-display:swap}
+@font-face{font-family:'Cardo';font-weight:700;src:url('/assets/fonts/Cardo-Bold.ttf') format('truetype');font-display:swap}
+@font-face{font-family:'Cardo';font-style:italic;src:url('/assets/fonts/Cardo-Italic.ttf') format('truetype');font-display:swap}
+@font-face{font-family:'BerkshireSwash';src:url('/assets/fonts/BerkshireSwash-Regular.ttf') format('truetype');font-display:swap}
+:root{--fundo:#0b0f1a;--painel:#141a28;--ink:#ece6d6;--suave:#b8b09c;--gold:#f7d58b;--brass:#b98b3e;--linha:rgba(247,213,139,.32)}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{min-height:100vh;background:radial-gradient(1100px 600px at 50% -10%,#1d2540 0%,var(--fundo) 60%) fixed;color:var(--ink);font-family:Cardo,Georgia,serif}
+header{display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid var(--linha)}
+.voltar{color:var(--ink);text-decoration:none;font-size:14px;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--linha);padding:7px 12px;border-radius:10px}
+.voltar:hover,.voltar:focus-visible{color:var(--gold);border-color:var(--brass);outline:none}
+h1{flex:1;margin:0;text-align:center;font-family:BerkshireSwash,Cardo,serif;font-weight:400;font-size:clamp(26px,5vw,38px);background:linear-gradient(180deg,#fff3cf 0%,var(--gold) 45%,var(--brass) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+header .esp{width:92px}
+main{max-width:980px;margin:0 auto;padding:26px 16px 40px}
+.intro{text-align:center;color:var(--suave);font-size:18px;line-height:1.5;margin:0 auto 28px;max-width:640px}
+.livro{display:grid;grid-template-columns:240px 1fr;gap:26px;background:linear-gradient(180deg,var(--painel),#0f1420);border:1px solid var(--linha);border-radius:16px;padding:22px;margin-bottom:22px;box-shadow:0 16px 40px rgba(0,0,0,.45)}
+.capa{align-self:start;width:100%;height:auto;aspect-ratio:2/3;border-radius:6px;box-shadow:0 10px 26px rgba(0,0,0,.6);display:block;object-fit:cover}
+.capa-tipo{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:20px;background:linear-gradient(160deg,#1c1c1c,#050505);border:1px solid #3a3326}
+.capa-tipo b{font-size:26px;letter-spacing:.12em;color:var(--gold);line-height:1.15}
+.capa-tipo i{margin-top:12px;color:var(--suave);font-size:15px}
+.capa-tipo span{margin-top:auto;font-size:12px;letter-spacing:.3em;color:var(--suave)}
+.genero{margin:0;font-size:13px;letter-spacing:.24em;text-transform:uppercase;color:var(--brass)}
+.livro h2{margin:6px 0 4px;font-size:clamp(24px,4vw,32px);color:var(--gold)}
+.frase{margin:0 0 14px;font-style:italic;font-size:18px}
+.livro p{line-height:1.55;font-size:17px}
+.estado{display:inline-block;font-size:13px;letter-spacing:.08em;padding:4px 10px;border-radius:999px;border:1px solid var(--linha);color:var(--suave)}
+.acoes{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.botao{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:700;font-size:16px;padding:12px 16px;border-radius:10px;background:linear-gradient(180deg,#fff3cf,var(--gold));color:#1b1712}
+.botao:hover,.botao:focus-visible{filter:brightness(1.07);outline:2px solid #fff4;outline-offset:2px}
+.caixa{margin-top:14px;padding:12px 14px;border:1px dashed var(--linha);border-radius:10px;font-size:15px;color:var(--suave);line-height:1.5}
+footer{text-align:center;color:#8d8670;font-size:13px;padding:10px 16px 24px}
+@media (max-width:680px){.livro{grid-template-columns:1fr}.capa{max-width:240px;margin:0 auto}header .esp{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <a class="voltar" href="/portal.html">‹ Portal</a>
+  <h1>Livros</h1>
+  <span class="esp"></span>
+</header>
+<main>
+  <p class="intro">Os livros de Rogério A S Torres, psicólogo e fundador da Irmandade Conhecimento com Luz.</p>
+
+  <article class="livro">
+    <img class="capa" src="/assets/img/livros/todo-crime-tem-um-autor.jpg" alt="Capa de Todo crime tem um autor?: um caixão dourado em forma de ponto de interrogação" width="600" height="900" />
+    <div>
+      <p class="genero">Romance policial</p>
+      <h2>Todo crime tem um autor?</h2>
+      <p class="frase">Todos querem Henrique morto.</p>
+      <p>Henrique Salvallus escapou da morte quatro vezes em oito meses. Na quinta, ela veio sem barulho, numa terça-feira de manhã. Com o celular do pai nas mãos, onde cada senha abre um segredo, os filhos Lucas e Lia descobrem que todos tinham motivo. O que não sabem é que, em silêncio, um está investigando o outro.</p>
+      <span class="estado">Em breve pela UICLAP</span>
+      <div class="caixa">Este livro tem um celular de verdade. Ao longo da história, as caixas <b>NO CELULAR DE HENRIQUE</b> trazem senhas que abrem, aqui no site, as mesmas mensagens, fotos e áudios que Lucas e Lia estão descobrindo.</div>
+      <div class="acoes"><a class="botao" href="/henrique">Abrir o celular de Henrique ›</a></div>
+    </div>
+  </article>
+
+  <article class="livro">
+    <div class="capa capa-tipo" role="img" aria-label="Capa de O Pleno Existencial"><b>O PLENO<br>EXISTENCIAL</b><i>A teoria entre o vazio e o cheio</i><span>ROGÉRIO A S TORRES</span></div>
+    <div>
+      <p class="genero">Ensaio</p>
+      <h2>O Pleno Existencial</h2>
+      <p class="frase">A teoria entre o vazio e o cheio.</p>
+      <p>A Teoria do Pleno Existencial: o que fazemos com o vazio e com o cheio que a vida nos dá.</p>
+      <span class="estado">Publicado pela UICLAP</span>
+    </div>
+  </article>
+</main>
+<footer>Para além. E sempre!! • © Irmandade Conhecimento com Luz</footer>
+</body>
+</html>

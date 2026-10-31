@@ -155,6 +155,9 @@ app.post("/api/tts", express.json({ limit: "16kb" }), async (req, res) => {
   }
 });
 
+// Livros: celular virtual de Henrique (cadastro, código pessoal e etapas)
+require("./livros-api")(app, express);
+
 // Rota para arquivos de tradução i18n dentro de /assets/js/i18n/
 app.get("/assets/js/i18n/:lang.json", async (req, res) => {
   const lang = req.params.lang;
