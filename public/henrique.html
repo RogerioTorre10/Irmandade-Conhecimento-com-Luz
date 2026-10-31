@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>O celular de Henrique • Irmandade</title>
+<meta name="description" content="O celular virtual de Henrique Salvallus, do livro Todo crime tem um autor?, de Rogério A S Torres." />
+<meta name="theme-color" content="#0a0806" />
+<meta name="robots" content="noindex" />
+<link rel="icon" href="/favicon.svg" />
+<link rel="stylesheet" href="/assets/henrique/celular.css" />
+</head>
+<body>
+<header class="topo">
+  <a class="voltar" href="/livros.html">‹ Livros</a>
+  <div class="titulo">
+    <span class="sobre">Todo crime tem um autor?</span>
+    <h1>O celular de Henrique</h1>
+  </div>
+  <span class="topo-dir" id="quem"></span>
+</header>
+
+<main class="palco">
+  <!-- Acesso: cadastro ou entrada -->
+  <section class="acesso" id="acesso" hidden>
+    <p class="intro">Henrique Salvallus deixou o celular para trás. Agora ele está com você. Para entrar, você precisa do seu código pessoal, que vai somar a cada senha do livro.</p>
+    <div class="abas" role="tablist">
+      <button type="button" role="tab" class="aba" id="abaEntrar" aria-selected="true">Já tenho meu código</button>
+      <button type="button" role="tab" class="aba" id="abaCadastro" aria-selected="false">Quero meu código</button>
+    </div>
+
+    <form class="form" id="formEntrar" autocomplete="on">
+      <label>E-mail do cadastro<input type="email" name="email" required autocomplete="email" inputmode="email" /></label>
+      <button type="submit" class="botao">Continuar</button>
+      <p class="nota">O seu e-mail só serve para calcular o seu código. Ele não fica guardado no site.</p>
+    </form>
+
+    <form class="form" id="formCadastro" hidden autocomplete="on">
+      <label>Seu nome<input name="nome" required autocomplete="name" /></label>
+      <label>Seu e-mail<input type="email" name="email" required autocomplete="email" inputmode="email" /></label>
+      <label><span id="pergunta">Carregando o desafio…</span><input name="resposta" required autocomplete="off" autocapitalize="none" /></label>
+      <button type="submit" class="botao">Gerar meu código</button>
+      <p class="nota">Use sempre o mesmo e-mail: ele gera sempre o mesmo código. Se esquecer o código, é só se cadastrar de novo.</p>
+    </form>
+
+    <div class="codigo" id="codigoBox" hidden>
+      <p>Seu código pessoal é</p>
+      <strong id="codigoNum">000</strong>
+      <p>Anote no espaço da página “O celular de Henrique”, no começo do livro. Em cada senha que aparecer na história, some este número.</p>
+      <p class="exemplo" id="codigoEx"></p>
+      <button type="button" class="botao" id="irCelular">Abrir o celular</button>
+    </div>
+    <p class="erro" id="erroAcesso" role="alert"></p>
+  </section>
+
+  <!-- O aparelho -->
+  <section class="aparelho" id="aparelho" hidden aria-label="Celular de Henrique">
+    <div class="corpo">
+      <div class="alto-falante" aria-hidden="true"></div>
+      <div class="tela" id="tela" tabindex="-1"></div>
+      <div class="botoes">
+        <button type="button" class="tecla verde" id="tHome" aria-label="Tela inicial"><span></span></button>
+        <button type="button" class="tecla" id="tMenu" aria-label="Tela inicial">⁘</button>
+        <button type="button" class="trackpad" id="tTrack" aria-label="Voltar"></button>
+        <button type="button" class="tecla" id="tVoltar" aria-label="Voltar">↩</button>
+        <button type="button" class="tecla vermelha" id="tFim" aria-label="Tela inicial"><span></span></button>
+      </div>
+      <div class="teclado" aria-hidden="true">
+        <span>Q W</span><span>E R</span><span>T Y</span><span>U I</span><span>O P</span>
+        <span>A S</span><span>D F</span><span>G H</span><span>J K</span><span>L ⌫</span>
+        <span>⇧ Z</span><span>X C</span><span>V B</span><span>N M</span><span>$ ↵</span>
+        <span>alt</span><span>0</span><span class="espaco">espaço</span><span>sym</span><span>⇧</span>
+      </div>
+    </div>
+    <p class="regra">Uma regra só: não abra o que a história ainda não abriu.</p>
+    <button type="button" class="sair" id="sair">Sair deste aparelho</button>
+  </section>
+</main>
+
+<footer class="rodape">© Rogério A S Torres · Irmandade Conhecimento com Luz · Esta é uma obra de ficção.</footer>
+<script src="/assets/henrique/celular.js"></script>
+</body>
+</html>
