@@ -89,7 +89,7 @@
   function carregarFotos(raiz) {
     raiz.querySelectorAll('img[data-foto]').forEach((img) => {
       const id = img.dataset.foto, etapa = img.dataset.etapa;
-      const tam = img.closest('.grade, .fotos') ? 'p' : 'g';
+      const tam = img.closest('.grade, .fotos, .msg') ? 'p' : 'g';
       const chave = id + ':' + tam;
       if (!fotosCache.has(chave)) {
         fotosCache.set(chave, fetch('/api/henrique/foto', { method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -215,7 +215,7 @@
       const d = dia(x.d);
       const sep = d !== ult ? `<div class="sep">${dataLonga(x.d)}</div>` : '';
       ult = d;
-      const foto = x.foto && st.imgs[x.foto] ? `<span class="foto">${st.imgs[x.foto]}</span>` : '';
+      const foto = x.foto && st.imgs[x.foto] ? `<button type="button" class="foto" data-foto-msg="${x.foto}" data-d="${x.d}" aria-label="Ampliar foto">${st.imgs[x.foto]}</button>` : '';
       const corpo = x.audio
         ? `<button type="button" class="audio" data-audio><span class="play">▶</span><span>${esc(x.t)}</span></button>`
         : esc(x.t);
@@ -223,6 +223,7 @@
       return `${sep}<div class="msg ${x.de === 'h' ? 'eu' : 'ele'}${x.naoLida ? ' nao-lida' : ''}">${foto}${corpo}<span class="hora">${hora(x.d)}${status}${x.naoLida ? ' · não lida' : ''}</span></div>`;
     }).join('');
     mostrar(cab(titulo || t.nome, t.tipo) + `<div class="corpo-tela"><div class="conversa">${html}</div></div>`);
+    tela().querySelectorAll('[data-foto-msg]').forEach((b) => b.addEventListener('click', () => ir(() => vVisor(b.dataset.fotoMsg, b.dataset.d, ''))));
     tela().querySelectorAll('[data-audio]').forEach((b) => b.addEventListener('click', () => (temEtapa(4) ? ir(vPlayer) : null)));
     const c = $('.corpo-tela', tela());
     c.scrollTop = c.scrollHeight;
