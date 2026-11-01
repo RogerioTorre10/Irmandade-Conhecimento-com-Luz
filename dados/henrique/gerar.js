@@ -306,13 +306,14 @@ const gravador = {
   arquivo: 'Para o Carlos', duracao: 41, gravado: '2010-10-02T22:10',
   dica: 'Onde eu espero toda quinta.',
   transcricao: [
-    [1, 'Carlos. Sou eu. Não apaga.'],
-    [3, 'Eu sei que você não quer ouvir a minha voz, e eu entendo.'],
-    [8, 'Eu fiquei esperando você naquele banco por seis meses e você nunca desceu. Tudo bem. Eu também não desceria.'],
-    [17, 'Mas eu não aguento mais carregar isso sozinho.'],
-    [21, 'Tem uma coisa que eu nunca contei para ninguém, e que eu devia ter contado há vinte anos.'],
-    [28, 'Semana que vem você vai entender por que eu estou falando isso agora.'],
-    [33, 'E a sua mãe vai saber de tudo.'],
+    [0.6, 'Carlos. Sou eu. Não apaga.'],
+    [5.4, 'Eu sei que você não quer ouvir a minha voz, e eu entendo.'],
+    [10.6, 'Eu fiquei esperando você naquele banco por seis meses e você nunca desceu.'],
+    [16.8, 'Tudo bem. Eu também não desceria.'],
+    [22.1, 'Mas eu não aguento mais carregar isso sozinho.'],
+    [25.6, 'Tem uma coisa que eu nunca contei para ninguém, e que eu devia ter contado há vinte anos.'],
+    [31.8, 'Semana que vem você vai entender por que eu estou falando isso agora.'],
+    [36.8, 'E a sua mãe vai saber de tudo.'],
   ],
 };
 const carlosAudio = m('2010-10-02T22:14', 'h', 'Mensagem de voz: Para o Carlos (0:41)', { audio: true, status: 'Entregue · Lida', tipo: 'BBM' });
