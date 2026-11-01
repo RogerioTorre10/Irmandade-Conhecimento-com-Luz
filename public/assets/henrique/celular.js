@@ -310,15 +310,15 @@
       <button type="button" class="bt" id="play" aria-label="Tocar">▶</button>
       <div class="transc" aria-live="polite">${g.transcricao.map(([s, t]) => `<span data-s="${s}">${esc(t)} </span>`).join('')}</div>
       <button type="button" class="sair" id="tudo" style="color:#c3cfdb">Ler tudo de uma vez</button></div></div>`);
-    let t = 0;
+    let t = 0, total = g.duracao;
     const barrasEl = tela().querySelectorAll('.onda i');
     const pinta = () => {
-      $('#tempo').textContent = `0:${String(t).padStart(2, '0')} / 0:${g.duracao}`;
-      barrasEl.forEach((b, i) => b.classList.toggle('on', i < Math.round((t / g.duracao) * 40)));
+      $('#tempo').textContent = `0:${String(Math.floor(t)).padStart(2, '0')} / 0:${g.duracao}`;
+      barrasEl.forEach((b, i) => b.classList.toggle('on', i < Math.round((t / total) * 40)));
       tela().querySelectorAll('.transc span').forEach((s) => s.classList.toggle('dita', t >= Number(s.dataset.s)));
     };
     // Com o arquivo de voz no servidor, o texto acompanha o áudio
-    // (os tempos da transcrição são proporcionais à duração real da gravação).
+    // (os tempos da transcrição marcam o início de cada frase na gravação, em segundos).
     if (g.temAudio) {
       const bt = $('#play');
       let audio = null;
@@ -331,11 +331,12 @@
         audioAtual = audio;
         audio.addEventListener('timeupdate', () => {
           const d = audio.duration || g.duracao;
-          t = Math.min(g.duracao, Math.floor((audio.currentTime / d) * g.duracao));
+          total = d;
+          t = audio.currentTime; // os tempos da transcrição são os da própria gravação, em segundos
           pinta();
           $('#tempo').textContent = `${fmt(audio.currentTime)} / ${fmt(d)}`;
         });
-        audio.addEventListener('ended', () => { bt.textContent = '▶'; t = g.duracao; pinta(); });
+        audio.addEventListener('ended', () => { bt.textContent = '▶'; t = total; pinta(); });
         return audio;
       };
       const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
@@ -345,7 +346,7 @@
           if (a.paused) { await a.play(); bt.textContent = '❚❚'; } else { a.pause(); bt.textContent = '▶'; }
         } catch (_) { bt.textContent = '▶'; aviso('Não foi possível tocar o áudio agora.'); }
       });
-      $('#tudo').addEventListener('click', () => { if (audio) audio.pause(); bt.textContent = '▶'; t = g.duracao; pinta(); });
+      $('#tudo').addEventListener('click', () => { if (audio) audio.pause(); bt.textContent = '▶'; t = total; pinta(); });
       return;
     }
     $('#play').addEventListener('click', () => {
