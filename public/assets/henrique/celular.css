@@ -123,7 +123,7 @@ button{font:inherit;cursor:pointer}
 .msg.eu{align-self:flex-end;background:var(--t-eu);border-top-right-radius:2px}
 .msg .hora{display:block;text-align:right;font-size:10px;color:#6f7a86;margin-top:2px}
 .msg.nao-lida{box-shadow:0 0 0 2px #e0a33f}
-.msg img,.msg .foto{display:block;width:180px;max-width:100%;border-radius:6px;margin:4px 0}
+.msg img,.msg .foto{display:block;width:180px;max-width:100%;border-radius:6px;margin:4px 0;padding:0;border:0;background:none;cursor:zoom-in}
 .msg .foto svg,.msg .foto img{display:block;width:100%;height:auto;border-radius:6px}
 .audio{display:flex;align-items:center;gap:8px;background:none;border:0;padding:0;color:inherit;text-align:left}
 .audio .play{width:28px;height:28px;border-radius:50%;background:#2f6fb3;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px}

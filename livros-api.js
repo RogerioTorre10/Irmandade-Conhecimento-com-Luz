@@ -162,6 +162,7 @@ module.exports = function livrosApi(app, express) {
 
 // Fotos reais em dados/henrique/fotos/<id>.jpg (grande) e <id>_p.jpg (miniatura), e a etapa de cada uma
 const FOTO_ETAPA = {
+  feira: 1,
   helenaPerfil: 3, inauguracao: 3,
   vistoria: 5, placa: 5, cida: 5, ubatuba: 5, neve: 5, vale: 5, trem: 5, chaleFrente: 5, chaleLado: 5, chaleVaranda: 5,
   postalFrente: 7,
