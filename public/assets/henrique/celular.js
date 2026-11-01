@@ -292,7 +292,11 @@
 
   // ---------------------------------------------------------------- gravador
   let timer = null;
-  function pararAudio() { if (timer) { clearInterval(timer); timer = null; } }
+  let audioAtual = null;
+  function pararAudio() {
+    if (timer) { clearInterval(timer); timer = null; }
+    if (audioAtual) { try { audioAtual.pause(); } catch (_) {} audioAtual = null; }
+  }
   function vGravador() {
     const g = st.dados[4].gravador;
     mostrar(cab('Gravador') + `<div class="corpo-tela"><ul class="lista"><li><button type="button" id="arq"><span class="meio"><span class="nome">${esc(g.arquivo)}</span><span class="prev">0:${String(g.duracao).padStart(2, '0')}</span></span><span class="data">${dataCurta(g.gravado)}<br>${hora(g.gravado)}</span></button></li></ul></div>`);
@@ -313,6 +317,37 @@
       barrasEl.forEach((b, i) => b.classList.toggle('on', i < Math.round((t / g.duracao) * 40)));
       tela().querySelectorAll('.transc span').forEach((s) => s.classList.toggle('dita', t >= Number(s.dataset.s)));
     };
+    // Com o arquivo de voz no servidor, o texto acompanha o áudio
+    // (os tempos da transcrição são proporcionais à duração real da gravação).
+    if (g.temAudio) {
+      const bt = $('#play');
+      let audio = null;
+      const carregar = async () => {
+        if (audio) return audio;
+        bt.textContent = '…';
+        const r = await fetch('/api/henrique/audio', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: st.email, senha: st.senhas[4] }) });
+        if (!r.ok) throw new Error('sem áudio');
+        audio = new Audio(URL.createObjectURL(await r.blob()));
+        audioAtual = audio;
+        audio.addEventListener('timeupdate', () => {
+          const d = audio.duration || g.duracao;
+          t = Math.min(g.duracao, Math.floor((audio.currentTime / d) * g.duracao));
+          pinta();
+          $('#tempo').textContent = `${fmt(audio.currentTime)} / ${fmt(d)}`;
+        });
+        audio.addEventListener('ended', () => { bt.textContent = '▶'; t = g.duracao; pinta(); });
+        return audio;
+      };
+      const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+      bt.addEventListener('click', async () => {
+        try {
+          const a = await carregar();
+          if (a.paused) { await a.play(); bt.textContent = '❚❚'; } else { a.pause(); bt.textContent = '▶'; }
+        } catch (_) { bt.textContent = '▶'; aviso('Não foi possível tocar o áudio agora.'); }
+      });
+      $('#tudo').addEventListener('click', () => { if (audio) audio.pause(); bt.textContent = '▶'; t = g.duracao; pinta(); });
+      return;
+    }
     $('#play').addEventListener('click', () => {
       if (timer) { pararAudio(); $('#play').textContent = '▶'; return; }
       if (t >= g.duracao) t = 0;

@@ -114,7 +114,32 @@ module.exports = function livrosApi(app, express) {
       return res.status(403).json({ erro: "Senha incorreta." + dica });
     }
     const dados = conteudo();
+    let c = dados.etapas[String(etapa)];
+    if (etapa === 4) c = { ...c, gravador: { ...c.gravador, temAudio: Boolean(arquivoAudio()) } };
     res.set("Cache-Control", "no-store");
-    res.json({ etapa, conteudo: dados.etapas[String(etapa)] });
+    res.json({ etapa, conteudo: c });
+  });
+
+  // Áudio "Para o Carlos": só sai para quem tem a senha do gravador (1207 + código pessoal)
+  app.post("/api/henrique/audio", json, (req, res) => {
+    if (excedeu("s:" + ipDe(req), 60)) return res.status(429).json({ erro: "Muitas tentativas. Espere alguns minutos." });
+    const { email, senha } = req.body || {};
+    const e = normEmail(email);
+    const n = Number(String(senha || "").replace(/\D/g, ""));
+    if (!emailValido(e) || ETAPAS[n - codigoPessoal(e)] !== 4) return res.status(403).json({ erro: "Senha incorreta." });
+    const arq = arquivoAudio();
+    if (!arq) return res.status(404).json({ erro: "Áudio ainda não disponível." });
+    res.set("Cache-Control", "no-store");
+    res.type(path.extname(arq).slice(1));
+    res.sendFile(arq);
   });
 };
+
+// Coloque o arquivo em dados/henrique/ com um destes nomes (o primeiro que existir vale)
+function arquivoAudio() {
+  for (const ext of ["mp3", "m4a", "ogg", "wav"]) {
+    const f = path.join(__dirname, "dados", "henrique", `para-o-carlos.${ext}`);
+    if (fsSync.existsSync(f)) return f;
+  }
+  return null;
+}
