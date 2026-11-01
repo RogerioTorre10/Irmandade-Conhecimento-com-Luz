@@ -81,6 +81,26 @@
     t.innerHTML = statusBar() + html;
     t.querySelectorAll('[data-voltar]').forEach((b) => b.addEventListener('click', voltar));
     if (foco) t.focus({ preventScroll: true });
+    carregarFotos(t);
+  }
+
+  // Fotos reais: chegam pela rota protegida, com a senha da etapa; miniatura na grade e no e-mail
+  const fotosCache = new Map();
+  function carregarFotos(raiz) {
+    raiz.querySelectorAll('img[data-foto]').forEach((img) => {
+      const id = img.dataset.foto, etapa = img.dataset.etapa;
+      const tam = img.closest('.grade, .fotos') ? 'p' : 'g';
+      const chave = id + ':' + tam;
+      if (!fotosCache.has(chave)) {
+        fotosCache.set(chave, fetch('/api/henrique/foto', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: st.email, senha: st.senhas[etapa], id, tam }) })
+          .then((r) => (r.ok ? r.blob() : Promise.reject(new Error('foto'))))
+          .then((b) => URL.createObjectURL(b))
+          .catch((e) => { fotosCache.delete(chave); throw e; }));
+      }
+      img.decoding = 'async';
+      fotosCache.get(chave).then((url) => { img.src = url; }).catch(() => { img.alt = 'Foto indisponível'; });
+    });
   }
   function ir(fn) { st.pilha.push(fn); fn(); }
   function voltar() {
