@@ -116,8 +116,33 @@ module.exports = function livrosApi(app, express) {
     const dados = conteudo();
     let c = dados.etapas[String(etapa)];
     if (etapa === 4) c = { ...c, gravador: { ...c.gravador, temAudio: Boolean(arquivoAudio()) } };
+    if (c.imagens) {
+      // onde houver foto real, o desenho dá lugar a uma <img> que o celular carrega pela rota protegida
+      const imagens = { ...c.imagens };
+      for (const id of Object.keys(imagens)) {
+        if (FOTO_ETAPA[id] === etapa && arquivoFoto(id, "g")) {
+          imagens[id] = `<img class="foto-real" data-foto="${id}" data-etapa="${etapa}" alt="">`;
+        }
+      }
+      c = { ...c, imagens };
+    }
     res.set("Cache-Control", "no-store");
     res.json({ etapa, conteudo: c });
+  });
+
+  // Fotos reais: só saem para quem tem a senha da etapa em que a foto aparece
+  app.post("/api/henrique/foto", json, (req, res) => {
+    if (excedeu("f:" + ipDe(req), 600)) return res.status(429).json({ erro: "Muitas tentativas. Espere alguns minutos." });
+    const { email, senha, id, tam } = req.body || {};
+    const e = normEmail(email);
+    const n = Number(String(senha || "").replace(/\D/g, ""));
+    const etapa = FOTO_ETAPA[id];
+    if (!etapa || !emailValido(e) || ETAPAS[n - codigoPessoal(e)] !== etapa) return res.status(403).json({ erro: "Senha incorreta." });
+    const arq = arquivoFoto(id, tam === "p" ? "p" : "g");
+    if (!arq) return res.status(404).json({ erro: "Foto não encontrada." });
+    res.set("Cache-Control", "private, max-age=86400");
+    res.type("jpg");
+    res.sendFile(arq);
   });
 
   // Áudio "Para o Carlos": só sai para quem tem a senha do gravador (1207 + código pessoal)
@@ -134,6 +159,18 @@ module.exports = function livrosApi(app, express) {
     res.sendFile(arq);
   });
 };
+
+// Fotos reais em dados/henrique/fotos/<id>.jpg (grande) e <id>_p.jpg (miniatura), e a etapa de cada uma
+const FOTO_ETAPA = {
+  helenaPerfil: 3, inauguracao: 3,
+  vistoria: 5, placa: 5, cida: 5, ubatuba: 5, neve: 5, vale: 5, trem: 5, chaleFrente: 5, chaleLado: 5, chaleVaranda: 5,
+  postalFrente: 7,
+};
+function arquivoFoto(id, tam) {
+  if (!Object.prototype.hasOwnProperty.call(FOTO_ETAPA, id)) return null;
+  const f = path.join(__dirname, "dados", "henrique", "fotos", `${id}${tam === "p" ? "_p" : ""}.jpg`);
+  return fsSync.existsSync(f) ? f : null;
+}
 
 // Coloque o arquivo em dados/henrique/ com um destes nomes (o primeiro que existir vale)
 function arquivoAudio() {
