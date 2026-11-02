@@ -11,6 +11,15 @@ Como usar: o autor manda os pedidos quando quiser; o Claude só anota aqui. Quan
       Não é versículo literal. Base bíblica: Mateus 25:21 (ARC, "sobre o pouco foste fiel, sobre muito te colocarei;
       entra no gozo do teu senhor") e Lucas 16:10 ("quem é fiel no mínimo também é fiel no muito").
       Proposta de lugar: Cap. 4, perto de "O peso de um obrigado" (gratidão como vibração). Confirmar com o autor.
+- [ ] Item 2 (02/11) — Cap. 8, junto de "A fé que vira fanatismo": fanatismo × idolatria como dois lados.
+      Fanatismo fica no nível espiritual; idolatria desce ao nível físico/material: idolatrar um astro,
+      um partido, um time, um mártir. Desenvolver no texto.
+      Cuidado: tratar partido e time sem citar nomes reais, para não tomar lado nem afastar leitores.
+- [ ] Item 3 (02/11) — Cap. 8, perto de "Esportes e corpo": distorções da imagem corporal, anorexia × vigorexia,
+      dois lados do mesmo pensamento (o corpo que precisa diminuir e o corpo que precisa crescer; o que está
+      dentro e o que está fora do corpo). Desenvolver no texto.
+      Cuidado: são transtornos sérios. Sem números (peso, calorias, treinos), sem descrever métodos,
+      sem frases que soem como incentivo; dizer que têm tratamento e indicar procurar ajuda profissional.
 - [ ] Dedicatória (para quem e o texto)
 - [ ] Subtítulo (opcional)
 - [ ] Leitura do DOCX de 02/11 (165 páginas) e as mudanças que surgirem dela
