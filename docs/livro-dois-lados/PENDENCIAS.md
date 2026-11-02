@@ -7,7 +7,10 @@ Como usar: o autor manda os pedidos quando quiser; o Claude só anota aqui. Quan
 **"pode executar a fila"**, o Claude aplica tudo, gera o livro uma vez e marca cada item como feito.
 
 ## Aguardando o autor
-- [ ] Citação nova para incluir (o autor vai enviar o texto e dizer onde entra)
+- [ ] Citação 1 (02/11): "quem se agrada no pouco, no muito se regozijará", ligada à vibração; desenvolver no texto.
+      Não é versículo literal. Base bíblica: Mateus 25:21 (ARC, "sobre o pouco foste fiel, sobre muito te colocarei;
+      entra no gozo do teu senhor") e Lucas 16:10 ("quem é fiel no mínimo também é fiel no muito").
+      Proposta de lugar: Cap. 4, perto de "O peso de um obrigado" (gratidão como vibração). Confirmar com o autor.
 - [ ] Dedicatória (para quem e o texto)
 - [ ] Subtítulo (opcional)
 - [ ] Leitura do DOCX de 02/11 (165 páginas) e as mudanças que surgirem dela
