@@ -26,6 +26,10 @@ Como usar: o autor manda os pedidos quando quiser; o Claude só anota aqui. Quan
       parecem imorais. Apresentar como caso imaginado ("imagine"), sem afirmar que é assim na lei real.
       Mostrar no texto que o próprio leitor é levado a julgar antes de saber de tudo (o autor viveu isso com o
       Claude): o julgamento muda quando a informação muda.
+      Ponto central do autor: o convite pede que todos levem roupa de banho, como quem chama amigos para a piscina.
+      A intenção está no modo como a palavra é dita e também no modo como é lida: "pediu que usassem roupas que
+      marcassem o corpo" e "pediu que levassem roupa de banho" descrevem o mesmo fato e produzem julgamentos
+      opostos. Usar as duas redações no texto para mostrar isso.
       Psicólogo: descartado pelo autor (sigilo fica no foro íntimo de cada envolvido).
       Para o lado "moral, mas antiético", usar a nomeação do sobrinho competente (nepotismo, Súmula Vinculante 13),
       salvo outra escolha do autor.
