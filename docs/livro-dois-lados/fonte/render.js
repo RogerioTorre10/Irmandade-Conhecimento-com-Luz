@@ -41,6 +41,13 @@ const front = [
   ...META.creditos.map((t) => new Paragraph({ spacing: { after: 120 },
     children: [new TextRun({ text: t, size: 18, font: FONT })] })),
 
+  ...(Array.isArray(META.dedicatoria) && META.dedicatoria.length ? [
+    new Paragraph({ pageBreakBefore: true, children: [] }),
+    ...blank(9),
+    ...META.dedicatoria.map((t) => new Paragraph({ alignment: AlignmentType.RIGHT, indent: { left: cm(0.5) },
+      spacing: { after: 60 }, children: [new TextRun({ text: t, italics: true, size: 24, font: FONT })] })),
+  ] : []),
+
   new Paragraph({ pageBreakBefore: true, children: [] }),
   ...blank(10),
   new Paragraph({ alignment: AlignmentType.RIGHT, indent: { left: cm(3) }, spacing: { after: 160 },
