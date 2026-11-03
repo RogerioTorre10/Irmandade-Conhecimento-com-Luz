@@ -44,9 +44,9 @@ Como usar: o autor manda os pedidos quando quiser; o Claude só anota aqui. Quan
       por "não existe uma zebra com o mesmo conjunto de listras de outra" (as listras se repetem; o desenho inteiro é único).
       No parágrafo seguinte ("A zebra não escolhe as suas listras, e o ser humano escolhe"), acrescentar Sartre:
       a ideia de que somos responsáveis pelo que escolhemos e também por não ter escolhido, porque não escolher
-      já é uma escolha. A frase exata enviada pelo autor não foi localizada nas obras de Sartre: escrever como
-      ideia dele, sem aspas ("Sartre dizia que…"), ou usar uma citação verificada de "O existencialismo é um
-      humanismo" (1946), como "o homem está condenado a ser livre".
+      já é uma escolha. DECIDIDO pelo autor (opção 1): sem aspas, como ideia de Sartre:
+      "Sartre dizia, em outras palavras, que somos responsáveis pelo que escolhemos e também pelo que
+      deixamos de escolher, porque não escolher já é uma escolha."
 - [ ] Dedicatória (para quem e o texto)
 - [ ] Subtítulo (opcional)
 - [ ] Leitura do DOCX de 02/11 (165 páginas) e as mudanças que surgirem dela
