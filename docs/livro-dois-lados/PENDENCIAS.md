@@ -20,6 +20,17 @@ Como usar: o autor manda os pedidos quando quiser; o Claude só anota aqui. Quan
       dentro e o que está fora do corpo). Desenvolver no texto.
       Cuidado: são transtornos sérios. Sem números (peso, calorias, treinos), sem descrever métodos,
       sem frases que soem como incentivo; dizer que têm tratamento e indicar procurar ajuda profissional.
+- [ ] Item 4 (03/11) — Cap. 22, "Ouvir e escutar": o barulho durante o sono. A pessoa acorda em alerta e
+      não apenas ouve: escuta. Faz uma varredura mental do ambiente, bloqueia os ruídos gerais e foca no
+      barulho que chamou a atenção, para saber o que é e de onde vem. Desenvolver no texto.
+- [ ] Item 5 (03/11) — Cap. 22 (ou Cap. 5, "A vibração que alerta"): o arrepio diante de um som agudo, como o giz
+      ou a unha arranhando o quadro-negro, ligado aos nossos ancestrais das cavernas e ao ruído das garras dos
+      predadores subindo pelas rochas. Desenvolver no texto.
+      Cuidado: a origem ancestral é uma hipótese, não um fato comprovado (há estudos que ligam o arrepio
+      a sons parecidos com gritos de alarme de primatas). Escrever como "uma das explicações" ou "acredita-se".
+- [ ] Item 6 (03/11) — Cap. 19, "A união", 1º parágrafo: trocar a frase que diz que a união estável é outra coisa
+      por uma que diga apenas que da união estável falaremos mais à frente (ela é tratada no mesmo capítulo,
+      em "Por que a lei chama de união"). Usar a redação que o autor corrigiu no DOCX, se ele enviar.
 - [ ] Dedicatória (para quem e o texto)
 - [ ] Subtítulo (opcional)
 - [ ] Leitura do DOCX de 02/11 (165 páginas) e as mudanças que surgirem dela
