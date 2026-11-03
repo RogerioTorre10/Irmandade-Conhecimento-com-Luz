@@ -31,6 +31,11 @@ Como usar: o autor manda os pedidos quando quiser; o Claude só anota aqui. Quan
 - [ ] Item 6 (03/11) — Cap. 19, "A união", 1º parágrafo: trocar a frase que diz que a união estável é outra coisa
       por uma que diga apenas que da união estável falaremos mais à frente (ela é tratada no mesmo capítulo,
       em "Por que a lei chama de união"). Usar a redação que o autor corrigiu no DOCX, se ele enviar.
+- [ ] Item 7 (03/11) — Cap. 22, "Ouvir e escutar" (perto de "O Deus que fala baixo", como contraste): no Sinai,
+      Moisés reúne o povo para escutar a voz do Senhor; havia trovões, relâmpagos e o som da trombeta, e o povo,
+      com medo, não suportou e pediu: "Fala tu conosco, e ouviremos; e não fale Deus conosco, para que não
+      morramos" (Êxodo 20:18–19; ver também Êxodo 19:16–19 e Deuteronômio 5:23–27). Desenvolver no texto.
+      Conferir as citações na ARC antes de incluir.
 - [ ] Dedicatória (para quem e o texto)
 - [ ] Subtítulo (opcional)
 - [ ] Leitura do DOCX de 02/11 (165 páginas) e as mudanças que surgirem dela
