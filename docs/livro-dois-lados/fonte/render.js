@@ -117,6 +117,15 @@ for (const b of blocks) {
   }
 }
 
+// ---------- sobre o autor ----------
+if (Array.isArray(META.sobre) && META.sobre.length) {
+  body.push(centered('SOBRE O AUTOR', { size: 24, bold: true, characterSpacing: 60 }, { pageBreakBefore: true, spacing: { before: 1600, after: 480 } }));
+  for (const t of META.sobre) {
+    body.push(new Paragraph({ alignment: AlignmentType.JUSTIFIED, indent: { firstLine: cm(0.6) }, spacing: { after: 120, ...LINE },
+      children: [new TextRun({ text: t, font: FONT, size: BODY })] }));
+  }
+}
+
 const page = {
   size: { width: cm(14), height: cm(21) },
   margin: { top: cm(2), bottom: cm(2.2), left: cm(2.1), right: cm(1.9), footer: cm(1) },
