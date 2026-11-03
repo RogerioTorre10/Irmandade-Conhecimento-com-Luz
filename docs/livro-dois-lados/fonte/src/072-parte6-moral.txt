@@ -1,0 +1,41 @@
+CAP|Capítulo 25|Moral, imoral e amoral
+Uma mesma atitude pode ser aplaudida num lugar e condenada no lugar ao lado. O gesto é o mesmo. O movimento é o mesmo. O que muda é a régua de quem olha. E, quando pessoas com réguas diferentes se encontram, nascem os conflitos que vemos nas famílias, nos bairros, nas igrejas e entre os povos.
+SUB|Três palavras
+Moral é o que está de acordo com os costumes e os valores de um grupo. Imoral é o que vai contra eles. E amoral é o que fica fora dessa régua: um ato que, para aquele grupo, não tem peso moral nenhum, nem bom nem mau. Escovar os dentes, escolher a cor da camisa, atravessar a rua. Ninguém aplaude nem condena. A mesma palavra também é usada para falar de quem não tem senso moral algum, mas aqui fico com o primeiro sentido, o do ato que não pesa.
+Moral e imoral são os dois lados. O amoral fica no meio, como a vibração neutra de que falei no capítulo 6, a de quem já não luta nem se revolta. E é justamente esse meio que mais engana, porque o que para um grupo é amoral, para outro pode ser moral ou imoral.
+SUB|Não é preciso atravessar o oceano
+Costumamos pensar nesses choques como coisa de países distantes. Mas eles acontecem a poucas quadras de casa.
+Na sinagoga, o homem cobre a cabeça em sinal de respeito diante de Deus. Na tradição cristã, o apóstolo Paulo ensinou o contrário: “Todo o homem que ora ou profetiza, tendo a cabeça coberta, desonra a sua própria cabeça” (1 Coríntios 11:4). O mesmo gesto, cobrir a cabeça, é reverência num lugar e desrespeito no outro. E, na rua, para a maioria das pessoas, usar ou não um boné é simplesmente amoral.
+O mesmo acontece com a dança. Em algumas comunidades religiosas, dançar no culto é louvor, como Davi diante da arca. Em outras, é visto como inadequado dentro do templo. Na festa típica do bairro, a dança é a própria festa. Com a bebida, igual: em certas festas tradicionais, a cerveja faz parte da celebração. Em muitas comunidades evangélicas, a bebida alcoólica não tem lugar. E com a música alta no sábado à noite: num bairro, é convivência; no outro, é falta de respeito com quem dorme.
+Ninguém, nesses exemplos, é mau. Cada um está sendo fiel à régua do seu lugar. O conflito nasce quando alguém leva a sua régua para o lugar do outro e mede o outro por ela.
+SUB|O pensamento que muda de lugar
+O quadro abaixo mostra algumas atitudes passando por lugares diferentes. Não é uma regra fixa, porque dentro de cada lugar também há variações. É só um retrato de como o mesmo gesto muda de peso conforme a régua de quem olha.
+TAB|Atitude|Templo|Bairro|Festa típica
+TAB|Cobrir a cabeça|Reverência na sinagoga; desrespeito na tradição cristã|Amoral|Amoral, ou parte do traje
+TAB|Dançar|Louvor em umas comunidades; inadequado em outras|Amoral|É a própria festa
+TAB|Beber cerveja|Inadequado em muitas comunidades|Amoral, com medida|Tradição em algumas festas
+TAB|Música alta à noite|Louvor no culto; desrespeito fora de hora|Convivência num bairro; desrespeito no outro|Esperada
+SUB|Ética não é a mesma coisa que moral
+Há ainda uma segunda régua, que muitas vezes confundimos com a primeira. A moral nasce dos costumes de um grupo. A ética, no sentido em que uso aqui, olha para os deveres: as regras que uma profissão, um cargo ou uma instituição assume e cumpre. A parte da ética que estuda esses deveres se chama deontologia, e é dela que nascem os códigos de ética do médico, do advogado, do psicólogo, do servidor público.
+As duas réguas nem sempre concordam. Uma atitude pode cumprir todos os deveres e ainda assim ferir os costumes de alguém. E pode respeitar os costumes de um grupo e quebrar um dever.
+SUB|A festa na praia
+Imagine um político que pediu aos funcionários da sua repartição que usassem roupas que marcassem o corpo.
+Antes de continuar, repare no que você sentiu ao ler essa frase. Provavelmente, já julgou. Eu mesmo julguei quando ouvi essa história pela primeira vez.
+Agora leia a mesma situação contada de outro jeito. Esse político organizou uma festa de confraternização numa praia para todos os funcionários da repartição. A verba foi separada do orçamento e aprovada numa assembleia específica para isso, justamente para que houvesse um dia de convívio entre todos. No convite, pediu que cada um levasse roupa de banho, como faz qualquer pessoa que chama os amigos para uma tarde na piscina.
+O fato é o mesmo. As duas frases contam a mesma coisa. Mas a primeira leva ao escândalo, e a segunda, a um convite. A intenção está no modo como a palavra é dita, e também no modo como ela é lida.
+E mesmo contada do segundo jeito, a festa continua tendo os seus lados. Do ponto de vista dos deveres, foi ética: o procedimento foi seguido e nenhuma regra foi quebrada. Na praia, sunga e biquíni são amorais, ninguém ali vê peso nenhum. Mas, para o contribuinte que olha de fora, ou para uma comunidade religiosa com outros costumes, a festa com dinheiro público e os trajes de banho podem parecer imorais. Ético e imoral ao mesmo tempo, conforme a régua.
+SUB|O sobrinho competente
+O caminho contrário também existe. Imagine outro político, que nomeia para um cargo de confiança o próprio sobrinho. O rapaz é competente, honesto e trabalhador, e recebe exatamente o que o cargo prevê. Para a família e para muita gente do bairro, isso é moral: é cuidar dos seus, dar oportunidade a quem você conhece e em quem confia.
+Para a ética pública, porém, é nepotismo. O Supremo Tribunal Federal, na Súmula Vinculante 13, de 2008, proibiu que autoridades nomeiem parentes próximos para cargos de confiança. A regra existe porque o cargo público não pertence a quem o ocupa, e todos os outros cidadãos têm o direito de concorrer a ele em igualdade. Moral para a família, antiético para a administração pública.
+SUB|As duas réguas juntas
+Quando cruzamos as duas réguas, aparecem quatro casas.
+TAB||Moral|Imoral
+TAB|Ético|O médico que atende pela ordem de chegada e trata todos com o mesmo respeito|A festa na praia, aprovada em assembleia, vista por quem tem outros costumes
+TAB|Antiético|O sobrinho competente nomeado pelo tio|O desvio de verba para benefício próprio
+Nas casas das pontas, todos concordam. Ninguém discute o médico que atende bem, nem defende o desvio de dinheiro. É nas outras duas casas que as pessoas brigam, porque cada lado está olhando com uma régua diferente e tem razão dentro dela.
+SUB|O que não muda de lugar
+Isso quer dizer que tudo é relativo, e que nada é certo nem errado? Não. Os costumes mudam de um lugar para outro, e é bom respeitá-los. Mas há valores que não dependem do endereço. A dignidade do outro é um deles. Jesus resumiu essa régua comum numa frase que vale em qualquer templo, bairro ou festa: “Portanto, tudo o que vós quereis que os homens vos façam, fazei-lho também vós” (Mateus 7:12).
+Antes de condenar alguém pela régua do meu lugar, posso perguntar: o que ele fez fere a dignidade de alguém, ou apenas fere o meu costume? Se fere a dignidade, há algo a corrigir. Se fere só o meu costume, talvez o que precise mudar seja o meu julgamento.
+SUB|As quatro perguntas
+Peso: o moral e o imoral pesam em direções opostas; o amoral não pesa. Escala: os três falam do mesmo ato, visto por réguas diferentes. Nível: a moral nasce nos costumes, no corpo da convivência; a ética nasce nos deveres; e a dignidade toca o espírito. Efeito: quem confunde a sua régua com a régua de todos divide. Quem reconhece as réguas e guarda o que é comum aproxima.
+QUOTE|O gesto é o mesmo. O que muda é a régua de quem olha.

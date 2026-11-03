@@ -7,38 +7,9 @@ Como usar: o autor manda os pedidos quando quiser; o Claude só anota aqui. Quan
 **"pode executar a fila"**, o Claude aplica tudo, gera o livro uma vez e marca cada item como feito.
 
 ## Aguardando o autor
-- [ ] Item 11 (03/11) — moral, imoral e amoral, e os conflitos entre culturas: o que é moral numa cultura pode ser
-      imoral ou amoral em outra, e isso gera choques nas relações interculturais. Desenvolver no texto.
-      Proposta: capítulo novo na Parte VI ("Os pares do dia a dia"), depois de "Solidão e solitude"
-      (o da IA passa a ser o 26). Moral e imoral são os dois lados; amoral é o "fora da escala", como a
-      vibração neutra do pai no Cap. 6.
-      Cuidados: exemplos de costumes do dia a dia (cumprimento com beijo ou sem toque, tirar os sapatos,
-      comer com as mãos, pontualidade, gestos), sem estereotipar povos ou religiões; e não cair no "tudo é
-      relativo": separar costumes, que mudam de um lugar para outro, de valores que o livro defende como
-      universais (a dignidade do outro, não fazer ao outro o que não queremos para nós — Mateus 7:12).
-      Ampliação (03/11): juntar ético × antiético (deontologia, os deveres e os códigos de conduta) com
-      moral × imoral × amoral, num ESQUEMA que mostre o pensamento mudando conforme o lugar — não só outro país:
-      igreja, sinagoga, bairro, festa típica. Mostrar que o ético pode ser imoral e o moral pode ser antiético.
-      EXEMPLO ESCOLHIDO PELO AUTOR (ético, mas imoral para alguns): um político financia uma festa de
-      confraternização na praia para os funcionários da repartição. A verba foi separada do orçamento e aprovada
-      numa assembleia específica para isso: nenhum crime, procedimento correto. Na praia, sunga e biquíni são
-      normais (amoral); vista de fora, por parte do público ou de uma comunidade religiosa, a festa e os trajes
-      parecem imorais. Apresentar como caso imaginado ("imagine"), sem afirmar que é assim na lei real.
-      Mostrar no texto que o próprio leitor é levado a julgar antes de saber de tudo (o autor viveu isso com o
-      Claude): o julgamento muda quando a informação muda.
-      Ponto central do autor: o convite pede que todos levem roupa de banho, como quem chama amigos para a piscina.
-      A intenção está no modo como a palavra é dita e também no modo como é lida: "pediu que usassem roupas que
-      marcassem o corpo" e "pediu que levassem roupa de banho" descrevem o mesmo fato e produzem julgamentos
-      opostos. Usar as duas redações no texto para mostrar isso.
-      Psicólogo: descartado pelo autor (sigilo fica no foro íntimo de cada envolvido).
-      Para o lado "moral, mas antiético", usar a nomeação do sobrinho competente (nepotismo, Súmula Vinculante 13),
-      salvo outra escolha do autor.
-      Esquema: quadro 2×2 (ético/antiético × moral/imoral) + uma mesma atitude passando por vários lugares
-      (roupa, cobrir a cabeça, dançar, beber). O render.js ainda não tem tabela: incluir suporte.
-- [ ] Dedicatória (para quem e o texto) — opcional
-- [ ] Subtítulo — opcional
+- [ ] Dedicatória e subtítulo — opcionais
 - [ ] Consentimento da filha para a história do transplante no Cap. 6
-- [ ] Leitura das páginas alteradas em 03/11 (lista abaixo)
+- [ ] Leitura rápida das páginas alteradas (lista em "Feito")
 
 ## Depois do texto fechado
 - [ ] Capa: ampliar para 300 dpi e resolver o título amarelo sobre amarelo
@@ -60,3 +31,7 @@ Como usar: o autor manda os pedidos quando quiser; o Claude só anota aqui. Quan
       160   Epílogo, a zebra e Sartre (item 9)
       167   Sobre o autor (novo)
       Sinopse da contracapa em contracapa.txt (nova)
+- [x] 03/11 — item 11: Cap. 25 novo, "Moral, imoral e amoral" (págs. 149–155), com os dois quadros;
+      o capítulo da IA passou a ser o 26; perguntas 27 e 28 no apêndice. Livro final: 179 páginas.
+      Páginas atualizadas: 40 · 44 · 51 · 70–71 · 127 · 137 · 140 · 149–155 · 158 · 162 · 166–167 · 172 · 174
+      PDF para a UICLAP: OS_DOIS_LADOS_DO_MESMO_PENSAMENTO.pdf

@@ -24,6 +24,11 @@ for path in sorted(glob.glob('src/*.txt')):
             blocks.append({'t': 'chap', 'label': rest[0], 'title': rest[1]})
         elif kind == 'SUB':
             blocks.append({'t': 'sub', 'text': rest[0]})
+        elif kind == 'TAB':
+            if blocks and blocks[-1]['t'] == 'table':
+                blocks[-1]['rows'].append(rest)
+            else:
+                blocks.append({'t': 'table', 'rows': [rest]})
         elif kind == 'QUOTE':
             blocks.append({'t': 'quote', 'text': rest[0]})
         else:
@@ -32,5 +37,5 @@ for path in sorted(glob.glob('src/*.txt')):
             blocks.append({'t': 'p', 'text': line})
 
 json.dump(blocks, open('blocks.json', 'w', encoding='utf-8'), ensure_ascii=False)
-words = sum(len((b.get('text') or b.get('title', '')).split()) for b in blocks)
+words = sum(len((b.get('text') or b.get('title', '') or ' '.join(' '.join(r) for r in b.get('rows', []))).split()) for b in blocks)
 print(f'blocos={len(blocks)} palavras={words}')

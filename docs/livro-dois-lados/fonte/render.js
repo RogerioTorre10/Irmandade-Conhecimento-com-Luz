@@ -2,7 +2,7 @@
 const fs = require('fs');
 const {
   Document, Packer, Paragraph, TextRun, AlignmentType, Footer, PageNumber,
-  LineRuleType, TabStopType, Tab,
+  LineRuleType, TabStopType, Tab, Table, TableRow, TableCell, WidthType, BorderStyle,
 } = require('docx');
 
 const blocks = JSON.parse(fs.readFileSync('blocks.json', 'utf8'));
@@ -99,6 +99,27 @@ for (const b of blocks) {
   } else if (b.t === 'sub') {
     body.push(new Paragraph({ spacing: { before: 400, after: 160 }, keepNext: true, keepLines: true,
       children: [new TextRun({ text: b.text, font: FONT, size: 24, bold: true, smallCaps: true })] }));
+    afterHeading = true;
+  } else if (b.t === 'table') {
+    const ncol = Math.max(...b.rows.map((r) => r.length));
+    const total = cm(10);
+    const first = ncol > 3 ? cm(2.2) : cm(2.0);
+    const widths = [first, ...Array(ncol - 1).fill(Math.floor((total - first) / (ncol - 1)))];
+    const borda = { style: BorderStyle.SINGLE, size: 4, color: '888888' };
+    const borders = { top: borda, bottom: borda, left: borda, right: borda, insideHorizontal: borda, insideVertical: borda };
+    body.push(new Paragraph({ spacing: { before: 120 }, children: [] }));
+    body.push(new Table({
+      width: { size: total, type: WidthType.DXA }, columnWidths: widths, borders,
+      rows: b.rows.map((r, ri) => new TableRow({ cantSplit: true, tableHeader: ri === 0,
+        children: widths.map((w, ci) => new TableCell({
+          width: { size: w, type: WidthType.DXA },
+          shading: ri === 0 || ci === 0 ? { fill: 'EDEDED' } : undefined,
+          margins: { top: 60, bottom: 60, left: 80, right: 80 },
+          children: [new Paragraph({ alignment: ri === 0 ? AlignmentType.CENTER : AlignmentType.LEFT,
+            children: [new TextRun({ text: r[ci] || '', font: FONT, size: 17, bold: ri === 0 || ci === 0 })] })],
+        })) })),
+    }));
+    body.push(new Paragraph({ spacing: { after: 160 }, children: [] }));
     afterHeading = true;
   } else if (b.t === 'quote') {
     body.push(new Paragraph({ alignment: AlignmentType.CENTER,
