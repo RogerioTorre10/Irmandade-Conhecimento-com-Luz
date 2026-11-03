@@ -19,13 +19,16 @@ Como usar: o autor manda os pedidos quando quiser; o Claude só anota aqui. Quan
       Ampliação (03/11): juntar ético × antiético (deontologia, os deveres e os códigos de conduta) com
       moral × imoral × amoral, num ESQUEMA que mostre o pensamento mudando conforme o lugar — não só outro país:
       igreja, sinagoga, bairro, festa típica. Mostrar que o ético pode ser imoral e o moral pode ser antiético.
-      Exemplo do autor (político que paga certo mas exige roupas que marquem a genitália) NÃO serve: é assédio,
-      antiético e ilegal. Opções propostas ao autor, aguardando escolha:
-        a) ético e imoral: advogado que defende réu que sabe culpado (o código garante defesa a todos);
-        b) ético e imoral para a família: psicólogo que guarda o sigilo do paciente (dentro dos limites do código);
-        c) moral e antiético: político que nomeia o sobrinho competente e o paga certinho (cuidar dos seus,
-           mas é nepotismo, proibido pela Súmula Vinculante 13 do STF);
-        d) moral e antiético: servidor que passa o vizinho doente à frente na fila do posto.
+      EXEMPLO ESCOLHIDO PELO AUTOR (ético, mas imoral para alguns): um político financia uma festa de
+      confraternização na praia para os funcionários da repartição. A verba foi separada do orçamento e aprovada
+      numa assembleia específica para isso: nenhum crime, procedimento correto. Na praia, sunga e biquíni são
+      normais (amoral); vista de fora, por parte do público ou de uma comunidade religiosa, a festa e os trajes
+      parecem imorais. Apresentar como caso imaginado ("imagine"), sem afirmar que é assim na lei real.
+      Mostrar no texto que o próprio leitor é levado a julgar antes de saber de tudo (o autor viveu isso com o
+      Claude): o julgamento muda quando a informação muda.
+      Psicólogo: descartado pelo autor (sigilo fica no foro íntimo de cada envolvido).
+      Para o lado "moral, mas antiético", usar a nomeação do sobrinho competente (nepotismo, Súmula Vinculante 13),
+      salvo outra escolha do autor.
       Esquema: quadro 2×2 (ético/antiético × moral/imoral) + uma mesma atitude passando por vários lugares
       (roupa, cobrir a cabeça, dançar, beber). O render.js ainda não tem tabela: incluir suporte.
 - [ ] Dedicatória (para quem e o texto) — opcional
