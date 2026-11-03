@@ -16,6 +16,18 @@ Como usar: o autor manda os pedidos quando quiser; o Claude só anota aqui. Quan
       comer com as mãos, pontualidade, gestos), sem estereotipar povos ou religiões; e não cair no "tudo é
       relativo": separar costumes, que mudam de um lugar para outro, de valores que o livro defende como
       universais (a dignidade do outro, não fazer ao outro o que não queremos para nós — Mateus 7:12).
+      Ampliação (03/11): juntar ético × antiético (deontologia, os deveres e os códigos de conduta) com
+      moral × imoral × amoral, num ESQUEMA que mostre o pensamento mudando conforme o lugar — não só outro país:
+      igreja, sinagoga, bairro, festa típica. Mostrar que o ético pode ser imoral e o moral pode ser antiético.
+      Exemplo do autor (político que paga certo mas exige roupas que marquem a genitália) NÃO serve: é assédio,
+      antiético e ilegal. Opções propostas ao autor, aguardando escolha:
+        a) ético e imoral: advogado que defende réu que sabe culpado (o código garante defesa a todos);
+        b) ético e imoral para a família: psicólogo que guarda o sigilo do paciente (dentro dos limites do código);
+        c) moral e antiético: político que nomeia o sobrinho competente e o paga certinho (cuidar dos seus,
+           mas é nepotismo, proibido pela Súmula Vinculante 13 do STF);
+        d) moral e antiético: servidor que passa o vizinho doente à frente na fila do posto.
+      Esquema: quadro 2×2 (ético/antiético × moral/imoral) + uma mesma atitude passando por vários lugares
+      (roupa, cobrir a cabeça, dançar, beber). O render.js ainda não tem tabela: incluir suporte.
 - [ ] Dedicatória (para quem e o texto) — opcional
 - [ ] Subtítulo — opcional
 - [ ] Consentimento da filha para a história do transplante no Cap. 6
