@@ -43,7 +43,7 @@ const front = [
 
   ...(Array.isArray(META.dedicatoria) && META.dedicatoria.length ? [
     new Paragraph({ pageBreakBefore: true, children: [] }),
-    ...blank(9),
+    ...blank(6),
     ...META.dedicatoria.map((t) => new Paragraph({ alignment: AlignmentType.RIGHT, indent: { left: cm(0.5) },
       spacing: { after: 60 }, children: [new TextRun({ text: t, italics: true, size: 24, font: FONT })] })),
   ] : []),
