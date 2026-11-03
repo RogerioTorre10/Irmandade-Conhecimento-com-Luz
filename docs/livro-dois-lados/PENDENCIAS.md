@@ -40,6 +40,13 @@ Como usar: o autor manda os pedidos quando quiser; o Claude só anota aqui. Quan
       "as grandezas terrenas, a imagem e a semelhança, os sentimentos e os sentidos"
       por "as grandezas terrenas, a imagem (os sentimentos) e a semelhança (os sentidos)",
       para não parecerem outras duas grandezas. Conferir o mesmo risco em outros trechos do livro.
+- [ ] Item 9 (03/11) — Epílogo, "O livre-arbítrio", parágrafo da zebra: trocar "não existe uma listra igual à outra"
+      por "não existe uma zebra com o mesmo conjunto de listras de outra" (as listras se repetem; o desenho inteiro é único).
+      No parágrafo seguinte ("A zebra não escolhe as suas listras, e o ser humano escolhe"), acrescentar Sartre:
+      a ideia de que somos responsáveis pelo que escolhemos e também por não ter escolhido, porque não escolher
+      já é uma escolha. A frase exata enviada pelo autor não foi localizada nas obras de Sartre: escrever como
+      ideia dele, sem aspas ("Sartre dizia que…"), ou usar uma citação verificada de "O existencialismo é um
+      humanismo" (1946), como "o homem está condenado a ser livre".
 - [ ] Dedicatória (para quem e o texto)
 - [ ] Subtítulo (opcional)
 - [ ] Leitura do DOCX de 02/11 (165 páginas) e as mudanças que surgirem dela
