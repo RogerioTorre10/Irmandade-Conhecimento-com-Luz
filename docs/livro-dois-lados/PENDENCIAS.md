@@ -47,6 +47,14 @@ Como usar: o autor manda os pedidos quando quiser; o Claude só anota aqui. Quan
       já é uma escolha. DECIDIDO pelo autor (opção 1): sem aspas, como ideia de Sartre:
       "Sartre dizia, em outras palavras, que somos responsáveis pelo que escolhemos e também pelo que
       deixamos de escolher, porque não escolher já é uma escolha."
+- [ ] Item 10 (03/11) — Cap. 25, "A máquina calcula, o ser humano vibra": a frase "Quem decide de que lado ela vibra
+      somos nós" dá a entender que a máquina vibra. Trocar por algo como "Quem decide de que lado ela será usada
+      somos nós". E acrescentar a ideia do autor: a máquina não vibra no sentido deste livro. A vibração de que o
+      livro fala é da ordem da ação do Divino e não depende de energia produzida pelo homem. A máquina pode se agitar,
+      e até "vibrar" como um celular, mas é uma vibração sem transferência de significado, da ordem da energia
+      elétrica ou de outra energia que não é infinita. Usar no texto as palavras do autor, adaptadas.
+      Varrer o capítulo inteiro (e os outros) por qualquer frase que atribua vibração à máquina, ex.: "do lado que
+      contagia" aplicado à IA — esclarecer que quem contagia é quem usa.
 - [ ] Dedicatória (para quem e o texto)
 - [ ] Subtítulo (opcional)
 - [ ] Leitura do DOCX de 02/11 (165 páginas) e as mudanças que surgirem dela
