@@ -7,6 +7,15 @@ Como usar: o autor manda os pedidos quando quiser; o Claude só anota aqui. Quan
 **"pode executar a fila"**, o Claude aplica tudo, gera o livro uma vez e marca cada item como feito.
 
 ## Aguardando o autor
+- [ ] Item 11 (03/11) — moral, imoral e amoral, e os conflitos entre culturas: o que é moral numa cultura pode ser
+      imoral ou amoral em outra, e isso gera choques nas relações interculturais. Desenvolver no texto.
+      Proposta: capítulo novo na Parte VI ("Os pares do dia a dia"), depois de "Solidão e solitude"
+      (o da IA passa a ser o 26). Moral e imoral são os dois lados; amoral é o "fora da escala", como a
+      vibração neutra do pai no Cap. 6.
+      Cuidados: exemplos de costumes do dia a dia (cumprimento com beijo ou sem toque, tirar os sapatos,
+      comer com as mãos, pontualidade, gestos), sem estereotipar povos ou religiões; e não cair no "tudo é
+      relativo": separar costumes, que mudam de um lugar para outro, de valores que o livro defende como
+      universais (a dignidade do outro, não fazer ao outro o que não queremos para nós — Mateus 7:12).
 - [ ] Dedicatória (para quem e o texto) — opcional
 - [ ] Subtítulo — opcional
 - [ ] Consentimento da filha para a história do transplante no Cap. 6
