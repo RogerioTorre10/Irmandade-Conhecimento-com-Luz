@@ -36,6 +36,10 @@ Como usar: o autor manda os pedidos quando quiser; o Claude só anota aqui. Quan
       com medo, não suportou e pediu: "Fala tu conosco, e ouviremos; e não fale Deus conosco, para que não
       morramos" (Êxodo 20:18–19; ver também Êxodo 19:16–19 e Deuteronômio 5:23–27). Desenvolver no texto.
       Conferir as citações na ARC antes de incluir.
+- [ ] Item 8 (03/11) — Epílogo, "O livre-arbítrio", 1º parágrafo: trocar
+      "as grandezas terrenas, a imagem e a semelhança, os sentimentos e os sentidos"
+      por "as grandezas terrenas, a imagem (os sentimentos) e a semelhança (os sentidos)",
+      para não parecerem outras duas grandezas. Conferir o mesmo risco em outros trechos do livro.
 - [ ] Dedicatória (para quem e o texto)
 - [ ] Subtítulo (opcional)
 - [ ] Leitura do DOCX de 02/11 (165 páginas) e as mudanças que surgirem dela
