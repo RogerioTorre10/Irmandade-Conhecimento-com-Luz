@@ -11,6 +11,17 @@ Como usar: o autor manda os pedidos quando quiser; o Claude só anota aqui. Quan
 - [ ] Consentimento da filha para a história do transplante no Cap. 6
 - [ ] Leitura rápida das páginas alteradas (lista em "Feito")
 
+## Fila (para a troca do PDF antes de sair do modo privado)
+- [ ] 05/11 — Cap. 26 (IA), seção "O que a máquina faz", depois do 1º parágrafo: o 0 e 1 e as cores como números.
+      Texto proposto:
+      "Por dentro, toda essa inteligência fala uma língua de apenas dois sinais, o zero e o um, combinados em
+      sequências como 010101. Um texto, uma música, uma fotografia, tudo o que a máquina guarda é escrito assim.
+      Até as cores são números: cada ponto da tela mistura vermelho, verde e azul, e cada um recebe um valor de
+      0 a 255. Com três números, a tela mostra mais de dezesseis milhões de cores. É o número da primeira parte
+      deste livro, levado ao extremo. Mas o número sozinho combina, não sente. Dois sinais apenas, o sim e o não,
+      e deles nasce toda a linguagem das máquinas, sem que nenhuma delas saiba o que está dizendo."
+      Conferir depois: total de páginas (180) e lombada (10 mm).
+
 ## Depois do texto fechado
 - [ ] Capa: ampliar para 300 dpi e resolver o título amarelo sobre amarelo
 - [ ] PDF final, envio à UICLAP e capa completa com a lombada que a UICLAP calcular
