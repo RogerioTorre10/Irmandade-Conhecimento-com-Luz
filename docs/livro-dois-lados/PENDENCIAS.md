@@ -23,11 +23,13 @@ Como usar: o autor manda os pedidos quando quiser; o Claude só anota aqui. Quan
       Medido: ~14 linhas, cabem no espaço livre da pág. 164 (fim do Cap. 26). Livro segue com 180 páginas, capa e lombada não mudam.
       Autor decidiu (05/11): a prova já está em produção; aplicar na LIBERAÇÃO do livro, junto com o que surgir na leitura da prova, e trocar só o PDF do miolo na UICLAP.
 
-## Depois do texto fechado
-- [ ] Capa: ampliar para 300 dpi e resolver o título amarelo sobre amarelo
-- [ ] PDF final, envio à UICLAP e capa completa com a lombada que a UICLAP calcular
+## Na liberação do livro
+- [ ] Ler a prova impressa (capa, cores, lombada, páginas) e anotar correções aqui
+- [ ] Executar esta fila, trocar o PDF do miolo na UICLAP e tirar o livro do modo privado
+- [ ] Página Livros do site: mostrar o livro como publicado
 
 ## Feito
+- [x] 03/11 — dedicatória (pág. 3), capa nova 600 dpi e capa completa (lombada 10 mm); publicado na UICLAP em modo privado, 180 páginas; prova em produção
 - [x] 02/11 — Cap. 6: "Quando a palavra e o ouvido falham" (Beethoven, Nelson Gonçalves, Alzheimer)
 - [x] 03/11 — fila executada de uma vez (172 páginas). Páginas impressas alteradas:
       40–41 Cap. 4, "O pouco e o muito" (item 1)
