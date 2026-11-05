@@ -20,7 +20,8 @@ Como usar: o autor manda os pedidos quando quiser; o Claude só anota aqui. Quan
       0 a 255. Com três números, a tela mostra mais de dezesseis milhões de cores. É o número da primeira parte
       deste livro, levado ao extremo. Mas o número sozinho combina, não sente. Dois sinais apenas, o sim e o não,
       e deles nasce toda a linguagem das máquinas, sem que nenhuma delas saiba o que está dizendo."
-      Conferir depois: total de páginas (180) e lombada (10 mm).
+      Medido: ~14 linhas, cabem no espaço livre da pág. 164 (fim do Cap. 26). Livro segue com 180 páginas, capa e lombada não mudam.
+      Autor decidiu (05/11): a prova já está em produção; aplicar na LIBERAÇÃO do livro, junto com o que surgir na leitura da prova, e trocar só o PDF do miolo na UICLAP.
 
 ## Depois do texto fechado
 - [ ] Capa: ampliar para 300 dpi e resolver o título amarelo sobre amarelo
