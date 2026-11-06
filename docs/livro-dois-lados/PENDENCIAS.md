@@ -23,6 +23,8 @@ Como usar: o autor manda os pedidos quando quiser; o Claude só anota aqui. Quan
       Medido: ~14 linhas, cabem no espaço livre da pág. 164 (fim do Cap. 26). Livro segue com 180 páginas, capa e lombada não mudam.
       Autor decidiu (05/11): a prova já está em produção; aplicar na LIBERAÇÃO do livro, junto com o que surgir na leitura da prova, e trocar só o PDF do miolo na UICLAP.
 
+- [ ] 06/11 — Livro todo: tirar o vício das séries de verbos e itens (mesmo ajuste do O Pleno). Autor pediu: **só depois que a prova chegar**.
+
 ## Na liberação do livro
 - [ ] Ler a prova impressa (capa, cores, lombada, páginas) e anotar correções aqui
 - [ ] Executar esta fila, trocar o PDF do miolo na UICLAP e tirar o livro do modo privado
