@@ -965,6 +965,7 @@
   }
 
   function goNext(bloco) {
+    resetNextBlockQuestionIndex(bloco);
     const nextSection = bloco?.nextSection || FINAL_SECTION_ID;
     const video = bloco?.transitionVideo || FINAL_VIDEO_FALLBACK;
 
@@ -1178,6 +1179,99 @@
     } catch {}
     State.questionIndex = safe;
     return safe;
+  }
+
+  // ─── Proteção contra índices antigos (jp:<bloco>:idx) ───────────────────────
+  // A chave jp:<bloco>:idx tem o nome só do bloco, então sobrevive de uma
+  // Jornada para outra no mesmo aparelho. Sem esta proteção, um bloco novo
+  // podia abrir direto na pergunta 3/10 ou 10/10 herdada de um teste antigo.
+  const QUESTION_INDEX_OWNER_KEY = 'JORNADA_QUESTION_INDEX_OWNER';
+
+  function isQuestionIndexKey(key) {
+    return Boolean(key) && key.startsWith('jp:') && key.endsWith(':idx');
+  }
+
+  function clearStoredQuestionIndexes() {
+    [sessionStorage, localStorage].forEach((storage) => {
+      try {
+        for (let i = storage.length - 1; i >= 0; i -= 1) {
+          const key = storage.key(i);
+          if (isQuestionIndexKey(key)) storage.removeItem(key);
+        }
+      } catch (err) {
+        console.warn('[PERGUNTAS][INDEX] falha ao limpar índices antigos:', err);
+      }
+    });
+  }
+
+  function getRemoteCheckpointFor(blocoId) {
+    try {
+      const remoteBlock = String(
+        sessionStorage.getItem('JORNADA_REMOTE_LAST_BLOCK') || ''
+      ).trim();
+      const remoteQuestion = Number(
+        sessionStorage.getItem('JORNADA_REMOTE_LAST_QUESTION')
+      );
+      if (
+        remoteBlock &&
+        remoteBlock === String(blocoId || '') &&
+        Number.isFinite(remoteQuestion) &&
+        remoteQuestion >= 0
+      ) {
+        return remoteQuestion;
+      }
+    } catch {}
+    return null;
+  }
+
+  // Garante que os índices guardados pertencem à Jornada atual (código).
+  // Ao trocar de Jornada, apaga todos e preserva só o checkpoint que veio
+  // do servidor para o bloco atual (retomada em outro aparelho).
+  function ensureQuestionIndexOwner(bloco) {
+    try {
+      const codigo = String(
+        localStorage.getItem('jornada_codigo') ||
+        sessionStorage.getItem('jornada.codigo_jornada') ||
+        ''
+      ).trim().toUpperCase();
+      if (!codigo) return;
+
+      const owner = `journey:${codigo}`;
+      if (String(localStorage.getItem(QUESTION_INDEX_OWNER_KEY) || '') === owner) return;
+
+      clearStoredQuestionIndexes();
+
+      const remoteIdx = getRemoteCheckpointFor(bloco?.id);
+      if (remoteIdx != null) setCurrentQuestionIndex(bloco, remoteIdx);
+
+      localStorage.setItem(QUESTION_INDEX_OWNER_KEY, owner);
+      console.log('[PERGUNTAS][INDEX] índices antigos limpos para', owner, {
+        bloco: bloco?.id,
+        checkpointPreservado: remoteIdx,
+      });
+    } catch (err) {
+      console.warn('[PERGUNTAS][INDEX] falha ao validar dono dos índices:', err);
+    }
+  }
+
+  // Ao sair de um bloco concluído, o próximo bloco SEMPRE começa na
+  // pergunta 1 — a não ser que o servidor diga outra posição para ele.
+  function resetNextBlockQuestionIndex(bloco) {
+    try {
+      const nextSection = bloco?.nextSection || FINAL_SECTION_ID;
+      if (!String(nextSection).startsWith('section-perguntas-')) return;
+      const nextBloco = getBlocoAtual(nextSection);
+      if (!nextBloco || nextBloco.id === bloco?.id) return;
+
+      const remoteIdx = getRemoteCheckpointFor(nextBloco.id);
+      const idx = remoteIdx != null ? remoteIdx : 0;
+      const key = questionIndexKey(nextBloco);
+      sessionStorage.setItem(key, String(idx));
+      localStorage.setItem(key, String(idx));
+      console.log('[PERGUNTAS][INDEX] próximo bloco inicia em', idx, nextBloco.id);
+    } catch (err) {
+      console.warn('[PERGUNTAS][INDEX] falha ao zerar próximo bloco:', err);
+    }
   }
 
   // Faz o upsert da devolutiva de UMA pergunta dentro do registro do bloco
@@ -2504,6 +2598,8 @@ function bindButtons(section, bloco, perguntaText, qIndex = 0) {
       warn('Bloco não encontrado para', sectionId);
       return;
     }
+
+    ensureQuestionIndexOwner(bloco);
 
     State.sectionId = sectionId;
     State.bloco = bloco;
