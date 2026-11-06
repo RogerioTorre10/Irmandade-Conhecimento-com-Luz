@@ -1746,6 +1746,7 @@ function removerFinalDuplicado(texto) {
         '__SELFIECARD_DONE__',
   
         'JORNADA_RUN_ID',
+        'JORNADA_QUESTION_INDEX_OWNER',
   
         'jornada.codigo_jornada',
         'jornada.email',
@@ -1773,7 +1774,8 @@ function removerFinalDuplicado(texto) {
           (
             key.startsWith('jornada_resp_') ||
             key.startsWith('jornada.pergunta.') ||
-            key.startsWith('JORNADA_REMOTE_')
+            key.startsWith('JORNADA_REMOTE_') ||
+            (key.startsWith('jp:') && key.endsWith(':idx'))
           )
         ) {
           localStorage.removeItem(key);
@@ -1788,7 +1790,8 @@ function removerFinalDuplicado(texto) {
           (
             key.startsWith('jornada_resp_') ||
             key.startsWith('jornada.pergunta.') ||
-            key.startsWith('JORNADA_REMOTE_')
+            key.startsWith('JORNADA_REMOTE_') ||
+            (key.startsWith('jp:') && key.endsWith(':idx'))
           )
         ) {
           sessionStorage.removeItem(key);
