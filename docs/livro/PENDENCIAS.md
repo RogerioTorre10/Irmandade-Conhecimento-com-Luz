@@ -21,11 +21,20 @@ O livro está na UICLAP em modo privado (publicado em 21/10, privado desde 31/10
       Medido: ~400 listas de três ou mais itens em 39 mil palavras (uma a cada 100 palavras), sendo
       ~55 séries só de verbos. Manter algumas, encurtar a maioria para um ou dois itens, desfazer outras
       em frase corrida, sem mudar o raciocínio. Estilo aprovado pelo autor em 06/11 (exemplos dos prints).
-      Atenção: o texto vai encurtar; conferir total de páginas (200) e, se mudar, refazer lombada e capa completa.
+      REGRA DO AUTOR (06/11): não fazer substituições que empobreçam ou dificultem a compreensão dos temas.
+      Na dúvida, manter a ideia e só mudar o ritmo. Pode acrescentar páginas se for o caso.
+      Conferir total de páginas (200) no fim e, se mudar, refazer lombada e capa completa.
 
 - [ ] 06/11 — Nota "Escrito a duas mãos" (depois do Epílogo, antes do Apêndice): o autor quer que fique claro
       que o livro foi escrito em parceria com a IA, não em relação de quem manda e quem obedece; a IA como
-      parceira, não só ferramenta. Texto proposto em 06/11, aguardando o autor aprovar ou ajustar.
+      parceira, não só ferramenta. Versão 2 (06/11), com as palavras do autor: trouxe todo o material para a IA
+      ajudar a organizar; tinha dificuldade em fundamentar algumas teses; colaboração de fundamental importância;
+      deixar explícito que foi escrito a duas mãos. Aguardando o autor aprovar a versão 2.
+- [ ] 06/11 — Cap. 12 (src2/15.txt), seção "O trabalho e as desigualdades da vida", depois do parágrafo
+      "Há também quem dependa de assistência do governo...": a sociedade, de forma velada, produz indivíduos para
+      ocupar as funções que existem nela (psicólogo, médico, jornalista / padeiro, mecânico, gari, sem demérito);
+      o sujeito escolhe ou aceita, mas dentro do que a sociedade permite. Texto proposto em 06/11 (com Bourdieu,
+      A Reprodução, 1970, como apoio opcional), aguardando o autor aprovar.
 
 ## Os Dois Lados do Mesmo Pensamento
 - O mesmo ajuste de estilo vale para ele, mas **só depois que a prova chegar** (ver docs/livro-dois-lados/PENDENCIAS.md).
