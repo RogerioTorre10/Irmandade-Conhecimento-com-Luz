@@ -327,11 +327,27 @@ function setFinalReplayState(
   function buildPdfBlocksFromSession() {
   const feedbacks = getStoredBlockFeedbacks();
 
+  // O backend exige listas sem buracos: um item null em "perguntas" ou
+  // "respostas" faz a API recusar o PDF inteiro (HTTP 422). Buracos aparecem
+  // quando uma pergunta do bloco não foi registrada (ex.: retomada em outro
+  // aparelho ou bloco que abriu fora da pergunta 1).
+  const textoOuVazio = (v) => (v == null ? '' : String(v).trim());
+
   return feedbacks.map((item) => ({
-    titulo: item?.blocoTitulo || item?.blocoId || 'Bloco',
-    respostas: Array.isArray(item?.respostas) ? item.respostas : [],
-    devolutiva: String(item?.devolutiva || item?.texto || '').trim(),
-    perguntas: Array.isArray(item?.perguntas) ? item.perguntas : []
+    titulo: textoOuVazio(item?.blocoTitulo || item?.blocoId) || 'Bloco',
+    respostas: (Array.isArray(item?.respostas) ? item.respostas : [])
+      .map(textoOuVazio)
+      .filter(Boolean),
+    devolutiva: textoOuVazio(item?.devolutiva || item?.texto),
+    perguntas: (Array.isArray(item?.perguntas) ? item.perguntas : [])
+      .filter((q) => q && typeof q === 'object')
+      .map((q) => ({
+        perguntaId: textoOuVazio(q.perguntaId) || null,
+        pergunta: textoOuVazio(q.pergunta),
+        resposta: textoOuVazio(q.resposta),
+        devolutiva: textoOuVazio(q.devolutiva)
+      }))
+      .filter((q) => q.pergunta || q.resposta || q.devolutiva)
   }));
 }
   
