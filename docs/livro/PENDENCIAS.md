@@ -36,6 +36,14 @@ O livro está na UICLAP em modo privado (publicado em 21/10, privado desde 31/10
       o sujeito escolhe ou aceita, mas dentro do que a sociedade permite. Texto proposto em 06/11 (com Bourdieu,
       A Reprodução, 1970, como apoio opcional), aguardando o autor aprovar.
 
+- [ ] 08/11 — Cap. 17, "Vitórias que custam caro" (src2/19b.txt): "o aprendizado que lhe faria falta mais tarde"
+      → "o aprendizado que lhe fará falta mais tarde".
+- [ ] 08/11 — Cap. 16, "A lagarta e o casulo" (src2/19.txt), depois do parágrafo da lagarta: exemplo do pintinho
+      (quem quebra a casca para ajudar atrapalha). Texto proposto em 08/11, sem a afirmação do "bico forte"
+      (não se sustenta: o dente de ovo cai depois do nascimento); no lugar, o que é verificável: no esforço o
+      pintinho termina de absorver a gema e os vasos ligados à casca se fecham; abrir antes da hora pode romper
+      vasos e causar sangramento e infecção. Aguardando o autor aprovar.
+
 ## Os Dois Lados do Mesmo Pensamento
 - O mesmo ajuste de estilo vale para ele, mas **só depois que a prova chegar** (ver docs/livro-dois-lados/PENDENCIAS.md).
 
