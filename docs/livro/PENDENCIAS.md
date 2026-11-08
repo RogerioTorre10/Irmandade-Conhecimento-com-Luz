@@ -44,6 +44,11 @@ O livro está na UICLAP em modo privado (publicado em 21/10, privado desde 31/10
       pintinho termina de absorver a gema e os vasos ligados à casca se fecham; abrir antes da hora pode romper
       vasos e causar sangramento e infecção. Aguardando o autor aprovar.
 
+- [ ] 08/11 — Cap. 17, história do cabo (src2/19b.txt), depois do parágrafo "O ganho virou uma perda muito maior...":
+      as vozes que mudaram de lado — antes, quem cobrava a promoção e incentivava a sair da zona de conforto;
+      depois, quem o chamava de louco por trocar o certo pelo duvidoso e dava a entender, veladamente, que era
+      castigo pela ganância. Texto proposto em 08/11, aguardando o autor aprovar.
+
 ## Os Dois Lados do Mesmo Pensamento
 - O mesmo ajuste de estilo vale para ele, mas **só depois que a prova chegar** (ver docs/livro-dois-lados/PENDENCIAS.md).
 
