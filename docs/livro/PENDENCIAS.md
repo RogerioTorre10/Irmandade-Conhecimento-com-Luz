@@ -50,7 +50,9 @@ O livro está na UICLAP em modo privado (publicado em 21/10, privado desde 31/10
       castigo pela ganância. Texto proposto em 08/11, aguardando o autor aprovar.
 
 - [ ] 09/11 — Cap. 17, "Perdas que libertam" (src2/19b.txt): Jó (Jó 1:9-11; 42:10) e José do Egito (Gn 37:11; 50:20)
-      como perder que vira ganhar. Texto proposto em 09/11, aguardando aprovação.
+      como perder que vira ganhar. Texto proposto em 09/11; autor disse "Sim": incluir Sabedoria 2:24 ("pela inveja
+      do diabo entrou a morte no mundo") e a ideia dele de que a inveja pode ser aberta (Caim) ou velada (gerar
+      dúvida sobre o potencial do outro, desmerecer), como fez o acusador com Jó.
 - [ ] 09/11 — Cap. 17, "Vitórias que custam caro": o ganhador da Mega-Sena de 2005 (R$ 52 milhões, não 49),
       casou em 2006 com mulher 25 anos mais jovem, assassinado em jan/2007; ela condenada em 2016 como mandante
       e declarada indigna da herança. Sem nomes. A "separação da esposa anterior" não foi confirmada nas fontes:
