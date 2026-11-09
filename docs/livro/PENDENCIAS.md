@@ -49,6 +49,15 @@ O livro está na UICLAP em modo privado (publicado em 21/10, privado desde 31/10
       depois, quem o chamava de louco por trocar o certo pelo duvidoso e dava a entender, veladamente, que era
       castigo pela ganância. Texto proposto em 08/11, aguardando o autor aprovar.
 
+- [ ] 09/11 — Cap. 17, "Perdas que libertam" (src2/19b.txt): Jó (Jó 1:9-11; 42:10) e José do Egito (Gn 37:11; 50:20)
+      como perder que vira ganhar. Texto proposto em 09/11, aguardando aprovação.
+- [ ] 09/11 — Cap. 17, "Vitórias que custam caro": o ganhador da Mega-Sena de 2005 (R$ 52 milhões, não 49),
+      casou em 2006 com mulher 25 anos mais jovem, assassinado em jan/2007; ela condenada em 2016 como mandante
+      e declarada indigna da herança. Sem nomes. A "separação da esposa anterior" não foi confirmada nas fontes:
+      ficou de fora. Texto proposto em 09/11, aguardando aprovação.
+- [ ] 09/11 — Cap. "As três energias da sombra", "A inveja e suas duas faces" (src2/02.txt), depois do parágrafo
+      da cobiça: Caim e Abel (Gn 4:5-8) como cobiça levada ao extremo. Texto proposto em 09/11, aguardando aprovação.
+
 ## Os Dois Lados do Mesmo Pensamento
 - O mesmo ajuste de estilo vale para ele, mas **só depois que a prova chegar** (ver docs/livro-dois-lados/PENDENCIAS.md).
 
