@@ -53,6 +53,8 @@
     mic: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
     cofre: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>',
     cad: '<svg viewBox="0 0 24 24" fill="#fff"><path d="M7 10V7a5 5 0 0 1 10 0v3h1v11H6V10zm2 0h6V7a3 3 0 0 0-6 0z"/></svg>',
+    lixo: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M4 7h16M9 7V4h6v3M6 7l1 14h10l1-14M10 11v6M14 11v6"/></svg>',
+    sacola: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M5 8h14l-1 13H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>',
     postal: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="1"/><path d="M14 9h5v4h-5zM5 11h6M5 15h6"/></svg>',
   };
 
@@ -69,6 +71,8 @@
     { id: 'privacidade', nome: 'Privacidade', ic: 'cofre', cor: '#1f3550', etapa: 2 },
     { id: 'cadeado', nome: '', ic: 'cad', cor: '#7d858d', etapa: 6, dica: 'O papel que me deixa ir.' },
     { id: 'postal', nome: 'Postal', ic: 'postal', cor: '#a26a3c', etapa: 7, dica: 'O cartão-postal' },
+    { id: 'lixeira', nome: 'Lixeira', ic: 'lixo', cor: '#5b626b', etapa: 6 },
+    { id: 'compras', nome: 'Compras', ic: 'sacola', cor: '#2d7f86', etapa: 7 },
   ];
 
   // ---------------------------------------------------------------- tela
@@ -155,7 +159,7 @@
     const app = APPS.find((a) => a.id === id);
     if (!temEtapa(app.etapa)) return pedirSenha(app);
     const v = { mensagens: vMensagens, emailc: vEmailC, emailp: vEmailP, chamadas: vChamadas, agenda: () => vAgenda('2010-10'),
-      galeria: vGaleria, notas: vNotas, gravador: vGravador, privacidade: vPrivacidade, cadeado: vCadeado, postal: vPostal }[id];
+      galeria: vGaleria, notas: vNotas, gravador: vGravador, privacidade: vPrivacidade, cadeado: vCadeado, postal: vPostal, lixeira: vLixeira, compras: vCompras }[id];
     ir(v);
   }
 
@@ -406,6 +410,67 @@
     $('#virar').addEventListener('click', () => vPostal(lado === 'frente' ? 'verso' : 'frente', false));
     const l = $('#luz');
     if (l) l.addEventListener('click', () => vPostal('verso', !luz));
+  }
+
+  // ---------------------------------------------------------------- lixeira (surpresa: vídeo e extrato)
+  let videoUrl = null;
+  function vLixeira() {
+    const l = st.dados[6].lixeira || [];
+    mostrar(cab('Lixeira', 'itens apagados') + `<div class="corpo-tela"><p class="lx-aviso">Os itens apagados ficam aqui até a lixeira ser esvaziada.</p><ul class="lista">${l.map((x, i) => `<li><button type="button" data-i="${i}">
+      <span class="lx-ic ${x.tipo}">${x.tipo === 'video' ? '▶' : 'PDF'}</span><span class="meio"><span class="nome">${esc(x.arquivo)}</span><span class="prev">${esc(x.tamanho)} · apagado em ${dataCurta(x.apagado)}</span></span><span class="data">${hora(x.apagado)}</span></button></li>`).join('')}</ul></div>`);
+    tela().querySelectorAll('[data-i]').forEach((b) => b.addEventListener('click', () => {
+      const x = l[b.dataset.i];
+      ir(() => (x.tipo === 'video' ? vVideo(x) : vExtrato(x)));
+    }));
+  }
+  function vVideo(x) {
+    mostrar(cab(x.arquivo, 'apagado em ' + dataCurta(x.apagado)) + `<div class="corpo-tela"><div class="vid">
+      <div class="msg ele"><b>${esc(x.de)}</b> · ${dataCurta(x.recebido)} ${hora(x.recebido)}<br>${esc(x.nota)}</div>
+      <div class="vid-box"><button type="button" class="vid-play" id="vPlay" aria-label="Assistir ao vídeo">▶</button></div>
+      <p class="vid-info">${esc(x.arquivo)} · ${esc(x.duracao)} · ${esc(x.tamanho)}</p></div></div>`);
+    const box = $('.vid-box', tela());
+    const tocar = (url) => {
+      box.innerHTML = `<video src="${url}" controls playsinline autoplay></video>`;
+      audioAtual = $('video', box);
+    };
+    $('#vPlay').addEventListener('click', async () => {
+      if (videoUrl) return tocar(videoUrl);
+      $('#vPlay').textContent = '…';
+      try {
+        const r = await fetch('/api/henrique/video', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: st.email, senha: st.senhas[6] }) });
+        if (!r.ok) throw new Error('video');
+        videoUrl = URL.createObjectURL(await r.blob());
+        tocar(videoUrl);
+      } catch (_) { $('#vPlay').textContent = '▶'; aviso('Não foi possível abrir o vídeo agora.'); }
+    });
+  }
+  function vExtrato(x) {
+    const e = x.extrato;
+    const linhas = e.linhas.map((l) => `<tr><td>${esc(l[0])}</td><td>${esc(l[1])}</td><td class="n">${esc(l[2])}</td><td class="n">${esc(l[3])}</td></tr>`).join('');
+    mostrar(cab(x.arquivo, 'apagado em ' + dataCurta(x.apagado)) + `<div class="corpo-tela"><div class="extrato">
+      <div class="ex-topo"><div class="ex-logo">A&amp;C</div><div><b>${esc(e.banco)}</b><small>${esc(e.cidade)}</small></div></div>
+      <h3>Extrato de conta · ${esc(e.moeda)}</h3>
+      <dl><dt>Titular</dt><dd>${esc(e.titular)}<br><small>${esc(e.sede)}</small></dd><dt>Conta</dt><dd>${esc(e.conta)}</dd><dt>Período</dt><dd>${esc(e.periodo)}</dd><dt>Signatário</dt><dd>${esc(e.signatario)}</dd></dl>
+      <table><thead><tr><th>Data</th><th>Descrição</th><th class="n">Crédito</th><th class="n">Débito</th></tr></thead><tbody>
+      <tr class="sub"><td></td><td>Saldo anterior</td><td class="n" colspan="2">${esc(e.anterior)}</td></tr>${linhas}</tbody>
+      <tfoot><tr><td></td><td>Saldo em 30.09.2010</td><td class="n" colspan="2">${esc(e.moeda)} ${esc(e.final)}</td></tr></tfoot></table>
+      <p class="ex-rod">${esc(e.rodape)}</p></div></div>`);
+  }
+
+  // ---------------------------------------------------------------- compras (surpresa: os livros)
+  function vCompras() {
+    const c = st.dados[7].compras || [];
+    mostrar(cab('Compras', 'pedidos') + `<div class="corpo-tela"><ul class="lista">${c.map((p, i) => `<li><button type="button" data-i="${i}"><span class="meio"><span class="nome">${esc(p.loja)}</span><span class="prev">${esc(p.assunto)}</span></span><span class="data">${dataCurta(p.d)}</span></button></li>`).join('')}</ul></div>`);
+    tela().querySelectorAll('[data-i]').forEach((b) => b.addEventListener('click', () => ir(() => vPedido(c[b.dataset.i]))));
+  }
+  function vPedido(p) {
+    mostrar(cab('Pedido nº ' + p.numero) + `<div class="corpo-tela"><div class="email pedido">
+      <div class="de">De: ${esc(p.loja)} · ${esc(p.local)} · ${dataLonga(p.d)}, ${hora(p.d)}</div><h3>${esc(p.assunto)}</h3>
+      <div class="corpo-m">${esc(p.texto)}</div>
+      <ul class="livros">${p.itens.map((l) => `<li><img src="${esc(l.capa)}" alt="Capa de ${esc(l.titulo)}" loading="lazy"><span><b>${esc(l.titulo)}</b><small>${esc(l.autor)}</small><em>${esc(l.preco)}</em></span></li>`).join('')}</ul>
+      <p class="tot">Frete: ${esc(p.frete)}<br><b>Total: ${esc(p.total)}</b></p>
+      <p class="obs">Observação do cliente: “${esc(p.obs)}”</p>
+      <div class="entrega"><small>Entregar a</small>${p.entrega.map((l) => `<div>${esc(l)}</div>`).join('')}</div></div></div>`);
   }
 
   // ---------------------------------------------------------------- acesso e início
