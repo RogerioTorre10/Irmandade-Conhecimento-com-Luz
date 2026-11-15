@@ -158,6 +158,20 @@ module.exports = function livrosApi(app, express) {
     res.type(path.extname(arq).slice(1));
     res.sendFile(arq);
   });
+
+  // Vídeo "Protocolo 71" (Lixeira): só sai para quem tem a senha do segundo cadeado (7215 + código pessoal)
+  app.post("/api/henrique/video", json, (req, res) => {
+    if (excedeu("v:" + ipDe(req), 60)) return res.status(429).json({ erro: "Muitas tentativas. Espere alguns minutos." });
+    const { email, senha } = req.body || {};
+    const e = normEmail(email);
+    const n = Number(String(senha || "").replace(/\D/g, ""));
+    if (!emailValido(e) || ETAPAS[n - codigoPessoal(e)] !== 6) return res.status(403).json({ erro: "Senha incorreta." });
+    const arq = path.join(__dirname, "dados", "henrique", "protocolo-71.mp4");
+    if (!fsSync.existsSync(arq)) return res.status(404).json({ erro: "Vídeo não encontrado." });
+    res.set("Cache-Control", "private, max-age=86400");
+    res.type("mp4");
+    res.sendFile(arq);
+  });
 };
 
 // Fotos reais em dados/henrique/fotos/<id>.jpg (grande) e <id>_p.jpg (miniatura), e a etapa de cada uma

@@ -228,3 +228,28 @@ button{font:inherit;cursor:pointer}
   .topo-dir{display:none}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* Lixeira e compras (surpresas) */
+.lx-aviso{color:#8d97a3;font-size:11px;margin:8px 12px 2px}
+.lx-ic{flex:0 0 34px;height:34px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;margin-right:10px;background:#3b4450}
+.lx-ic.video{background:#7a2f2f}.lx-ic.extrato{background:#8a6d2b}
+.vid{padding:10px}.vid .msg{max-width:100%;margin-bottom:10px}
+.vid-box{background:#000;border-radius:8px;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.vid-box video{width:100%;height:100%;display:block;background:#000}
+.vid-play{width:64px;height:64px;border-radius:50%;border:2px solid rgba(255,255,255,.7);background:rgba(255,255,255,.08);color:#fff;font-size:24px;cursor:pointer}
+.vid-info{color:#8d97a3;font-size:11px;text-align:center;margin:8px 0 0}
+.extrato{background:#fbfaf6;color:#222;margin:10px;padding:14px 12px;border-radius:3px;font-family:Arial,sans-serif;font-size:11px;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+.ex-topo{display:flex;gap:10px;align-items:center;border-bottom:2px solid #1d3b5c;padding-bottom:8px}
+.ex-logo{width:34px;height:34px;border-radius:50%;background:#1d3b5c;color:#e9d9a8;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:12px;font-weight:700}
+.ex-topo b{display:block;font-size:13px;color:#1d3b5c}.ex-topo small{color:#666}
+.extrato h3{font-size:12px;margin:10px 0 6px;color:#1d3b5c;text-transform:uppercase;letter-spacing:.04em}
+.extrato dl{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;margin:0 0 10px}.extrato dt{color:#777}.extrato dd{margin:0}.extrato dd small{color:#777}
+.extrato table{width:100%;border-collapse:collapse}.extrato th{text-align:left;font-size:10px;color:#555;border-bottom:1px solid #bbb;padding:4px 2px}
+.extrato td{padding:4px 2px;border-bottom:1px solid #e3e0d8;vertical-align:top}.extrato .n{text-align:right;white-space:nowrap}
+.extrato tr.sub td{color:#666}.extrato tfoot td{font-weight:700;border-top:2px solid #1d3b5c;border-bottom:0;padding-top:6px}
+.ex-rod{color:#888;font-size:9px;margin:10px 0 0}
+.pedido .livros{list-style:none;padding:0;margin:12px 0}.pedido .livros li{display:flex;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.pedido .livros img{width:52px;height:auto;border-radius:2px;box-shadow:0 2px 6px rgba(0,0,0,.5)}
+.pedido .livros span{display:flex;flex-direction:column;gap:2px}.pedido .livros small{color:#9aa4b0}.pedido .livros em{font-style:normal;color:#d9c48a;font-size:12px}
+.pedido .tot{text-align:right;margin:8px 0}.pedido .obs{font-style:italic;color:#d9c48a;margin:10px 0}
+.pedido .entrega{border:1px dashed rgba(255,255,255,.25);padding:8px;border-radius:6px;font-size:12px}.pedido .entrega small{display:block;color:#9aa4b0;margin-bottom:3px}

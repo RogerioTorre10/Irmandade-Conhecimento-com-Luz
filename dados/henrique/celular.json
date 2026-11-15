@@ -2168,7 +2168,68 @@
      }
     ],
     "aviso": "Segundo cadeado"
-   }
+   },
+   "lixeira": [
+    {
+     "id": "video71",
+     "tipo": "video",
+     "arquivo": "PROTOCOLO_71_cob07.mp4",
+     "tamanho": "1,0 MB",
+     "duracao": "0:50",
+     "de": "A.",
+     "recebido": "2010-09-17T23:14",
+     "apagado": "2010-09-17T23:19",
+     "nota": "Assiste uma vez e apaga. Esse vídeo não pode existir."
+    },
+    {
+     "id": "extrato",
+     "tipo": "extrato",
+     "arquivo": "Extrato_UBH_09-2010.pdf",
+     "tamanho": "84 KB",
+     "de": "Banque Aldermatt & Cie",
+     "recebido": "2010-10-01T07:02",
+     "apagado": "2010-10-01T07:06",
+     "extrato": {
+      "banco": "Banque Aldermatt & Cie",
+      "cidade": "Bahnhofstrasse · 8001 Zürich",
+      "titular": "UBATUBA HOLDINGS LTD.",
+      "sede": "Road Town, Tortola · Ilhas Virgens Britânicas",
+      "conta": "0071-488.209.3",
+      "moeda": "CHF",
+      "periodo": "01.09.2010 – 30.09.2010",
+      "signatario": "Á. MENDES (diretor, conforme ata de agosto de 2010)",
+      "anterior": "3.912.400,00",
+      "linhas": [
+       [
+        "03.09",
+        "Crédito · transferência recebida · ref. HS/0903",
+        "1.250.000,00",
+        ""
+       ],
+       [
+        "14.09",
+        "Tarifa de manutenção de conta",
+        "",
+        "480,00"
+       ],
+       [
+        "22.09",
+        "Crédito · transferência recebida · ref. HS/2209",
+        "640.000,00",
+        ""
+       ],
+       [
+        "28.09",
+        "Débito · Immobilier Haut-Valais · sinal, chalé",
+        "",
+        "350.000,00"
+       ]
+      ],
+      "final": "5.451.920,00",
+      "rodape": "Documento confidencial. Este extrato não substitui a correspondência oficial do banco."
+     }
+    }
+   ]
   },
   "7": {
    "titulo": "O cartão-postal",
@@ -2187,7 +2248,48 @@
    },
    "imagens": {
     "postalFrente": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 320 220\" >\n  <linearGradient id=\"ceu\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#7fb2e5\"/><stop offset=\"1\" stop-color=\"#dcebf7\"/></linearGradient>\n  <rect width=\"320\" height=\"220\" fill=\"url(#ceu)\"/>\n  <polygon points=\"0,150 70,60 120,120 175,35 240,115 280,75 320,130 320,220 0,220\" fill=\"#6f7f93\"/>\n  <polygon points=\"175,35 160,58 168,56 176,66 186,54 193,60\" fill=\"#fff\"/><polygon points=\"70,60 58,78 66,76 74,84 82,74\" fill=\"#fff\"/><polygon points=\"280,75 270,90 279,88 290,92\" fill=\"#fff\"/>\n  <polygon points=\"0,170 60,120 130,165 200,110 270,160 320,140 320,220 0,220\" fill=\"#e9eef3\"/><rect y=\"180\" width=\"320\" height=\"40\" fill=\"#fff\"/><polygon points=\"69.12,112 160.2,64.16 251.28,112\" fill=\"#5b3a26\"/><polygon points=\"72.8,110.16 160.2,69.68 247.6,110.16\" fill=\"#f4f6f8\" opacity=\".85\"/><rect x=\"82\" y=\"112\" width=\"156.4\" height=\"64.4\" fill=\"#a0683e\"/><line x1=\"82\" y1=\"112\" x2=\"238.4\" y2=\"112\" stroke=\"#8a5632\" stroke-width=\"0.552\"/><line x1=\"82\" y1=\"116.6\" x2=\"238.4\" y2=\"116.6\" stroke=\"#8a5632\" stroke-width=\"0.552\"/><line x1=\"82\" y1=\"121.2\" x2=\"238.4\" y2=\"121.2\" stroke=\"#8a5632\" stroke-width=\"0.552\"/><line x1=\"82\" y1=\"125.8\" x2=\"238.4\" y2=\"125.8\" stroke=\"#8a5632\" stroke-width=\"0.552\"/><line x1=\"82\" y1=\"130.4\" x2=\"238.4\" y2=\"130.4\" stroke=\"#8a5632\" stroke-width=\"0.552\"/><line x1=\"82\" y1=\"135\" x2=\"238.4\" y2=\"135\" stroke=\"#8a5632\" stroke-width=\"0.552\"/><line x1=\"82\" y1=\"139.6\" x2=\"238.4\" y2=\"139.6\" stroke=\"#8a5632\" stroke-width=\"0.552\"/><line x1=\"82\" y1=\"144.2\" x2=\"238.4\" y2=\"144.2\" stroke=\"#8a5632\" stroke-width=\"0.552\"/><line x1=\"82\" y1=\"148.8\" x2=\"238.4\" y2=\"148.8\" stroke=\"#8a5632\" stroke-width=\"0.552\"/><line x1=\"82\" y1=\"153.4\" x2=\"238.4\" y2=\"153.4\" stroke=\"#8a5632\" stroke-width=\"0.552\"/><line x1=\"82\" y1=\"158\" x2=\"238.4\" y2=\"158\" stroke=\"#8a5632\" stroke-width=\"0.552\"/><line x1=\"82\" y1=\"162.6\" x2=\"238.4\" y2=\"162.6\" stroke=\"#8a5632\" stroke-width=\"0.552\"/><line x1=\"82\" y1=\"167.2\" x2=\"238.4\" y2=\"167.2\" stroke=\"#8a5632\" stroke-width=\"0.552\"/><line x1=\"82\" y1=\"171.8\" x2=\"238.4\" y2=\"171.8\" stroke=\"#8a5632\" stroke-width=\"0.552\"/><rect x=\"90.28\" y=\"119.36\" width=\"12.88\" height=\"16.560000000000002\" fill=\"#ffe7a8\" stroke=\"#3b2416\" stroke-width=\"1.288\"/><line x1=\"96.72\" y1=\"119.36\" x2=\"96.72\" y2=\"135.92000000000002\" stroke=\"#3b2416\" stroke-width=\"0.92\"/><rect x=\"114.66\" y=\"119.36\" width=\"12.88\" height=\"16.560000000000002\" fill=\"#ffe7a8\" stroke=\"#3b2416\" stroke-width=\"1.288\"/><line x1=\"121.1\" y1=\"119.36\" x2=\"121.1\" y2=\"135.92000000000002\" stroke=\"#3b2416\" stroke-width=\"0.92\"/><rect x=\"139.04000000000002\" y=\"119.36\" width=\"12.88\" height=\"16.560000000000002\" fill=\"#ffe7a8\" stroke=\"#3b2416\" stroke-width=\"1.288\"/><line x1=\"145.48000000000002\" y1=\"119.36\" x2=\"145.48000000000002\" y2=\"135.92000000000002\" stroke=\"#3b2416\" stroke-width=\"0.92\"/><rect x=\"163.42000000000002\" y=\"119.36\" width=\"12.88\" height=\"16.560000000000002\" fill=\"#ffe7a8\" stroke=\"#3b2416\" stroke-width=\"1.288\"/><line x1=\"169.86\" y1=\"119.36\" x2=\"169.86\" y2=\"135.92000000000002\" stroke=\"#3b2416\" stroke-width=\"0.92\"/><rect x=\"187.8\" y=\"119.36\" width=\"12.88\" height=\"16.560000000000002\" fill=\"#ffe7a8\" stroke=\"#3b2416\" stroke-width=\"1.288\"/><line x1=\"194.24\" y1=\"119.36\" x2=\"194.24\" y2=\"135.92000000000002\" stroke=\"#3b2416\" stroke-width=\"0.92\"/><rect x=\"212.18\" y=\"119.36\" width=\"12.88\" height=\"16.560000000000002\" fill=\"#ffe7a8\" stroke=\"#3b2416\" stroke-width=\"1.288\"/><line x1=\"218.62\" y1=\"119.36\" x2=\"218.62\" y2=\"135.92000000000002\" stroke=\"#3b2416\" stroke-width=\"0.92\"/><rect x=\"90.28\" y=\"148.8\" width=\"12.88\" height=\"16.560000000000002\" fill=\"#ffe7a8\" stroke=\"#3b2416\" stroke-width=\"1.288\"/><line x1=\"96.72\" y1=\"148.8\" x2=\"96.72\" y2=\"165.36\" stroke=\"#3b2416\" stroke-width=\"0.92\"/><rect x=\"114.66\" y=\"148.8\" width=\"12.88\" height=\"16.560000000000002\" fill=\"#ffe7a8\" stroke=\"#3b2416\" stroke-width=\"1.288\"/><line x1=\"121.1\" y1=\"148.8\" x2=\"121.1\" y2=\"165.36\" stroke=\"#3b2416\" stroke-width=\"0.92\"/><rect x=\"187.8\" y=\"148.8\" width=\"12.88\" height=\"16.560000000000002\" fill=\"#ffe7a8\" stroke=\"#3b2416\" stroke-width=\"1.288\"/><line x1=\"194.24\" y1=\"148.8\" x2=\"194.24\" y2=\"165.36\" stroke=\"#3b2416\" stroke-width=\"0.92\"/><rect x=\"212.18\" y=\"148.8\" width=\"12.88\" height=\"16.560000000000002\" fill=\"#ffe7a8\" stroke=\"#3b2416\" stroke-width=\"1.288\"/><line x1=\"218.62\" y1=\"148.8\" x2=\"218.62\" y2=\"165.36\" stroke=\"#3b2416\" stroke-width=\"0.92\"/><rect x=\"144.56000000000003\" y=\"145.12\" width=\"29.44\" height=\"31.28\" fill=\"#3b2416\"/><rect x=\"137.20000000000002\" y=\"148.8\" width=\"6.44\" height=\"14.72\" fill=\"#ffe7a8\" stroke=\"#3b2416\" stroke-width=\"0.92\"/><rect x=\"182.74\" y=\"148.8\" width=\"6.44\" height=\"14.72\" fill=\"#ffe7a8\" stroke=\"#3b2416\" stroke-width=\"0.92\"/><rect x=\"70.96\" y=\"172.72\" width=\"178.48000000000002\" height=\"5.5200000000000005\" fill=\"#6e4429\"/><rect x=\"70.96\" y=\"161.68\" width=\"1.84\" height=\"11.040000000000001\" fill=\"#6e4429\"/><rect x=\"85.83333333333333\" y=\"161.68\" width=\"1.84\" height=\"11.040000000000001\" fill=\"#6e4429\"/><rect x=\"100.70666666666666\" y=\"161.68\" width=\"1.84\" height=\"11.040000000000001\" fill=\"#6e4429\"/><rect x=\"115.58\" y=\"161.68\" width=\"1.84\" height=\"11.040000000000001\" fill=\"#6e4429\"/><rect x=\"130.45333333333332\" y=\"161.68\" width=\"1.84\" height=\"11.040000000000001\" fill=\"#6e4429\"/><rect x=\"145.32666666666665\" y=\"161.68\" width=\"1.84\" height=\"11.040000000000001\" fill=\"#6e4429\"/><rect x=\"160.2\" y=\"161.68\" width=\"1.84\" height=\"11.040000000000001\" fill=\"#6e4429\"/><rect x=\"175.07333333333332\" y=\"161.68\" width=\"1.84\" height=\"11.040000000000001\" fill=\"#6e4429\"/><rect x=\"189.94666666666666\" y=\"161.68\" width=\"1.84\" height=\"11.040000000000001\" fill=\"#6e4429\"/><rect x=\"204.82\" y=\"161.68\" width=\"1.84\" height=\"11.040000000000001\" fill=\"#6e4429\"/><rect x=\"219.69333333333333\" y=\"161.68\" width=\"1.84\" height=\"11.040000000000001\" fill=\"#6e4429\"/><rect x=\"234.56666666666666\" y=\"161.68\" width=\"1.84\" height=\"11.040000000000001\" fill=\"#6e4429\"/><rect x=\"249.44\" y=\"161.68\" width=\"1.84\" height=\"11.040000000000001\" fill=\"#6e4429\"/><rect x=\"70.96\" y=\"160.76\" width=\"178.48000000000002\" height=\"2.0240000000000005\" fill=\"#6e4429\"/><text x=\"14\" y=\"206\" font-family=\"Georgia,serif\" font-size=\"12\" font-style=\"italic\" fill=\"#2b4a73\">Valais · Schweiz</text></svg>"
-   }
+   },
+   "compras": [
+    {
+     "id": "pedido",
+     "loja": "Librairie Edelweiss",
+     "local": "Zermatt · Valais",
+     "numero": "71-2026",
+     "d": "2026-10-31T09:12",
+     "assunto": "Seu pedido nº 71-2026 foi enviado",
+     "cliente": "H. S.",
+     "entrega": [
+      "H. S.",
+      "Chalet das Doze Janelas",
+      "3920 · Valais",
+      "SUÍÇA"
+     ],
+     "itens": [
+      {
+       "titulo": "Todo crime tem um autor?",
+       "autor": "Rogério A S Torres",
+       "capa": "/assets/img/livros/todo-crime-tem-um-autor.jpg",
+       "preco": "CHF 24,00"
+      },
+      {
+       "titulo": "O Pleno Existencial",
+       "autor": "Rogério A S Torres",
+       "capa": "/assets/img/livros/o-pleno-existencial.jpg",
+       "preco": "CHF 26,00"
+      },
+      {
+       "titulo": "Os Dois Lados do Mesmo Pensamento",
+       "autor": "Rogério A S Torres",
+       "capa": "/assets/img/livros/os-dois-lados-do-mesmo-pensamento.jpg",
+       "preco": "CHF 26,00"
+      }
+     ],
+     "frete": "CHF 9,00",
+     "total": "CHF 85,00",
+     "obs": "Embrulhar o primeiro separado. É presente para mim mesmo.",
+     "texto": "Olá! Os três volumes, em português, como o senhor pediu, já seguiram para o chalé. A entrega sobe a montanha na quinta-feira. Obrigado por comprar conosco."
+    }
+   ]
   }
  }
 }
