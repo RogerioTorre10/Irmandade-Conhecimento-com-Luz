@@ -253,3 +253,4 @@ button{font:inherit;cursor:pointer}
 .pedido .livros span{display:flex;flex-direction:column;gap:2px}.pedido .livros small{color:#9aa4b0}.pedido .livros em{font-style:normal;color:#d9c48a;font-size:12px}
 .pedido .tot{text-align:right;margin:8px 0}.pedido .obs{font-style:italic;color:#d9c48a;margin:10px 0}
 .pedido .entrega{border:1px dashed rgba(255,255,255,.25);padding:8px;border-radius:6px;font-size:12px}.pedido .entrega small{display:block;color:#9aa4b0;margin-bottom:3px}
+.borrado{display:inline-block;filter:blur(1.8px);opacity:1;color:#555;letter-spacing:-1px;transform:rotate(-3deg);user-select:none}
