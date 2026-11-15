@@ -14,6 +14,8 @@
 .tabs{display:flex;gap:7px;margin:12px 0;flex-wrap:wrap}.tab{border:1px solid var(--line);background:#0e1520;color:var(--muted);padding:9px 14px;border-radius:999px;cursor:pointer}.tab.active{background:rgba(232,198,112,.12);color:var(--gold);border-color:rgba(232,198,112,.38)}
 .toolbar{padding:11px;display:grid;grid-template-columns:minmax(220px,1.5fr) repeat(3,minmax(130px,.45fr)) auto;gap:9px;margin-bottom:12px}.table-card{overflow:hidden}.table-head{display:flex;justify-content:space-between;padding:14px 15px;border-bottom:1px solid var(--line)}.table-head span{font-size:11px;color:var(--muted)}.wrap{overflow:auto;max-height:68vh}table{width:100%;border-collapse:collapse;min-width:1700px}th{position:sticky;top:0;z-index:2;background:#111925;text-align:left;padding:10px;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#ccd2dc;border-bottom:1px solid rgba(255,255,255,.08)}td{padding:10px;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px;vertical-align:middle}tbody tr:hover{background:rgba(232,198,112,.035)}.mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}.badge{display:inline-flex;padding:4px 8px;border-radius:999px;font-size:10px;font-weight:800;border:1px solid rgba(255,255,255,.10)}.ok{color:#94e4b5}.bad{color:#ffaaaa}.warn{color:#f2d38e}.blue{color:#9fcaff}.neutral{color:#bec6d2}.gold{color:#f3d487}.empty{padding:36px;text-align:center;color:var(--muted)}.foot{font-size:11px;color:var(--muted);text-align:right;margin-top:10px}.status{min-height:20px;margin-top:10px;font-size:12px}.status.error{color:#ff9d9d}
 @media(max-width:1200px){.metrics,.metrics.secondary{grid-template-columns:repeat(3,1fr)}}@media(max-width:760px){.top{flex-direction:column;align-items:flex-start}.metrics,.metrics.secondary{grid-template-columns:repeat(2,1fr)}.toolbar{grid-template-columns:1fr 1fr}.toolbar .search{grid-column:1/-1}.row{flex-direction:column}}
+.vtool{grid-template-columns:1fr repeat(2,minmax(150px,.3fr)) auto;align-items:center}.vtitle{display:flex;flex-direction:column}.vbox{margin-bottom:12px}.vgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.vchart{display:flex;align-items:flex-end;gap:3px;height:190px;padding:14px 15px 28px;overflow-x:auto}.vcol{flex:1 0 14px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;position:relative}.vbar{width:100%;max-width:26px;background:linear-gradient(#e8c670,#9b7a31);border-radius:5px 5px 2px 2px;min-height:2px}.vcol .n{font-size:9px;color:var(--muted);margin-bottom:3px}.vcol .d{position:absolute;bottom:-20px;font-size:9px;color:var(--muted);white-space:nowrap}.vlist{padding:8px 15px 14px}.vrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:13px}.vrow .t{position:relative}.vrow .t i{position:absolute;left:0;bottom:-4px;height:3px;background:rgba(232,198,112,.55);border-radius:3px}.vrow b{color:var(--gold)}.vtable{min-width:900px}
+@media(max-width:760px){.vgrid{grid-template-columns:1fr}.vtool{grid-template-columns:1fr 1fr}.vtitle{grid-column:1/-1}}
 </style>
 </head>
 <body><main class="shell">
@@ -44,9 +46,9 @@
 <article class="card metric"><div class="k">Custo médio</div><div id="mCustoMedio" class="v">—</div><div class="h">por Jornada com uso</div></article>
 </section>
 
-<nav class="tabs"><button class="tab active" data-tab="jornadas">Jornadas</button><button class="tab" data-tab="hotmart">Compras Hotmart</button></nav>
+<nav class="tabs"><button class="tab active" data-tab="jornadas">Jornadas</button><button class="tab" data-tab="hotmart">Compras Hotmart</button><button class="tab" data-tab="visitas">Visitas ao site</button></nav>
 
-<section class="card toolbar">
+<section id="toolbarMain" class="card toolbar">
 <input id="busca" class="field search" type="search" placeholder="Buscar e-mail, código, pedido, cidade, guia...">
 <select id="status" class="field"><option value="">Todos status</option><option value="em_andamento">Em andamento</option><option value="concluida">Concluída</option><option value="expirada">Expirada</option><option value="aprovado">Aprovada</option></select>
 <select id="guia" class="field"><option value="">Todos os guias</option><option value="lumen">Lumen</option><option value="zion">Zion</option><option value="arian">Arian</option></select>
@@ -54,13 +56,37 @@
 <button id="limpar" class="btn">Limpar</button>
 </section>
 
-<section class="card table-card"><div class="table-head"><strong id="tableTitle">Jornadas</strong><span id="count">0 registros</span></div><div class="wrap">
+<section id="tableMain" class="card table-card"><div class="table-head"><strong id="tableTitle">Jornadas</strong><span id="count">0 registros</span></div><div class="wrap">
 <table id="tableJornadas"><thead><tr>
 <th>Código</th><th>Participante</th><th>Status</th><th>Guia</th><th>Idioma</th><th>País</th><th>Estado</th><th>Cidade</th><th>Provider</th><th>Modelo</th><th>Entrada</th><th>Saída</th><th>Total</th><th>Custo IA</th><th>Bloco</th><th>Pergunta</th><th>Restante</th><th>Atividade</th>
 </tr></thead><tbody id="bodyJornadas"></tbody></table>
 <table id="tableHotmart" class="hidden"><thead><tr><th>Transação</th><th>Nome</th><th>E-mail</th><th>Status</th><th>Código</th><th>Produto</th><th>Aprovada em</th><th>E-mail acesso</th><th>Último evento</th></tr></thead><tbody id="bodyHotmart"></tbody></table>
 <div id="empty" class="empty hidden">Nenhum registro encontrado.</div>
 </div></section>
+<section id="visitas" class="hidden">
+<section class="card toolbar vtool"><div class="vtitle"><strong>Visitas ao site</strong><span id="vStatus" class="sub">—</span></div>
+<select id="vDias" class="field"><option value="7">Últimos 7 dias</option><option value="30" selected>Últimos 30 dias</option><option value="90">Últimos 90 dias</option><option value="365">Último ano</option></select>
+<select id="vAmb" class="field"><option value="comercial" selected>Site comercial</option><option value="homolog">Homolog (testes)</option><option value="todos">Todos</option></select>
+<button id="vContar" class="btn">—</button></section>
+<section class="metrics">
+<article class="card metric"><div class="k">Visitas hoje</div><div id="vHoje" class="v">0</div><div id="vHojeU" class="h">0 pessoas</div></article>
+<article class="card metric"><div class="k">Últimos 7 dias</div><div id="v7" class="v">0</div><div id="v7U" class="h">0 pessoas</div></article>
+<article class="card metric"><div class="k">No período</div><div id="vPer" class="v">0</div><div id="vPerU" class="h">0 pessoas</div></article>
+<article class="card metric"><div class="k">Começaram as perguntas</div><div id="vInicio" class="v">0</div><div class="h">pessoas na Jornada</div></article>
+<article class="card metric"><div class="k">Vindas da Hotmart</div><div id="vHot" class="v">0</div><div class="h">acessos pelo checkout/área</div></article>
+<article class="card metric"><div class="k">Cliques para fora</div><div id="vExt" class="v">0</div><div class="h">lojas, livros, links</div></article>
+</section>
+<section class="card vbox"><div class="table-head"><strong>Visitas por dia</strong><span>barra = visitas · número = pessoas</span></div><div id="vChart" class="vchart"></div></section>
+<div class="vgrid">
+<section class="card vbox"><div class="table-head"><strong>Páginas mais visitadas</strong><span>visitas · pessoas</span></div><div id="vPaginas" class="vlist"></div></section>
+<section class="card vbox"><div class="table-head"><strong>Caminho na Jornada</strong><span>pessoas que chegaram em cada etapa</span></div><div id="vFunil" class="vlist"></div></section>
+<section class="card vbox"><div class="table-head"><strong>Idioma do visitante</strong></div><div id="vIdiomas" class="vlist"></div></section>
+<section class="card vbox"><div class="table-head"><strong>Região (fuso horário)</strong></div><div id="vRegioes" class="vlist"></div></section>
+<section class="card vbox"><div class="table-head"><strong>De onde vieram</strong></div><div id="vOrigens" class="vlist"></div></section>
+<section class="card vbox"><div class="table-head"><strong>Aparelho</strong></div><div id="vDisp" class="vlist"></div><div class="table-head"><strong>Cliques para fora do site</strong></div><div id="vDest" class="vlist"></div></section>
+</div>
+<section class="card table-card"><div class="table-head"><strong>Acessos recentes</strong><span id="vCount">0</span></div><div class="wrap"><table class="vtable"><thead><tr><th>Quando</th><th>O quê</th><th>Página / etapa</th><th>Idioma</th><th>Região</th><th>Aparelho</th><th>Veio de</th></tr></thead><tbody id="vRecentes"></tbody></table><div id="vEmpty" class="empty hidden">Nenhuma visita registrada ainda.</div></div></section>
+</section>
 <div class="foot">Atualização automática a cada 30 segundos · O painel não lê respostas, devolutivas ou conteúdo emocional.</div>
 </section></main>
 <script src="/assets/js/admin-dashboard.js"></script>
