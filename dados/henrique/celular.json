@@ -2254,9 +2254,8 @@
      "id": "pedido",
      "loja": "Librairie Edelweiss",
      "local": "Zermatt · Valais",
-     "numero": "71-2026",
-     "d": "2026-10-31T09:12",
-     "assunto": "Seu pedido nº 71-2026 foi enviado",
+     "numero": "0071",
+     "assunto": "Seu pedido nº 0071 foi enviado",
      "cliente": "H. S.",
      "entrega": [
       "H. S.",
@@ -2287,7 +2286,9 @@
      "frete": "CHF 9,00",
      "total": "CHF 85,00",
      "obs": "Embrulhar o primeiro separado. É presente para mim mesmo.",
-     "texto": "Olá! Os três volumes, em português, como o senhor pediu, já seguiram para o chalé. A entrega sobe a montanha na quinta-feira. Obrigado por comprar conosco."
+     "texto": "Olá! Os três volumes, em português, como o senhor pediu, já seguiram para o chalé. A entrega sobe a montanha na quinta-feira. Obrigado por comprar conosco.",
+     "dia": "31/10",
+     "hora": "09:12"
     }
    ]
   }

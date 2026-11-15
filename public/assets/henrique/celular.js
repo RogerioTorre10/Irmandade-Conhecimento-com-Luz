@@ -460,12 +460,12 @@
   // ---------------------------------------------------------------- compras (surpresa: os livros)
   function vCompras() {
     const c = st.dados[7].compras || [];
-    mostrar(cab('Compras', 'pedidos') + `<div class="corpo-tela"><ul class="lista">${c.map((p, i) => `<li><button type="button" data-i="${i}"><span class="meio"><span class="nome">${esc(p.loja)}</span><span class="prev">${esc(p.assunto)}</span></span><span class="data">${dataCurta(p.d)}</span></button></li>`).join('')}</ul></div>`);
+    mostrar(cab('Compras', 'pedidos') + `<div class="corpo-tela"><ul class="lista">${c.map((p, i) => `<li><button type="button" data-i="${i}"><span class="meio"><span class="nome">${esc(p.loja)}</span><span class="prev">${esc(p.assunto)}</span></span><span class="data">${esc(p.dia)}/<span class="borrado" aria-label="ano ilegível">20▒▒</span></span></button></li>`).join('')}</ul></div>`);
     tela().querySelectorAll('[data-i]').forEach((b) => b.addEventListener('click', () => ir(() => vPedido(c[b.dataset.i]))));
   }
   function vPedido(p) {
     mostrar(cab('Pedido nº ' + p.numero) + `<div class="corpo-tela"><div class="email pedido">
-      <div class="de">De: ${esc(p.loja)} · ${esc(p.local)} · ${dataLonga(p.d)}, ${hora(p.d)}</div><h3>${esc(p.assunto)}</h3>
+      <div class="de">De: ${esc(p.loja)} · ${esc(p.local)} · ${esc(p.dia)}/<span class="borrado" aria-label="ano ilegível">20▒▒</span>, ${esc(p.hora)}</div><h3>${esc(p.assunto)}</h3>
       <div class="corpo-m">${esc(p.texto)}</div>
       <ul class="livros">${p.itens.map((l) => `<li><img src="${esc(l.capa)}" alt="Capa de ${esc(l.titulo)}" loading="lazy"><span><b>${esc(l.titulo)}</b><small>${esc(l.autor)}</small><em>${esc(l.preco)}</em></span></li>`).join('')}</ul>
       <p class="tot">Frete: ${esc(p.frete)}<br><b>Total: ${esc(p.total)}</b></p>
