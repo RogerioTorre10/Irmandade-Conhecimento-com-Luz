@@ -48,7 +48,7 @@
         var dados = {
           e: evento, p: location.pathname, h: host, v: visitante, s: sessao,
           l: navigator.language || '', tz: tz, m: celular,
-          r: document.referrer || '', hm: dentroHotmart
+          r: document.referrer || '', hm: dentroHotmart, wd: !!navigator.webdriver
         };
         if (extra) for (var k in extra) dados[k] = extra[k];
         var corpo = JSON.stringify(dados);
