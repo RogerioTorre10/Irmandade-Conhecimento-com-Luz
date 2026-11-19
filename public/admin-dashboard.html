@@ -17,6 +17,8 @@
 .vtool{grid-template-columns:1fr repeat(3,minmax(140px,.28fr)) auto;align-items:center}.vtitle{display:flex;flex-direction:column}.vbox{margin-bottom:12px}.vgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.vchart{display:flex;align-items:flex-end;gap:3px;height:190px;padding:14px 15px 28px;overflow-x:auto}.vcol{flex:1 0 14px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;position:relative}.vbar{width:100%;max-width:26px;background:linear-gradient(#e8c670,#9b7a31);border-radius:5px 5px 2px 2px;min-height:2px}.vcol .n{font-size:9px;color:var(--muted);margin-bottom:3px}.vcol .d{position:absolute;bottom:-20px;font-size:9px;color:var(--muted);white-space:nowrap}.vlist{padding:8px 15px 14px}.vrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:13px}.vrow .t{position:relative}.vrow .t i{position:absolute;left:0;bottom:-4px;height:3px;background:rgba(232,198,112,.55);border-radius:3px}.vrow b{color:var(--gold)}.vtable{min-width:900px}
 @media(max-width:760px){.vgrid{grid-template-columns:1fr}.vtool{grid-template-columns:1fr 1fr}.vtitle{grid-column:1/-1}}
 .vcod{font-family:ui-monospace,Consolas,monospace;font-weight:800;color:var(--gold);background:rgba(232,198,112,.10);border:1px solid rgba(232,198,112,.3);border-radius:6px;padding:2px 6px;cursor:pointer}.vrobo{color:#ffaaaa}.vlimpa{cursor:pointer;color:var(--gold);text-decoration:underline}
+.rgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:12px}.rcard{padding:14px}.rcard .h{font-size:12px;color:var(--muted);margin-top:3px}.rtop{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.rtop .badge{margin-left:auto}.ric{width:26px;height:26px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:13px}.rnum{font-size:30px;font-weight:850;margin-top:10px}.rdelta{display:flex;gap:14px;font-size:12px;color:var(--muted);margin:8px 0 4px}.rerro{margin-top:8px;font-size:12px;color:#ffaaaa;background:rgba(241,132,132,.08);border-radius:8px;padding:7px 9px}.racoes{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}.racoes a{text-decoration:none}.rform{margin-top:12px;display:grid;gap:8px}.rform label{font-size:12px;color:var(--muted);display:grid;gap:4px}.rlinha{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+@media(max-width:1100px){.rgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:700px){.rgrid,.rlinha{grid-template-columns:1fr}}
 </style>
 </head>
 <body><main class="shell">
@@ -47,7 +49,7 @@
 <article class="card metric"><div class="k">Custo médio</div><div id="mCustoMedio" class="v">—</div><div class="h">por Jornada com uso</div></article>
 </section>
 
-<nav class="tabs"><button class="tab active" data-tab="jornadas">Jornadas</button><button class="tab" data-tab="hotmart">Compras Hotmart</button><button class="tab" data-tab="visitas">Visitas ao site</button></nav>
+<nav class="tabs"><button class="tab active" data-tab="jornadas">Jornadas</button><button class="tab" data-tab="hotmart">Compras Hotmart</button><button class="tab" data-tab="visitas">Visitas ao site</button><button class="tab" data-tab="redes">Redes sociais</button></nav>
 
 <section id="toolbarMain" class="card toolbar">
 <input id="busca" class="field search" type="search" placeholder="Buscar e-mail, código, pedido, cidade, guia...">
@@ -91,7 +93,21 @@
 <section class="card table-card"><div class="table-head"><strong>Acessos recentes</strong><span><span id="vFiltro"></span> <span id="vCount">0</span></span></div><div class="wrap"><table class="vtable"><thead><tr><th>Quando</th><th>Visitante</th><th>O quê</th><th>Página / etapa</th><th>Idioma</th><th>Região</th><th>Aparelho</th><th>Navegador</th><th>Veio de</th></tr></thead><tbody id="vRecentes"></tbody></table><div id="vEmpty" class="empty hidden">Nenhuma visita registrada ainda.</div></div></section>
 </section>
 <div id="iasModal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:50;display:flex;align-items:center;justify-content:center;padding:16px"><div class="card" style="max-width:640px;width:100%;padding:18px"><div style="display:flex;justify-content:space-between;align-items:center"><strong>🩺 Teste das chaves de IA</strong><button id="iasFechar" class="btn">Fechar</button></div><div class="sub" style="margin:6px 0 12px">Faz uma chamada mínima em cada IA, com o mesmo modelo da Jornada. A chave nunca aparece aqui.</div><div id="iasLista">Testando…</div></div></div>
-<div class="foot">Atualização automática a cada 30 segundos · O painel não lê respostas, devolutivas ou conteúdo emocional.</div>
+<section id="redes" class="hidden">
+<section class="card toolbar vtool"><div class="vtitle"><strong>Redes sociais</strong><span id="rStatus" class="sub">—</span></div>
+<select id="rDias" class="field"><option value="30">Últimos 30 dias</option><option value="90" selected>Últimos 90 dias</option><option value="365">Último ano</option></select>
+<span></span><span></span>
+<button id="rColetar" class="btn">↻ Coletar agora</button></section>
+<section class="metrics" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+<article class="card metric"><div class="k">Total de seguidores</div><div id="rTotal" class="v">—</div><div class="h">somando todas as redes</div></article>
+<article class="card metric"><div class="k">Crescimento em 7 dias</div><div id="rTotal7" class="v">—</div><div class="h">novos seguidores</div></article>
+<article class="card metric"><div class="k">Crescimento em 30 dias</div><div id="rTotal30" class="v">—</div><div class="h">novos seguidores</div></article>
+</section>
+<section class="card vbox"><div class="table-head"><strong>Evolução dos seguidores</strong><span>todas as redes</span></div><div id="rGrafico"></div></section>
+<div id="rCards" class="rgrid"></div>
+</section>
+Atualização automática a cada 30 segundos · O painel não lê respostas, devolutivas ou conteúdo emocional.</div>
 </section></main>
+<script src="/assets/js/admin-redes.js"></script>
 <script src="/assets/js/admin-dashboard.js"></script>
 </body></html>
