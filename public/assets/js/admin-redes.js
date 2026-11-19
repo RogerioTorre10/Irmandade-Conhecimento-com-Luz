@@ -101,7 +101,7 @@ function desenhar() {
   box.querySelectorAll('[data-abrir]').forEach((b) => b.addEventListener('click', () => { st.aberto = st.aberto === b.dataset.abrir ? null : b.dataset.abrir; desenhar(); }));
   box.querySelectorAll('[data-salvar]').forEach((b) => b.addEventListener('click', async () => {
     b.disabled = true;
-    try { await chamar('/admin/config', { rede: b.dataset.salvar, url: $('#rUrl').value.trim(), identificador: $('#rIdent')?.value.trim() || '' }); await chamar('/admin/coletar', {}).catch(() => {}); await carregar(); }
+    try { await chamar('/admin/config', { rede: b.dataset.salvar, url: $('#rUrl').value.trim(), identificador: $('#rIdent')?.value.trim() || '' }); await chamar('/admin/coletar', {}).catch(() => {}); st.aberto = null; await carregar(); }
     catch (e) { alert(e.message); b.disabled = false; }
   }));
   box.querySelectorAll('[data-lancar]').forEach((b) => b.addEventListener('click', async () => {
