@@ -27,7 +27,7 @@
 </section>
 
 <section id="dash" class="hidden">
-<header class="top"><div class="brand"><div class="seal">🕯️</div><div><h1>Painel da Irmandade</h1><div class="sub">Jornada Essencial — centro de comando comercial e operacional</div></div></div><div class="actions"><span class="live"><i id="dot" class="dot"></i><span id="liveText">Conectado</span></span><a class="btn" href="/sala-equipe.html" style="text-decoration:none">🕯️ Sala da Equipe</a><button id="atualizar" class="btn">Atualizar</button><button id="sair" class="btn danger">Sair</button></div></header>
+<header class="top"><div class="brand"><div class="seal">🕯️</div><div><h1>Painel da Irmandade</h1><div class="sub">Jornada Essencial — centro de comando comercial e operacional</div></div></div><div class="actions"><span class="live"><i id="dot" class="dot"></i><span id="liveText">Conectado</span></span><a class="btn" href="/sala-equipe.html" style="text-decoration:none">🕯️ Sala da Equipe</a><button id="testarIas" class="btn">🩺 Testar IAs</button><button id="atualizar" class="btn">Atualizar</button><button id="sair" class="btn danger">Sair</button></div></header>
 
 <section class="metrics">
 <article class="card metric"><div class="k">Compras Hotmart</div><div id="mCompras" class="v">0</div><div class="h">recebidas</div></article>
@@ -90,6 +90,7 @@
 </div>
 <section class="card table-card"><div class="table-head"><strong>Acessos recentes</strong><span><span id="vFiltro"></span> <span id="vCount">0</span></span></div><div class="wrap"><table class="vtable"><thead><tr><th>Quando</th><th>Visitante</th><th>O quê</th><th>Página / etapa</th><th>Idioma</th><th>Região</th><th>Aparelho</th><th>Navegador</th><th>Veio de</th></tr></thead><tbody id="vRecentes"></tbody></table><div id="vEmpty" class="empty hidden">Nenhuma visita registrada ainda.</div></div></section>
 </section>
+<div id="iasModal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:50;display:flex;align-items:center;justify-content:center;padding:16px"><div class="card" style="max-width:640px;width:100%;padding:18px"><div style="display:flex;justify-content:space-between;align-items:center"><strong>🩺 Teste das chaves de IA</strong><button id="iasFechar" class="btn">Fechar</button></div><div class="sub" style="margin:6px 0 12px">Faz uma chamada mínima em cada IA, com o mesmo modelo da Jornada. A chave nunca aparece aqui.</div><div id="iasLista">Testando…</div></div></div>
 <div class="foot">Atualização automática a cada 30 segundos · O painel não lê respostas, devolutivas ou conteúdo emocional.</div>
 </section></main>
 <script src="/assets/js/admin-dashboard.js"></script>
