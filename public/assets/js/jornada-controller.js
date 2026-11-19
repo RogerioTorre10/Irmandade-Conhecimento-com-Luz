@@ -357,6 +357,12 @@
   }
 
   async function show(sectionId, opts) {
+    // Aceita o nome curto (ex.: JC.show('guia')) e converte para o id real
+    // da seção ('section-guia'). Sem isso a seção era renomeada para 'guia'
+    // e o script dela (que espera 'section-guia') não iniciava: guias e
+    // botões ficavam invisíveis.
+    sectionId = String(sectionId || '').trim();
+    if (sectionId && !sectionId.startsWith('section-')) sectionId = 'section-' + sectionId;
     const force = !!(opts && opts.force);
     // Segurança: nenhuma seção privada pode ser aberta
     // manualmente pelo console sem uma Jornada autenticada e válida.
