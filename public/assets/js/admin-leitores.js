@@ -22,15 +22,17 @@ function desenhar() {
   $('#lStatus').textContent = st.erro ? `Erro: ${st.erro}` : (d ? `Atualizado ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}` : 'Carregando…');
   if (!d) return;
   const r = d.resumo || {};
-  $('#lTotal').textContent = num(r.total); $('#lNov').textContent = num(r.novidades);
+  $('#lTotal').textContent = num(r.total); $('#lConf').textContent = num(r.confirmados); $('#lNov').textContent = num(r.novidades_confirmados);
   $('#l7').textContent = num(r.ultimos_7_dias); $('#lHoje').textContent = num(r.hoje);
   const busca = ($('#lBusca').value || '').trim().toLowerCase();
-  const so = $('#lFiltro').value === 'sim';
-  const lista = (d.leitores || []).filter((l) => (!so || l.novidades) && (!busca || `${l.nome} ${l.email}`.toLowerCase().includes(busca)));
+  const f = $('#lFiltro').value;
+  const passa = (l) => !f || (f === 'conf' && l.confirmado) || (f === 'sim' && l.confirmado && l.novidades) || (f === 'pend' && !l.confirmado);
+  const lista = (d.leitores || []).filter((l) => passa(l) && (!busca || `${l.nome} ${l.email}`.toLowerCase().includes(busca)));
   $('#lCount').textContent = `${num(lista.length)} de ${num(r.total)}`;
-  $('#lCorpo').innerHTML = lista.map((l) => `<tr><td>${quando(l.criado_em)}</td><td>${esc(l.nome)}</td><td class="mono">${esc(l.email)}</td><td>${esc(l.titulo)}</td>`
+  $('#lCorpo').innerHTML = lista.map((l) => `<tr><td>${quando(l.criado_em)}</td><td>${esc(l.nome || '—')}</td><td class="mono">${esc(l.email)}</td><td>${esc(l.titulo)}</td>`
+    + `<td>${l.confirmado ? `<span class="badge ok" title="${quando(l.confirmado_em)}">sim</span>` : '<span class="badge warn">aguardando</span>'}</td>`
     + `<td>${l.novidades ? '<span class="badge ok">sim</span>' : '<span class="badge neutral">não</span>'}</td><td>${num(l.envios)}</td>`
-    + `<td>${l.ultimo_envio_status === 'enviado' ? '<span class="badge ok">enviado</span>' : `<span class="badge bad">${esc(l.ultimo_envio_status || '—')}</span>`}</td></tr>`).join('');
+    + `<td>${l.ultimo_envio_status === 'enviado' ? '<span class="badge ok">enviado</span>' : (l.ultimo_envio_status ? `<span class="badge bad">${esc(l.ultimo_envio_status)}</span>` : '<span class="badge neutral" title="Pegou o código antes do envio por e-mail">antes</span>')}</td></tr>`).join('');
   $('#lVazio').classList.toggle('hidden', lista.length > 0);
 }
 async function exportar() {

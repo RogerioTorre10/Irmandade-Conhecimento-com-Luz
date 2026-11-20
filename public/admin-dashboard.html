@@ -109,16 +109,16 @@
 <section id="leitores" class="hidden">
 <section class="card toolbar vtool"><div class="vtitle"><strong>Leitores dos livros</strong><span id="lStatus" class="sub">—</span></div>
 <input id="lBusca" class="field" placeholder="Buscar nome ou e-mail" />
-<select id="lFiltro" class="field"><option value="">Todos</option><option value="sim">Querem novidades</option></select>
+<select id="lFiltro" class="field"><option value="">Todos</option><option value="conf">Confirmados</option><option value="sim">Querem novidades (confirmados)</option><option value="pend">Ainda não confirmados</option></select>
 <span></span>
 <button id="lCsv" class="btn">⬇ Exportar lista</button></section>
 <section class="metrics" style="grid-template-columns:repeat(4,minmax(0,1fr))">
-<article class="card metric"><div class="k">Leitores cadastrados</div><div id="lTotal" class="v">—</div><div class="h">e-mails confirmados pelo envio do código</div></article>
-<article class="card metric"><div class="k">Querem novidades</div><div id="lNov" class="v">—</div><div class="h">autorizaram receber e-mails</div></article>
-<article class="card metric"><div class="k">Últimos 7 dias</div><div id="l7" class="v">—</div><div class="h">novos leitores</div></article>
-<article class="card metric"><div class="k">Hoje</div><div id="lHoje" class="v">—</div><div class="h">últimas 24 horas</div></article>
+<article class="card metric"><div class="k">Pediram o código</div><div id="lTotal" class="v">—</div><div class="h">cadastros no celular do Henrique</div></article>
+<article class="card metric"><div class="k">Confirmados</div><div id="lConf" class="v">—</div><div class="h">destravaram o celular com o código do e-mail</div></article>
+<article class="card metric"><div class="k">Querem novidades</div><div id="lNov" class="v">—</div><div class="h">confirmados que autorizaram e-mails</div></article>
+<article class="card metric"><div class="k">Últimos 7 dias</div><div id="l7" class="v">—</div><div class="h">novos pedidos · <span id="lHoje">—</span> hoje</div></article>
 </section>
-<section class="card table-card"><div class="table-head"><strong>Leitores</strong><span id="lCount">0</span></div><div class="wrap"><table class="vtable"><thead><tr><th>Cadastro</th><th>Nome</th><th>E-mail</th><th>Livro</th><th>Novidades</th><th>Envios</th><th>Último e-mail</th></tr></thead><tbody id="lCorpo"></tbody></table><div id="lVazio" class="empty hidden">Nenhum leitor cadastrado ainda.</div></div></section>
+<section class="card table-card"><div class="table-head"><strong>Leitores</strong><span id="lCount">0</span></div><div class="wrap"><table class="vtable"><thead><tr><th>Cadastro</th><th>Nome</th><th>E-mail</th><th>Livro</th><th>Confirmado</th><th>Novidades</th><th>Envios</th><th>Último e-mail</th></tr></thead><tbody id="lCorpo"></tbody></table><div id="lVazio" class="empty hidden">Nenhum leitor cadastrado ainda.</div></div></section>
 </section>
 Atualização automática a cada 30 segundos · O painel não lê respostas, devolutivas ou conteúdo emocional.</div>
 </section></main>
