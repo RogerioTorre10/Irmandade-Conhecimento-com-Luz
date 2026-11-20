@@ -24,9 +24,8 @@ const SEGREDO = process.env.HENRIQUE_SEGREDO || "irmandade-luz-henrique-2010";
 const DADOS = path.join(__dirname, "dados", "henrique", "celular.json");
 
 // Código pessoal por e-mail (envio pelo backend, mesmo Resend da Jornada).
-// LIVROS_CODIGO_EMAIL=0 no Render desliga e volta a mostrar o código na tela.
-// Enquanto estiver em teste, só vale para quem abre /henrique?teste-email=1.
-const CODIGO_POR_EMAIL = process.env.LIVROS_CODIGO_EMAIL === "1";
+// Ligado para todos. LIVROS_CODIGO_EMAIL=0 no Render desliga e volta a mostrar o código na tela.
+const CODIGO_POR_EMAIL = process.env.LIVROS_CODIGO_EMAIL !== "0";
 const BACKEND = (process.env.LIVROS_BACKEND_URL || "https://lumen-backend-api.onrender.com").replace(/\/$/, "");
 const mascarar = (e) => e.replace(/^(.)(.*)(@.*)$/, (_, a, b, c) => a + "•".repeat(Math.min(Math.max(b.length, 2), 6)) + c);
 
