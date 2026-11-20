@@ -4,8 +4,9 @@
 // Como funciona:
 // - O leitor se cadastra com nome e e-mail e responde a um desafio
 //   do livro (a primeira palavra de uma página). Recebe um código
-//   pessoal de 3 dígitos, calculado a partir do e-mail. Nada é
-//   gravado: o mesmo e-mail gera sempre o mesmo código.
+//   pessoal de 3 dígitos, calculado a partir do e-mail (o mesmo
+//   e-mail gera sempre o mesmo código). O código vai por e-mail e o
+//   backend guarda o leitor para o painel (aba Leitores).
 // - Cada senha do livro é somada ao código pessoal. O servidor
 //   subtrai o código e descobre qual etapa do celular abrir.
 // - O conteúdo do celular fica em dados/henrique/celular.json, fora
@@ -21,6 +22,13 @@ const fsSync = require("fs");
 
 const SEGREDO = process.env.HENRIQUE_SEGREDO || "irmandade-luz-henrique-2010";
 const DADOS = path.join(__dirname, "dados", "henrique", "celular.json");
+
+// Código pessoal por e-mail (envio pelo backend, mesmo Resend da Jornada).
+// LIVROS_CODIGO_EMAIL=0 no Render desliga e volta a mostrar o código na tela.
+// Enquanto estiver em teste, só vale para quem abre /henrique?teste-email=1.
+const CODIGO_POR_EMAIL = process.env.LIVROS_CODIGO_EMAIL === "1";
+const BACKEND = (process.env.LIVROS_BACKEND_URL || "https://lumen-backend-api.onrender.com").replace(/\/$/, "");
+const mascarar = (e) => e.replace(/^(.)(.*)(@.*)$/, (_, a, b, c) => a + "•".repeat(Math.min(Math.max(b.length, 2), 6)) + c);
 
 // Senhas fixas impressas no livro → etapa do celular
 const ETAPAS = {
@@ -85,7 +93,7 @@ module.exports = function livrosApi(app, express) {
   });
 
   // Cadastro: confere o desafio e devolve o código pessoal
-  app.post("/api/henrique/cadastro", json, (req, res) => {
+  app.post("/api/henrique/cadastro", json, async (req, res) => {
     if (excedeu("c:" + ipDe(req))) return res.status(429).json({ erro: "Muitas tentativas. Espere alguns minutos." });
     const { nome, email, desafio, resposta } = req.body || {};
     const e = normEmail(email);
@@ -96,7 +104,33 @@ module.exports = function livrosApi(app, express) {
     if (semAcento(resposta) !== d.resposta) {
       return res.status(403).json({ erro: `Não é essa a palavra. Abra o livro na página ${d.pagina}.` });
     }
-    res.json({ codigo: codigoPessoal(e) });
+    const codigo = codigoPessoal(e);
+    if (!(CODIGO_POR_EMAIL || req.body.teste === true)) return res.json({ codigo });
+
+    // Código por e-mail: o backend envia pelo mesmo Resend da Jornada e guarda o leitor
+    const ts = Math.floor(Date.now() / 1000);
+    const assinatura = crypto.createHmac("sha256", SEGREDO).update(`${e}|todo-crime|${codigo}|${ts}`).digest("hex");
+    try {
+      const r = await fetch(`${BACKEND}/api/livros/enviar-codigo`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: e, nome: String(nome).trim().slice(0, 120), livro: "todo-crime",
+          codigo, ts, assinatura, novidades: req.body.novidades === true }),
+        signal: AbortSignal.timeout(30000),
+      });
+      const j = await r.json().catch(() => ({}));
+      if (r.ok && j.ok) return res.json({ enviado: true, email: mascarar(e) });
+      if (r.status === 429) {
+        const s = Number(j.espera) || 60;
+        const quando = s >= 120 ? `${Math.ceil(s / 60)} minutos` : `${s} segundos`;
+        return res.status(429).json({ erro: `Já enviamos o código para esse e-mail. Confira a caixa de entrada e o spam, ou peça de novo daqui a ${quando}.` });
+      }
+      console.error("[LIVROS] envio do código falhou:", r.status, j.erro || "");
+    } catch (err) {
+      console.error("[LIVROS] backend fora do ar:", err.message);
+    }
+    // Se o e-mail falhar, o leitor não fica travado: o código aparece na tela, como antes.
+    res.json({ codigo, aviso: "Não conseguimos enviar o e-mail agora. Anote o seu código:" });
   });
 
   // Abrir uma etapa: senha digitada = senha do livro + código pessoal

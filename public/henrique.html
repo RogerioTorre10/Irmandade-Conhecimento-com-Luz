@@ -32,19 +32,29 @@
     <form class="form" id="formEntrar" autocomplete="on">
       <label>E-mail do cadastro<input type="email" name="email" required autocomplete="email" inputmode="email" /></label>
       <button type="submit" class="botao">Continuar</button>
-      <p class="nota">O seu e-mail só serve para calcular o seu código. Ele não fica guardado no site.</p>
+      <p class="nota">Use o mesmo e-mail em que você recebeu o código.</p>
     </form>
 
     <form class="form" id="formCadastro" hidden autocomplete="on">
       <label>Seu nome<input name="nome" required autocomplete="name" /></label>
       <label>Seu e-mail<input type="email" name="email" required autocomplete="email" inputmode="email" /></label>
       <label><span id="pergunta">Carregando o desafio…</span><input name="resposta" required autocomplete="off" autocapitalize="none" /></label>
-      <button type="submit" class="botao">Gerar meu código</button>
-      <p class="nota">Use sempre o mesmo e-mail: ele gera sempre o mesmo código. Se esquecer o código, é só se cadastrar de novo.</p>
+      <label class="marcar"><input type="checkbox" name="novidades" /> <span>Quero receber novidades da Irmandade Conhecimento com Luz (livros, músicas e a Jornada). Posso sair quando quiser.</span></label>
+      <button type="submit" class="botao">Quero meu código</button>
+      <p class="nota">Use sempre o mesmo e-mail: ele gera sempre o mesmo código. Se esquecer o código, é só pedir de novo. Veja a nossa <a href="/privacidade" target="_blank" rel="noopener">política de privacidade</a>.</p>
     </form>
 
+    <div class="codigo" id="enviadoBox" hidden>
+      <p class="envelope" aria-hidden="true">✉️</p>
+      <p>Enviamos o seu código pessoal para<br><b id="enviadoPara"></b></p>
+      <p>Confira a caixa de entrada e também o <b>spam</b> ou <b>promoções</b>. O e-mail vem de <b>Irmandade Conhecimento com Luz</b>.</p>
+      <button type="button" class="botao" id="irCelular2">Já recebi, abrir o celular</button>
+      <button type="button" class="botao secundario" id="reenviar">Não chegou? Enviar de novo</button>
+      <p class="nota" id="reenvioMsg" role="status"></p>
+    </div>
+
     <div class="codigo" id="codigoBox" hidden>
-      <p>Seu código pessoal é</p>
+      <p id="codigoAviso">Seu código pessoal é</p>
       <strong id="codigoNum">000</strong>
       <p>Anote no espaço da página “O celular de Henrique”, no começo do livro. Em cada senha que aparecer na história, some este número.</p>
       <p class="exemplo" id="codigoEx"></p>
