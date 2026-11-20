@@ -496,6 +496,7 @@
     $('#formEntrar').hidden = cad;
     $('#formCadastro').hidden = !cad;
     $('#codigoBox').hidden = true;
+    $('#enviadoBox').hidden = true;
     $('#erroAcesso').textContent = '';
     if (cad && !desafio) carregarDesafio();
   }
@@ -517,23 +518,48 @@
       st.email = e.target.email.value.trim().toLowerCase();
       gravar(); mostrarAparelho(); bloqueio();
     });
-    $('#formCadastro').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const f = e.target, bt = $('button', f);
+    const testeEmail = /[?&]teste-email=1\b/.test(location.search);
+    let ultimoPedido = null;
+    async function pedirCodigo(pedido, bt) {
       bt.disabled = true; $('#erroAcesso').textContent = '';
       try {
-        const j = await api('/api/henrique/cadastro', { nome: f.nome.value, email: f.email.value, desafio: desafio && desafio.id, resposta: f.resposta.value });
-        st.email = f.email.value.trim().toLowerCase();
+        const j = await api('/api/henrique/cadastro', pedido);
+        st.email = String(pedido.email).trim().toLowerCase();
         gravar();
-        f.hidden = true;
+        $('#formCadastro').hidden = true;
+        if (j.enviado) {
+          $('#codigoBox').hidden = true;
+          $('#enviadoPara').textContent = j.email;
+          $('#enviadoBox').hidden = false;
+          return true;
+        }
+        $('#enviadoBox').hidden = true;
+        $('#codigoAviso').textContent = j.aviso || 'Seu código pessoal é';
         $('#codigoNum').textContent = j.codigo;
         $('#codigoEx').textContent = `Exemplo: 4821 + ${j.codigo} = ${4821 + j.codigo}`;
         $('#codigoBox').hidden = false;
+        return true;
       } catch (err) {
         $('#erroAcesso').textContent = err.message;
         if (/Desafio/.test(err.message)) carregarDesafio();
+        return false;
       } finally { bt.disabled = false; }
+    }
+    $('#formCadastro').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const f = e.target;
+      ultimoPedido = { nome: f.nome.value, email: f.email.value, desafio: desafio && desafio.id, resposta: f.resposta.value,
+        novidades: f.novidades.checked, ...(testeEmail ? { teste: true } : {}) };
+      await pedirCodigo(ultimoPedido, $('button', f));
     });
+    $('#reenviar').addEventListener('click', async (e) => {
+      if (!ultimoPedido) return;
+      $('#reenvioMsg').textContent = '';
+      if (await pedirCodigo(ultimoPedido, e.currentTarget) && !$('#enviadoBox').hidden) {
+        $('#reenvioMsg').textContent = 'Pronto, enviamos de novo.';
+      }
+    });
+    $('#irCelular2').addEventListener('click', () => { mostrarAparelho(); bloqueio(); });
     $('#irCelular').addEventListener('click', () => { mostrarAparelho(); bloqueio(); });
     $('#sair').addEventListener('click', () => {
       try { localStorage.removeItem(CHAVE); } catch (_) {}

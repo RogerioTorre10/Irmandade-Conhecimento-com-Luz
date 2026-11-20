@@ -49,7 +49,7 @@
 <article class="card metric"><div class="k">Custo médio</div><div id="mCustoMedio" class="v">—</div><div class="h">por Jornada com uso</div></article>
 </section>
 
-<nav class="tabs"><button class="tab active" data-tab="jornadas">Jornadas</button><button class="tab" data-tab="hotmart">Compras Hotmart</button><button class="tab" data-tab="visitas">Visitas ao site</button><button class="tab" data-tab="redes">Redes sociais</button></nav>
+<nav class="tabs"><button class="tab active" data-tab="jornadas">Jornadas</button><button class="tab" data-tab="hotmart">Compras Hotmart</button><button class="tab" data-tab="visitas">Visitas ao site</button><button class="tab" data-tab="redes">Redes sociais</button><button class="tab" data-tab="leitores">Leitores</button></nav>
 
 <section id="toolbarMain" class="card toolbar">
 <input id="busca" class="field search" type="search" placeholder="Buscar e-mail, código, pedido, cidade, guia...">
@@ -106,8 +106,23 @@
 <section class="card vbox"><div class="table-head"><strong>Evolução dos seguidores</strong><span>todas as redes</span></div><div id="rGrafico"></div></section>
 <div id="rCards" class="rgrid"></div>
 </section>
+<section id="leitores" class="hidden">
+<section class="card toolbar vtool"><div class="vtitle"><strong>Leitores dos livros</strong><span id="lStatus" class="sub">—</span></div>
+<input id="lBusca" class="field" placeholder="Buscar nome ou e-mail" />
+<select id="lFiltro" class="field"><option value="">Todos</option><option value="sim">Querem novidades</option></select>
+<span></span>
+<button id="lCsv" class="btn">⬇ Exportar lista</button></section>
+<section class="metrics" style="grid-template-columns:repeat(4,minmax(0,1fr))">
+<article class="card metric"><div class="k">Leitores cadastrados</div><div id="lTotal" class="v">—</div><div class="h">e-mails confirmados pelo envio do código</div></article>
+<article class="card metric"><div class="k">Querem novidades</div><div id="lNov" class="v">—</div><div class="h">autorizaram receber e-mails</div></article>
+<article class="card metric"><div class="k">Últimos 7 dias</div><div id="l7" class="v">—</div><div class="h">novos leitores</div></article>
+<article class="card metric"><div class="k">Hoje</div><div id="lHoje" class="v">—</div><div class="h">últimas 24 horas</div></article>
+</section>
+<section class="card table-card"><div class="table-head"><strong>Leitores</strong><span id="lCount">0</span></div><div class="wrap"><table class="vtable"><thead><tr><th>Cadastro</th><th>Nome</th><th>E-mail</th><th>Livro</th><th>Novidades</th><th>Envios</th><th>Último e-mail</th></tr></thead><tbody id="lCorpo"></tbody></table><div id="lVazio" class="empty hidden">Nenhum leitor cadastrado ainda.</div></div></section>
+</section>
 Atualização automática a cada 30 segundos · O painel não lê respostas, devolutivas ou conteúdo emocional.</div>
 </section></main>
 <script src="/assets/js/admin-redes.js"></script>
+<script src="/assets/js/admin-leitores.js"></script>
 <script src="/assets/js/admin-dashboard.js"></script>
 </body></html>
