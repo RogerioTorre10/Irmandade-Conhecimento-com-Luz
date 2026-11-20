@@ -80,6 +80,23 @@ function conteudo() {
   return cache;
 }
 
+// Quando o leitor destrava o celular, ele provou que recebeu o código no e-mail:
+// avisa o backend para marcar o cadastro como "confirmado" (uma vez por e-mail).
+const confirmados = new Set();
+function confirmarLeitor(e) {
+  if (confirmados.has(e)) return;
+  confirmados.add(e);
+  if (confirmados.size > 20000) confirmados.clear();
+  const ts = Math.floor(Date.now() / 1000);
+  const assinatura = crypto.createHmac("sha256", SEGREDO).update(`${e}|todo-crime|confirmar|${ts}`).digest("hex");
+  fetch(`${BACKEND}/api/livros/confirmar`, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: e, livro: "todo-crime", ts, assinatura }),
+    signal: AbortSignal.timeout(30000),
+  }).then((r) => { if (!r.ok) confirmados.delete(e); })
+    .catch(() => confirmados.delete(e));
+}
+
 module.exports = function livrosApi(app, express) {
   const json = express.json({ limit: "8kb" });
   const ipDe = (req) => (req.headers["x-forwarded-for"] || req.ip || "").toString().split(",")[0].trim();
@@ -146,6 +163,7 @@ module.exports = function livrosApi(app, express) {
       const dica = ETAPAS[n] ? " Lembre de somar o seu código pessoal à senha do livro." : "";
       return res.status(403).json({ erro: "Senha incorreta." + dica });
     }
+    confirmarLeitor(e);
     const dados = conteudo();
     let c = dados.etapas[String(etapa)];
     if (etapa === 4) c = { ...c, gravador: { ...c.gravador, temAudio: Boolean(arquivoAudio()) } };
