@@ -69,7 +69,7 @@
     { id: 'notas', nome: 'Notas', ic: 'nota', cor: '#c9a72a', etapa: 5 },
     { id: 'gravador', nome: 'Gravador', ic: 'mic', cor: '#46525e', etapa: 4, dica: 'Onde eu espero toda quinta.' },
     { id: 'privacidade', nome: 'Privacidade', ic: 'cofre', cor: '#1f3550', etapa: 2 },
-    { id: 'cadeado', nome: '', ic: 'cad', cor: '#7d858d', etapa: 6, dica: 'O papel que me deixa ir.' },
+    { id: 'cadeado', nome: '', ic: 'cad', cor: '#7d858d', etapa: 6, dica: 'O papel que me deixa ir.', soma: 'Os 4 últimos números + o seu código pessoal.' },
     { id: 'postal', nome: 'Postal', ic: 'postal', cor: '#a26a3c', etapa: 7, dica: 'O cartão-postal' },
     { id: 'lixeira', nome: 'Lixeira', ic: 'lixo', cor: '#5b626b', etapa: 6 },
     { id: 'compras', nome: 'Compras', ic: 'sacola', cor: '#2d7f86', etapa: 7 },
@@ -167,7 +167,7 @@
     const cx = document.createElement('div');
     cx.className = 'senha';
     cx.innerHTML = `<form class="cx"><h3>${esc(app.nome || 'Aplicativo protegido')}: digite a senha</h3>
-      ${app.dica && app.id !== 'postal' ? `<p class="dica">Dica: ${esc(app.dica)}</p>` : '<p class="dica">Senha do livro + o seu código pessoal.</p>'}
+      ${app.dica && app.id !== 'postal' ? `<p class="dica">Dica: ${esc(app.dica)}</p>` : ''}<p class="dica">${esc(app.soma || 'Senha do livro + o seu código pessoal.')}</p>
       <input inputmode="numeric" autocomplete="off" maxlength="5" aria-label="Senha" />
       <p class="msgerro" role="alert"></p>
       <div class="acoes"><button type="button" class="cancela">Cancelar</button><button type="submit" class="ok">OK</button></div></form>`;
