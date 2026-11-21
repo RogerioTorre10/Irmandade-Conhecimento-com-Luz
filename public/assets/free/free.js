@@ -10,7 +10,48 @@
   const ORDEM = ['acesso', 'guia', 'selfie', 'dados', 'perguntas', 'final'];
 
   let st = carregar();
-  let perguntas = st.perguntas || [];
+  const I18N = window.FREE_I18N || {};
+  const LANGS = Object.keys(I18N);
+  function escolherIdioma() {
+    const pedir = (params.get('lang') || st.lang || navigator.language || 'pt-BR').toLowerCase();
+    return LANGS.find((l) => l.toLowerCase() === pedir) || LANGS.find((l) => l.slice(0, 2) === pedir.slice(0, 2)) || 'pt-BR';
+  }
+  let lang = escolherIdioma();
+  const T = (k, v) => {
+    let s = (I18N[lang] && I18N[lang][k]) ?? (I18N['pt-BR'] || {})[k] ?? k;
+    if (v && typeof s === 'string') for (const [a, b] of Object.entries(v)) s = s.split('{' + a + '}').join(b);
+    return s;
+  };
+  function perguntasAtuais() {
+    if (st.perguntas_i18n) return st.perguntas_i18n[lang] || st.perguntas_i18n['pt-BR'] || [];
+    return st.perguntas || [];
+  }
+  let perguntas = perguntasAtuais();
+
+  function aplicarIdioma() {
+    document.documentElement.lang = lang;
+    document.title = `${T('titulo')} • Irmandade Conhecimento com Luz`;
+    $$('[data-t]').forEach((el) => { el.textContent = T(el.dataset.t); });
+    $$('[data-th]').forEach((el) => { el.innerHTML = T(el.dataset.th); });
+    $$('[data-tp]').forEach((el) => { el.placeholder = T(el.dataset.tp); });
+    const tl = T('tr_l');
+    $$('[data-tl]').forEach((el, i) => {
+      const txt = Array.isArray(tl) ? tl[i] : '';
+      if (el.tagName === 'SELECT') el.options[0].textContent = txt; else el.placeholder = txt;
+    });
+    $$('.digita').forEach((p) => { p.dataset.txt = p.textContent; });
+    perguntas = perguntasAtuais();
+  }
+  const sel = $('#idioma');
+  if (sel) {
+    sel.innerHTML = LANGS.map((l) => `<option value="${l}">${I18N[l]._nome}</option>`).join('');
+    sel.value = lang;
+    sel.addEventListener('change', () => {
+      lang = sel.value; st.lang = lang; gravar();
+      aplicarIdioma();
+      if (st.etapa) ir(st.etapa);
+    });
+  }
 
   function carregar() {
     try { return JSON.parse(localStorage.getItem(CHAVE)) || {}; } catch (_) { return {}; }
@@ -28,12 +69,19 @@
   }
 
   async function api(rota, corpo, binario) {
-    const r = await fetch(API + rota, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corpo) });
+    let r;
+    try {
+      r = await fetch(API + rota, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...corpo, idioma: lang }) });
+    } catch (_) { throw new Error(T('e_rede')); }
     if (binario && r.ok) return r.blob();
     let j = {};
     try { j = await r.json(); } catch (_) {}
     if (!r.ok || j.ok === false) {
-      const e = new Error(j.erro || 'Não foi possível falar com a Irmandade agora. Tente de novo.');
+      const porStatus = { 401: 'e_sessao', 429: rota === '/solicitar' || rota === '/entrar' ? 'e_muitas' : 'e_limite',
+        403: 'e_codigo', 502: rota === '/solicitar' ? 'e_email_envio' : 'e_guia', 500: rota === '/pdf' ? 'e_pdf' : 'e_guia' };
+      const chave = porStatus[r.status];
+      const msg = lang === 'pt-BR' ? (j.erro || T(chave || 'e_rede')) : T(chave || 'e_rede');
+      const e = new Error(msg);
       e.status = r.status; e.usada = j.usada;
       throw e;
     }
@@ -89,8 +137,10 @@
     if (!('speechSynthesis' in window)) return;
     if (speechSynthesis.speaking) { speechSynthesis.cancel(); return; }
     const u = new SpeechSynthesisUtterance(texto);
-    u.lang = 'pt-BR'; u.rate = 0.98;
-    const v = speechSynthesis.getVoices().find((x) => /pt(-|_)BR/i.test(x.lang));
+    const voz = T('_voz');
+    u.lang = voz; u.rate = 0.98;
+    const v = speechSynthesis.getVoices().find((x) => x.lang.replace('_', '-').toLowerCase() === voz.toLowerCase())
+      || speechSynthesis.getVoices().find((x) => x.lang.slice(0, 2) === voz.slice(0, 2));
     if (v) u.voice = v;
     speechSynthesis.speak(u);
   }
@@ -104,7 +154,7 @@
       await api('/solicitar', { email, aceite: f.aceite.checked, novidades: f.novidades.checked });
       st.email = email; gravar();
       f.hidden = true; $('#fEntrar').hidden = false; $('#jaTenho').parentElement.hidden = true;
-      $('#enviadoPara').textContent = `✉️ Enviamos o seu código para ${email}.`;
+      $('#enviadoPara').textContent = T('enviadoPara', { e: email });
       $('#fEntrar').codigo.focus();
     } catch (e) {
       if (e.usada) { st.email = email; ir('usada'); } else erro(e.message);
@@ -113,23 +163,23 @@
   $('#fPedir').addEventListener('submit', (ev) => {
     ev.preventDefault();
     const f = ev.target, email = f.email.value.trim().toLowerCase();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return erro('Confira o seu e-mail.');
-    if (!f.aceite.checked) return erro('Para continuar, aceite os termos e a política de privacidade.');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return erro(T('e_email'));
+    if (!f.aceite.checked) return erro(T('e_aceite'));
     pedirCodigo(email);
   });
   $('#reenviar').addEventListener('click', () => {
     const f = $('#fPedir');
     if (!f.email.value && st.email) f.email.value = st.email;
-    if (!f.aceite.checked) { f.hidden = false; $('#fEntrar').hidden = true; return erro('Confirme o aceite e peça o código de novo.'); }
+    if (!f.aceite.checked) { f.hidden = false; $('#fEntrar').hidden = true; return erro(T('e_reconfirme')); }
     pedirCodigo(f.email.value.trim().toLowerCase());
   });
   $('#jaTenho').addEventListener('click', () => {
     const f = $('#fPedir');
     const email = f.email.value.trim().toLowerCase() || st.email || '';
-    if (!email) { f.email.focus(); return erro('Escreva primeiro o seu e-mail.'); }
+    if (!email) { f.email.focus(); return erro(T('e_semEmail')); }
     st.email = email; gravar();
     f.hidden = true; $('#fEntrar').hidden = false; $('#jaTenho').parentElement.hidden = true;
-    $('#enviadoPara').textContent = `E-mail: ${email}`;
+    $('#enviadoPara').textContent = T('emailLabel', { e: email });
   });
   $('#fEntrar').addEventListener('submit', async (ev) => {
     ev.preventDefault();
@@ -137,7 +187,7 @@
     bt.disabled = true; erro('');
     try {
       const j = await api('/entrar', { email: st.email, codigo: ev.target.codigo.value });
-      st.token = j.token; st.perguntas = perguntas = j.perguntas;
+      st.token = j.token; st.perguntas = j.perguntas; st.perguntas_i18n = j.perguntas_i18n || null; perguntas = perguntasAtuais();
       if (j.nome && !(st.dados && st.dados.nome)) st.dados = { ...(st.dados || {}), nome: j.nome };
       gravar(); ir('guia');
     } catch (e) {
@@ -161,7 +211,7 @@
     pararCamera();
     $('#video').hidden = true; $('#tirar').hidden = true;
     const foto = $('#foto'); foto.src = dataUrl; foto.hidden = false; $('#semFoto').hidden = true;
-    $('#usarFoto').hidden = false; $('#abrirCamera').hidden = false; $('#abrirCamera').textContent = 'Tirar outra';
+    $('#usarFoto').hidden = false; $('#abrirCamera').hidden = false; $('#abrirCamera').textContent = T('tirarOutra');
   }
   function recortar(src, w, h, espelhar) {
     const c = document.createElement('canvas'); c.width = 480; c.height = 640;
@@ -179,7 +229,7 @@
       const v = $('#video'); v.srcObject = stream; v.hidden = false; await v.play();
       $('#foto').hidden = true; $('#semFoto').hidden = true;
       $('#tirar').hidden = false; $('#abrirCamera').hidden = true; $('#usarFoto').hidden = true;
-    } catch (_) { erro('Não foi possível abrir a câmera. Você pode escolher uma foto ou seguir sem foto.'); }
+    } catch (_) { erro(T('e_camera')); }
   });
   $('#tirar').addEventListener('click', () => {
     const v = $('#video');
@@ -190,7 +240,7 @@
     if (!f) return;
     const img = new Image();
     img.onload = () => { mostrarFoto(recortar(img, img.naturalWidth, img.naturalHeight, false)); URL.revokeObjectURL(img.src); };
-    img.onerror = () => erro('Não consegui abrir essa imagem.');
+    img.onerror = () => erro(T('e_imagem'));
     img.src = URL.createObjectURL(f);
   });
   $('#usarFoto').addEventListener('click', () => { pararCamera(); ir('dados'); });
@@ -206,7 +256,7 @@
     const f = ev.target;
     const d = {};
     ['nome', 'cidade', 'estado', 'profissao'].forEach((k) => { d[k] = f[k].value.trim().slice(0, 120); });
-    if (d.nome.length < 2) { f.nome.focus(); return erro('Escreva o seu nome.'); }
+    if (d.nome.length < 2) { f.nome.focus(); return erro(T('e_nome')); }
     st.dados = d; st.itens = st.itens || []; st.idx = st.idx || 0; gravar();
     ir('perguntas');
   });
@@ -217,7 +267,7 @@
     const i = Math.min(st.idx || 0, perguntas.length - 1);
     const p = perguntas[i];
     $('#qBloco').textContent = p.bloco;
-    $('#qNum').textContent = `Pergunta ${i + 1} de ${perguntas.length}`;
+    $('#qNum').textContent = T('perguntaN', { i: i + 1, n: perguntas.length });
     digitar($('#qTexto'), p.texto, 16);
     const it = (st.itens || [])[i] || {};
     const f = $('#fResp');
@@ -230,22 +280,22 @@
   }
   function mostrarDevolutiva(txt, animar) {
     const nome = NOMES[st.guia] || 'Guia';
-    $('#qQuem').textContent = `${nome} responde:`;
+    $('#qQuem').textContent = T('responde', { g: nome });
     const it = (st.itens || [])[st.idx || 0] || {};
-    $('#qSua').textContent = it.resposta ? `Você respondeu: “${it.resposta}”` : '';
+    $('#qSua').textContent = it.resposta ? `${T('voceRespondeu')} “${it.resposta}”` : '';
     $('#qDev').hidden = false;
     const caixa = $('#qDevTexto');
     if (animar) digitarParagrafos(caixa, txt);
     else caixa.innerHTML = String(txt).split(/\n+/).filter(Boolean).map((t) => `<p>${t.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]))}</p>`).join('');
-    $('#proxima').textContent = (st.idx || 0) >= perguntas.length - 1 ? 'Ver a devolutiva geral' : 'Próxima pergunta';
+    $('#proxima').textContent = (st.idx || 0) >= perguntas.length - 1 ? T('verGeral') : T('proxima');
   }
   $('#fResp').addEventListener('submit', async (ev) => {
     ev.preventDefault();
     const f = ev.target, resposta = f.resposta.value.trim();
-    if (resposta.length < 3) return erro('Escreva a sua resposta antes de enviar.');
+    if (resposta.length < 3) return erro(T('e_resposta'));
     const i = st.idx || 0;
     const bt = $('button', f); bt.disabled = true; erro('');
-    esperando(true, `${NOMES[st.guia] || 'O Guia'} está refletindo sobre a sua resposta…`);
+    esperando(true, T('refletindo', { g: NOMES[st.guia] || 'Guia' }));
     try {
       const j = await api('/devolutiva', { token: st.token, guia: st.guia, nome: st.dados.nome, dadosPessoais: st.dados, indice: i, resposta });
       st.itens = st.itens || [];
@@ -265,14 +315,14 @@
 
   // ------------------------------------------------------------ final
   async function mostrarFinal() {
-    $('#fQuem').textContent = `${NOMES[st.guia] || 'O Guia'} fala com você:`;
+    $('#fQuem').textContent = T('falaComVoce', { g: NOMES[st.guia] || 'Guia' });
     if (st.final) {
       $('#fDevTexto').innerHTML = st.final.split(/\n+/).filter(Boolean).map((t) => `<p>${t.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]))}</p>`).join('');
       $('#fimAcoes').hidden = false; $('#ouvirFinal').hidden = false;
       return;
     }
     $('#fDevTexto').innerHTML = '';
-    esperando(true, `${NOMES[st.guia] || 'O Guia'} está reunindo as suas três respostas…`);
+    esperando(true, T('reunindo', { g: NOMES[st.guia] || 'Guia' }));
     try {
       const j = await api('/devolutiva-final', { token: st.token, guia: st.guia, nome: st.dados.nome, dadosPessoais: st.dados, itens: st.itens });
       st.final = j.texto; gravar();
@@ -283,39 +333,40 @@
       esperando(false);
       if (e.status === 401) { st.token = null; gravar(); return ir('acesso'); }
       erro(e.message + ' ');
-      const b = document.createElement('button'); b.className = 'link'; b.textContent = 'Tentar de novo';
+      const b = document.createElement('button'); b.className = 'link'; b.textContent = T('tentar');
       b.onclick = () => { erro(''); mostrarFinal(); }; $('#erro').appendChild(b);
     }
   }
   $('#ouvirFinal').addEventListener('click', () => falar($('#fDevTexto').innerText));
   $('#gerarPdf').addEventListener('click', async (ev) => {
     const bt = ev.currentTarget; bt.disabled = true; erro('');
-    $('#pdfMsg').textContent = 'Preparando o seu pergaminho…';
+    $('#pdfMsg').textContent = T('preparando');
     try {
       const blob = await api('/pdf', { token: st.token, guia: st.guia, nome: st.dados.nome, dadosPessoais: st.dados,
         itens: st.itens, devolutivaFinal: st.final, selfie: st.selfie || null }, true);
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = `Pergaminho-Jornada-Free-${(st.dados.nome || 'viajante').split(' ')[0]}.pdf`;
+      a.download = `${T('titulo').replace(/\s+/g, '-')}-${(st.dados.nome || 'viajante').split(' ')[0]}.pdf`;
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(a.href), 8000);
       st.concluida = true; gravar();
-      $('#pdfMsg').textContent = `Pronto! O pergaminho foi baixado e também enviado para ${st.email}.`;
-      bt.textContent = '📜 Baixar de novo';
+      $('#pdfMsg').textContent = T('prontoPdf', { e: st.email });
+      bt.textContent = T('baixarDeNovo');
     } catch (e) {
       $('#pdfMsg').textContent = '';
-      erro(e.status === 401 ? 'Sessão expirada. Entre de novo com o seu código.' : e.message);
+      erro(e.status === 401 ? T('e_sessao') : e.message);
     } finally { bt.disabled = false; }
   });
 
   // ------------------------------------------------------------ início
   $$('[data-ir]').forEach((b) => b.addEventListener('click', () => ir(b.dataset.ir)));
   $('#recomecar').addEventListener('click', () => {
-    if (!confirm('Recomeçar apaga as respostas guardadas neste aparelho. Continuar?')) return;
+    if (!confirm(T('confirmRecomecar'))) return;
     try { localStorage.removeItem(CHAVE); } catch (_) {}
     location.reload();
   });
 
+  aplicarIdioma();
   const etapaSalva = st.etapa;
   if (etapaSalva && etapaSalva !== 'inicio' && (st.token || ['acesso', 'usada'].includes(etapaSalva))) {
     if (etapaSalva === 'acesso' && st.email) $('#fPedir').email.value = st.email;
