@@ -1,0 +1,108 @@
+/* Jornada Free — página independente da Jornada Essencial */
+@font-face{font-family:'Cardo';src:url('/assets/fonts/Cardo-Regular.ttf') format('truetype');font-display:swap}
+@font-face{font-family:'Cardo';font-weight:700;src:url('/assets/fonts/Cardo-Bold.ttf') format('truetype');font-display:swap}
+@font-face{font-family:'Cardo';font-style:italic;src:url('/assets/fonts/Cardo-Italic.ttf') format('truetype');font-display:swap}
+@font-face{font-family:'ManufacturingConsent';src:url('/assets/fonts/ManufacturingConsent-Regular.ttf') format('truetype');font-display:swap}
+
+:root{--tinta:#2b1d0e;--tinta-2:#5a4122;--ouro:#c99a3e;--ouro-claro:#f3d58e;--vinho:#7b2a1c}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;min-height:100%}
+body{background:radial-gradient(ellipse at top,#1a1428 0%,#0a0f1a 60%);color:#f2efe6;font-family:'Cardo',Georgia,serif;line-height:1.55}
+.site-header{padding:14px 16px 0}
+.site-header h1{font-size:clamp(30px,6vw,44px)}
+.selo{text-align:center;margin:2px 0 10px;color:var(--ouro-claro);font-style:italic;letter-spacing:.04em}
+
+.palco{max-width:760px;margin:0 auto;padding:0 12px 30px}
+.pergaminho{position:relative;color:var(--tinta);padding:clamp(50px,8vw,74px) clamp(30px,7vw,74px) clamp(64px,9vw,84px);
+  background:url('/assets/img/pergaminho-rasgado-vert.png') center/128% 122% no-repeat;min-height:70vh;
+  filter:drop-shadow(0 10px 30px rgba(0,0,0,.6))}
+.pergaminho h2{font-family:'ManufacturingConsent',cursive;font-weight:400;font-size:clamp(28px,6vw,40px);text-align:center;margin:6px 0 12px;color:var(--vinho)}
+.pergaminho h3{font-family:'ManufacturingConsent',cursive;font-weight:400;font-size:28px;margin:0 0 6px;color:var(--vinho)}
+.pergaminho p{margin:0 0 12px}
+.etapa{animation:surge .5s ease}
+@keyframes surge{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+.trilha{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 10px;list-style:none;padding:0;margin:0 0 10px;font-size:13px;color:var(--tinta-2)}
+.trilha li{opacity:.6;background:rgba(255,248,228,.55);padding:1px 9px;border-radius:999px}
+.trilha li.feito{opacity:.8}
+.trilha li.agora{opacity:1;font-weight:700;color:var(--vinho);background:rgba(255,248,228,.9)}
+
+.itens{margin:0 0 18px;padding-left:20px}
+.itens li{margin:4px 0}
+
+.botao{display:inline-block;font:700 17px/1.2 'Cardo',Georgia,serif;padding:13px 22px;border-radius:999px;border:1px solid #8a6424;cursor:pointer;text-decoration:none;text-align:center;
+  background:linear-gradient(#e9c776,#c29235);color:#2b1d0e;box-shadow:0 3px 10px rgba(80,50,10,.35)}
+.botao:disabled{opacity:.6;cursor:wait}
+.botao.secundario{background:rgba(255,250,235,.55);color:var(--tinta)}
+.etapa>.botao{display:block;margin:18px auto 0;min-width:220px}
+.link{background:none;border:0;padding:6px;color:var(--vinho);text-decoration:underline;font:inherit;cursor:pointer}
+.rodape .link{color:#c9b98f}
+
+.form{display:flex;flex-direction:column;gap:12px}
+.form label{display:flex;flex-direction:column;gap:5px;font-weight:700}
+.form input,.form textarea,.form select{font:17px/1.35 Georgia,serif;padding:11px 12px;border-radius:10px;border:1px solid #a6824a;background:rgba(255,251,240,.86);color:#1f160b;width:100%}
+.form input:focus,.form textarea:focus{outline:2px solid var(--ouro);outline-offset:1px}
+.form textarea{resize:vertical;min-height:140px}
+.form .codigo{font-size:28px;letter-spacing:.4em;text-align:center}
+.form .marcar{flex-direction:row;align-items:flex-start;gap:10px;font-weight:400;font-size:15px;line-height:1.4}
+.form .marcar input{width:20px;height:20px;margin:2px 0 0;flex:0 0 auto;accent-color:#8a6424}
+.termos{font-size:14.5px;background:rgba(255,250,235,.45);border:1px solid rgba(138,100,36,.35);border-radius:10px;padding:10px 12px}
+.termos p{margin:0}
+.nota{font-size:14px;color:var(--tinta-2);text-align:center}
+.aviso-ok{background:rgba(255,250,235,.6);border-radius:10px;padding:10px;text-align:center}
+.erro{color:#9b1c10;font-weight:700;text-align:center;min-height:1.2em;margin-top:12px}
+
+.guias{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.guia{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 8px 12px;border-radius:14px;border:1px solid #a6824a;background:rgba(255,250,235,.55);cursor:pointer;font:inherit;color:var(--tinta);transition:transform .15s,box-shadow .15s}
+.guia:hover,.guia:focus-visible{transform:translateY(-3px);box-shadow:0 8px 18px rgba(80,50,10,.35)}
+.guia img{width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:10px}
+.guia b{font-family:'ManufacturingConsent',cursive;font-weight:400;font-size:26px;color:var(--vinho)}
+.guia span{font-size:13.5px;line-height:1.35;text-align:center}
+
+.camera{width:min(280px,80%);aspect-ratio:3/4;margin:6px auto 12px;border-radius:16px;overflow:hidden;border:3px solid var(--ouro);background:#2b2216;box-shadow:0 0 22px rgba(201,154,62,.5)}
+.camera video,.camera img{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.camera img{transform:none}
+.moldura{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:54px;opacity:.6}
+.acoes{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;align-items:center}
+.arquivo{position:relative}
+
+.grade{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grade>input[name=nome]{grid-column:1/-1}
+.grade>.botao{grid-column:1/-1;justify-self:center;min-width:220px;margin-top:6px}
+.trancado{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,1fr);gap:8px;border:1px dashed rgba(138,100,36,.6);border-radius:12px;padding:10px;margin:4px 0 0;opacity:.6}
+.trancado legend{font-size:14px;padding:0 6px;color:var(--tinta-2)}
+.trancado input,.trancado select{font-size:14px;padding:8px;background:rgba(230,222,205,.7)}
+
+.bloco{text-align:center;font-style:italic;color:var(--tinta-2);margin:0}
+.pergunta{font-size:clamp(19px,3.6vw,22px);text-align:center;font-weight:700;margin:4px 0 16px}
+.devolutiva{margin-top:16px;background:rgba(255,250,235,.55);border:1px solid rgba(138,100,36,.4);border-radius:14px;padding:14px 16px}
+.devolutiva .sua{font-style:italic;color:var(--tinta-2);border-bottom:1px solid rgba(138,100,36,.3);padding-bottom:8px;margin-bottom:10px;white-space:pre-wrap}
+.devolutiva .quem{font-weight:700;color:var(--vinho);margin-bottom:6px}
+.devolutiva .texto p{margin:0 0 10px}
+.devolutiva .acoes{justify-content:space-between;margin-top:6px}
+
+#fimAcoes{margin-top:18px;text-align:center}
+#fimAcoes>.botao{min-width:260px}
+.convite{margin:22px 0 10px;padding:16px;border-radius:14px;background:rgba(123,42,28,.08);border:1px solid rgba(123,42,28,.3)}
+.redes{margin-top:14px}
+.redes p{margin:0 0 6px;font-weight:700}
+.redes a{display:inline-block;margin:4px;padding:8px 14px;border-radius:999px;border:1px solid #8a6424;color:var(--tinta);text-decoration:none;background:rgba(255,250,235,.6)}
+
+.esperando{text-align:center;margin-top:14px}
+.esperando .chama-vela{--largura:26px;--altura:52px}
+.esperando p{font-style:italic;color:var(--tinta-2)}
+.cursor::after{content:'▌';animation:pisca .8s infinite;color:var(--vinho)}
+@keyframes pisca{50%{opacity:0}}
+
+.rodape{text-align:center;font-size:13px;color:#a99d84;padding:10px 0 24px}
+.rodape a{color:#c9b98f}
+
+@media (max-width:560px){
+  .pergaminho{background-size:134% 118%;padding:62px 30px 78px}
+  .guias{grid-template-columns:1fr;gap:10px}
+  .guia{flex-direction:row;text-align:left;align-items:center;gap:12px}
+  .guia img{width:72px;flex:0 0 auto}
+  .guia span{text-align:left}
+  .grade,.trancado{grid-template-columns:1fr}
+}
