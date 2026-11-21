@@ -13,6 +13,9 @@ body{background:radial-gradient(ellipse at top,#1a1428 0%,#0a0f1a 60%);color:#f2
 .site-header h1{font-size:clamp(30px,6vw,44px)}
 .selo{text-align:center;margin:2px 0 10px;color:var(--ouro-claro);font-style:italic;letter-spacing:.04em}
 
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.idiomas{text-align:center;margin:0 0 12px}
+.idiomas select{font:15px Georgia,serif;padding:6px 10px;border-radius:999px;border:1px solid #8a6424;background:#1b1626;color:var(--ouro-claro);cursor:pointer}
 .palco{max-width:760px;margin:0 auto;padding:0 12px 30px}
 .pergaminho{position:relative;color:var(--tinta);padding:clamp(50px,8vw,74px) clamp(30px,7vw,74px) clamp(64px,9vw,84px);
   background:url('/assets/img/pergaminho-rasgado-vert.png') center/128% 122% no-repeat;min-height:70vh;
