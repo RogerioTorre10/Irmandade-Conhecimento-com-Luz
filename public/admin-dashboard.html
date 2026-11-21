@@ -49,7 +49,7 @@
 <article class="card metric"><div class="k">Custo médio</div><div id="mCustoMedio" class="v">—</div><div class="h">por Jornada com uso</div></article>
 </section>
 
-<nav class="tabs"><button class="tab active" data-tab="jornadas">Jornadas</button><button class="tab" data-tab="hotmart">Compras Hotmart</button><button class="tab" data-tab="visitas">Visitas ao site</button><button class="tab" data-tab="redes">Redes sociais</button><button class="tab" data-tab="leitores">Leitores</button></nav>
+<nav class="tabs"><button class="tab active" data-tab="jornadas">Jornadas</button><button class="tab" data-tab="hotmart">Compras Hotmart</button><button class="tab" data-tab="visitas">Visitas ao site</button><button class="tab" data-tab="redes">Redes sociais</button><button class="tab" data-tab="leitores">Inscritos</button></nav>
 
 <section id="toolbarMain" class="card toolbar">
 <input id="busca" class="field search" type="search" placeholder="Buscar e-mail, código, pedido, cidade, guia...">
@@ -107,18 +107,18 @@
 <div id="rCards" class="rgrid"></div>
 </section>
 <section id="leitores" class="hidden">
-<section class="card toolbar vtool"><div class="vtitle"><strong>Leitores dos livros</strong><span id="lStatus" class="sub">—</span></div>
+<section class="card toolbar vtool"><div class="vtitle"><strong>Inscritos: livros e Jornada Free</strong><span id="lStatus" class="sub">—</span></div>
 <input id="lBusca" class="field" placeholder="Buscar nome ou e-mail" />
 <select id="lFiltro" class="field"><option value="">Todos</option><option value="conf">Confirmados</option><option value="sim">Querem novidades (confirmados)</option><option value="pend">Ainda não confirmados</option></select>
 <span></span>
 <button id="lCsv" class="btn">⬇ Exportar lista</button></section>
 <section class="metrics" style="grid-template-columns:repeat(4,minmax(0,1fr))">
-<article class="card metric"><div class="k">Pediram o código</div><div id="lTotal" class="v">—</div><div class="h">cadastros no celular do Henrique</div></article>
-<article class="card metric"><div class="k">Confirmados</div><div id="lConf" class="v">—</div><div class="h">destravaram o celular com o código do e-mail</div></article>
+<article class="card metric"><div class="k">Pediram o código</div><div id="lTotal" class="v">—</div><div class="h">celular do Henrique e Jornada Free</div></article>
+<article class="card metric"><div class="k">Confirmados</div><div id="lConf" class="v">—</div><div class="h">entraram com o código recebido no e-mail</div></article>
 <article class="card metric"><div class="k">Querem novidades</div><div id="lNov" class="v">—</div><div class="h">confirmados que autorizaram e-mails</div></article>
 <article class="card metric"><div class="k">Últimos 7 dias</div><div id="l7" class="v">—</div><div class="h">novos pedidos · <span id="lHoje">—</span> hoje</div></article>
 </section>
-<section class="card table-card"><div class="table-head"><strong>Leitores</strong><span id="lCount">0</span></div><div class="wrap"><table class="vtable"><thead><tr><th>Cadastro</th><th>Nome</th><th>E-mail</th><th>Livro</th><th>Confirmado</th><th>Novidades</th><th>Envios</th><th>Último e-mail</th></tr></thead><tbody id="lCorpo"></tbody></table><div id="lVazio" class="empty hidden">Nenhum leitor cadastrado ainda.</div></div></section>
+<section class="card table-card"><div class="table-head"><strong>Leitores</strong><span id="lCount">0</span></div><div class="wrap"><table class="vtable"><thead><tr><th>Cadastro</th><th>Nome</th><th>E-mail</th><th>Origem</th><th>Confirmado</th><th>Novidades</th><th>Envios</th><th>Último e-mail</th></tr></thead><tbody id="lCorpo"></tbody></table><div id="lVazio" class="empty hidden">Nenhum leitor cadastrado ainda.</div></div></section>
 </section>
 Atualização automática a cada 30 segundos · O painel não lê respostas, devolutivas ou conteúdo emocional.</div>
 </section></main>
