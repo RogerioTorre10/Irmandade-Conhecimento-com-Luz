@@ -6,6 +6,8 @@
   const params = new URLSearchParams(location.search);
   const API = (params.get('api') || 'https://lumen-backend-api.onrender.com').replace(/\/$/, '') + '/api/free';
   const CHAVE = 'jornada_free_v1';
+  // Link de compra da Jornada Essencial (Hotmart)
+  const LINK_COMPRA = 'https://go.hotmart.com/H106899850J';
   const NOMES = { lumen: 'Lumen', zion: 'Zion', arian: 'Arian' };
   const ORDEM = ['acesso', 'guia', 'selfie', 'dados', 'perguntas', 'final'];
 
@@ -349,11 +351,12 @@
       a.download = `${T('titulo').replace(/\s+/g, '-')}-${(st.dados.nome || 'viajante').split(' ')[0]}.pdf`;
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(a.href), 8000);
-      st.concluida = true; gravar();
+      st.concluida = true; st.concluidaEm = Date.now(); gravar();
       $('#pdfMsg').textContent = T('prontoPdf', { e: st.email });
       bt.textContent = T('baixarDeNovo');
     } catch (e) {
       $('#pdfMsg').textContent = '';
+      if (e.usada) { encerrar(); return ir('usada'); }
       erro(e.status === 401 ? T('e_sessao') : e.message);
     } finally { bt.disabled = false; }
   });
@@ -365,6 +368,15 @@
     try { localStorage.removeItem(CHAVE); } catch (_) {}
     location.reload();
   });
+
+  // Jornada concluída: ao reabrir a página, o aparelho volta limpo para o começo
+  function encerrar() {
+    const manter = { lang: st.lang };
+    st = manter;
+    try { localStorage.setItem(CHAVE, JSON.stringify(manter)); } catch (_) {}
+  }
+  if (st.concluida) encerrar();
+  $$('a.compra').forEach((a) => { a.href = LINK_COMPRA; });
 
   aplicarIdioma();
   const etapaSalva = st.etapa;
