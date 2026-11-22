@@ -7,7 +7,7 @@
   const API = (params.get('api') || 'https://lumen-backend-api.onrender.com').replace(/\/$/, '') + '/api/free';
   const CHAVE = 'jornada_free_v1';
   // Link de compra da Jornada Essencial (Hotmart)
-  const LINK_COMPRA = 'https://go.hotmart.com/H106899850J';
+  const LINK_COMPRA = 'https://pay.hotmart.com/H106899850J';
   const NOMES = { lumen: 'Lumen', zion: 'Zion', arian: 'Arian' };
   const ORDEM = ['acesso', 'guia', 'selfie', 'dados', 'perguntas', 'final'];
 
