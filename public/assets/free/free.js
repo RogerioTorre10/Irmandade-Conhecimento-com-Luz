@@ -281,7 +281,7 @@
     }
   }
   function mostrarDevolutiva(txt, animar) {
-    const nome = NOMES[st.guia] || 'Guia';
+    const nome = NOMES[st.guia] || 'Mentor';
     $('#qQuem').textContent = T('responde', { g: nome });
     const it = (st.itens || [])[st.idx || 0] || {};
     $('#qSua').textContent = it.resposta ? `${T('voceRespondeu')} “${it.resposta}”` : '';
@@ -297,7 +297,7 @@
     if (resposta.length < 3) return erro(T('e_resposta'));
     const i = st.idx || 0;
     const bt = $('button', f); bt.disabled = true; erro('');
-    esperando(true, T('refletindo', { g: NOMES[st.guia] || 'Guia' }));
+    esperando(true, T('refletindo', { g: NOMES[st.guia] || 'Mentor' }));
     try {
       const j = await api('/devolutiva', { token: st.token, guia: st.guia, nome: st.dados.nome, dadosPessoais: st.dados, indice: i, resposta });
       st.itens = st.itens || [];
@@ -317,14 +317,14 @@
 
   // ------------------------------------------------------------ final
   async function mostrarFinal() {
-    $('#fQuem').textContent = T('falaComVoce', { g: NOMES[st.guia] || 'Guia' });
+    $('#fQuem').textContent = T('falaComVoce', { g: NOMES[st.guia] || 'Mentor' });
     if (st.final) {
       $('#fDevTexto').innerHTML = st.final.split(/\n+/).filter(Boolean).map((t) => `<p>${t.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]))}</p>`).join('');
       $('#fimAcoes').hidden = false; $('#ouvirFinal').hidden = false;
       return;
     }
     $('#fDevTexto').innerHTML = '';
-    esperando(true, T('reunindo', { g: NOMES[st.guia] || 'Guia' }));
+    esperando(true, T('reunindo', { g: NOMES[st.guia] || 'Mentor' }));
     try {
       const j = await api('/devolutiva-final', { token: st.token, guia: st.guia, nome: st.dados.nome, dadosPessoais: st.dados, itens: st.itens });
       st.final = j.texto; gravar();
