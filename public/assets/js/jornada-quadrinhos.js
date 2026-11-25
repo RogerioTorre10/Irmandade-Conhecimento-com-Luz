@@ -341,26 +341,46 @@
   }
 
   // ---------------- tela final: um botão junto do PDF e do SelfieCard ----------------
+  // O section-final redesenha os botões quando habilita PDF/SelfieCard; por isso o
+  // botão do filme é criado uma vez e reencaixado sempre que some.
+  let btFilme = null, obsFinal = null;
+  function encaixarFilme() {
+    if (!btFilme) return;
+    const sec = document.getElementById('section-final'); if (!sec) return;
+    const acoes = sec.querySelector('.final-acoes'); if (!acoes) return;
+    const modelo = acoes.querySelector('#btnBaixarSelfie') || acoes.querySelector('button:not(#btnFilmeJornada)');
+    if (modelo && !btFilme.disabled) btFilme.className = modelo.className;
+    const ref = acoes.querySelector('#btnVoltarPortal');
+    if (btFilme.parentNode === acoes && (!ref || btFilme.nextElementSibling === ref)) return;
+    acoes.insertBefore(btFilme, ref && ref.parentNode === acoes ? ref : null);
+  }
   async function montarFinal() {
     if (!ATIVO || !consentiu()) return;
-    const sec = document.getElementById('section-final'); if (!sec || sec.querySelector('#btnFilmeJornada')) return;
+    const sec = document.getElementById('section-final'); if (!sec) return;
     if (!(await avatar())) return;
-    const acoes = sec.querySelector('.final-acoes'); if (!acoes) return;
-    const modelo = acoes.querySelector('#btnBaixarSelfie') || acoes.querySelector('button');
-    const bt = document.createElement('button');
-    bt.id = 'btnFilmeJornada'; bt.type = 'button';
-    if (modelo) bt.className = modelo.className;
-    bt.textContent = t('baixar');
-    const ref = acoes.querySelector('#btnVoltarPortal');
-    acoes.insertBefore(bt, ref || null);
-    bt.onclick = async () => {
-      const rotulo = t('baixar');
-      bt.disabled = true;
-      try {
-        await completar((n, tot) => { bt.textContent = `${t('completando')} ${n}/${tot}`; });
-      } finally { bt.textContent = rotulo; }
-      await filme(true, [bt]);   // passa o filme e, no fim, baixa o arquivo
-    };
+    if (!btFilme) {
+      const bt = document.createElement('button');
+      bt.id = 'btnFilmeJornada'; bt.type = 'button';
+      bt.textContent = t('baixar');
+      bt.onclick = async () => {
+        const rotulo = t('baixar');
+        bt.disabled = true;
+        try {
+          await completar((n, tot) => { bt.textContent = `${t('completando')} ${n}/${tot}`; });
+        } finally { bt.textContent = rotulo; }
+        await filme(true, [bt]);   // passa o filme e, no fim, baixa o arquivo
+      };
+      btFilme = bt;
+    }
+    encaixarFilme();
+    if (!obsFinal) {
+      let pend = false;
+      obsFinal = new MutationObserver(() => {
+        if (pend) return; pend = true;
+        requestAnimationFrame(() => { pend = false; encaixarFilme(); });
+      });
+      obsFinal.observe(document.body, { childList: true, subtree: true });
+    }
   }
   document.addEventListener('section:shown', (e) => { const id = e.detail?.sectionId || e.detail; if (id === 'section-final') setTimeout(montarFinal, 1500); });
 
