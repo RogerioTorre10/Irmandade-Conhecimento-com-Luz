@@ -283,6 +283,7 @@
     } catch (_) { return null; }
   }
   async function filme(gravar, botoes) {
+    estilos();   // sem o CSS a tela do filme fica fora da vista e só se ouve a narração
     const av = await avatar(); const qs = await quadrosEmOrdem(); if (!av && !qs.length) return;
     botoes.forEach((b) => (b.disabled = true));
     const tela = document.createElement('div'); tela.className = 'iclq-tela';
@@ -357,6 +358,7 @@
   async function montarFinal() {
     if (!ATIVO || !consentiu()) return;
     const sec = document.getElementById('section-final'); if (!sec) return;
+    estilos();
     if (!(await avatar())) return;
     if (!btFilme) {
       const bt = document.createElement('button');
