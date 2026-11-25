@@ -54,6 +54,15 @@
   let ATIVO = false;
 
   // ---------------- IndexedDB ----------------
+  // Escopo do cache: código da Jornada; sem código (homolog), uma Jornada por aba.
+  // 'v2' invalida quadros gerados com o prompt antigo de cena.
+  function escopo() {
+    let id = ident().codigo;
+    if (!id) {
+      try { id = sessionStorage.getItem('iclq.run'); if (!id) { id = 'run' + Date.now().toString(36); sessionStorage.setItem('iclq.run', id); } } catch (_) { id = 'semcodigo'; }
+    }
+    return 'v2|' + id;
+  }
   let dbp = null;
   function db() {
     if (dbp) return dbp;
@@ -66,14 +75,14 @@
     return dbp;
   }
   async function guardar(chave, valor) {
-    try { const d = await db(); await new Promise((ok, e) => { const tx = d.transaction('itens', 'readwrite'); tx.objectStore('itens').put(valor, ident().codigo + '|' + chave); tx.oncomplete = ok; tx.onerror = () => e(tx.error); }); } catch (e) { console.warn('[QUADRINHOS] não guardou', e); }
+    try { const d = await db(); await new Promise((ok, e) => { const tx = d.transaction('itens', 'readwrite'); tx.objectStore('itens').put(valor, escopo() + '|' + chave); tx.oncomplete = ok; tx.onerror = () => e(tx.error); }); } catch (e) { console.warn('[QUADRINHOS] não guardou', e); }
   }
   async function ler(chave) {
-    try { const d = await db(); return await new Promise((ok) => { const r = d.transaction('itens').objectStore('itens').get(ident().codigo + '|' + chave); r.onsuccess = () => ok(r.result || null); r.onerror = () => ok(null); }); } catch (_) { return null; }
+    try { const d = await db(); return await new Promise((ok) => { const r = d.transaction('itens').objectStore('itens').get(escopo() + '|' + chave); r.onsuccess = () => ok(r.result || null); r.onerror = () => ok(null); }); } catch (_) { return null; }
   }
   async function todos() {
     try {
-      const d = await db(); const pre = ident().codigo + '|q|';
+      const d = await db(); const pre = escopo() + '|q|';
       return await new Promise((ok) => {
         const out = []; const r = d.transaction('itens').objectStore('itens').openCursor();
         r.onsuccess = () => { const c = r.result; if (!c) return ok(out); if (String(c.key).startsWith(pre)) out.push(c.value); c.continue(); };
