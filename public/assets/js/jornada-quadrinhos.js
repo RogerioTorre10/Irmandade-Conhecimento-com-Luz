@@ -103,12 +103,12 @@
       .iclq-bt.sec{background:transparent;border:1px solid #2b2116;color:#2b2116}.iclq-bt:disabled{opacity:.5;cursor:wait}
       .iclq-aviso{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:99998;background:#1d2c4a;color:#fdf3dc;padding:10px 16px;border-radius:999px;font:14px system-ui,sans-serif;box-shadow:0 8px 30px #0008;display:flex;gap:10px;align-items:center}
       .iclq-aviso img{width:34px;height:34px;border-radius:50%;object-fit:cover}
-      .iclq-quadro{margin:14px auto 0;max-width:520px;background:#fff;border:3px solid #1a1410;border-radius:6px;overflow:hidden;animation:iclqIn .8s ease}
-      .iclq-quadro img{width:100%;display:block;aspect-ratio:4/3;object-fit:cover}
-      .iclq-quadro .leg{padding:8px 12px;font:italic 15px Georgia,serif;color:#2b2116;background:#fff8e6;border-top:3px solid #1a1410}
+      .iclq-quadro{margin:14px auto 0;max-width:520px;background:transparent;border:1px solid rgba(224,168,74,.55);border-radius:12px;overflow:hidden;box-shadow:0 0 18px rgba(224,168,74,.18);animation:iclqIn .8s ease}
+      .iclq-quadro img{width:100%;display:block;aspect-ratio:4/3;object-fit:cover;-webkit-mask-image:linear-gradient(#000 82%,transparent);mask-image:linear-gradient(#000 82%,transparent)}
+      .iclq-quadro .leg{margin-top:-28px;position:relative;padding:6px 14px 10px;font:italic 15px Georgia,serif;color:inherit;opacity:.95;background:transparent;text-align:center;text-shadow:0 1px 6px rgba(0,0,0,.7)}
       .iclq-pagina{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-top:14px}
-      .iclq-pagina img{width:100%;aspect-ratio:4/3;object-fit:cover;border:2px solid #1a1410;border-radius:4px;background:#ddd}
-      .iclq-tit{font:700 13px system-ui,sans-serif;letter-spacing:.8px;text-transform:uppercase;color:#8a6a2a;margin-top:16px}
+      .iclq-pagina img{width:100%;aspect-ratio:4/3;object-fit:cover;border:1px solid rgba(224,168,74,.55);border-radius:8px;background:transparent;box-shadow:0 0 10px rgba(224,168,74,.15)}
+      .iclq-tit{font:700 13px system-ui,sans-serif;letter-spacing:.8px;text-transform:uppercase;color:inherit;opacity:.85;margin-top:16px}
       .iclq-final{margin:18px 0;padding:16px;border:1px solid rgba(224,168,74,.6);border-radius:14px;background:rgba(255,248,230,.6);color:#2b2116}
       .iclq-final h3{margin:0 0 6px;font-family:Georgia,serif}
       .iclq-tela{position:fixed;inset:0;z-index:100000;background:#000;display:grid;place-items:center}
