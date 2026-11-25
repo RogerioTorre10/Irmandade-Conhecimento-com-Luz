@@ -2839,12 +2839,31 @@ function bindButtons(section, bloco, perguntaText, qIndex = 0) {
     );
   }
 
+  // Evita renderizar (e narrar) a mesma pergunta duas vezes quando
+  // sectionLoaded e section:shown chegam juntos para a mesma seção.
+  function requestRender(section, origem) {
+    try {
+      const id = getSectionId(section);
+      const bloco = id ? getBlocoAtual(id) : null;
+      const q = bloco ? getCurrentQuestionIndex(bloco) : -1;
+      const key = `${id}:${q}`;
+      const agora = Date.now();
+      if (State.__lastRenderKey === key && agora - (State.__lastRenderAt || 0) < 4000) {
+        console.log('[PERGUNTAS_BLOCO] render repetido ignorado (' + origem + '):', key);
+        return;
+      }
+      State.__lastRenderKey = key;
+      State.__lastRenderAt = agora;
+    } catch {}
+    renderBloco(section);
+  }
+
   // ─── Eventos globais ─────────────────────────────────────────────────────────
   document.addEventListener('sectionLoaded', function (ev) {
     const section = getSectionFromEvent(ev.detail);
     const id = getSectionId(section);
     if (!id || !id.startsWith('section-perguntas-')) return;
-    setTimeout(() => renderBloco(section), 80);
+    setTimeout(() => requestRender(section, 'sectionLoaded'), 80);
   });
 
   document.addEventListener('section:shown', function (ev) {
@@ -2859,7 +2878,7 @@ function bindButtons(section, bloco, perguntaText, qIndex = 0) {
       );
   
       setTimeout(() => {
-          renderBloco(section);
+          requestRender(section, 'section:shown');
       }, 80);
   });
 
@@ -2867,7 +2886,7 @@ function bindButtons(section, bloco, perguntaText, qIndex = 0) {
     const section = getCurrentSection();
     const id = getSectionId(section);
     if (id && id.startsWith('section-perguntas-')) {
-      renderBloco(section);
+      requestRender(section, 'DOMContentLoaded');
     }
   });
 
