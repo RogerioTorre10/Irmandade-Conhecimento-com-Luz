@@ -22,7 +22,7 @@
 
   // ---------------- textos (7 idiomas) ----------------
   const T = {
-    pt: { pergunta: 'Quer que a sua Jornada vire uma história em quadrinhos?', expl: 'Com a sua selfie, desenhamos um personagem seu. Cada resposta vira um quadro, e no final você assiste ao filme da sua Jornada. A selfie é usada só para isso, e as imagens ficam apenas neste aparelho.', sim: 'Sim, quero', nao: 'Agora não', desenhando: 'Desenhando o seu personagem…', pronto: 'O seu personagem está pronto!', capitulo: 'O seu capítulo em quadrinhos', titulo: 'A sua história em quadrinhos', filme: 'Assistir ao filme da Jornada', baixar: 'Baixar o filme', pagina: 'Baixar página', completando: 'Completando a sua história', inicio: 'Esta é a sua história.', fim: 'Para além. E sempre!!', abertura: 'A sua Jornada', sou: 'Este sou eu nesta história.', preparando: 'Preparando a narração…' },
+    pt: { pergunta: 'Quer que a sua Jornada vire uma história em quadrinhos?', expl: 'Com a sua selfie, desenhamos um personagem seu. Cada resposta vira um quadro, e no final você assiste ao filme da sua Jornada. A selfie é usada só para isso, e as imagens ficam apenas neste aparelho.', sim: 'Sim, quero', nao: 'Agora não', desenhando: 'Desenhando o seu personagem…', pronto: 'O seu personagem está pronto!', capitulo: 'O seu capítulo em quadrinhos', titulo: 'A sua história em quadrinhos', filme: 'Assistir ao filme da Jornada', baixar: 'Baixar Filme', pagina: 'Baixar página', completando: 'Completando a sua história', inicio: 'Esta é a sua história.', fim: 'Para além. E sempre!!', abertura: 'A sua Jornada', sou: 'Este sou eu nesta história.', preparando: 'Preparando a narração…' },
     en: { pergunta: 'Would you like your Journey to become a comic story?', expl: 'From your selfie we draw your own character. Each answer becomes a panel, and at the end you watch the film of your Journey. The selfie is used only for this, and the images stay only on this device.', sim: 'Yes, please', nao: 'Not now', desenhando: 'Drawing your character…', pronto: 'Your character is ready!', capitulo: 'Your chapter in comics', titulo: 'Your story in comics', filme: 'Watch the film of your Journey', baixar: 'Download the film', pagina: 'Download page', completando: 'Completing your story', inicio: 'This is your story.', fim: 'Beyond. And always!!', abertura: 'Your Journey', sou: 'This is me in this story.', preparando: 'Preparing the narration…' },
     es: { pergunta: '¿Quieres que tu Jornada se convierta en un cómic?', expl: 'Con tu selfie dibujamos tu propio personaje. Cada respuesta se convierte en una viñeta y al final ves la película de tu Jornada. La selfie se usa solo para esto y las imágenes quedan solo en este dispositivo.', sim: 'Sí, quiero', nao: 'Ahora no', desenhando: 'Dibujando tu personaje…', pronto: '¡Tu personaje está listo!', capitulo: 'Tu capítulo en cómic', titulo: 'Tu historia en cómic', filme: 'Ver la película de la Jornada', baixar: 'Descargar la película', pagina: 'Descargar página', completando: 'Completando tu historia', inicio: 'Esta es tu historia.', fim: 'Más allá. ¡¡Y siempre!!', abertura: 'Tu Jornada', sou: 'Este soy yo en esta historia.', preparando: 'Preparando la narración…' },
     fr: { pergunta: 'Voulez-vous que votre Parcours devienne une bande dessinée ?', expl: 'À partir de votre selfie, nous dessinons votre personnage. Chaque réponse devient une case et, à la fin, vous regardez le film de votre Parcours. Le selfie sert uniquement à cela et les images restent sur cet appareil.', sim: 'Oui', nao: 'Pas maintenant', desenhando: 'Dessin de votre personnage…', pronto: 'Votre personnage est prêt !', capitulo: 'Votre chapitre en BD', titulo: 'Votre histoire en BD', filme: 'Regarder le film du Parcours', baixar: 'Télécharger le film', pagina: 'Télécharger la page', completando: 'Votre histoire se complète', inicio: 'Voici votre histoire.', fim: 'Au-delà. Et toujours !!', abertura: 'Votre Parcours', sou: 'Me voici dans cette histoire.', preparando: 'Préparation de la narration…' },
@@ -331,29 +331,27 @@
     const a = document.createElement('a'); a.href = c.toDataURL('image/jpeg', 0.9); a.download = titulo.replace(/[^\p{L}\p{N}]+/gu, '-').toLowerCase() + '.jpg'; a.click();
   }
 
-  // ---------------- tela final ----------------
+  // ---------------- tela final: um botão junto do PDF e do SelfieCard ----------------
   async function montarFinal() {
     if (!ATIVO || !consentiu()) return;
-    const sec = document.getElementById('section-final'); if (!sec || sec.querySelector('.iclq-final')) return;
+    const sec = document.getElementById('section-final'); if (!sec || sec.querySelector('#btnFilmeJornada')) return;
     if (!(await avatar())) return;
-    estilos();
-    const box = document.createElement('div'); box.className = 'iclq-final';
-    box.innerHTML = '<h3></h3><div class="iclq-st"></div><div class="iclq-acoes"></div><div class="iclq-pags"></div>';
-    box.querySelector('h3').textContent = t('titulo');
-    const alvo = sec.querySelector('.final-acoes'); (alvo?.parentNode || sec).insertBefore(box, alvo ? alvo.nextSibling : null);
-    const st = box.querySelector('.iclq-st');
-    await completar((n, tot) => { st.textContent = `${t('completando')}: ${n}/${tot}`; });
-    st.textContent = '';
-    const qs = await quadrosEmOrdem(); const av = await avatar();
-    const acoes = box.querySelector('.iclq-acoes');
-    const b1 = document.createElement('button'); b1.className = 'iclq-bt'; b1.type = 'button'; b1.textContent = t('filme');
-    const b2 = document.createElement('button'); b2.className = 'iclq-bt sec'; b2.type = 'button'; b2.textContent = t('baixar');
-    acoes.append(b1, b2);
-    b1.onclick = () => filme(false, [b1, b2]); b2.onclick = () => filme(true, [b1, b2]);
-    const blocos = []; qs.forEach((q) => { let b = blocos.find((x) => x.id === q.blocoId); if (!b) blocos.push(b = { id: q.blocoId, titulo: q.blocoTitulo || q.blocoId, itens: [] }); b.itens.push(q); });
-    if (blocos[0] && av) blocos[0].itens.unshift({ imagem: av, legenda: t('sou') });
-    const pags = box.querySelector('.iclq-pags');
-    blocos.forEach((b) => { const bt = document.createElement('button'); bt.className = 'iclq-bt sec'; bt.type = 'button'; bt.textContent = `${t('pagina')}: ${b.titulo}`; bt.onclick = () => baixarPagina(b.titulo, b.itens); pags.appendChild(bt); });
+    const acoes = sec.querySelector('.final-acoes'); if (!acoes) return;
+    const modelo = acoes.querySelector('#btnBaixarSelfie') || acoes.querySelector('button');
+    const bt = document.createElement('button');
+    bt.id = 'btnFilmeJornada'; bt.type = 'button';
+    if (modelo) bt.className = modelo.className;
+    bt.textContent = t('baixar');
+    const ref = acoes.querySelector('#btnVoltarPortal');
+    acoes.insertBefore(bt, ref || null);
+    bt.onclick = async () => {
+      const rotulo = t('baixar');
+      bt.disabled = true;
+      try {
+        await completar((n, tot) => { bt.textContent = `${t('completando')} ${n}/${tot}`; });
+      } finally { bt.textContent = rotulo; }
+      await filme(true, [bt]);   // passa o filme e, no fim, baixa o arquivo
+    };
   }
   document.addEventListener('section:shown', (e) => { const id = e.detail?.sectionId || e.detail; if (id === 'section-final') setTimeout(montarFinal, 1500); });
 

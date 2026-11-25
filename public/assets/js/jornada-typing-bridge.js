@@ -1309,22 +1309,27 @@ function waitTransitionThen(fn) {
     typingLog('Transição ativa — typing em espera…');
 
     return new Promise((resolve) => {
+      // Roda a digitação/fala UMA vez só (antes a segurança de 20 s repetia).
+      let feito = false;
+      let seguranca = null;
+      const executar = () => {
+        if (feito) return;
+        feito = true;
+        clearTimeout(seguranca);
+        document.removeEventListener('transition:ended',    onEnd, true);
+        window.removeEventListener('jornada:transicao:end', onEnd, true);
+        resolve(fn());
+      };
       const onEnd = () => {
-        document.removeEventListener('transition:ended',      onEnd, true);
-        window.removeEventListener('jornada:transicao:end',   onEnd, true);
         // pequena pausa para a página renderizar antes de digitar
-        setTimeout(() => resolve(fn()), 150);
+        setTimeout(executar, 150);
       };
 
       document.addEventListener('transition:ended',    onEnd, { once: true, capture: true });
       window.addEventListener('jornada:transicao:end', onEnd, { once: true, capture: true });
 
       // Segurança: se o evento nunca chegar, libera após 20s
-      setTimeout(() => {
-        document.removeEventListener('transition:ended',    onEnd, true);
-        window.removeEventListener('jornada:transicao:end', onEnd, true);
-        resolve(fn());
-      }, 20000);
+      seguranca = setTimeout(executar, 20000);
     });
   }
 
