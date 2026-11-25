@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Laboratório • A sua história em quadrinhos</title>
+<style>
+  :root{--fundo:#0d1424;--papel:#f6ecd6;--tinta:#2b2116;--ouro:#e0a84a;--azul:#1d2c4a;--muted:#a9b3c7}
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(circle at 50% 0,#22345c,var(--fundo) 60%);color:#eef2fa;font-family:Georgia,"Times New Roman",serif;min-height:100vh}
+  header{text-align:center;padding:28px 16px 8px}
+  header h1{margin:0;font-size:clamp(24px,4vw,36px);color:var(--ouro);letter-spacing:.5px}
+  header p{margin:6px 0 0;color:var(--muted);font-family:system-ui,sans-serif;font-size:14px}
+  .selo{display:inline-block;margin-top:10px;padding:4px 10px;border:1px solid var(--ouro);border-radius:999px;color:var(--ouro);font:600 12px system-ui,sans-serif;letter-spacing:.6px}
+  main{max-width:980px;margin:0 auto;padding:16px}
+  .cartao{background:var(--papel);color:var(--tinta);border-radius:14px;padding:22px;margin:16px 0;box-shadow:0 10px 40px #0007}
+  .cartao h2{margin:0 0 10px;font-size:22px}
+  .cartao p{line-height:1.55}
+  label{font-family:system-ui,sans-serif;font-size:14px}
+  input[type=password],textarea{width:100%;padding:10px 12px;border:1px solid #c9b48a;border-radius:10px;font:16px system-ui,sans-serif;background:#fffaf0}
+  textarea{min-height:110px;resize:vertical}
+  .botao{appearance:none;border:0;border-radius:999px;background:var(--ouro);color:#22170a;font:700 15px system-ui,sans-serif;padding:12px 22px;cursor:pointer;margin-top:12px}
+  .botao.secundario{background:transparent;border:1px solid var(--tinta);color:var(--tinta)}
+  .botao:disabled{opacity:.5;cursor:wait}
+  .linha{display:flex;gap:18px;flex-wrap:wrap;align-items:center}
+  .foto{width:180px;height:180px;border-radius:14px;object-fit:cover;background:#e9dcc0;border:2px dashed #c9b48a}
+  .status{font:14px system-ui,sans-serif;color:#7a5a20;margin-top:8px;min-height:20px}
+  .erro{color:#a3261b}
+  .pergunta{font-size:19px;font-weight:600;margin:6px 0 12px}
+  .bloco{font:700 12px system-ui,sans-serif;letter-spacing:1px;text-transform:uppercase;color:#8a6a2a}
+  .pagina{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+  .quadro{background:#fff;border:3px solid #1a1410;border-radius:6px;overflow:hidden;display:flex;flex-direction:column}
+  .quadro img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:#ddd}
+  .quadro .leg{padding:10px 12px;font-size:15px;font-style:italic;border-top:3px solid #1a1410;background:#fff8e6;min-height:54px}
+  .carregando{aspect-ratio:4/3;display:grid;place-items:center;background:repeating-linear-gradient(45deg,#efe3c6,#efe3c6 10px,#f6ecd6 10px,#f6ecd6 20px);font:14px system-ui,sans-serif;color:#7a5a20}
+  .oculto{display:none!important}
+  #tela{width:100%;aspect-ratio:16/9;background:#000;border-radius:12px;display:block}
+  .custo{font:13px system-ui,sans-serif;color:var(--muted);text-align:center;margin:10px 0 30px}
+  .aviso{font:13px system-ui,sans-serif;background:#fff3d6;border-left:4px solid var(--ouro);padding:10px 12px;border-radius:8px}
+</style>
+</head>
+<body>
+<header>
+  <h1>A sua história em quadrinhos</h1>
+  <p>Protótipo da Irmandade Conhecimento com Luz — cada resposta vira um quadro, e o fim vira um mini filme.</p>
+  <span class="selo">LABORATÓRIO • SÓ PARA TESTES</span>
+</header>
+<main>
+  <!-- Chave -->
+  <section class="cartao" id="s-chave">
+    <h2>Acesso do laboratório</h2>
+    <p>Use a mesma chave administrativa do Painel da Irmandade. Se você entrou no painel neste navegador, ela já vem preenchida.</p>
+    <input type="password" id="chave" placeholder="Chave administrativa" autocomplete="off" />
+    <button class="botao" id="b-chave">Entrar</button>
+    <div class="status" id="st-chave"></div>
+  </section>
+
+  <!-- Selfie -->
+  <section class="cartao oculto" id="s-selfie">
+    <h2>1. A selfie vira o seu personagem</h2>
+    <div class="linha">
+      <img class="foto" id="selfie-prev" alt="Selfie" />
+      <img class="foto oculto" id="avatar-prev" alt="Personagem" />
+    </div>
+    <p><input type="file" id="selfie" accept="image/*" capture="user" /></p>
+    <p class="aviso">A selfie é usada só para desenhar o seu personagem. Nada fica gravado no servidor: a foto, o personagem e os quadros ficam apenas neste navegador e somem ao fechar a página.</p>
+    <label><input type="checkbox" id="consent" /> Autorizo o uso da minha selfie para criar o personagem.</label><br />
+    <button class="botao" id="b-avatar" disabled>Criar meu personagem</button>
+    <button class="botao secundario oculto" id="b-seguir">Gostei, seguir para as perguntas</button>
+    <div class="status" id="st-avatar"></div>
+  </section>
+
+  <!-- Perguntas -->
+  <section class="cartao oculto" id="s-perg">
+    <h2>2. Responda, e a história vai se desenhando</h2>
+    <div class="bloco" id="p-bloco"></div>
+    <div class="pergunta" id="p-texto"></div>
+    <textarea id="p-resp" placeholder="Escreva com calma..."></textarea>
+    <button class="botao" id="b-resp">Responder</button>
+    <div class="status" id="st-perg"></div>
+  </section>
+
+  <!-- Página em quadrinhos -->
+  <section class="cartao oculto" id="s-pagina">
+    <h2>A sua página</h2>
+    <div class="pagina" id="pagina"></div>
+    <div class="linha">
+      <button class="botao oculto" id="b-filme">Assistir ao mini filme</button>
+      <button class="botao secundario oculto" id="b-baixar">Baixar o filme</button>
+      <button class="botao secundario oculto" id="b-pagina">Baixar a página</button>
+    </div>
+    <div class="status" id="st-filme"></div>
+    <canvas id="tela" width="1280" height="720" class="oculto"></canvas>
+  </section>
+  <p class="custo" id="custo"></p>
+</main>
+
+<script>
+(function(){
+  const qs=new URLSearchParams(location.search);
+  const API=(qs.get('api')||'https://lumen-backend-api.onrender.com').replace(/\/$/,'');
+  const $=s=>document.querySelector(s);
+  const PERGUNTAS=[
+    {bloco:'Bloco 1 — Raízes',texto:'Pensando naquela criança que você foi: do que ela mais precisava e talvez não tenha recebido na medida certa?'},
+    {bloco:'Bloco 2 — Reflexões',texto:'Hoje, quando algo te faz sentir rejeitado, criticado ou ameaçado, qual costuma ser sua reação mais automática — antes mesmo de pensar?'},
+    {bloco:'Bloco 3 — Crescimento',texto:'Se pudesse largar hoje, sem nenhum risco, uma única forma de se proteger, qual seria — e quem você acha que poderia ser sem ela?'}
+  ];
+  const S={chave:'',selfie:'',avatar:'',i:0,quadros:[],imagens:0,gravando:false};
+
+  function mostra(id){$(id).classList.remove('oculto')}
+  function esconde(id){$(id).classList.add('oculto')}
+  function st(id,t,erro){const e=$(id);e.textContent=t||'';e.classList.toggle('erro',!!erro)}
+  function custo(){const us=S.imagens*0.04;$('#custo').textContent=S.imagens?`Imagens geradas neste teste: ${S.imagens} · custo estimado ≈ US$ ${us.toFixed(2)}`:''}
+
+  async function post(rota,corpo){
+    const r=await fetch(API+'/api/quadrinhos'+rota,{method:'POST',headers:{'Content-Type':'application/json','X-Admin-Secret':S.chave},body:JSON.stringify(corpo)});
+    let d={};try{d=await r.json()}catch(_){}
+    if(!r.ok)throw new Error(d.detail||('HTTP '+r.status));
+    return d;
+  }
+
+  // ---------- chave ----------
+  try{$('#chave').value=sessionStorage.getItem('ICL_ADMIN_SECRET_SESSION')||''}catch(_){}
+  $('#b-chave').onclick=async()=>{
+    S.chave=$('#chave').value.trim(); if(!S.chave){st('#st-chave','Informe a chave.',1);return}
+    st('#st-chave','Conferindo...');
+    try{
+      const r=await fetch(API+'/api/quadrinhos/status',{headers:{'X-Admin-Secret':S.chave}});
+      const d=await r.json().catch(()=>({}));
+      if(!r.ok)throw new Error(d.detail||('HTTP '+r.status));
+      if(!d.chave_gemini)throw new Error('A chave do Gemini não está configurada no servidor.');
+      esconde('#s-chave'); mostra('#s-selfie');
+    }catch(e){st('#st-chave',e.message,1)}
+  };
+
+  // ---------- selfie ----------
+  function reduz(file,max=768){return new Promise((ok,erro)=>{const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,max/Math.max(im.width,im.height));const c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);ok(c.toDataURL('image/jpeg',0.86))};im.onerror=erro;im.src=fr.result};fr.onerror=erro;fr.readAsDataURL(file)})}
+  function libera(){$('#b-avatar').disabled=!(S.selfie&&$('#consent').checked)}
+  $('#selfie').onchange=async e=>{const f=e.target.files[0];if(!f)return;S.selfie=await reduz(f);$('#selfie-prev').src=S.selfie;libera()};
+  $('#consent').onchange=libera;
+  $('#b-avatar').onclick=async()=>{
+    $('#b-avatar').disabled=true; st('#st-avatar','Desenhando o seu personagem... (cerca de 15 a 30 segundos)');
+    try{
+      const d=await post('/avatar',{selfie:S.selfie,consentimento:true});
+      S.avatar=d.imagem; S.imagens++; custo();
+      $('#avatar-prev').src=S.avatar; mostra('#avatar-prev'); mostra('#b-seguir');
+      $('#b-avatar').textContent='Desenhar de novo'; st('#st-avatar','Pronto! Se não gostar, peça para desenhar de novo.');
+    }catch(e){st('#st-avatar',e.message,1)}
+    $('#b-avatar').disabled=false;
+  };
+  $('#b-seguir').onclick=()=>{esconde('#s-selfie');mostra('#s-perg');mostra('#s-pagina');pergunta()};
+
+  // ---------- perguntas ----------
+  function pergunta(){const p=PERGUNTAS[S.i];$('#p-bloco').textContent=p.bloco;$('#p-texto').textContent=p.texto;$('#p-resp').value='';$('#p-resp').focus()}
+  function novoQuadro(i){const el=document.createElement('div');el.className='quadro';el.innerHTML=`<div class="carregando">Desenhando o quadro ${i+1}...</div><div class="leg"></div>`;$('#pagina').appendChild(el);return el}
+  $('#b-resp').onclick=()=>{
+    const resp=$('#p-resp').value.trim(); if(resp.length<3){st('#st-perg','Escreva um pouco mais.',1);return}
+    st('#st-perg','');
+    const i=S.i, p=PERGUNTAS[i], el=novoQuadro(i);
+    S.quadros[i]={pendente:true};
+    post('/cena',{avatar:S.avatar,pergunta:p.texto,resposta:resp,idioma:'pt-BR',indice:i+1,total:PERGUNTAS.length})
+      .then(d=>{S.imagens++;custo();S.quadros[i]={imagem:d.imagem,legenda:d.legenda||''};el.innerHTML=`<img alt="Quadro ${i+1}"><div class="leg"></div>`;el.querySelector('img').src=d.imagem;el.querySelector('.leg').textContent=d.legenda||''})
+      .catch(e=>{S.quadros[i]={erro:e.message};el.innerHTML=`<div class="carregando">Não foi possível desenhar: ${e.message}</div><div class="leg"></div>`})
+      .finally(fim);
+    S.i++;
+    if(S.i<PERGUNTAS.length){pergunta()}else{esconde('#s-perg');st('#st-filme','Terminando de desenhar os últimos quadros...')}
+  };
+  function fim(){
+    if(S.i<PERGUNTAS.length)return;
+    if(S.quadros.length<PERGUNTAS.length||S.quadros.some(q=>!q||q.pendente))return;
+    st('#st-filme','');
+    if(S.quadros.some(q=>q.imagem)){mostra('#b-filme');mostra('#b-baixar');mostra('#b-pagina')}
+  }
+
+  // ---------- mini filme ----------
+  const tela=$('#tela'), cx=tela.getContext('2d');
+  function carrega(src){return new Promise((ok,erro)=>{const im=new Image();im.onload=()=>ok(im);im.onerror=erro;im.src=src})}
+  async function voz(ctx,texto){
+    if(!texto)return null;
+    try{
+      const r=await fetch(API+'/api/tts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:texto,guide:'lumen',lang:'pt-BR'})});
+      if(!r.ok)return null;
+      return await ctx.decodeAudioData(await r.arrayBuffer());
+    }catch(_){return null}
+  }
+  function quebra(t,larg){const p=t.split(' ');const l=[];let a='';for(const w of p){const n=a?a+' '+w:w;if(cx.measureText(n).width>larg&&a){l.push(a);a=w}else a=n}if(a)l.push(a);return l}
+  function desenha(im,t,legenda,alfa){
+    const W=tela.width,H=tela.height;cx.globalAlpha=1;cx.fillStyle='#000';cx.fillRect(0,0,W,H);
+    if(im){const k=1.02+0.12*t;const r=Math.max(W/im.width,H/im.height)*k;const w=im.width*r,h=im.height*r;const dx=(W-w)/2+(t-0.5)*40,dy=(H-h)/2-(t-0.5)*20;cx.globalAlpha=alfa;cx.drawImage(im,dx,dy,w,h)}
+    cx.globalAlpha=alfa;
+    if(legenda){cx.font='italic 38px Georgia, serif';const ls=quebra(legenda,W-200);const bh=ls.length*50+40;cx.fillStyle='rgba(10,14,26,.62)';cx.fillRect(0,H-bh-30,W,bh);cx.fillStyle='#fdf3dc';cx.textAlign='center';ls.forEach((l,i)=>cx.fillText(l,W/2,H-bh-30+58+i*50))}
+    cx.globalAlpha=1;
+  }
+  function telaTexto(t1,t2,alfa){const W=tela.width,H=tela.height;cx.fillStyle='#070b14';cx.fillRect(0,0,W,H);cx.globalAlpha=alfa;cx.textAlign='center';cx.fillStyle='#e0a84a';cx.font='bold 56px Georgia, serif';cx.fillText(t1,W/2,H/2-10);cx.fillStyle='#cfd6e6';cx.font='italic 30px Georgia, serif';cx.fillText(t2,W/2,H/2+50);cx.globalAlpha=1}
+  function anima(dur,quadro){return new Promise(ok=>{const t0=performance.now();(function f(){const t=Math.min(1,(performance.now()-t0)/dur);const fade=Math.min(1,t*dur/700,(1-t)*dur/700);quadro(t,Math.max(0,fade));if(t<1)requestAnimationFrame(f);else ok()})()})}
+
+  async function filme(gravar){
+    if(S.gravando)return; S.gravando=true;
+    ['#b-filme','#b-baixar','#b-pagina'].forEach(b=>$(b).disabled=true);
+    mostra('#tela'); tela.scrollIntoView({behavior:'smooth',block:'center'});
+    st('#st-filme','Preparando a narração...');
+    const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const destino=ctx.createMediaStreamDestination();
+    const cenas=[{im:await carrega(S.avatar),leg:'Esta é a sua história.'}];
+    for(const q of S.quadros) if(q&&q.imagem) cenas.push({im:await carrega(q.imagem),leg:q.legenda});
+    const vozes=await Promise.all(cenas.map(c=>voz(ctx,c.leg)));
+    let rec=null,partes=[];
+    if(gravar&&window.MediaRecorder){
+      const fluxo=new MediaStream([...tela.captureStream(30).getVideoTracks(),...destino.stream.getAudioTracks()]);
+      const tipo=['video/mp4','video/webm;codecs=vp9,opus','video/webm'].find(t=>MediaRecorder.isTypeSupported(t))||'';
+      rec=new MediaRecorder(fluxo,tipo?{mimeType:tipo}:undefined); rec.ondataavailable=e=>e.data.size&&partes.push(e.data); rec.start();
+    }
+    st('#st-filme','');
+    await anima(2600,(t,a)=>telaTexto('A sua Jornada','Irmandade Conhecimento com Luz',a));
+    for(let i=0;i<cenas.length;i++){
+      const buf=vozes[i]; let dur=6000;
+      if(buf){dur=Math.max(5000,buf.duration*1000+1400);const src=ctx.createBufferSource();src.buffer=buf;src.connect(ctx.destination);src.connect(destino);setTimeout(()=>src.start(),500)}
+      await anima(dur,(t,a)=>desenha(cenas[i].im,t,cenas[i].leg,a));
+    }
+    await anima(3000,(t,a)=>telaTexto('Para além. E sempre!!','O seu caminho continua na Jornada Essencial',a));
+    if(rec){await new Promise(ok=>{rec.onstop=ok;rec.stop()});const blob=new Blob(partes,{type:rec.mimeType||'video/webm'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='minha-jornada.'+((rec.mimeType||'').includes('mp4')?'mp4':'webm');a.click()}
+    ctx.close(); S.gravando=false;
+    ['#b-filme','#b-baixar','#b-pagina'].forEach(b=>$(b).disabled=false);
+  }
+  $('#b-filme').onclick=()=>filme(false);
+  $('#b-baixar').onclick=()=>filme(true);
+
+  // ---------- página em PNG ----------
+  $('#b-pagina').onclick=async()=>{
+    const qs2=S.quadros.filter(q=>q&&q.imagem); const W=1240,M=40,G=24,cw=(W-2*M-G)/2,ch=cw*0.75,lh=90;
+    const linhas=Math.ceil((qs2.length+1)/2); const H=160+linhas*(ch+lh+G)+M;
+    const c=document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d');
+    g.fillStyle='#f6ecd6';g.fillRect(0,0,W,H);g.fillStyle='#2b2116';g.textAlign='center';g.font='bold 48px Georgia, serif';g.fillText('A minha Jornada',W/2,90);g.font='italic 22px Georgia, serif';g.fillText('Irmandade Conhecimento com Luz',W/2,128);
+    const todos=[{imagem:S.avatar,legenda:'Este sou eu nesta história.'},...qs2];
+    for(let i=0;i<todos.length;i++){const x=M+(i%2)*(cw+G),y=160+Math.floor(i/2)*(ch+lh+G);const im=await carrega(todos[i].imagem);const r=Math.max(cw/im.width,ch/im.height);const w=im.width*r,h=im.height*r;g.save();g.beginPath();g.rect(x,y,cw,ch);g.clip();g.drawImage(im,x+(cw-w)/2,y+(ch-h)/2,w,h);g.restore();g.lineWidth=5;g.strokeStyle='#1a1410';g.strokeRect(x,y,cw,ch+lh);g.fillStyle='#fff8e6';g.fillRect(x+2.5,y+ch,cw-5,lh-2.5);g.beginPath();g.moveTo(x,y+ch);g.lineTo(x+cw,y+ch);g.stroke();g.fillStyle='#2b2116';g.font='italic 21px Georgia, serif';g.textAlign='left';const pal=(todos[i].legenda||'').split(' ');let l='',yy=y+ch+34;for(const p of pal){const n=l?l+' '+p:p;if(g.measureText(n).width>cw-28&&l){g.fillText(l,x+14,yy);yy+=26;l=p}else l=n}g.fillText(l,x+14,yy)}
+    const a=document.createElement('a');a.href=c.toDataURL('image/jpeg',0.92);a.download='minha-pagina.jpg';a.click();
+  };
+})();
+</script>
+</body>
+</html>
