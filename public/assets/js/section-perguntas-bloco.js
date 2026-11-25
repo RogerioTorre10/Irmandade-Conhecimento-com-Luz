@@ -1305,6 +1305,24 @@
     });
 
     setStoredBlockFeedbacks(outros);
+
+    // Quadrinhos: avisa que esta resposta ganhou devolutiva (o desenho é opcional e isolado).
+    try {
+      if (entry?.devolutiva && entry?.resposta) {
+        document.dispatchEvent(new CustomEvent('jornada:devolutiva', {
+          detail: {
+            blocoId,
+            blocoTitulo: bloco?.title || blocoId,
+            qIndex,
+            total: getBlockQuestionsCount(bloco),
+            pergunta: String(entry.pergunta || ''),
+            resposta: String(entry.resposta || ''),
+            devolutiva: String(entry.devolutiva || ''),
+          },
+        }));
+      }
+    } catch {}
+
     return perguntas;
   }
 
@@ -2126,6 +2144,13 @@ function getNomeParticipanteAtual() {
         '[BLOCO] devolutiva concluída. source=',
         result?.source || 'desconhecida'
       );
+
+      // Quadrinhos: o capítulo deste bloco está completo.
+      try {
+        document.dispatchEvent(new CustomEvent('jornada:devolutiva-bloco', {
+          detail: { blocoId: bloco?.id || '', blocoTitulo: bloco?.title || bloco?.id || '' },
+        }));
+      } catch {}
 
       // O participante confirma a leitura da devolutiva antes de seguir.
       showBlockNextBtn(section, bloco);
