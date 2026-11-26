@@ -13,7 +13,7 @@ const AJUDA = {
   telegram: 'Automático: crie um robô no @BotFather, adicione-o ao canal como administrador e coloque o token no Render como TELEGRAM_BOT_TOKEN. Em “Configurar”, use o @ do canal.',
   instagram: 'Automático: precisa de conta profissional ligada a uma página do Facebook e de um token da Meta (META_ACCESS_TOKEN). Em “Configurar”, use o ID da conta do Instagram. Enquanto isso, lance os números à mão.',
   facebook: 'Automático: mesmo token da Meta (META_ACCESS_TOKEN). Em “Configurar”, use o ID ou o nome de usuário da página. Enquanto isso, lance os números à mão.',
-  tiktok: 'O TikTok só libera dados para aplicativos aprovados. Lance os números à mão uma vez por semana (ou use o Metricool).',
+  tiktok: 'Coleta automática pela página pública do perfil (sem chave). Se o TikTok bloquear alguma coleta, o painel tenta de novo na hora seguinte; se precisar, lance à mão.',
   kwai: 'O Kwai não tem API pública. Lance os números à mão uma vez por semana.',
 };
 const st = { secret: '', api: '', dados: null, erro: '', aberto: null, dias: 90 };
@@ -75,7 +75,7 @@ function cartao(r) {
     <div class="racoes">${r.url ? `<a class="btn" href="${esc(r.url)}" target="_blank" rel="noopener">Abrir ↗</a>` : ''}<button class="btn" data-abrir="${r.rede}">${aberto ? 'Fechar' : 'Configurar / lançar'}</button></div>
     ${aberto ? `<div class="rform">
       <label>Link do perfil<input class="field" id="rUrl" value="${esc(r.url)}" placeholder="https://..."></label>
-      ${r.automatica ? `<label>Identificador para a coleta automática<input class="field" id="rIdent" value="${esc(r.identificador)}" placeholder="${r.rede === 'youtube' ? '@canal ou UC...' : r.rede === 'telegram' ? '@canal' : 'ID da conta/página'}"></label>` : ''}
+      ${r.automatica ? `<label>Identificador para a coleta automática<input class="field" id="rIdent" value="${esc(r.identificador)}" placeholder="${r.rede === 'youtube' ? '@canal ou UC...' : r.rede === 'telegram' ? '@canal' : r.rede === 'tiktok' ? '@irmandadeluz' : 'ID da conta/página'}"></label>` : ''}
       <button class="btn primary" data-salvar="${r.rede}">Salvar configuração</button>
       <hr style="border:0;border-top:1px solid rgba(255,255,255,.08);margin:12px 0">
       <div class="h" style="margin-bottom:6px">Lançar números de hoje (à mão)</div>
