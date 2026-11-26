@@ -277,7 +277,7 @@
     if (it.devolutiva) {
       f.hidden = true; mostrarDevolutiva(it.devolutiva, false);
     } else {
-      f.hidden = false; $('#qDev').hidden = true;
+      f.hidden = false; $('#qDev').hidden = true; $('#qQuadro').hidden = true;
     }
   }
   function mostrarDevolutiva(txt, animar) {
@@ -290,6 +290,7 @@
     if (animar) digitarParagrafos(caixa, txt);
     else caixa.innerHTML = String(txt).split(/\n+/).filter(Boolean).map((t) => `<p>${t.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]))}</p>`).join('');
     $('#proxima').textContent = (st.idx || 0) >= perguntas.length - 1 ? T('verGeral') : T('proxima');
+    mostrarQuadrinho($('#qQuadro'), st.idx || 0);
   }
   $('#fResp').addEventListener('submit', async (ev) => {
     ev.preventDefault();
@@ -315,8 +316,58 @@
   });
   $('#ouvir').addEventListener('click', () => falar($('#qDevTexto').innerText));
 
+  // ------------------------------------------------------------ quadrinho (um por e-mail)
+  // A imagem fica numa chave própria: se não couber no aparelho, vale só nesta visita.
+  const CHAVE_Q = 'jornada_free_quadrinho';
+  let qImagem = null;
+  try { qImagem = localStorage.getItem(CHAVE_Q); } catch (_) {}
+  const escHtml = (t) => String(t || '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  function figuraQuadrinho(caixa) {
+    caixa.innerHTML = `<p class="q-aviso"><b>${escHtml(T('q_titulo'))}</b></p><figure><img alt=""><figcaption></figcaption></figure>
+      <div class="acoes"><button type="button" class="botao secundario q-baixar"></button></div>`;
+    caixa.querySelector('img').src = qImagem;
+    caixa.querySelector('figcaption').textContent = st.quadrinho.legenda || '';
+    const b = caixa.querySelector('.q-baixar'); b.textContent = T('q_baixar');
+    b.onclick = () => { const a = document.createElement('a'); a.href = qImagem; a.download = 'meu-quadrinho-jornada-free.png'; document.body.appendChild(a); a.click(); a.remove(); };
+  }
+  function mostrarQuadrinho(caixa, i) {
+    if (!caixa) return;
+    const q = st.quadrinho;
+    caixa.hidden = false;
+    if (q && q.imagem && qImagem && (i === null || q.idx === i)) return figuraQuadrinho(caixa);
+    if (i === null) { caixa.hidden = true; return; }   // no final, só aparece se houver quadrinho
+    if (q) {   // já escolheu outra pergunta (ou já usou neste e-mail)
+      caixa.innerHTML = `<p class="q-nota">${T(q.imagem ? 'q_outra' : 'q_usado')}</p>`;
+      return;
+    }
+    caixa.innerHTML = `<p class="q-aviso">${T('q_aviso')}</p>
+      <div class="acoes"><button type="button" class="botao q-pedir"></button></div>
+      <p class="q-nota"></p>`;
+    caixa.querySelector('.q-pedir').textContent = T('q_botao');
+    caixa.querySelector('.q-nota').textContent = st.selfie ? T('q_selfie') : T('q_semSelfie');
+    caixa.querySelector('.q-pedir').onclick = (ev) => pedirQuadrinho(ev.currentTarget, caixa, i);
+  }
+  async function pedirQuadrinho(bt, caixa, i) {
+    const it = (st.itens || [])[i] || {};
+    bt.disabled = true; erro('');
+    esperando(true, T('q_desenhando'));
+    try {
+      const j = await api('/quadrinho', { token: st.token, indice: i, resposta: it.resposta || '', devolutiva: it.devolutiva || '',
+        selfie: st.selfie || null, consentimento: !!st.selfie });
+      qImagem = j.imagem;
+      st.quadrinho = { idx: i, imagem: true, legenda: j.legenda || '' }; gravar();
+      try { localStorage.setItem(CHAVE_Q, j.imagem); } catch (_) {}
+      figuraQuadrinho(caixa);
+    } catch (e) {
+      if (e.status === 401) { st.token = null; gravar(); return ir('acesso'); }
+      if (e.status === 409) { st.quadrinho = { idx: -1, imagem: false }; gravar(); mostrarQuadrinho(caixa, i); return; }
+      erro(e.message); bt.disabled = false;
+    } finally { esperando(false); }
+  }
+
   // ------------------------------------------------------------ final
   async function mostrarFinal() {
+    mostrarQuadrinho($('#fQuadro'), null);
     $('#fQuem').textContent = T('falaComVoce', { g: NOMES[st.guia] || 'Mentor' });
     if (st.final) {
       $('#fDevTexto').innerHTML = st.final.split(/\n+/).filter(Boolean).map((t) => `<p>${t.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]))}</p>`).join('');
@@ -365,7 +416,7 @@
   $$('[data-ir]').forEach((b) => b.addEventListener('click', () => ir(b.dataset.ir)));
   $('#recomecar').addEventListener('click', () => {
     if (!confirm(T('confirmRecomecar'))) return;
-    try { localStorage.removeItem(CHAVE); } catch (_) {}
+    try { localStorage.removeItem(CHAVE); localStorage.removeItem(CHAVE_Q); } catch (_) {}
     location.reload();
   });
 
@@ -373,7 +424,7 @@
   function encerrar() {
     const manter = { lang: st.lang };
     st = manter;
-    try { localStorage.setItem(CHAVE, JSON.stringify(manter)); } catch (_) {}
+    try { localStorage.setItem(CHAVE, JSON.stringify(manter)); localStorage.removeItem(CHAVE_Q); } catch (_) {}
   }
   if (st.concluida) encerrar();
   $$('a.compra').forEach((a) => { a.href = LINK_COMPRA; });

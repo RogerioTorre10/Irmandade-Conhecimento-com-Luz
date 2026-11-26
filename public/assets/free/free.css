@@ -109,3 +109,13 @@ body{background:radial-gradient(ellipse at top,#1a1428 0%,#0a0f1a 60%);color:#f2
   .guia span{text-align:left}
   .grade,.trancado{grid-template-columns:1fr}
 }
+
+/* Quadrinho de degustação (um por e-mail) */
+.quadrinho{margin-top:16px;border:1px dashed rgba(138,100,36,.6);border-radius:14px;padding:14px 16px;background:rgba(255,246,222,.6);text-align:center}
+.quadrinho .q-aviso{margin:0 0 10px;color:var(--tinta-2);line-height:1.5}
+.quadrinho .q-aviso b{color:var(--vinho)}
+.quadrinho .q-nota{font-size:.88em;opacity:.8;margin:8px 0 0}
+.quadrinho figure{margin:0}
+.quadrinho img{width:100%;border-radius:10px;border:1px solid rgba(138,100,36,.5);box-shadow:0 6px 22px rgba(60,40,10,.25);display:block}
+.quadrinho figcaption{font-style:italic;margin:10px 4px 4px;color:var(--tinta-2)}
+.quadrinho .acoes{justify-content:center;flex-wrap:wrap;gap:10px;margin-top:10px}
